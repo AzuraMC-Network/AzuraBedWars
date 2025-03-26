@@ -32,9 +32,9 @@ public class ConnectionPoolHandler {
             }
 
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:mysql://azuramc-database/" + database);
+            config.setJdbcUrl("jdbc:mysql://localhost/" + database);
             config.setUsername("root");
-            config.setPassword("password");
+            config.setPassword("s*6tlO68FnEbyBn4");
             config.addDataSourceProperty("cachePrepStmts", "true");
             config.addDataSourceProperty("prepStmtCacheSize", "250");
             config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

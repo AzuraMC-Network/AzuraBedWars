@@ -4,6 +4,8 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.map.MapData;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.TeamColor;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -18,22 +20,21 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Bed;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.List;
 
 public class Util {
-    public static void spawnALL(AzuraBedWars plugin) {
-        Game game = plugin.getGame();
+    public static void spawnALL(AzuraBedWars main) {
+        Game game = main.getGame();
 
         for (Location loc : game.getMapData().getShopLocations(MapData.ShopType.ITEM)) {
             if (!loc.getChunk().isLoaded()) {
                 loc.getChunk().load();
             }
 
-            spawnVillager(plugin, loc);
+            spawnVillager(main, loc);
         }
 
         for (Location loc : game.getMapData().getShopLocations(MapData.ShopType.UPDATE)) {
@@ -41,7 +42,7 @@ public class Util {
                 loc.getChunk().load();
             }
 
-            spawnVillager2(plugin, loc);
+            spawnVillager2(main, loc);
         }
 
         for (Location loc : game.getMapData().getDropLocations(MapData.DropType.DIAMOND)) {
@@ -83,7 +84,8 @@ public class Util {
         Villager v = l.getWorld().spawn(l, Villager.class);
         v.setCustomNameVisible(false);
         if (v.getType() == EntityType.VILLAGER) {
-            v.setProfession(Villager.Profession.NONE);
+            v.setProfession(Villager.Profession.FARMER);
+//            v.setProfession(Villager.Profession.BLACKSMITH);
         }
 
         v.setMetadata("Shop2", new FixedMetadataValue(main, "Shop2"));
@@ -175,20 +177,40 @@ public class Util {
     }
 
     public static void dropTargetBlock(Block targetBlock) {
-        if (targetBlock.getType().equals(Material.RED_BED)) {
+        if (isBedBlock(targetBlock)) {
             Block bedHead;
             Block bedFeet;
-            Bed bedBlock = (Bed) targetBlock.getState().getData();
-
-            if (!bedBlock.isHeadOfBed()) {
-                bedFeet = targetBlock;
-                bedHead = getBedNeighbor(bedFeet);
-            } else {
-                bedHead = targetBlock;
-                bedFeet = getBedNeighbor(bedHead);
+            
+            boolean isNewVersion = MaterialUtil.isNewVersion();
+            
+            try {
+                if (isNewVersion) {
+                    org.bukkit.block.data.type.Bed bedBlock = (org.bukkit.block.data.type.Bed) targetBlock.getBlockData();
+                    
+                    if (bedBlock.getPart() == org.bukkit.block.data.type.Bed.Part.FOOT) {
+                        bedFeet = targetBlock;
+                        bedHead = getBedNeighbor(bedFeet);
+                    } else {
+                        bedHead = targetBlock;
+                        bedFeet = getBedNeighbor(bedHead);
+                    }
+                } else {
+                    org.bukkit.material.Bed bedBlock = (org.bukkit.material.Bed) targetBlock.getState().getData();
+                    
+                    if (!bedBlock.isHeadOfBed()) {
+                        bedFeet = targetBlock;
+                        bedHead = getBedNeighbor(bedFeet);
+                    } else {
+                        bedHead = targetBlock;
+                        bedFeet = getBedNeighbor(bedHead);
+                    }
+                }
+                
+                bedHead.setType(Material.AIR);
+                bedFeet.setType(Material.AIR);
+            } catch (Exception e) {
+                targetBlock.setType(Material.AIR);
             }
-
-            bedHead.setType(Material.AIR);
         } else {
             targetBlock.setType(Material.AIR);
         }
@@ -210,8 +232,17 @@ public class Util {
         if (isBed == null) {
             return false;
         }
-
-        return (isBed.getType() == Material.RED_BED || isBed.getType() == Material.RED_BED);
+        
+        if (MaterialUtil.isNewVersion()) {
+            return isBed.getType().name().endsWith("_BED");
+        } else {
+            try {
+                Material bedBlock = Material.valueOf("BED_BLOCK");
+                return (MaterialUtil.BED().equals(isBed.getType()) || bedBlock.equals(isBed.getType()));
+            } catch (IllegalArgumentException e) {
+                return MaterialUtil.BED().equals(isBed.getType());
+            }
+        }
     }
 
     public static void setFlying(Player player) {
@@ -249,4 +280,20 @@ public class Util {
         return new Vector(X, Y, Z);
     }
 
+    public static void setPlayerTeamTab() {
+        Game game = AzuraBedWars.getInstance().getGame();
+
+        for (TeamColor teamColor : TeamColor.values()) {
+            GameTeam gameTeam = game.getTeam(teamColor);
+            if (gameTeam == null) {
+                continue;
+            }
+
+//            gameTeam.getAlivePlayers().forEach(gamePlayer -> {
+//                Player player = gamePlayer.getPlayer();
+//                NametagEdit.getApi().clearNametag(player);
+//                NametagEdit.getApi().setNametag(player, gameTeam.getName() + " ", gamePlayer.getName().equals(gamePlayer.getDisplayname()) ? "" : gamePlayer.getDisplayname());
+//            });
+        }
+    }
 }

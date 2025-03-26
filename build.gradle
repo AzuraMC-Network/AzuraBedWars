@@ -31,6 +31,9 @@ repositories {
     maven {
         url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
     }
+    maven {
+        url = "https://raw.githubusercontent.com/eurotech/kura_addons/mvn-repo/"
+    }
 }
 
 dependencies {
@@ -39,6 +42,10 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.34'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.1.0'
     compileOnly 'me.clip:placeholderapi:2.11.6'
+    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    implementation 'com.zaxxer:HikariCP:6.2.1'
+    // https://mvnrepository.com/artifact/org.apache/org.apache.commons.lang3
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'commons-io:commons-io:2.18.0'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
 }

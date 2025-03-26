@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.database.map;
 
-import cc.i9mc.gameutils.BukkitGameUtils;
+import cc.azuramc.bedwars.AzuraBedWars;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -22,7 +22,7 @@ public class MapDataSQL implements Listener {
     public MapData loadMap(String mapName) {
         MapData mapData = null;
 
-        try (Connection connection = BukkitGameUtils.getInstance().getConnectionPoolHandler().getConnection("bw_data")) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwdata")) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM BWMaps Where MapName=?");
             preparedStatement.setString(1, mapName);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -59,7 +59,7 @@ public class MapDataSQL implements Listener {
         MapData.Location location = null;
         String wordName = null;
 
-        try (Connection connection = BukkitGameUtils.getInstance().getConnectionPoolHandler().getConnection("bw_data")) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwdata")) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM BWConfig Where configKey=?");
             preparedStatement.setString(1, "WaitingMapURL");
             ResultSet resultSet = preparedStatement.executeQuery();

@@ -125,16 +125,54 @@ public class MapData {
                 for (int z = Math.min(pos1.getBlockZ(), pos2.getBlockZ()); z <= Math.max(pos1.getBlockZ(), pos2.getBlockZ()); z++) {
                     Block block = new org.bukkit.Location(pos1.getWorld(), x, y, z).getBlock();
 
-                    if (block.getType() == Material.AIR || block.getType() == Material.RED_BED || block.getType() == Material.GRASS_BLOCK || block.getType() == Material.DEAD_BUSH) {
-                        continue;
+                    if (block != null) {
+                        // 使用版本兼容的方式检查方块类型
+                        if (isSkippableBlock(block)) {
+                            continue;
+                        }
+                        System.out.println(x + ", " + y + ", " + z);
+                        blocks.add(block.getLocation());
                     }
-                    System.out.println(x + ", " + y + ", " + z);
-                    blocks.add(block.getLocation());
                 }
             }
         }
 
         return blocks;
+    }
+
+    /**
+     * 检查方块是否应该被跳过（不加入到blocks列表中）
+     * 此方法兼容1.8和1.21版本
+     */
+    private boolean isSkippableBlock(Block block) {
+        Material type = block.getType();
+        String typeName = type.name();
+
+        // 检查AIR（空气方块）- 两个版本都有
+        if (type == Material.AIR) {
+            return true;
+        }
+
+        // 检查BED_BLOCK（床方块）
+        // 在1.13+版本中变为BED、RED_BED等
+        if (typeName.equals("BED_BLOCK") || typeName.contains("_BED")) {
+            return true;
+        }
+
+        // 检查LONG_GRASS（长草）
+        // 在1.13+版本中变为GRASS、TALL_GRASS等
+        if (typeName.equals("LONG_GRASS") || typeName.equals("GRASS") ||
+                typeName.equals("TALL_GRASS") || typeName.contains("_GRASS")) {
+            return true;
+        }
+
+        // 检查DEAD_BUSH（枯灌木）
+        // 在1.13+版本中名称保持一致，但为了安全起见使用字符串比较
+        if (typeName.equals("DEAD_BUSH") || typeName.contains("DEAD_BUSH")) {
+            return true;
+        }
+
+        return false;
     }
 
     public boolean hasRegion(org.bukkit.Location location) {
@@ -198,27 +236,32 @@ public class MapData {
         private float yaw;
 
         public org.bukkit.Location toLocation() {
-            return new org.bukkit.Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
+//            return new org.bukkit.Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
+            return new org.bukkit.Location(Bukkit.getWorld("world"), 0.5, 180, 0.5, 0, 180);
         }
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class DropLocation extends Location {
         private DropType dropType;
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class ShopLocation extends Location {
         private ShopType shopType;
     }
 
-    @Data
+    @Getter
+    @Setter
     public class Players {
         private Integer team;
         private Integer min;
     }
 
-    @Data
+    @Getter
+    @Setter
     public class Region {
         private Location pos1;
         private Location pos2;

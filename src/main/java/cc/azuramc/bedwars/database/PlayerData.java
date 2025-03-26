@@ -19,7 +19,6 @@ public class PlayerData {
     private GamePlayer gamePlayer;
     private ModeType modeType;
     private int kills;
-    private int finalKills;
     private int deaths;
     private int destroyedBeds;
     private int wins;
@@ -29,7 +28,7 @@ public class PlayerData {
 
     public PlayerData(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bw_stats_players Where Name=?");
             preparedStatement.setString(1, gamePlayer.getName());
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -37,7 +36,6 @@ public class PlayerData {
             if (resultSet.next()) {
                 this.modeType = ModeType.valueOf(resultSet.getString("Mode"));
                 this.kills = resultSet.getInt("kills");
-                this.finalKills = resultSet.getInt("finalKills");
                 this.deaths = resultSet.getInt("deaths");
                 this.destroyedBeds = resultSet.getInt("destroyedBeds");
                 this.wins = resultSet.getInt("wins");
@@ -45,7 +43,7 @@ public class PlayerData {
                 this.games = resultSet.getInt("games");
             } else {
                 this.modeType = ModeType.DEFAULT;
-                preparedStatement = connection.prepareStatement("INSERT INTO bw_stats_players (Name,Mode,kills,finalKills,deaths,destroyedBeds,wins,loses,games) VALUES (?,?,0,0,0,0,0,0,0)");
+                preparedStatement = connection.prepareStatement("INSERT INTO bw_stats_players (Name,Mode,kills,deaths,destroyedBeds,wins,loses,games) VALUES (?,?,0,0,0,0,0,0)");
                 preparedStatement.setString(1, gamePlayer.getName());
                 preparedStatement.setString(2, ModeType.DEFAULT.toString());
                 preparedStatement.executeUpdate();
@@ -59,7 +57,7 @@ public class PlayerData {
 
     public void asyncLoadShop() {
         fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bw_shop_players Where Name=?");
                 preparedStatement.setString(1, gamePlayer.getName());
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -80,7 +78,7 @@ public class PlayerData {
                     }
                     preparedStatement = connection.prepareStatement("INSERT INTO bw_shop_players (Name,data) VALUES (?,?)");
                     preparedStatement.setString(1, gamePlayer.getName());
-                    preparedStatement.setString(2, string.substring(0, string.length() - 2));
+                    preparedStatement.setString(2, string.toString().substring(0, string.length() - 2));
                 }
 
                 resultSet.close();
@@ -93,7 +91,7 @@ public class PlayerData {
 
     public void saveShops() {
         PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 StringBuilder string = null;
                 for (String s : shopSort) {
                     if (string == null) {
@@ -105,9 +103,7 @@ public class PlayerData {
                 }
 
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_shop_players SET data=? Where Name=?");
-                if (string != null) {
-                    preparedStatement.setString(1, string.substring(0, string.length() - 2));
-                }
+                preparedStatement.setString(1, string.toString().substring(0, string.length() - 2));
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
 
@@ -124,7 +120,7 @@ public class PlayerData {
         }
 
         PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET Mode=? Where Name=?");
                 preparedStatement.setString(1, modeType.toString());
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -141,7 +137,7 @@ public class PlayerData {
     public void addKills() {
         kills += 1;
         PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET kills=? Where Name=?");
                 preparedStatement.setInt(1, kills);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -155,25 +151,13 @@ public class PlayerData {
     }
 
     public void addFinalKills() {
-        finalKills += 1;
-        PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET finalKills=? Where Name=?");
-                preparedStatement.setInt(1, kills);
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        //finalKills += 1;
     }
 
     public void addDeaths() {
         deaths += 1;
         PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET deaths=? Where Name=?");
                 preparedStatement.setInt(1, deaths);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -189,7 +173,7 @@ public class PlayerData {
     public void addDestroyedBeds() {
         destroyedBeds += 1;
         PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET destroyedBeds=? Where Name=?");
                 preparedStatement.setInt(1, destroyedBeds);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -205,7 +189,7 @@ public class PlayerData {
     public void addWins() {
         wins += 1;
         PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET wins=? Where Name=?");
                 preparedStatement.setInt(1, wins);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -221,7 +205,7 @@ public class PlayerData {
     public void addLoses() {
         loses += 1;
         PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET loses=? Where Name=?");
                 preparedStatement.setInt(1, loses);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -238,7 +222,7 @@ public class PlayerData {
     public void addGames() {
         games += 1;
         PlayerData.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bw_stats")) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET games=? Where Name=?");
                 preparedStatement.setInt(1, games);
                 preparedStatement.setString(2, gamePlayer.getName());
