@@ -20,11 +20,6 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,117 +45,47 @@ public final class AzuraBedWars extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
         long time = System.currentTimeMillis();
-        
-        // 初始化连接池
         connectionPoolHandler = new ConnectionPoolHandler();
-        
-        // 注册数据库
-        getConnectionPoolHandler().registerDatabase("bwdata");
-        getConnectionPoolHandler().registerDatabase("bwstats");
-        
-        // 初始化数据库表
-        initDatabase();
-        
-        // 初始化游戏实例
-        game = new Game(this, null);
-        
-        // 设置经济系统
-        setupEconomy();
-        setupChat();
-        
-        // 注册事件监听器
-        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
-        Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ReSpawnListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
-        Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
-        Bukkit.getPluginCommand("start").setExecutor(new StartCommand());
-        Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
-        Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
-        
-        // 加载特殊物品和等级
-        SpecialItem.loadSpecials();
-        loadLevel();
-        
-        // 设置世界属性
-        Bukkit.getWorlds().forEach(world -> {
-            world.setAutoSave(false);
-            world.setDifficulty(Difficulty.NORMAL);
-        });
-        
-        // 注册命令
+
+//        if (getConfig().getBoolean("isUP")) {
+            MapDataSQL mds = new MapDataSQL();
+
+            getConnectionPoolHandler().registerDatabase("bwdata");
+            getConnectionPoolHandler().registerDatabase("bwstats");
+//            game = new Game(this, mds.getWaitingLoc().toLocation());
+            game = new Game(this, null);
+
+            setupEconomy();
+            setupChat();
+
+            Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
+            Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
+            Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+            Bukkit.getPluginManager().registerEvents(new ReSpawnListener(), this);
+            Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+            Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
+            Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
+            Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
+            Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
+            Bukkit.getPluginCommand("start").setExecutor(new StartCommand());
+            Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
+            Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
+            Bukkit.getPluginManager().registerEvents(mds, this);
+
+            SpecialItem.loadSpecials();
+            loadLevel();
+
+
+            Bukkit.getWorlds().forEach(world -> {
+                world.setAutoSave(false);
+                world.setDifficulty(Difficulty.NORMAL);
+            });
+//            return;
+//        }
+
         Bukkit.getPluginCommand("game").setExecutor(new AdminCommand());
-        
+
         Bukkit.getConsoleSender().sendMessage("[AzuraBedWars] 加载完成耗时 " + (System.currentTimeMillis() - time) + " ms");
-    }
-    
-    private void initDatabase() {
-        try {
-            // 使用bwdata数据库执行初始化
-            try (Connection connection = connectionPoolHandler.getConnection("bwdata")) {
-                if (connection == null) {
-                    getLogger().severe("无法连接到bwdata数据库！");
-                    return;
-                }
-                
-                // 创建数据库
-                try (Statement stmt = connection.createStatement()) {
-                    stmt.execute("CREATE DATABASE IF NOT EXISTS bwdata");
-                    stmt.execute("CREATE DATABASE IF NOT EXISTS bwstats");
-                }
-                
-                // 创建表
-                try (Statement stmt = connection.createStatement()) {
-                    // bwdata数据库的表
-                    stmt.execute("USE bwdata");
-                    stmt.execute("CREATE TABLE IF NOT EXISTS BWMaps (" +
-                            "MapName VARCHAR(36) PRIMARY KEY," +
-                            "URL TEXT NOT NULL," +
-                            "Data TEXT NOT NULL" +
-                            ")");
-                    stmt.execute("CREATE TABLE IF NOT EXISTS BWConfig (" +
-                            "configKey VARCHAR(36) PRIMARY KEY," +
-                            "object TEXT NOT NULL" +
-                            ")");
-                    
-                    // bwstats数据库的表
-                    stmt.execute("USE bwstats");
-                    stmt.execute("CREATE TABLE IF NOT EXISTS bw_stats_players (" +
-                            "Name VARCHAR(36) PRIMARY KEY," +
-                            "Mode VARCHAR(20) NOT NULL," +
-                            "kills INT DEFAULT 0," +
-                            "deaths INT DEFAULT 0," +
-                            "destroyedBeds INT DEFAULT 0," +
-                            "wins INT DEFAULT 0," +
-                            "loses INT DEFAULT 0," +
-                            "games INT DEFAULT 0" +
-                            ")");
-                    stmt.execute("CREATE TABLE IF NOT EXISTS bw_shop_players (" +
-                            "Name VARCHAR(36) PRIMARY KEY," +
-                            "data TEXT NOT NULL" +
-                            ")");
-                    stmt.execute("CREATE TABLE IF NOT EXISTS bw_spectator_settings (" +
-                            "Name VARCHAR(36) PRIMARY KEY," +
-                            "speed INT DEFAULT 0," +
-                            "autoTp BOOLEAN DEFAULT FALSE," +
-                            "nightVision BOOLEAN DEFAULT FALSE," +
-                            "firstPerson BOOLEAN DEFAULT TRUE," +
-                            "hideOther BOOLEAN DEFAULT FALSE," +
-                            "fly BOOLEAN DEFAULT FALSE" +
-                            ")");
-                }
-            }
-            
-            getLogger().info("数据库初始化完成");
-            
-        } catch (Exception e) {
-            getLogger().severe("初始化数据库失败：" + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     public void mainThreadRunnable(Runnable runnable) {

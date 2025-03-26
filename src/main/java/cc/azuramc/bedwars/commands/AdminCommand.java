@@ -18,9 +18,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,34 +99,10 @@ public class AdminCommand implements CommandExecutor {
             }
 
             if (strings[0].equalsIgnoreCase("new")) {
-                // 确保数据库和表已创建
-                try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwdata")) {
-                    if (connection == null) {
-                        player.sendMessage("§c无法连接到数据库！");
-                        return true;
-                    }
-                    
-                    // 创建新地图
-                    MapData mapData = new MapData();
-                    mapData.setAuthor(player.getName());
-                    maps.put(strings[1], mapData);
-                    
-                    // 保存到数据库
-                    try (PreparedStatement stmt = connection.prepareStatement(
-                            "INSERT INTO BWMaps (MapName, URL, Data) VALUES (?, ?, ?)")) {
-                        stmt.setString(1, strings[1]);
-                        stmt.setString(2, ""); // 暂时为空，后续保存时更新
-                        stmt.setString(3, new Gson().toJson(mapData));
-                        stmt.executeUpdate();
-                    }
-                    
-                    player.sendMessage("§a地图创建成功！");
-                    return true;
-                } catch (SQLException e) {
-                    player.sendMessage("§c创建地图失败：" + e.getMessage());
-                    e.printStackTrace();
-                    return true;
-                }
+                maps.put(strings[1], new MapData());
+
+                player.sendMessage("地图创建成功!");
+                return true;
             }
 
             if (strings[0].equalsIgnoreCase("setRespawn")) {
