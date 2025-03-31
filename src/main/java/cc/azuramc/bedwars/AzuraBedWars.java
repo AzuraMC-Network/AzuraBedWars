@@ -67,19 +67,20 @@ public final class AzuraBedWars extends JavaPlugin {
         mapManager.preloadAllMaps();
         MapData mapData = mapManager.getMapData("");
         game = new Game(this, mapData);
+        new CommandHandler(this);
 
-        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
-        Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ReSpawnListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
-        Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
-
-        Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
-        Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
+//        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
+//        Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
+//        Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+//        Bukkit.getPluginManager().registerEvents(new ReSpawnListener(), this);
+//        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+//        Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
+//        Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
+//        Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
+//        Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
+//
+//        Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
+//        Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
 
         SpecialItem.loadSpecials();
         loadLevel();
@@ -94,7 +95,7 @@ public final class AzuraBedWars extends JavaPlugin {
 //            return;
 //        }
 
-        new CommandHandler(this);
+
 
         Bukkit.getConsoleSender().sendMessage("[AzuraBedWars] 加载完成耗时 " + (System.currentTimeMillis() - time) + " ms");
     }
