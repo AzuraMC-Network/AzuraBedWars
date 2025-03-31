@@ -37,7 +37,7 @@ public class Util {
             spawnVillager(main, loc);
         }
 
-        for (Location loc : game.getMapData().getShopLocations(MapData.ShopType.UPDATE)) {
+        for (Location loc : game.getMapData().getShopLocations(MapData.ShopType.UPGRADE)) {
             if (!loc.getChunk().isLoaded()) {
                 loc.getChunk().load();
             }

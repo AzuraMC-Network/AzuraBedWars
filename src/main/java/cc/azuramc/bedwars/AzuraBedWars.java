@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars;
 
+import cc.azuramc.bedwars.commands.CommandHandler;
 import cc.azuramc.bedwars.database.map.MapLoader;
 import cc.azuramc.bedwars.listeners.*;
-import cc.azuramc.bedwars.commands.AdminCommand;
-import cc.azuramc.bedwars.commands.StartCommand;
+import cc.azuramc.bedwars.commands.user.StartCommand;
 import cc.azuramc.bedwars.database.map.MapData;
 import cc.azuramc.bedwars.database.map.MapDataSQL;
 import cc.azuramc.bedwars.game.Game;
@@ -88,7 +88,7 @@ public final class AzuraBedWars extends JavaPlugin {
 //            return;
 //        }
 
-        Bukkit.getPluginCommand("game").setExecutor(new AdminCommand());
+        new CommandHandler(this);
 
         Bukkit.getConsoleSender().sendMessage("[AzuraBedWars] 加载完成耗时 " + (System.currentTimeMillis() - time) + " ms");
     }

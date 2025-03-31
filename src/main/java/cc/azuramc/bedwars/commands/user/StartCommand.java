@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.commands;
+package cc.azuramc.bedwars.commands.user;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.Game;

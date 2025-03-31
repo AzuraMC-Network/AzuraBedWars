@@ -13,6 +13,9 @@ public final class CC {
     @Setter
     static boolean usingPlaceholderAPI = false;
 
+    public static final String CHAT_BAR = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH
+            + "------------------------------------------------";
+
     public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         TitleUtil.sendTitle(player, fadeIn, stay, fadeOut, color(title), color(subtitle));
     }

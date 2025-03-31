@@ -220,7 +220,8 @@ public class MapData {
     }
 
     public enum ShopType {
-        ITEM, UPDATE
+        ITEM,
+        UPGRADE
     }
 
     @Data
