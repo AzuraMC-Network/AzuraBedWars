@@ -110,7 +110,6 @@ public class PlayerListener implements Listener {
                         }
                     }
 
-                    player.sendMessage("§4睡你妈逼起来嗨!");
                     event.setCancelled(true);
                     return;
                 }
@@ -154,12 +153,12 @@ public class PlayerListener implements Listener {
                     }
 
                     if (gameTeam.isUnbed()) {
-                        player.sendMessage("§c已使用过回春床了.");
+                        player.sendMessage("§c已使用过回春床了");
                         return;
                     }
 
                     if (!gameTeam.isBedDestroy()) {
-                        player.sendMessage("§c床还在,回啥春呢?");
+                        player.sendMessage("§c床仍然存在 无法使用回春床");
                         return;
                     }
 

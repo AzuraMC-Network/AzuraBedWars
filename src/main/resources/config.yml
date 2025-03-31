@@ -1,2 +1,2 @@
-settingMode: false
-mapsRepositoryPath: /nvme/path/bedWarsMapRepo
+editorMode: "false"
+defaultMapName: "test"

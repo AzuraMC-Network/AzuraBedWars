@@ -124,14 +124,24 @@ public class MapCommand {
     public void addDropLoc(Player player, String mapName, String value) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.addDrop(MapData.DropType.valueOf(value.toUpperCase()), player.getLocation());
-        player.sendMessage(CC.color("&a增加资源掉落点成功!"));
+        switch (MapData.DropType.valueOf(value)) {
+            case BASE -> player.sendMessage(CC.color("&a成功添加基地资源点"));
+            case DIAMOND -> player.sendMessage(CC.color("&a成功添加钻石资源点"));
+            case EMERALD -> player.sendMessage(CC.color("&a成功添加绿宝石资源点"));
+            default -> player.sendMessage(CC.color("&c添加资源点失败"));
+        }
     }
 
     @Subcommand("addShop")
     public void addShop(Player player, String mapName, String value) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        mapData.addShop(MapData.ShopType.valueOf(value.toUpperCase()), player.getLocation());
-        player.sendMessage(CC.color("&a增加商人成功!"));
+        MapData.ShopType shopType = MapData.ShopType.valueOf(value.toUpperCase());
+        mapData.addShop(shopType, player.getLocation());
+        if (shopType == MapData.ShopType.ITEM) {
+            player.sendMessage(CC.color("&a成功设置物品商店!"));
+        } else {
+            player.sendMessage(CC.color("&a成功设置团队升级!"));
+        }
     }
 
     @Subcommand("list")
@@ -217,6 +227,8 @@ public class MapCommand {
         player.sendMessage(CC.color(" &9&l▸ &f地图最小人数: &b" + mapData.getPlayers().getMin()));
         player.sendMessage(CC.color(" &9&l▸ &f队伍最大人数: &b" + mapData.getPlayers().getTeam()));
         player.sendMessage(" ");
+        player.sendMessage(CC.color(" &9&l▸ &fPos1: &b" + mapData.getPos1Location()));
+        player.sendMessage(CC.color(" &9&l▸ &fPos2: &b" + mapData.getPos2Location()));
         player.sendMessage(CC.color(" &9&l▸ &f大厅位置: &b" + mapData.getWaitingLocation()));
         player.sendMessage(CC.color(" &9&l▸ &f基地出生点: &b" + mapData.getBases()));
         player.sendMessage(CC.color(" &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE)));

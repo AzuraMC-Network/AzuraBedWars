@@ -32,20 +32,14 @@ public class FireWorkUtil {
 
     private static Type getRandomType() {
         int type = getRandomNum(5, 1);
-        switch (type) {
-            case 1:
-                return Type.STAR;
-            case 2:
-                return Type.CREEPER;
-            case 3:
-                return Type.BURST;
-            case 4:
-                return Type.BALL_LARGE;
-            case 5:
-                return Type.BALL;
-            default:
-                return Type.STAR;
-        }
+        return switch (type) {
+            case 1 -> Type.STAR;
+            case 2 -> Type.CREEPER;
+            case 3 -> Type.BURST;
+            case 4 -> Type.BALL_LARGE;
+            case 5 -> Type.BALL;
+            default -> Type.STAR;
+        };
     }
 
     private static Color getRandomColor() {

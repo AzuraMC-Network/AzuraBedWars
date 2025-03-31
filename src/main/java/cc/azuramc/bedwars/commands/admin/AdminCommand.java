@@ -28,6 +28,7 @@ public class AdminCommand {
         player.sendMessage(CC.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助"));
         player.sendMessage("");
         player.sendMessage(CC.color("&7 • &f/map &7查看地图相关指令帮助"));
+        player.sendMessage(CC.color("&7 • &f/editorMode true/false &7开关编辑模式"));
         player.sendMessage(CC.color("&7 • &f/bw toWorld <worldName> &7前往世界"));
         player.sendMessage(CC.color("&7 • &f/bw loadWorld <worldName> &7加载世界"));
         player.sendMessage(CC.CHAT_BAR);
@@ -57,6 +58,16 @@ public class AdminCommand {
         player.sendMessage(CC.color("&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式"));
         player.sendMessage(CC.color("&7 • &f/map info <mapName> &7查看地图信息"));
         player.sendMessage(CC.CHAT_BAR);
+    }
+
+    @Subcommand("editorMode")
+    public void editorMode(Player player, boolean value) {
+        if (plugin.getConfig().getBoolean("editorMode") == value) {
+            player.sendMessage("&ceditorMode值已经是 " + value + "了");
+            return;
+        }
+        plugin.getConfig().set("editorMode", value);
+        plugin.saveConfig();
     }
 
     @Subcommand("toWorld")

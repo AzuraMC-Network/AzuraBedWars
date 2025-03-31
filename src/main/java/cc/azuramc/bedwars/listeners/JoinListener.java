@@ -64,12 +64,12 @@ public class JoinListener implements Listener {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         if (gamePlayer == null) {
-            player.kickPlayer("进你个锤子");
+            player.kickPlayer("玩家异常状态");
             return;
         }
         gamePlayer.getPlayerData().asyncLoadShop();
         FastBoard board = new FastBoard(player);
-        board.updateTitle("§e§l超级起床战争");
+        board.updateTitle("§e§l起床战争");
         board.updateLines("Test");
         gamePlayer.setBoard(board);
         game.addPlayer(gamePlayer);
