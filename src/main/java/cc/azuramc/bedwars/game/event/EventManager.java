@@ -30,7 +30,7 @@ public class EventManager extends TimerTask {
         this.registerEvent(new EmeraldUpdateEvent(2, 360, 2));
         this.registerEvent(new DiamondUpdateEvent(3, 360, 3));
         this.registerEvent(new EmeraldUpdateEvent(3, 360, 4));
-        this.registerEvent(new BedBOOMEvent());
+        this.registerEvent(new BedDestroyedEvent());
         this.registerEvent(new OverEvent());
         this.registerEvent(new EndEvent());
     }

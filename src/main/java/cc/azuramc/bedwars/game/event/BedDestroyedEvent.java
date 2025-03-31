@@ -10,8 +10,8 @@ import org.bukkit.block.Block;
 
 import java.lang.reflect.Method;
 
-public class BedBOOMEvent extends GameEvent {
-    public BedBOOMEvent() {
+public class BedDestroyedEvent extends GameEvent {
+    public BedDestroyedEvent() {
         super("床自毁", 360, 5);
     }
 
