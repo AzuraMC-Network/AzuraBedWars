@@ -58,7 +58,7 @@ public class AdminCommand {
     @Subcommand("setWaiting")
     public void setWaiting(Player player) {
         Location location = player.getLocation();
-        MapData.Location rawLocation = new MapData.Location();
+        MapData.RawLocation rawLocation = new MapData.RawLocation();
         rawLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());

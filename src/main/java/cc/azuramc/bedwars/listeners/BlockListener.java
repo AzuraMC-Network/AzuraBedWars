@@ -134,8 +134,8 @@ public class BlockListener implements Listener {
             }
         }
 
-        for (MapData.Location location : game.getMapData().getDrops()) {
-            if (location.toLocation().distance(block.getLocation()) <= 3) {
+        for (MapData.RawLocation rawLocation : game.getMapData().getDrops()) {
+            if (rawLocation.toLocation().distance(block.getLocation()) <= 3) {
                 event.setCancelled(true);
                 return;
             }

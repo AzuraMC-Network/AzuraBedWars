@@ -24,7 +24,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.HumanEntity;
@@ -268,8 +267,8 @@ public class PlayerListener implements Listener {
                     fireball.setMetadata("Game FIREBALL", new FixedMetadataValue(AzuraBedWars.getInstance(), player.getUniqueId()));
                     return;
                 } else if (material == MaterialUtil.WATER_BUCKET()) {
-                    for (MapData.Location location : game.getMapData().getShops()) {
-                        if (location.toLocation().distance(player.getLocation()) <= 5) {
+                    for (MapData.RawLocation rawLocation : game.getMapData().getShops()) {
+                        if (rawLocation.toLocation().distance(player.getLocation()) <= 5) {
                             event.setCancelled(true);
                             return;
                         }

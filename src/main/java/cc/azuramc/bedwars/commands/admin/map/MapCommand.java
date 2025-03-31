@@ -79,7 +79,7 @@ public class MapCommand {
     @Subcommand("{mapName} setPos2")
     public void setPos2(Player player, String mapName) {
         MapData mapData = maps.get(mapName);
-        mapData.setPos1(player.getLocation());
+        mapData.setPos2(player.getLocation());
         player.sendMessage(CC.color("&a设置地图边界 2 成功!"));
     }
 

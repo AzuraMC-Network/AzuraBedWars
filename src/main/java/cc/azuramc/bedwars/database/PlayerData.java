@@ -123,7 +123,7 @@ public class PlayerData {
                     }
                     preparedStatement = connection.prepareStatement("INSERT INTO bw_shop_players (Name,data) VALUES (?,?)");
                     preparedStatement.setString(1, gamePlayer.getName());
-                    preparedStatement.setString(2, string.toString().substring(0, string.length() - 2));
+                    preparedStatement.setString(2, string.substring(0, string.length() - 2));
                 }
 
                 resultSet.close();
@@ -151,7 +151,9 @@ public class PlayerData {
                 }
 
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_shop_players SET data=? Where Name=?");
-                preparedStatement.setString(1, string.toString().substring(0, string.length() - 2));
+                if (string != null) {
+                    preparedStatement.setString(1, string.substring(0, string.length() - 2));
+                }
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
 

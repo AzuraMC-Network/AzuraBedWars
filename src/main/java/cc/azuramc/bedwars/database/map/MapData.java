@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -15,14 +16,14 @@ import java.util.stream.Collectors;
 public class MapData {
     private final Players players;
     private final Region region;
-    private final List<Location> bases;
-    private final List<DropLocation> drops;
-    private final List<ShopLocation> shops;
+    private final List<RawLocation> bases;
+    private final List<DropRawLocation> drops;
+    private final List<ShopRawLocation> shops;
     @Setter
     private transient String name;
     @Setter
     private String author;
-    private Location reSpawn;
+    private RawLocation reSpawn;
 
     public MapData() {
         this.players = new Players();
@@ -32,8 +33,8 @@ public class MapData {
         this.shops = new ArrayList<>();
     }
 
-    public void setReSpawn(org.bukkit.Location location) {
-        Location rawLocation = new Location();
+    public void setReSpawn(Location location) {
+        RawLocation rawLocation = new RawLocation();
         rawLocation.setWorld(location.getWorld().getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
@@ -43,8 +44,8 @@ public class MapData {
         reSpawn = rawLocation;
     }
 
-    public void addBase(org.bukkit.Location location) {
-        Location rawLocation = new Location();
+    public void addBase(Location location) {
+        RawLocation rawLocation = new RawLocation();
         rawLocation.setWorld(location.getWorld().getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
@@ -54,8 +55,8 @@ public class MapData {
         bases.add(rawLocation);
     }
 
-    public void setPos1(org.bukkit.Location location) {
-        Location rawLocation = new Location();
+    public void setPos1(Location location) {
+        RawLocation rawLocation = new RawLocation();
         rawLocation.setWorld(location.getWorld().getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
@@ -65,8 +66,8 @@ public class MapData {
         region.setPos1(rawLocation);
     }
 
-    public void setPos2(org.bukkit.Location location) {
-        Location rawLocation = new Location();
+    public void setPos2(Location location) {
+        RawLocation rawLocation = new RawLocation();
         rawLocation.setWorld(location.getWorld().getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
@@ -76,8 +77,8 @@ public class MapData {
         region.setPos2(rawLocation);
     }
 
-    public void addDrop(DropType dropType, org.bukkit.Location location) {
-        DropLocation dropLocation = new DropLocation();
+    public void addDrop(DropType dropType, Location location) {
+        DropRawLocation dropLocation = new DropRawLocation();
         dropLocation.setWorld(location.getWorld().getName());
         dropLocation.setX(location.getX());
         dropLocation.setY(location.getY());
@@ -88,8 +89,8 @@ public class MapData {
         this.drops.add(dropLocation);
     }
 
-    public void addShop(ShopType shopType, org.bukkit.Location location) {
-        ShopLocation shopLocation = new ShopLocation();
+    public void addShop(ShopType shopType, Location location) {
+        ShopRawLocation shopLocation = new ShopRawLocation();
         shopLocation.setWorld(location.getWorld().getName());
         shopLocation.setX(location.getX());
         shopLocation.setY(location.getY());
@@ -108,22 +109,151 @@ public class MapData {
         return Math.toIntExact(shops.stream().filter((e) -> e.getShopType() == shopType).count());
     }
 
-    public List<org.bukkit.Location> getDropLocations(DropType dropType) {
-        return drops.stream().filter((e) -> e.getDropType() == dropType).map(Location::toLocation).collect(Collectors.toList());
+    public List<Location> getDropLocations(DropType dropType) {
+        return drops.stream().filter((e) -> e.getDropType() == dropType).map(RawLocation::toLocation).collect(Collectors.toList());
     }
 
-    public List<org.bukkit.Location> getShopLocations(ShopType shopType) {
-        return shops.stream().filter((e) -> e.getShopType() == shopType).map(Location::toLocation).collect(Collectors.toList());
+    public List<Location> getShopLocations(ShopType shopType) {
+        return shops.stream().filter((e) -> e.getShopType() == shopType).map(RawLocation::toLocation).collect(Collectors.toList());
     }
 
-    public List<org.bukkit.Location> loadMap() {
-        List<org.bukkit.Location> blocks = new ArrayList<>();
-        org.bukkit.Location pos1 = region.getPos1().toLocation();
-        org.bukkit.Location pos2 = region.getPos2().toLocation();
+    /**
+     * 获取重生点的Bukkit Location对象
+     * @return 地图重生点位置
+     */
+    public Location getReSpawnLocation() {
+        return reSpawn != null ? reSpawn.toLocation() : null;
+    }
+
+    /**
+     * 获取所有基地的Bukkit Location对象列表
+     * @return 地图所有基地位置的列表
+     */
+    public List<Location> getBaseLocations() {
+        return bases.stream().map(RawLocation::toLocation).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取指定索引的基地Bukkit Location对象
+     * @param index 基地索引
+     * @return 指定索引的基地位置，如果索引无效则返回null
+     */
+    public Location getBaseLocation(int index) {
+        return (index >= 0 && index < bases.size()) ? bases.get(index).toLocation() : null;
+    }
+
+    /**
+     * 获取地图区域的第一个点
+     * @return 区域第一个点的Bukkit Location对象
+     */
+    public Location getPos1Location() {
+        return region.getPos1() != null ? region.getPos1().toLocation() : null;
+    }
+
+    /**
+     * 获取地图区域的第二个点
+     * @return 区域第二个点的Bukkit Location对象
+     */
+    public Location getPos2Location() {
+        return region.getPos2() != null ? region.getPos2().toLocation() : null;
+    }
+
+    /**
+     * 获取所有掉落点的Bukkit Location对象列表
+     * @return 地图所有掉落点位置的列表
+     */
+    public List<Location> getAllDropLocations() {
+        return drops.stream().map(RawLocation::toLocation).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取所有商店的Bukkit Location对象列表
+     * @return 地图所有商店位置的列表
+     */
+    public List<Location> getAllShopLocations() {
+        return shops.stream().map(RawLocation::toLocation).collect(Collectors.toList());
+    }
+
+    /**
+     * 删除指定位置的基地
+     * @param location 要删除的基地位置
+     * @return 是否成功删除
+     */
+    public boolean removeBase(Location location) {
+        if (location == null) return false;
+        
+        for (int i = 0; i < bases.size(); i++) {
+            RawLocation base = bases.get(i);
+            Location baseLoc = base.toLocation();
+            if (baseLoc.getBlockX() == location.getBlockX() &&
+                baseLoc.getBlockY() == location.getBlockY() &&
+                baseLoc.getBlockZ() == location.getBlockZ()) {
+                bases.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 删除指定位置的掉落点
+     * @param location 要删除的掉落点位置
+     * @return 是否成功删除
+     */
+    public boolean removeDrop(Location location) {
+        if (location == null) return false;
+        
+        for (int i = 0; i < drops.size(); i++) {
+            RawLocation drop = drops.get(i);
+            Location dropLoc = drop.toLocation();
+            if (dropLoc.getBlockX() == location.getBlockX() &&
+                dropLoc.getBlockY() == location.getBlockY() &&
+                dropLoc.getBlockZ() == location.getBlockZ()) {
+                drops.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 删除指定位置的商店
+     * @param location 要删除的商店位置
+     * @return 是否成功删除
+     */
+    public boolean removeShop(Location location) {
+        if (location == null) return false;
+        
+        for (int i = 0; i < shops.size(); i++) {
+            RawLocation shop = shops.get(i);
+            Location shopLoc = shop.toLocation();
+            if (shopLoc.getBlockX() == location.getBlockX() &&
+                shopLoc.getBlockY() == location.getBlockY() &&
+                shopLoc.getBlockZ() == location.getBlockZ()) {
+                shops.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isValid() {
+        return region.getPos1() != null && 
+               region.getPos2() != null && 
+               reSpawn != null && 
+               !bases.isEmpty() &&
+               players.getTeam() != null &&
+               players.getMin() != null;
+    }
+
+    public List<Location> loadMap() {
+        List<Location> blocks = new ArrayList<>();
+        Location pos1 = region.getPos1().toLocation();
+        Location pos2 = region.getPos2().toLocation();
         for (int x = Math.min(pos1.getBlockX(), pos2.getBlockX()); x <= Math.max(pos1.getBlockX(), pos2.getBlockX()); x++) {
             for (int y = Math.min(pos1.getBlockY(), pos2.getBlockY()); y <= Math.max(pos1.getBlockY(), pos2.getBlockY()); y++) {
                 for (int z = Math.min(pos1.getBlockZ(), pos2.getBlockZ()); z <= Math.max(pos1.getBlockZ(), pos2.getBlockZ()); z++) {
-                    Block block = new org.bukkit.Location(pos1.getWorld(), x, y, z).getBlock();
+                    Block block = new Location(pos1.getWorld(), x, y, z).getBlock();
 
                     // 使用版本兼容的方式检查方块类型
                     if (isSkippableBlock(block)) {
@@ -172,9 +302,9 @@ public class MapData {
         return false;
     }
 
-    public boolean hasRegion(org.bukkit.Location location) {
-        org.bukkit.Location pos1 = region.getPos1().toLocation();
-        org.bukkit.Location pos2 = region.getPos2().toLocation();
+    public boolean hasRegion(Location location) {
+        Location pos1 = region.getPos1().toLocation();
+        Location pos2 = region.getPos2().toLocation();
 
         int x1 = pos1.getBlockX();
         int x2 = pos2.getBlockX();
@@ -199,8 +329,8 @@ public class MapData {
     }
 
     public boolean chunkIsInRegion(double x, double z) {
-        org.bukkit.Location pos1 = region.getPos1().toLocation();
-        org.bukkit.Location pos2 = region.getPos2().toLocation();
+        Location pos1 = region.getPos1().toLocation();
+        Location pos2 = region.getPos2().toLocation();
 
         int x1 = pos1.getBlockX();
         int x2 = pos2.getBlockX();
@@ -225,7 +355,7 @@ public class MapData {
     }
 
     @Data
-    public static class Location {
+    public static class RawLocation {
         private String world;
         private double x;
         private double y;
@@ -233,20 +363,20 @@ public class MapData {
         private float pitch;
         private float yaw;
 
-        public org.bukkit.Location toLocation() {
-            return new org.bukkit.Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
+        public Location toLocation() {
+            return new Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
         }
     }
 
     @Getter
     @Setter
-    public static class DropLocation extends Location {
+    public static class DropRawLocation extends RawLocation {
         private DropType dropType;
     }
 
     @Getter
     @Setter
-    public static class ShopLocation extends Location {
+    public static class ShopRawLocation extends RawLocation {
         private ShopType shopType;
     }
 
@@ -260,7 +390,7 @@ public class MapData {
     @Getter
     @Setter
     public class Region {
-        private Location pos1;
-        private Location pos2;
+        private RawLocation pos1;
+        private RawLocation pos2;
     }
 }

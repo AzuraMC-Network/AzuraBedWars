@@ -55,8 +55,8 @@ public class MapDataSQL implements Listener {
         return mapData;
     }
 
-    public MapData.Location getWaitingLoc() {
-        MapData.Location location = null;
+    public MapData.RawLocation getWaitingLoc() {
+        MapData.RawLocation rawLocation = null;
         String wordName = null;
 
         try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwdata")) {
@@ -86,8 +86,8 @@ public class MapDataSQL implements Listener {
             preparedStatement.setString(1, "WaitingLoc");
             resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                location = GSON.fromJson(resultSet.getString("object"), MapData.Location.class);
-                location.setWorld(wordName);
+                rawLocation = GSON.fromJson(resultSet.getString("object"), MapData.RawLocation.class);
+                rawLocation.setWorld(wordName);
             }
 
             preparedStatement.close();
@@ -96,7 +96,7 @@ public class MapDataSQL implements Listener {
             e.printStackTrace();
         }
 
-        return location;
+        return rawLocation;
     }
 
 }
