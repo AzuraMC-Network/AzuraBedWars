@@ -33,6 +33,7 @@ public class MapCommand {
         player.sendMessage(CC.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置"));
         player.sendMessage("");
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> create &7创建新的地图"));
+        player.sendMessage(CC.color("&7 • &f/bw map <mapName> setWaiting &7设置等待大厅位置"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setAuthor <authorName> &7设置地图作者名"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setTeamPlayers <number> &7设置队伍最大人数"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setMinPlayers <number> &7设置地图最小需要人数"));
@@ -42,6 +43,8 @@ public class MapCommand {
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> addShop <type> &7增加商店 (类型: ITEM/UPGRADE)"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setPos1 &7设置地图边界1"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setPos2 &7设置地图边界2"));
+        player.sendMessage(CC.color("&7 • &f/bw map <mapName> save &7保存地图"));
+        player.sendMessage(CC.color("&7 • &f/bw map <mapName> load &7加载地图配置"));
         player.sendMessage("");
         player.sendMessage(CC.color("&7 • &f/bw map list <type> &7查看指定存储方式地图列表"));
         player.sendMessage(CC.color("&7 • &f/bw map migrate &7迁移所有地图数据存储方式 (类型: JSON/MYSQL)"));
@@ -50,75 +53,82 @@ public class MapCommand {
         player.sendMessage(CC.CHAT_BAR);
     }
 
-    @Subcommand("{mapName} create")
+    @Subcommand("<mapName> create")
     public void createMap(Player player, String mapName) {
         mapManager.getLoadedMaps().put(mapName, new MapData());
     }
 
-    @Subcommand("{mapName} setRespawn")
+    @Subcommand("<mapName> setWaiting")
+    public void setWaiting(Player player, String mapName) {
+        MapData mapData = mapManager.getLoadedMaps().get(mapName);
+        mapData.setWaitingLocation(player.getLocation());
+        player.sendMessage(CC.color("&a地图等待大厅设置成功!"));
+    }
+
+    @Subcommand("<mapName> setRespawn")
     public void setRespawn(Player player, String mapName) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setReSpawn(player.getLocation());
         player.sendMessage(CC.color("&a地图重生点设置成功!"));
     }
 
-    @Subcommand("{mapName} addBase")
+    @Subcommand("<mapName> addBase")
     public void addBase(Player player, String mapName) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.addBase(player.getLocation());
         player.sendMessage(CC.color("&a基地出生点增加成功!"));
     }
 
-    @Subcommand("{mapName} setPos1")
+    @Subcommand("<mapName> setPos1")
     public void setPos1(Player player, String mapName) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setPos1(player.getLocation());
         player.sendMessage(CC.color("&a设置地图边界 1 成功!"));
     }
 
-    @Subcommand("{mapName} setPos2")
+    @Subcommand("<mapName> setPos2")
     public void setPos2(Player player, String mapName) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setPos2(player.getLocation());
         player.sendMessage(CC.color("&a设置地图边界 2 成功!"));
     }
 
-    @Subcommand("{mapName} setRespawn {authorName}")
+    @Subcommand("<mapName> setRespawn {authorName}")
     public void setRespawn(Player player, String mapName, String authorName) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setAuthor(authorName);
         player.sendMessage(CC.color("&a地图作者设置成功!"));
     }
 
-    @Subcommand("{mapName} setTeamPlayers {value}")
+    @Subcommand("<mapName> setTeamPlayers <value>")
     public void setTeamPlayers(Player player, String mapName, int value) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.getPlayers().setTeam(value);
         player.sendMessage(CC.color("&a队伍最大人数设置成功!"));
     }
 
-    @Subcommand("{mapName} setMinPlayers {value}")
+    @Subcommand("<mapName> setMinPlayers <value>")
     public void setMinPlayers(Player player, String mapName, int value) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.getPlayers().setMin(value);
         player.sendMessage(CC.color("&a地图最小人数置成功!"));
     }
 
-    @Subcommand("{mapName} addDropLoc {value}")
+    @Subcommand("<mapName> addDropLoc <value>")
     public void addDropLoc(Player player, String mapName, String value) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.addDrop(MapData.DropType.valueOf(value.toUpperCase()), player.getLocation());
         player.sendMessage(CC.color("&a增加基地掉落点成功!"));
     }
 
-    @Subcommand("{mapName} addShop {value}")
+    @Subcommand("<mapName> addShop <value>")
     public void addShop(Player player, String mapName, String value) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.addShop(MapData.ShopType.valueOf(value.toUpperCase()), player.getLocation());
         player.sendMessage(CC.color("&a增加商人成功!"));
     }
 
-    @Subcommand("list {type}")
+    @Subcommand("list <type>")
     public void list(Player player, String type) {
         MapStorageFactory.StorageType storageType = MapStorageFactory.StorageType.JSON;
 
@@ -142,7 +152,7 @@ public class MapCommand {
         }
     }
 
-    @Subcommand("migrate {sourceType} {targetType} {mapName}")
+    @Subcommand("migrate <sourceType> <targetType> <mapName>")
     public void migrate(Player player, String sourceTypeString, String targetTypeString, String mapName) {
 
         MapStorageFactory.StorageType sourceTypeEnum;
@@ -186,7 +196,7 @@ public class MapCommand {
 
     }
 
-    @Subcommand("info {mapName}")
+    @Subcommand("info <mapName>")
     public void info(Player player, String mapName) {
         MapData mapData = MapStorageFactory.getDefaultStorage().loadMap(mapName);
         if (mapData == null) {
@@ -208,7 +218,7 @@ public class MapCommand {
         player.sendMessage(CC.CHAT_BAR);
     }
 
-    @Subcommand("{mapName} save")
+    @Subcommand("<mapName} save")
     public void save(Player player, String mapName) {
         if (mapManager.saveMapData(mapName)) {
             player.sendMessage(CC.color("&a保存成功!"));
@@ -217,9 +227,9 @@ public class MapCommand {
         player.sendMessage(CC.color("&c地图保存失败!"));
     }
 
-    @Subcommand("{mapName} load")
+    @Subcommand("<mapName} load")
     public void load(Player player, String mapName) {
-        mapManager.loadMapData(mapName);
+        mapManager.getMapData(mapName);
     }
 
 }

@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.commands.admin;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.map.data.MapData;
+import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.utils.CC;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -28,7 +28,7 @@ public class AdminCommand {
         player.sendMessage(CC.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助"));
         player.sendMessage("");
         player.sendMessage(CC.color("&7 • &f/bw map &7查看地图相关指令帮助"));
-        player.sendMessage(CC.color("&7 • &f/bw setWaiting &7设置等待大厅位置"));
+        player.sendMessage(CC.color("&7 • &f/bw loadGame <mapName> &7创建一个新的Game对象"));
         player.sendMessage(CC.color("&7 • &f/bw toWorld <worldName> &7前往世界"));
         player.sendMessage(CC.color("&7 • &f/bw loadWorld <worldName> &7加载世界"));
         player.sendMessage(CC.CHAT_BAR);
@@ -40,6 +40,7 @@ public class AdminCommand {
         player.sendMessage(CC.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置"));
         player.sendMessage("");
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> create &7创建新的地图"));
+        player.sendMessage(CC.color("&7 • &f/bw map <mapName> setWaiting &7设置等待大厅位置"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setAuthor <authorName> &7设置地图作者名"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setTeamPlayers <number> &7设置队伍最大人数"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setMinPlayers <number> &7设置地图最小需要人数"));
@@ -49,24 +50,17 @@ public class AdminCommand {
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> addShop <type> &7增加商店 (类型: ITEM/UPGRADE)"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setPos1 &7设置地图边界1"));
         player.sendMessage(CC.color("&7 • &f/bw map <mapName> setPos2 &7设置地图边界2"));
-        player.sendMessage(CC.color("&7 • &f/bw map <mapName> info &7查看地图信息"));
-        player.sendMessage(CC.color("&7 • &f/bw map <mapName> save &7保存地图数据"));
-        player.sendMessage(CC.color("&7 • &f/bw map <mapName> load &7加载地图数据"));
+        player.sendMessage("");
+        player.sendMessage(CC.color("&7 • &f/bw map list <type> &7查看指定存储方式地图列表"));
+        player.sendMessage(CC.color("&7 • &f/bw map migrate &7迁移所有地图数据存储方式 (类型: JSON/MYSQL)"));
+        player.sendMessage(CC.color("&7 • &f/bw map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式"));
+        player.sendMessage(CC.color("&7 • &f/bw map info <mapName> &7查看地图信息"));
         player.sendMessage(CC.CHAT_BAR);
     }
 
-    @Subcommand("setWaiting")
-    public void setWaiting(Player player) {
-        Location location = player.getLocation();
-        MapData.RawLocation rawLocation = new MapData.RawLocation();
-        rawLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
-        rawLocation.setX(location.getX());
-        rawLocation.setY(location.getY());
-        rawLocation.setZ(location.getZ());
-        rawLocation.setPitch(location.getPitch());
-        rawLocation.setYaw(location.getYaw());
-
-        player.sendMessage("设置等待大厅成功!");
+    @Subcommand("loadGame <mapName>")
+    public void loadGame(Player player, String mapName) {
+        new Game(plugin, plugin.getMapManager().getMapData(mapName));
     }
 
     @Subcommand("toWorld {worldName}")

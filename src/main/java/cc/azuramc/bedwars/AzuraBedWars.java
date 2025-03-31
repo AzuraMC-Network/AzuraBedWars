@@ -55,17 +55,18 @@ public final class AzuraBedWars extends JavaPlugin {
 
         getConnectionPoolHandler().registerDatabase("bwdata");
         getConnectionPoolHandler().registerDatabase("bwstats");
-//            game = new Game(this, mds.getWaitingLoc().toLocation());
 
-        mapManager = new MapManager();
-        game = new Game(this, mapManager.getWaitingLocation());
         new GUIListener(this);
 
         setupEconomy();
         setupChat();
 
-        // 初始化地图存储
         initMapStorage();
+
+        mapManager = new MapManager();
+        mapManager.preloadAllMaps();
+        MapData mapData = mapManager.getMapData("");
+        game = new Game(this, mapData);
 
         Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
         Bukkit.getPluginManager().registerEvents(new QuitListener(), this);

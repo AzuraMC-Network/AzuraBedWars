@@ -1,11 +1,11 @@
 package cc.azuramc.bedwars.map;
 
-import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.map.mysql.MySQLMapStorage;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -38,7 +38,7 @@ public class MapManager {
      * @param mapName 地图名称
      * @return 地图数据对象，如果不存在则返回null
      */
-    public MapData loadMapData(String mapName) {
+    public MapData getMapData(String mapName) {
         // 如果已经加载过，直接返回缓存
         if (loadedMaps.containsKey(mapName)) {
             return loadedMaps.get(mapName);
@@ -137,7 +137,7 @@ public class MapManager {
         
         try {
             // 检查目标目录是否存在，存在则删除
-            File targetDir = new File(mapName);
+            File targetDir = new File(Bukkit.getWorldContainer(), mapName);
             if (targetDir.exists()) {
                 FileUtils.deleteDirectory(targetDir);
             }
@@ -153,6 +153,8 @@ public class MapManager {
             // 设置世界属性
             if (mapWorld != null) {
                 mapWorld.setAutoSave(false);
+                mapWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+                mapWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
                 mapWorld.setGameRuleValue("doMobSpawning", "false");
                 mapWorld.setGameRuleValue("doFireTick", "false");
                 return mapWorld;
@@ -184,7 +186,7 @@ public class MapManager {
         }
         
         // 加载地图数据
-        MapData mapData = loadMapData(mapName);
+        MapData mapData = getMapData(mapName);
         if (mapData == null) {
             return null;
         }
@@ -226,67 +228,5 @@ public class MapManager {
         
         return null;
     }
-    
-    /**
-     * 获取等待大厅的位置
-     * 该方法从配置中获取等待大厅的位置并加载对应的世界
-     * @return 等待大厅的位置，如果不存在则返回null
-     */
-    public org.bukkit.Location getWaitingLocation() {
-        // 从配置中获取等待大厅信息
-        try {
-            if (defaultStorage instanceof MySQLMapStorage) {
-                MySQLMapStorage mysqlStorage = (MySQLMapStorage) defaultStorage;
-                
-                // 获取等待大厅地图URL
-                String worldUrl = null;
-                try (java.sql.Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwdata")) {
-                    java.sql.PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM BWConfig WHERE configKey=?");
-                    preparedStatement.setString(1, "WaitingMapURL");
-                    java.sql.ResultSet resultSet = preparedStatement.executeQuery();
-                    
-                    if (resultSet.next()) {
-                        worldUrl = resultSet.getString("object");
-                    }
-                    
-                    preparedStatement.close();
-                    resultSet.close();
-                }
-                
-                if (worldUrl == null || worldUrl.isEmpty()) {
-                    return null;
-                }
-                
-                // 获取世界名称
-                String worldName = new File(worldUrl).getName();
-                
-                // 加载世界
-                World world = loadMapWorld(worldName, worldUrl);
-                if (world == null) {
-                    return null;
-                }
-                
-                // 获取等待位置
-                try (java.sql.Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwdata")) {
-                    java.sql.PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM BWConfig WHERE configKey=?");
-                    preparedStatement.setString(1, "WaitingLoc");
-                    java.sql.ResultSet resultSet = preparedStatement.executeQuery();
-                    
-                    if (resultSet.next()) {
-                        MapData.RawLocation location = new com.google.gson.Gson().fromJson(resultSet.getString("object"), MapData.RawLocation.class);
-                        location.setWorld(worldName);
-                        return location.toLocation();
-                    }
-                    
-                    preparedStatement.close();
-                    resultSet.close();
-                }
-            }
-        } catch (Exception e) {
-            Bukkit.getLogger().severe("获取等待位置时出错: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return null;
-    }
+
 } 

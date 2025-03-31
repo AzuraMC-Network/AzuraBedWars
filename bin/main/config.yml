@@ -1,3 +1,2 @@
-isUP: false
-updateMap: true
-isDocker: false
+settingMode: false
+mapsRepositoryPath: /nvme/path/bedWarsMapRepo

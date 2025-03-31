@@ -23,7 +23,7 @@ public class MapData {
     private transient String name;
     @Setter
     private String author;
-    private Location waitingLocation;
+    private RawLocation waitingLocation;
     private RawLocation reSpawn;
 
     public MapData() {
@@ -32,6 +32,17 @@ public class MapData {
         this.bases = new ArrayList<>();
         this.drops = new ArrayList<>();
         this.shops = new ArrayList<>();
+    }
+
+    public void setWaitingLocation(Location location) {
+        RawLocation rawLocation = new RawLocation();
+        rawLocation.setWorld(location.getWorld().getName());
+        rawLocation.setX(location.getX());
+        rawLocation.setY(location.getY());
+        rawLocation.setZ(location.getZ());
+        rawLocation.setPitch(location.getPitch());
+        rawLocation.setYaw(location.getYaw());
+        waitingLocation = rawLocation;
     }
 
     public void setReSpawn(Location location) {
