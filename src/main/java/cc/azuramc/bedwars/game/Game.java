@@ -40,25 +40,23 @@ public class Game {
 
     private List<SpecialItem> specialItems;
 
-    public Game(AzuraBedWars main, MapData mapData) {
-        if (mapData != null) {
-            loadGame(mapData);
-            this.main = main;
-            this.forceStart = false;
-            this.gameTeams = new ArrayList<>();
-            this.gameParties = new ArrayList<>();
-
-            this.armorSande = new HashMap<>();
-            this.armorStand = new HashMap<>();
-
-            this.specialItems = new ArrayList<>();
-
-            ItemShopManager.init(this);
-            this.eventManager = new EventManager(this);
-        }
+    public Game(AzuraBedWars main) {
+        this.main = main;
+        this.forceStart = false;
+        this.gameTeams = new ArrayList<>();
+        this.gameParties = new ArrayList<>();
+        this.armorSande = new HashMap<>();
+        this.armorStand = new HashMap<>();
+        this.specialItems = new ArrayList<>();
+        ItemShopManager.init(this);
+        this.eventManager = new EventManager(this);
     }
 
     public void loadGame(MapData mapData) {
+        if (mapData == null) {
+            return;
+        }
+        
         this.mapData = mapData;
         this.blocks = mapData.loadMap();
         this.respawnLocation = mapData.getReSpawn().toLocation();

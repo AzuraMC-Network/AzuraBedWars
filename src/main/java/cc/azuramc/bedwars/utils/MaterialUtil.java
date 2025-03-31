@@ -354,7 +354,7 @@ public class MaterialUtil {
     }
     
     public static Material REDSTONE_COMPARATOR() {
-        return getMaterial("REDSTONE_COMPARATOR", "REDSTONE_COMPARATOR");
+        return getMaterial("COMPARATOR", "REDSTONE_COMPARATOR");
     }
     
     public static Material RED_WOOL() {

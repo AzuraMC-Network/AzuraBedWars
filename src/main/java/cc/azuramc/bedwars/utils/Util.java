@@ -74,7 +74,7 @@ public class Util {
         v.setMetadata("Shop", new FixedMetadataValue(main, "Shop"));
         ab.setGravity(false);
         ab.setVisible(false);
-        ab.setPassenger(v);
+        ab.addPassenger(v);
         spawnArmorStand2(l.add(0.0D, 1.3D, 0.0D), "§b§l物品商人");
     }
 

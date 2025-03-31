@@ -38,7 +38,7 @@ public class MapManager {
      * @param mapName 地图名称
      * @return 地图数据对象，如果不存在则返回null
      */
-    public MapData getMapData(String mapName) {
+    public MapData getAndLoadMapData(String mapName) {
         // 如果已经加载过，直接返回缓存
         if (loadedMaps.containsKey(mapName)) {
             return loadedMaps.get(mapName);
@@ -95,14 +95,7 @@ public class MapManager {
             }
         }
     }
-    
-    /**
-     * 获取所有已加载的地图
-     * @return 地图名称到地图数据的映射
-     */
-    public Map<String, MapData> getLoadedMaps() {
-        return new HashMap<>(loadedMaps);
-    }
+
     
     /**
      * 判断地图数据是否存在
@@ -186,7 +179,7 @@ public class MapManager {
         }
         
         // 加载地图数据
-        MapData mapData = getMapData(mapName);
+        MapData mapData = getAndLoadMapData(mapName);
         if (mapData == null) {
             return null;
         }

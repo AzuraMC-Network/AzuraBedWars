@@ -28,7 +28,6 @@ public class AdminCommand {
         player.sendMessage(CC.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助"));
         player.sendMessage("");
         player.sendMessage(CC.color("&7 • &f/map &7查看地图相关指令帮助"));
-        player.sendMessage(CC.color("&7 • &f/bw loadGame <mapName> &7创建一个新的Game对象"));
         player.sendMessage(CC.color("&7 • &f/bw toWorld <worldName> &7前往世界"));
         player.sendMessage(CC.color("&7 • &f/bw loadWorld <worldName> &7加载世界"));
         player.sendMessage(CC.CHAT_BAR);
@@ -56,11 +55,6 @@ public class AdminCommand {
         player.sendMessage(CC.color("&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式"));
         player.sendMessage(CC.color("&7 • &f/map info <mapName> &7查看地图信息"));
         player.sendMessage(CC.CHAT_BAR);
-    }
-
-    @Subcommand("loadGame")
-    public void loadGame(Player player, String mapName) {
-        new Game(plugin, plugin.getMapManager().getMapData(mapName));
     }
 
     @Subcommand("toWorld")

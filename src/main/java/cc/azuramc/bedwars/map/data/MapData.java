@@ -26,7 +26,8 @@ public class MapData {
     private RawLocation waitingLocation;
     private RawLocation reSpawn;
 
-    public MapData() {
+    public MapData(String mapName) {
+        this.name = mapName;
         this.players = new Players();
         this.region = new Region();
         this.bases = new ArrayList<>();

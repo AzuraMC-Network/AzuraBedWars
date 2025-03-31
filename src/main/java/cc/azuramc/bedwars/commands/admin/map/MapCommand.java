@@ -60,7 +60,7 @@ public class MapCommand {
 
     @Subcommand("create")
     public void createMap(Player player, String mapName) {
-        mapManager.getLoadedMaps().put(mapName, new MapData());
+        mapManager.getLoadedMaps().put(mapName, new MapData(mapName));
         player.sendMessage(CC.color("&a地图创建成功!!"));
     }
 
@@ -124,7 +124,7 @@ public class MapCommand {
     public void addDropLoc(Player player, String mapName, String value) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.addDrop(MapData.DropType.valueOf(value.toUpperCase()), player.getLocation());
-        player.sendMessage(CC.color("&a增加基地掉落点成功!"));
+        player.sendMessage(CC.color("&a增加资源掉落点成功!"));
     }
 
     @Subcommand("addShop")
@@ -204,7 +204,7 @@ public class MapCommand {
 
     @Subcommand("info")
     public void info(Player player, String mapName) {
-        MapData mapData = MapStorageFactory.getDefaultStorage().loadMap(mapName);
+        MapData mapData = mapManager.getAndLoadMapData(mapName);
         if (mapData == null) {
             player.sendMessage(ChatColor.RED + "找不到地图: " + mapName);
             return;
@@ -217,6 +217,7 @@ public class MapCommand {
         player.sendMessage(CC.color(" &9&l▸ &f地图最小人数: &b" + mapData.getPlayers().getMin()));
         player.sendMessage(CC.color(" &9&l▸ &f队伍最大人数: &b" + mapData.getPlayers().getTeam()));
         player.sendMessage(" ");
+        player.sendMessage(CC.color(" &9&l▸ &f大厅位置: &b" + mapData.getWaitingLocation()));
         player.sendMessage(CC.color(" &9&l▸ &f基地出生点: &b" + mapData.getBases()));
         player.sendMessage(CC.color(" &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE)));
         player.sendMessage(CC.color(" &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND)));
@@ -235,7 +236,8 @@ public class MapCommand {
 
     @Subcommand("load")
     public void load(Player player, String mapName) {
-        mapManager.getMapData(mapName);
+        mapManager.getAndLoadMapData(mapName);
+        player.sendMessage(CC.color("&a地图加载成功!"));
     }
 
 }

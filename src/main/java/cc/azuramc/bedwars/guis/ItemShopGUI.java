@@ -225,7 +225,7 @@ public class ItemShopGUI extends CustomGUI {
 
                     player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
                 } else {
-                    player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                    player.playSound(player.getLocation(), SoundUtil.get("ENTITY_ENDERMAN_TELEPORT", "ENTITY_ENDERMAN_TELEPORT"), 30.0F, 1.0F);
                     player.sendMessage("§c没有足够资源购买！");
                     return;
                 }

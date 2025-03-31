@@ -2,7 +2,6 @@ package cc.azuramc.bedwars;
 
 import cc.azuramc.bedwars.commands.CommandHandler;
 import cc.azuramc.bedwars.listeners.*;
-import cc.azuramc.bedwars.commands.user.StartCommand;
 import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.map.MapManager;
 import cc.azuramc.bedwars.map.MapStorageFactory;
@@ -65,22 +64,23 @@ public final class AzuraBedWars extends JavaPlugin {
 
         mapManager = new MapManager();
         mapManager.preloadAllMaps();
-        MapData mapData = mapManager.getMapData("");
-        game = new Game(this, mapData);
+        MapData mapData = mapManager.getAndLoadMapData("test");
+        game = new Game(this);
+        game.loadGame(mapData);
         new CommandHandler(this);
 
-//        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new ReSpawnListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
-//        Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
-//        Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
-//
-//        Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
-//        Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
+        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
+        Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ReSpawnListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
+        Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
+
+        Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
+        Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
 
         SpecialItem.loadSpecials();
         loadLevel();
