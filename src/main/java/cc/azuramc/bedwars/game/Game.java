@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.utils.ItemBuilderUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.map.MapData;
+import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.events.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.game.event.EventManager;
 import cc.azuramc.bedwars.scoreboards.GameBoard;

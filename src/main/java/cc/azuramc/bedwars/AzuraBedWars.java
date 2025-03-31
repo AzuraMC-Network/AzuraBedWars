@@ -1,11 +1,11 @@
 package cc.azuramc.bedwars;
 
 import cc.azuramc.bedwars.commands.CommandHandler;
-import cc.azuramc.bedwars.database.map.MapLoader;
 import cc.azuramc.bedwars.listeners.*;
 import cc.azuramc.bedwars.commands.user.StartCommand;
-import cc.azuramc.bedwars.database.map.MapData;
-import cc.azuramc.bedwars.database.map.MapDataSQL;
+import cc.azuramc.bedwars.map.data.MapData;
+import cc.azuramc.bedwars.map.MapManager;
+import cc.azuramc.bedwars.map.MapStorageFactory;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.scoreboards.GameBoard;
 import cc.azuramc.bedwars.scoreboards.LobbyBoard;
@@ -33,6 +33,8 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter
     private Game game;
     @Getter
+    private MapManager mapManager;
+    @Getter
     @Setter
     private MapData mapData;
     @Getter
@@ -50,41 +52,45 @@ public final class AzuraBedWars extends JavaPlugin {
         connectionPoolHandler = new ConnectionPoolHandler();
 
 //        if (getConfig().getBoolean("isUP")) {
-            MapDataSQL mds = new MapDataSQL();
 
-            getConnectionPoolHandler().registerDatabase("bwdata");
-            getConnectionPoolHandler().registerDatabase("bwstats");
+        getConnectionPoolHandler().registerDatabase("bwdata");
+        getConnectionPoolHandler().registerDatabase("bwstats");
 //            game = new Game(this, mds.getWaitingLoc().toLocation());
-            game = new Game(this, null);
-            new GUIListener(this);
 
-            setupEconomy();
-            setupChat();
+        mapManager = new MapManager();
+        game = new Game(this, mapManager.getWaitingLocation());
+        new GUIListener(this);
 
-            Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
-            Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
-            Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
-            Bukkit.getPluginManager().registerEvents(new ReSpawnListener(), this);
-            Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-            Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
-            Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
-            Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
-            Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
-            Bukkit.getPluginCommand("start").setExecutor(new StartCommand());
-            Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
-            Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
-            Bukkit.getPluginManager().registerEvents(mds, this);
+        setupEconomy();
+        setupChat();
 
-            SpecialItem.loadSpecials();
-            loadLevel();
+        // 初始化地图存储
+        initMapStorage();
+
+        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
+        Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ReSpawnListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
+        Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
+        Bukkit.getPluginCommand("start").setExecutor(new StartCommand());
+
+        Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
+        Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
+
+        SpecialItem.loadSpecials();
+        loadLevel();
 
 
-            Bukkit.getWorlds().forEach(world -> {
-                world.setAutoSave(false);
-                world.setDifficulty(Difficulty.NORMAL);
-            });
+        Bukkit.getWorlds().forEach(world -> {
+            world.setAutoSave(false);
+            world.setDifficulty(Difficulty.NORMAL);
+        });
 
-            getGame().loadGame(MapLoader.loadMapFromJson("map"));
+//            getGame().loadGame(MapLoader.loadMapFromJson("map"));
 //            return;
 //        }
 
@@ -176,6 +182,35 @@ public final class AzuraBedWars extends JavaPlugin {
 
     public void callEvent(Event event) {
         getServer().getPluginManager().callEvent(event);
+    }
+
+    /**
+     * 初始化地图存储系统
+     */
+    private void initMapStorage() {
+        // 加载默认配置到配置文件
+        if (!getConfig().contains("map.storage")) {
+            getConfig().set("map.storage", "JSON");
+            saveConfig();
+        }
+        
+        if (!getConfig().contains("database.maps.name")) {
+            getConfig().set("database.maps.name", "bwdata");
+            saveConfig();
+        }
+        
+        if (!getConfig().contains("database.maps.table")) {
+            getConfig().set("database.maps.table", "BWMaps");
+            saveConfig();
+        }
+        
+        // 确保数据库连接已注册
+        getConnectionPoolHandler().registerDatabase(getConfig().getString("database.maps.name", "bwdata"));
+        
+        // 初始化默认存储
+        MapStorageFactory.getDefaultStorage();
+        
+        getLogger().info("地图存储系统已初始化，使用 " + getConfig().getString("map.storage", "JSON") + " 作为默认存储方式");
     }
 
 }

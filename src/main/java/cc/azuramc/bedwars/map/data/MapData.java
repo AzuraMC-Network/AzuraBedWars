@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.database.map;
+package cc.azuramc.bedwars.map.data;
 
 import lombok.Data;
 import lombok.Getter;
@@ -23,6 +23,7 @@ public class MapData {
     private transient String name;
     @Setter
     private String author;
+    private Location waitingLocation;
     private RawLocation reSpawn;
 
     public MapData() {

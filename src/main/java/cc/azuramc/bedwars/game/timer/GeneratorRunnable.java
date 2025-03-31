@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.game.timer;
 
 import cc.azuramc.bedwars.utils.ItemBuilderUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.map.MapData;
+import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.event.Runnable;
 import cc.azuramc.bedwars.utils.ArmorStandUtil;

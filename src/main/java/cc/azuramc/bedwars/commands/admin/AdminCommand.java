@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.commands.admin;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.map.MapData;
+import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.utils.CC;
 import org.bukkit.*;
 import org.bukkit.entity.Player;

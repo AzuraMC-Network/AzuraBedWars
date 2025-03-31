@@ -5,4 +5,6 @@ authors: [An5w1r_]
 api-version: 1.13
 commands:
   start:
-  game:
+    description: Start a game
+    usage: /<command>
+    permission: azura.bw.user

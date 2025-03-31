@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.listeners;
 
 import cc.azuramc.bedwars.utils.ActionBarUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.map.MapData;
+import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.events.BedwarsDestroyBedEvent;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
