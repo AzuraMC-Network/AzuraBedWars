@@ -173,11 +173,11 @@ public class Game {
     }
 
     public int getMaxPlayers() {
-        return mapData.getBases().size() * mapData.getSettings().getTeamSize();
+        return mapData.getBases().size() * mapData.getPlayers().getTeam();
     }
 
     boolean hasEnoughPlayers() {
-        return GamePlayer.getOnlinePlayers().size() >= mapData.getSettings().getMinPlayers();
+        return GamePlayer.getOnlinePlayers().size() >= mapData.getPlayers().getMin();
     }
 
     public GameTeam getLowestTeam() {

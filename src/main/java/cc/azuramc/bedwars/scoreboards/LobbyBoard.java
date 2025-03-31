@@ -49,7 +49,7 @@ public class LobbyBoard implements Listener {
             List<String> lines = new ArrayList<>();
             lines.add("");
             lines.add("§f地图: §a" + game.getMapData().getName());
-            lines.add("§f队伍: §a" + game.getMapData().getSettings().getTeamSize() + "人 " + game.getGameTeams().size() + "队");
+            lines.add("§f队伍: §a" + game.getMapData().getPlayers().getTeam() + "人 " + game.getGameTeams().size() + "队");
             lines.add("§f作者: §a" + game.getMapData().getAuthor());
             lines.add("");
             lines.add("§f玩家: §a" + GamePlayer.getOnlinePlayers().size() + "/" + game.getMaxPlayers());
