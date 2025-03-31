@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.utils.FireWorkUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.listeners.ChunkListener;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -81,14 +82,17 @@ public class GameOverRunnable extends BukkitRunnable {
         }
 
         if (this.counter == 0) {
-//            Bukkit.getOnlinePlayers().forEach(player -> PBukkitChannelTask.createTask().sender(player).channel(BukkitChannel.getInst().getBukkitChannel()).command("BungeeHub", "send", player.getName(), "BWLobby").run());
+            ChunkListener.releaseForceLoadedChunks();
+
+            cancel();
+
+            //            Bukkit.getOnlinePlayers().forEach(player -> PBukkitChannelTask.createTask().sender(player).channel(BukkitChannel.getInst().getBukkitChannel()).command("BungeeHub", "send", player.getName(), "BWLobby").run());
 
             (new BukkitRunnable() {
                 public void run() {
                     Bukkit.shutdown();
                 }
             }).runTaskLater(AzuraBedWars.getInstance(), 40L);
-            this.cancel();
         }
 
         --this.counter;

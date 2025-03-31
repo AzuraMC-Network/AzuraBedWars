@@ -58,7 +58,7 @@ public class EventManager extends TimerTask {
             if (player1.getInventory().contains(new ItemStack(Material.COMPASS))) {
                 Player target = game.findTargetPlayer(player1);
                 if (target != null) {
-                    XBedwars.getInstance().mainThreadRunnable(() -> player1.setCompassTarget(target.getLocation()));
+                    AzutaBedWars.getInstance().mainThreadRunnable(() -> player1.setCompassTarget(target.getLocation()));
                 }
             }
         }*/

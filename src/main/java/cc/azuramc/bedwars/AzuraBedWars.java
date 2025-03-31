@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars;
 
+import cc.azuramc.bedwars.database.map.MapLoader;
 import cc.azuramc.bedwars.listeners.*;
 import cc.azuramc.bedwars.commands.AdminCommand;
 import cc.azuramc.bedwars.commands.StartCommand;
@@ -10,6 +11,7 @@ import cc.azuramc.bedwars.scoreboards.GameBoard;
 import cc.azuramc.bedwars.scoreboards.LobbyBoard;
 import cc.azuramc.bedwars.specials.SpecialItem;
 import cc.azuramc.bedwars.database.mysql.ConnectionPoolHandler;
+import cc.azuramc.bedwars.utils.gui.GUIListener;
 import lombok.Getter;
 import lombok.Setter;
 import net.milkbowl.vault.chat.Chat;
@@ -54,6 +56,7 @@ public final class AzuraBedWars extends JavaPlugin {
             getConnectionPoolHandler().registerDatabase("bwstats");
 //            game = new Game(this, mds.getWaitingLoc().toLocation());
             game = new Game(this, null);
+            new GUIListener(this);
 
             setupEconomy();
             setupChat();
@@ -80,6 +83,8 @@ public final class AzuraBedWars extends JavaPlugin {
                 world.setAutoSave(false);
                 world.setDifficulty(Difficulty.NORMAL);
             });
+
+            getGame().loadGame(MapLoader.loadMapFromJson("map"));
 //            return;
 //        }
 

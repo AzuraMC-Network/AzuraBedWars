@@ -39,7 +39,7 @@ public class MapData {
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
         rawLocation.setPitch(location.getPitch());
-        rawLocation.setY(location.getYaw());
+        rawLocation.setYaw(location.getYaw());
         reSpawn = rawLocation;
     }
 
@@ -50,7 +50,7 @@ public class MapData {
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
         rawLocation.setPitch(location.getPitch());
-        rawLocation.setY(location.getYaw());
+        rawLocation.setYaw(location.getYaw());
         bases.add(rawLocation);
     }
 
@@ -61,7 +61,7 @@ public class MapData {
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
         rawLocation.setPitch(location.getPitch());
-        rawLocation.setY(location.getYaw());
+        rawLocation.setYaw(location.getYaw());
         region.setPos1(rawLocation);
     }
 
@@ -72,7 +72,7 @@ public class MapData {
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
         rawLocation.setPitch(location.getPitch());
-        rawLocation.setY(location.getYaw());
+        rawLocation.setYaw(location.getYaw());
         region.setPos2(rawLocation);
     }
 
@@ -83,7 +83,7 @@ public class MapData {
         dropLocation.setY(location.getY());
         dropLocation.setZ(location.getZ());
         dropLocation.setPitch(location.getPitch());
-        dropLocation.setY(location.getYaw());
+        dropLocation.setYaw(location.getYaw());
         dropLocation.setDropType(dropType);
         this.drops.add(dropLocation);
     }
@@ -95,7 +95,7 @@ public class MapData {
         shopLocation.setY(location.getY());
         shopLocation.setZ(location.getZ());
         shopLocation.setPitch(location.getPitch());
-        shopLocation.setY(location.getYaw());
+        shopLocation.setYaw(location.getYaw());
         shopLocation.setShopType(shopType);
         this.shops.add(shopLocation);
     }
@@ -125,14 +125,11 @@ public class MapData {
                 for (int z = Math.min(pos1.getBlockZ(), pos2.getBlockZ()); z <= Math.max(pos1.getBlockZ(), pos2.getBlockZ()); z++) {
                     Block block = new org.bukkit.Location(pos1.getWorld(), x, y, z).getBlock();
 
-                    if (block != null) {
-                        // 使用版本兼容的方式检查方块类型
-                        if (isSkippableBlock(block)) {
-                            continue;
-                        }
-                        System.out.println(x + ", " + y + ", " + z);
-                        blocks.add(block.getLocation());
+                    // 使用版本兼容的方式检查方块类型
+                    if (isSkippableBlock(block)) {
+                        continue;
                     }
+                    blocks.add(block.getLocation());
                 }
             }
         }
@@ -236,8 +233,7 @@ public class MapData {
         private float yaw;
 
         public org.bukkit.Location toLocation() {
-//            return new org.bukkit.Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
-            return new org.bukkit.Location(Bukkit.getWorld("world"), 0.5, 180, 0.5, 0, 180);
+            return new org.bukkit.Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
         }
     }
 

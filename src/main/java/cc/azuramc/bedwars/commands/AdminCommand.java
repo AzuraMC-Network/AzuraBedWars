@@ -12,11 +12,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +27,7 @@ public class AdminCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+    public boolean onCommand(@NotNull CommandSender commandSender, Command  command, String s, String[] strings) {
         if (!(commandSender instanceof Player)) {
             commandSender.sendMessage("此命令仅限玩家");
             return true;
@@ -70,7 +68,6 @@ public class AdminCommand implements CommandExecutor {
             rawLocation.setZ(location.getZ());
             rawLocation.setPitch(location.getPitch());
             rawLocation.setY(location.getYaw());
-            System.out.println(new Gson().toJson(rawLocation));
 
             player.sendMessage("设置等待大厅成功!");
             return true;
@@ -92,8 +89,37 @@ public class AdminCommand implements CommandExecutor {
             }
 
             if (strings[0].equalsIgnoreCase("loadGame")) {
-                maps.put(strings[1], new MapDataSQL().loadMap(strings[1]));
+//                maps.put(strings[1], new MapDataSQL().loadMap(strings[1]));
 
+                String mapName = strings[1];
+                File file = new File(AzuraBedWars.getInstance().getDataFolder(), mapName + ".json");
+
+                if (!file.exists()) {
+                    player.sendMessage("§c找不到地图文件: " + mapName + ".json");
+                    return true;
+                }
+
+                try {
+                    // 从JSON文件读取数据
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                    StringBuilder jsonContent = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        jsonContent.append(line);
+                    }
+                    bufferedReader.close();
+
+                    // 将JSON转换为MapData对象
+                    MapData mapData = new Gson().fromJson(jsonContent.toString(), MapData.class);
+                    maps.put(mapName, mapData);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    player.sendMessage("§c读取地图文件时出错: " + e.getMessage());
+                }
                 player.sendMessage("配置加载成功!");
                 return true;
             }
@@ -163,7 +189,10 @@ public class AdminCommand implements CommandExecutor {
 
                 try {
                     File file = new File(AzuraBedWars.getInstance().getDataFolder(), strings[1] + ".json");
-                    file.createNewFile();
+                    boolean successful = file.createNewFile();
+                    if (!successful) {
+                        Bukkit.getLogger().warning("map json create failed");
+                    }
 
                     FileOutputStream fileOutputStream = new FileOutputStream(file);
                     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);

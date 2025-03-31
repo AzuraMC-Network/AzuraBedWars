@@ -47,6 +47,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache/org.apache.commons.lang3
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'commons-io:commons-io:2.18.0'
+    implementation 'com.github.Revxrsal.Lamp:common:3.2.1'
+    implementation 'com.github.Revxrsal.Lamp:bukkit:3.2.1'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
 

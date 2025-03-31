@@ -1,13 +1,14 @@
 package cc.azuramc.bedwars.utils;
 
-import cc.azuramc.bedwars.utils.nms.NMSUtils;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 
 public class ArmorStandUtil {
@@ -118,13 +119,32 @@ public class ArmorStandUtil {
         }
 
         try {
-            Constructor constructor = NMSUtils.getNMSClass("PacketPlayOutEntityTeleport").getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
-            Method method = NMSUtils.getNMSClass("MathHelper").getMethod("floor", double.class);
-            Object packet = constructor.newInstance(armorStand.getEntityId(), method.invoke(null, location.getX() * 32.0D), method.invoke(null, location.getY() * 32.0D), method.invoke(null, location.getZ() * 32.0D), (byte) (location.getYaw() * 256.0f / 360.0f), (byte) (location.getPitch() * 256.0f / 360.0f), true);
+            // 使用 ProtocolLib 发送实体传送数据包
+            ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+            PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
+            
+            // 设置实体ID
+            packet.getIntegers().write(0, armorStand.getEntityId());
+            
+            // 设置位置 (x, y, z)
+            packet.getDoubles().write(0, location.getX());
+            packet.getDoubles().write(1, location.getY());
+            packet.getDoubles().write(2, location.getZ());
+            
+            // 设置朝向 (yaw, pitch)
+            packet.getBytes().write(0, (byte) (location.getYaw() * 256.0f / 360.0f));
+            packet.getBytes().write(1, (byte) (location.getPitch() * 256.0f / 360.0f));
+            
+            // 设置是否接触地面
+            packet.getBooleans().write(0, true);
+            
+            // 发送数据包给所有玩家
             for (Player player : Bukkit.getOnlinePlayers()) {
-                NMSUtils.sendPacket(player, packet);
+                protocolManager.sendServerPacket(player, packet);
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            // 捕获并记录异常，但不要中断游戏流程
+            Bukkit.getLogger().warning("无法移动盔甲架: " + e.getMessage());
         }
     }
 }

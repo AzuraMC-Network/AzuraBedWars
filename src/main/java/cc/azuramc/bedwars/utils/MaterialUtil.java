@@ -488,7 +488,7 @@ public class MaterialUtil {
      * @return 告示牌材质
      */
     public static Material SIGN() {
-        return getMaterial("SIGN", "SIGN");
+        return getMaterial("OAK_SIGN", "SIGN");
     }
 
     /**

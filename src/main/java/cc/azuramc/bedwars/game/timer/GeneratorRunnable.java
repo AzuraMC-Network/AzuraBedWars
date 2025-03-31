@@ -41,10 +41,16 @@ public class GeneratorRunnable {
             }, 0L, 1L);
 
             //IRON
-            game.getEventManager().registerRunnable("铁刷新", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> game.getMapData().getDropLocations(MapData.DropType.BASE).forEach((location -> location.getWorld().dropItem(location, new ItemBuilderUtil().setType(Material.IRON_INGOT).setDisplayName("§a§a§a§a§a§a").getItem()).setVelocity(new Vector(0.0D, 0.1D, 0.0D))))), 2);
+            game.getEventManager().registerRunnable("铁刷新", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(),
+                    () -> game.getMapData().getDropLocations(MapData.DropType.BASE)
+                            .forEach((location -> location.getWorld().dropItem(location, new ItemBuilderUtil().setType(Material.IRON_INGOT)
+                                    .setDisplayName("§a§a§a§a§a§a").getItem()).setVelocity(new Vector(0.0D, 0.1D, 0.0D))))), 2);
 
             //GOLD
-            game.getEventManager().registerRunnable("金刷新", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> game.getMapData().getDropLocations(MapData.DropType.BASE).forEach((location -> location.getWorld().dropItem(location, new ItemBuilderUtil().setType(Material.GOLD_INGOT).setDisplayName("§a§a§a§a§a§a").getItem()).setVelocity(new Vector(0.0D, 0.1D, 0.0D))))), 6);
+            game.getEventManager().registerRunnable("金刷新", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(),
+                    () -> game.getMapData().getDropLocations(MapData.DropType.BASE)
+                            .forEach((location -> location.getWorld().dropItem(location, new ItemBuilderUtil().setType(Material.GOLD_INGOT).setDisplayName("§a§a§a§a§a§a")
+                                    .getItem()).setVelocity(new Vector(0.0D, 0.1D, 0.0D))))), 6);
 
             //D
             game.getEventManager().registerRunnable("钻石时间显示", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> {
@@ -66,7 +72,10 @@ public class GeneratorRunnable {
                 }
             }));
 
-            game.getEventManager().registerRunnable("钻石刷新", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> game.getMapData().getDropLocations(MapData.DropType.DIAMOND).forEach(location -> location.getWorld().dropItem(location, new ItemBuilderUtil().setType(Material.DIAMOND).setDisplayName("§a§a§a§a§a§a").getItem()).setVelocity(new Vector(0.0D, 0.1D, 0.0D)))), 30);
+            game.getEventManager().registerRunnable("钻石刷新", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(),
+                    () -> game.getMapData().getDropLocations(MapData.DropType.DIAMOND)
+                            .forEach(location -> location.getWorld().dropItem(location, new ItemBuilderUtil().setType(Material.DIAMOND)
+                                    .setDisplayName("§a§a§a§a§a§a").getItem()).setVelocity(new Vector(0.0D, 0.1D, 0.0D)))), 30);
 
             //E
             game.getEventManager().registerRunnable("绿宝石时间显示", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> {
@@ -88,7 +97,10 @@ public class GeneratorRunnable {
                 }
             }));
 
-            game.getEventManager().registerRunnable("绿宝石刷新", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> game.getMapData().getDropLocations(MapData.DropType.EMERALD).forEach(location -> location.getWorld().dropItem(location, new ItemBuilderUtil().setType(Material.EMERALD).setDisplayName("§a§a§a§a§a§a").getItem()).setVelocity(new Vector(0.0D, 0.1D, 0.0D)))), 55);
+            game.getEventManager().registerRunnable("绿宝石刷新", (seconds, currentEvent) -> Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(),
+                    () -> game.getMapData().getDropLocations(MapData.DropType.EMERALD)
+                            .forEach(location -> location.getWorld().dropItem(location, new ItemBuilderUtil().setType(Material.EMERALD)
+                                    .setDisplayName("§a§a§a§a§a§a").getItem()).setVelocity(new Vector(0.0D, 0.1D, 0.0D)))), 55);
         }
     }
 }

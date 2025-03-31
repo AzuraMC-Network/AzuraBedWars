@@ -29,6 +29,9 @@ public class PlayerData {
     public PlayerData(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
         try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+            // 确保表存在
+            ensureStatsTableExists(connection);
+            
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bw_stats_players Where Name=?");
             preparedStatement.setString(1, gamePlayer.getName());
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -54,10 +57,52 @@ public class PlayerData {
             e.printStackTrace();
         }
     }
+    
+    private void ensureStatsTableExists(Connection connection) throws SQLException {
+        String createStatsTable = "CREATE TABLE IF NOT EXISTS bw_stats_players (" +
+                "Name VARCHAR(36) PRIMARY KEY, " +
+                "Mode VARCHAR(20) NOT NULL, " +
+                "kills INT DEFAULT 0, " +
+                "deaths INT DEFAULT 0, " +
+                "destroyedBeds INT DEFAULT 0, " +
+                "wins INT DEFAULT 0, " +
+                "loses INT DEFAULT 0, " +
+                "games INT DEFAULT 0" +
+                ")";
+        try (PreparedStatement statement = connection.prepareStatement(createStatsTable)) {
+            statement.executeUpdate();
+        }
+    }
+    
+    private void ensureShopTableExists(Connection connection) throws SQLException {
+        String createShopTable = "CREATE TABLE IF NOT EXISTS bw_shop_players (" +
+                "Name VARCHAR(36) PRIMARY KEY, " +
+                "data TEXT NOT NULL" +
+                ")";
+        try (PreparedStatement statement = connection.prepareStatement(createShopTable)) {
+            statement.executeUpdate();
+        }
+    }
+    
+    private void ensureSpectatorSettingsTableExists(Connection connection) throws SQLException {
+        String createSpectatorTable = "CREATE TABLE IF NOT EXISTS bw_spectator_settings (" +
+                "Name VARCHAR(36) PRIMARY KEY, " +
+                "firstPerson BOOLEAN DEFAULT TRUE, " +
+                "hideSpectators BOOLEAN DEFAULT TRUE, " +
+                "nightVision BOOLEAN DEFAULT FALSE, " +
+                "speedLevel INT DEFAULT 1" +
+                ")";
+        try (PreparedStatement statement = connection.prepareStatement(createSpectatorTable)) {
+            statement.executeUpdate();
+        }
+    }
 
     public void asyncLoadShop() {
         fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureShopTableExists(connection);
+                
                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM bw_shop_players Where Name=?");
                 preparedStatement.setString(1, gamePlayer.getName());
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -92,6 +137,9 @@ public class PlayerData {
     public void saveShops() {
         PlayerData.fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureShopTableExists(connection);
+                
                 StringBuilder string = null;
                 for (String s : shopSort) {
                     if (string == null) {
@@ -121,6 +169,9 @@ public class PlayerData {
 
         PlayerData.fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureStatsTableExists(connection);
+                
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET Mode=? Where Name=?");
                 preparedStatement.setString(1, modeType.toString());
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -138,6 +189,9 @@ public class PlayerData {
         kills += 1;
         PlayerData.fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureStatsTableExists(connection);
+                
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET kills=? Where Name=?");
                 preparedStatement.setInt(1, kills);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -158,6 +212,9 @@ public class PlayerData {
         deaths += 1;
         PlayerData.fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureStatsTableExists(connection);
+                
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET deaths=? Where Name=?");
                 preparedStatement.setInt(1, deaths);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -174,6 +231,9 @@ public class PlayerData {
         destroyedBeds += 1;
         PlayerData.fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureStatsTableExists(connection);
+                
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET destroyedBeds=? Where Name=?");
                 preparedStatement.setInt(1, destroyedBeds);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -190,6 +250,9 @@ public class PlayerData {
         wins += 1;
         PlayerData.fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureStatsTableExists(connection);
+                
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET wins=? Where Name=?");
                 preparedStatement.setInt(1, wins);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -206,6 +269,9 @@ public class PlayerData {
         loses += 1;
         PlayerData.fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureStatsTableExists(connection);
+                
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET loses=? Where Name=?");
                 preparedStatement.setInt(1, loses);
                 preparedStatement.setString(2, gamePlayer.getName());
@@ -223,6 +289,9 @@ public class PlayerData {
         games += 1;
         PlayerData.fixedThreadPool.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection("bwstats")) {
+                // 确保表存在
+                ensureStatsTableExists(connection);
+                
                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE bw_stats_players SET games=? Where Name=?");
                 preparedStatement.setInt(1, games);
                 preparedStatement.setString(2, gamePlayer.getName());

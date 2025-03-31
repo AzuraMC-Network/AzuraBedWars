@@ -1,10 +1,10 @@
 package cc.azuramc.bedwars.listeners;
 
-import cc.azuramc.bedwars.utils.board.Board;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.utils.board.FastBoard;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -68,7 +68,10 @@ public class JoinListener implements Listener {
             return;
         }
         gamePlayer.getPlayerData().asyncLoadShop();
-        gamePlayer.setBoard(new Board(player, "SB", Collections.singletonList("Test")));
+        FastBoard board = new FastBoard(player);
+        board.updateTitle("§e§l超级起床战争");
+        board.updateLines("Test");
+        gamePlayer.setBoard(board);
         game.addPlayer(gamePlayer);
     }
 }

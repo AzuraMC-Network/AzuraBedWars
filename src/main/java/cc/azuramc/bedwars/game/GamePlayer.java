@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.utils.ActionBarUtil;
 import cc.azuramc.bedwars.utils.ItemBuilderUtil;
 import cc.azuramc.bedwars.utils.TitleUtil;
-import cc.azuramc.bedwars.utils.board.Board;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.PlayerData;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
@@ -13,13 +12,13 @@ import cc.azuramc.bedwars.types.ToolType;
 import cc.azuramc.bedwars.utils.Util;
 import cc.azuramc.bedwars.utils.MaterialUtil;
 import cc.azuramc.bedwars.utils.EnchantmentUtil;
+import cc.azuramc.bedwars.utils.board.FastBoard;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -44,11 +43,10 @@ public class GamePlayer {
     @Getter
     private final PlayerData playerData;
     @Setter
-    @Getter
     private String displayname;
     @Getter
     @Setter
-    private Board board;
+    private FastBoard board;
     @Getter
     private boolean spectator;
     @Getter
@@ -106,6 +104,10 @@ public class GamePlayer {
             }
         }
         return null;
+    }
+
+    public String getDisplayname() {
+        return this.name;
     }
 
     public static List<GamePlayer> getGamePlayers() {

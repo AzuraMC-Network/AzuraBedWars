@@ -110,7 +110,7 @@ public class Game {
         player.getEnderChest().clear();
         gamePlayer.clean();
 
-        player.teleport(waitingLocation);
+//        player.teleport(waitingLocation);
 
         LobbyBoard.show(player);
         LobbyBoard.updateBoard();
@@ -173,11 +173,11 @@ public class Game {
     }
 
     public int getMaxPlayers() {
-        return mapData.getBases().size() * mapData.getPlayers().getTeam();
+        return mapData.getBases().size() * mapData.getSettings().getTeamSize();
     }
 
     boolean hasEnoughPlayers() {
-        return GamePlayer.getOnlinePlayers().size() >= mapData.getPlayers().getMin();
+        return GamePlayer.getOnlinePlayers().size() >= mapData.getSettings().getMinPlayers();
     }
 
     public GameTeam getLowestTeam() {
