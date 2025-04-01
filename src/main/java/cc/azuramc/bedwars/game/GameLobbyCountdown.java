@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.scoreboards.LobbyBoard;
-import cc.azuramc.bedwars.utils.SoundUtil;
+import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;

@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.timer.CompassRunnable;
 import cc.azuramc.bedwars.game.timer.GeneratorRunnable;
-import cc.azuramc.bedwars.utils.SoundUtil;
+import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;

@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.utils;
+package cc.azuramc.bedwars.compat.sound;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;

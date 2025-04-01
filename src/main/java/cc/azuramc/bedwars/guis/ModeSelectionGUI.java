@@ -8,7 +8,7 @@ import cc.azuramc.bedwars.utils.ItemBuilderUtil;
 import cc.azuramc.bedwars.database.PlayerData;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.types.ModeType;
-import cc.azuramc.bedwars.utils.SoundUtil;
+import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import org.bukkit.entity.Player;
 
 public class ModeSelectionGUI extends CustomGUI {

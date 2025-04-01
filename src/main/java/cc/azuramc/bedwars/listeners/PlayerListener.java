@@ -14,7 +14,7 @@ import cc.azuramc.bedwars.guis.TeamShopGUI;
 import cc.azuramc.bedwars.spectator.SpectatorSettingGUI;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.types.ModeType;
-import cc.azuramc.bedwars.utils.SoundUtil;
+import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
 import org.bukkit.Bukkit;

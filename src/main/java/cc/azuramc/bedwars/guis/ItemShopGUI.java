@@ -18,7 +18,7 @@ import cc.azuramc.bedwars.types.ModeType;
 import cc.azuramc.bedwars.types.ToolType;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
-import cc.azuramc.bedwars.utils.SoundUtil;
+import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;

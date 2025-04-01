@@ -8,7 +8,7 @@ import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.utils.SoundUtil;
+import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import cc.azuramc.bedwars.utils.Util;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import org.bukkit.Bukkit;
