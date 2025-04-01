@@ -80,7 +80,7 @@ public class ChatListener implements Listener {
         int level = calculatePlayerLevel(playerData);
         String globalPrefix = ChatColor.translateAlternateColorCodes('&', plugin.getChat().getPlayerPrefix(player));
         
-        return "§6[" + plugin.getLevel(level) + "✫]" + globalPrefix + "§7" + gamePlayer.getDisplayname() + CHAT_SEPARATOR + message;
+        return "§6[" + plugin.getLevel(level) + "✫]" + globalPrefix + "§7" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
     }
 
     /**
@@ -130,7 +130,7 @@ public class ChatListener implements Listener {
      * @param message 消息内容
      */
     private void handleSpectatorChat(Player player, GamePlayer gamePlayer, String message) {
-        String spectatorMessage = SPECTATOR_PREFIX + "§f" + gamePlayer.getDisplayname() + CHAT_SEPARATOR + message;
+        String spectatorMessage = SPECTATOR_PREFIX + "§f" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
         
         if (player.hasPermission("bw.*")) {
             game.broadcastMessage(spectatorMessage);
@@ -155,7 +155,7 @@ public class ChatListener implements Listener {
                 "[" +
                 gameTeam.getName() +
                 "]" +
-                gamePlayer.getDisplayname() +
+                gamePlayer.getNickName() +
                 CHAT_SEPARATOR +
                 (isGlobalChat ? message.substring(1) : message);
     }

@@ -20,7 +20,7 @@ public class SpectatorCompassGUI extends CustomGUI {
                 continue;
             }
 
-            setItem(i, new ItemBuilderUtil().setOwner(gamePlayer.getName()).setDisplayName(gameTeam.getName() + " " + gamePlayer.getDisplayname()).setLores(" ", "§f血量: §8" + (int) gamePlayer.getPlayer().getHealth(), "§f饥饿: §8" + gamePlayer.getPlayer().getFoodLevel(), "§f等级: §8" + gamePlayer.getPlayer().getLevel(), "§f距离: §8" + (int) gamePlayer.getPlayer().getLocation().distance(player.getLocation())).getItem(), new GUIAction(0, () -> {
+            setItem(i, new ItemBuilderUtil().setOwner(gamePlayer.getName()).setDisplayName(gameTeam.getName() + " " + gamePlayer.getNickName()).setLores(" ", "§f血量: §8" + (int) gamePlayer.getPlayer().getHealth(), "§f饥饿: §8" + gamePlayer.getPlayer().getFoodLevel(), "§f等级: §8" + gamePlayer.getPlayer().getLevel(), "§f距离: §8" + (int) gamePlayer.getPlayer().getLocation().distance(player.getLocation())).getItem(), new GUIAction(0, () -> {
                 player.teleport(gamePlayer.getPlayer());
             }, true));
             i++;

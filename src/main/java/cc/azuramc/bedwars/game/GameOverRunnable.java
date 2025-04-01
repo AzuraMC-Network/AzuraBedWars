@@ -138,7 +138,7 @@ public class GameOverRunnable extends BukkitRunnable {
                 if (!isFirst) {
                     winnerText.append(", ");
                 }
-                winnerText.append(gamePlayer.getDisplayname());
+                winnerText.append(gamePlayer.getNickName());
                 isFirst = false;
             }
         } else {
@@ -186,7 +186,7 @@ public class GameOverRunnable extends BukkitRunnable {
         for (int i = 0; i < maxRanks; i++) {
             GamePlayer player = topKillers.get(i);
             messages.add(RANK_PREFIX + RANK_TITLES[i] + " §7- " + 
-                       player.getDisplayname() + " - " + player.getKills());
+                       player.getNickName() + " - " + player.getKills());
         }
     }
     

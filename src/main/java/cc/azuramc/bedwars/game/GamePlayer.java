@@ -28,172 +28,312 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 游戏玩家类
+ * <p>
+ * 管理玩家在游戏中的状态、装备、数据等
+ * 提供玩家相关的各种操作方法
+ * </p>
+ */
 public class GamePlayer {
+    // 静态字段
     private static final ConcurrentHashMap<UUID, GamePlayer> gamePlayers = new ConcurrentHashMap<>();
+    private static final int MAX_HEALTH = 20;
+    private static final float MAX_SATURATION = 5.0f;
+    private static final int MAX_FOOD_LEVEL = 20;
 
-    @Getter
-    private final UUID uuid;
-    @Getter
-    private final String name;
-    @Getter
-    private final AssistsManager assistsManager;
-    @Getter
-    private final PlayerData playerData;
-    @Setter
-    private String nickName;
-    @Getter
-    @Setter
-    private FastBoard board;
-    @Getter
-    private boolean spectator;
-    @Getter
-    @Setter
-    private SpectatorTarget spectatorTarget;
-    @Getter
-    @Setter
-    private GameTeam gameTeam;
-    @Getter
-    private final PlayerCompass playerCompass;
-    @Getter
-    private int kills;
-    @Getter
-    private int finalKills;
-    @Getter
-    @Setter
-    private ArmorType armorType;
-    @Getter
-    @Setter
-    private ToolType pickaxeType;
-    @Getter
-    @Setter
-    private ToolType axeType;
-    @Getter
-    @Setter
-    private boolean shear;
+    // 基础属性
+    @Getter private final UUID uuid;
+    @Getter private final String name;
+    @Getter private final AssistsManager assistsManager;
+    @Getter private final PlayerData playerData;
+    @Getter private final PlayerCompass playerCompass;
+    
+    // 游戏状态
+    @Setter private String nickName;
+    @Getter @Setter private FastBoard board;
+    @Getter private boolean spectator;
+    @Getter @Setter private SpectatorTarget spectatorTarget;
+    @Getter @Setter private GameTeam gameTeam;
+    
+    // 战斗数据
+    @Getter private int kills;
+    @Getter private int finalKills;
+    
+    // 装备状态
+    @Getter @Setter private ArmorType armorType;
+    @Getter @Setter private ToolType pickaxeType;
+    @Getter @Setter private ToolType axeType;
+    @Getter @Setter private boolean shear;
 
+    /**
+     * 构造方法
+     * 
+     * @param uuid 玩家UUID
+     * @param name 玩家名称
+     */
     public GamePlayer(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
-
+        
+        // 初始化装备状态
         this.armorType = ArmorType.DEFAULT;
         this.pickaxeType = ToolType.NONE;
         this.axeType = ToolType.NONE;
-
-        assistsManager = new AssistsManager(this);
-        playerData = new PlayerData(this);
-        playerCompass = new PlayerCompass(this);
+        
+        // 初始化管理器
+        this.assistsManager = new AssistsManager(this);
+        this.playerData = new PlayerData(this);
+        this.playerCompass = new PlayerCompass(this);
     }
 
+    /**
+     * 创建或获取游戏玩家实例
+     * 
+     * @param uuid 玩家UUID
+     * @param name 玩家名称
+     * @return 游戏玩家实例
+     */
     public static GamePlayer create(UUID uuid, String name) {
-        GamePlayer gamePlayer = get(uuid);
-        if (gamePlayer != null) {
-            return gamePlayer;
-        }
-        gamePlayer = new GamePlayer(uuid, name);
-        gamePlayers.put(uuid, gamePlayer);
-        return gamePlayer;
+        return gamePlayers.computeIfAbsent(uuid, k -> new GamePlayer(uuid, name));
     }
 
+    /**
+     * 获取游戏玩家实例
+     * 
+     * @param uuid 玩家UUID
+     * @return 游戏玩家实例
+     */
     public static GamePlayer get(UUID uuid) {
-        for (GamePlayer gamePlayer : gamePlayers.values()) {
-            if (gamePlayer.getUuid().equals(uuid)) {
-                return gamePlayer;
-            }
-        }
-        return null;
+        return gamePlayers.get(uuid);
     }
 
-    public String getDisplayname() {
-        return this.name;
+    /**
+     * 获取玩家显示名称
+     * 
+     * @return 玩家显示名称
+     */
+    public String getNickName() {
+        return this.nickName != null ? this.nickName : this.name;
     }
 
+    /**
+     * 获取所有游戏玩家
+     * 
+     * @return 游戏玩家列表
+     */
     public static List<GamePlayer> getGamePlayers() {
         return new ArrayList<>(gamePlayers.values());
     }
 
+    /**
+     * 获取所有团队玩家
+     * 
+     * @return 团队玩家列表
+     */
     public static List<GamePlayer> getTeamPlayers() {
         List<GamePlayer> teamPlayers = new ArrayList<>();
-        for (GamePlayer gamePlayer : gamePlayers.values()) {
-            if (gamePlayer.getGameTeam() != null) {
-                teamPlayers.add(gamePlayer);
+        for (GamePlayer player : gamePlayers.values()) {
+            if (player.getGameTeam() != null) {
+                teamPlayers.add(player);
             }
         }
         return teamPlayers;
     }
 
+    /**
+     * 获取所有在线玩家
+     * 
+     * @return 在线玩家列表
+     */
     public static List<GamePlayer> getOnlinePlayers() {
         List<GamePlayer> onlinePlayers = new ArrayList<>();
-        for (GamePlayer gamePlayer : gamePlayers.values()) {
-            if (gamePlayer.isOnline()) {
-                onlinePlayers.add(gamePlayer);
+        for (GamePlayer player : gamePlayers.values()) {
+            if (player.isOnline()) {
+                onlinePlayers.add(player);
             }
         }
         return onlinePlayers;
     }
 
+    /**
+     * 获取所有观察者
+     * 
+     * @return 观察者列表
+     */
     public static List<GamePlayer> getSpectators() {
         List<GamePlayer> spectators = new ArrayList<>();
-        for (GamePlayer gamePlayer : gamePlayers.values()) {
-            if (gamePlayer.isSpectator()) {
-                spectators.add(gamePlayer);
+        for (GamePlayer player : gamePlayers.values()) {
+            if (player.isSpectator()) {
+                spectators.add(player);
             }
         }
         return spectators;
     }
 
+    /**
+     * 按最终击杀数排序玩家
+     * 
+     * @return 排序后的玩家列表
+     */
     public static List<GamePlayer> sortFinalKills() {
-        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> player2.getFinalKills() - player1.getFinalKills());
-        return list;
+        List<GamePlayer> sortedPlayers = new ArrayList<>(getOnlinePlayers());
+        
+        // 创建比较器
+        Comparator<GamePlayer> finalKillsComparator = (player1, player2) -> {
+            // 空值检查
+            if (player1 == null && player2 == null) {
+                return 0;
+            }
+            if (player1 == null) {
+                return -1;
+            }
+            if (player2 == null) {
+                return 1;
+            }
+
+            // 按最终击杀数降序排序
+            int kills1 = player1.getFinalKills();
+            int kills2 = player2.getFinalKills();
+            return kills2 - kills1;
+        };
+        
+        // 执行排序
+        sortedPlayers.sort(finalKillsComparator);
+        return sortedPlayers;
     }
 
+    /**
+     * 获取Bukkit玩家实例
+     * 
+     * @return Bukkit玩家实例
+     */
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
 
+    /**
+     * 检查玩家是否在线
+     * 
+     * @return 是否在线
+     */
     public boolean isOnline() {
         return Bukkit.getPlayer(uuid) != null;
     }
 
+    /**
+     * 发送动作栏消息
+     * 
+     * @param message 消息内容
+     */
     public void sendActionBar(String message) {
         if (!isOnline()) return;
         ActionBarUtil.sendBar(getPlayer(), message);
     }
 
+    /**
+     * 发送标题消息
+     * 
+     * @param fadeIn 淡入时间
+     * @param stay 停留时间
+     * @param fadeOut 淡出时间
+     * @param title 主标题
+     * @param subTitle 副标题
+     */
     public void sendTitle(int fadeIn, int stay, int fadeOut, String title, String subTitle) {
         if (!isOnline()) return;
         TitleUtil.sendTitle(getPlayer(), fadeIn, stay, fadeOut, title, subTitle);
     }
 
+    /**
+     * 发送聊天消息
+     * 
+     * @param message 消息内容
+     */
     public void sendMessage(String message) {
         if (!isOnline()) return;
         getPlayer().sendMessage(message);
     }
 
+    /**
+     * 播放音效
+     * 
+     * @param sound 音效类型
+     * @param volume 音量
+     * @param pitch 音调
+     */
     public void playSound(Sound sound, float volume, float pitch) {
         if (!isOnline()) return;
         getPlayer().playSound(getPlayer().getLocation(), sound, volume, pitch);
     }
 
+    /**
+     * 设置玩家为观察者
+     */
     public void setSpectator() {
         spectator = true;
     }
 
+    /**
+     * 将玩家转换为观察者
+     * 
+     * @param title 主标题
+     * @param subTitle 副标题
+     */
     public void toSpectator(String title, String subTitle) {
         spectator = true;
         spectatorTarget = new SpectatorTarget(this, null);
 
         Player player = getPlayer();
-        sendTitle(10, 20, 10, title, subTitle);
-        getOnlinePlayers().forEach(gamePlayer1 -> 
-            PlayerUtil.hidePlayer(gamePlayer1.getPlayer(), player)
-        );
-        player.setGameMode(GameMode.ADVENTURE);
+        setupSpectatorPlayer(player, title, subTitle);
+        setupSpectatorInventory(player);
+        setupSpectatorEffects(player);
+        setupSpectatorTarget();
+    }
 
+    /**
+     * 设置观察者玩家状态
+     */
+    private void setupSpectatorPlayer(Player player, String title, String subTitle) {
+        sendTitle(10, 20, 10, title, subTitle);
+        for (GamePlayer gamePlayer1 : getOnlinePlayers()) {
+            PlayerUtil.hidePlayer(gamePlayer1.getPlayer(), player);
+        }
+        player.setGameMode(GameMode.ADVENTURE);
+        player.setAllowFlight(true);
+        Util.setFlying(player);
+        player.teleport(AzuraBedWars.getInstance().getGame().getMapData().getReSpawn().toLocation());
+    }
+
+    /**
+     * 设置观察者物品栏
+     */
+    private void setupSpectatorInventory(Player player) {
+        player.getInventory().setItem(0, createSpectatorItem(MaterialUtil.COMPASS(), "§a§l传送器§7(右键打开)"));
+        player.getInventory().setItem(4, createSpectatorItem(MaterialUtil.COMPARATOR(), "§c§l旁观者设置§7(右键打开)"));
+        player.getInventory().setItem(7, createSpectatorItem(Material.PAPER, "§b§l快速加入§7(右键加入)"));
+        player.getInventory().setItem(8, createSpectatorItem(MaterialUtil.SLIME_BALL(), "§c§l离开游戏§7(右键离开)"));
+    }
+
+    /**
+     * 创建观察者物品
+     */
+    private ItemStack createSpectatorItem(Material material, String name) {
+        return new ItemBuilderUtil()
+                .setType(material)
+                .setDisplayName(name)
+                .getItem();
+    }
+
+    /**
+     * 设置观察者效果
+     */
+    private void setupSpectatorEffects(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
         SpectatorSettings spectatorSettings = SpectatorSettings.get(this);
         if (spectatorSettings.getOption(SpectatorSettings.Option.NIGHTVISION)) {
@@ -202,71 +342,123 @@ public class GamePlayer {
             }
             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
         }
+    }
 
-        player.getInventory().setItem(0, new ItemBuilderUtil().setType(MaterialUtil.COMPASS()).setDisplayName("§a§l传送器§7(右键打开)").getItem());
-        player.getInventory().setItem(4, new ItemBuilderUtil().setType(MaterialUtil.COMPARATOR()).setDisplayName("§c§l旁观者设置§7(右键打开)").getItem());
-        player.getInventory().setItem(7, new ItemBuilderUtil().setType(Material.PAPER).setDisplayName("§b§l快速加入§7(右键加入)").getItem());
-        player.getInventory().setItem(8, new ItemBuilderUtil().setType(MaterialUtil.SLIME_BALL()).setDisplayName("§c§l离开游戏§7(右键离开)").getItem());
-
-        player.setAllowFlight(true);
-        Util.setFlying(player);
-        player.teleport(AzuraBedWars.getInstance().getGame().getMapData().getReSpawn().toLocation());
-
+    /**
+     * 设置观察者目标
+     */
+    private void setupSpectatorTarget() {
         if (gameTeam != null && !gameTeam.getAlivePlayers().isEmpty()) {
-            spectatorTarget.setTarget(gameTeam.getAlivePlayers().get(0));
+            spectatorTarget.setTarget(gameTeam.getAlivePlayers().getFirst());
         }
     }
 
+    /**
+     * 增加击杀数
+     */
     public void addKills() {
-        kills += 1;
+        kills++;
     }
 
+    /**
+     * 增加最终击杀数
+     */
     public void addFinalKills() {
-        finalKills += 1;
+        finalKills++;
     }
 
+    /**
+     * 设置最后伤害来源
+     * 
+     * @param damager 伤害来源玩家
+     * @param time 时间戳
+     */
     public void setLastDamage(GamePlayer damager, long time) {
         assistsManager.setLastDamage(damager, time);
     }
 
+    /**
+     * 给予玩家初始装备
+     */
     public void giveInventory() {
         Player player = getPlayer();
-        player.getInventory().setHelmet(new ItemBuilderUtil().setType(MaterialUtil.LEATHER_HELMET()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-        player.getInventory().setChestplate(new ItemBuilderUtil().setType(MaterialUtil.LEATHER_CHESTPLATE()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+        setupBaseArmor(player);
         giveArmor();
         giveSword(false);
-        givePickaxe(false);
-        giveAxe(false);
         giveShear();
-
         player.updateInventory();
     }
 
+    /**
+     * 设置基础护甲
+     */
+    private void setupBaseArmor(Player player) {
+        player.getInventory().setHelmet(createColoredArmor(MaterialUtil.LEATHER_HELMET()));
+        player.getInventory().setChestplate(createColoredArmor(MaterialUtil.LEATHER_CHESTPLATE()));
+    }
+
+    /**
+     * 创建染色护甲
+     */
+    private ItemStack createColoredArmor(Material material) {
+        return new ItemBuilderUtil()
+                .setType(material)
+                .setColor(gameTeam.getColor())
+                .setUnbreakable(true, true)
+                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                .getItem();
+    }
+
+    /**
+     * 给予护甲
+     */
     public void giveArmor() {
         Player player = getPlayer();
+        setupLeggingsAndBoots(player);
+        applyReinforcedArmor(player);
+    }
 
+    /**
+     * 设置护腿和靴子
+     */
+    private void setupLeggingsAndBoots(Player player) {
         switch (armorType) {
             case CHAINMAIL:
-                player.getInventory().setLeggings(new ItemBuilderUtil().setType(MaterialUtil.CHAINMAIL_LEGGINGS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilderUtil().setType(MaterialUtil.CHAINMAIL_BOOTS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setLeggings(createUnbreakableArmor(MaterialUtil.CHAINMAIL_LEGGINGS()));
+                player.getInventory().setBoots(createUnbreakableArmor(MaterialUtil.CHAINMAIL_BOOTS()));
                 break;
             case IRON:
-                player.getInventory().setLeggings(new ItemBuilderUtil().setType(MaterialUtil.IRON_LEGGINGS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilderUtil().setType(MaterialUtil.IRON_BOOTS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setLeggings(createUnbreakableArmor(MaterialUtil.IRON_LEGGINGS()));
+                player.getInventory().setBoots(createUnbreakableArmor(MaterialUtil.IRON_BOOTS()));
                 break;
             case DIAMOND:
-                player.getInventory().setLeggings(new ItemBuilderUtil().setType(MaterialUtil.DIAMOND_LEGGINGS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilderUtil().setType(MaterialUtil.DIAMOND_BOOTS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setLeggings(createUnbreakableArmor(MaterialUtil.DIAMOND_LEGGINGS()));
+                player.getInventory().setBoots(createUnbreakableArmor(MaterialUtil.DIAMOND_BOOTS()));
                 break;
             default:
-                player.getInventory().setLeggings(new ItemBuilderUtil().setType(MaterialUtil.LEATHER_LEGGINGS()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilderUtil().setType(MaterialUtil.LEATHER_BOOTS()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setLeggings(createColoredArmor(MaterialUtil.LEATHER_LEGGINGS()));
+                player.getInventory().setBoots(createColoredArmor(MaterialUtil.LEATHER_BOOTS()));
                 break;
         }
+    }
 
+    /**
+     * 创建不可破坏的护甲
+     */
+    private ItemStack createUnbreakableArmor(Material material) {
+        return new ItemBuilderUtil()
+                .setType(material)
+                .setUnbreakable(true, true)
+                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                .getItem();
+    }
+
+    /**
+     * 应用强化护甲效果
+     */
+    private void applyReinforcedArmor(Player player) {
         if (gameTeam.getReinforcedArmor() > 0) {
-            for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
-                ItemStack armor = player.getInventory().getArmorContents()[i];
+            for (ItemStack armor : player.getInventory().getArmorContents()) {
                 if (armor != null) {
                     armor.addEnchantment(EnchantmentUtil.PROTECTION_ENVIRONMENTAL(), gameTeam.getReinforcedArmor());
                 }
@@ -274,147 +466,155 @@ public class GamePlayer {
         }
     }
 
+    /**
+     * 给予剑
+     */
     public void giveSword(boolean remove) {
         Player player = getPlayer();
-
         if (remove) {
             player.getInventory().remove(MaterialUtil.WOODEN_SWORD());
         }
+        
+        ItemBuilderUtil builder = new ItemBuilderUtil()
+                .setType(MaterialUtil.WOODEN_SWORD())
+                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                .setUnbreakable(true, true);
+                
         if (gameTeam.isSharpenedSwords()) {
-            player.getInventory().addItem(new ItemBuilderUtil()
-                .setType(MaterialUtil.WOODEN_SWORD())
-                .addEnchant(EnchantmentUtil.DAMAGE_ALL(), 1)
-                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                .setUnbreakable(true, true)
-                .getItem());
-        } else {
-            player.getInventory().addItem(new ItemBuilderUtil()
-                .setType(MaterialUtil.WOODEN_SWORD())
-                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                .setUnbreakable(true, true)
-                .getItem());
+            builder.addEnchant(EnchantmentUtil.DAMAGE_ALL(), 1);
         }
+        
+        player.getInventory().addItem(builder.getItem());
     }
 
+    /**
+     * 给予镐子
+     */
     public void givePickaxe(boolean remove) {
         Player player = getPlayer();
+        if (remove) {
+            removePreviousPickaxe(player);
+            return;
+        }
 
+        player.getInventory().addItem(createTool(Material.WOODEN_PICKAXE));
+    }
+
+    /**
+     * 移除上一个镐子
+     */
+    private void removePreviousPickaxe(Player player) {
         switch (pickaxeType) {
-            case WOOD:
-                player.getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.WOODEN_PICKAXE())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                    .getItem());
-                break;
-            case STONE:
-                if (remove) player.getInventory().remove(MaterialUtil.WOODEN_PICKAXE());
-                player.getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.STONE_PICKAXE())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                    .getItem());
+            case DIAMOND:
+                player.getInventory().remove(MaterialUtil.IRON_PICKAXE());
                 break;
             case IRON:
-                if (remove) player.getInventory().remove(MaterialUtil.STONE_PICKAXE());
-                player.getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.IRON_PICKAXE())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                    .getItem());
+                player.getInventory().remove(MaterialUtil.STONE_PICKAXE());
                 break;
-            case DIAMOND:
-                if (remove) player.getInventory().remove(MaterialUtil.IRON_PICKAXE());
-                player.getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.DIAMOND_PICKAXE())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                    .getItem());
-                break;
-            default:
+            case STONE:
+                player.getInventory().remove(MaterialUtil.WOODEN_PICKAXE());
                 break;
         }
     }
 
+    /**
+     * 给予斧头
+     */
     public void giveAxe(boolean remove) {
         Player player = getPlayer();
+        if (remove) {
+            removePreviousAxe(player);
+            return;
+        }
 
+        player.getInventory().addItem(createTool(MaterialUtil.WOODEN_AXE()));
+    }
+
+    /**
+     * 移除上一个斧头
+     */
+    private void removePreviousAxe(Player player) {
         switch (axeType) {
-            case WOOD:
-                player.getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.WOODEN_AXE())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                    .getItem());
-                break;
-            case STONE:
-                if (remove) player.getInventory().remove(MaterialUtil.WOODEN_AXE());
-                player.getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.STONE_AXE())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                    .getItem());
+            case DIAMOND:
+                player.getInventory().remove(MaterialUtil.IRON_AXE());
                 break;
             case IRON:
-                if (remove) player.getInventory().remove(MaterialUtil.STONE_AXE());
-                player.getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.IRON_AXE())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                    .getItem());
+                player.getInventory().remove(MaterialUtil.STONE_AXE());
                 break;
-            case DIAMOND:
-                if (remove) player.getInventory().remove(MaterialUtil.IRON_AXE());
-                player.getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.DIAMOND_AXE())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                    .getItem());
-                break;
-            default:
+            case STONE:
+                player.getInventory().remove(MaterialUtil.WOODEN_AXE());
                 break;
         }
     }
 
-    public void giveShear() {
-        Player player = getPlayer();
-
-        if (shear) {
-            player.getInventory().addItem(new ItemBuilderUtil()
-                .setType(MaterialUtil.SHEARS())
+    /**
+     * 创建工具
+     */
+    private ItemStack createTool(Material material) {
+        return new ItemBuilderUtil()
+                .setType(material)
                 .setUnbreakable(true, true)
                 .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                .getItem());
+                .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
+                .getItem();
+    }
+
+    /**
+     * 给予剪刀
+     */
+    public void giveShear() {
+        if (shear) {
+            getPlayer().getInventory().addItem(new ItemBuilderUtil()
+                    .setType(MaterialUtil.SHEARS())
+                    .setUnbreakable(true, true)
+                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                    .getItem());
         }
     }
 
-    public void clean() {
+    /**
+     * 清理玩家状态
+     */
+    public void cleanState() {
         Player player = getPlayer();
+        resetPlayerState(player);
+        clearInventory(player);
+        clearEffects(player);
+    }
+
+    /**
+     * 重置玩家状态
+     */
+    private void resetPlayerState(Player player) {
         player.setAllowFlight(false);
         player.setFlying(false);
         player.setExp(0.0F);
         player.setLevel(0);
         player.setSneaking(false);
         player.setSprinting(false);
-        player.setFoodLevel(20);
-        player.setSaturation(5.0f);
+        player.setFoodLevel(MAX_FOOD_LEVEL);
+        player.setSaturation(MAX_SATURATION);
         player.setExhaustion(0.0f);
-        player.setMaxHealth(20.0D);
-        player.setHealth(20.0f);
+        player.setHealth(MAX_HEALTH);
         player.setFireTicks(0);
+    }
 
+    /**
+     * 清空物品栏
+     */
+    private void clearInventory(Player player) {
         PlayerInventory inv = player.getInventory();
         inv.setArmorContents(new ItemStack[4]);
         inv.setContents(new ItemStack[]{});
-        player.getActivePotionEffects().forEach((potionEffect -> player.removePotionEffect(potionEffect.getType())));
+    }
+
+    /**
+     * 清除效果
+     */
+    private void clearEffects(Player player) {
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
     }
 
     @Override
@@ -427,15 +627,15 @@ public class GamePlayer {
         if (!(obj instanceof GamePlayer)) {
             return false;
         }
-
-        GamePlayer gamePlayer = (GamePlayer) obj;
-        return uuid.equals(gamePlayer.getUuid());
+        return uuid.equals(((GamePlayer) obj).getUuid());
     }
 
+    /**
+     * 玩家指南针内部类
+     */
+    @Getter
     public static class PlayerCompass {
-        @Getter
         private final GamePlayer gamePlayer;
-        @Getter
         private final Player player;
 
         public PlayerCompass(GamePlayer gamePlayer) {
@@ -443,11 +643,18 @@ public class GamePlayer {
             this.player = gamePlayer.getPlayer();
         }
 
+        /**
+         * 发送最近玩家信息
+         */
         public void sendClosestPlayer() {
             GamePlayer closestPlayer = AzuraBedWars.getInstance().getGame().findTargetPlayer(gamePlayer);
 
             if (closestPlayer != null) {
-                gamePlayer.sendActionBar("§f玩家 " + closestPlayer.getGameTeam().getChatColor() + closestPlayer.getDisplayname() + " §f距离您 " + ((int) closestPlayer.getPlayer().getLocation().distance(player.getLocation())) + "m");
+                int distance = (int) closestPlayer.getPlayer().getLocation().distance(player.getLocation());
+                gamePlayer.sendActionBar(String.format("§f玩家 %s%s §f距离您 %dm",
+                    closestPlayer.getGameTeam().getChatColor(),
+                    closestPlayer.getNickName(),
+                    distance));
                 player.setCompassTarget(closestPlayer.getPlayer().getLocation());
             } else {
                 gamePlayer.sendActionBar("§c没有目标");

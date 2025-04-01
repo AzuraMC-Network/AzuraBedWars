@@ -293,7 +293,7 @@ public class Util {
 //            gameTeam.getAlivePlayers().forEach(gamePlayer -> {
 //                Player player = gamePlayer.getPlayer();
 //                NametagEdit.getApi().clearNametag(player);
-//                NametagEdit.getApi().setNametag(player, gameTeam.getName() + " ", gamePlayer.getName().equals(gamePlayer.getDisplayname()) ? "" : gamePlayer.getDisplayname());
+//                NametagEdit.getApi().setNametag(player, gameTeam.getName() + " ", gamePlayer.getName().equals(gamePlayer.getNickName()) ? "" : gamePlayer.getNickName());
 //            });
         }
     }

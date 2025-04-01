@@ -86,7 +86,7 @@ public class RespawnListener implements Listener {
         }
 
         if (gamePlayer != null) {
-            gamePlayer.clean();
+            gamePlayer.cleanState();
         }
 
         // 如果玩家的床已经被摧毁，处理永久死亡
@@ -165,7 +165,7 @@ public class RespawnListener implements Listener {
      * @param gameTeam 被消灭的队伍
      */
     private void announceTeamElimination(GameTeam gameTeam) {
-        String destroyerName = gameTeam.getDestroyPlayer() != null ? gameTeam.getDestroyPlayer().getDisplayname() : "null";
+        String destroyerName = gameTeam.getDestroyPlayer() != null ? gameTeam.getDestroyPlayer().getNickName() : "null";
         
         game.broadcastSound(SoundUtil.ENDERDRAGON_HIT(), 10, 10);
         game.broadcastMessage(TEAM_ELIMINATED_FORMAT);

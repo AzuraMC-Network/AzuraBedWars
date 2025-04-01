@@ -144,7 +144,7 @@ public class Game {
         player.spigot().respawn();
         player.setGameMode(GameMode.ADVENTURE);
         player.getEnderChest().clear();
-        gamePlayer.clean();
+        gamePlayer.cleanState();
 
         // 传送到等待区域
         player.teleport(waitingLocation);
@@ -251,7 +251,7 @@ public class Game {
             if (!gamePlayer.getGameTeam().isDead()) {
                 Util.setPlayerTeamTab();
                 PlayerUtil.callPlayerRespawnEvent(player, respawnLocation);
-                broadcastMessage(String.format(MSG_PLAYER_RECONNECT, gamePlayer.getDisplayname()));
+                broadcastMessage(String.format(MSG_PLAYER_RECONNECT, gamePlayer.getNickName()));
                 return;
             }
         }
@@ -278,7 +278,7 @@ public class Game {
      */
     public void removePlayers(GamePlayer gamePlayer) {
         if (gameState == GameState.WAITING) {
-            broadcastMessage(String.format(MSG_PLAYER_LEAVE, gamePlayer.getDisplayname()));
+            broadcastMessage(String.format(MSG_PLAYER_LEAVE, gamePlayer.getNickName()));
         }
 
         if (gameState == GameState.RUNNING && gamePlayer.isSpectator()) {
@@ -650,7 +650,7 @@ public class Game {
             player.setAllowFlight(false);
             player.setFlying(false);
             player.setGameMode(GameMode.SURVIVAL);
-            gamePlayer.clean();
+            gamePlayer.cleanState();
             gamePlayer.getPlayerData().addGames();
         }
     }

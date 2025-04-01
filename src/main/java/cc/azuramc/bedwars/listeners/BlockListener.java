@@ -600,7 +600,7 @@ public class BlockListener implements Listener {
         // 发送全局消息
         game.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
         game.broadcastMessage(" ");
-        game.broadcastMessage("§c§l" + targetTeam.getName() + " §a的床被 " + gameTeam.getChatColor() + gamePlayer.getDisplayname() + "§a 挖爆!");
+        game.broadcastMessage("§c§l" + targetTeam.getName() + " §a的床被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + "§a 挖爆!");
         game.broadcastMessage(" ");
         game.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
 

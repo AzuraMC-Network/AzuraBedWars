@@ -587,7 +587,7 @@ public class PlayerListener implements Listener {
                     return;
                 }
 
-                game.broadcastTeamTitle(gameTeam, 0, 8, 0, "", gameTeam.getChatColor() + gamePlayer.getDisplayname() + " 说: §c注意,我们的床有危险！");
+                game.broadcastTeamTitle(gameTeam, 0, 8, 0, "", gameTeam.getChatColor() + gamePlayer.getNickName() + " 说: §c注意,我们的床有危险！");
                 game.broadcastTeamSound(gameTeam, SoundUtil.get("CLICK", "UI_BUTTON_CLICK"), 1f, 1f);
                 i++;
             }
