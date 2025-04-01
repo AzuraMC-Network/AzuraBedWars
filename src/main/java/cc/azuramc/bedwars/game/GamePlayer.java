@@ -44,7 +44,7 @@ public class GamePlayer {
     @Getter
     private final PlayerData playerData;
     @Setter
-    private String displayname;
+    private String nickName;
     @Getter
     @Setter
     private FastBoard board;
