@@ -362,7 +362,7 @@ public class BlockListener implements Listener {
                 }
 
                 player.damage(3);
-                gamePlayer.getAssistsMap().setLastDamage(ownerPlayer, System.currentTimeMillis());
+                gamePlayer.getAssistsManager().setLastDamage(ownerPlayer, System.currentTimeMillis());
                 player.setMetadata("FIREBALL PLAYER NOFALL", new FixedMetadataValue(AzuraBedWars.getInstance(), ownerPlayer.getUuid()));
                 player.setVelocity(Util.getPosition(player.getLocation(), fireball.getLocation(), 1.5D).multiply(0.5));
             }

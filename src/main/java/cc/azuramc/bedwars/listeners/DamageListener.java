@@ -139,7 +139,7 @@ public class DamageListener implements Listener {
 
         if (!player.hasMetadata("voidPlayer")) {
             Player killer = player.getKiller();
-            List<GamePlayer> killers = gamePlayer.getAssistsMap().getAssists(System.currentTimeMillis());
+            List<GamePlayer> killers = gamePlayer.getAssistsManager().getAssists(System.currentTimeMillis());
             if (killer == null && !killers.isEmpty())
                 killer = killers.get(0).getPlayer();
 
@@ -207,7 +207,7 @@ public class DamageListener implements Listener {
                     if (gamePlayer.getGameTeam().isInTeam(damagerPlayer)) {
                         event.setCancelled(true);
                     } else {
-                        gamePlayer.getAssistsMap().setLastDamage(damagerPlayer, System.currentTimeMillis());
+                        gamePlayer.getAssistsManager().setLastDamage(damagerPlayer, System.currentTimeMillis());
                     }
                 } else if (entity instanceof Player && damager instanceof Projectile) {
                     Projectile projectile = (Projectile) damager;
@@ -223,7 +223,7 @@ public class DamageListener implements Listener {
                         if (gamePlayer.getGameTeam().isInTeam(damagerPlayer)) {
                             event.setCancelled(true);
                         } else {
-                            gamePlayer.getAssistsMap().setLastDamage(damagerPlayer, System.currentTimeMillis());
+                            gamePlayer.getAssistsManager().setLastDamage(damagerPlayer, System.currentTimeMillis());
                         }
                     }
                 }

@@ -39,7 +39,7 @@ public class GamePlayer {
     @Getter
     private final String name;
     @Getter
-    private final AssistsMap assistsMap;
+    private final AssistsManager assistsManager;
     @Getter
     private final PlayerData playerData;
     @Setter
@@ -82,7 +82,7 @@ public class GamePlayer {
         this.pickaxeType = ToolType.NONE;
         this.axeType = ToolType.NONE;
 
-        assistsMap = new AssistsMap(this);
+        assistsManager = new AssistsManager(this);
         playerData = new PlayerData(this);
         playerCompass = new PlayerCompass(this);
     }
@@ -231,7 +231,7 @@ public class GamePlayer {
     }
 
     public void setLastDamage(GamePlayer damager, long time) {
-        assistsMap.setLastDamage(damager, time);
+        assistsManager.setLastDamage(damager, time);
     }
 
     public void giveInventory() {
