@@ -38,7 +38,7 @@ public class GameOverRunnable extends BukkitRunnable {
     private static final String DEFEAT_SUBTITLE = "§7你输掉了这场游戏";
     
     // 排行榜标题及分隔线
-    private static final String[] RANK_TITLES = {"§e§l击杀数第一名", "§6§l击杀数第二名", "§c§l击杀数第三名"};
+    private static final String[] lead = {"§e§l击杀数第一名", "§6§l击杀数第二名", "§c§l击杀数第三名"};
     private static final String SEPARATOR_LINE = "§a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
     private static final String GAME_TITLE = "§f                                              §l起床战争";
     private static final String WINNERS_PREFIX = "                                    §e胜利者 §7- ";
@@ -165,29 +165,20 @@ public class GameOverRunnable extends BukkitRunnable {
         messages.add(" ");
         
         // 添加击杀排行
-        addKillRanking(messages);
+        int i = 0;
+        for (GamePlayer gamePlayer : GamePlayer.sortFinalKills()) {
+            if (i > 2) {
+                continue;
+            }
+            messages.add(RANK_PREFIX + lead[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getFinalKills());
+            i++;
+        }
         
         // 添加底部分隔线
         messages.add(" ");
         messages.add(SEPARATOR_LINE);
         
         return messages;
-    }
-    
-    /**
-     * 添加击杀排行到消息列表
-     * 
-     * @param messages 消息列表
-     */
-    private void addKillRanking(List<String> messages) {
-        List<GamePlayer> topKillers = GamePlayer.sortFinalKills();
-        int maxRanks = Math.min(RANK_TITLES.length, topKillers.size());
-        
-        for (int i = 0; i < maxRanks; i++) {
-            GamePlayer player = topKillers.get(i);
-            messages.add(RANK_PREFIX + RANK_TITLES[i] + " §7- " + 
-                       player.getNickName() + " - " + player.getKills());
-        }
     }
     
     /**

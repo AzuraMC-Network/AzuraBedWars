@@ -208,7 +208,7 @@ public class DamageListener implements Listener {
             broadcastVoidKillMessage(gamePlayer, gameTeam, killerPlayer, killerTeam, gameTeam.isBedDestroy());
         } else {
             // 自杀消息
-            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + "♛)§e划下了虚空");
+            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + ")§e掉下了虚空");
             gamePlayer.getPlayerData().addDeaths();
         }
         
@@ -220,9 +220,9 @@ public class DamageListener implements Listener {
      */
     private void broadcastVoidKillMessage(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer killerPlayer, GameTeam killerTeam, boolean isFinalKill) {
         if (isFinalKill) {
-            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + "♛)[最终击杀]§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + "♛)§e狠狠滴丢下虚空");
+            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + ") [最终击杀]§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + ")§e狠狠滴丢下虚空");
         } else {
-            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + "♛)§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + "♛)§e狠狠滴丢下虚空");
+            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + ")§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + ")§e狠狠滴丢下虚空");
         }
     }
 

@@ -182,30 +182,9 @@ public class GamePlayer {
      * @return 排序后的玩家列表
      */
     public static List<GamePlayer> sortFinalKills() {
-        List<GamePlayer> sortedPlayers = new ArrayList<>(getOnlinePlayers());
-        
-        // 创建比较器
-        Comparator<GamePlayer> finalKillsComparator = (player1, player2) -> {
-            // 空值检查
-            if (player1 == null && player2 == null) {
-                return 0;
-            }
-            if (player1 == null) {
-                return -1;
-            }
-            if (player2 == null) {
-                return 1;
-            }
-
-            // 按最终击杀数降序排序
-            int kills1 = player1.getFinalKills();
-            int kills2 = player2.getFinalKills();
-            return kills2 - kills1;
-        };
-        
-        // 执行排序
-        sortedPlayers.sort(finalKillsComparator);
-        return sortedPlayers;
+        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
+        list.sort((player1, player2) -> player2.getFinalKills() - player1.getFinalKills());
+        return list;
     }
 
     /**
