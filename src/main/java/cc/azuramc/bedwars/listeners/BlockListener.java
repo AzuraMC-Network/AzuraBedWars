@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.listeners;
 
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.utils.ActionBarUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.map.data.MapData;
@@ -37,20 +38,6 @@ import java.util.UUID;
 public class BlockListener implements Listener {
     private final AzuraBedWars main;
     private final Game game;
-    private static final boolean NEW_VERSION;
-    
-    static {
-        boolean newVersion = false;
-        try {
-            // 1.13+版本存在Material.PLAYER_HEAD
-            Material.valueOf("PLAYER_HEAD");
-            newVersion = true;
-        } catch (IllegalArgumentException e) {
-            // 1.8-1.12版本
-            newVersion = false;
-        }
-        NEW_VERSION = newVersion;
-    }
 
     public BlockListener(AzuraBedWars main) {
         this.main = main;
@@ -67,7 +54,7 @@ public class BlockListener implements Listener {
     
     private void setBlockData(Block block, byte data) {
         try {
-            if (!NEW_VERSION) {
+            if (VersionUtil.isLessThan113()) {
                 java.lang.reflect.Method setDataMethod = Block.class.getMethod("setData", byte.class);
                 setDataMethod.invoke(block, data);
             }
@@ -78,7 +65,7 @@ public class BlockListener implements Listener {
 
     private ItemStack getItemInHand(Player player) {
         try {
-            if (NEW_VERSION) {
+            if (!VersionUtil.isLessThan113()) {
                 return player.getInventory().getItemInMainHand();
             } else {
                 return (ItemStack) player.getClass().getMethod("getItemInHand").invoke(player);
@@ -90,7 +77,7 @@ public class BlockListener implements Listener {
 
     private void setItemInHand(Player player, ItemStack item) {
         try {
-            if (NEW_VERSION) {
+            if (!VersionUtil.isLessThan113()) {
                 player.getInventory().setItemInMainHand(item);
             } else {
                 player.getClass().getMethod("setItemInHand", ItemStack.class).invoke(player, item);
@@ -210,7 +197,7 @@ public class BlockListener implements Listener {
 
                     if (block.getRelative(blockFace, i).getType() == MaterialUtil.AIR()) {
                         block.getRelative(blockFace, i).setType(item.getType());
-                        if (!NEW_VERSION) {
+                        if (!VersionUtil.isLessThan113()) {
                             setBlockData(block.getRelative(blockFace, i), item.getData().getData());
                         }
                         block.getWorld().playSound(block.getLocation(), SoundUtil.STEP_WOOL(), 1f, 1f);
@@ -328,7 +315,7 @@ public class BlockListener implements Listener {
                     event.setCancelled(true);
                     b.setType(MaterialUtil.AIR());
                     
-                    if (NEW_VERSION) {
+                    if (!VersionUtil.isLessThan113()) {
                         b.getWorld().spawnParticle(org.bukkit.Particle.SMOKE, b.getLocation(), 5);
                     } else {
                         b.getWorld().playEffect(b.getLocation(), Effect.SMOKE, 0);
