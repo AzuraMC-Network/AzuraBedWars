@@ -30,6 +30,7 @@ public class GameTeam {
     private boolean healPool;
     private boolean trap;
     private boolean miner;
+    private boolean alarmTrap;
     
     // 判断服务器版本
     private static final boolean NEW_VERSION;
@@ -56,6 +57,7 @@ public class GameTeam {
         this.miner = false;
         this.healPool = false;
         this.trap = false;
+        this.alarmTrap = false;
 
         this.spawn = location;
         this.teamColor = teamColor;
@@ -230,5 +232,13 @@ public class GameTeam {
 
     public String getName() {
         return teamColor.getName();
+    }
+
+    public boolean isAlarmTrap() {
+        return alarmTrap;
+    }
+
+    public void setAlarmTrap(boolean alarmTrap) {
+        this.alarmTrap = alarmTrap;
     }
 }
