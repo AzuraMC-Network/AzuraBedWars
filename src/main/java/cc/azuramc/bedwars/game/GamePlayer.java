@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.utils.ActionBarUtil;
-import cc.azuramc.bedwars.utils.ItemBuilderUtil;
+import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.utils.TitleUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.PlayerData;

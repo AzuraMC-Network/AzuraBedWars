@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.spectator;
 
 import cc.azuramc.bedwars.utils.gui.CustomGUI;
 import cc.azuramc.bedwars.utils.gui.GUIAction;
-import cc.azuramc.bedwars.utils.ItemBuilderUtil;
+import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.GameMode;

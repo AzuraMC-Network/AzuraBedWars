@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.shop.data;
 
-import cc.azuramc.bedwars.utils.ItemBuilderUtil;
+import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
 import cc.azuramc.bedwars.shop.ShopData;

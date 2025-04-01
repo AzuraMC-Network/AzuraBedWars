@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.game;
 
-import cc.azuramc.bedwars.utils.ItemBuilderUtil;
+import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.events.BedwarsGameStartEvent;

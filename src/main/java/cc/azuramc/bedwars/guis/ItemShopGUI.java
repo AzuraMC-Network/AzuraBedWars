@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.guis;
 import cc.azuramc.bedwars.utils.gui.CustomGUI;
 import cc.azuramc.bedwars.utils.gui.GUIAction;
 import cc.azuramc.bedwars.utils.gui.NewGUIAction;
-import cc.azuramc.bedwars.utils.ItemBuilderUtil;
+import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.database.PlayerData;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
