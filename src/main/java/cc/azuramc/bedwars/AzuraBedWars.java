@@ -106,6 +106,7 @@ public final class AzuraBedWars extends JavaPlugin {
     @Override
     public void onDisable() {
         connectionPoolHandler.closeAll();
+        game.getEventManager().stop();
     }
 
     public void mainThreadRunnable(Runnable runnable) {
