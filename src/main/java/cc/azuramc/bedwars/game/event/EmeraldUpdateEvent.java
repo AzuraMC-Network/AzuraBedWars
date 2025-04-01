@@ -56,14 +56,11 @@ public class EmeraldUpdateEvent extends GameEvent {
      * @return 刷新间隔（秒）
      */
     private int getRefreshSecondsForLevel() {
-        switch (level) {
-            case 2:
-                return LEVEL_2_REFRESH_SECONDS;
-            case 3:
-                return LEVEL_3_REFRESH_SECONDS;
-            default:
-                return LEVEL_2_REFRESH_SECONDS; // 默认使用2级刷新时间
-        }
+        return switch (level) {
+            case 2 -> LEVEL_2_REFRESH_SECONDS;
+            case 3 -> LEVEL_3_REFRESH_SECONDS;
+            default -> LEVEL_2_REFRESH_SECONDS; // 默认使用2级刷新时间
+        };
     }
     
     /**
