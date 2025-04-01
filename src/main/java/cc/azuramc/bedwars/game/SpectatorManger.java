@@ -12,11 +12,11 @@ public class SpectatorManger/* implements Runnable, Listener*/ {
         spectators = new ArrayList<>();
         spectatorPlayers = new HashMap<>();
 
-        Bukkit.getPluginManager().registerEvents(this, XBedwars.getInstance());
+        Bukkit.getPluginManager().registerEvents(this,  AzuraBedWars.getInstance());
     }
 
     public void start() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(XBedwars.getInstance(), this, 0, 1);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(AzuraBedWars.getInstance(), this, 0, 1);
     }
 
     public void addSpectator(Player player) {
@@ -57,7 +57,7 @@ public class SpectatorManger/* implements Runnable, Listener*/ {
             if (player.getSpectatorTarget() == null) {
                 if (spectatorPlayers.containsKey(player.getName())) {
                     spectatorPlayers.remove(player.getName());
-                    XBedwars.getInstance().mainThreadRunnable(() -> {
+                    AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                         player.setSpectatorTarget(null);
                         levelSpectator(player);
                     });

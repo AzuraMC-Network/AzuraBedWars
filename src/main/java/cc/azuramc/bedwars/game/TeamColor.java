@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 
+@Getter
 public enum TeamColor {
     RED(Color.fromRGB(255, 85, 85), ChatColor.RED, DyeColor.RED, "§c红"),
     BLUE(Color.fromRGB(85, 85, 255), ChatColor.BLUE, DyeColor.LIGHT_BLUE, "§9蓝"),
@@ -16,13 +17,9 @@ public enum TeamColor {
     GRAY(Color.fromRGB(85, 85, 85), ChatColor.DARK_GRAY, DyeColor.GRAY, "§8灰");
 
 
-    @Getter
     private final ChatColor chatColor;
-    @Getter
     private final Color color;
-    @Getter
     private final DyeColor dyeColor;
-    @Getter
     private final String name;
 
     TeamColor(Color color, ChatColor chatColor, DyeColor dyeColor, String name) {
