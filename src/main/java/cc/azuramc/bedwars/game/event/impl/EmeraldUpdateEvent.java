@@ -1,44 +1,46 @@
-package cc.azuramc.bedwars.game.event;
+package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.event.GameEvent;
+import cc.azuramc.bedwars.game.event.Runnable;
 
 /**
- * 钻石资源点升级事件
- * 随着游戏进行，钻石生成速度会加快
+ * 绿宝石资源点升级事件
+ * 随着游戏进行，绿宝石生成速度会加快
  */
-public class DiamondUpdateEvent extends GameEvent {
-    // 钻石资源点刷新标识符
-    private static final String DIAMOND_REFRESH_KEY = "钻石刷新";
+public class EmeraldUpdateEvent extends GameEvent {
+    // 绿宝石资源点刷新标识符
+    private static final String EMERALD_REFRESH_KEY = "绿宝石刷新";
     
-    // 定义各等级的钻石刷新时间（秒）
-    private static final int LEVEL_2_REFRESH_SECONDS = 23;
-    private static final int LEVEL_3_REFRESH_SECONDS = 15;
+    // 定义各等级的绿宝石刷新时间（秒）
+    private static final int LEVEL_2_REFRESH_SECONDS = 40;
+    private static final int LEVEL_3_REFRESH_SECONDS = 35;
     
     // 当前升级等级
     private final int level;
 
     /**
-     * 创建钻石升级事件
+     * 创建绿宝石升级事件
      *
      * @param level 升级目标等级
      * @param second 事件触发时间（秒）
      * @param priority 事件优先级
      */
-    public DiamondUpdateEvent(int level, int second, int priority) {
-        super("钻石资源点升级到" + level + "级", second, priority);
+    public EmeraldUpdateEvent(int level, int second, int priority) {
+        super("绿宝石升级到" + level + "级", second, priority);
         this.level = level;
     }
 
     /**
-     * 执行钻石升级事件
-     * 根据等级调整钻石刷新速度
+     * 执行绿宝石升级事件
+     * 根据等级调整绿宝石刷新速度
      *
      * @param game 游戏实例
      */
     @Override
     public void excute(Game game) {
-        // 获取钻石刷新任务
-        Runnable runnable = game.getEventManager().getRunnables().get(DIAMOND_REFRESH_KEY);
+        // 获取绿宝石刷新任务
+        cc.azuramc.bedwars.game.event.Runnable runnable = game.getEventManager().getRunnables().get(EMERALD_REFRESH_KEY);
         if (runnable == null) {
             return; // 防止NPE
         }

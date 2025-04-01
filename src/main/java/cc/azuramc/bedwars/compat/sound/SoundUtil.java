@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.compat.sound;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -102,6 +103,13 @@ public class SoundUtil {
 
     public static void playDragonHitSound(Player player) {
         player.playSound(player.getLocation(), ENDERDRAGON_HIT(), 1, 1);
+    }
+
+
+    // AzuraBedWars独立
+
+    public static void playEndermanTeleportSound(GamePlayer player) {
+        player.playSound(ENDERMAN_TELEPORT(), 30F, 1F);
     }
 
 }

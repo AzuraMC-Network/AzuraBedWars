@@ -1,8 +1,9 @@
-package cc.azuramc.bedwars.game.event;
+package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.event.GameEvent;
 import org.bukkit.Bukkit;
 import cc.azuramc.bedwars.compat.util.DestroyBed;
 import org.bukkit.Sound;

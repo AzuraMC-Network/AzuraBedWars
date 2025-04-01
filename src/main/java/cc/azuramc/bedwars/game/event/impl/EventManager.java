@@ -1,8 +1,11 @@
-package cc.azuramc.bedwars.game.event;
+package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.event.GameEvent;
+import cc.azuramc.bedwars.game.event.Runnable;
+import cc.azuramc.bedwars.game.event.StartEvent;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
@@ -39,7 +42,7 @@ public class EventManager extends TimerTask {
     
     // 定时任务和事件映射
     @Getter
-    private final HashMap<String, Runnable> runnables = new HashMap<>();
+    private final HashMap<String, cc.azuramc.bedwars.game.event.Runnable> runnables = new HashMap<>();
     private final HashMap<Integer, GameEvent> events = new HashMap<>();
     
     // 计时器和状态变量
@@ -199,8 +202,8 @@ public class EventManager extends TimerTask {
      * @param name 任务名称
      * @param runnable 任务执行逻辑
      */
-    public void registerRunnable(String name, Runnable.Event runnable) {
-        this.runnables.put(name, new Runnable(0, 0, runnable));
+    public void registerRunnable(String name, cc.azuramc.bedwars.game.event.Runnable.Event runnable) {
+        this.runnables.put(name, new cc.azuramc.bedwars.game.event.Runnable(0, 0, runnable));
     }
 
     /**
@@ -210,7 +213,7 @@ public class EventManager extends TimerTask {
      * @param runnable 任务执行逻辑
      * @param seconds 执行周期（秒）
      */
-    public void registerRunnable(String name, Runnable.Event runnable, int seconds) {
+    public void registerRunnable(String name, cc.azuramc.bedwars.game.event.Runnable.Event runnable, int seconds) {
         this.runnables.put(name, new Runnable(seconds, 0, runnable));
     }
 

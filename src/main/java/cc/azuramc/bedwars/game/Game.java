@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.events.BedwarsGameStartEvent;
-import cc.azuramc.bedwars.game.event.EventManager;
+import cc.azuramc.bedwars.game.event.impl.EventManager;
 import cc.azuramc.bedwars.scoreboards.GameBoard;
 import cc.azuramc.bedwars.scoreboards.LobbyBoard;
 import cc.azuramc.bedwars.shop.ItemShopManager;
