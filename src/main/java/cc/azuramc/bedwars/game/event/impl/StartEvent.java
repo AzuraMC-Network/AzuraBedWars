@@ -1,14 +1,14 @@
-package cc.azuramc.bedwars.game.event;
+package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.event.GameEvent;
 import cc.azuramc.bedwars.game.timer.CompassRunnable;
 import cc.azuramc.bedwars.game.timer.GeneratorRunnable;
 import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import cc.azuramc.bedwars.compat.potioneffect.PotionEffectUtil;
-import org.bukkit.Sound;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 

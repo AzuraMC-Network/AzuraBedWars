@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.compat.sound;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -76,6 +77,10 @@ public class SoundUtil {
         return get("CLICK", "UI_BUTTON_CLICK");
     }
 
+    public static Sound ENDERDRAGON_GROWL() {
+        return get("ENDERDRAGON_GROWL", "ENTITY_ENDER_DRAGON_GROWL");
+    }
+
     // 常用播放声音操作
     public static void playLevelUpSound(Player player) {
         player.playSound(player.getLocation(), LEVEL_UP(), 10, 15F);
@@ -110,6 +115,10 @@ public class SoundUtil {
 
     public static void playEndermanTeleportSound(GamePlayer player) {
         player.playSound(ENDERMAN_TELEPORT(), 30F, 1F);
+    }
+
+    public static void broadcastEnderDragonGrowl(Game game) {
+        game.broadcastSound(ENDERDRAGON_GROWL(), 1, 1);
     }
 
 }

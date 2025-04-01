@@ -1,63 +1,81 @@
 package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.event.GameEvent;
-import org.bukkit.Bukkit;
 import cc.azuramc.bedwars.compat.util.DestroyBed;
-import org.bukkit.Sound;
+import java.util.logging.Level;
 
+/**
+ * 床自毁事件
+ * <p>
+ * 在游戏进行到一定时间后，自动销毁所有队伍的床，
+ * 使游戏进入到更激烈的阶段。该事件触发时，会向所有玩家播放末影龙咆哮音效
+ * 并显示床自毁的全屏提示。
+ * </p>
+ */
 public class BedDestroyedEvent extends GameEvent {
+    // 事件相关常量
+    private static final String EVENT_NAME = "床自毁";
+    private static final int EXECUTE_SECONDS = 360; // 6分钟
+    private static final int PRIORITY = 5;
+    
+    // 标题显示相关常量
+    private static final String TITLE = "§c§l床自毁";
+    private static final String SUBTITLE = "§e所有队伍床消失";
+    private static final int TITLE_FADE_IN = 10;
+    private static final int TITLE_STAY = 20;
+    private static final int TITLE_FADE_OUT = 10;
+
+    /**
+     * 创建床自毁事件
+     * 默认在游戏开始6分钟后触发，优先级为5
+     */
     public BedDestroyedEvent() {
-        super("床自毁", 360, 5);
+        super(EVENT_NAME, EXECUTE_SECONDS, PRIORITY);
     }
 
+    /**
+     * 执行床自毁事件
+     * 销毁所有队伍的床，播放音效，并向玩家显示提示
+     * 
+     * @param game 当前游戏实例
+     */
     @Override
     public void excute(Game game) {
-        AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            for (GameTeam gameTeam : game.getGameTeams()) {
-                if (gameTeam.isBedDestroy()) continue;
+        if (game == null) {
+            AzuraBedWars.getInstance().getLogger().log(Level.WARNING, "无法执行床自毁事件：游戏实例为null");
+            return;
+        }
 
-                DestroyBed.destroyBed(gameTeam);
-                gameTeam.setBedDestroy(true);
+        // 在主线程销毁所有队伍的床
+        AzuraBedWars.getInstance().mainThreadRunnable(() -> {
+            try {
+                destroyAllBeds(game);
+            } catch (Exception e) {
+                AzuraBedWars.getInstance().getLogger().log(Level.SEVERE, "床自毁事件执行异常", e);
             }
         });
 
-        playCompatibleSound(game);
-        game.broadcastTitle(10, 20, 10, "§c§l床自毁", "§e所有队伍床消失");
+        // 播放音效和显示标题
+        SoundUtil.broadcastEnderDragonGrowl(game);
+        game.broadcastTitle(TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT, TITLE, SUBTITLE);
     }
-
-
+    
     /**
-     * 播放兼容不同版本Minecraft的声音
+     * 销毁所有队伍的床
+     * 
+     * @param game 当前游戏实例
      */
-    private void playCompatibleSound(Game game) {
-        try {
-            // 尝试使用1.8版本的声音枚举
-            Sound dragonSound = Sound.valueOf("ENDERDRAGON_GROWL");
-            game.broadcastSound(dragonSound, 1, 1);
-        } catch (IllegalArgumentException e) {
-            try {
-                // 尝试使用1.9+版本的声音枚举
-                Sound dragonSound = Sound.valueOf("ENTITY_ENDER_DRAGON_GROWL");
-                game.broadcastSound(dragonSound, 1, 1);
-            } catch (IllegalArgumentException e2) {
-                try {
-                    // 尝试使用最新版本的可能命名
-                    Sound dragonSound = Sound.valueOf("ENTITY_DRAGON_GROWL");
-                    game.broadcastSound(dragonSound, 1, 1);
-                } catch (IllegalArgumentException e3) {
-                    // 如果所有尝试都失败，使用一个通用的备选声音
-                    try {
-                        Sound fallbackSound = Sound.valueOf("ENTITY_GENERIC_EXPLODE");
-                        game.broadcastSound(fallbackSound, 1, 1);
-                    } catch (Exception e4) {
-                        // 如果连备选声音都失败，则静默失败
-                        Bukkit.getLogger().warning("无法播放兼容的声音效果");
-                    }
-                }
-            }
+    private void destroyAllBeds(Game game) {
+        for (GameTeam gameTeam : game.getGameTeams()) {
+            if (gameTeam == null) continue;
+            if (gameTeam.isBedDestroy()) continue;
+
+            DestroyBed.destroyBed(gameTeam);
+            gameTeam.setBedDestroy(true);
         }
     }
 }

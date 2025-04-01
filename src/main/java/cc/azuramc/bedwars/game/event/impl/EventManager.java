@@ -5,7 +5,6 @@ import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.event.GameEvent;
 import cc.azuramc.bedwars.game.event.Runnable;
-import cc.azuramc.bedwars.game.event.StartEvent;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
