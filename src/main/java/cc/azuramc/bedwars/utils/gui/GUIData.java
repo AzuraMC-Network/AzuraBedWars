@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
+@Getter
 public class GUIData {
 
     @Getter

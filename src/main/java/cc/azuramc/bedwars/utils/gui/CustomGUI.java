@@ -9,13 +9,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class CustomGUI {
     public List<GUIItem> items;
-    @Getter
     private final Player player;
-    @Getter
     private final String title;
-    @Getter
     private final int size;
 
     public CustomGUI(Player player, String title, int size) {
