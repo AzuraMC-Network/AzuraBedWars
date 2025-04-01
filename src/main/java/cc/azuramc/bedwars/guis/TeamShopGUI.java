@@ -59,18 +59,18 @@ public class TeamShopGUI extends CustomGUI {
                             }
                         }
 
-                        player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                        SoundUtil.playItemPickupSound(player);
                     } else {
-                        player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                        SoundUtil.playEndermanTeleportSound(player);
                         player.sendMessage("§c没有足够资源购买！");
                         return;
                     }
                 } else {
                     if (player.getLevel() >= 400) {
                         player.setLevel(player.getLevel() - 400);
-                        player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                        SoundUtil.playItemPickupSound(player);
                     } else {
-                        player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                        SoundUtil.playEndermanTeleportSound(player);
                         player.sendMessage("§c没有足够资源购买！");
                         return;
                     }
@@ -142,18 +142,18 @@ public class TeamShopGUI extends CustomGUI {
                         }
                     }
 
-                    player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                    SoundUtil.playItemPickupSound(player);
                 } else {
-                    player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                    SoundUtil.playEndermanTeleportSound(player);
                     player.sendMessage("§c没有足够资源购买！");
                     return;
                 }
             } else {
                 if (player.getLevel() >= (money * 100)) {
                     player.setLevel(player.getLevel() - (money * 100));
-                    player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                    SoundUtil.playItemPickupSound(player);
                 } else {
-                    player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                    SoundUtil.playEndermanTeleportSound(player);
                     player.sendMessage("§c没有足够资源购买！");
                     return;
                 }
@@ -234,18 +234,18 @@ public class TeamShopGUI extends CustomGUI {
                         }
                     }
 
-                    player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                    SoundUtil.playItemPickupSound(player);
                 } else {
-                    player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                    SoundUtil.playEndermanTeleportSound(player);
                     player.sendMessage("§c没有足够资源购买！");
                     return;
                 }
             } else {
                 if (player.getLevel() >= (money * 100)) {
                     player.setLevel(player.getLevel() - (money * 100));
-                    player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                    SoundUtil.playItemPickupSound(player);
                 } else {
-                    player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                    SoundUtil.playEndermanTeleportSound(player);
                     player.sendMessage("§c没有足够资源购买！");
                     return;
                 }
@@ -304,18 +304,18 @@ public class TeamShopGUI extends CustomGUI {
                             }
                         }
 
-                        player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                        SoundUtil.playItemPickupSound(player);
                     } else {
-                        player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                        SoundUtil.playEndermanTeleportSound(player);
                         player.sendMessage("§c没有足够资源购买！");
                         return;
                     }
                 } else {
                     if (player.getLevel() >= 200) {
                         player.setLevel(player.getLevel() - 200);
-                        player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                        SoundUtil.playItemPickupSound(player);
                     } else {
-                        player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                        SoundUtil.playEndermanTeleportSound(player);
                         player.sendMessage("§c没有足够资源购买！");
                         return;
                     }
@@ -363,18 +363,18 @@ public class TeamShopGUI extends CustomGUI {
                             }
                         }
 
-                        player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                        SoundUtil.playItemPickupSound(player);
                     } else {
-                        player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                        SoundUtil.playEndermanTeleportSound(player);
                         player.sendMessage("§c没有足够资源购买！");
                         return;
                     }
                 } else {
                     if (player.getLevel() >= 400) {
                         player.setLevel(player.getLevel() - 400);
-                        player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                        SoundUtil.playItemPickupSound(player);
                     } else {
-                        player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                        SoundUtil.playEndermanTeleportSound(player);
                         player.sendMessage("§c没有足够资源购买！");
                         return;
                     }
@@ -422,18 +422,18 @@ public class TeamShopGUI extends CustomGUI {
                             }
                         }
 
-                        player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                        SoundUtil.playItemPickupSound(player);
                     } else {
-                        player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                        SoundUtil.playEndermanTeleportSound(player);
                         player.sendMessage("§c没有足够资源购买！");
                         return;
                     }
                 } else {
                     if (player.getLevel() >= 100) {
                         player.setLevel(player.getLevel() - 100);
-                        player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                        SoundUtil.playItemPickupSound(player);
                     } else {
-                        player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                        SoundUtil.playEndermanTeleportSound(player);
                         player.sendMessage("§c没有足够资源购买！");
                         return;
                     }

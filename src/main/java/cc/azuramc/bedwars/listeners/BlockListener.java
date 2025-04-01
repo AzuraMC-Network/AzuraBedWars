@@ -213,7 +213,7 @@ public class BlockListener implements Listener {
                         if (!NEW_VERSION) {
                             setBlockData(block.getRelative(blockFace, i), item.getData().getData());
                         }
-                        block.getWorld().playSound(block.getLocation(), SoundUtil.get("STEP_WOOL", "BLOCK_CLOTH_STEP"), 1f, 1f);
+                        block.getWorld().playSound(block.getLocation(), SoundUtil.STEP_WOOL(), 1f, 1f);
                     }
 
                     i++;
@@ -273,7 +273,7 @@ public class BlockListener implements Listener {
                             player.sendMessage("§6+10个金币 (破坏床)");
                             AzuraBedWars.getInstance().getEcon().depositPlayer(player, 10);
 
-                            game.broadcastSound(SoundUtil.get("ENDERDRAGON_HIT", "ENTITY_ENDERDRAGON_HURT"), 10, 10);
+                            game.broadcastSound(SoundUtil.ENDERDRAGON_HIT(), 10, 10);
                             game.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
                             game.broadcastMessage(" ");
                             game.broadcastMessage("§c§l" + gameTeam1.getName() + " §a的床被 " + gameTeam.getChatColor() + gamePlayer.getDisplayname() + "§a 挖爆!");
@@ -334,7 +334,7 @@ public class BlockListener implements Listener {
                         b.getWorld().playEffect(b.getLocation(), Effect.SMOKE, 0);
                     }
                     
-                    b.getWorld().playSound(b.getLocation(), SoundUtil.get("EXPLODE", "ENTITY_GENERIC_EXPLODE"), 1.0F, 1.0F);
+                    b.getWorld().playSound(b.getLocation(), SoundUtil.EXPLODE(), 1.0F, 1.0F);
                 }
             }
         }

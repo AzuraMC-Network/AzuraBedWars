@@ -393,13 +393,13 @@ public class PlayerListener implements Listener {
                 event.setCancelled(true);
                 event.getItem().remove();
 
-                player.playSound(player.getLocation(), SoundUtil.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 10, 15);
+                SoundUtil.playLevelUpSound(player);
                 player.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
             } else if (playerData.getModeType() == ModeType.EXPERIENCE) {
                 event.setCancelled(true);
                 event.getItem().remove();
 
-                player.playSound(player.getLocation(), SoundUtil.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 10, 15);
+                SoundUtil.playLevelUpSound(player);
                 player.setLevel((int) (player.getLevel() + xp));
             }
 
@@ -440,7 +440,7 @@ public class PlayerListener implements Listener {
 
             event.getItem().remove();
             player.setLevel((int) (player.getLevel() + xp));
-            player.playSound(player.getLocation(), SoundUtil.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 10, 15);
+            SoundUtil.playLevelUpSound(player);
         }
 
         if (itemStack.getType() == Material.EMERALD) {
@@ -463,7 +463,7 @@ public class PlayerListener implements Listener {
 
             event.getItem().remove();
             player.setLevel((int) (player.getLevel() + xp));
-            player.playSound(player.getLocation(), SoundUtil.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 10, 15);
+            SoundUtil.playLevelUpSound(player);
         }
     }
 

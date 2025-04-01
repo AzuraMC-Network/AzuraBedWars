@@ -8,8 +8,13 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MaterialUtil {
 
+    private static final Map<String, Material> MATERIAL_CACHE = new HashMap<>();
+    
     /**
      * 获取兼容的材质
      * @param oldName 旧版本(1.8-1.12)的材质名称
@@ -17,22 +22,34 @@ public class MaterialUtil {
      * @return 对应当前服务器版本的有效Material
      */
     public static Material getMaterial(String oldName, String newName) {
+        // 检查缓存
+        String cacheKey = oldName + ":" + newName;
+        if (MATERIAL_CACHE.containsKey(cacheKey)) {
+            return MATERIAL_CACHE.get(cacheKey);
+        }
+        
+        Material result;
         try {
             if (VersionUtil.isLessThan113()) {
-                return Material.valueOf(oldName);
+                result = Material.valueOf(oldName);
             } else {
-                return Material.valueOf(newName);
+                result = Material.valueOf(newName);
             }
         } catch (IllegalArgumentException e) {
             try {
                 // 尝试使用另一个名称
-                return VersionUtil.isLessThan113() ? 
+                result = VersionUtil.isLessThan113() ? 
                        Material.valueOf(newName) : Material.valueOf(oldName);
             } catch (IllegalArgumentException ex) {
                 Bukkit.getLogger().warning("无法找到材质: " + oldName + " 或 " + newName);
-                return Material.STONE; // 默认返回石头
+                result = Material.STONE; // 默认返回石头
             }
         }
+        
+        // 将结果存入缓存
+        MATERIAL_CACHE.put(cacheKey, result);
+
+        return result;
     }
     
     /**
@@ -469,4 +486,4 @@ public class MaterialUtil {
     public static Material COMPARATOR() {
         return getMaterial("REDSTONE_COMPARATOR", "COMPARATOR");
     }
-} 
+}

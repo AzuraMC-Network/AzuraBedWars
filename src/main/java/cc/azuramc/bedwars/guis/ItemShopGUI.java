@@ -223,18 +223,18 @@ public class ItemShopGUI extends CustomGUI {
                         }
                     }
 
-                    player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                    SoundUtil.playItemPickupSound(player);
                 } else {
-                    player.playSound(player.getLocation(), SoundUtil.get("ENTITY_ENDERMAN_TELEPORT", "ENTITY_ENDERMAN_TELEPORT"), 30.0F, 1.0F);
+                    SoundUtil.playEndermanTeleportSound(player);
                     player.sendMessage("§c没有足够资源购买！");
                     return;
                 }
             } else {
                 if (player.getLevel() >= itemType.getPriceCost().getXp()) {
                     player.setLevel(player.getLevel() - itemType.getPriceCost().getXp());
-                    player.playSound(player.getLocation(), SoundUtil.get("ITEM_PICKUP", "ENTITY_ITEM_PICKUP"), 1f, 1f);
+                    SoundUtil.playItemPickupSound(player);
                 } else {
-                    player.playSound(player.getLocation(), SoundUtil.get("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT"), 30.0F, 1.0F);
+                    SoundUtil.playEndermanTeleportSound(player);
                     player.sendMessage("§c没有足够资源购买！");
                     return;
                 }

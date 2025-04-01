@@ -20,14 +20,14 @@ public class ModeSelectionGUI extends CustomGUI {
 
         setItem(11, new ItemBuilderUtil().setType(MaterialUtil.BED()).setDisplayName("§a普通模式").setLores(" ", playerData.getModeType() == ModeType.DEFAULT ? "§a§l✔已选择" : "").getItem(), new GUIAction(0, () -> {
             playerData.setModeType(ModeType.DEFAULT);
-            player.playSound(player.getLocation(), SoundUtil.get("ORB_PICKUP", "ENTITY_EXPERIENCE_ORB_PICKUP"), 10.0F, 1.0F);
+            SoundUtil.playOrbPickupSound(player);
             LobbyBoard.updateBoard();
             player.sendMessage("§a模式选择成功!");
         }, true));
 
         setItem(15, new ItemBuilderUtil().setType(MaterialUtil.EXPERIENCE_BOTTLE()).setDisplayName("§a经验模式").setLores(" ", playerData.getModeType() == ModeType.EXPERIENCE ? "§a§l✔已选择" : "").getItem(), new GUIAction(0, () -> {
             playerData.setModeType(ModeType.EXPERIENCE);
-            player.playSound(player.getLocation(), SoundUtil.get("ORB_PICKUP", "ENTITY_EXPERIENCE_ORB_PICKUP"), 10.0F, 1.0F);
+            SoundUtil.playOrbPickupSound(player);
             LobbyBoard.updateBoard();
             player.sendMessage("§a模式选择成功!");
         }, true));

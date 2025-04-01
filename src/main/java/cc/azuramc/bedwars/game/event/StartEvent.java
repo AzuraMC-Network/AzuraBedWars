@@ -19,7 +19,7 @@ public class StartEvent extends GameEvent {
     }
 
     public void excuteRunnbale(Game game, int seconds) {
-        game.broadcastSound(SoundUtil.get("CLICK", "UI_BUTTON_CLICK"), 1f, 1f);
+        game.broadcastSound(SoundUtil.CLICK(), 1f, 1f);
         game.broadcastTitle(1, 20, 1, "§c§l游戏即将开始", "§e§l" + seconds);
     }
 

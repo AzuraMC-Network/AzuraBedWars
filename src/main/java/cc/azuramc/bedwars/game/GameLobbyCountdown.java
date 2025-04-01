@@ -37,7 +37,7 @@ public class GameLobbyCountdown extends BukkitRunnable {
             GamePlayer.getOnlinePlayers().forEach(player -> {
                 player.sendMessage("§e游戏将在§c" + countdown + "§e秒后开始！");
                 player.sendTitle(1, 20, 1, "§c§l" + countdown, "§e§l准备战斗吧！");
-                player.playSound(SoundUtil.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 1F, 10F);
+                player.playSound(SoundUtil.LEVEL_UP(), 1F, 10F);
             });
         }
 
