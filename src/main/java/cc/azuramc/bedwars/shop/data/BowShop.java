@@ -5,8 +5,8 @@ import cc.azuramc.bedwars.shop.ShopData;
 import cc.azuramc.bedwars.shop.type.ColorType;
 import cc.azuramc.bedwars.shop.type.ItemType;
 import cc.azuramc.bedwars.shop.type.PriceCost;
-import cc.azuramc.bedwars.utils.EnchantmentUtil;
-import cc.azuramc.bedwars.utils.MaterialUtil;
+import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 

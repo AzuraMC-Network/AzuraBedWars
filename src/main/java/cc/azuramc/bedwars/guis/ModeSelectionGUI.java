@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.guis;
 
 import cc.azuramc.bedwars.scoreboards.LobbyBoard;
-import cc.azuramc.bedwars.utils.MaterialUtil;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.utils.gui.CustomGUI;
 import cc.azuramc.bedwars.utils.gui.GUIAction;
 import cc.azuramc.bedwars.utils.ItemBuilderUtil;

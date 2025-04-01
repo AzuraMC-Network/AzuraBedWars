@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.utils;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;

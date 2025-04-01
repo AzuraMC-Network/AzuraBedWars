@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.specials;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.utils.MaterialUtil;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

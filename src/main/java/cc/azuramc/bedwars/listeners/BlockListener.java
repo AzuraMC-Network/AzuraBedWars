@@ -10,7 +10,7 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.utils.SoundUtil;
 import cc.azuramc.bedwars.utils.Util;
-import cc.azuramc.bedwars.utils.MaterialUtil;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;

@@ -1,6 +1,5 @@
-package cc.azuramc.bedwars.utils;
+package cc.azuramc.bedwars.compat.potioneffect;
 
-import org.bukkit.Bukkit;
 import org.bukkit.potion.PotionEffectType;
 
 /**

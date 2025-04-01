@@ -1,12 +1,12 @@
 package cc.azuramc.bedwars.shop.data;
 
 import cc.azuramc.bedwars.utils.ItemBuilderUtil;
-import cc.azuramc.bedwars.utils.MaterialUtil;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.shop.ShopData;
 import cc.azuramc.bedwars.shop.type.ColorType;
 import cc.azuramc.bedwars.shop.type.ItemType;
 import cc.azuramc.bedwars.shop.type.PriceCost;
-import cc.azuramc.bedwars.utils.PotionEffectUtil;
+import cc.azuramc.bedwars.compat.potioneffect.PotionEffectUtil;
 import lombok.Getter;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;

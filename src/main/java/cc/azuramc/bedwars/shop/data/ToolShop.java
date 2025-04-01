@@ -5,11 +5,9 @@ import cc.azuramc.bedwars.shop.ShopData;
 import cc.azuramc.bedwars.shop.type.ColorType;
 import cc.azuramc.bedwars.shop.type.ItemType;
 import cc.azuramc.bedwars.shop.type.PriceCost;
-import cc.azuramc.bedwars.utils.MaterialUtil;
-import cc.azuramc.bedwars.utils.EnchantmentUtil;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
+import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
 import lombok.Getter;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 
 import java.util.LinkedList;
