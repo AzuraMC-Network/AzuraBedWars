@@ -8,31 +8,28 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Player;
 
-/**
- * 材质兼容性工具类
- * 用于处理不同Minecraft版本(1.8-1.21)的Material名称变化和数据值问题
- * By An5w1r_
- */
 public class MaterialUtil {
 
     /**
      * 获取兼容的材质
-     * @param newName 新版本(1.13+)的材质名称
      * @param oldName 旧版本(1.8-1.12)的材质名称
+     * @param newName 新版本(1.13+)的材质名称
      * @return 对应当前服务器版本的有效Material
      */
-    public static Material getMaterial(String newName, String oldName) {
+    public static Material getMaterial(String oldName, String newName) {
         try {
-            if (!VersionUtil.isLessThan113()) {
-                return Material.valueOf(newName);
-            } else {
+            if (VersionUtil.isLessThan113()) {
                 return Material.valueOf(oldName);
+            } else {
+                return Material.valueOf(newName);
             }
         } catch (IllegalArgumentException e) {
             try {
-                return Material.valueOf(oldName);
+                // 尝试使用另一个名称
+                return VersionUtil.isLessThan113() ? 
+                       Material.valueOf(newName) : Material.valueOf(oldName);
             } catch (IllegalArgumentException ex) {
-                Bukkit.getLogger().warning("无法找到材质: " + newName + " 或 " + oldName);
+                Bukkit.getLogger().warning("无法找到材质: " + oldName + " 或 " + newName);
                 return Material.STONE; // 默认返回石头
             }
         }
@@ -43,7 +40,7 @@ public class MaterialUtil {
      * @return 玻璃板材质
      */
     public static Material GLASS_PANE() {
-        return getMaterial("GLASS_PANE", "THIN_GLASS");
+        return getMaterial("THIN_GLASS", "GLASS_PANE");
     }
 
     
@@ -114,83 +111,83 @@ public class MaterialUtil {
     }
 
     public static Material WOODEN_SWORD() {
-        return getMaterial("WOODEN_SWORD", "WOOD_SWORD");
+        return getMaterial("WOOD_SWORD", "WOODEN_SWORD");
     }
     
     public static Material WOODEN_PICKAXE() {
-        return getMaterial("WOODEN_PICKAXE", "WOOD_PICKAXE");
+        return getMaterial("WOOD_PICKAXE", "WOODEN_PICKAXE");
     }
     
     public static Material WOODEN_AXE() {
-        return getMaterial("WOODEN_AXE", "WOOD_AXE");
+        return getMaterial("WOOD_AXE", "WOODEN_AXE");
     }
     
     public static Material WOODEN_SHOVEL() {
-        return getMaterial("WOODEN_SHOVEL", "WOOD_SPADE");
+        return getMaterial("WOOD_SPADE", "WOODEN_SHOVEL");
     }
 
     public static Material STONE_SWORD() {
-        return getMaterial("STONE_SWORD", "STONE_SWORD");
+        return Material.STONE_SWORD;
     }
     
     public static Material STONE_PICKAXE() {
-        return getMaterial("STONE_PICKAXE", "STONE_PICKAXE");
+        return Material.STONE_PICKAXE;
     }
     
     public static Material STONE_AXE() {
-        return getMaterial("STONE_AXE", "STONE_AXE");
+        return Material.STONE_AXE;
     }
     
     public static Material STONE_SHOVEL() {
-        return getMaterial("STONE_SHOVEL", "STONE_SPADE");
+        return getMaterial("STONE_SPADE", "STONE_SHOVEL");
     }
 
     public static Material IRON_SWORD() {
-        return getMaterial("IRON_SWORD", "IRON_SWORD");
+        return Material.IRON_SWORD;
     }
     
     public static Material IRON_PICKAXE() {
-        return getMaterial("IRON_PICKAXE", "IRON_PICKAXE");
+        return Material.IRON_PICKAXE;
     }
     
     public static Material IRON_AXE() {
-        return getMaterial("IRON_AXE", "IRON_AXE");
+        return Material.IRON_AXE;
     }
     
     public static Material IRON_SHOVEL() {
-        return getMaterial("IRON_SHOVEL", "IRON_SPADE");
+        return getMaterial("IRON_SPADE", "IRON_SHOVEL");
     }
 
     public static Material GOLDEN_SWORD() {
-        return getMaterial("GOLDEN_SWORD", "GOLD_SWORD");
+        return getMaterial("GOLD_SWORD", "GOLDEN_SWORD");
     }
     
     public static Material GOLDEN_PICKAXE() {
-        return getMaterial("GOLDEN_PICKAXE", "GOLD_PICKAXE");
+        return getMaterial("GOLD_PICKAXE", "GOLDEN_PICKAXE");
     }
     
     public static Material GOLDEN_AXE() {
-        return getMaterial("GOLDEN_AXE", "GOLD_AXE");
+        return getMaterial("GOLD_AXE", "GOLDEN_AXE");
     }
     
     public static Material GOLDEN_SHOVEL() {
-        return getMaterial("GOLDEN_SHOVEL", "GOLD_SPADE");
+        return getMaterial("GOLD_SPADE", "GOLDEN_SHOVEL");
     }
 
     public static Material DIAMOND_SWORD() {
-        return getMaterial("DIAMOND_SWORD", "DIAMOND_SWORD");
+        return Material.DIAMOND_SWORD;
     }
     
     public static Material DIAMOND_PICKAXE() {
-        return getMaterial("DIAMOND_PICKAXE", "DIAMOND_PICKAXE");
+        return Material.DIAMOND_PICKAXE;
     }
     
     public static Material DIAMOND_AXE() {
-        return getMaterial("DIAMOND_AXE", "DIAMOND_AXE");
+        return Material.DIAMOND_AXE;
     }
     
     public static Material DIAMOND_SHOVEL() {
-        return getMaterial("DIAMOND_SHOVEL", "DIAMOND_SPADE");
+        return getMaterial("DIAMOND_SPADE", "DIAMOND_SHOVEL");
     }
 
     public static Material BOW() {
@@ -198,127 +195,123 @@ public class MaterialUtil {
     }
     
     public static Material CROSSBOW() {
-        return getMaterial("CROSSBOW", "BOW");
+        return getMaterial("BOW", "CROSSBOW");
     }
 
     public static Material SHEARS() {
-        return getMaterial("SHEARS", "SHEARS");
+        return Material.SHEARS;
     }
 
     public static Material LEATHER_HELMET() {
-        return getMaterial("LEATHER_HELMET", "LEATHER_HELMET");
+        return Material.LEATHER_HELMET;
     }
     
     public static Material LEATHER_CHESTPLATE() {
-        return getMaterial("LEATHER_CHESTPLATE", "LEATHER_CHESTPLATE");
+        return Material.LEATHER_CHESTPLATE;
     }
     
     public static Material LEATHER_LEGGINGS() {
-        return getMaterial("LEATHER_LEGGINGS", "LEATHER_LEGGINGS");
+        return Material.LEATHER_LEGGINGS;
     }
     
     public static Material LEATHER_BOOTS() {
-        return getMaterial("LEATHER_BOOTS", "LEATHER_BOOTS");
+        return Material.LEATHER_BOOTS;
     }
 
     public static Material CHAINMAIL_HELMET() {
-        return getMaterial("CHAINMAIL_HELMET", "CHAINMAIL_HELMET");
+        return Material.CHAINMAIL_HELMET;
     }
     
     public static Material CHAINMAIL_CHESTPLATE() {
-        return getMaterial("CHAINMAIL_CHESTPLATE", "CHAINMAIL_CHESTPLATE");
+        return Material.CHAINMAIL_CHESTPLATE;
     }
     
     public static Material CHAINMAIL_LEGGINGS() {
-        return getMaterial("CHAINMAIL_LEGGINGS", "CHAINMAIL_LEGGINGS");
+        return Material.CHAINMAIL_LEGGINGS;
     }
     
     public static Material CHAINMAIL_BOOTS() {
-        return getMaterial("CHAINMAIL_BOOTS", "CHAINMAIL_BOOTS");
+        return Material.CHAINMAIL_BOOTS;
     }
 
     public static Material IRON_HELMET() {
-        return getMaterial("IRON_HELMET", "IRON_HELMET");
+        return Material.IRON_HELMET;
     }
     
     public static Material IRON_CHESTPLATE() {
-        return getMaterial("IRON_CHESTPLATE", "IRON_CHESTPLATE");
+        return Material.IRON_CHESTPLATE;
     }
     
     public static Material IRON_LEGGINGS() {
-        return getMaterial("IRON_LEGGINGS", "IRON_LEGGINGS");
+        return Material.IRON_LEGGINGS;
     }
     
     public static Material IRON_BOOTS() {
-        return getMaterial("IRON_BOOTS", "IRON_BOOTS");
+        return Material.IRON_BOOTS;
     }
 
     public static Material DIAMOND_HELMET() {
-        return getMaterial("DIAMOND_HELMET", "DIAMOND_HELMET");
+        return Material.DIAMOND_HELMET;
     }
     
     public static Material DIAMOND_CHESTPLATE() {
-        return getMaterial("DIAMOND_CHESTPLATE", "DIAMOND_CHESTPLATE");
+        return Material.DIAMOND_CHESTPLATE;
     }
     
     public static Material DIAMOND_LEGGINGS() {
-        return getMaterial("DIAMOND_LEGGINGS", "DIAMOND_LEGGINGS");
+        return Material.DIAMOND_LEGGINGS;
     }
     
     public static Material DIAMOND_BOOTS() {
-        return getMaterial("DIAMOND_BOOTS", "DIAMOND_BOOTS");
+        return Material.DIAMOND_BOOTS;
     }
     
     public static Material IRON_INGOT() {
-        return getMaterial("IRON_INGOT", "IRON_INGOT");
+        return Material.IRON_INGOT;
     }
     
     public static Material GOLD_INGOT() {
-        return getMaterial("GOLD_INGOT", "GOLD_INGOT");
+        return Material.GOLD_INGOT;
     }
     
     public static Material DIAMOND() {
-        return getMaterial("DIAMOND", "DIAMOND");
+        return Material.DIAMOND;
     }
     
     public static Material EMERALD() {
-        return getMaterial("EMERALD", "EMERALD");
+        return Material.EMERALD;
     }
     
     public static Material COMPASS() {
-        return getMaterial("COMPASS", "COMPASS");
+        return Material.COMPASS;
     }
     
     public static Material CLOCK() {
-        return getMaterial("CLOCK", "WATCH");
+        return getMaterial("WATCH", "CLOCK");
     }
     
     public static Material ENDER_PEARL() {
-        return getMaterial("ENDER_PEARL", "ENDER_PEARL");
+        return Material.ENDER_PEARL;
     }
     
     public static Material PLAYER_HEAD() {
-        return getMaterial("PLAYER_HEAD", "SKULL_ITEM");
+        return getMaterial("SKULL_ITEM", "PLAYER_HEAD");
     }
     
     public static Material WALL_SIGN() {
-        return getMaterial("OAK_WALL_SIGN", "WALL_SIGN");
+        return getMaterial("WALL_SIGN", "OAK_WALL_SIGN");
     }
     
     public static Material SLIME_BALL() {
-        return getMaterial("SLIME_BALL", "SLIME_BALL");
+        return Material.SLIME_BALL;
     }
     
     public static Material REDSTONE_COMPARATOR() {
-        return getMaterial("COMPARATOR", "REDSTONE_COMPARATOR");
+        return getMaterial("REDSTONE_COMPARATOR", "COMPARATOR");
     }
     
     public static Material RED_WOOL() {
-        if (!VersionUtil.isLessThan113()) {
-            return Material.valueOf("RED_WOOL");
-        } else {
-            return Material.valueOf("WOOL");
-        }
+        return getMaterial("WOOL", "RED_WOOL");
     }
     
     /**
@@ -334,7 +327,7 @@ public class MaterialUtil {
                 String colorName = dyeColor.toString();
                 return new ItemStack(Material.valueOf(colorName + "_WOOL"));
             } catch (Exception e) {
-                return new ItemStack(Material.WHITE_WOOL);
+                return new ItemStack(WHITE_WOOL());
             }
         } else {
             // 1.8-1.12 使用数据值
@@ -346,77 +339,71 @@ public class MaterialUtil {
     }
     
     public static byte getWoolData(DyeColor dyeColor) {
-        try {
-            // 尝试使用反射获取数据
-            return (byte) dyeColor.getClass().getMethod("getData").invoke(dyeColor);
-        } catch (Exception e) {
-            // 如果反射失败，返回默认值
-            return 0;
-        }
+        return (byte) dyeColor.getWoolData();
     }
     
     public static Material BED() {
-        return getMaterial("WHITE_BED", "BED");
+        return getMaterial("BED", "RED_BED");
     }
     
     public static Material EXPERIENCE_BOTTLE() {
-        return getMaterial("EXPERIENCE_BOTTLE", "EXP_BOTTLE");
+        return getMaterial("EXP_BOTTLE", "EXPERIENCE_BOTTLE");
     }
     
     public static Material BEACON() {
-        return getMaterial("BEACON", "BEACON");
+        return Material.BEACON;
     }
     
     public static Material TRIPWIRE_HOOK() {
-        return getMaterial("TRIPWIRE_HOOK", "TRIPWIRE_HOOK");
+        return Material.TRIPWIRE_HOOK;
     }
 
     public static Material TNT() {
-        return getMaterial("TNT", "TNT");
+        return Material.TNT;
     }
 
     public static Material AIR() {
-        return getMaterial("AIR", "AIR");
+        return Material.AIR;
     }
 
     public static Material WHITE_WOOL() {
-        return getMaterial("WHITE_WOOL", "WOOL");
+        return getMaterial("WOOL", "WHITE_WOOL");
     }
 
     public static Material FIREBALL() {
-        return getMaterial("FIRE_CHARGE", "FIREBALL");
+        return getMaterial("FIREBALL", "FIRE_CHARGE");
     }
 
     public static Material WATER_BUCKET() {
-        return getMaterial("WATER_BUCKET", "WATER_BUCKET");
+        return Material.WATER_BUCKET;
     }
 
     public static Material GLASS_BOTTLE() {
-        return getMaterial("GLASS_BOTTLE", "GLASS_BOTTLE");
+        return Material.GLASS_BOTTLE;
     }
 
     public static Material TERRACOTTA() {
-        return getMaterial("TERRACOTTA", "HARD_CLAY");
+        return getMaterial("HARD_CLAY", "TERRACOTTA");
     }
 
     public static Material GLASS() {
-        return getMaterial("GLASS", "GLASS");
+        return Material.GLASS;
     }
 
     public static Material END_STONE() {
-        return getMaterial("END_STONE", "ENDER_STONE");
+        return getMaterial("ENDER_STONE", "END_STONE");
     }
 
     public static Material LADDER() {
-        return getMaterial("LADDER", "LADDER");
+        return Material.LADDER;
     }
 
     public static Material SIGN() {
-        return getMaterial("OAK_SIGN", "SIGN");
+        return getMaterial("SIGN", "OAK_SIGN");
     }
 
     public static Material OAK_PLANKS() {
-        return getMaterial("OAK_PLANKS", "WOOD");
+        return getMaterial("WOOD", "OAK_PLANKS");
     }
 
     public static Material SLIME_BLOCK() {
@@ -424,15 +411,15 @@ public class MaterialUtil {
     }
 
     public static Material COBWEB() {
-        return getMaterial("COBWEB", "WEB");
+        return getMaterial("WEB", "COBWEB");
     }
 
     public static Material OBSIDIAN() {
-        return getMaterial("OBSIDIAN", "OBSIDIAN");
+        return Material.OBSIDIAN;
     }
 
     public static Material NETHER_STAR() {
-        return getMaterial("NETHER_STAR", "NETHER_STAR");
+        return Material.NETHER_STAR;
     }
 
     public static Material GOLDEN_APPLE() {
@@ -440,15 +427,15 @@ public class MaterialUtil {
     }
 
     public static Material POTION() {
-        return getMaterial("POTION", "POTION");
+        return Material.POTION;
     }
 
     public static Material ARROW() {
-        return getMaterial("ARROW", "ARROW");
+        return Material.ARROW;
     }
 
     public static Material COOKED_PORKCHOP() {
-        return getMaterial("COOKED_PORKCHOP", "GRILLED_PORK");
+        return getMaterial("GRILLED_PORK", "COOKED_PORKCHOP");
     }
 
     public static Material COOKED_BEEF() {
@@ -456,30 +443,30 @@ public class MaterialUtil {
     }
 
     public static Material CARROT() {
-        return getMaterial("CARROT", "CARROT_ITEM");
+        return getMaterial("CARROT_ITEM", "CARROT");
     }
 
     public static Material BREWING_STAND() {
-        return getMaterial("BREWING_STAND", "BREWING_STAND_ITEM");
+        return getMaterial("BREWING_STAND", "BREWING_STAND");
     }
 
     public static Material STICK() {
-        return getMaterial("STICK", "STICK");
+        return Material.STICK;
     }
 
     public static Material BLAZE_ROD() {
-        return getMaterial("BLAZE_ROD", "BLAZE_ROD");
+        return Material.BLAZE_ROD;
     }
 
     public static Material GUNPOWDER() {
-        return getMaterial("GUNPOWDER", "SULPHUR");
+        return getMaterial("SULPHUR", "GUNPOWDER");
     }
 
     public static Material GOLDEN_BOOTS() {
-        return getMaterial("GOLDEN_BOOTS", "GOLD_BOOTS");
+        return getMaterial("GOLD_BOOTS", "GOLDEN_BOOTS");
     }
 
     public static Material COMPARATOR() {
-        return getMaterial("COMPARATOR", "REDSTONE_COMPARATOR");
+        return getMaterial("REDSTONE_COMPARATOR", "COMPARATOR");
     }
 } 
