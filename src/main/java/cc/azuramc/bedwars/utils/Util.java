@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.utils;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.game.Game;
@@ -181,11 +182,10 @@ public class Util {
         if (isBedBlock(targetBlock)) {
             Block bedHead;
             Block bedFeet;
-            
-            boolean isNewVersion = MaterialUtil.isNewVersion();
+
             
             try {
-                if (isNewVersion) {
+                if (!VersionUtil.isLessThan113()) {
                     org.bukkit.block.data.type.Bed bedBlock = (org.bukkit.block.data.type.Bed) targetBlock.getBlockData();
                     
                     if (bedBlock.getPart() == org.bukkit.block.data.type.Bed.Part.FOOT) {
@@ -234,7 +234,7 @@ public class Util {
             return false;
         }
         
-        if (MaterialUtil.isNewVersion()) {
+        if (!VersionUtil.isLessThan113()) {
             return isBed.getType().name().endsWith("_BED");
         } else {
             try {
