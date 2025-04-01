@@ -13,8 +13,6 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-import java.util.Collections;
-
 public class JoinListener implements Listener {
     private final Game game = AzuraBedWars.getInstance().getGame();
 

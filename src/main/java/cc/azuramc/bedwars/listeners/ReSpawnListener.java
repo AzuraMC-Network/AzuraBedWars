@@ -49,7 +49,7 @@ public class ReSpawnListener implements Listener {
                 public void run() {
                     TextComponent textComponent = new TextComponent("§c你凉了!想再来一局嘛? ");
                     textComponent.addExtra("§b§l点击这里!");
-                    textComponent.getExtra().get(0).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/queue join qc x"));
+                    textComponent.getExtra().getFirst().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/queue join qc x"));
                     player.spigot().sendMessage(textComponent);
 
                     event.setRespawnLocation(game.getRespawnLocation());
