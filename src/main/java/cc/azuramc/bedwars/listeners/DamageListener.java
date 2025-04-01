@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.listeners;
 
 import cc.azuramc.bedwars.utils.ActionBarUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.events.BedwarsPlayerKilledEvent;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -22,212 +23,391 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 
+/**
+ * 伤害监听器
+ * <p>
+ * 负责处理玩家伤害和死亡事件，包括虚空伤害、玩家击杀、团队伤害检测等
+ * </p>
+ */
 public class DamageListener implements Listener {
-    private final Game game = AzuraBedWars.getInstance().getGame();
+    // 常量定义
+    private static final String METADATA_VOID_PLAYER = "voidPlayer";
+    private static final String METADATA_FIREBALL_NOFALL = "FIREBALL PLAYER NOFALL";
+    private static final String METADATA_SHOP = "Shop";
+    private static final String METADATA_SHOP2 = "Shop2";
+    private static final String COINS_ACTION_BAR = "§6+1个金币";
+    private static final String COINS_MESSAGE = "§6+1个金币 (最终击杀)";
+    private static final int COINS_ACTIONBAR_TIMES = 5;
+    private static final int ACTIONBAR_PERIOD = 10;
+    private static final int RESPAWN_DELAY = 10;
+    private static final double VOID_DAMAGE = 100.0D;
+    private static final int COINS_REWARD = 1;
 
+    private final Game game = AzuraBedWars.getInstance().getGame();
+    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
+
+    /**
+     * 处理实体伤害事件
+     *
+     * @param event 实体伤害事件
+     */
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (event.getEntity().hasMetadata("Shop") || event.getEntity().hasMetadata("Shop2")) {
+        // 检查商店NPC伤害
+        if (event.getEntity().hasMetadata(METADATA_SHOP) || event.getEntity().hasMetadata(METADATA_SHOP2)) {
             event.setCancelled(true);
+            return;
         }
 
+        // 只处理玩家伤害
         if (!(event.getEntity() instanceof Player player)) {
             return;
         }
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
 
+        // 处理等待阶段的伤害
         if (game.getGameState() == GameState.WAITING) {
-            event.setCancelled(true);
-            if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-                if (game.getGameLobbyCountdown() != null) {
-                    if (game.getGameLobbyCountdown().getCountdown() < 3) {
-                        return;
-                    }
-                }
-                player.teleport(game.getWaitingLocation());
-                return;
-            }
+            handleWaitingStateDamage(event, player);
+            return;
         }
 
+        // 处理游戏阶段的伤害
         if (game.getGameState() == GameState.RUNNING) {
-            if (game.getEventManager().isOver()) {
-                event.setCancelled(true);
-                return;
-            }
-
-            if (gamePlayer.isSpectator()) {
-                event.setCancelled(true);
-                if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
-                    gamePlayer.getSpectatorTarget().tp();
-                }
-                return;
-            }
-
-            if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-                event.setDamage(100.0D);
-
-                Player killer = player.getKiller();
-
-                GameTeam gameTeam = gamePlayer.getGameTeam();
-
-                if (killer != null) {
-                    GamePlayer killerPlayer = GamePlayer.get(killer.getUniqueId());
-                    if(killerPlayer == null) {
-                        return;
-                    }
-                    GameTeam killerTeam = killerPlayer.getGameTeam();
-
-                    if (gameTeam.isBedDestroy()) {
-                        new BukkitRunnable() {
-                            int i = 0;
-
-                            @Override
-                            public void run() {
-                                if (i == 5) {
-                                    cancel();
-                                    return;
-                                }
-                                ActionBarUtil.sendBar(killer, "§6+1个金币");
-                                i++;
-                            }
-                        }.runTaskTimerAsynchronously(AzuraBedWars.getInstance(), 0, 10);
-                        killer.sendMessage("§6+1个金币 (最终击杀)");
-                        AzuraBedWars.getInstance().getEcon().depositPlayer(player, 1);
-                        killerPlayer.addFinalKills();
-
-                        game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)[最终击杀]§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + "♛)§e狠狠滴丢下虚空");
-                    } else {
-                        game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + "♛)§e狠狠滴丢下虚空");
-                        killerPlayer.addKills();
-                    }
-                    killerPlayer.getPlayerData().addKills();
-                    Bukkit.getPluginManager().callEvent(new BedwarsPlayerKilledEvent(player, killer, gameTeam.isBedDestroy()));
-                } else {
-                    game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)§e划下了虚空");
-                    gamePlayer.getPlayerData().addDeaths();
-                }
-                player.setMetadata("voidPlayer", new FixedMetadataValue(AzuraBedWars.getInstance(), ""));
-                return;
-            }
-
-            if (event.getCause() == EntityDamageEvent.DamageCause.FALL && player.hasMetadata("FIREBALL PLAYER NOFALL")) {
-                event.setCancelled(true);
-                player.removeMetadata("FIREBALL PLAYER NOFALL", AzuraBedWars.getInstance());
-            }
+            handleRunningStateDamage(event, player, gamePlayer);
         }
     }
 
+    /**
+     * 处理玩家死亡事件
+     *
+     * @param event 玩家死亡事件
+     */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-        GameTeam gameTeam = gamePlayer.getGameTeam();
+        GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
 
-        event.setDeathMessage(null);
-        event.setKeepInventory(true);
-        event.getDrops().clear();
-        event.getEntity().getInventory().clear();
-        event.setDroppedExp(0);
+        // 清理死亡信息和物品
+        cleanDeathDrops(event);
 
-        if (game.getGameState() == GameState.WAITING) {
+        // 游戏未开始或玩家是观察者时不处理
+        if (game.getGameState() == GameState.WAITING || (gamePlayer != null && gamePlayer.isSpectator())) {
             return;
         }
 
-        if (gamePlayer.isSpectator()) {
-            return;
+        // 处理非虚空死亡
+        if (!player.hasMetadata(METADATA_VOID_PLAYER)) {
+            handleNormalDeath(player, gamePlayer, gameTeam);
         }
 
-        if (!player.hasMetadata("voidPlayer")) {
-            Player killer = player.getKiller();
-            List<GamePlayer> killers = gamePlayer.getAssistsManager().getAssists(System.currentTimeMillis());
-            if (killer == null && !killers.isEmpty())
-                killer = killers.get(0).getPlayer();
-
-            if (killer != null) {
-                GamePlayer killerPlayer = GamePlayer.get(killer.getUniqueId());
-                GameTeam killerTeam = killerPlayer.getGameTeam();
-
-                if (gameTeam.isBedDestroy()) {
-                    Player finalKiller = killer;
-                    new BukkitRunnable() {
-                        int i = 0;
-
-                        @Override
-                        public void run() {
-                            if (i == 5) {
-                                cancel();
-                                return;
-                            }
-                            ActionBarUtil.sendBar(finalKiller, "§6+1个金币");
-                            i++;
-                        }
-                    }.runTaskTimerAsynchronously(AzuraBedWars.getInstance(), 0, 10);
-                    killer.sendMessage("§6+1个金币 (最终击杀)");
-                    AzuraBedWars.getInstance().getEcon().depositPlayer(player, 1);
-                    killerPlayer.addFinalKills();
-
-                    game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)[最终击杀]§e被" + killerTeam.getChatColor() + killerPlayer.getDisplayname() + "(" + killerTeam.getName() + "♛)§e狠狠滴推倒");
-//                    Bukkit.getPluginManager().callEvent(new RejoinGameDeathEvent(player));
-                } else {
-                    game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)§e被" + killerTeam.getChatColor() + killerPlayer.getDisplayname() + "(" + killerTeam.getName() + "♛)§e狠狠滴推倒");
-                    killerPlayer.addKills();
-                }
-
-                Bukkit.getPluginManager().callEvent(new BedwarsPlayerKilledEvent(player, killer, gameTeam.isBedDestroy()));
-
-                killerPlayer.getPlayerData().addKills();
-                gamePlayer.getPlayerData().addDeaths();
-            }
-        }
-
-        player.removeMetadata("voidPlayer", AzuraBedWars.getInstance());
-        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> {
-            player.spigot().respawn();
-            GamePlayer.getOnlinePlayers().forEach((gamePlayer1 -> gamePlayer1.getPlayer().hidePlayer(player)));
-            player.hidePlayer(player);
-        }, 10L);
+        // 移除虚空标记并处理重生
+        player.removeMetadata(METADATA_VOID_PLAYER, plugin);
+        handlePlayerRespawn(player);
     }
 
+    /**
+     * 处理实体间伤害事件（PVP等）
+     *
+     * @param event 实体间伤害事件
+     */
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         Entity entity = event.getEntity();
         Entity damager = event.getDamager();
 
+        // 只处理玩家相关伤害
         if (entity instanceof Player || damager instanceof Player || damager instanceof Projectile) {
-            GamePlayer gamePlayer = GamePlayer.get(entity.getUniqueId());
+            if (game.getGameState() != GameState.RUNNING) {
+                return;
+            }
 
-            if (game.getGameState() == GameState.RUNNING) {
-                if (damager instanceof Player && entity instanceof Player) {
-                    GamePlayer damagerPlayer = GamePlayer.get(damager.getUniqueId());
+            GamePlayer gamePlayer = entity instanceof Player ? GamePlayer.get(entity.getUniqueId()) : null;
+            
+            if (damager instanceof Player && entity instanceof Player) {
+                handlePlayerVsPlayerDamage(event, gamePlayer, damager);
+            } else if (entity instanceof Player && damager instanceof Projectile projectile) {
+                handleProjectileDamage(event, gamePlayer, projectile);
+            }
+        }
+    }
 
-                    if (damagerPlayer.isSpectator()) {
-                        event.setCancelled(true);
-                    }
+    /**
+     * 处理等待状态的伤害
+     *
+     * @param event 伤害事件
+     * @param player 玩家
+     */
+    private void handleWaitingStateDamage(EntityDamageEvent event, Player player) {
+        event.setCancelled(true);
+        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            // 倒计时时间小于3秒时不处理
+            if (game.getGameLobbyCountdown() != null && game.getGameLobbyCountdown().getCountdown() < 3) {
+                return;
+            }
+            player.teleport(game.getWaitingLocation());
+        }
+    }
 
-                    if (gamePlayer.getGameTeam().isInTeam(damagerPlayer)) {
-                        event.setCancelled(true);
-                    } else {
-                        gamePlayer.getAssistsManager().setLastDamage(damagerPlayer, System.currentTimeMillis());
-                    }
-                } else if (entity instanceof Player && damager instanceof Projectile) {
-                    Projectile projectile = (Projectile) damager;
+    /**
+     * 处理游戏进行中的伤害
+     *
+     * @param event 伤害事件
+     * @param player 玩家
+     * @param gamePlayer 游戏玩家
+     */
+    private void handleRunningStateDamage(EntityDamageEvent event, Player player, GamePlayer gamePlayer) {
+        // 游戏结束时取消所有伤害
+        if (game.getEventManager().isOver()) {
+            event.setCancelled(true);
+            return;
+        }
 
-                    if (projectile.getType() == EntityType.FIREBALL) {
-                        event.setCancelled(true);
-                        return;
-                    }
+        // 观察者不受伤害
+        if (gamePlayer != null && gamePlayer.isSpectator()) {
+            event.setCancelled(true);
+            if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+                gamePlayer.getSpectatorTarget().tp();
+            }
+            return;
+        }
 
-                    if (projectile.getShooter() instanceof Player) {
-                        GamePlayer damagerPlayer = GamePlayer.get(((Player) projectile.getShooter()).getUniqueId());
+        // 处理虚空伤害
+        if (event.getCause() == EntityDamageEvent.DamageCause.VOID && gamePlayer != null) {
+            handleVoidDamage(event, player, gamePlayer);
+            return;
+        }
 
-                        if (gamePlayer.getGameTeam().isInTeam(damagerPlayer)) {
-                            event.setCancelled(true);
-                        } else {
-                            gamePlayer.getAssistsManager().setLastDamage(damagerPlayer, System.currentTimeMillis());
-                        }
-                    }
+        // 处理火球落地不受伤
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL && player.hasMetadata(METADATA_FIREBALL_NOFALL)) {
+            event.setCancelled(true);
+            player.removeMetadata(METADATA_FIREBALL_NOFALL, plugin);
+        }
+    }
+
+    /**
+     * 处理虚空伤害
+     *
+     * @param event 伤害事件
+     * @param player 玩家
+     * @param gamePlayer 游戏玩家
+     */
+    private void handleVoidDamage(EntityDamageEvent event, Player player, GamePlayer gamePlayer) {
+        event.setDamage(VOID_DAMAGE);
+        Player killer = player.getKiller();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+
+        if (killer != null) {
+            GamePlayer killerPlayer = GamePlayer.get(killer.getUniqueId());
+            if (killerPlayer == null) {
+                return;
+            }
+            
+            GameTeam killerTeam = killerPlayer.getGameTeam();
+            processKill(gamePlayer, gameTeam, killerPlayer, killerTeam, killer, player, gameTeam.isBedDestroy());
+            broadcastVoidKillMessage(gamePlayer, gameTeam, killerPlayer, killerTeam, gameTeam.isBedDestroy());
+        } else {
+            // 自杀消息
+            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)§e划下了虚空");
+            gamePlayer.getPlayerData().addDeaths();
+        }
+        
+        player.setMetadata(METADATA_VOID_PLAYER, new FixedMetadataValue(plugin, ""));
+    }
+
+    /**
+     * 发送虚空击杀消息
+     */
+    private void broadcastVoidKillMessage(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer killerPlayer, GameTeam killerTeam, boolean isFinalKill) {
+        if (isFinalKill) {
+            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)[最终击杀]§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + "♛)§e狠狠滴丢下虚空");
+        } else {
+            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + "♛)§e狠狠滴丢下虚空");
+        }
+    }
+
+    /**
+     * 处理普通击杀奖励和消息
+     */
+    private void processKill(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer killerPlayer, GameTeam killerTeam, Player killer, Player player, boolean isFinalKill) {
+        if (isFinalKill) {
+            // 最终击杀给金币奖励
+            showCoinsReward(killer);
+            AzuraBedWars.getInstance().getEcon().depositPlayer(player, COINS_REWARD);
+            killerPlayer.addFinalKills();
+        } else {
+            killerPlayer.addKills();
+        }
+        
+        killerPlayer.getPlayerData().addKills();
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerKilledEvent(player, killer, isFinalKill));
+    }
+
+    /**
+     * 显示金币奖励
+     *
+     * @param player 获得奖励的玩家
+     */
+    private void showCoinsReward(Player player) {
+        new BukkitRunnable() {
+            int i = 0;
+
+            @Override
+            public void run() {
+                if (i == COINS_ACTIONBAR_TIMES) {
+                    cancel();
+                    return;
                 }
+                ActionBarUtil.sendBar(player, COINS_ACTION_BAR);
+                i++;
+            }
+        }.runTaskTimerAsynchronously(plugin, 0, ACTIONBAR_PERIOD);
+        player.sendMessage(COINS_MESSAGE);
+    }
+
+    /**
+     * 清理死亡掉落物和消息
+     *
+     * @param event 死亡事件
+     */
+    private void cleanDeathDrops(PlayerDeathEvent event) {
+        event.setDeathMessage(null);
+        event.setKeepInventory(true);
+        event.getDrops().clear();
+        event.getEntity().getInventory().clear();
+        event.setDroppedExp(0);
+    }
+
+    /**
+     * 处理普通（非虚空）死亡
+     *
+     * @param player 死亡玩家
+     * @param gamePlayer 游戏玩家
+     * @param gameTeam 玩家队伍
+     */
+    private void handleNormalDeath(Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
+        // 获取击杀者
+        Player killer = findKiller(player, gamePlayer);
+        if (killer == null) {
+            return;
+        }
+
+        GamePlayer killerPlayer = GamePlayer.get(killer.getUniqueId());
+        if (killerPlayer == null) {
+            return;
+        }
+
+        GameTeam killerTeam = killerPlayer.getGameTeam();
+        boolean isFinalKill = gameTeam != null && gameTeam.isBedDestroy();
+
+        // 处理最终击杀
+        if (isFinalKill) {
+            showCoinsReward(killer);
+            AzuraBedWars.getInstance().getEcon().depositPlayer(player, COINS_REWARD);
+            killerPlayer.addFinalKills();
+            
+            // 广播击杀消息
+            game.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getDisplayname() + "(" + gameTeam.getName() + "♛)[最终击杀]§e被" + 
+                                 killerTeam.getChatColor() + killerPlayer.getDisplayname() + "(" + killerTeam.getName() + "♛)§e狠狠滴推倒");
+        }
+
+        // 触发击杀事件
+        if (gameTeam != null) {
+            Bukkit.getPluginManager().callEvent(new BedwarsPlayerKilledEvent(player, killer, isFinalKill));
+        }
+
+        // 更新玩家数据
+        killerPlayer.getPlayerData().addKills();
+        if (gamePlayer != null) {
+            gamePlayer.getPlayerData().addDeaths();
+        }
+    }
+
+    /**
+     * 寻找真正的击杀者（包括辅助击杀）
+     *
+     * @param player 死亡玩家
+     * @param gamePlayer 游戏玩家
+     * @return 击杀者
+     */
+    private Player findKiller(Player player, GamePlayer gamePlayer) {
+        Player killer = player.getKiller();
+        
+        // 如果没有直接击杀者，尝试从辅助中获取
+        if (killer == null && gamePlayer != null) {
+            List<GamePlayer> killers = gamePlayer.getAssistsManager().getAssists(System.currentTimeMillis());
+            if (killers != null && !killers.isEmpty()) {
+                killer = killers.getFirst().getPlayer();
+            }
+        }
+        
+        return killer;
+    }
+
+    /**
+     * 处理玩家重生
+     *
+     * @param player 重生玩家
+     */
+    private void handlePlayerRespawn(Player player) {
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            player.spigot().respawn();
+            
+            // 使用PlayerUtil隐藏玩家
+            for (GamePlayer otherPlayer : GamePlayer.getOnlinePlayers()) {
+                PlayerUtil.hidePlayer(otherPlayer.getPlayer(), player);
+            }
+            
+            // 玩家自己也看不到自己
+            PlayerUtil.hidePlayer(player, player);
+        }, RESPAWN_DELAY);
+    }
+
+    /**
+     * 处理玩家VS玩家伤害
+     *
+     * @param event 伤害事件
+     * @param gamePlayer 受伤玩家
+     * @param damager 攻击者
+     */
+    private void handlePlayerVsPlayerDamage(EntityDamageByEntityEvent event, GamePlayer gamePlayer, Entity damager) {
+        GamePlayer damagerPlayer = GamePlayer.get(damager.getUniqueId());
+
+        // 观察者不能造成伤害
+        if (damagerPlayer != null && damagerPlayer.isSpectator()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 阻止队友伤害
+        if (gamePlayer != null && gamePlayer.getGameTeam().isInTeam(damagerPlayer)) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * 处理投射物伤害
+     *
+     * @param event 伤害事件
+     * @param gamePlayer 受伤玩家
+     * @param projectile 投射物
+     */
+    private void handleProjectileDamage(EntityDamageByEntityEvent event, GamePlayer gamePlayer, Projectile projectile) {
+        // 火球伤害特殊处理
+        if (projectile.getType() == EntityType.FIREBALL) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 检查射击者是否为玩家
+        if (projectile.getShooter() instanceof Player) {
+            GamePlayer attackerPlayer = GamePlayer.get(((Player) projectile.getShooter()).getUniqueId());
+
+            // 阻止队友的弓箭伤害
+            if (gamePlayer != null && gamePlayer.getGameTeam().isInTeam(attackerPlayer)) {
+                event.setCancelled(true);
             }
         }
     }
 }
+

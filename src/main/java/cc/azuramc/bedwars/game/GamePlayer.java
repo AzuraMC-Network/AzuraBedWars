@@ -12,6 +12,7 @@ import cc.azuramc.bedwars.types.ToolType;
 import cc.azuramc.bedwars.utils.Util;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.utils.board.FastBoard;
 import lombok.Getter;
 import lombok.Setter;
@@ -188,15 +189,9 @@ public class GamePlayer {
 
         Player player = getPlayer();
         sendTitle(10, 20, 10, title, subTitle);
-        getOnlinePlayers().forEach((gamePlayer1 -> {
-            try {
-                // 尝试使用新版本API (1.12.2+)
-                gamePlayer1.getPlayer().hidePlayer(AzuraBedWars.getInstance(), player);
-            } catch (Throwable e) {
-                // 如果新版本API不可用，回退到旧版本API
-                gamePlayer1.getPlayer().hidePlayer(player);
-            }
-        }));
+        getOnlinePlayers().forEach(gamePlayer1 -> 
+            PlayerUtil.hidePlayer(gamePlayer1.getPlayer(), player)
+        );
         player.setGameMode(GameMode.ADVENTURE);
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
