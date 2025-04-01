@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.specials;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
@@ -62,7 +63,7 @@ public class RescuePlatform extends SpecialItem {
         Location mid = player.getLocation().clone();
         mid.setY(mid.getY() - 1.0D);
 
-        ItemStack usedStack = MaterialUtil.getItemInHand(player);
+        ItemStack usedStack = PlayerUtil.getItemInHand(player);
         usedStack.setAmount(usedStack.getAmount() - 1);
         player.getInventory().setItem(player.getInventory().getHeldItemSlot(), usedStack);
         player.updateInventory();

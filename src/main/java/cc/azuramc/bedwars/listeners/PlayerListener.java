@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listeners;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.database.PlayerData;
 import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.game.Game;
@@ -104,7 +105,7 @@ public class PlayerListener implements Listener {
 
                 if (event.getClickedBlock() != null && event.getClickedBlock().getType().toString().contains("BED")) {
                     if (player.isSneaking()) {
-                        ItemStack item = MaterialUtil.getItemInHand(player);
+                        ItemStack item = PlayerUtil.getItemInHand(player);
                         if (item != null && item.getType().isBlock()) {
                             return;
                         }
@@ -223,10 +224,10 @@ public class PlayerListener implements Listener {
                         bedHead.update(true, true);
                     }
 
-                    if (MaterialUtil.getItemInHand(player).getAmount() == 1) {
+                    if (PlayerUtil.getItemInHand(player).getAmount() == 1) {
                         player.getInventory().setItemInHand(null);
                     } else {
-                        MaterialUtil.getItemInHand(player).setAmount(MaterialUtil.getItemInHand(player).getAmount() - 1);
+                        PlayerUtil.getItemInHand(player).setAmount(PlayerUtil.getItemInHand(player).getAmount() - 1);
                     }
 
                     gameTeam.setBedDestroy(false);
@@ -250,10 +251,10 @@ public class PlayerListener implements Listener {
                         return;
                     }
 
-                    if (MaterialUtil.getItemInHand(player).getAmount() == 1) {
+                    if (PlayerUtil.getItemInHand(player).getAmount() == 1) {
                         player.getInventory().setItemInHand(null);
                     } else {
-                        MaterialUtil.getItemInHand(player).setAmount(MaterialUtil.getItemInHand(player).getAmount() - 1);
+                        PlayerUtil.getItemInHand(player).setAmount(PlayerUtil.getItemInHand(player).getAmount() - 1);
                     }
 
                     player.setMetadata("Game FIREBALL TIMER", new FixedMetadataValue(AzuraBedWars.getInstance(), System.currentTimeMillis()));
@@ -519,8 +520,8 @@ public class PlayerListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (MaterialUtil.getItemInHand(player).getType() == MaterialUtil.GLASS_BOTTLE()) {
-                    MaterialUtil.setItemInHand(player, new ItemStack(MaterialUtil.AIR()));
+                if (PlayerUtil.getItemInHand(player).getType() == MaterialUtil.GLASS_BOTTLE()) {
+                    PlayerUtil.setItemInHand(player, new ItemStack(MaterialUtil.AIR()));
                 }
             }
         }.runTaskLater(AzuraBedWars.getInstance(), 0);

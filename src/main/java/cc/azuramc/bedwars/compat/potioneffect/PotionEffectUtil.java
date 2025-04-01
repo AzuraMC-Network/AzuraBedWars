@@ -1,26 +1,24 @@
 package cc.azuramc.bedwars.compat.potioneffect;
 
+import cc.azuramc.bedwars.compat.VersionUtil;
 import org.bukkit.potion.PotionEffectType;
 
-/**
- * 药水效果兼容性工具类
- * 用于处理不同Minecraft版本(1.8-1.21)的PotionEffectType名称变化
- * By An5w1r_
- */
 public class PotionEffectUtil {
-    private static final boolean NEW_VERSION;
-    
-    static {
-        boolean newVersion = false;
+
+    public static PotionEffectType get(String v18, String v113) {
+        PotionEffectType finalEffect = null;
+
         try {
-            // 1.13+版本存在PotionEffectType.JUMP
-            Class.forName("org.bukkit.potion.PotionEffectType").getDeclaredField("JUMP");
-            newVersion = true;
-        } catch (Exception e) {
-            // 1.8-1.12版本
-            newVersion = false;
+            if (VersionUtil.isLessThan113()) {
+                finalEffect = (PotionEffectType) PotionEffectType.class.getDeclaredField(v18).get(null);
+            } else {
+                finalEffect = (PotionEffectType) PotionEffectType.class.getDeclaredField(v113).get(null);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        NEW_VERSION = newVersion;
+
+        return finalEffect;
     }
     
     /**
@@ -29,7 +27,7 @@ public class PotionEffectUtil {
      */
     public static PotionEffectType JUMP_BOOST() {
         try {
-            if (NEW_VERSION) {
+            if (VersionUtil.isLessThan113()) {
                 return (PotionEffectType) PotionEffectType.class.getDeclaredField("JUMP").get(null);
             } else {
                 return (PotionEffectType) PotionEffectType.class.getDeclaredField("JUMP_BOOST").get(null);
@@ -38,7 +36,7 @@ public class PotionEffectUtil {
             return null;
         }
     }
-    
+
     /**
      * 获取速度效果
      * @return 速度效果

@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.specials;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -84,7 +85,7 @@ public class WarpPowder extends SpecialItem {
         Player player = gamePlayer.getPlayer();
 
 
-        stack = MaterialUtil.getItemInHand(player);
+        stack = PlayerUtil.getItemInHand(player);
         player.getInventory().setItem(player.getInventory().getHeldItemSlot(), this.getCancelItemStack());
         player.updateInventory();
 
