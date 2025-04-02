@@ -41,8 +41,7 @@ public class WarpPowderListener implements Listener {
         }
         
         for (SpecialItem item : game.getSpecialItems()) {
-            if (item instanceof WarpPowder) {
-                WarpPowder powder = (WarpPowder) item;
+            if (item instanceof WarpPowder powder) {
                 if (powder.getPlayer() != null && powder.getPlayer().equals(gamePlayer)) {
                     return powder;
                 }
