@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.Game;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.compat.material.MaterialUtil;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,79 +16,189 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * 救援平台特殊物品
+ * <p>
+ * 创建一个临时平台帮助玩家防止坠落
+ * </p>
+ */
 public class RescuePlatform extends SpecialItem {
-    private Game game;
-    private int livingTime = 0;
+    // 常量定义
+    private static final int DEFAULT_BREAK_TIME = 12;      // 默认平台存在时间（秒）
+    private static final int DEFAULT_WAIT_TIME = 20;       // 默认使用冷却时间（秒）
+    private static final double JUMP_BOOST = 0.7;          // 跳跃提升力度
+    private static final Material PLATFORM_MATERIAL = Material.SLIME_BLOCK;  // 平台方块材质
+
+
+    @Getter private Game game;
+    @Getter private int livingTime = 0;
     private GamePlayer ownerPlayer;
     private final List<Block> platformBlocks;
+    
+    // 配置变量
+    private int breakTime = DEFAULT_BREAK_TIME;
+    private int waitTime = DEFAULT_WAIT_TIME;
 
+    /**
+     * 构造函数
+     */
     public RescuePlatform() {
         super();
-
         this.platformBlocks = new ArrayList<>();
         this.game = null;
         this.ownerPlayer = null;
     }
 
+    /**
+     * 添加平台方块到列表中
+     * 
+     * @param block 方块
+     */
     public void addPlatformBlock(Block block) {
         this.platformBlocks.add(block);
     }
 
-    public void create(GamePlayer gamePlayer, Game game) {
+    /**
+     * 创建救援平台
+     * 
+     * @param gamePlayer 游戏玩家
+     * @param game 游戏实例
+     * @return 是否成功创建
+     */
+    public boolean create(GamePlayer gamePlayer, Game game) {
         this.game = game;
         this.ownerPlayer = gamePlayer;
         Player player = ownerPlayer.getPlayer();
+        
+        if (player == null) {
+            return false;
+        }
 
-        int breakTime = 12;
-        int waitTime = 20;
-        Material configMaterial = Material.SLIME_BLOCK;
+        // 检查冷却时间
+        if (!checkCooldown(gamePlayer)) {
+            return false;
+        }
+        
+        // 检查玩家是否在空中
+        if (!isPlayerInAir(player)) {
+            gamePlayer.sendMessage("§c你不在空气中!");
+            return false;
+        }
 
-        ArrayList<RescuePlatform> livingPlatforms = this.getLivingPlatforms();
+        // 创建平台
+        if (!createPlatform(player)) {
+            return false;
+        }
+        
+        // 消耗物品
+        consumeItem(player);
+        
+        // 提升玩家向上的速度
+        boostPlayerUp(player);
+        
+        // 启动任务
+        this.runTask(breakTime, waitTime);
+        game.addSpecialItem(this);
+        return true;
+    }
+    
+    /**
+     * 检查使用冷却
+     * 
+     * @param gamePlayer 游戏玩家
+     * @return 是否可以使用
+     */
+    private boolean checkCooldown(GamePlayer gamePlayer) {
+        List<RescuePlatform> livingPlatforms = this.getLivingPlatforms();
         if (!livingPlatforms.isEmpty()) {
             for (RescuePlatform livingPlatform : livingPlatforms) {
                 int waitLeft = waitTime - livingPlatform.getLivingTime();
                 if (waitLeft > 0) {
                     gamePlayer.sendMessage("§c需要 §e" + waitLeft + "秒§c 你才能使用下一个救援平台!");
-                    return;
+                    return false;
                 }
             }
         }
-
-        if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
-            gamePlayer.sendMessage("§c你不在空气中!");
-            return;
-        }
-
+        return true;
+    }
+    
+    /**
+     * 检查玩家是否在空中
+     * 
+     * @param player 玩家
+     * @return 是否在空中
+     */
+    private boolean isPlayerInAir(Player player) {
+        return player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR;
+    }
+    
+    /**
+     * 创建平台
+     * 
+     * @param player 玩家
+     * @return 是否成功创建
+     */
+    private boolean createPlatform(Player player) {
         Location mid = player.getLocation().clone();
         mid.setY(mid.getY() - 1.0D);
-
-        ItemStack usedStack = PlayerUtil.getItemInHand(player);
-        usedStack.setAmount(usedStack.getAmount() - 1);
-        player.getInventory().setItem(player.getInventory().getHeldItemSlot(), usedStack);
-        player.updateInventory();
-
-        for (BlockFace face : BlockFace.values()) {
-            if (face.equals(BlockFace.DOWN) || face.equals(BlockFace.UP)) {
-                continue;
-            }
-
+        
+        // 获取水平方向的方块面
+        BlockFace[] horizontalFaces = {
+            BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST,
+            BlockFace.NORTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST, BlockFace.NORTH_WEST
+        };
+        
+        boolean anyBlockPlaced = false;
+        
+        // 放置周围的方块
+        for (BlockFace face : horizontalFaces) {
             Block placed = mid.getBlock().getRelative(face);
             if (placed.getType() != Material.AIR) {
                 continue;
             }
-
-            placed.setType(configMaterial);
-
+            
+            placed.setType(PLATFORM_MATERIAL);
             this.addPlatformBlock(placed);
+            anyBlockPlaced = true;
         }
-
+        
+        // 放置中间的方块
+        if (mid.getBlock().getType() == Material.AIR) {
+            mid.getBlock().setType(PLATFORM_MATERIAL);
+            this.addPlatformBlock(mid.getBlock());
+            anyBlockPlaced = true;
+        }
+        
+        return anyBlockPlaced;
+    }
+    
+    /**
+     * 消耗玩家手中的物品
+     * 
+     * @param player 玩家
+     */
+    private void consumeItem(Player player) {
+        ItemStack usedStack = PlayerUtil.getItemInHand(player);
+        if (usedStack.getAmount() > 1) {
+            usedStack.setAmount(usedStack.getAmount() - 1);
+            player.getInventory().setItem(player.getInventory().getHeldItemSlot(), usedStack);
+        } else {
+            player.getInventory().setItem(player.getInventory().getHeldItemSlot(), null);
+        }
+        player.updateInventory();
+    }
+    
+    /**
+     * 提升玩家向上的速度
+     * 
+     * @param player 玩家
+     */
+    private void boostPlayerUp(Player player) {
         Vector vector = player.getLocation().getDirection();
-        vector.setY(vector.getY() + 0.7);
+        vector.setY(vector.getY() + JUMP_BOOST);
         player.getLocation().setDirection(vector);
-
-        this.runTask(breakTime, waitTime);
-        game.addSpecialItem(this);
     }
 
     @Override
@@ -96,56 +206,105 @@ public class RescuePlatform extends SpecialItem {
         return null;
     }
 
-    public Game getGame() {
-        return this.game;
-    }
-
     @Override
     public Material getItemMaterial() {
         return Material.BLAZE_ROD;
     }
 
-    private ArrayList<RescuePlatform> getLivingPlatforms() {
-        ArrayList<RescuePlatform> livingPlatforms = new ArrayList<>();
-        for (SpecialItem item : game.getSpecialItems()) {
-            if (item instanceof RescuePlatform) {
-                RescuePlatform rescuePlatform = (RescuePlatform) item;
-                if (rescuePlatform.getOwner().equals(this.getOwner())) {
-                    livingPlatforms.add(rescuePlatform);
-                }
-            }
+    /**
+     * 获取当前存活的救援平台
+     * 
+     * @return 救援平台列表
+     */
+    private List<RescuePlatform> getLivingPlatforms() {
+        if (game == null) return new ArrayList<>();
+        
+        return game.getSpecialItems().stream()
+                .filter(item -> item instanceof RescuePlatform)
+                .map(item -> (RescuePlatform) item)
+                .filter(platform -> platform.getOwner() != null && platform.getOwner().equals(this.getOwner()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 设置平台存在时间
+     * 
+     * @param breakTime 存在时间（秒）
+     */
+    public void setBreakTime(int breakTime) {
+        if (breakTime > 0) {
+            this.breakTime = breakTime;
         }
-        return livingPlatforms;
+    }
+    
+    /**
+     * 设置使用冷却时间
+     * 
+     * @param waitTime 冷却时间（秒）
+     */
+    public void setWaitTime(int waitTime) {
+        if (waitTime > 0) {
+            this.waitTime = waitTime;
+        }
     }
 
-    public int getLivingTime() {
-        return this.livingTime;
-    }
-
+    /**
+     * 获取平台所有者
+     * 
+     * @return 所有者
+     */
     public GamePlayer getOwner() {
         return this.ownerPlayer;
     }
 
+    /**
+     * 启动平台管理任务
+     * 
+     * @param breakTime 存在时间
+     * @param waitTime 冷却时间
+     */
     public void runTask(final int breakTime, final int waitTime) {
         new BukkitRunnable() {
-
             @Override
             public void run() {
                 RescuePlatform.this.livingTime++;
 
+                // 到达销毁时间时移除平台方块
                 if (breakTime > 0 && RescuePlatform.this.livingTime == breakTime) {
-                    for (Block block : RescuePlatform.this.platformBlocks) {
-                        block.setType(Material.AIR);
-                    }
+                    removePlatform();
                 }
 
+                // 达到总生命周期后移除特殊物品
                 if (RescuePlatform.this.livingTime >= waitTime
                         && RescuePlatform.this.livingTime >= breakTime) {
-                    RescuePlatform.this.game.removeSpecialItem(RescuePlatform.this);
+                    if (RescuePlatform.this.game != null) {
+                        RescuePlatform.this.game.removeSpecialItem(RescuePlatform.this);
+                    }
                     this.cancel();
                 }
             }
         }.runTaskTimer(AzuraBedWars.getInstance(), 20L, 20L);
     }
-
+    
+    /**
+     * 移除平台方块
+     */
+    public void removePlatform() {
+        for (Block block : this.platformBlocks) {
+            if (block.getType() == PLATFORM_MATERIAL) {
+                block.setType(Material.AIR);
+            }
+        }
+        this.platformBlocks.clear();
+    }
+    
+    /**
+     * 强制移除平台
+     */
+    public void forceRemove() {
+        removePlatform();
+        if (this.game != null) {
+            this.game.removeSpecialItem(this);
+        }
+    }
 }

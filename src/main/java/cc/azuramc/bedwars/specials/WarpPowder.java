@@ -9,43 +9,120 @@ import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.utils.Util;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+/**
+ * 传送粉末特殊物品
+ * <p>
+ * 允许玩家在原地等待几秒后传送回自己的基地
+ * </p>
+ */
 public class WarpPowder extends SpecialItem {
-    private final int fullTeleportingTime = 6;
-    private Game game = AzuraBedWars.getInstance().getGame();
-    private GamePlayer gamePlayer = null;
-    private ItemStack stack = null;
-    private BukkitTask teleportingTask = null;
-    private double teleportingTime = 6.0;
-
+    // 常量定义
+    private static final int DEFAULT_TELEPORT_TIME = 6;           // 默认传送时间（秒）
+    private static final int CIRCLE_ELEMENTS = 20;                // 每个粒子环的粒子数量
+    private static final double PARTICLE_RADIUS = 1.0;            // 粒子环半径
+    private static final double PARTICLE_HEIGHT = 2.0;            // 粒子效果总高度
+    private static final double CIRCLE_COUNT = 15.0;              // 粒子环的数量
+    private static final String CANCEL_ITEM_NAME = "§4取消传送";    // 取消传送物品名称
+    private static final String TELEPORT_START_MESSAGE = "§a在 §c%d§a 秒后你将被传送，请不要移动!";
+    private static final String TELEPORT_CANCEL_MESSAGE = "§c你的传送被取消!";
+    
+    // 实例变量
+    private final int fullTeleportingTime;      // 完整传送时间
+    private Game game;                          // 游戏实例
+    private GamePlayer gamePlayer;              // 玩家
+    private ItemStack stack;                    // 原始物品栈
+    private BukkitTask teleportingTask;         // 传送任务
+    private double teleportingTime;             // 剩余传送时间
+    
+    /**
+     * 默认构造函数
+     */
     public WarpPowder() {
         super();
+        this.fullTeleportingTime = DEFAULT_TELEPORT_TIME;
+        this.game = AzuraBedWars.getInstance().getGame();
+        this.gamePlayer = null;
+        this.stack = null;
+        this.teleportingTask = null;
+        this.teleportingTime = DEFAULT_TELEPORT_TIME;
+    }
+    
+    /**
+     * 带参数的构造函数
+     * 
+     * @param teleportTime 传送时间（秒）
+     */
+    public WarpPowder(int teleportTime) {
+        super();
+        this.fullTeleportingTime = teleportTime > 0 ? teleportTime : DEFAULT_TELEPORT_TIME;
+        this.game = AzuraBedWars.getInstance().getGame();
+        this.gamePlayer = null;
+        this.stack = null;
+        this.teleportingTask = null;
+        this.teleportingTime = this.fullTeleportingTime;
     }
 
+    /**
+     * 取消传送
+     * 
+     * @param removeSpecial 是否从游戏中移除此特殊物品
+     * @param showMessage 是否显示取消消息
+     */
     public void cancelTeleport(boolean removeSpecial, boolean showMessage) {
+        if (gamePlayer == null || teleportingTask == null) {
+            return;
+        }
+        
         Player player = gamePlayer.getPlayer();
+        if (player == null) {
+            return;
+        }
 
+        // 取消任务并重置计时
         this.teleportingTask.cancel();
-        this.teleportingTime = 6;
+        this.teleportingTime = fullTeleportingTime;
 
+        // 清除玩家等级显示
         player.setLevel(0);
 
-        if (removeSpecial) {
+        // 如果需要，从游戏中移除特殊物品
+        if (removeSpecial && game != null) {
             game.removeSpecialItem(this);
         }
 
+        // 显示消息
         if (showMessage) {
-            gamePlayer.sendMessage("§c你的传送被取消!");
+            gamePlayer.sendMessage(TELEPORT_CANCEL_MESSAGE);
         }
 
+        // 恢复物品
+        restorePlayerItem(player);
+    }
+
+    /**
+     * 恢复玩家的物品
+     * 
+     * @param player 玩家
+     */
+    private void restorePlayerItem(Player player) {
+        if (stack == null) return;
+        
+        // 减少物品数量
         setStackAmount(this.getStack().getAmount() - 1);
-        player.getInventory().setItem(player.getInventory().first(getCancelItemStack()), stack);
-        player.updateInventory();
+        
+        // 查找并替换取消物品
+        int cancelItemSlot = player.getInventory().first(getCancelItemStack());
+        if (cancelItemSlot >= 0) {
+            player.getInventory().setItem(cancelItemSlot, stack.getAmount() > 0 ? stack : null);
+            player.updateInventory();
+        }
     }
 
     @Override
@@ -53,12 +130,18 @@ public class WarpPowder extends SpecialItem {
         return MaterialUtil.getMaterial("GLOWSTONE_DUST", "GLOWSTONE_DUST");
     }
 
+    /**
+     * 获取取消传送的物品
+     * 
+     * @return 取消传送物品
+     */
     private ItemStack getCancelItemStack() {
         ItemStack glowstone = new ItemStack(this.getActivatedMaterial(), 1);
         ItemMeta meta = glowstone.getItemMeta();
-        meta.setDisplayName("§4取消传送");
-        glowstone.setItemMeta(meta);
-
+        if (meta != null) {
+            meta.setDisplayName(CANCEL_ITEM_NAME);
+            glowstone.setItemMeta(meta);
+        }
         return glowstone;
     }
 
@@ -67,91 +150,188 @@ public class WarpPowder extends SpecialItem {
         return MaterialUtil.GUNPOWDER();
     }
 
+    /**
+     * 获取使用此物品的玩家
+     * 
+     * @return 玩家
+     */
     public GamePlayer getPlayer() {
         return gamePlayer;
     }
 
+    /**
+     * 设置使用此物品的玩家
+     * 
+     * @param gamePlayer 玩家
+     */
     public void setPlayer(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
     }
 
+    /**
+     * 获取原始物品栈
+     * 
+     * @return 物品栈
+     */
     public ItemStack getStack() {
         return this.stack;
     }
 
-    public void runTask() {
-        final int circles = 15;
-        final double height = 2.0;
+    /**
+     * 启动传送任务
+     * 
+     * @return 是否成功启动
+     */
+    public boolean runTask() {
+        if (gamePlayer == null || game == null) {
+            return false;
+        }
+        
         Player player = gamePlayer.getPlayer();
+        if (player == null) {
+            return false;
+        }
+        
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null || gameTeam.getSpawn() == null) {
+            gamePlayer.sendMessage("§c无法找到你的队伍出生点!");
+            return false;
+        }
 
-
+        // 保存原始物品并替换为取消物品
         stack = PlayerUtil.getItemInHand(player);
         player.getInventory().setItem(player.getInventory().getHeldItemSlot(), this.getCancelItemStack());
         player.updateInventory();
 
-        teleportingTime = 6;
-        gamePlayer.sendMessage("§a在 §c" + this.fullTeleportingTime + "§a 秒后你将被传送，请不要移动!");
+        // 重置传送时间
+        teleportingTime = fullTeleportingTime;
+        
+        // 发送开始传送消息
+        gamePlayer.sendMessage(String.format(TELEPORT_START_MESSAGE, this.fullTeleportingTime));
+        
+        // 播放开始传送音效
+        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
 
+        // 计算每个tick减少的时间
+        final double perThrough = (Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((fullTeleportingTime * 20) / CIRCLE_COUNT)) / 20);
+        
+        // 创建传送任务
         this.teleportingTask = new BukkitRunnable() {
-
             public double through = 0.0;
 
             @Override
             public void run() {
                 try {
-                    int circleElements = 20;
-                    double radius = 1.0;
-                    double height2 = 1.0;
-                    double circles = 15.0;
-                    double fulltime = WarpPowder.this.fullTeleportingTime;
-                    double teleportingTime = WarpPowder.this.teleportingTime;
-
-                    double perThrough = (Math.ceil((height / circles) * ((fulltime * 20) / circles)) / 20);
-
+                    // 减少剩余传送时间
                     WarpPowder.this.teleportingTime = teleportingTime - perThrough;
-                    GameTeam gameTeam = GamePlayer.get(player.getUniqueId()).getGameTeam();
-                    Location tLoc = gameTeam.getSpawn();
+                    
+                    // 获取目标位置
+                    GameTeam team = gamePlayer.getGameTeam();
+                    if (team == null) {
+                        cancel();
+                        WarpPowder.this.cancelTeleport(true, true);
+                        return;
+                    }
+                    
+                    Location targetLoc = team.getSpawn();
+                    if (targetLoc == null) {
+                        cancel();
+                        WarpPowder.this.cancelTeleport(true, true);
+                        return;
+                    }
 
+                    // 传送完成
                     if (WarpPowder.this.teleportingTime <= 1.0) {
-                        player.teleport(gameTeam.getSpawn());
+                        player.teleport(targetLoc);
+                        player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.0f);
                         WarpPowder.this.cancelTeleport(true, false);
                         return;
                     }
 
+                    // 更新玩家等级显示剩余时间
                     player.setLevel((int) WarpPowder.this.teleportingTime);
 
-                    Location loc = player.getLocation();
-
-                    double y = (height2 / circles) * through;
-                    for (int i = 0; i < 20; i++) {
-                        double alpha = (360.0 / circleElements) * i;
-                        double x = radius * Math.sin(Math.toRadians(alpha));
-                        double z = radius * Math.cos(Math.toRadians(alpha));
-
-                        Location particleFrom = new Location(loc.getWorld(), loc.getX() + x, loc.getY() + y, loc.getZ() + z);
-                        Util.spawnParticle(GamePlayer.getOnlinePlayers(), particleFrom);
-
-                        Location particleTo = new Location(tLoc.getWorld(), tLoc.getX() + x, tLoc.getY() + y, tLoc.getZ() + z);
-                        Util.spawnParticle(GamePlayer.getOnlinePlayers(), particleTo);
-                    }
-
+                    // 生成粒子效果
+                    createTeleportParticles(player.getLocation(), targetLoc, through);
+                    
+                    // 增加计数器
                     this.through += 1.0;
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     this.cancel();
-                    WarpPowder.this.cancelTeleport(true, false);
+                    WarpPowder.this.cancelTeleport(true, true);
                 }
             }
         }.runTaskTimer(AzuraBedWars.getInstance(), 0L,
-                (long) Math.ceil((height / circles) * ((this.fullTeleportingTime * 20) / circles)));
+                (long) Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((this.fullTeleportingTime * 20) / CIRCLE_COUNT)));
+        
+        // 添加到游戏中的特殊物品列表
         this.game.addSpecialItem(this);
+        return true;
+    }
+    
+    /**
+     * 创建传送粒子效果
+     * 
+     * @param fromLoc 起始位置
+     * @param toLoc 目标位置
+     * @param through 当前高度计数
+     */
+    private void createTeleportParticles(Location fromLoc, Location toLoc, double through) {
+        double y = (PARTICLE_HEIGHT / CIRCLE_COUNT) * through;
+        
+        for (int i = 0; i < CIRCLE_ELEMENTS; i++) {
+            double alpha = (360.0 / CIRCLE_ELEMENTS) * i;
+            double x = PARTICLE_RADIUS * Math.sin(Math.toRadians(alpha));
+            double z = PARTICLE_RADIUS * Math.cos(Math.toRadians(alpha));
+
+            // 在玩家位置生成粒子
+            Location particleFrom = new Location(fromLoc.getWorld(), fromLoc.getX() + x, fromLoc.getY() + y, fromLoc.getZ() + z);
+            Util.spawnParticle(GamePlayer.getOnlinePlayers(), particleFrom);
+
+            // 在目标位置生成粒子
+            if (toLoc.getWorld() != null) {
+                Location particleTo = new Location(toLoc.getWorld(), toLoc.getX() + x, toLoc.getY() + y, toLoc.getZ() + z);
+                Util.spawnParticle(GamePlayer.getOnlinePlayers(), particleTo);
+            }
+        }
     }
 
+    /**
+     * 设置游戏实例
+     * 
+     * @param game 游戏实例
+     */
     public void setGame(Game game) {
         this.game = game;
     }
 
+    /**
+     * 设置物品堆叠数量
+     * 
+     * @param amount 数量
+     */
     public void setStackAmount(int amount) {
-        this.stack.setAmount(amount);
+        if (this.stack != null) {
+            this.stack.setAmount(Math.max(0, amount));
+        }
+    }
+    
+    /**
+     * 检查玩家是否正在传送中
+     * 
+     * @return 是否传送中
+     */
+    public boolean isTeleporting() {
+        return this.teleportingTask != null && !this.teleportingTask.isCancelled();
+    }
+    
+    /**
+     * 获取剩余传送时间
+     * 
+     * @return 剩余时间（秒）
+     */
+    public double getRemainingTime() {
+        return this.teleportingTime;
     }
 }
