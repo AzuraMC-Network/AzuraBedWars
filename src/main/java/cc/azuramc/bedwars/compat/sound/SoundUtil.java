@@ -70,7 +70,7 @@ public class SoundUtil {
     }
 
     public static Sound ENDERDRAGON_HIT() {
-        return get("ENDERDRAGON_HIT", "ENTITY_ENDERDRAGON_HURT");
+        return get("ENDERDRAGON_HIT", "ENTITY_ENDER_DRAGON_HURT");
     }
     
     public static Sound CLICK() {
