@@ -26,6 +26,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Util {
     public static void spawnALL(AzuraBedWars main) {
@@ -66,7 +67,7 @@ public class Util {
 
     private static void spawnVillager(AzuraBedWars main, Location l) {
         Location loc = l.add(0.0D, -1.5D, 0.0D);
-        ArmorStand ab = l.getWorld().spawn(loc, ArmorStand.class);
+        ArmorStand ab = Objects.requireNonNull(l.getWorld()).spawn(loc, ArmorStand.class);
         Villager v = l.getWorld().spawn(l, Villager.class);
         v.setCustomNameVisible(false);
         if (v.getType() == EntityType.VILLAGER) {
@@ -82,7 +83,7 @@ public class Util {
 
     private static void spawnVillager2(AzuraBedWars main, Location l) {
         Location loc = l.add(0.0D, -1.5D, 0.0D);
-        ArmorStand ab = l.getWorld().spawn(loc, ArmorStand.class);
+        ArmorStand ab = Objects.requireNonNull(l.getWorld()).spawn(loc, ArmorStand.class);
         Villager v = l.getWorld().spawn(l, Villager.class);
         v.setCustomNameVisible(false);
         if (v.getType() == EntityType.VILLAGER) {
@@ -98,7 +99,7 @@ public class Util {
     }
 
     private static void spawnArmorStand2(Location l, String name) {
-        ArmorStand a2 = l.getWorld().spawn(l.add(0.0D, 0.25D, 0.0D), ArmorStand.class);
+        ArmorStand a2 = Objects.requireNonNull(l.getWorld()).spawn(l.add(0.0D, 0.25D, 0.0D), ArmorStand.class);
         a2.setCustomName(name);
         a2.setCustomNameVisible(true);
         a2.setGravity(false);
@@ -111,7 +112,7 @@ public class Util {
         l.add(0.0D, 1.0D, 0.0D);
 
         if (type == MapData.DropType.EMERALD) {
-            as = l.getWorld().spawn(l, ArmorStand.class);
+            as = Objects.requireNonNull(l.getWorld()).spawn(l, ArmorStand.class);
             as.setGravity(false);
             as.setVisible(false);
             as.setFallDistance(7.0F);
@@ -144,7 +145,7 @@ public class Util {
         }
 
         if (type == MapData.DropType.DIAMOND) {
-            as = l.getWorld().spawn(l, ArmorStand.class);
+            as = Objects.requireNonNull(l.getWorld()).spawn(l, ArmorStand.class);
             as.setGravity(false);
             as.setVisible(false);
             as.setFallDistance(7.0F);

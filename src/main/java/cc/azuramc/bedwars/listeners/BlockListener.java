@@ -56,9 +56,11 @@ public class BlockListener implements Listener {
     private static final double FIREBALL_KNOCKBACK_MULTIPLIER = 0.5;
     private static final long BLOCK_PLACEMENT_COOLDOWN = 1000; // 毫秒
     private static final int MAX_BRIDGE_EGG_LENGTH = 6;
+    private static final int MAX_SPEED_WOOL_LENGTH = 6;
     private static final String BLOCK_TIMER_METADATA = "Game BLOCK TIMER";
     private static final String FIREBALL_METADATA = "Game FIREBALL";
     private static final String NOFALL_METADATA = "FIREBALL PLAYER NOFALL";
+    private static final String SPEED_WOOL_METADATA = "SPEED_WOOL";
     
     private final AzuraBedWars plugin;
     private final Game game;
@@ -421,7 +423,7 @@ public class BlockListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        
+
         // 设置冷却时间
         player.setMetadata(BLOCK_TIMER_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), System.currentTimeMillis()));
 
@@ -437,8 +439,8 @@ public class BlockListener implements Listener {
         // 获取搭桥方向
         BlockFace blockFace = event.getBlockAgainst().getFace(block);
         
-        // 开始搭桥任务
-        startBridgeTask(block, blockFace, item);
+        // 开始大桥蛋搭桥任务
+        startBridgeEggTask(block, blockFace, item);
     }
 
     /**
@@ -452,21 +454,14 @@ public class BlockListener implements Listener {
     }
 
     /**
-     * 处理搭桥蛋放置
+     * 处理火速羊毛放置
      *
      * @param event 方块放置事件
      * @param player 玩家
      * @param item 物品
      */
     private void handleSpeedWoolPlacement(BlockPlaceEvent event, Player player, ItemStack item) {
-        // 检查冷却时间
-        if (isOnCooldown(player)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 设置冷却时间
-        player.setMetadata(BLOCK_TIMER_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), System.currentTimeMillis()));
+        // 不对火速羊毛使用全局冷却，允许多个同时进行
 
         // 防止玩家卡在方块中
         Block block = event.getBlock();
@@ -480,8 +475,8 @@ public class BlockListener implements Listener {
         // 获取搭桥方向
         BlockFace blockFace = event.getBlockAgainst().getFace(block);
 
-        // 开始搭桥任务
-        startBridgeTask(block, blockFace, item);
+        // 开始火速羊毛搭桥任务
+        startSpeedWoolTask(block, blockFace, item);
     }
 
     /**
@@ -497,13 +492,13 @@ public class BlockListener implements Listener {
     }
 
     /**
-     * 开始搭桥任务
+     * 开始大桥蛋搭桥任务
      *
      * @param block 起始方块
      * @param blockFace 方向
      * @param item 使用的物品
      */
-    private void startBridgeTask(Block block, BlockFace blockFace, ItemStack item) {
+    private void startBridgeEggTask(Block block, BlockFace blockFace, ItemStack item) {
         new BukkitRunnable() {
             int i = 1;
 
@@ -533,7 +528,54 @@ public class BlockListener implements Listener {
 
                 i++;
             }
-        }.runTaskTimer(AzuraBedWars.getInstance(), 0, 4L);
+        }.runTaskTimer(AzuraBedWars.getInstance(), 0, 4L); // 每4刻生成一格
+    }
+    
+    /**
+     * 开始火速羊毛搭桥任务
+     * 火速羊毛的搭桥速度比大桥蛋更快
+     *
+     * @param block 起始方块
+     * @param blockFace 方向
+     * @param item 使用的物品
+     */
+    private void startSpeedWoolTask(Block block, BlockFace blockFace, ItemStack item) {
+        new BukkitRunnable() {
+            int i = 1;
+            final UUID taskId = UUID.randomUUID(); // 为每个火速羊毛任务生成一个唯一ID
+            
+            @Override
+            public void run() {
+                if (i > MAX_SPEED_WOOL_LENGTH) {
+                    cancel();
+                    return;
+                }
+
+                Block relativeBlock = block.getRelative(blockFace, i);
+
+                // 检查是否可以在此位置放置方块
+                if (isProtectedRelativeLocation(relativeBlock, blockFace)) {
+                    cancel();
+                    return;
+                }
+
+                // 放置方块
+                if (relativeBlock.getType() == MaterialUtil.AIR()) {
+                    relativeBlock.setType(item.getType());
+                    if (!VersionUtil.isLessThan113() && item.getData() != null) {
+                        setBlockData(relativeBlock, item.getData().getData());
+                    }
+                    
+                    // 为火速羊毛放置的方块添加元数据标记
+                    relativeBlock.setMetadata(SPEED_WOOL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), taskId.toString()));
+                    
+                    // 播放羊毛放置声音
+                    block.getWorld().playSound(relativeBlock.getLocation(), SoundUtil.STEP_WOOL(), 0.3f, 1.5f);
+                }
+
+                i++;
+            }
+        }.runTaskTimer(AzuraBedWars.getInstance(), 0, 2L); // 每2刻生成一格，比大桥蛋更快
     }
 
     /**

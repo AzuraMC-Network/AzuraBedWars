@@ -66,7 +66,7 @@ public class SoundUtil {
     }
 
     public static Sound STEP_WOOL() {
-        return get("STEP_WOOL", "BLOCK_CLOTH_STEP");
+        return get("STEP_WOOL", "BLOCK_WOOL_PLACE");
     }
 
     public static Sound ENDERDRAGON_HIT() {
