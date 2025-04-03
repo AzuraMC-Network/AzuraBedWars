@@ -157,7 +157,7 @@ public class BlockListener implements Listener {
             return;
         }
 
-        if (MaterialUtil.isWool(item.getType())) {
+        if (isSpeedWool(item)) {
             handleSpeedWoolPlacement(event, player, item);
         }
     }
@@ -448,7 +448,7 @@ public class BlockListener implements Listener {
      * @return 如果是火速羊毛返回true，否则返回false
      */
     private boolean isSpeedWool(ItemStack item) {
-        return item != null && MaterialUtil.isWool(item.getType());
+        return item != null && MaterialUtil.isWool(item.getType()) && !item.getEnchantments().isEmpty();
     }
 
     /**
