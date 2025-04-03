@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.map.data;
 
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;

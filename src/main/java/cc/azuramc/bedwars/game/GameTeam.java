@@ -256,13 +256,13 @@ public class GameTeam {
             // 尝试使用9x和8x服务器的朝向数据
             byte data = block.getData();
             // 0: 头朝南, 1: 头朝西, 2: 头朝北, 3: 头朝东
-            switch (data & 0x3) {
-                case 0: return BlockFace.SOUTH;
-                case 1: return BlockFace.WEST;
-                case 2: return BlockFace.NORTH;
-                case 3: return BlockFace.EAST;
-                default: return DEFAULT_BED_FACE;
-            }
+            return switch (data & 0x3) {
+                case 0 -> BlockFace.SOUTH;
+                case 1 -> BlockFace.WEST;
+                case 2 -> BlockFace.NORTH;
+                case 3 -> BlockFace.EAST;
+                default -> DEFAULT_BED_FACE;
+            };
         } catch (Exception e) {
             return DEFAULT_BED_FACE;
         }

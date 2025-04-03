@@ -406,6 +406,10 @@ public class MaterialUtil {
         return Material.GLASS;
     }
 
+    public static Material LONG_GRASS() {
+        return Material.TALL_GRASS;
+    }
+
     public static Material END_STONE() {
         return getMaterial("ENDER_STONE", "END_STONE");
     }
@@ -484,5 +488,27 @@ public class MaterialUtil {
 
     public static Material COMPARATOR() {
         return getMaterial("REDSTONE_COMPARATOR", "COMPARATOR");
+    }
+
+    /**
+     * 检查材质是否为羊毛方块
+     * 兼容1.8-1.12和1.13+版本
+     * 
+     * @param material 要检查的材质
+     * @return 如果是羊毛方块返回true，否则返回false
+     */
+    public static boolean isWool(Material material) {
+        if (material == null) {
+            return false;
+        }
+        
+        String name = material.name();
+        if (VersionUtil.isLessThan113()) {
+            // 1.8-1.12版本，羊毛的名称为WOOL
+            return "WOOL".equals(name);
+        } else {
+            // 1.13+版本，羊毛的名称格式为X_WOOL（如WHITE_WOOL, RED_WOOL等）
+            return name.endsWith("_WOOL");
+        }
     }
 }

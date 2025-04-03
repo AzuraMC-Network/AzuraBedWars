@@ -74,6 +74,122 @@ public class BlockListener implements Listener {
     }
 
     /**
+     * 处理方块破坏事件
+     *
+     * @param event 方块破坏事件
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBreak(BlockBreakEvent event) {
+        if (game.getGameState() == GameState.WAITING) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (game.getGameState() == GameState.RUNNING) {
+            Player player = event.getPlayer();
+            Block block = event.getBlock();
+            GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+
+            if (gamePlayer == null) {
+                return;
+            }
+
+            GameTeam gameTeam = gamePlayer.getGameTeam();
+
+            if (gamePlayer.isSpectator()) {
+                event.setCancelled(true);
+                return;
+            }
+
+            // 处理床方块破坏
+            if (isBedBlock(block)) {
+                handleBedBreak(event, player, block, gamePlayer, gameTeam);
+                return;
+            }
+
+            // 检查区域保护和玩家放置的方块
+            if (game.getMapData().hasRegion(block.getLocation()) || game.getBlocks().contains(block.getLocation())) {
+                player.sendMessage("break canceled:  " + block.getLocation() + "first: " + game.getMapData().hasRegion(block.getLocation()));
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    /**
+     * 处理方块放置事件
+     *
+     * @param event 方块放置事件
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        Block block = event.getBlock();
+
+        // 游戏未开始或玩家为观察者时不允许放置方块
+        if (gamePlayer != null && (game.getGameState() == GameState.WAITING || gamePlayer.isSpectator())) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 不允许放置床方块
+        if (block.getType().toString().startsWith("BED")) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 检查区域保护
+        if (isProtectedArea(block.getLocation())) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 处理TNT放置
+        if (block.getType() == MaterialUtil.TNT()) {
+            handleTNTPlacement(event, player);
+            return;
+        }
+
+        // 处理搭桥蛋
+        ItemStack item = PlayerUtil.getItemInHand(player);
+        if (isBridgeEggItem(item)) {
+            handleBridgeEggPlacement(event, player, item);
+            return;
+        }
+
+        if (MaterialUtil.isWool(item.getType())) {
+            handleSpeedWoolPlacement(event, player, item);
+        }
+    }
+
+    /**
+     * 处理实体爆炸事件
+     *
+     * @param event 实体爆炸事件
+     */
+    @EventHandler
+    public void onExplode(EntityExplodeEvent event) {
+        Entity entity = event.getEntity();
+
+        // 游戏未运行时取消爆炸
+        if (game.getGameState() != GameState.RUNNING) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 处理爆炸块列表
+        processExplodedBlocks(event);
+
+        // 处理火球爆炸
+        if (entity instanceof Fireball) {
+            handleFireballExplosion((Fireball) entity);
+        }
+
+        // 取消原版爆炸效果，使用自定义爆炸效果
+        event.setCancelled(true);
+    }
+
+    /**
      * 检查方块是否为床方块
      * 兼容全版本Minecraft
      * 
@@ -196,7 +312,7 @@ public class BlockListener implements Listener {
             
             // 对于羊毛等染色方块，我们可以直接替换为对应颜色的方块
             Material type = block.getType();
-            if (type.name().contains("WOOL")) {
+            if (MaterialUtil.isWool(type)) {
                 String colorName = getColorNameFromData(data);
                 Material newType = Material.getMaterial(colorName + "_WOOL");
                 if (newType != null) {
@@ -214,48 +330,6 @@ public class BlockListener implements Listener {
             
         } catch (Exception e) {
             Bukkit.getLogger().warning("回退设置方块数据方法失败: " + e.getMessage());
-        }
-    }
-
-    /**
-     * 处理方块放置事件
-     * 
-     * @param event 方块放置事件
-     */
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlace(BlockPlaceEvent event) {
-        Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-        Block block = event.getBlock();
-
-        // 游戏未开始或玩家为观察者时不允许放置方块
-        if (gamePlayer != null && (game.getGameState() == GameState.WAITING || gamePlayer.isSpectator())) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 不允许放置床方块
-        if (block.getType().toString().startsWith("BED")) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 检查区域保护
-        if (isProtectedArea(block.getLocation())) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 处理TNT放置
-        if (block.getType() == MaterialUtil.TNT()) {
-            handleTNTPlacement(event, player);
-            return;
-        }
-
-        // 处理搭桥蛋
-        ItemStack item = PlayerUtil.getItemInHand(player);
-        if (isBridgeEggItem(item)) {
-            handleBridgeEggPlacement(event, player, item);
         }
     }
 
@@ -331,7 +405,7 @@ public class BlockListener implements Listener {
      * @return 如果是搭桥蛋返回true，否则返回false
      */
     private boolean isBridgeEggItem(ItemStack item) {
-        return item != null && item.getType() == MaterialUtil.WHITE_WOOL() && !item.getEnchantments().isEmpty();
+        return item != null && item.getType() == Material.EGG;
     }
 
     /**
@@ -363,6 +437,49 @@ public class BlockListener implements Listener {
         // 获取搭桥方向
         BlockFace blockFace = event.getBlockAgainst().getFace(block);
         
+        // 开始搭桥任务
+        startBridgeTask(block, blockFace, item);
+    }
+
+    /**
+     * 检查物品是否为火速羊毛
+     *
+     * @param item 物品
+     * @return 如果是火速羊毛返回true，否则返回false
+     */
+    private boolean isSpeedWool(ItemStack item) {
+        return item != null && MaterialUtil.isWool(item.getType());
+    }
+
+    /**
+     * 处理搭桥蛋放置
+     *
+     * @param event 方块放置事件
+     * @param player 玩家
+     * @param item 物品
+     */
+    private void handleSpeedWoolPlacement(BlockPlaceEvent event, Player player, ItemStack item) {
+        // 检查冷却时间
+        if (isOnCooldown(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 设置冷却时间
+        player.setMetadata(BLOCK_TIMER_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), System.currentTimeMillis()));
+
+        // 防止玩家卡在方块中
+        Block block = event.getBlock();
+        if (block.getY() != event.getBlockAgainst().getY()) {
+            if (Math.max(Math.abs(player.getLocation().getX() - (block.getX() + 0.5D)),
+                    Math.abs(player.getLocation().getZ() - (block.getZ() + 0.5D))) < 0.5) {
+                return;
+            }
+        }
+
+        // 获取搭桥方向
+        BlockFace blockFace = event.getBlockAgainst().getFace(block);
+
         // 开始搭桥任务
         startBridgeTask(block, blockFace, item);
     }
@@ -454,47 +571,6 @@ public class BlockListener implements Listener {
         }
         
         return false;
-    }
-
-    /**
-     * 处理方块破坏事件
-     * 
-     * @param event 方块破坏事件
-     */
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBreak(BlockBreakEvent event) {
-        if (game.getGameState() == GameState.WAITING) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (game.getGameState() == GameState.RUNNING) {
-            Player player = event.getPlayer();
-            Block block = event.getBlock();
-            GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-            
-            if (gamePlayer == null) {
-                return;
-            }
-
-            GameTeam gameTeam = gamePlayer.getGameTeam();
-
-            if (gamePlayer.isSpectator()) {
-                event.setCancelled(true);
-                return;
-            }
-
-            // 处理床方块破坏
-            if (isBedBlock(block)) {
-                handleBedBreak(event, player, block, gamePlayer, gameTeam);
-                return;
-            }
-
-            // 检查区域保护和玩家放置的方块
-            if (game.getMapData().hasRegion(block.getLocation()) || !game.getBlocks().contains(block.getLocation())) {
-                event.setCancelled(true);
-            }
-        }
     }
 
     /**
@@ -608,32 +684,6 @@ public class BlockListener implements Listener {
         game.broadcastTeamTitle(targetTeam, 1, 20, 1, "§c§l床被摧毁", "§c死亡将无法复活");
     }
 
-    /**
-     * 处理实体爆炸事件
-     * 
-     * @param event 实体爆炸事件
-     */
-    @EventHandler
-    public void onExplode(EntityExplodeEvent event) {
-        Entity entity = event.getEntity();
-
-        // 游戏未运行时取消爆炸
-        if (game.getGameState() != GameState.RUNNING) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 处理爆炸块列表
-        processExplodedBlocks(event);
-
-        // 处理火球爆炸
-        if (entity instanceof Fireball) {
-            handleFireballExplosion((Fireball) entity);
-        }
-        
-        // 取消原版爆炸效果，使用自定义爆炸效果
-        event.setCancelled(true);
-    }
 
     /**
      * 处理爆炸块列表
