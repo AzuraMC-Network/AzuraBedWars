@@ -47,14 +47,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onFood(FoodLevelChangeEvent event) {
-        if (game.getGameState() == GameState.WAITING) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (GamePlayer.get(event.getEntity().getUniqueId()).isSpectator()) {
-            event.setCancelled(true);
-        }
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -65,7 +58,6 @@ public class PlayerListener implements Listener {
             }
         }
     }
-
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
