@@ -111,7 +111,6 @@ public class BlockListener implements Listener {
 
             // 检查区域保护和玩家放置的方块
             if (game.getMapData().hasRegion(block.getLocation()) || game.getBlocks().contains(block.getLocation())) {
-                player.sendMessage("break canceled:  " + block.getLocation() + "first: " + game.getMapData().hasRegion(block.getLocation()));
                 event.setCancelled(true);
             }
         }
