@@ -1,5 +1,0 @@
-name: AzuraBedWars
-version: ${version}
-main: cc.azuramc.bedwars.AzuraBedWars
-authors: [An5w1r_]
-api-version: 1.13
