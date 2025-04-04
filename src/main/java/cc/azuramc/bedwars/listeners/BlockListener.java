@@ -14,7 +14,6 @@ import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import cc.azuramc.bedwars.utils.Util;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -34,6 +33,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -733,8 +734,8 @@ public class BlockListener implements Listener {
      */
     private void processExplodedBlocks(EntityExplodeEvent event) {
         // 创建一个新的列表来存储真正需要被爆炸的方块
-        java.util.List<Block> blocksToExplode = new java.util.ArrayList<>();
-        
+        List<Block> blocksToExplode = new ArrayList<>();
+
         for (int i = 0; i < event.blockList().size(); i++) {
             Block block = event.blockList().get(i);
             
@@ -744,7 +745,7 @@ public class BlockListener implements Listener {
             }
 
             // 只处理玩家放置的方块，保护地图方块
-            if (!isProtectedBlockType(block) && game.getBlocks().contains(block.getLocation())) {
+            if (!isProtectedBlockType(block) && !game.getBlocks().contains(block.getLocation())) {
                 blocksToExplode.add(block);
             }
         }
