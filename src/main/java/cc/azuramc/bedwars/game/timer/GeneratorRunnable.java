@@ -74,7 +74,7 @@ public class GeneratorRunnable {
     public void start() {
         if (!this.timer) {
             timer = true;
-            
+
             // 启动盔甲架位置更新任务
             startArmorStandUpdateTask();
             
@@ -104,19 +104,19 @@ public class GeneratorRunnable {
      */
     private void startArmorStandUpdateTask() {
         taskId = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> {
-            List<ArmorStand> allArmor = new ArrayList<>();
-            allArmor.addAll(game.getArmorSande().keySet());
-            allArmor.addAll(game.getArmorStand().keySet());
+                List<ArmorStand> allArmor = new ArrayList<>();
+                allArmor.addAll(game.getArmorSande().keySet());
+                allArmor.addAll(game.getArmorStand().keySet());
             
-            for (ArmorStand as : allArmor) {
+                for (ArmorStand as : allArmor) {
                 if (as == null) continue;
                 
-                Location loc = as.getLocation();
-                if (!loc.getChunk().isLoaded()) {
-                    loc.getChunk().load();
+                    Location loc = as.getLocation();
+                    if (!loc.getChunk().isLoaded()) {
+                        loc.getChunk().load();
+                    }
+                    ArmorStandUtil.moveArmorStand(as, as.getLocation().getY());
                 }
-                ArmorStandUtil.moveArmorStand(as, as.getLocation().getY());
-            }
         }, 0L, 1L).getTaskId();
     }
     

@@ -32,7 +32,7 @@ import java.lang.reflect.Array;
 import java.util.Objects;
 
 /**
- * {@inheritDoc}
+ * 一个快速、高效的记分板实现，基于FastBoardBase
  */
 public class FastBoard extends FastBoardBase<String> {
 
@@ -51,14 +51,18 @@ public class FastBoard extends FastBoardBase<String> {
     }
 
     /**
-     * {@inheritDoc}
+     * 创建一个新的FastBoard实例
+     * 
+     * @param player 玩家对象
      */
     public FastBoard(Player player) {
         super(player);
     }
 
     /**
-     * {@inheritDoc}
+     * 更新计分板Title
+     *
+     * @param title 标题
      */
     @Override
     public void updateTitle(String title) {
@@ -72,7 +76,9 @@ public class FastBoard extends FastBoardBase<String> {
     }
 
     /**
-     * {@inheritDoc}
+     * 更新计分板lines
+     *
+     * @param lines string...
      */
     @Override
     public void updateLines(String... lines) {

@@ -71,6 +71,26 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('charset', 'UTF-8')
+    options.addBooleanOption('html5', true)
+    
+    // 跳过未写注释的方法
+    failOnError = false // 确保Javadoc任务不会因错误而失败
+    options {
+        tags = [
+            'apiNote:a:API Note:',
+            'implSpec:a:Implementation Requirements:',
+            'implNote:a:Implementation Note:'
+        ]
+    }
+    
+    // 跳过内部包或特定类
+    exclude '**/internal/**'
+}
+
 processResources {
     def props = [version: version]
     inputs.properties props
