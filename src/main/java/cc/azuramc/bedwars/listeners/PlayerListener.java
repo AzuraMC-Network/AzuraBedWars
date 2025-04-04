@@ -42,6 +42,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Objects;
+
 public class PlayerListener implements Listener {
     private final Game game = AzuraBedWars.getInstance().getGame();
 
@@ -374,7 +376,20 @@ public class PlayerListener implements Listener {
             }
         }
 
+        // 游戏进行中
+        if (game.getGameState() == GameState.RUNNING) {
+            // 当玩家将要捡起铁锭/金锭/钻石/绿宝石
+            if (itemStack.getType() == Material.IRON_INGOT || itemStack.getType() == Material.GOLD_INGOT || itemStack.getType() == Material.DIAMOND || itemStack.getType() == Material.EMERALD) {
+                // 玩家挂机状态不能拾取资源
+                if (AFKListener.afk.get(player.getUniqueId())) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
         if (itemStack.getType() == Material.IRON_INGOT || itemStack.getType() == Material.GOLD_INGOT) {
+
             double xp = itemStack.getAmount();
 
             if (itemStack.getType() == Material.GOLD_INGOT) {
@@ -396,7 +411,7 @@ public class PlayerListener implements Listener {
             }
 
             if (itemStack.hasItemMeta()) {
-                itemStack.getItemMeta().getDisplayName();
+                Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName();
                 for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
                     if (entity instanceof Player) {
                         Player players = (Player) entity;

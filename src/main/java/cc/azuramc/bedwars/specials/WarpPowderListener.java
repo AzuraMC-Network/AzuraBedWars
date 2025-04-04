@@ -18,6 +18,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Objects;
+
 /**
  * 传送粉末监听器
  * <p>
@@ -208,7 +210,7 @@ public class WarpPowderListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onMove(PlayerMoveEvent event) {
         // 检查是否只是头部转动
-        if (event.getFrom().getBlock().equals(event.getTo().getBlock())) {
+        if (event.getFrom().getBlock().equals(Objects.requireNonNull(event.getTo()).getBlock())) {
             return;
         }
 

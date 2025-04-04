@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.listeners.AFKListener;
 import cc.azuramc.bedwars.map.data.MapData;
 import cc.azuramc.bedwars.events.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.game.event.impl.EventManager;
@@ -633,6 +634,9 @@ public class Game {
 
         GamePlayer.getOnlinePlayers().forEach(GamePlayer::giveInventory);
         Bukkit.getPluginManager().callEvent(new BedwarsGameStartEvent());
+
+        // 开始挂机状态检测
+        AFKListener.startCheckAFKTask();
     }
 
     /**

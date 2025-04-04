@@ -439,7 +439,7 @@ public class BlockListener implements Listener {
         // 获取搭桥方向
         BlockFace blockFace = event.getBlockAgainst().getFace(block);
         
-        // 开始大桥蛋搭桥任务
+        // 开始搭桥蛋搭桥任务
         startBridgeEggTask(block, blockFace, item);
     }
 

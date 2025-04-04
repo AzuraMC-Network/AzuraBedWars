@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.game;
 
+import cc.azuramc.bedwars.listeners.AFKListener;
 import cc.azuramc.bedwars.utils.FireWorkUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.listeners.ChunkListener;
@@ -62,11 +63,14 @@ public class GameOverRunnable extends BukkitRunnable {
     @Override
     public void run() {
         GameTeam winner = game.getWinner();
-        
+
         if (countdown > 0) {
             // 首次运行时显示胜利消息和排行榜
             if (isFirstRun) {
                 displayGameResults(winner);
+
+                // 首次运行时取消挂机状态检测任务
+                AFKListener.stop();
                 isFirstRun = false;
             }
 
