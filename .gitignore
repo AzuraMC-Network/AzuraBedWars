@@ -5,7 +5,6 @@
 *.ipr
 *.iws
 
-libs/
 .cursorignore
 bin/
 # IntelliJ
