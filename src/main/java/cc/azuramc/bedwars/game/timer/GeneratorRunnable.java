@@ -10,9 +10,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,6 +35,27 @@ public class GeneratorRunnable {
     private static final int GOLD_SPAWN_INTERVAL = 6;
     private static final int DIAMOND_SPAWN_INTERVAL = 30;
     private static final int EMERALD_SPAWN_INTERVAL = 55;
+    
+    // 基础资源生成最大堆叠数量（一级）
+    private static final int MAX_IRON_STACK_LEVEL_1 = 48;
+    private static final int MAX_GOLD_STACK_LEVEL_1 = 8;
+    private static final int MAX_DIAMOND_STACK_LEVEL_1 = 4;
+    private static final int MAX_EMERALD_STACK_LEVEL_1 = 2;
+    
+    // 二级资源生成最大堆叠数量
+    private static final int MAX_IRON_STACK_LEVEL_2 = 48;
+    private static final int MAX_GOLD_STACK_LEVEL_2 = 8;
+    private static final int MAX_DIAMOND_STACK_LEVEL_2 = 6;
+    private static final int MAX_EMERALD_STACK_LEVEL_2 = 4;
+    
+    // 三级资源生成最大堆叠数量
+    private static final int MAX_IRON_STACK_LEVEL_3 = 64;
+    private static final int MAX_GOLD_STACK_LEVEL_3 = 12;
+    private static final int MAX_DIAMOND_STACK_LEVEL_3 = 8;
+    private static final int MAX_EMERALD_STACK_LEVEL_3 = 4;
+    
+    // 检测资源周围范围（方块）
+    private static final double RESOURCE_CHECK_RADIUS = 3;
     
     // 盔甲架标识
     private static final float NAME_DISPLAY_HEIGHT = 6.0F;
@@ -104,37 +128,125 @@ public class GeneratorRunnable {
      */
     private void startArmorStandUpdateTask() {
         taskId = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> {
-                List<ArmorStand> allArmor = new ArrayList<>();
-                allArmor.addAll(game.getArmorSande().keySet());
-                allArmor.addAll(game.getArmorStand().keySet());
-            
-                for (ArmorStand as : allArmor) {
+            List<ArmorStand> allArmor = new ArrayList<>();
+            allArmor.addAll(game.getArmorSande().keySet());
+            allArmor.addAll(game.getArmorStand().keySet());
+
+            for (ArmorStand as : allArmor) {
                 if (as == null) continue;
-                
-                    Location loc = as.getLocation();
-                    if (!loc.getChunk().isLoaded()) {
-                        loc.getChunk().load();
-                    }
-                    ArmorStandUtil.moveArmorStand(as, as.getLocation().getY());
+
+                Location loc = as.getLocation();
+                if (!loc.getChunk().isLoaded()) {
+                    loc.getChunk().load();
                 }
+                ArmorStandUtil.moveArmorStand(as, as.getLocation().getY());
+            }
         }, 0L, 1L).getTaskId();
+    }
+    
+    /**
+     * 根据当前事件等级获取铁锭最大堆叠数量
+     * 
+     * @param eventLevel 当前事件等级
+     * @return 最大堆叠数量
+     */
+    private int getMaxIronStack(int eventLevel) {
+        if (eventLevel <= 1) {
+            return MAX_IRON_STACK_LEVEL_1;
+        } else if (eventLevel == 2) {
+            return MAX_IRON_STACK_LEVEL_2;
+        } else {
+            return MAX_IRON_STACK_LEVEL_3;
+        }
+    }
+    
+    /**
+     * 根据当前事件等级获取金锭最大堆叠数量
+     * 
+     * @param eventLevel 当前事件等级
+     * @return 最大堆叠数量
+     */
+    private int getMaxGoldStack(int eventLevel) {
+        if (eventLevel <= 1) {
+            return MAX_GOLD_STACK_LEVEL_1;
+        } else if (eventLevel == 2) {
+            return MAX_GOLD_STACK_LEVEL_2;
+        } else {
+            return MAX_GOLD_STACK_LEVEL_3;
+        }
+    }
+    
+    /**
+     * 根据当前事件等级获取钻石最大堆叠数量
+     * 
+     * @param eventLevel 当前事件等级
+     * @return 最大堆叠数量
+     */
+    private int getMaxDiamondStack(int eventLevel) {
+        if (eventLevel <= 1) {
+            return MAX_DIAMOND_STACK_LEVEL_1;
+        } else if (eventLevel == 2) {
+            return MAX_DIAMOND_STACK_LEVEL_2;
+        } else {
+            return MAX_DIAMOND_STACK_LEVEL_3;
+        }
+    }
+    
+    /**
+     * 根据当前事件等级获取绿宝石最大堆叠数量
+     * 
+     * @param eventLevel 当前事件等级
+     * @return 最大堆叠数量
+     */
+    private int getMaxEmeraldStack(int eventLevel) {
+        if (eventLevel <= 1) {
+            return MAX_EMERALD_STACK_LEVEL_1;
+        } else if (eventLevel == 2) {
+            return MAX_EMERALD_STACK_LEVEL_2;
+        } else {
+            return MAX_EMERALD_STACK_LEVEL_3;
+        }
     }
     
     /**
      * 注册所有资源生成器
      */
     private void registerResourceGenerators() {
-        // 铁锭生成器
-        registerItemGenerator(IRON_GENERATOR_NAME, Material.IRON_INGOT, MapData.DropType.BASE, IRON_SPAWN_INTERVAL);
+        // 铁锭生成器（根据事件等级调整堆叠上限）
+        game.getEventManager().registerRunnable(IRON_GENERATOR_NAME, (seconds, currentEvent) -> 
+            Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
+                game.getMapData().getDropLocations(MapData.DropType.BASE)
+                    .forEach(location -> 
+                        dropItem(location, Material.IRON_INGOT, getMaxIronStack(currentEvent))
+                    )
+            ), IRON_SPAWN_INTERVAL);
         
-        // 金锭生成器
-        registerItemGenerator(GOLD_GENERATOR_NAME, Material.GOLD_INGOT, MapData.DropType.BASE, GOLD_SPAWN_INTERVAL);
+        // 金锭生成器（根据事件等级调整堆叠上限）
+        game.getEventManager().registerRunnable(GOLD_GENERATOR_NAME, (seconds, currentEvent) -> 
+            Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
+                game.getMapData().getDropLocations(MapData.DropType.BASE)
+                    .forEach(location -> 
+                        dropItem(location, Material.GOLD_INGOT, getMaxGoldStack(currentEvent))
+                    )
+            ), GOLD_SPAWN_INTERVAL);
         
-        // 钻石生成器
-        registerItemGenerator(DIAMOND_GENERATOR_NAME, Material.DIAMOND, MapData.DropType.DIAMOND, DIAMOND_SPAWN_INTERVAL);
+        // 钻石生成器（根据事件等级调整堆叠上限）
+        game.getEventManager().registerRunnable(DIAMOND_GENERATOR_NAME, (seconds, currentEvent) -> 
+            Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
+                game.getMapData().getDropLocations(MapData.DropType.DIAMOND)
+                    .forEach(location -> 
+                        dropItem(location, Material.DIAMOND, getMaxDiamondStack(currentEvent))
+                    )
+            ), DIAMOND_SPAWN_INTERVAL);
         
-        // 绿宝石生成器
-        registerItemGenerator(EMERALD_GENERATOR_NAME, Material.EMERALD, MapData.DropType.EMERALD, EMERALD_SPAWN_INTERVAL);
+        // 绿宝石生成器（根据事件等级调整堆叠上限）
+        game.getEventManager().registerRunnable(EMERALD_GENERATOR_NAME, (seconds, currentEvent) -> 
+            Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
+                game.getMapData().getDropLocations(MapData.DropType.EMERALD)
+                    .forEach(location -> 
+                        dropItem(location, Material.EMERALD, getMaxEmeraldStack(currentEvent))
+                    )
+            ), EMERALD_SPAWN_INTERVAL);
     }
     
     /**
@@ -149,32 +261,24 @@ public class GeneratorRunnable {
     }
     
     /**
-     * 注册资源生成器
-     *
-     * @param name 生成器名称
-     * @param material 生成的物品类型
-     * @param dropType 资源点类型
-     * @param interval 生成间隔（秒）
-     */
-    private void registerItemGenerator(String name, Material material, MapData.DropType dropType, int interval) {
-        game.getEventManager().registerRunnable(name, (seconds, currentEvent) -> 
-            Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
-                game.getMapData().getDropLocations(dropType)
-                    .forEach(location -> 
-                        dropItem(location, material)
-                    )
-            ), interval);
-    }
-    
-    /**
-     * 在指定位置生成物品
+     * 在指定位置生成物品，但不超过最大堆叠数量
      *
      * @param location 生成位置
      * @param material 物品类型
+     * @param maxStack 最大堆叠数量
      */
-    private void dropItem(Location location, Material material) {
+    private void dropItem(Location location, Material material, int maxStack) {
         if (location == null || location.getWorld() == null) return;
         
+        // 计算当前位置已有的资源数量
+        int currentAmount = countNearbyItems(location, material);
+        
+        // 如果已达到或超过最大堆叠数量，则不生成
+        if (currentAmount >= maxStack) {
+            return;
+        }
+        
+        // 生成物品
         location.getWorld().dropItem(
             location, 
             new ItemBuilderUtil()
@@ -182,6 +286,38 @@ public class GeneratorRunnable {
                 .setDisplayName(ITEM_DISPLAY_NAME)
                 .getItem()
         ).setVelocity(ITEM_VELOCITY);
+    }
+    
+    /**
+     * 计算指定位置附近特定类型物品的数量
+     *
+     * @param location 中心位置
+     * @param material 物品类型
+     * @return 物品总数
+     */
+    private int countNearbyItems(Location location, Material material) {
+        if (location == null || location.getWorld() == null) return 0;
+        
+        // 获取周围实体
+        Collection<Entity> nearbyEntities = location.getWorld().getNearbyEntities(
+            location, 
+            RESOURCE_CHECK_RADIUS, 
+            RESOURCE_CHECK_RADIUS, 
+            RESOURCE_CHECK_RADIUS
+        );
+        
+        // 统计指定类型的物品数量
+        int count = 0;
+        for (Entity entity : nearbyEntities) {
+            if (entity instanceof Item) {
+                Item item = (Item) entity;
+                if (item.getItemStack().getType() == material) {
+                    count += item.getItemStack().getAmount();
+                }
+            }
+        }
+        
+        return count;
     }
     
     /**
