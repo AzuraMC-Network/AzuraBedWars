@@ -6,6 +6,7 @@
 *.iws
 
 libs/
+.cursorignore
 bin/
 # IntelliJ
 out/
