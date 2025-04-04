@@ -733,6 +733,9 @@ public class BlockListener implements Listener {
      * @param event 爆炸事件
      */
     private void processExplodedBlocks(EntityExplodeEvent event) {
+        // 创建一个新的列表来存储真正需要被爆炸的方块
+        java.util.List<Block> blocksToExplode = new java.util.ArrayList<>();
+        
         for (int i = 0; i < event.blockList().size(); i++) {
             Block block = event.blockList().get(i);
             
@@ -741,21 +744,30 @@ public class BlockListener implements Listener {
                 continue;
             }
 
-            // 处理可爆炸的方块
-            if (!isProtectedBlockType(block) && !game.getBlocks().contains(block.getLocation())) {
-                // 清除方块并显示爆炸效果
-                block.setType(MaterialUtil.AIR());
-                
-                // 根据版本显示不同的爆炸粒子效果
-                if (!VersionUtil.isLessThan113()) {
-                    block.getWorld().spawnParticle(org.bukkit.Particle.SMOKE, block.getLocation(), 5);
-                } else {
-                    block.getWorld().playEffect(block.getLocation(), Effect.SMOKE, 0);
-                }
-                
-                // 播放爆炸音效
-                block.getWorld().playSound(block.getLocation(), SoundUtil.EXPLODE(), 1.0F, 1.0F);
+            // 只处理玩家放置的方块，保护地图方块
+            if (!isProtectedBlockType(block) && game.getBlocks().contains(block.getLocation())) {
+                blocksToExplode.add(block);
             }
+        }
+        
+        // 清空原始列表，避免破坏地图方块
+        event.blockList().clear();
+        
+        // 处理可爆炸的方块
+        for (Block block : blocksToExplode) {
+            // 清除方块并显示爆炸效果
+            block.setType(MaterialUtil.AIR());
+
+            // 播放爆炸音效
+            try {
+                block.getWorld().playSound(block.getLocation(), SoundUtil.EXPLODE(), 0.5F, 1.0F);
+            } catch (Exception e) {
+                // 如果声音效果失败，记录日志但不中断游戏
+                Bukkit.getLogger().warning("无法播放爆炸音效: " + e.getMessage());
+            }
+            
+            // 从游戏放置的方块列表中移除
+            game.getBlocks().remove(block.getLocation());
         }
     }
 
