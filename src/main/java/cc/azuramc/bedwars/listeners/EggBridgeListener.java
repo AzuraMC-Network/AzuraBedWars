@@ -30,37 +30,44 @@ public class EggBridgeListener implements Listener {
 
     @EventHandler
     public void onThrow(ProjectileLaunchEvent event) {
-        // 游戏运行中
-        if (game.getGameState() == GameState.RUNNING) {
-            // 投掷物为鸡蛋（搭桥蛋）
-            if (event.getEntity() instanceof Egg egg) {
-                // 投掷者为玩家
-                if (egg.getShooter() instanceof Player shooter) {
-
-                    // 在搭桥蛋 3 秒冷却中
-                    if (inBridgeCooldown.contains(shooter.getUniqueId())) {
-                        shooter.sendMessage(CC.color("&c搭桥蛋冷却中！"));
-                        event.setCancelled(true);
-                        return;
-                    }
-
-                    // 触发 EggBridgeThrowEvent 事件
-                    EggBridgeThrowEvent throwEvent = new EggBridgeThrowEvent(shooter);
-                    Bukkit.getPluginManager().callEvent(throwEvent);
-
-                    if (event.isCancelled()) {
-                        event.setCancelled(true);
-                        return;
-                    }
-
-                    // 存进生效的搭桥蛋列表
-                    bridges.put(egg, new EggBridgeTask(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
-                    // 创建 3 秒冷却时间
-                    if (!inBridgeCooldown.contains(shooter.getUniqueId())) inBridgeCooldown.add(shooter.getUniqueId());
-                    Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> inBridgeCooldown.remove(shooter.getUniqueId()), 60L);
-                }
-            }
+        // 游戏运行判断
+        if (game.getGameState() != GameState.RUNNING) {
+            return;
         }
+
+        // 投掷物是否为鸡蛋判断
+        if (!(event.getEntity() instanceof Egg egg)) {
+            return;
+        }
+
+        // 仅为玩家
+        if (!(egg.getShooter() instanceof Player shooter)) {
+            return;
+        }
+
+
+        // 在搭桥蛋 3 秒冷却中
+        if (inBridgeCooldown.contains(shooter.getUniqueId())) {
+            shooter.sendMessage(CC.color("&c搭桥蛋冷却中！"));
+            event.setCancelled(true);
+            return;
+        }
+
+        // 触发 EggBridgeThrowEvent 事件
+        EggBridgeThrowEvent throwEvent = new EggBridgeThrowEvent(shooter);
+        Bukkit.getPluginManager().callEvent(throwEvent);
+
+        if (event.isCancelled()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 存进生效的搭桥蛋列表
+        bridges.put(egg, new EggBridgeTask(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
+        // 创建 3 秒冷却时间
+        if (!inBridgeCooldown.contains(shooter.getUniqueId())) inBridgeCooldown.add(shooter.getUniqueId());
+        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> inBridgeCooldown.remove(shooter.getUniqueId()), 60L);
+
     }
 
     @EventHandler
