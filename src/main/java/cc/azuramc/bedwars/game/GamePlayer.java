@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -361,196 +362,114 @@ public class GamePlayer {
      */
     public void giveInventory() {
         Player player = getPlayer();
-        setupBaseArmor(player);
+        player.getInventory().setHelmet(new ItemBuilderUtil().setType(Material.LEATHER_HELMET).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+        player.getInventory().setChestplate(new ItemBuilderUtil().setType(Material.LEATHER_CHESTPLATE).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
         giveArmor();
         giveSword(false);
+        givePickaxe(false);
+        giveAxe(false);
         giveShear();
+
         player.updateInventory();
     }
 
-    /**
-     * 设置基础护甲
-     */
-    private void setupBaseArmor(Player player) {
-        player.getInventory().setHelmet(createColoredArmor(MaterialUtil.LEATHER_HELMET()));
-        player.getInventory().setChestplate(createColoredArmor(MaterialUtil.LEATHER_CHESTPLATE()));
-    }
-
-    /**
-     * 创建染色护甲
-     */
-    private ItemStack createColoredArmor(Material material) {
-        return new ItemBuilderUtil()
-                .setType(material)
-                .setColor(gameTeam.getColor())
-                .setUnbreakable(true, true)
-                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                .getItem();
-    }
-
-    /**
-     * 给予护甲
-     */
     public void giveArmor() {
         Player player = getPlayer();
-        setupLeggingsAndBoots(player);
-        applyReinforcedArmor(player);
-    }
 
-    /**
-     * 设置护腿和靴子
-     */
-    private void setupLeggingsAndBoots(Player player) {
         switch (armorType) {
             case CHAINMAIL:
-                player.getInventory().setLeggings(createUnbreakableArmor(MaterialUtil.CHAINMAIL_LEGGINGS()));
-                player.getInventory().setBoots(createUnbreakableArmor(MaterialUtil.CHAINMAIL_BOOTS()));
+                player.getInventory().setLeggings(new ItemBuilderUtil().setType(Material.CHAINMAIL_LEGGINGS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setBoots(new ItemBuilderUtil().setType(Material.CHAINMAIL_BOOTS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
                 break;
             case IRON:
-                player.getInventory().setLeggings(createUnbreakableArmor(MaterialUtil.IRON_LEGGINGS()));
-                player.getInventory().setBoots(createUnbreakableArmor(MaterialUtil.IRON_BOOTS()));
+                player.getInventory().setLeggings(new ItemBuilderUtil().setType(Material.IRON_LEGGINGS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setBoots(new ItemBuilderUtil().setType(Material.IRON_BOOTS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
                 break;
             case DIAMOND:
-                player.getInventory().setLeggings(createUnbreakableArmor(MaterialUtil.DIAMOND_LEGGINGS()));
-                player.getInventory().setBoots(createUnbreakableArmor(MaterialUtil.DIAMOND_BOOTS()));
+                player.getInventory().setLeggings(new ItemBuilderUtil().setType(Material.DIAMOND_LEGGINGS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setBoots(new ItemBuilderUtil().setType(Material.DIAMOND_BOOTS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
                 break;
             default:
-                player.getInventory().setLeggings(createColoredArmor(MaterialUtil.LEATHER_LEGGINGS()));
-                player.getInventory().setBoots(createColoredArmor(MaterialUtil.LEATHER_BOOTS()));
+                player.getInventory().setLeggings(new ItemBuilderUtil().setType(Material.LEATHER_LEGGINGS).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setBoots(new ItemBuilderUtil().setType(Material.LEATHER_BOOTS).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
                 break;
         }
-    }
 
-    /**
-     * 创建不可破坏的护甲
-     */
-    private ItemStack createUnbreakableArmor(Material material) {
-        return new ItemBuilderUtil()
-                .setType(material)
-                .setUnbreakable(true, true)
-                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                .getItem();
-    }
-
-    /**
-     * 应用强化护甲效果
-     */
-    private void applyReinforcedArmor(Player player) {
         if (gameTeam.getReinforcedArmor() > 0) {
-            for (ItemStack armor : player.getInventory().getArmorContents()) {
-                if (armor != null) {
-                    armor.addEnchantment(EnchantmentUtil.PROTECTION_ENVIRONMENTAL(), gameTeam.getReinforcedArmor());
-                }
+            for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
+                player.getInventory().getArmorContents()[i].addEnchantment(EnchantmentUtil.PROTECTION_ENVIRONMENTAL(), gameTeam.getReinforcedArmor());
             }
         }
     }
 
-    /**
-     * 给予剑
-     */
     public void giveSword(boolean remove) {
         Player player = getPlayer();
+
         if (remove) {
             player.getInventory().remove(MaterialUtil.WOODEN_SWORD());
         }
-        
-        ItemBuilderUtil builder = new ItemBuilderUtil()
-                .setType(MaterialUtil.WOODEN_SWORD())
-                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                .setUnbreakable(true, true);
-                
         if (gameTeam.isSharpenedSwords()) {
-            builder.addEnchant(EnchantmentUtil.DAMAGE_ALL(), 1);
+            player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.WOODEN_SWORD()).addEnchant(EnchantmentUtil.DAMAGE_ALL(), 1).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
+        } else {
+            player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.WOODEN_SWORD()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
         }
-        
-        player.getInventory().addItem(builder.getItem());
     }
 
-    /**
-     * 给予镐子
-     */
     public void givePickaxe(boolean remove) {
         Player player = getPlayer();
-        if (remove) {
-            removePreviousPickaxe(player);
-            return;
-        }
 
-        player.getInventory().addItem(createTool(Material.WOODEN_PICKAXE));
-    }
-
-    /**
-     * 移除上一个镐子
-     */
-    private void removePreviousPickaxe(Player player) {
         switch (pickaxeType) {
-            case DIAMOND:
-                player.getInventory().remove(MaterialUtil.IRON_PICKAXE());
-                break;
-            case IRON:
-                player.getInventory().remove(MaterialUtil.STONE_PICKAXE());
+            case WOOD:
+                player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.WOODEN_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentUtil.DIG_SPEED(), 1).getItem());
                 break;
             case STONE:
-                player.getInventory().remove(MaterialUtil.WOODEN_PICKAXE());
+                if (remove) player.getInventory().remove(MaterialUtil.WOODEN_PICKAXE());
+                player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.STONE_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentUtil.DIG_SPEED(), 1).getItem());
+                break;
+            case IRON:
+                if (remove) player.getInventory().remove(MaterialUtil.STONE_PICKAXE());
+                player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.IRON_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentUtil.DIG_SPEED(), 1).getItem());
+                break;
+            case DIAMOND:
+                if (remove) player.getInventory().remove(MaterialUtil.IRON_PICKAXE());
+                player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.DIAMOND_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentUtil.DIG_SPEED(), 1).getItem());
+                break;
+            default:
                 break;
         }
     }
 
-    /**
-     * 给予斧头
-     */
     public void giveAxe(boolean remove) {
         Player player = getPlayer();
-        if (remove) {
-            removePreviousAxe(player);
-            return;
-        }
 
-        player.getInventory().addItem(createTool(MaterialUtil.WOODEN_AXE()));
-    }
-
-    /**
-     * 移除上一个斧头
-     */
-    private void removePreviousAxe(Player player) {
         switch (axeType) {
-            case DIAMOND:
-                player.getInventory().remove(MaterialUtil.IRON_AXE());
-                break;
-            case IRON:
-                player.getInventory().remove(MaterialUtil.STONE_AXE());
+            case WOOD:
+                player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.WOODEN_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentUtil.DIG_SPEED(), 1).getItem());
                 break;
             case STONE:
-                player.getInventory().remove(MaterialUtil.WOODEN_AXE());
+                if (remove) player.getInventory().remove(MaterialUtil.WOODEN_AXE());
+                player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.STONE_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentUtil.DIG_SPEED(), 1).getItem());
+                break;
+            case IRON:
+                if (remove) player.getInventory().remove(MaterialUtil.STONE_AXE());
+                player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.IRON_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentUtil.DIG_SPEED(), 1).getItem());
+                break;
+            case DIAMOND:
+                if (remove) player.getInventory().remove(MaterialUtil.IRON_AXE());
+                player.getInventory().addItem(new ItemBuilderUtil().setType(MaterialUtil.DIAMOND_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentUtil.DIG_SPEED(), 1).getItem());
+                break;
+            default:
                 break;
         }
     }
 
-    /**
-     * 创建工具
-     */
-    private ItemStack createTool(Material material) {
-        return new ItemBuilderUtil()
-                .setType(material)
-                .setUnbreakable(true, true)
-                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                .addEnchant(EnchantmentUtil.DIG_SPEED(), 1)
-                .getItem();
-    }
-
-    /**
-     * 给予剪刀
-     */
     public void giveShear() {
+        Player player = getPlayer();
+
         if (shear) {
-            getPlayer().getInventory().addItem(new ItemBuilderUtil()
-                    .setType(MaterialUtil.SHEARS())
-                    .setUnbreakable(true, true)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .getItem());
+            player.getInventory().addItem(new ItemBuilderUtil().setType(Material.SHEARS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
         }
     }
-
     /**
      * 清理玩家状态
      */
