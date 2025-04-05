@@ -511,4 +511,31 @@ public class MaterialUtil {
             return name.endsWith("_WOOL");
         }
     }
+
+    /**
+     * 根据DyeColor对象获取彩色羊毛
+     * @param dyeColor DyeColor对象
+     * @return 对应颜色的羊毛
+     */
+    public static ItemStack getColoredWool(DyeColor dyeColor) {
+        if (dyeColor == null) {
+            return new ItemStack(WHITE_WOOL());
+        }
+
+        if (!VersionUtil.isLessThan113()) {
+            try {
+                // 1.13+ 使用枚举名称直接获取材质
+                String colorName = dyeColor.toString();
+                return new ItemStack(Material.valueOf(colorName + "_WOOL"));
+            } catch (Exception e) {
+                return new ItemStack(WHITE_WOOL());
+            }
+        } else {
+            // 1.8-1.12 使用数据值
+            return new ItemBuilderUtil()
+                    .setType(Material.valueOf("WOOL"))
+                    .setDurability((short) dyeColor.ordinal())
+                    .getItem();
+        }
+    }
 }

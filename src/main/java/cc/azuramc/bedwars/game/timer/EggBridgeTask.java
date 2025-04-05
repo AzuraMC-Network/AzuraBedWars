@@ -1,0 +1,91 @@
+package cc.azuramc.bedwars.game.timer;
+
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
+import cc.azuramc.bedwars.compat.sound.SoundUtil;
+import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.TeamColor;
+import cc.azuramc.bedwars.game.event.impl.EggBridgeBuildEvent;
+import cc.azuramc.bedwars.listeners.BlockListener;
+import cc.azuramc.bedwars.listeners.EggBridgeListener;
+import lombok.Getter;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Egg;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
+
+public class EggBridgeTask implements Runnable {
+
+    @Getter
+    private final Egg projectile;
+    @Getter
+    private final TeamColor teamColor;
+    @Getter
+    private final Player player;
+    private final BukkitTask task;
+
+    private final Game game;
+
+    public EggBridgeTask(AzuraBedWars plugin, Player player, Egg projectile, TeamColor teamColor) {
+        this.game = plugin.getGame();
+        this.projectile = projectile;
+        this.teamColor = teamColor;
+        this.player = player;
+        task = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), this, 0, 1);
+    }
+
+    @Override
+    public void run() {
+
+        // 扔出搭桥蛋时搭桥蛋的位置
+        Location loc = getProjectile().getLocation();
+
+        // 第二个方块（循环的第一个方块）
+        Block b2 = loc.clone().subtract(0.0D, 2.0D, 0.0D).getBlock();
+        // 第三个方块（循环的第二个方块）
+        Block b3 = loc.clone().subtract(1.0D, 2.0D, 0.0D).getBlock();
+        // 第四个方块（循环的第三个方块）
+        Block b4 = loc.clone().subtract(0.0D, 2.0D, 1.0D).getBlock();
+
+        // 检查是否接触到保护区域
+        if (BlockListener.isProtectedArea(b2.getLocation(b2.getLocation())) || BlockListener.isProtectedArea(b3.getLocation()) || BlockListener.isProtectedArea(b4.getLocation())) {
+            EggBridgeListener.removeEgg(projectile);
+            return;
+        }
+
+        // 判断搭桥蛋生效位置条件
+        if (getProjectile().isDead()
+                || getPlayer().getLocation().distance(getProjectile().getLocation()) > 27
+                || getPlayer().getLocation().getY() - getProjectile().getLocation().getY() > 9) {
+            EggBridgeListener.removeEgg(projectile);
+            return;
+        }
+
+        // 从距离玩家 2 格开始搭桥
+        if (getPlayer().getLocation().distance(loc) > 3.0D) {
+            buildEggBridgeBlock(b2);
+            buildEggBridgeBlock(b3);
+            buildEggBridgeBlock(b4);
+        }
+    }
+
+    private void buildEggBridgeBlock(Block block) {
+        // 检查为非地图方块
+        if (!game.getMapData().hasRegion(block.getLocation())) {
+            // 检查是否为空气方块
+            if (block.getType() == Material.AIR) {
+                // 改变 AIR 为 指定颜色的羊毛
+                block.setType(MaterialUtil.getColoredWool(teamColor.getDyeColor()).getType());
+                // 触发 EggBridgeBuildEvent 事件
+                Bukkit.getPluginManager().callEvent(new EggBridgeBuildEvent(getTeamColor(), block));
+                // 播放超级无敌音效
+                SoundUtil.playOrbPickupSound(getPlayer());
+            }
+        }
+    }
+
+    public void cancel(){
+        task.cancel();
+    }
+}

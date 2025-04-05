@@ -53,7 +53,7 @@ public class AFKListener implements Listener {
         }, 0L, 20L);
     }
 
-    public static void clearAFK(UUID uuid) {
+    private void clearAFK(UUID uuid) {
         afkLastMovement.remove(uuid);
         afk.remove(uuid);
     }

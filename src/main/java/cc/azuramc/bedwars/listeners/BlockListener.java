@@ -18,6 +18,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -33,6 +35,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -55,16 +58,13 @@ public class BlockListener implements Listener {
     private static final int FIREBALL_EXPLOSION_RADIUS_Z = 4;
     private static final int FIREBALL_DAMAGE = 3;
     private static final double FIREBALL_KNOCKBACK_MULTIPLIER = 0.5;
-    private static final long BLOCK_PLACEMENT_COOLDOWN = 1000; // 毫秒
-    private static final int MAX_BRIDGE_EGG_LENGTH = 6;
     private static final int MAX_SPEED_WOOL_LENGTH = 6;
-    private static final String BLOCK_TIMER_METADATA = "Game BLOCK TIMER";
     private static final String FIREBALL_METADATA = "Game FIREBALL";
     private static final String NOFALL_METADATA = "FIREBALL PLAYER NOFALL";
     private static final String SPEED_WOOL_METADATA = "SPEED_WOOL";
     
     private final AzuraBedWars plugin;
-    private final Game game;
+    private static Game game = null;
 
     /**
      * 构造方法
@@ -73,7 +73,7 @@ public class BlockListener implements Listener {
      */
     public BlockListener(AzuraBedWars plugin) {
         this.plugin = plugin;
-        this.game = plugin.getGame();
+        game = plugin.getGame();
     }
 
     /**
@@ -152,13 +152,8 @@ public class BlockListener implements Listener {
             return;
         }
 
-        // 处理搭桥蛋
+        // 处理火速羊毛
         ItemStack item = PlayerUtil.getItemInHand(player);
-        if (isBridgeEggItem(item)) {
-            handleBridgeEggPlacement(event, player, item);
-            return;
-        }
-
         if (isSpeedWool(item)) {
             handleSpeedWoolPlacement(event, player, item);
         }
@@ -224,13 +219,13 @@ public class BlockListener implements Listener {
         try {
             if (VersionUtil.isLessThan113()) {
                 // 1.8 - 1.12版本使用反射调用setData方法
-                java.lang.reflect.Method setDataMethod = Block.class.getMethod("setData", byte.class);
+                Method setDataMethod = Block.class.getMethod("setData", byte.class);
                 setDataMethod.invoke(block, data);
             } else if (VersionUtil.isLessThan116()) {
                 // 1.13 - 1.15版本，可以通过BlockData API设置
-                org.bukkit.block.data.BlockData blockData = block.getBlockData();
+                BlockData blockData = block.getBlockData();
                 // 根据方块类型处理方向数据
-                if (blockData instanceof org.bukkit.block.data.Directional directional) {
+                if (blockData instanceof Directional directional) {
                     // 将旧版本的数据值转换为方向
                     BlockFace face = convertDataToBlockFace(data);
                     if (face != null && directional.getFaces().contains(face)) {
@@ -309,9 +304,6 @@ public class BlockListener implements Listener {
     private void fallbackSetBlockData(Block block, byte data) {
         // 尝试使用NMS或其他方法
         try {
-            // 获取当前服务器版本
-            String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-            
             // 对于羊毛等染色方块，我们可以直接替换为对应颜色的方块
             Material type = block.getType();
             if (MaterialUtil.isWool(type)) {
@@ -341,7 +333,7 @@ public class BlockListener implements Listener {
      * @param location 位置
      * @return 如果区域受保护返回true，否则返回false
      */
-    private boolean isProtectedArea(Location location) {
+    public static boolean isProtectedArea(Location location) {
         // 检查地图区域保护
         if (game.getMapData().hasRegion(location)) {
             return true;
@@ -401,49 +393,6 @@ public class BlockListener implements Listener {
     }
 
     /**
-     * 检查物品是否为搭桥蛋
-     * 
-     * @param item 物品
-     * @return 如果是搭桥蛋返回true，否则返回false
-     */
-    private boolean isBridgeEggItem(ItemStack item) {
-        return item != null && item.getType() == Material.EGG;
-    }
-
-    /**
-     * 处理搭桥蛋放置
-     * 
-     * @param event 方块放置事件
-     * @param player 玩家
-     * @param item 物品
-     */
-    private void handleBridgeEggPlacement(BlockPlaceEvent event, Player player, ItemStack item) {
-        // 检查冷却时间
-        if (isOnCooldown(player)) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 设置冷却时间
-        player.setMetadata(BLOCK_TIMER_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), System.currentTimeMillis()));
-
-        // 防止玩家卡在方块中
-        Block block = event.getBlock();
-        if (block.getY() != event.getBlockAgainst().getY()) {
-            if (Math.max(Math.abs(player.getLocation().getX() - (block.getX() + 0.5D)), 
-                          Math.abs(player.getLocation().getZ() - (block.getZ() + 0.5D))) < 0.5) {
-                return;
-            }
-        }
-        
-        // 获取搭桥方向
-        BlockFace blockFace = event.getBlockAgainst().getFace(block);
-        
-        // 开始搭桥蛋搭桥任务
-        startBridgeEggTask(block, blockFace, item);
-    }
-
-    /**
      * 检查物品是否为火速羊毛
      *
      * @param item 物品
@@ -478,58 +427,6 @@ public class BlockListener implements Listener {
         // 开始火速羊毛搭桥任务
         startSpeedWoolTask(block, blockFace, item);
     }
-
-    /**
-     * 检查玩家是否在冷却时间内
-     * 
-     * @param player 玩家
-     * @return 如果在冷却时间内返回true，否则返回false
-     */
-    private boolean isOnCooldown(Player player) {
-        long lastUse = player.hasMetadata(BLOCK_TIMER_METADATA) ? 
-                       player.getMetadata(BLOCK_TIMER_METADATA).getFirst().asLong() : 0L;
-        return Math.abs(System.currentTimeMillis() - lastUse) < BLOCK_PLACEMENT_COOLDOWN;
-    }
-
-    /**
-     * 开始大桥蛋搭桥任务
-     *
-     * @param block 起始方块
-     * @param blockFace 方向
-     * @param item 使用的物品
-     */
-    private void startBridgeEggTask(Block block, BlockFace blockFace, ItemStack item) {
-        new BukkitRunnable() {
-            int i = 1;
-
-            @Override
-            public void run() {
-                if (i > MAX_BRIDGE_EGG_LENGTH) {
-                    cancel();
-                    return;
-                }
-
-                Block relativeBlock = block.getRelative(blockFace, i);
-
-                // 检查是否可以在此位置放置方块
-                if (isProtectedRelativeLocation(relativeBlock, blockFace)) {
-                    cancel();
-                    return;
-                }
-
-                // 放置方块
-                if (relativeBlock.getType() == MaterialUtil.AIR()) {
-                    relativeBlock.setType(item.getType());
-                    if (!VersionUtil.isLessThan113() && item.getData() != null) {
-                        setBlockData(relativeBlock, item.getData().getData());
-                    }
-                    block.getWorld().playSound(block.getLocation(), SoundUtil.STEP_WOOL(), 1f, 1f);
-                }
-
-                i++;
-            }
-        }.runTaskTimer(AzuraBedWars.getInstance(), 0, 4L); // 每4刻生成一格
-    }
     
     /**
      * 开始火速羊毛搭桥任务
@@ -554,7 +451,7 @@ public class BlockListener implements Listener {
                 Block relativeBlock = block.getRelative(blockFace, i);
 
                 // 检查是否可以在此位置放置方块
-                if (isProtectedRelativeLocation(relativeBlock, blockFace)) {
+                if (isProtectedRelativeLocation(relativeBlock)) {
                     cancel();
                     return;
                 }
@@ -582,10 +479,9 @@ public class BlockListener implements Listener {
      * 检查相对位置是否受保护
      * 
      * @param block 方块
-     * @param blockFace 方向
      * @return 如果位置受保护返回true，否则返回false
      */
-    private boolean isProtectedRelativeLocation(Block block, BlockFace blockFace) {
+    private boolean isProtectedRelativeLocation(Block block) {
         // 检查团队出生点保护
         for (GameTeam gameTeam : game.getGameTeams()) {
             if (gameTeam.getSpawn().distance(block.getLocation()) <= TEAM_SPAWN_PROTECTION_RADIUS) {
@@ -733,7 +629,7 @@ public class BlockListener implements Listener {
      * @param event 爆炸事件
      */
     private void processExplodedBlocks(EntityExplodeEvent event) {
-        // 创建一个新的列表来存储真正需要被爆炸的方块
+        // 创建一个新列表来存储真正需要被爆炸的方块
         List<Block> blocksToExplode = new ArrayList<>();
 
         for (int i = 0; i < event.blockList().size(); i++) {

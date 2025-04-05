@@ -2,14 +2,10 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.data.type.Bed;
-import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
 import java.util.List;
