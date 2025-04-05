@@ -41,7 +41,7 @@ public class AFKListener implements Listener {
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 UUID uuid = player.getUniqueId();
-                long lastMove = afkLastMovement.get(uuid);
+                long lastMove = afkLastMovement.getOrDefault(uuid, currentTime);
 
                 // 大于45秒未移动
                 if (currentTime - lastMove >= 45000) {

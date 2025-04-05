@@ -23,6 +23,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -304,9 +305,9 @@ public class ItemShopGUI extends CustomGUI {
     /**
      * 处理物品点击
      */
-    private void handleItemClick(org.bukkit.event.inventory.InventoryClickEvent event, GamePlayer gamePlayer, Player player, 
-                                int shopSlot, int displaySlot, ItemType itemType, ItemBuilderUtil itemBuilder, 
-                                int itemSlot, PlayerData playerData, Game game) {
+    private void handleItemClick(InventoryClickEvent event, GamePlayer gamePlayer, Player player,
+                                 int shopSlot, int displaySlot, ItemType itemType, ItemBuilderUtil itemBuilder,
+                                 int itemSlot, PlayerData playerData, Game game) {
         // 处理Shift+点击 (快捷购买相关操作)
         if (event.isShiftClick() || event.getClick().isShiftClick()) {
             handleShiftClick(player, gamePlayer, shopSlot, displaySlot, itemBuilder, itemSlot, playerData, game);
@@ -365,7 +366,7 @@ public class ItemShopGUI extends CustomGUI {
         if (MaterialUtil.SHEARS().equals(itemMaterial) && gamePlayer.isShear()) {
             return false;
         }
-        
+
         return true;
     }
     
