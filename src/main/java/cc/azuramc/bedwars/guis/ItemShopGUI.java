@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.guis;
 
+import cc.azuramc.bedwars.utils.CC;
 import cc.azuramc.bedwars.utils.gui.CustomGUI;
 import cc.azuramc.bedwars.utils.gui.GUIAction;
 import cc.azuramc.bedwars.utils.gui.NewGUIAction;
@@ -24,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -353,23 +355,59 @@ public class ItemShopGUI extends CustomGUI {
      * 检查是否可以购买物品
      */
     private boolean canPurchaseItem(GamePlayer gamePlayer, ItemType itemType, Material itemMaterial) {
-        // 检查工具类型和等级
+        // 如果镐子已满级则不卖
         if (itemType.getColorType() == ColorType.PICKAXE && gamePlayer.getPickaxeType() == ToolType.DIAMOND) {
             return false;
         }
-        
+
+        // 如果斧子已满级则不卖
         if (itemType.getColorType() == ColorType.AXE && gamePlayer.getAxeType() == ToolType.DIAMOND) {
             return false;
         }
-        
-        // 检查剪刀
+
+        // 如果已经有剪刀则不卖
         if (MaterialUtil.SHEARS().equals(itemMaterial) && gamePlayer.isShear()) {
+            return false;
+        }
+
+        // 如果买锁链且当前不是皮革则不卖
+        if (itemMaterial == Material.CHAINMAIL_BOOTS && gamePlayer.getArmorType() != ArmorType.DEFAULT) {
+            return false;
+        }
+
+        // 如果买铁套且当前是铁套/钻套则不卖
+        if (itemMaterial == Material.IRON_BOOTS && (gamePlayer.getArmorType() == ArmorType.IRON || gamePlayer.getArmorType() == ArmorType.DIAMOND)) {
+            return false;
+        }
+
+        // 如果买钻套且当前是钻套则不卖
+        if (itemMaterial == Material.DIAMOND_BOOTS && gamePlayer.getArmorType() == ArmorType.DIAMOND) {
+            return false;
+        }
+
+        // 如果买木镐且背包有空格子则卖
+        if ((itemMaterial == Material.WOODEN_PICKAXE && gamePlayer.getPickaxeType() == ToolType.NONE) && hasEmptySlot(gamePlayer)) {
+            return true;
+        }
+
+        // 如果买木斧且背包有空格子则卖
+        if ((itemMaterial == Material.WOODEN_AXE && gamePlayer.getAxeType() == ToolType.NONE) && hasEmptySlot(gamePlayer)) {
+            return true;
+        }
+
+        // 如果背包已满则不卖
+        if (!hasEmptySlot(gamePlayer)) {
+            gamePlayer.sendMessage(CC.color("&c背包已满！"));
             return false;
         }
 
         return true;
     }
-    
+
+    private boolean hasEmptySlot(GamePlayer gamePlayer) {
+        return gamePlayer.getPlayer().getInventory().firstEmpty() != -1;
+    }
+
     /**
      * 处理支付
      */
