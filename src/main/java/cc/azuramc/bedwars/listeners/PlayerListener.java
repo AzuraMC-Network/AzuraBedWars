@@ -352,6 +352,12 @@ public class PlayerListener implements Listener {
             return;
         }
 
+        if (game.getGameState() != GameState.RUNNING) {
+            event.setCancelled(true);
+            return;
+        }
+
+
         if (itemStack.getType() == MaterialUtil.BED()) {
             if (itemStack.hasItemMeta() && itemStack.getItemMeta().getDisplayName() != null) {
                 return;
@@ -368,7 +374,7 @@ public class PlayerListener implements Listener {
 
             for (int i = 0; i < player.getInventory().getSize(); i++) {
                 if (player.getInventory().getItem(i) != null) {
-                    if (player.getInventory().getItem(i).getType() == MaterialUtil.WOODEN_SWORD()) {
+                    if (Objects.requireNonNull(player.getInventory().getItem(i)).getType() == MaterialUtil.WOODEN_SWORD()) {
                         player.getInventory().setItem(i, new ItemStack(MaterialUtil.AIR()));
                         break;
                     }
@@ -376,21 +382,18 @@ public class PlayerListener implements Listener {
             }
         }
 
-        // 游戏进行中
-        if (game.getGameState() == GameState.RUNNING) {
-            // 当玩家将要捡起铁锭/金锭/钻石/绿宝石
-            if (itemStack.getType() == Material.IRON_INGOT || itemStack.getType() == Material.GOLD_INGOT || itemStack.getType() == Material.DIAMOND || itemStack.getType() == Material.EMERALD) {
-                // 玩家挂机状态不能拾取资源
-                if (AFKListener.afk.get(player.getUniqueId())) {
-                    event.setCancelled(true);
-                    return;
-                }
+        // 当玩家将要捡起铁锭/金锭/钻石/绿宝石
+        if (itemStack.getType() == Material.IRON_INGOT || itemStack.getType() == Material.GOLD_INGOT || itemStack.getType() == Material.DIAMOND || itemStack.getType() == Material.EMERALD) {
+            // 玩家挂机状态不能拾取资源
+            if (AFKListener.afk.get(player.getUniqueId())) {
+                event.setCancelled(true);
+                return;
             }
         }
 
         if (itemStack.getType() == Material.IRON_INGOT || itemStack.getType() == Material.GOLD_INGOT) {
 
-            double xp = itemStack.getAmount();
+            int xp = itemStack.getAmount();
 
             if (itemStack.getType() == Material.GOLD_INGOT) {
                 xp = xp * 3;
@@ -407,20 +410,19 @@ public class PlayerListener implements Listener {
                 event.getItem().remove();
 
                 SoundUtil.playLevelUpSound(player);
-                player.setLevel((int) (player.getLevel() + xp));
+                player.setLevel(player.getLevel() + xp);
             }
 
             if (itemStack.hasItemMeta()) {
                 Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName();
                 for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
-                    if (entity instanceof Player) {
-                        Player players = (Player) entity;
+                    if (entity instanceof Player players) {
                         players.playSound(players.getLocation(), SoundUtil.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 10, 15);
 
                         if (GamePlayer.get(players.getUniqueId()).getPlayerData().getModeType() == ModeType.DEFAULT) {
                             players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
                         } else {
-                            players.setLevel((int) (players.getLevel() + xp));
+                            players.setLevel(players.getLevel() + xp);
                         }
                     }
                 }

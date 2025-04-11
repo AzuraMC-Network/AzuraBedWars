@@ -9,6 +9,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -18,10 +19,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 伤害监听器
@@ -88,6 +93,11 @@ public class DamageListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
 
+        // 给予被击杀者身上的资源至击杀者（全部转换为经验）
+        if (player.getKiller() != null && player.getKiller() instanceof Player killer) {
+            killer.giveExpLevels(getPlayerRewardEXP(player));
+        }
+
         // 清理死亡信息和物品
         cleanDeathDrops(event);
 
@@ -104,6 +114,40 @@ public class DamageListener implements Listener {
         // 移除虚空标记并处理重生
         player.removeMetadata(METADATA_VOID_PLAYER, plugin);
         handlePlayerRespawn(player);
+    }
+
+    /**
+     * 获取玩家死亡时身上的资源（经典模式）
+     *
+     * @param player 要获取的目标玩家（死亡玩家）
+     */
+    private int getPlayerRewardEXP(Player player) {
+        // 处理物品类型资源
+        Map<Material, Integer> items = new HashMap<>();
+        items.put(Material.IRON_INGOT, 0);
+        items.put(Material.GOLD_INGOT, 0);
+        items.put(Material.DIAMOND, 0);
+        items.put(Material.EMERALD, 0);
+          // 遍历背包 得到各类物品资源总数 存在 items 中
+        Inventory inventory = player.getInventory();
+        for (ItemStack item : inventory.getContents()) {
+            if (item == null) continue;
+
+            Material itemType = item.getType();
+            if (items.containsKey(itemType)) {
+                items.put(itemType, items.get(itemType) + item.getAmount());
+            }
+        }
+
+        // 处理经验资源
+        int oldExp = player.getLevel();
+        int ironExp = items.get(Material.IRON_INGOT);
+        int goldExp = items.get(Material.GOLD_INGOT) * 3;
+        int diamondExp = items.get(Material.DIAMOND) * 40;
+        int emeraldExp = items.get(Material.EMERALD) * 80;
+
+        // 目标玩家的全部身家 :w:
+        return oldExp + ironExp + goldExp + diamondExp + emeraldExp;
     }
 
     /**
