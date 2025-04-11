@@ -11,6 +11,9 @@ import cc.azuramc.bedwars.scoreboards.LobbyBoard;
 import cc.azuramc.bedwars.specials.SpecialItem;
 import cc.azuramc.bedwars.database.mysql.ConnectionPoolHandler;
 import cc.azuramc.bedwars.utils.gui.GUIListener;
+import cc.azuramc.bedwars.config.ConfigFactory;
+import cc.azuramc.bedwars.config.ConfigManager;
+import cc.azuramc.bedwars.config.SettingsConfig;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -34,18 +37,6 @@ public final class AzuraBedWars extends JavaPlugin {
     // 数据库相关常量
     private static final String DB_PLAYER_DATA = "bwdata";
     private static final String DB_PLAYER_STATS = "bwstats";
-    
-    // 配置相关常量
-    private static final String CONFIG_EDITOR_MODE = "editorMode";
-    private static final String CONFIG_DEFAULT_MAP = "defaultMapName";
-    private static final String CONFIG_MAP_STORAGE = "map.storage";
-    private static final String CONFIG_DB_MAP_NAME = "database.maps.name";
-    private static final String CONFIG_DB_MAP_TABLE = "database.maps.table";
-    
-    // 默认值常量
-    private static final String DEFAULT_STORAGE_TYPE = "JSON";
-    private static final String DEFAULT_DB_NAME = "bwdata";
-    private static final String DEFAULT_TABLE_NAME = "BWMaps";
     
     // 插件标识常量
     private static final String PLUGIN_PREFIX = "[AzuraBedWars] ";
@@ -81,6 +72,12 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter
     private ConnectionPoolHandler connectionPoolHandler;
 
+    @Getter
+    private ConfigManager configManager;
+    
+    @Getter
+    private SettingsConfig settingsConfig;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -92,8 +89,11 @@ public final class AzuraBedWars extends JavaPlugin {
         initMapSystem();
         initCommands();
         
+        // 初始化配置系统
+        initConfigSystem();
+        
         // 不在编辑模式下初始化游戏功能
-        if (!getConfig().getBoolean(CONFIG_EDITOR_MODE)) {
+        if (!settingsConfig.isEditorMode()) {
             initGameFeatures();
         }
 
@@ -158,9 +158,9 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void loadDefaultMap() {
         mapManager.preloadAllMaps();
-        String defaultMapName = getConfig().getString(CONFIG_DEFAULT_MAP);
+        String defaultMapName = settingsConfig.getDefaultMapName();
         
-        if (defaultMapName != null) {
+        if (defaultMapName != null && !defaultMapName.isEmpty()) {
             mapData = mapManager.getAndLoadMapData(defaultMapName);
         } else if (!mapManager.getLoadedMaps().isEmpty()) {
             mapData = mapManager.getLoadedMaps().entrySet().iterator().next().getValue();
@@ -213,6 +213,11 @@ public final class AzuraBedWars extends JavaPlugin {
         
         if (game != null && game.getEventManager() != null) {
             game.getEventManager().stop();
+        }
+        
+        // 保存配置
+        if (configManager != null) {
+            configManager.saveAll();
         }
     }
 
@@ -346,42 +351,37 @@ public final class AzuraBedWars extends JavaPlugin {
      * 初始化地图存储系统
      */
     private void initMapStorage() {
-        ensureConfigDefaults();
-        
         // 确保数据库连接已注册
-        String dbName = getConfig().getString(CONFIG_DB_MAP_NAME, DEFAULT_DB_NAME);
+        String dbName = settingsConfig.getDatabaseMapName();
         connectionPoolHandler.registerDatabase(dbName);
         
         // 初始化默认存储
         MapStorageFactory.getDefaultStorage();
         
-        String storageType = getConfig().getString(CONFIG_MAP_STORAGE, DEFAULT_STORAGE_TYPE);
+        String storageType = settingsConfig.getMapStorage();
         getLogger().info("地图存储系统已初始化，使用 " + storageType + " 作为默认存储方式");
     }
     
     /**
-     * 确保配置文件中包含必要的默认设置
+     * 初始化配置系统
      */
-    private void ensureConfigDefaults() {
-        boolean configChanged = false;
+    private void initConfigSystem() {
+        // 创建配置管理器
+        configManager = new ConfigManager(this);
         
-        if (!getConfig().contains(CONFIG_MAP_STORAGE)) {
-            getConfig().set(CONFIG_MAP_STORAGE, DEFAULT_STORAGE_TYPE);
-            configChanged = true;
-        }
+        // 创建配置工厂
+        ConfigFactory configFactory = new ConfigFactory();
         
-        if (!getConfig().contains(CONFIG_DB_MAP_NAME)) {
-            getConfig().set(CONFIG_DB_MAP_NAME, DEFAULT_DB_NAME);
-            configChanged = true;
-        }
+        // 注册配置对象供应商
+        configFactory.registerSupplier("settings", SettingsConfig::new);
         
-        if (!getConfig().contains(CONFIG_DB_MAP_TABLE)) {
-            getConfig().set(CONFIG_DB_MAP_TABLE, DEFAULT_TABLE_NAME);
-            configChanged = true;
-        }
+        // 初始化默认配置
+        configFactory.initializeDefaults(configManager);
         
-        if (configChanged) {
-            saveConfig();
-        }
+        // 获取配置对象
+        settingsConfig = configManager.getConfig("settings", SettingsConfig.class);
+        
+        // 保存配置
+        configManager.saveAll();
     }
 }
