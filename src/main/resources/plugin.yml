@@ -1,5 +1,7 @@
 name: AzuraBedWars
 version: ${version}
 main: cc.azuramc.bedwars.AzuraBedWars
-authors: [An5w1r_]
+authors:
+  - An5w1r_
+  - Ant1Aura
 api-version: 1.13

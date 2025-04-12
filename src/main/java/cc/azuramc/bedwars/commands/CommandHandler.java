@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.commands;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.commands.admin.AdminCommand;
 import cc.azuramc.bedwars.commands.admin.map.MapCommand;
+import cc.azuramc.bedwars.commands.user.ShoutCommand;
 import cc.azuramc.bedwars.commands.user.StartCommand;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
@@ -26,5 +27,6 @@ public class CommandHandler {
 
         handler.register(new MapCommand());
         handler.register(new StartCommand());
+        handler.register(new ShoutCommand());
     }
 }
