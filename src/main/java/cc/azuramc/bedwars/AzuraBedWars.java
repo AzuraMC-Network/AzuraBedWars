@@ -184,6 +184,7 @@ public final class AzuraBedWars extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
         Bukkit.getPluginManager().registerEvents(new AFKListener(), this);
         Bukkit.getPluginManager().registerEvents(new EggBridgeListener(instance), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
 
         // 游戏世界监听器
         Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);

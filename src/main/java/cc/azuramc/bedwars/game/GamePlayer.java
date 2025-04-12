@@ -70,6 +70,11 @@ public class GamePlayer {
     @Getter @Setter private ToolType axeType;
     @Getter @Setter private boolean shear;
 
+    // UI 状态
+    @Getter @Setter private boolean isInventoryOpening;
+    @Getter @Setter private boolean isChestOpening;
+    @Getter @Setter private boolean isEnderChestOpening;
+
     /**
      * 构造方法
      * 
@@ -79,7 +84,12 @@ public class GamePlayer {
     public GamePlayer(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
-        
+
+        // 初始化 UI 状态
+        this.isInventoryOpening = false;
+        this.isChestOpening = false;
+        this.isEnderChestOpening = false;
+
         // 初始化装备状态
         this.armorType = ArmorType.DEFAULT;
         this.pickaxeType = ToolType.NONE;
@@ -248,6 +258,33 @@ public class GamePlayer {
     public void playSound(Sound sound, float volume, float pitch) {
         if (!isOnline()) return;
         getPlayer().playSound(getPlayer().getLocation(), sound, volume, pitch);
+    }
+
+    /**
+     * 设置 背包UI 状态
+     *
+     * @param state 状态
+     */
+    public void setViewingInventory(boolean state) {
+        isInventoryOpening = state;
+    }
+
+    /**
+     * 设置 普通箱子UI 状态
+     *
+     * @param state 状态
+     */
+    public void setViewingChest(boolean state) {
+        isInventoryOpening = state;
+    }
+
+    /**
+     * 设置 末影箱UI 状态
+     *
+     * @param state 状态
+     */
+    public void setViewingEnderChest(boolean state) {
+        isInventoryOpening = state;
     }
 
     /**

@@ -14,6 +14,8 @@ import java.util.UUID;
 
 public class AFKListener implements Listener {
 
+    private static final int MAX_NO_MOVEMENT_TIME = 45;
+
     public static Map<UUID, Long> afkLastMovement = new HashMap<>();
     public static Map<UUID, Boolean> afk = new HashMap<>();
     public static int checkAFKTask;
@@ -43,8 +45,8 @@ public class AFKListener implements Listener {
                 UUID uuid = player.getUniqueId();
                 long lastMove = afkLastMovement.getOrDefault(uuid, currentTime);
 
-                // 大于45秒未移动
-                if (currentTime - lastMove >= 45000) {
+                // 大于时间未移动
+                if (currentTime - lastMove >= MAX_NO_MOVEMENT_TIME * 1000L) {
                     afk.put(uuid, true);
                 } else {
                     afk.put(uuid, false);
