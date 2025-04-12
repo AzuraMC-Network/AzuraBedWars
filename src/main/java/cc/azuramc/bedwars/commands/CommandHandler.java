@@ -9,11 +9,9 @@ import revxrsal.commands.bukkit.BukkitCommandHandler;
 
 public class CommandHandler {
 
-    private final AzuraBedWars plugin;
     private final BukkitCommandHandler handler;
 
     public CommandHandler(AzuraBedWars plugin) {
-        this.plugin = plugin;
 
         handler = BukkitCommandHandler.create(plugin);
         handler.registerDependency(AzuraBedWars.class, plugin);

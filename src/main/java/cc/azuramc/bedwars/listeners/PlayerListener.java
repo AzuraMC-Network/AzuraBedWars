@@ -437,13 +437,13 @@ public class PlayerListener implements Listener {
             double xp = itemStack.getAmount() * 40;
             event.setCancelled(true);
 
-            if (player.hasPermission("bw.xp.vip1")) {
+            if (player.hasPermission("azurabedwars.xp.vip1")) {
                 xp = xp + (xp * 1.1);
-            } else if (player.hasPermission("bw.xp.vip2")) {
+            } else if (player.hasPermission("azurabedwars.xp.vip2")) {
                 xp = xp + (xp * 1.2);
-            } else if (player.hasPermission("bw.xp.vip3")) {
+            } else if (player.hasPermission("azurabedwars.xp.vip3")) {
                 xp = xp + (xp * 1.4);
-            } else if (player.hasPermission("bw.xp.vip4")) {
+            } else if (player.hasPermission("azurabedwars.xp.vip4")) {
                 xp = xp + (xp * 1.8);
             }
 
@@ -460,37 +460,19 @@ public class PlayerListener implements Listener {
             double xp = itemStack.getAmount() * 80;
             event.setCancelled(true);
 
-            if (player.hasPermission("bw.xp.vip1")) {
+            if (player.hasPermission("azurabedwars.xp.vip1")) {
                 xp = xp + (xp * 1.1);
-            } else if (player.hasPermission("bw.xp.vip2")) {
+            } else if (player.hasPermission("azurabedwars.xp.vip2")) {
                 xp = xp + (xp * 1.2);
-            } else if (player.hasPermission("bw.xp.vip3")) {
+            } else if (player.hasPermission("azurabedwars.xp.vip3")) {
                 xp = xp + (xp * 1.4);
-            } else if (player.hasPermission("bw.xp.vip4")) {
+            } else if (player.hasPermission("azurabedwars.xp.vip4")) {
                 xp = xp + (xp * 1.8);
             }
 
             event.getItem().remove();
             player.setLevel((int) (player.getLevel() + xp));
             SoundUtil.playLevelUpSound(player);
-        }
-    }
-
-    @EventHandler
-    public void onCommand(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
-        String message = event.getMessage();
-
-        if (message.startsWith("/report")) {
-            return;
-        }
-
-        if (message.startsWith("/queue join qc x")) {
-            return;
-        }
-
-        if (!player.hasPermission("bw.*")) {
-            event.setCancelled(true);
         }
     }
 

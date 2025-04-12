@@ -108,9 +108,9 @@ public class ChatListener implements Listener {
     /**
      * 构建聊天消息
      *
-     * @param player     玩家
+     * @param player 玩家
      * @param gamePlayer 游戏玩家对象
-     * @param message    原始消息
+     * @param message 原始消息
      * @return 格式化后的聊天消息
      */
     public static String buildChatMessage(Player player, GamePlayer gamePlayer, String message) {
@@ -159,6 +159,7 @@ public class ChatListener implements Listener {
                 return;
             }
             game.broadcastMessage(formattedMessage);
+            processShoutCooldown(player);
         } else {
             game.broadcastTeamMessage(gameTeam, formattedMessage);
         }

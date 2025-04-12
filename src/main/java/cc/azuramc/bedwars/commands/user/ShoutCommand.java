@@ -11,8 +11,6 @@ import revxrsal.commands.annotation.Default;
 import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 
-import java.util.Objects;
-
 public class ShoutCommand {
 
     @Dependency
@@ -27,7 +25,7 @@ public class ShoutCommand {
         }
 
         Game game = AzuraBedWars.getInstance().getGame();
-        GamePlayer gamePlayer = GamePlayer.get(Objects.requireNonNull(actor.requirePlayer().getPlayer()).getUniqueId());
+        GamePlayer gamePlayer = GamePlayer.get(actor.getUniqueId());
 
         // 游戏未开始时使用
         if (game.getGameState() != GameState.RUNNING) {
@@ -42,6 +40,6 @@ public class ShoutCommand {
         }
 
         // 发全局消息
-        ChatListener.handleInGameChat(actor.requirePlayer().getPlayer(), gamePlayer, ChatListener.GLOBAL_CHAT_PREFIX + message);
+        ChatListener.handleInGameChat(gamePlayer.getPlayer(), gamePlayer, ChatListener.GLOBAL_CHAT_PREFIX + message);
     }
 }
