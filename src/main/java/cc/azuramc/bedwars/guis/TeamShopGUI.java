@@ -3,10 +3,10 @@ package cc.azuramc.bedwars.guis;
 import cc.azuramc.bedwars.utils.gui.CustomGUI;
 import cc.azuramc.bedwars.utils.gui.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.types.ModeType;
+import cc.azuramc.bedwars.enums.ModeType;
 import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
 import cc.azuramc.bedwars.compat.sound.SoundUtil;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
@@ -83,28 +83,28 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 创建团队商店GUI
      * @param player 玩家
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
-    public TeamShopGUI(Player player, Game game) {
+    public TeamShopGUI(Player player, GameManager gameManager) {
         super(player, "§8团队升级", 45);
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         if (gamePlayer == null) {
             return;
         }
 
-        ModeType modeType = gamePlayer.getPlayerData().getModeType();
+        ModeType modeType = gamePlayer.getPlayerProfile().getModeType();
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         // 设置界面边框
         setupBorders();
         
         // 设置升级选项
-        addSharpenedSwordsUpgrade(player, gamePlayer, game, modeType);
-        addReinforcedArmorUpgrade(player, gamePlayer, game, modeType);
-        addManicMinerUpgrade(player, gamePlayer, game, modeType);
-        addMiningFatigueTrap(player, gamePlayer, game, modeType);
-        addHealingPoolUpgrade(player, gamePlayer, game, modeType);
-        addAlarmTrap(player, gamePlayer, game, modeType);
+        addSharpenedSwordsUpgrade(player, gamePlayer, gameManager, modeType);
+        addReinforcedArmorUpgrade(player, gamePlayer, gameManager, modeType);
+        addManicMinerUpgrade(player, gamePlayer, gameManager, modeType);
+        addMiningFatigueTrap(player, gamePlayer, gameManager, modeType);
+        addHealingPoolUpgrade(player, gamePlayer, gameManager, modeType);
+        addAlarmTrap(player, gamePlayer, gameManager, modeType);
     }
     
     /**
@@ -249,7 +249,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加锋利升级选项
      */
-    private void addSharpenedSwordsUpgrade(Player player, GamePlayer gamePlayer, Game game, ModeType modeType) {
+    private void addSharpenedSwordsUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, ModeType modeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         if (!gameTeam.isSharpenedSwords()) {
@@ -268,7 +268,7 @@ public class TeamShopGUI extends CustomGUI {
                         }
                         
                         gameTeam.setSharpenedSwords(true);
-                        new TeamShopGUI(player, game).open();
+                        new TeamShopGUI(player, gameManager).open();
                         
                         // 为团队所有玩家的剑添加锋利附魔
                         for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
@@ -299,7 +299,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加保护升级选项
      */
-    private void addReinforcedArmorUpgrade(Player player, GamePlayer gamePlayer, Game game, ModeType modeType) {
+    private void addReinforcedArmorUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, ModeType modeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         int currentLevel = gameTeam.getReinforcedArmor();
         
@@ -320,7 +320,7 @@ public class TeamShopGUI extends CustomGUI {
                         }
                         
                         gameTeam.setReinforcedArmor(nextLevel);
-                        new TeamShopGUI(player, game).open();
+                        new TeamShopGUI(player, gameManager).open();
                         
                         // 为团队所有玩家的护甲添加保护附魔
                         for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
@@ -351,7 +351,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加疯狂矿工升级选项
      */
-    private void addManicMinerUpgrade(Player player, GamePlayer gamePlayer, Game game, ModeType modeType) {
+    private void addManicMinerUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, ModeType modeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         int currentLevel = gameTeam.getManicMiner();
         
@@ -372,7 +372,7 @@ public class TeamShopGUI extends CustomGUI {
                         }
                         
                         gameTeam.setManicMiner(nextLevel);
-                        new TeamShopGUI(player, game).open();
+                        new TeamShopGUI(player, gameManager).open();
                     }, false));
         } else {
             // 已达到最高级
@@ -391,7 +391,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加挖掘疲劳陷阱升级选项
      */
-    private void addMiningFatigueTrap(Player player, GamePlayer gamePlayer, Game game, ModeType modeType) {
+    private void addMiningFatigueTrap(Player player, GamePlayer gamePlayer, GameManager gameManager, ModeType modeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         if (!gameTeam.isMiner()) {
@@ -416,7 +416,7 @@ public class TeamShopGUI extends CustomGUI {
                         }
                         
                         gameTeam.setMiner(true);
-                        new TeamShopGUI(player, game).open();
+                        new TeamShopGUI(player, gameManager).open();
                     }, false));
         } else {
             // 已升级状态
@@ -440,7 +440,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加治愈池升级选项
      */
-    private void addHealingPoolUpgrade(Player player, GamePlayer gamePlayer, Game game, ModeType modeType) {
+    private void addHealingPoolUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, ModeType modeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         if (!gameTeam.isHealPool()) {
@@ -464,7 +464,7 @@ public class TeamShopGUI extends CustomGUI {
                         }
                         
                         gameTeam.setHealPool(true);
-                        new TeamShopGUI(player, game).open();
+                        new TeamShopGUI(player, gameManager).open();
                     }, false));
         } else {
             // 已升级状态
@@ -487,7 +487,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加警报陷阱升级选项
      */
-    private void addAlarmTrap(Player player, GamePlayer gamePlayer, Game game, ModeType modeType) {
+    private void addAlarmTrap(Player player, GamePlayer gamePlayer, GameManager gameManager, ModeType modeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         if (!gameTeam.isAlarmTrap()) {
@@ -511,7 +511,7 @@ public class TeamShopGUI extends CustomGUI {
                         }
                         
                         gameTeam.setAlarmTrap(true);
-                        new TeamShopGUI(player, game).open();
+                        new TeamShopGUI(player, gameManager).open();
                     }, false));
         } else {
             // 已升级状态
@@ -631,13 +631,13 @@ public class TeamShopGUI extends CustomGUI {
      * @return 罗马数字表示
      */
     private String getRomanNumeral(int number) {
-        switch (number) {
-            case 1: return "I";
-            case 2: return "II";
-            case 3: return "III";
-            case 4: return "IV";
-            case 5: return "V";
-            default: return String.valueOf(number);
-        }
+        return switch (number) {
+            case 1 -> "I";
+            case 2 -> "II";
+            case 3 -> "III";
+            case 4 -> "IV";
+            case 5 -> "V";
+            default -> String.valueOf(number);
+        };
     }
 }

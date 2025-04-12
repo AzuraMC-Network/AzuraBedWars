@@ -1,9 +1,12 @@
 package cc.azuramc.bedwars.compat.util;
 
+import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 import java.lang.reflect.Method;
 
@@ -47,6 +50,74 @@ public class DestroyBed {
             try {
                 block.setType(Material.AIR);
             } catch (Exception ignored) {
+            }
+        }
+    }
+
+    public static void dropTargetBlock(Block targetBlock) {
+        if (isBedBlock(targetBlock)) {
+            Block bedHead;
+            Block bedFeet;
+
+
+            try {
+                if (!VersionUtil.isLessThan113()) {
+                    org.bukkit.block.data.type.Bed bedBlock = (org.bukkit.block.data.type.Bed) targetBlock.getBlockData();
+
+                    if (bedBlock.getPart() == org.bukkit.block.data.type.Bed.Part.FOOT) {
+                        bedFeet = targetBlock;
+                        bedHead = getBedNeighborBlock(bedFeet);
+                    } else {
+                        bedHead = targetBlock;
+                        bedFeet = getBedNeighborBlock(bedHead);
+                    }
+                } else {
+                    org.bukkit.material.Bed bedBlock = (org.bukkit.material.Bed) targetBlock.getState().getData();
+
+                    if (!bedBlock.isHeadOfBed()) {
+                        bedFeet = targetBlock;
+                        bedHead = getBedNeighborBlock(bedFeet);
+                    } else {
+                        bedHead = targetBlock;
+                        bedFeet = getBedNeighborBlock(bedHead);
+                    }
+                }
+
+                bedHead.setType(Material.AIR);
+                bedFeet.setType(Material.AIR);
+            } catch (Exception e) {
+                targetBlock.setType(Material.AIR);
+            }
+        } else {
+            targetBlock.setType(Material.AIR);
+        }
+    }
+
+    private static Block getBedNeighborBlock(Block head) {
+        if (isBedBlock(head.getRelative(BlockFace.EAST))) {
+            return head.getRelative(BlockFace.EAST);
+        } else if (isBedBlock(head.getRelative(BlockFace.WEST))) {
+            return head.getRelative(BlockFace.WEST);
+        } else if (isBedBlock(head.getRelative(BlockFace.SOUTH))) {
+            return head.getRelative(BlockFace.SOUTH);
+        } else {
+            return head.getRelative(BlockFace.NORTH);
+        }
+    }
+
+    private static boolean isBedBlock(Block isBed) {
+        if (isBed == null) {
+            return false;
+        }
+
+        if (!VersionUtil.isLessThan113()) {
+            return isBed.getType().name().endsWith("_BED");
+        } else {
+            try {
+                Material bedBlock = Material.valueOf("BED_BLOCK");
+                return (MaterialUtil.BED().equals(isBed.getType()) || bedBlock.equals(isBed.getType()));
+            } catch (IllegalArgumentException e) {
+                return MaterialUtil.BED().equals(isBed.getType());
             }
         }
     }

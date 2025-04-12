@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.event.GameEvent;
@@ -56,27 +56,27 @@ public class StartEvent extends GameEvent {
     /**
      * 处理游戏开始倒计时
      *
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      * @param seconds 剩余秒数
      */
     @Override
-    public void excuteRunnbale(Game game, int seconds) {
-        game.broadcastSound(SoundUtil.CLICK(), 1f, 1f);
-        game.broadcastTitle(TITLE_FADE_IN, TITLE_DURATION, TITLE_FADE_OUT, "§c§l游戏即将开始", "§e§l" + seconds);
+    public void executeRunnable(GameManager gameManager, int seconds) {
+        gameManager.broadcastSound(SoundUtil.CLICK(), 1f, 1f);
+        gameManager.broadcastTitle(TITLE_FADE_IN, TITLE_DURATION, TITLE_FADE_OUT, "§c§l游戏即将开始", "§e§l" + seconds);
     }
 
     /**
      * 执行游戏开始事件
      * 注册团队升级任务、启动资源生成和指南针追踪
      *
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
     @Override
-    public void excute(Game game) {
+    public void execute(GameManager gameManager) {
 
-        registerTeamUpgradeTask(game);
+        registerTeamUpgradeTask(gameManager);
 
-        startResourceGenerators(game);
+        startResourceGenerators(gameManager);
 
         startCompassTracking();
     }
@@ -84,16 +84,16 @@ public class StartEvent extends GameEvent {
     /**
      * 注册团队升级任务，处理团队效果和陷阱
      *
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
-    private void registerTeamUpgradeTask(Game game) {
-        game.getEventManager().registerRunnable(TEAM_UPGRADE_TASK_NAME, (s, c) -> 
+    private void registerTeamUpgradeTask(GameManager gameManager) {
+        gameManager.getEventManager().registerRunnable(TEAM_UPGRADE_TASK_NAME, (s, c) ->
             GamePlayer.getOnlinePlayers().forEach(player -> {
                 if (player.isSpectator()) {
                     return;
                 }
                 
-                for (GameTeam gameTeam : game.getGameTeams()) {
+                for (GameTeam gameTeam : gameManager.getGameTeams()) {
                     // 跳过不同世界的团队
                     if (!Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawn().getWorld())) {
                         continue;
@@ -230,10 +230,10 @@ public class StartEvent extends GameEvent {
     /**
      * 启动资源生成器
      *
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
-    private void startResourceGenerators(Game game) {
-        new GeneratorRunnable(game).start();
+    private void startResourceGenerators(GameManager gameManager) {
+        new GeneratorRunnable(gameManager).start();
     }
     
     /**

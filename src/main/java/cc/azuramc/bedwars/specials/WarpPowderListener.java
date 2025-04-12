@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.specials;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.enums.GameState;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -27,22 +27,22 @@ import java.util.Objects;
  * </p>
  */
 public class WarpPowderListener implements Listener {
-    private final Game game = AzuraBedWars.getInstance().getGame();
+    private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     private static final String CANCEL_ITEM_NAME = "§4取消传送";
 
     /**
      * 获取玩家当前使用的传送粉末
      * 
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      * @param gamePlayer 游戏玩家
      * @return 传送粉末实例或null
      */
-    private WarpPowder getActiveWarpPowder(Game game, GamePlayer gamePlayer) {
-        if (game == null || gamePlayer == null) {
+    private WarpPowder getActiveWarpPowder(GameManager gameManager, GamePlayer gamePlayer) {
+        if (gameManager == null || gamePlayer == null) {
             return null;
         }
         
-        for (SpecialItem item : game.getSpecialItems()) {
+        for (SpecialItem item : gameManager.getSpecialItems()) {
             if (item instanceof WarpPowder powder) {
                 if (powder.getPlayer() != null && powder.getPlayer().equals(gamePlayer)) {
                     return powder;
@@ -61,20 +61,19 @@ public class WarpPowderListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onDamage(EntityDamageEvent event) {
         // 检查是否为玩家
-        if (!(event.getEntity() instanceof Player)) {
+        if (!(event.getEntity() instanceof Player player)) {
             return;
         }
 
-        Player player = (Player) event.getEntity();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         
         // 检查游戏状态和玩家状态
-        if (game.getGameState() != GameState.RUNNING || gamePlayer == null || gamePlayer.isSpectator()) {
+        if (gameManager.getGameState() != GameState.RUNNING || gamePlayer == null || gamePlayer.isSpectator()) {
             return;
         }
 
         // 寻找正在使用的传送粉末并取消传送
-        WarpPowder powder = getActiveWarpPowder(game, gamePlayer);
+        WarpPowder powder = getActiveWarpPowder(gameManager, gamePlayer);
         if (powder != null && powder.isTeleporting()) {
             powder.cancelTeleport(true, true);
         }
@@ -87,7 +86,7 @@ public class WarpPowderListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL)
     public void onDrop(PlayerDropItemEvent event) {
-        if (game.getGameState() != GameState.RUNNING) {
+        if (gameManager.getGameState() != GameState.RUNNING) {
             return;
         }
         
@@ -116,7 +115,7 @@ public class WarpPowderListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         
         // 检查游戏状态
-        if (game.getGameState() != GameState.RUNNING || gamePlayer == null) {
+        if (gameManager.getGameState() != GameState.RUNNING || gamePlayer == null) {
             return;
         }
 
@@ -136,7 +135,7 @@ public class WarpPowderListener implements Listener {
         }
 
         // 获取玩家已激活的传送粉末
-        WarpPowder activePowder = getActiveWarpPowder(game, gamePlayer);
+        WarpPowder activePowder = getActiveWarpPowder(gameManager, gamePlayer);
 
         // 处理取消传送物品
         if (material.equals(warpPowder.getActivatedMaterial())) {
@@ -218,12 +217,12 @@ public class WarpPowderListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         
         // 检查游戏状态
-        if (game.getGameState() != GameState.RUNNING || gamePlayer == null) {
+        if (gameManager.getGameState() != GameState.RUNNING || gamePlayer == null) {
             return;
         }
 
         // 寻找激活的传送粉末并取消传送
-        WarpPowder powder = getActiveWarpPowder(game, gamePlayer);
+        WarpPowder powder = getActiveWarpPowder(gameManager, gamePlayer);
         if (powder != null && powder.isTeleporting()) {
             powder.setStackAmount(powder.getStack().getAmount() + 1);
             player.updateInventory();

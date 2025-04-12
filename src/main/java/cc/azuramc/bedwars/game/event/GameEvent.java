@@ -1,33 +1,23 @@
 package cc.azuramc.bedwars.game.event;
 
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
+import lombok.Getter;
 
+@Getter
 public abstract class GameEvent {
     private final String name;
-    private final int excuteSeconds;
+    private final int executeSeconds;
     private final int priority;
 
-    public GameEvent(String name, int excuteSeconds, int priority) {
+    public GameEvent(String name, int executeSeconds, int priority) {
         this.name = name;
-        this.excuteSeconds = excuteSeconds;
+        this.executeSeconds = executeSeconds;
         this.priority = priority;
     }
 
-    public String getName() {
-        return this.name;
+    public void execute(GameManager gameManager) {
     }
 
-    public int getExcuteSeconds() {
-        return this.excuteSeconds;
-    }
-
-    public int getPriority() {
-        return this.priority;
-    }
-
-    public void excute(Game game) {
-    }
-
-    public void excuteRunnbale(Game game, int seconds) {
+    public void executeRunnable(GameManager gameManager, int seconds) {
     }
 }

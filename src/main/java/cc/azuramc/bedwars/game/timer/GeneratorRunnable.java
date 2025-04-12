@@ -2,8 +2,8 @@ package cc.azuramc.bedwars.game.timer;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.map.data.MapData;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.database.map.data.MapData;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.event.Runnable;
 import cc.azuramc.bedwars.utils.ArmorStandUtil;
 import org.bukkit.Bukkit;
@@ -26,7 +26,7 @@ import java.util.List;
  * </p>
  */
 public class GeneratorRunnable {
-    private final Game game;
+    private final GameManager gameManager;
     private boolean timer;
     private int taskId = -1;
     
@@ -85,10 +85,10 @@ public class GeneratorRunnable {
     /**
      * 创建资源生成计时器
      *
-     * @param game 当前游戏实例
+     * @param gameManager 当前游戏实例
      */
-    public GeneratorRunnable(Game game) {
-        this.game = game;
+    public GeneratorRunnable(GameManager gameManager) {
+        this.gameManager = gameManager;
     }
 
     /**
@@ -129,8 +129,8 @@ public class GeneratorRunnable {
     private void startArmorStandUpdateTask() {
         taskId = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> {
             List<ArmorStand> allArmor = new ArrayList<>();
-            allArmor.addAll(game.getArmorSande().keySet());
-            allArmor.addAll(game.getArmorStand().keySet());
+            allArmor.addAll(gameManager.getArmorSande().keySet());
+            allArmor.addAll(gameManager.getArmorStand().keySet());
 
             for (ArmorStand as : allArmor) {
                 if (as == null) continue;
@@ -213,36 +213,36 @@ public class GeneratorRunnable {
      */
     private void registerResourceGenerators() {
         // 铁锭生成器（根据事件等级调整堆叠上限）
-        game.getEventManager().registerRunnable(IRON_GENERATOR_NAME, (seconds, currentEvent) -> 
+        gameManager.getEventManager().registerRunnable(IRON_GENERATOR_NAME, (seconds, currentEvent) ->
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
-                game.getMapData().getDropLocations(MapData.DropType.BASE)
+                gameManager.getMapData().getDropLocations(MapData.DropType.BASE)
                     .forEach(location -> 
                         dropItem(location, Material.IRON_INGOT, getMaxIronStack(currentEvent))
                     )
             ), IRON_SPAWN_INTERVAL);
         
         // 金锭生成器（根据事件等级调整堆叠上限）
-        game.getEventManager().registerRunnable(GOLD_GENERATOR_NAME, (seconds, currentEvent) -> 
+        gameManager.getEventManager().registerRunnable(GOLD_GENERATOR_NAME, (seconds, currentEvent) ->
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
-                game.getMapData().getDropLocations(MapData.DropType.BASE)
+                gameManager.getMapData().getDropLocations(MapData.DropType.BASE)
                     .forEach(location -> 
                         dropItem(location, Material.GOLD_INGOT, getMaxGoldStack(currentEvent))
                     )
             ), GOLD_SPAWN_INTERVAL);
         
         // 钻石生成器（根据事件等级调整堆叠上限）
-        game.getEventManager().registerRunnable(DIAMOND_GENERATOR_NAME, (seconds, currentEvent) -> 
+        gameManager.getEventManager().registerRunnable(DIAMOND_GENERATOR_NAME, (seconds, currentEvent) ->
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
-                game.getMapData().getDropLocations(MapData.DropType.DIAMOND)
+                gameManager.getMapData().getDropLocations(MapData.DropType.DIAMOND)
                     .forEach(location -> 
                         dropItem(location, Material.DIAMOND, getMaxDiamondStack(currentEvent))
                     )
             ), DIAMOND_SPAWN_INTERVAL);
         
         // 绿宝石生成器（根据事件等级调整堆叠上限）
-        game.getEventManager().registerRunnable(EMERALD_GENERATOR_NAME, (seconds, currentEvent) -> 
+        gameManager.getEventManager().registerRunnable(EMERALD_GENERATOR_NAME, (seconds, currentEvent) ->
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
-                game.getMapData().getDropLocations(MapData.DropType.EMERALD)
+                gameManager.getMapData().getDropLocations(MapData.DropType.EMERALD)
                     .forEach(location -> 
                         dropItem(location, Material.EMERALD, getMaxEmeraldStack(currentEvent))
                     )
@@ -254,10 +254,10 @@ public class GeneratorRunnable {
      */
     private void registerDisplayUpdaters() {
         // 钻石显示更新
-        registerResourceDisplay(DIAMOND_TIME_DISPLAY, DIAMOND_GENERATOR_NAME, game.getArmorStand().keySet(), DIAMOND_NAME);
+        registerResourceDisplay(DIAMOND_TIME_DISPLAY, DIAMOND_GENERATOR_NAME, gameManager.getArmorStand().keySet(), DIAMOND_NAME);
         
         // 绿宝石显示更新
-        registerResourceDisplay(EMERALD_TIME_DISPLAY, EMERALD_GENERATOR_NAME, game.getArmorSande().keySet(), EMERALD_NAME);
+        registerResourceDisplay(EMERALD_TIME_DISPLAY, EMERALD_GENERATOR_NAME, gameManager.getArmorSande().keySet(), EMERALD_NAME);
     }
     
     /**
@@ -309,8 +309,7 @@ public class GeneratorRunnable {
         // 统计指定类型的物品数量
         int count = 0;
         for (Entity entity : nearbyEntities) {
-            if (entity instanceof Item) {
-                Item item = (Item) entity;
+            if (entity instanceof Item item) {
                 if (item.getItemStack().getType() == material) {
                     count += item.getItemStack().getAmount();
                 }
@@ -330,7 +329,7 @@ public class GeneratorRunnable {
      */
     private void registerResourceDisplay(String displayName, String generatorName, 
                                        java.util.Set<ArmorStand> armorStands, String resourceName) {
-        game.getEventManager().registerRunnable(displayName, (seconds, currentEvent) -> 
+        gameManager.getEventManager().registerRunnable(displayName, (seconds, currentEvent) ->
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> {
                 for (ArmorStand armorStand : armorStands) {
                     if (armorStand == null) continue;
@@ -366,7 +365,7 @@ public class GeneratorRunnable {
     private void updateTimeDisplay(ArmorStand armorStand, String generatorName) {
         if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
             int timeRemaining = 0;
-            Runnable runnable = game.getEventManager().getRunnables().getOrDefault(generatorName, null);
+            Runnable runnable = gameManager.getEventManager().getRunnables().getOrDefault(generatorName, null);
             
             if (runnable != null) {
                 timeRemaining = runnable.getSeconds() - runnable.getNextSeconds();

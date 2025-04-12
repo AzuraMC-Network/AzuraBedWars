@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.specials;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.enums.GameState;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
  */
 public class RescuePlatformListener implements Listener {
     
-    private final Game game = AzuraBedWars.getInstance().getGame();
+    private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
     /**
      * 处理玩家交互事件
@@ -37,7 +37,7 @@ public class RescuePlatformListener implements Listener {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
 
-        if (game.getGameState() != GameState.RUNNING) {
+        if (gameManager.getGameState() != GameState.RUNNING) {
             return;
         }
 
@@ -48,7 +48,7 @@ public class RescuePlatformListener implements Listener {
         }
 
         // 创建并激活救援平台
-        boolean success = platform.create(gamePlayer, game);
+        boolean success = platform.create(gamePlayer, gameManager);
         
         // 如果创建成功，播放声音
         if (success) {

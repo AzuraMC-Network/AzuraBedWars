@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.specials;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -32,7 +32,7 @@ public class RescuePlatform extends SpecialItem {
     private static final Material PLATFORM_MATERIAL = Material.SLIME_BLOCK;  // 平台方块材质
 
 
-    @Getter private Game game;
+    @Getter private GameManager gameManager;
     @Getter private int livingTime = 0;
     private GamePlayer ownerPlayer;
     private final List<Block> platformBlocks;
@@ -47,7 +47,7 @@ public class RescuePlatform extends SpecialItem {
     public RescuePlatform() {
         super();
         this.platformBlocks = new ArrayList<>();
-        this.game = null;
+        this.gameManager = null;
         this.ownerPlayer = null;
     }
 
@@ -64,11 +64,11 @@ public class RescuePlatform extends SpecialItem {
      * 创建救援平台
      * 
      * @param gamePlayer 游戏玩家
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      * @return 是否成功创建
      */
-    public boolean create(GamePlayer gamePlayer, Game game) {
-        this.game = game;
+    public boolean create(GamePlayer gamePlayer, GameManager gameManager) {
+        this.gameManager = gameManager;
         this.ownerPlayer = gamePlayer;
         Player player = ownerPlayer.getPlayer();
         
@@ -100,7 +100,7 @@ public class RescuePlatform extends SpecialItem {
         
         // 启动任务
         this.runTask(breakTime, waitTime);
-        game.addSpecialItem(this);
+        gameManager.addSpecialItem(this);
         return true;
     }
     
@@ -217,9 +217,9 @@ public class RescuePlatform extends SpecialItem {
      * @return 救援平台列表
      */
     private List<RescuePlatform> getLivingPlatforms() {
-        if (game == null) return new ArrayList<>();
+        if (gameManager == null) return new ArrayList<>();
         
-        return game.getSpecialItems().stream()
+        return gameManager.getSpecialItems().stream()
                 .filter(item -> item instanceof RescuePlatform)
                 .map(item -> (RescuePlatform) item)
                 .filter(platform -> platform.getOwner() != null && platform.getOwner().equals(this.getOwner()))
@@ -277,8 +277,8 @@ public class RescuePlatform extends SpecialItem {
                 // 达到总生命周期后移除特殊物品
                 if (RescuePlatform.this.livingTime >= waitTime
                         && RescuePlatform.this.livingTime >= breakTime) {
-                    if (RescuePlatform.this.game != null) {
-                        RescuePlatform.this.game.removeSpecialItem(RescuePlatform.this);
+                    if (RescuePlatform.this.gameManager != null) {
+                        RescuePlatform.this.gameManager.removeSpecialItem(RescuePlatform.this);
                     }
                     this.cancel();
                 }
@@ -303,8 +303,8 @@ public class RescuePlatform extends SpecialItem {
      */
     public void forceRemove() {
         removePlatform();
-        if (this.game != null) {
-            this.game.removeSpecialItem(this);
+        if (this.gameManager != null) {
+            this.gameManager.removeSpecialItem(this);
         }
     }
 }

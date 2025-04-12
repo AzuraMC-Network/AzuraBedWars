@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.scoreboards;
 
 import cc.azuramc.bedwars.events.BedwarsGameStartEvent;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.utils.board.FastBoard;
@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 public class GameBoard implements Listener {
     // 游戏实例
-    private static Game game;
+    private static GameManager gameManager;
     
     // 常量定义
     private static final String TITLE = "§e§l超级起床战争";
@@ -49,10 +49,10 @@ public class GameBoard implements Listener {
     /**
      * 构造函数
      * 
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
-    public GameBoard(Game game) {
-        GameBoard.game = game;
+    public GameBoard(GameManager gameManager) {
+        GameBoard.gameManager = gameManager;
     }
 
     /**
@@ -139,8 +139,8 @@ public class GameBoard implements Listener {
      * @param lines 计分板行列表
      */
     private static void addEventInfo(List<String> lines) {
-        lines.add(game.getEventManager().formattedNextEvent());
-        lines.add("§a" + game.getFormattedTime(game.getEventManager().getLeftTime()));
+        lines.add(gameManager.getEventManager().formattedNextEvent());
+        lines.add("§a" + gameManager.getFormattedTime(gameManager.getEventManager().getLeftTime()));
         lines.add(EMPTY_LINE);
     }
     
@@ -151,7 +151,7 @@ public class GameBoard implements Listener {
      * @param gamePlayer 游戏玩家
      */
     private static void addTeamsInfo(List<String> lines, GamePlayer gamePlayer) {
-        for (GameTeam gameTeam : game.getGameTeams()) {
+        for (GameTeam gameTeam : gameManager.getGameTeams()) {
             StringBuilder teamLine = new StringBuilder()
                 .append(gameTeam.getName())
                 .append(" ")
@@ -189,7 +189,7 @@ public class GameBoard implements Listener {
         Bukkit.getOnlinePlayers().forEach(GameBoard::show);
 
         // 注册计分板更新任务
-        game.getEventManager().registerRunnable("计分板", (s, c) -> updateBoard());
+        gameManager.getEventManager().registerRunnable("计分板", (s, c) -> updateBoard());
     }
 
     /**

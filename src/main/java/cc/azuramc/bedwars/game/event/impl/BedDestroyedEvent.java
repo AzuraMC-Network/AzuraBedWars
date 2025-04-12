@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.sound.SoundUtil;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.event.GameEvent;
 import cc.azuramc.bedwars.compat.util.DestroyBed;
@@ -41,11 +41,11 @@ public class BedDestroyedEvent extends GameEvent {
      * 执行床自毁事件
      * 销毁所有队伍的床，播放音效，并向玩家显示提示
      * 
-     * @param game 当前游戏实例
+     * @param gameManager 当前游戏实例
      */
     @Override
-    public void excute(Game game) {
-        if (game == null) {
+    public void execute(GameManager gameManager) {
+        if (gameManager == null) {
             AzuraBedWars.getInstance().getLogger().log(Level.WARNING, "无法执行床自毁事件：游戏实例为null");
             return;
         }
@@ -53,24 +53,24 @@ public class BedDestroyedEvent extends GameEvent {
         // 在主线程销毁所有队伍的床
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
             try {
-                destroyAllBeds(game);
+                destroyAllBeds(gameManager);
             } catch (Exception e) {
                 AzuraBedWars.getInstance().getLogger().log(Level.SEVERE, "床自毁事件执行异常", e);
             }
         });
 
         // 播放音效和显示标题
-        SoundUtil.broadcastEnderDragonGrowl(game);
-        game.broadcastTitle(TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT, TITLE, SUBTITLE);
+        SoundUtil.broadcastEnderDragonGrowl(gameManager);
+        gameManager.broadcastTitle(TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT, TITLE, SUBTITLE);
     }
     
     /**
      * 销毁所有队伍的床
      * 
-     * @param game 当前游戏实例
+     * @param gameManager 当前游戏实例
      */
-    private void destroyAllBeds(Game game) {
-        for (GameTeam gameTeam : game.getGameTeams()) {
+    private void destroyAllBeds(GameManager gameManager) {
+        for (GameTeam gameTeam : gameManager.getGameTeams()) {
             if (gameTeam == null) continue;
             if (gameTeam.isBedDestroy()) continue;
 

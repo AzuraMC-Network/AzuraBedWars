@@ -2,11 +2,17 @@ package cc.azuramc.bedwars.specials;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
-import cc.azuramc.bedwars.utils.Util;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -15,6 +21,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.List;
 
 /**
  * 传送粉末特殊物品
@@ -35,8 +43,10 @@ public class WarpPowder extends SpecialItem {
     
     // 实例变量
     private final int fullTeleportingTime;      // 完整传送时间
-    private Game game;                          // 游戏实例
+    @Setter
+    private GameManager gameManager;                          // 游戏实例
     private GamePlayer gamePlayer;              // 玩家
+    @Getter
     private ItemStack stack;                    // 原始物品栈
     private BukkitTask teleportingTask;         // 传送任务
     private double teleportingTime;             // 剩余传送时间
@@ -47,7 +57,7 @@ public class WarpPowder extends SpecialItem {
     public WarpPowder() {
         super();
         this.fullTeleportingTime = DEFAULT_TELEPORT_TIME;
-        this.game = AzuraBedWars.getInstance().getGame();
+        this.gameManager = AzuraBedWars.getInstance().getGameManager();
         this.gamePlayer = null;
         this.stack = null;
         this.teleportingTask = null;
@@ -62,7 +72,7 @@ public class WarpPowder extends SpecialItem {
     public WarpPowder(int teleportTime) {
         super();
         this.fullTeleportingTime = teleportTime > 0 ? teleportTime : DEFAULT_TELEPORT_TIME;
-        this.game = AzuraBedWars.getInstance().getGame();
+        this.gameManager = AzuraBedWars.getInstance().getGameManager();
         this.gamePlayer = null;
         this.stack = null;
         this.teleportingTask = null;
@@ -93,8 +103,8 @@ public class WarpPowder extends SpecialItem {
         player.setLevel(0);
 
         // 如果需要，从游戏中移除特殊物品
-        if (removeSpecial && game != null) {
-            game.removeSpecialItem(this);
+        if (removeSpecial && gameManager != null) {
+            gameManager.removeSpecialItem(this);
         }
 
         // 显示消息
@@ -169,21 +179,12 @@ public class WarpPowder extends SpecialItem {
     }
 
     /**
-     * 获取原始物品栈
-     * 
-     * @return 物品栈
-     */
-    public ItemStack getStack() {
-        return this.stack;
-    }
-
-    /**
      * 启动传送任务
      * 
      * @return 是否成功启动
      */
     public boolean runTask() {
-        if (gamePlayer == null || game == null) {
+        if (gamePlayer == null || gameManager == null) {
             return false;
         }
         
@@ -266,7 +267,7 @@ public class WarpPowder extends SpecialItem {
                 (long) Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((this.fullTeleportingTime * 20) / CIRCLE_COUNT)));
         
         // 添加到游戏中的特殊物品列表
-        this.game.addSpecialItem(this);
+        this.gameManager.addSpecialItem(this);
         return true;
     }
     
@@ -287,23 +288,14 @@ public class WarpPowder extends SpecialItem {
 
             // 在玩家位置生成粒子
             Location particleFrom = new Location(fromLoc.getWorld(), fromLoc.getX() + x, fromLoc.getY() + y, fromLoc.getZ() + z);
-            Util.spawnParticle(GamePlayer.getOnlinePlayers(), particleFrom);
+            spawnParticle(GamePlayer.getOnlinePlayers(), particleFrom);
 
             // 在目标位置生成粒子
             if (toLoc.getWorld() != null) {
                 Location particleTo = new Location(toLoc.getWorld(), toLoc.getX() + x, toLoc.getY() + y, toLoc.getZ() + z);
-                Util.spawnParticle(GamePlayer.getOnlinePlayers(), particleTo);
+                spawnParticle(GamePlayer.getOnlinePlayers(), particleTo);
             }
         }
-    }
-
-    /**
-     * 设置游戏实例
-     * 
-     * @param game 游戏实例
-     */
-    public void setGame(Game game) {
-        this.game = game;
     }
 
     /**
@@ -333,5 +325,23 @@ public class WarpPowder extends SpecialItem {
      */
     public double getRemainingTime() {
         return this.teleportingTime;
+    }
+
+    public void spawnParticle(List<GamePlayer> gamePlayers, Location loc) {
+        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.WORLD_PARTICLES);
+        packet.getModifier().writeDefaults();
+        packet.getParticles().write(0, EnumWrappers.Particle.FIREWORKS_SPARK);
+        packet.getBooleans().write(0, false);
+        packet.getFloat().write(0, (float) loc.getX());
+        packet.getFloat().write(1, (float) loc.getY());
+        packet.getFloat().write(2, (float) loc.getZ());
+        packet.getFloat().write(3, 0.0F);
+        packet.getFloat().write(4, 0.0F);
+        packet.getFloat().write(5, 0.0F);
+        packet.getFloat().write(6, 0.0F);
+        packet.getIntegers().write(0, 1);
+        gamePlayers.forEach(gamePlayer -> {protocolManager.sendServerPacket(gamePlayer.getPlayer(), packet);
+        });
     }
 }

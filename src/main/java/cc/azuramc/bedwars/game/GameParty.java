@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 public class GameParty {
     // 游戏实例引用
-    private final Game game;
+    private final GameManager gameManager;
     
     // 队长
     @Getter
@@ -27,12 +27,12 @@ public class GameParty {
     /**
      * 创建一个游戏队伍
      *
-     * @param game 关联的游戏实例
+     * @param gameManager 关联的游戏实例
      * @param leader 队长
      * @param initialPlayers 初始队伍成员（不包含队长）
      */
-    public GameParty(Game game, GamePlayer leader, List<GamePlayer> initialPlayers) {
-        this.game = Objects.requireNonNull(game, "游戏实例不能为空");
+    public GameParty(GameManager gameManager, GamePlayer leader, List<GamePlayer> initialPlayers) {
+        this.gameManager = Objects.requireNonNull(gameManager, "游戏实例不能为空");
         this.leader = Objects.requireNonNull(leader, "队长不能为空");
         
         // 初始化成员列表
@@ -44,7 +44,7 @@ public class GameParty {
         }
         
         // 将队伍添加到游戏中
-        game.addParty(this);
+        gameManager.addParty(this);
     }
 
     /**
@@ -85,7 +85,7 @@ public class GameParty {
         
         // 如果队伍为空，从游戏中移除
         if (removed && players.isEmpty()) {
-            game.removeParty(this);
+            gameManager.removeParty(this);
         }
         
         return removed;

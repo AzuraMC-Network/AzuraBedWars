@@ -3,6 +3,8 @@ package cc.azuramc.bedwars.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import cc.azuramc.bedwars.compat.util.ActionBarUtil;
+import cc.azuramc.bedwars.compat.util.TitleUtil;
 import lombok.Setter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;

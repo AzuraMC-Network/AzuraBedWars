@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.shop;
 
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.shop.data.*;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ public class ItemShopManager {
     @Getter
     private static final List<ShopData> shops = new ArrayList<>();
 
-    public static void init(Game game) {
+    public static void init(GameManager gameManager) {
         registerShop(new DefaultShop());
         registerShop(new BlockShop());
         registerShop(new SwordShop());

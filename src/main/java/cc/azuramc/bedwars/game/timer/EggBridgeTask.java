@@ -3,11 +3,10 @@ package cc.azuramc.bedwars.game.timer;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.compat.sound.SoundUtil;
-import cc.azuramc.bedwars.game.Game;
-import cc.azuramc.bedwars.game.TeamColor;
-import cc.azuramc.bedwars.game.event.impl.EggBridgeBuildEvent;
-import cc.azuramc.bedwars.listeners.BlockListener;
-import cc.azuramc.bedwars.listeners.EggBridgeListener;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.enums.TeamColor;
+import cc.azuramc.bedwars.listeners.projectile.EggBridgeListener;
+import cc.azuramc.bedwars.utils.MapUtil;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -25,10 +24,10 @@ public class EggBridgeTask implements Runnable {
     private final Player player;
     private final BukkitTask task;
 
-    private final Game game;
+    private final GameManager gameManager;
 
     public EggBridgeTask(AzuraBedWars plugin, Player player, Egg projectile, TeamColor teamColor) {
-        this.game = plugin.getGame();
+        this.gameManager = plugin.getGameManager();
         this.projectile = projectile;
         this.teamColor = teamColor;
         this.player = player;
@@ -49,7 +48,7 @@ public class EggBridgeTask implements Runnable {
         Block b4 = loc.clone().subtract(0.0D, 2.0D, 1.0D).getBlock();
 
         // 检查是否接触到保护区域
-        if (BlockListener.isProtectedArea(b2.getLocation(b2.getLocation())) || BlockListener.isProtectedArea(b3.getLocation()) || BlockListener.isProtectedArea(b4.getLocation())) {
+        if (MapUtil.isProtectedArea(b2.getLocation(b2.getLocation())) || MapUtil.isProtectedArea(b3.getLocation()) || MapUtil.isProtectedArea(b4.getLocation())) {
             EggBridgeListener.removeEgg(projectile);
             return;
         }
@@ -72,13 +71,11 @@ public class EggBridgeTask implements Runnable {
 
     private void buildEggBridgeBlock(Block block) {
         // 检查为非地图方块
-        if (!game.getMapData().hasRegion(block.getLocation())) {
+        if (!gameManager.getMapData().hasRegion(block.getLocation())) {
             // 检查是否为空气方块
             if (block.getType() == Material.AIR) {
                 // 改变 AIR 为 指定颜色的羊毛
                 block.setType(MaterialUtil.getColoredWool(teamColor.getDyeColor()).getType());
-                // 触发 EggBridgeBuildEvent 事件
-                Bukkit.getPluginManager().callEvent(new EggBridgeBuildEvent(getTeamColor(), block));
                 // 播放超级无敌音效
                 SoundUtil.playOrbPickupSound(getPlayer());
             }

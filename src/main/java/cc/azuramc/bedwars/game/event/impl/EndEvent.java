@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.events.BedwarsGameEndEvent;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.event.GameEvent;
-import cc.azuramc.bedwars.listeners.ChunkListener;
+import cc.azuramc.bedwars.listeners.chunk.ChunkListener;
 import org.bukkit.Bukkit;
 
 /**
@@ -29,10 +29,10 @@ public class EndEvent extends GameEvent {
      * 执行游戏结束事件
      * 清理资源并触发服务器关闭
      *
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
     @Override
-    public void excute(Game game) {
+    public void execute(GameManager gameManager) {
 
         performCleanup();
 

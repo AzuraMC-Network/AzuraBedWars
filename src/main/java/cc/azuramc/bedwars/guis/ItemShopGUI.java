@@ -5,8 +5,8 @@ import cc.azuramc.bedwars.utils.gui.CustomGUI;
 import cc.azuramc.bedwars.utils.gui.GUIAction;
 import cc.azuramc.bedwars.utils.gui.NewGUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
-import cc.azuramc.bedwars.database.PlayerData;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.database.player.PlayerProfile;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.shop.ItemShopManager;
 import cc.azuramc.bedwars.shop.ShopData;
@@ -14,9 +14,9 @@ import cc.azuramc.bedwars.shop.data.DefaultShop;
 import cc.azuramc.bedwars.shop.type.ColorType;
 import cc.azuramc.bedwars.shop.type.ItemType;
 import cc.azuramc.bedwars.shop.type.PriceCost;
-import cc.azuramc.bedwars.types.ArmorType;
-import cc.azuramc.bedwars.types.ModeType;
-import cc.azuramc.bedwars.types.ToolType;
+import cc.azuramc.bedwars.enums.ArmorType;
+import cc.azuramc.bedwars.enums.ModeType;
+import cc.azuramc.bedwars.enums.ToolType;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
 import cc.azuramc.bedwars.compat.sound.SoundUtil;
@@ -25,7 +25,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -61,15 +60,15 @@ public class ItemShopGUI extends CustomGUI {
      * 创建道具商店GUI
      * @param player 玩家
      * @param slot 商店槽位
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
-    public ItemShopGUI(Player player, int slot, Game game) {
+    public ItemShopGUI(Player player, int slot, GameManager gameManager) {
         super(player, "§8道具商店 - " + ChatColor.stripColor(ItemShopManager.getShops().get(slot).getMainShopItem().getDisplayName()), 54);
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-        PlayerData playerData = gamePlayer.getPlayerData();
+        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
 
         // 初始化商店导航栏
-        initializeShopNavbar(player, slot, game);
+        initializeShopNavbar(player, slot, gameManager);
         
         // 初始化商店分隔条
         initializeShopSeparator(slot);
@@ -77,16 +76,16 @@ public class ItemShopGUI extends CustomGUI {
         // 初始化商店内容
         ShopData shopData = ItemShopManager.getShops().get(slot);
         if (shopData instanceof DefaultShop) {
-            initializeDefaultShop(gamePlayer, playerData, slot, game);
+            initializeDefaultShop(gamePlayer, playerProfile, slot, gameManager);
         } else {
-            initializeRegularShop(gamePlayer, shopData, slot, game);
+            initializeRegularShop(gamePlayer, shopData, slot, gameManager);
         }
     }
 
     /**
      * 初始化商店导航栏
      */
-    private void initializeShopNavbar(Player player, int slot, Game game) {
+    private void initializeShopNavbar(Player player, int slot, GameManager gameManager) {
         int i = 0;
         for (ShopData shopData : ItemShopManager.getShops()) {
             if (i > 9) {
@@ -99,7 +98,7 @@ public class ItemShopGUI extends CustomGUI {
                     .setDisplayName(shopData.getMainShopItem().getDisplayName())
                     .getItem(), 
                     new GUIAction(0, () -> {
-                        if (finalI != slot) new ItemShopGUI(player, finalI, game).open();
+                        if (finalI != slot) new ItemShopGUI(player, finalI, gameManager).open();
                     }, false));
             ++i;
         }
@@ -122,9 +121,9 @@ public class ItemShopGUI extends CustomGUI {
     /**
      * 初始化默认商店(快捷购买)
      */
-    private void initializeDefaultShop(GamePlayer gamePlayer, PlayerData playerData, int slot, Game game) {
+    private void initializeDefaultShop(GamePlayer gamePlayer, PlayerProfile playerProfile, int slot, GameManager gameManager) {
         int itemIndex = -1;
-        for (String shopItemCode : playerData.getShopSort()) {
+        for (String shopItemCode : playerProfile.getShopSort()) {
             itemIndex++;
             
             // 解析商店物品代码
@@ -133,12 +132,12 @@ public class ItemShopGUI extends CustomGUI {
             
             if (itemInfo == null || itemType == null) {
                 // 设置空槽位
-                setEmptySlot(gamePlayer.getPlayer(), SHOP_SLOTS[itemIndex], slot, game);
+                setEmptySlot(gamePlayer.getPlayer(), SHOP_SLOTS[itemIndex], slot, gameManager);
                 continue;
             }
             
             // 设置有物品的槽位
-            setItem(gamePlayer, slot, SHOP_SLOTS[itemIndex], game, itemType, -1, 
+            setItem(gamePlayer, slot, SHOP_SLOTS[itemIndex], gameManager, itemType, -1,
                     Arrays.asList("§7Shift+左键从快捷购买中移除", " "));
         }
     }
@@ -146,7 +145,7 @@ public class ItemShopGUI extends CustomGUI {
     /**
      * 设置空槽位
      */
-    private void setEmptySlot(Player player, int slotPosition, int shopSlot, Game game) {
+    private void setEmptySlot(Player player, int slotPosition, int shopSlot, GameManager gameManager) {
         setItem(slotPosition, 
                 new ItemBuilderUtil()
                     .setItemStack(MaterialUtil.getStainedGlassPane(14))
@@ -179,21 +178,21 @@ public class ItemShopGUI extends CustomGUI {
     /**
      * 初始化常规商店
      */
-    private void initializeRegularShop(GamePlayer gamePlayer, ShopData shopData, int shopSlot, Game game) {
+    private void initializeRegularShop(GamePlayer gamePlayer, ShopData shopData, int shopSlot, GameManager gameManager) {
         int itemIndex = -1;
         for (ItemType itemType : shopData.getShopItems()) {
             itemIndex++;
-            setItem(gamePlayer, shopSlot, SHOP_SLOTS[itemIndex], game, itemType, itemIndex, null);
+            setItem(gamePlayer, shopSlot, SHOP_SLOTS[itemIndex], gameManager, itemType, itemIndex, null);
         }
     }
 
     /**
      * 设置商店物品
      */
-    public void setItem(GamePlayer gamePlayer, int shopSlot, int displaySlot, Game game, ItemType itemType, int itemSlot, List<String> moreLore) {
+    public void setItem(GamePlayer gamePlayer, int shopSlot, int displaySlot, GameManager gameManager, ItemType itemType, int itemSlot, List<String> moreLore) {
         Player player = gamePlayer.getPlayer();
-        PlayerData playerData = gamePlayer.getPlayerData();
-        ModeType modeType = playerData.getModeType();
+        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
+        ModeType modeType = playerProfile.getModeType();
 
         // 准备物品显示
         ItemBuilderUtil itemBuilder = prepareItemDisplay(gamePlayer, itemType);
@@ -207,7 +206,7 @@ public class ItemShopGUI extends CustomGUI {
                       .setLores(lore)
                       .getItem(), 
             new NewGUIAction(0, event -> handleItemClick(event, gamePlayer, player, shopSlot, displaySlot, 
-                                                       itemType, itemBuilder, itemSlot, playerData, game), false));
+                                                       itemType, itemBuilder, itemSlot, playerProfile, gameManager), false));
     }
     
     /**
@@ -309,10 +308,10 @@ public class ItemShopGUI extends CustomGUI {
      */
     private void handleItemClick(InventoryClickEvent event, GamePlayer gamePlayer, Player player,
                                  int shopSlot, int displaySlot, ItemType itemType, ItemBuilderUtil itemBuilder,
-                                 int itemSlot, PlayerData playerData, Game game) {
+                                 int itemSlot, PlayerProfile playerProfile, GameManager gameManager) {
         // 处理Shift+点击 (快捷购买相关操作)
         if (event.isShiftClick() || event.getClick().isShiftClick()) {
-            handleShiftClick(player, gamePlayer, shopSlot, displaySlot, itemBuilder, itemSlot, playerData, game);
+            handleShiftClick(player, gamePlayer, shopSlot, displaySlot, itemBuilder, itemSlot, playerProfile, gameManager);
             return;
         }
         
@@ -322,30 +321,30 @@ public class ItemShopGUI extends CustomGUI {
         }
         
         // 处理支付
-        if (!processPayment(player, itemType, playerData.getModeType())) {
+        if (!processPayment(player, itemType, playerProfile.getModeType())) {
             return;
         }
         
         // 处理物品给予
-        handleItemGiving(player, gamePlayer, shopSlot, itemType, itemBuilder, game);
+        handleItemGiving(player, gamePlayer, shopSlot, itemType, itemBuilder, gameManager);
     }
     
     /**
      * 处理Shift+点击
      */
-    private void handleShiftClick(Player player, GamePlayer gamePlayer, int shopSlot, int displaySlot, 
-                                  ItemBuilderUtil itemBuilder, int itemSlot, PlayerData playerData, Game game) {
+    private void handleShiftClick(Player player, GamePlayer gamePlayer, int shopSlot, int displaySlot,
+                                  ItemBuilderUtil itemBuilder, int itemSlot, PlayerProfile playerProfile, GameManager gameManager) {
         if (shopSlot == 0) {
             // 从快捷购买移除
             int slotIndex = Arrays.asList(SHOP_SLOTS).indexOf(displaySlot);
             if (slotIndex == -1) return;
             
-            playerData.getShopSort()[slotIndex] = "AIR";
-            playerData.saveShops();
-            new ItemShopGUI(player, shopSlot, game).open();
+            playerProfile.getShopSort()[slotIndex] = "AIR";
+            playerProfile.saveShops();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
         } else {
             // 添加到快捷购买
-            new DIYShopGUI(game, gamePlayer, itemBuilder.getItem().clone(), 
+            new DIYShopGUI(gameManager, gamePlayer, itemBuilder.getItem().clone(),
                           ItemShopManager.getShops().get(shopSlot).getClass().getSimpleName() 
                           + "#" + (itemSlot + 1)).open();
         }
@@ -486,16 +485,16 @@ public class ItemShopGUI extends CustomGUI {
      * 处理物品给予
      */
     private void handleItemGiving(Player player, GamePlayer gamePlayer, int shopSlot, 
-                                 ItemType itemType, ItemBuilderUtil itemBuilder, Game game) {
+                                 ItemType itemType, ItemBuilderUtil itemBuilder, GameManager gameManager) {
         Material material = itemBuilder.getItem().getType();
         
         // 处理护甲
-        if (handleArmorGiving(player, gamePlayer, shopSlot, material, game)) {
+        if (handleArmorGiving(player, gamePlayer, shopSlot, material, gameManager)) {
             return;
         }
         
         // 处理工具
-        if (handleToolGiving(player, gamePlayer, shopSlot, material, game)) {
+        if (handleToolGiving(player, gamePlayer, shopSlot, material, gameManager)) {
             return;
         }
         
@@ -506,24 +505,24 @@ public class ItemShopGUI extends CustomGUI {
     /**
      * 处理护甲给予
      */
-    private boolean handleArmorGiving(Player player, GamePlayer gamePlayer, int shopSlot, Material material, Game game) {
+    private boolean handleArmorGiving(Player player, GamePlayer gamePlayer, int shopSlot, Material material, GameManager gameManager) {
         if (MaterialUtil.CHAINMAIL_BOOTS().equals(material)) {
             gamePlayer.setArmorType(ArmorType.CHAINMAIL);
             gamePlayer.giveArmor();
             player.updateInventory();
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         } else if (MaterialUtil.IRON_BOOTS().equals(material)) {
             gamePlayer.setArmorType(ArmorType.IRON);
             gamePlayer.giveArmor();
             player.updateInventory();
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         } else if (MaterialUtil.DIAMOND_BOOTS().equals(material)) {
             gamePlayer.setArmorType(ArmorType.DIAMOND);
             gamePlayer.giveArmor();
             player.updateInventory();
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         }
         return false;
@@ -532,27 +531,27 @@ public class ItemShopGUI extends CustomGUI {
     /**
      * 处理工具给予
      */
-    private boolean handleToolGiving(Player player, GamePlayer gamePlayer, int shopSlot, Material material, Game game) {
+    private boolean handleToolGiving(Player player, GamePlayer gamePlayer, int shopSlot, Material material, GameManager gameManager) {
         // 镐
         if (MaterialUtil.WOODEN_PICKAXE().equals(material)) {
             gamePlayer.setPickaxeType(ToolType.WOOD);
             gamePlayer.givePickaxe(false);
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         } else if (MaterialUtil.STONE_PICKAXE().equals(material)) {
             gamePlayer.setPickaxeType(ToolType.STONE);
             gamePlayer.givePickaxe(true);
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         } else if (MaterialUtil.IRON_PICKAXE().equals(material)) {
             gamePlayer.setPickaxeType(ToolType.IRON);
             gamePlayer.givePickaxe(true);
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         } else if (MaterialUtil.DIAMOND_PICKAXE().equals(material)) {
             gamePlayer.setPickaxeType(ToolType.DIAMOND);
             gamePlayer.givePickaxe(true);
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         }
         
@@ -560,22 +559,22 @@ public class ItemShopGUI extends CustomGUI {
         else if (MaterialUtil.WOODEN_AXE().equals(material)) {
             gamePlayer.setAxeType(ToolType.WOOD);
             gamePlayer.giveAxe(false);
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         } else if (MaterialUtil.STONE_AXE().equals(material)) {
             gamePlayer.setAxeType(ToolType.STONE);
             gamePlayer.giveAxe(true);
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         } else if (MaterialUtil.IRON_AXE().equals(material)) {
             gamePlayer.setAxeType(ToolType.IRON);
             gamePlayer.giveAxe(true);
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         } else if (MaterialUtil.DIAMOND_AXE().equals(material)) {
             gamePlayer.setAxeType(ToolType.DIAMOND);
             gamePlayer.giveAxe(true);
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         }
         
@@ -583,7 +582,7 @@ public class ItemShopGUI extends CustomGUI {
         else if (MaterialUtil.SHEARS().equals(material)) {
             gamePlayer.setShear(true);
             gamePlayer.giveShear();
-            new ItemShopGUI(player, shopSlot, game).open();
+            new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
         }
         

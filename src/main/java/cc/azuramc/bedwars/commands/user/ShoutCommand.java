@@ -1,10 +1,10 @@
 package cc.azuramc.bedwars.commands.user;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.listeners.ChatListener;
+import cc.azuramc.bedwars.enums.GameState;
+import cc.azuramc.bedwars.listeners.chat.ChatListener;
 import cc.azuramc.bedwars.utils.CommandUtil;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Default;
@@ -24,11 +24,11 @@ public class ShoutCommand {
             return;
         }
 
-        Game game = AzuraBedWars.getInstance().getGame();
+        GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
         GamePlayer gamePlayer = GamePlayer.get(actor.getUniqueId());
 
         // 游戏未开始时使用
-        if (game.getGameState() != GameState.RUNNING) {
+        if (gameManager.getGameState() != GameState.RUNNING) {
             CommandUtil.sendLayout(actor, "&c该命令只能在游戏开始后使用！");
             return;
         }

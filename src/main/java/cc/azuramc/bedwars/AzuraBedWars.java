@@ -1,11 +1,11 @@
 package cc.azuramc.bedwars;
 
 import cc.azuramc.bedwars.commands.CommandHandler;
-import cc.azuramc.bedwars.listeners.*;
-import cc.azuramc.bedwars.map.data.MapData;
-import cc.azuramc.bedwars.map.MapManager;
-import cc.azuramc.bedwars.map.MapStorageFactory;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.database.map.data.MapData;
+import cc.azuramc.bedwars.database.map.MapManager;
+import cc.azuramc.bedwars.database.map.MapStorageFactory;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.listeners.ListenerHandler;
 import cc.azuramc.bedwars.scoreboards.GameBoard;
 import cc.azuramc.bedwars.scoreboards.LobbyBoard;
 import cc.azuramc.bedwars.specials.SpecialItem;
@@ -50,7 +50,7 @@ public final class AzuraBedWars extends JavaPlugin {
     
     /** 游戏实例 */
     @Getter
-    private Game game;
+    private GameManager gameManager;
     
     /** 地图管理器 */
     @Getter
@@ -139,8 +139,8 @@ public final class AzuraBedWars extends JavaPlugin {
         loadDefaultMap();
 
         // 创建并加载游戏实例
-        game = new Game(this);
-        game.loadGame(mapData);
+        gameManager = new GameManager(this);
+        gameManager.loadGame(mapData);
 
         // 注册各种事件监听器
         registerEventListeners();
@@ -175,25 +175,12 @@ public final class AzuraBedWars extends JavaPlugin {
      * 注册所有事件监听器
      */
     private void registerEventListeners() {
-        // 玩家监听器
-        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
-        Bukkit.getPluginManager().registerEvents(new QuitListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
-        Bukkit.getPluginManager().registerEvents(new RespawnListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
-        Bukkit.getPluginManager().registerEvents(new AFKListener(), this);
-        Bukkit.getPluginManager().registerEvents(new EggBridgeListener(instance), this);
-        Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
 
-        // 游戏世界监听器
-        Bukkit.getPluginManager().registerEvents(new BlockListener(instance), this);
-        Bukkit.getPluginManager().registerEvents(new ServerListener(), this);
-        Bukkit.getPluginManager().registerEvents(new ChunkListener(), this);
+        new ListenerHandler(this);
         
         // 记分板监听器
-        Bukkit.getPluginManager().registerEvents(new LobbyBoard(game), this);
-        Bukkit.getPluginManager().registerEvents(new GameBoard(game), this);
+        Bukkit.getPluginManager().registerEvents(new LobbyBoard(gameManager), this);
+        Bukkit.getPluginManager().registerEvents(new GameBoard(gameManager), this);
     }
 
     /**
@@ -212,8 +199,8 @@ public final class AzuraBedWars extends JavaPlugin {
             connectionPoolHandler.closeAll();
         }
         
-        if (game != null && game.getEventManager() != null) {
-            game.getEventManager().stop();
+        if (gameManager != null && gameManager.getEventManager() != null) {
+            gameManager.getEventManager().stop();
         }
         
         // 保存配置

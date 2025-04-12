@@ -44,44 +44,26 @@ public class FireWorkUtil {
 
     private static Color getRandomColor() {
         int color = getRandomNum(17, 1);
-        switch (color) {
-            case 1:
-                return Color.AQUA;
-            case 2:
-                return Color.BLACK;
-            case 3:
-                return Color.BLUE;
-            case 4:
-                return Color.FUCHSIA;
-            case 5:
-                return Color.GRAY;
-            case 6:
-                return Color.GREEN;
-            case 7:
-                return Color.LIME;
-            case 8:
-                return Color.MAROON;
-            case 9:
-                return Color.NAVY;
-            case 10:
-                return Color.OLIVE;
-            case 11:
-                return Color.ORANGE;
-            case 12:
-                return Color.PURPLE;
-            case 13:
-                return Color.RED;
-            case 14:
-                return Color.SILVER;
-            case 15:
-                return Color.TEAL;
-            case 16:
-                return Color.WHITE;
-            case 17:
-                return Color.YELLOW;
-            default:
-                return Color.RED;
-        }
+        return switch (color) {
+            case 1 -> Color.AQUA;
+            case 2 -> Color.BLACK;
+            case 3 -> Color.BLUE;
+            case 4 -> Color.FUCHSIA;
+            case 5 -> Color.GRAY;
+            case 6 -> Color.GREEN;
+            case 7 -> Color.LIME;
+            case 8 -> Color.MAROON;
+            case 9 -> Color.NAVY;
+            case 10 -> Color.OLIVE;
+            case 11 -> Color.ORANGE;
+            case 12 -> Color.PURPLE;
+            case 13 -> Color.RED;
+            case 14 -> Color.SILVER;
+            case 15 -> Color.TEAL;
+            case 16 -> Color.WHITE;
+            case 17 -> Color.YELLOW;
+            default -> Color.RED;
+        };
     }
 
 }

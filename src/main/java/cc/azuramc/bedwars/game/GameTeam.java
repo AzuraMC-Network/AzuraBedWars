@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.enums.TeamColor;
 import lombok.Data;
 import org.bukkit.*;
 import org.bukkit.block.Block;

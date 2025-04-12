@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.game.event.impl;
 
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.event.GameEvent;
 import cc.azuramc.bedwars.game.event.Runnable;
 
@@ -35,12 +35,12 @@ public class DiamondUpdateEvent extends GameEvent {
      * 执行钻石升级事件
      * 根据等级调整钻石刷新速度
      *
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
     @Override
-    public void excute(Game game) {
+    public void execute(GameManager gameManager) {
         // 获取钻石刷新任务
-        cc.azuramc.bedwars.game.event.Runnable runnable = game.getEventManager().getRunnables().get(DIAMOND_REFRESH_KEY);
+        cc.azuramc.bedwars.game.event.Runnable runnable = gameManager.getEventManager().getRunnables().get(DIAMOND_REFRESH_KEY);
         if (runnable == null) {
             return; // 防止NPE
         }

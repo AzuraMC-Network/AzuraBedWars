@@ -4,8 +4,8 @@ import cc.azuramc.bedwars.utils.gui.CustomGUI;
 import cc.azuramc.bedwars.utils.gui.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
-import cc.azuramc.bedwars.database.PlayerData;
-import cc.azuramc.bedwars.game.Game;
+import cc.azuramc.bedwars.database.player.PlayerProfile;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.shop.ItemShopManager;
 import cc.azuramc.bedwars.shop.ShopData;
@@ -38,24 +38,24 @@ public class DIYShopGUI extends CustomGUI {
     /**
      * 创建自定义商店GUI
      *
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      * @param gamePlayer 游戏玩家
      * @param itemStack 要添加的物品
      * @param className 物品分类名称
      */
-    public DIYShopGUI(Game game, GamePlayer gamePlayer, ItemStack itemStack, String className) {
+    public DIYShopGUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className) {
         super(gamePlayer.getPlayer(), "§8添加物品到快捷购买", 54);
         Player player = gamePlayer.getPlayer();
-        PlayerData playerData = gamePlayer.getPlayerData();
+        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
 
         // 初始化界面
-        initializeUI(game, gamePlayer, itemStack, className, playerData);
+        initializeUI(gameManager, gamePlayer, itemStack, className, playerProfile);
     }
     
     /**
      * 初始化用户界面
      */
-    private void initializeUI(Game game, GamePlayer gamePlayer, ItemStack itemStack, String className, PlayerData playerData) {
+    private void initializeUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className, PlayerProfile playerProfile) {
         Player player = gamePlayer.getPlayer();
         
         // 设置顶部展示物品
@@ -69,7 +69,7 @@ public class DIYShopGUI extends CustomGUI {
         setupBorders();
         
         // 设置快捷购买槽位
-        setupShopSlots(game, gamePlayer, className, playerData);
+        setupShopSlots(gameManager, gamePlayer, className, playerProfile);
     }
     
     /**
@@ -100,9 +100,9 @@ public class DIYShopGUI extends CustomGUI {
     /**
      * 设置商店槽位
      */
-    private void setupShopSlots(Game game, GamePlayer gamePlayer, String className, PlayerData playerData) {
+    private void setupShopSlots(GameManager gameManager, GamePlayer gamePlayer, String className, PlayerProfile playerProfile) {
         Player player = gamePlayer.getPlayer();
-        String[] shopSort = playerData.getShopSort();
+        String[] shopSort = playerProfile.getShopSort();
         
         for (int i = 0; i < SHOP_SLOTS.length; i++) {
             String slotData = shopSort[i];
@@ -114,10 +114,10 @@ public class DIYShopGUI extends CustomGUI {
             
             if (itemInfo == null || itemType == null) {
                 // 空槽位
-                setupEmptySlot(game, player, slotPosition, i, className, playerData);
+                setupEmptySlot(gameManager, player, slotPosition, i, className, playerProfile);
             } else {
                 // 已有物品的槽位
-                setupOccupiedSlot(game, gamePlayer, slotPosition, itemType, className);
+                setupOccupiedSlot(gameManager, gamePlayer, slotPosition, itemType, className);
             }
         }
     }
@@ -142,7 +142,7 @@ public class DIYShopGUI extends CustomGUI {
     /**
      * 设置空槽位
      */
-    private void setupEmptySlot(Game game, Player player, int slotPosition, int slotIndex, String className, PlayerData playerData) {
+    private void setupEmptySlot(GameManager gameManager, Player player, int slotPosition, int slotIndex, String className, PlayerProfile playerProfile) {
         setItem(slotPosition, 
                 new ItemBuilderUtil()
                     .setItemStack(MaterialUtil.getStainedGlassPane(EMPTY_SLOT_GLASS_COLOR))
@@ -151,21 +151,21 @@ public class DIYShopGUI extends CustomGUI {
                     .getItem(), 
                 new GUIAction(0, () -> {
                     // 更新玩家数据
-                    playerData.getShopSort()[slotIndex] = className;
-                    playerData.saveShops();
+                    playerProfile.getShopSort()[slotIndex] = className;
+                    playerProfile.saveShops();
                     
                     // 播放确认音效
                     SoundUtil.playClickSound(player);
                     
                     // 返回物品商店
-                    new ItemShopGUI(player, 0, game).open();
+                    new ItemShopGUI(player, 0, gameManager).open();
                 }, false));
     }
     
     /**
      * 设置已占用槽位
      */
-    private void setupOccupiedSlot(Game game, GamePlayer gamePlayer, int slotPosition, ItemType itemType, String className) {
+    private void setupOccupiedSlot(GameManager gameManager, GamePlayer gamePlayer, int slotPosition, ItemType itemType, String className) {
         // 准备物品显示
         ItemBuilderUtil itemBuilder = prepareItemDisplay(gamePlayer, itemType);
         
@@ -177,20 +177,20 @@ public class DIYShopGUI extends CustomGUI {
                     .getItem(), 
                 new GUIAction(0, () -> {
                     Player player = gamePlayer.getPlayer();
-                    PlayerData playerData = gamePlayer.getPlayerData();
+                    PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
                     
                     // 获取槽位索引
                     int slotIndex = Arrays.asList(SHOP_SLOTS).indexOf(slotPosition);
                     
                     // 更新玩家数据
-                    playerData.getShopSort()[slotIndex] = className;
-                    playerData.saveShops();
+                    playerProfile.getShopSort()[slotIndex] = className;
+                    playerProfile.saveShops();
                     
                     // 播放确认音效
                     SoundUtil.playClickSound(player);
                     
                     // 返回物品商店
-                    new ItemShopGUI(player, 0, game).open();
+                    new ItemShopGUI(player, 0, gameManager).open();
                 }, false));
     }
 

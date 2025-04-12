@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.game.event.impl;
 
 import cc.azuramc.bedwars.events.BedwarsGameOverEvent;
-import cc.azuramc.bedwars.game.Game;
-import cc.azuramc.bedwars.game.GameOverRunnable;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.timer.GameRunnable;
 import cc.azuramc.bedwars.game.event.GameEvent;
 import org.bukkit.Bukkit;
 
@@ -15,9 +15,9 @@ public class OverEvent extends GameEvent {
         super("游戏结束", 600, 6);
     }
 
-    public void excute(Game game) {
-        game.getEventManager().setCurrentEvent(7);
-        Bukkit.getPluginManager().callEvent(new BedwarsGameOverEvent(game.getWinner()));
-        new GameOverRunnable(game);
+    public void execute(GameManager gameManager) {
+        gameManager.getEventManager().setCurrentEvent(7);
+        Bukkit.getPluginManager().callEvent(new BedwarsGameOverEvent(gameManager.getWinner()));
+        new GameRunnable(gameManager);
     }
 }

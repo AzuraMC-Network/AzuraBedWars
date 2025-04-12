@@ -1,15 +1,14 @@
 package cc.azuramc.bedwars.game;
 
-import cc.azuramc.bedwars.utils.ActionBarUtil;
+import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilderUtil;
-import cc.azuramc.bedwars.utils.TitleUtil;
+import cc.azuramc.bedwars.compat.util.TitleUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.PlayerData;
+import cc.azuramc.bedwars.database.player.PlayerProfile;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
-import cc.azuramc.bedwars.types.ArmorType;
-import cc.azuramc.bedwars.types.ToolType;
-import cc.azuramc.bedwars.utils.Util;
+import cc.azuramc.bedwars.enums.ArmorType;
+import cc.azuramc.bedwars.enums.ToolType;
 import cc.azuramc.bedwars.compat.material.MaterialUtil;
 import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
@@ -50,7 +49,7 @@ public class GamePlayer {
     @Getter private final UUID uuid;
     @Getter private final String name;
     @Getter private final AssistsManager assistsManager;
-    @Getter private final PlayerData playerData;
+    @Getter private final PlayerProfile playerProfile;
     @Getter private final PlayerCompass playerCompass;
     
     // 游戏状态
@@ -97,7 +96,7 @@ public class GamePlayer {
         
         // 初始化管理器
         this.assistsManager = new AssistsManager(this);
-        this.playerData = new PlayerData(this);
+        this.playerProfile = new PlayerProfile(this);
         this.playerCompass = new PlayerCompass(this);
     }
 
@@ -321,8 +320,8 @@ public class GamePlayer {
         }
         player.setGameMode(GameMode.ADVENTURE);
         player.setAllowFlight(true);
-        Util.setFlying(player);
-        player.teleport(AzuraBedWars.getInstance().getGame().getMapData().getReSpawn().toLocation());
+        PlayerUtil.setFlying(player);
+        player.teleport(AzuraBedWars.getInstance().getGameManager().getMapData().getReSpawn().toLocation());
     }
 
     /**
@@ -580,7 +579,7 @@ public class GamePlayer {
          * 发送最近玩家信息
          */
         public void sendClosestPlayer() {
-            GamePlayer closestPlayer = AzuraBedWars.getInstance().getGame().findTargetPlayer(gamePlayer);
+            GamePlayer closestPlayer = AzuraBedWars.getInstance().getGameManager().findTargetPlayer(gamePlayer);
 
             if (closestPlayer != null) {
                 int distance = (int) closestPlayer.getPlayer().getLocation().distance(player.getLocation());

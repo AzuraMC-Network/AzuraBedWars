@@ -1,14 +1,13 @@
 package cc.azuramc.bedwars.scoreboards;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.PlayerData;
-import cc.azuramc.bedwars.game.Game;
-import cc.azuramc.bedwars.game.GameLobbyCountdown;
+import cc.azuramc.bedwars.database.player.PlayerProfile;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.timer.GameStartRunnable;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.types.ModeType;
+import cc.azuramc.bedwars.enums.GameState;
+import cc.azuramc.bedwars.enums.ModeType;
 import cc.azuramc.bedwars.utils.board.FastBoard;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LobbyBoard implements Listener {
     // 游戏实例
-    private static Game game;
+    private static GameManager gameManager;
     
     // 常量定义
     private static final String TITLE = "§e§l超级起床战争";
@@ -50,10 +49,10 @@ public class LobbyBoard implements Listener {
     /**
      * 构造函数
      * 
-     * @param game 游戏实例
+     * @param gameManager 游戏实例
      */
-    public LobbyBoard(Game game) {
-        LobbyBoard.game = game;
+    public LobbyBoard(GameManager gameManager) {
+        LobbyBoard.gameManager = gameManager;
         plugin = AzuraBedWars.getInstance();
     }
 
@@ -106,7 +105,7 @@ public class LobbyBoard implements Listener {
         }
         
         // 更新玩家等级
-        updatePlayerLevel(player, gamePlayer.getPlayerData());
+        updatePlayerLevel(player, gamePlayer.getPlayerProfile());
         
         List<String> lines = new ArrayList<>();
         
@@ -120,7 +119,7 @@ public class LobbyBoard implements Listener {
         addCountdownInfo(lines);
         
         // 添加模式信息
-        addModeInfo(lines, gamePlayer.getPlayerData());
+        addModeInfo(lines, gamePlayer.getPlayerProfile());
         
         // 添加版本信息
         addVersionInfo(lines);
@@ -136,12 +135,12 @@ public class LobbyBoard implements Listener {
      * 更新玩家等级
      * 
      * @param player 玩家
-     * @param playerData 玩家数据
+     * @param playerProfile 玩家数据
      */
-    private static void updatePlayerLevel(Player player, PlayerData playerData) {
-        int expPoints = (playerData.getKills() * 2) + 
-                       (playerData.getDestroyedBeds() * 10) + 
-                       (playerData.getWins() * 15);
+    private static void updatePlayerLevel(Player player, PlayerProfile playerProfile) {
+        int expPoints = (playerProfile.getKills() * 2) +
+                       (playerProfile.getDestroyedBeds() * 10) +
+                       (playerProfile.getWins() * 15);
         int level = plugin.getLevel(expPoints);
         player.setLevel(level);
     }
@@ -153,9 +152,9 @@ public class LobbyBoard implements Listener {
      */
     private static void addMapInfo(List<String> lines) {
         lines.add(EMPTY_LINE);
-        lines.add("§f地图: §a" + game.getMapData().getName());
-        lines.add("§f队伍: §a" + game.getMapData().getPlayers().getTeam() + "人 " + game.getGameTeams().size() + "队");
-        lines.add("§f作者: §a" + game.getMapData().getAuthor());
+        lines.add("§f地图: §a" + gameManager.getMapData().getName());
+        lines.add("§f队伍: §a" + gameManager.getMapData().getPlayers().getTeam() + "人 " + gameManager.getGameTeams().size() + "队");
+        lines.add("§f作者: §a" + gameManager.getMapData().getAuthor());
         lines.add(EMPTY_LINE);
     }
     
@@ -165,7 +164,7 @@ public class LobbyBoard implements Listener {
      * @param lines 计分板行列表
      */
     private static void addPlayerInfo(List<String> lines) {
-        lines.add("§f玩家: §a" + GamePlayer.getOnlinePlayers().size() + "/" + game.getMaxPlayers());
+        lines.add("§f玩家: §a" + GamePlayer.getOnlinePlayers().size() + "/" + gameManager.getMaxPlayers());
         lines.add(EMPTY_LINE);
     }
     
@@ -186,10 +185,10 @@ public class LobbyBoard implements Listener {
      * 添加模式信息到计分板
      * 
      * @param lines 计分板行列表
-     * @param playerData 玩家数据
+     * @param playerProfile 玩家数据
      */
-    private static void addModeInfo(List<String> lines, PlayerData playerData) {
-        String modeText = playerData.getModeType() == ModeType.DEFAULT ? DEFAULT_MODE : EXP_MODE;
+    private static void addModeInfo(List<String> lines, PlayerProfile playerProfile) {
+        String modeText = playerProfile.getModeType() == ModeType.DEFAULT ? DEFAULT_MODE : EXP_MODE;
         lines.add("§f你的模式: §a" + modeText);
         lines.add(EMPTY_LINE);
     }
@@ -219,12 +218,12 @@ public class LobbyBoard implements Listener {
      * @return 倒计时文本
      */
     private static String getCountdown() {
-        Game currentGame = plugin.getGame();
-        GameLobbyCountdown gameLobbyCountdown = currentGame.getGameLobbyCountdown();
+        GameManager currentGameManager = plugin.getGameManager();
+        GameStartRunnable gameStartRunnable = currentGameManager.getGameStartRunnable();
 
-        if (gameLobbyCountdown != null) {
-            return gameLobbyCountdown.getCountdown() + "秒后开始";
-        } else if (currentGame.getGameState() == GameState.WAITING) {
+        if (gameStartRunnable != null) {
+            return gameStartRunnable.getCountdown() + "秒后开始";
+        } else if (currentGameManager.getGameState() == GameState.WAITING) {
             return WAITING_MESSAGE;
         }
 
