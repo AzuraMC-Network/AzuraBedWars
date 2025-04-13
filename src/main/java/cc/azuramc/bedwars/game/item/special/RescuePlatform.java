@@ -2,8 +2,8 @@ package cc.azuramc.bedwars.game.item.special;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.game.manager.GameManager;
-import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;

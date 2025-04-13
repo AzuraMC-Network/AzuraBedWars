@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.compat.wrapper;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.game.manager.GameManager;
-import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

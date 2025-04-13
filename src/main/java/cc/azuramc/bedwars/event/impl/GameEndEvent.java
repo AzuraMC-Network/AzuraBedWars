@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.api.event.BedwarsGameEndEvent;
-import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.GameEvent;
-import cc.azuramc.bedwars.listeners.world.ChunkListener;
+import cc.azuramc.bedwars.listener.world.ChunkListener;
 import org.bukkit.Bukkit;
 
 /**

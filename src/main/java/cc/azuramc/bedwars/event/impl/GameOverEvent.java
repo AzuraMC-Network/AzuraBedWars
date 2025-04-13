@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.api.event.BedwarsGameOverEvent;
-import cc.azuramc.bedwars.game.manager.GameManager;
-import cc.azuramc.bedwars.task.game.GameLoopTask;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.task.GameLoopTask;
 import cc.azuramc.bedwars.event.GameEvent;
 import org.bukkit.Bukkit;
 

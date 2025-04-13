@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.game.item.special;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.listeners.special.RescuePlatformListener;
-import cc.azuramc.bedwars.listeners.special.WarpPowderListener;
+import cc.azuramc.bedwars.listener.special.RescuePlatformListener;
+import cc.azuramc.bedwars.listener.special.WarpPowderListener;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.database.storage.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
-import cc.azuramc.bedwars.game.arena.MapData;
+import cc.azuramc.bedwars.game.map.MapData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;

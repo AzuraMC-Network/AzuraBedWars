@@ -1,13 +1,13 @@
 package cc.azuramc.bedwars;
 
-import cc.azuramc.bedwars.commands.CommandRegistry;
-import cc.azuramc.bedwars.game.arena.MapData;
-import cc.azuramc.bedwars.game.arena.MapManager;
+import cc.azuramc.bedwars.command.CommandRegistry;
+import cc.azuramc.bedwars.game.map.MapData;
+import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
-import cc.azuramc.bedwars.game.manager.GameManager;
-import cc.azuramc.bedwars.listeners.ListenerHandler;
-import cc.azuramc.bedwars.scoreboards.provider.GameBoardProvider;
-import cc.azuramc.bedwars.scoreboards.provider.LobbyBoardProvider;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.listener.ListenerRegistry;
+import cc.azuramc.bedwars.scoreboard.provider.GameBoardProvider;
+import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
 import cc.azuramc.bedwars.game.item.special.SpecialItem;
 import cc.azuramc.bedwars.database.connection.ConnectionPoolHandler;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
@@ -176,7 +176,7 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void registerEventListeners() {
 
-        new ListenerHandler(this);
+        new ListenerRegistry(this);
         
         // 记分板监听器
         Bukkit.getPluginManager().registerEvents(new LobbyBoardProvider(gameManager), this);

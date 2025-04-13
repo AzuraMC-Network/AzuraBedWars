@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.database.storage;
 
-import cc.azuramc.bedwars.game.arena.MapData;
+import cc.azuramc.bedwars.game.map.MapData;
 
 /**
  * 地图数据存储接口

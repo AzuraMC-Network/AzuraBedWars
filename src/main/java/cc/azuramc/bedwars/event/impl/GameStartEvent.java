@@ -1,12 +1,12 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.manager.GameManager;
-import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.event.GameEvent;
-import cc.azuramc.bedwars.task.spectator.SpectatorCompassTask;
-import cc.azuramc.bedwars.task.game.GeneratorTask;
+import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
+import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.compat.wrapper.PotionEffectWrapper;
 import org.bukkit.potion.PotionEffect;

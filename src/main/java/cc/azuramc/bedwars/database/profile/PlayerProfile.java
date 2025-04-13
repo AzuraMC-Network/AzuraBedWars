@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.database.profile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.data.GamePlayer;
-import cc.azuramc.bedwars.game.data.GameModeType;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameModeType;
 import lombok.Data;
 
 import java.sql.Connection;

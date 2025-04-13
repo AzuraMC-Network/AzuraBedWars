@@ -1,14 +1,14 @@
 package cc.azuramc.bedwars.gui;
 
-import cc.azuramc.bedwars.scoreboards.provider.LobbyBoardProvider;
+import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
 import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
-import cc.azuramc.bedwars.game.manager.GameManager;
-import cc.azuramc.bedwars.game.data.GamePlayer;
-import cc.azuramc.bedwars.game.data.GameModeType;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import org.bukkit.entity.Player;
 

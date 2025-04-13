@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game.team;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Data;
 import org.bukkit.*;
 import org.bukkit.block.Block;

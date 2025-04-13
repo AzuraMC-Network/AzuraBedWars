@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.shop;
 
-import cc.azuramc.bedwars.game.manager.GameManager;
-import cc.azuramc.bedwars.shop.model.ShopData;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.shop.page.*;
 import lombok.Getter;
 

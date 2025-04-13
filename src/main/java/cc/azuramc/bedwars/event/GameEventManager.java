@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.event;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.event.impl.*;
 import lombok.Getter;

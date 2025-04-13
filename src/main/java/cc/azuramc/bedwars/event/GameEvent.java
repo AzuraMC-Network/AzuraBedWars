@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.event;
 
-import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.GameManager;
 import lombok.Getter;
 
 @Getter

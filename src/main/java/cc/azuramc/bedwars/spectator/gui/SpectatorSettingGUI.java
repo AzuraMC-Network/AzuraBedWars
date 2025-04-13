@@ -1,11 +1,11 @@
 package cc.azuramc.bedwars.spectator.gui;
 
-import cc.azuramc.bedwars.spectator.data.SpectatorSettings;
+import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
-import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

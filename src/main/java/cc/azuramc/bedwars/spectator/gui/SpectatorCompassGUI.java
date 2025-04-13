@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.spectator.gui;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

@@ -1,10 +1,10 @@
 package cc.azuramc.bedwars.shop.page;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.shop.model.ShopData;
-import cc.azuramc.bedwars.shop.model.ColorType;
-import cc.azuramc.bedwars.shop.model.ShopItemType;
-import cc.azuramc.bedwars.shop.model.PriceCost;
+import cc.azuramc.bedwars.shop.ShopData;
+import cc.azuramc.bedwars.shop.ColorType;
+import cc.azuramc.bedwars.shop.ShopItemType;
+import cc.azuramc.bedwars.shop.PriceCost;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import org.bukkit.Material;

@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.event.impl;
 
-import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.GameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 
