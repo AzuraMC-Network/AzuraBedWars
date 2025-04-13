@@ -1,12 +1,12 @@
 package cc.azuramc.bedwars.listeners.chat;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.player.PlayerProfile;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.enums.GameState;
-import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.utils.CC;
+import cc.azuramc.bedwars.database.profile.PlayerProfile;
+import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.phase.GameState;
+import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.utils.chat.ChatColorUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -68,7 +68,7 @@ public class ChatListener implements Listener {
         }
 
         // 根据游戏状态发送消息
-        if (gameManager.getGameState() == GameState.RUNNING && !gameManager.getEventManager().isOver() && gamePlayer != null) {
+        if (gameManager.getGameState() == GameState.RUNNING && !gameManager.getGameEventManager().isOver() && gamePlayer != null) {
             handleInGameChat(player, gamePlayer, message);
         } else {
             // 游戏未开始或已结束时的聊天，全服可见
@@ -101,7 +101,7 @@ public class ChatListener implements Listener {
         inShoutCoolDown.add(player.getUniqueId());
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             inShoutCoolDown.remove(player.getUniqueId());
-            player.sendMessage(CC.color("&a喊话冷却结束！"));
+            player.sendMessage(ChatColorUtil.color("&a喊话冷却结束！"));
         }, GLOBAL_CHAT_COOLDOWN * 20L);
     }
 
@@ -155,7 +155,7 @@ public class ChatListener implements Listener {
         // 发送消息
         if (isGlobalChat) {
             if (inShoutCoolDown.contains(player.getUniqueId())) {
-                gamePlayer.sendMessage(CC.color("&c喊话冷却中！"));
+                gamePlayer.sendMessage(ChatColorUtil.color("&c喊话冷却中！"));
                 return;
             }
             gameManager.broadcastMessage(formattedMessage);

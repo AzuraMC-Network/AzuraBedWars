@@ -1,19 +1,19 @@
 package cc.azuramc.bedwars;
 
-import cc.azuramc.bedwars.commands.CommandHandler;
-import cc.azuramc.bedwars.database.map.data.MapData;
-import cc.azuramc.bedwars.database.map.MapManager;
-import cc.azuramc.bedwars.database.map.MapStorageFactory;
-import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.commands.CommandRegistry;
+import cc.azuramc.bedwars.game.arena.MapData;
+import cc.azuramc.bedwars.game.arena.MapManager;
+import cc.azuramc.bedwars.database.storage.MapStorageFactory;
+import cc.azuramc.bedwars.game.manager.GameManager;
 import cc.azuramc.bedwars.listeners.ListenerHandler;
-import cc.azuramc.bedwars.scoreboards.GameBoard;
-import cc.azuramc.bedwars.scoreboards.LobbyBoard;
-import cc.azuramc.bedwars.specials.SpecialItem;
-import cc.azuramc.bedwars.database.mysql.ConnectionPoolHandler;
-import cc.azuramc.bedwars.utils.gui.GUIListener;
+import cc.azuramc.bedwars.scoreboards.provider.GameBoardProvider;
+import cc.azuramc.bedwars.scoreboards.provider.LobbyBoardProvider;
+import cc.azuramc.bedwars.game.item.special.SpecialItem;
+import cc.azuramc.bedwars.database.connection.ConnectionPoolHandler;
+import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
-import cc.azuramc.bedwars.config.SettingsConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -120,7 +120,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 初始化命令处理器
      */
     private void initCommands() {
-        new CommandHandler(this);
+        new CommandRegistry(this);
     }
 
     /**
@@ -179,8 +179,8 @@ public final class AzuraBedWars extends JavaPlugin {
         new ListenerHandler(this);
         
         // 记分板监听器
-        Bukkit.getPluginManager().registerEvents(new LobbyBoard(gameManager), this);
-        Bukkit.getPluginManager().registerEvents(new GameBoard(gameManager), this);
+        Bukkit.getPluginManager().registerEvents(new LobbyBoardProvider(gameManager), this);
+        Bukkit.getPluginManager().registerEvents(new GameBoardProvider(gameManager), this);
     }
 
     /**
@@ -199,8 +199,8 @@ public final class AzuraBedWars extends JavaPlugin {
             connectionPoolHandler.closeAll();
         }
         
-        if (gameManager != null && gameManager.getEventManager() != null) {
-            gameManager.getEventManager().stop();
+        if (gameManager != null && gameManager.getGameEventManager() != null) {
+            gameManager.getGameEventManager().stop();
         }
         
         // 保存配置

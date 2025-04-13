@@ -1,10 +1,10 @@
 package cc.azuramc.bedwars.utils;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.map.data.MapData;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.enums.TeamColor;
+import cc.azuramc.bedwars.game.arena.MapData;
+import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.team.TeamColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;

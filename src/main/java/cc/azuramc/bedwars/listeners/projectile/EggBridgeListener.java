@@ -1,11 +1,10 @@
 package cc.azuramc.bedwars.listeners.projectile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.enums.GameState;
-import cc.azuramc.bedwars.game.timer.EggBridgeTask;
-import cc.azuramc.bedwars.utils.CC;
+import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.phase.GameState;
+import cc.azuramc.bedwars.utils.chat.ChatColorUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
@@ -18,7 +17,7 @@ import java.util.*;
 
 public class EggBridgeListener implements Listener {
 
-    private static final Map<Egg, EggBridgeTask> bridges = new HashMap<>();
+    private static final Map<Egg, EggBridgeHandler> bridges = new HashMap<>();
     public static List<UUID> inBridgeCooldown = new ArrayList<>();
 
     private static final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
@@ -43,7 +42,7 @@ public class EggBridgeListener implements Listener {
 
         // 在搭桥蛋 3 秒冷却中
         if (inBridgeCooldown.contains(shooter.getUniqueId())) {
-            shooter.sendMessage(CC.color("&c搭桥蛋冷却中！"));
+            shooter.sendMessage(ChatColorUtil.color("&c搭桥蛋冷却中！"));
             event.setCancelled(true);
             return;
         }
@@ -54,7 +53,7 @@ public class EggBridgeListener implements Listener {
         }
 
         // 存进生效的搭桥蛋列表
-        bridges.put(egg, new EggBridgeTask(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
+        bridges.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
         // 创建 3 秒冷却时间
         if (!inBridgeCooldown.contains(shooter.getUniqueId())) inBridgeCooldown.add(shooter.getUniqueId());
         Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> inBridgeCooldown.remove(shooter.getUniqueId()), 60L);

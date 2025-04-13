@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.commands.user;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.manager.GameManager;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.bukkit.BukkitCommandActor;

@@ -2,22 +2,22 @@ package cc.azuramc.bedwars.listeners.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.database.player.PlayerProfile;
-import cc.azuramc.bedwars.database.map.data.MapData;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.enums.GameState;
-import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.guis.ItemShopGUI;
-import cc.azuramc.bedwars.guis.ModeSelectionGUI;
-import cc.azuramc.bedwars.spectator.SpectatorCompassGUI;
-import cc.azuramc.bedwars.guis.TeamShopGUI;
-import cc.azuramc.bedwars.spectator.SpectatorSettingGUI;
-import cc.azuramc.bedwars.spectator.SpectatorSettings;
-import cc.azuramc.bedwars.enums.ModeType;
-import cc.azuramc.bedwars.compat.sound.SoundUtil;
-import cc.azuramc.bedwars.compat.material.MaterialUtil;
-import cc.azuramc.bedwars.compat.enchantment.EnchantmentUtil;
+import cc.azuramc.bedwars.database.profile.PlayerProfile;
+import cc.azuramc.bedwars.game.arena.MapData;
+import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.phase.GameState;
+import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.shop.gui.ItemShopGUI;
+import cc.azuramc.bedwars.gui.ModeSelectionGUI;
+import cc.azuramc.bedwars.spectator.gui.SpectatorCompassGUI;
+import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
+import cc.azuramc.bedwars.spectator.gui.SpectatorSettingGUI;
+import cc.azuramc.bedwars.spectator.data.SpectatorSettings;
+import cc.azuramc.bedwars.game.data.GameModeType;
+import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
+import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -117,32 +117,32 @@ public class PlayerListener implements Listener {
 
             if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
                 Material material = event.getMaterial();
-                if (material == MaterialUtil.COMPASS()) {
+                if (material == MaterialWrapper.COMPASS()) {
                     event.setCancelled(true);
                     if (!gamePlayer.isSpectator()) {
                         return;
                     }
                     new SpectatorCompassGUI(player).open();
                     return;
-                } else if (material == MaterialUtil.REDSTONE_COMPARATOR()) {
+                } else if (material == MaterialWrapper.REDSTONE_COMPARATOR()) {
                     new SpectatorSettingGUI(player).open();
                     return;
                 } else if (material == Material.PAPER) {
                     event.setCancelled(true);
                     Bukkit.dispatchCommand(player, "azurabedwars nextgame");
                     return;
-                } else if (material == MaterialUtil.SLIME_BALL()) {
+                } else if (material == MaterialWrapper.SLIME_BALL()) {
                     event.setCancelled(true);
                     // back to lobby
                     return;
-                } else if (material == MaterialUtil.BED()) {
+                } else if (material == MaterialWrapper.BED()) {
                     event.setCancelled(true);
                     if (gamePlayer.isSpectator()) {
                         return;
                     }
 
-                    int priority = gameManager.getEventManager().currentEvent().getPriority();
-                    if (priority > 2 || priority == 2 && gameManager.getEventManager().getLeftTime() <= 120) {
+                    int priority = gameManager.getGameEventManager().currentEvent().getPriority();
+                    if (priority > 2 || priority == 2 && gameManager.getGameEventManager().getLeftTime() <= 120) {
                         player.sendMessage("§c开局已超过10分钟.");
                         return;
                     }
@@ -166,52 +166,52 @@ public class PlayerListener implements Listener {
 
                     if (face == BlockFace.NORTH) {
                         Location l = gameTeam.getBedHead().getLocation();
-                        l.getBlock().setType(MaterialUtil.AIR());
-                        l.getBlock().setType(MaterialUtil.BED());
+                        l.getBlock().setType(MaterialWrapper.AIR());
+                        l.getBlock().setType(MaterialWrapper.BED());
                         Block block = gameTeam.getBedHead();
                         BlockState bedFoot = block.getState();
                         BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
-                        bedFoot.setType(MaterialUtil.BED());
-                        bedHead.setType(MaterialUtil.BED());
+                        bedFoot.setType(MaterialWrapper.BED());
+                        bedHead.setType(MaterialWrapper.BED());
                         bedFoot.setRawData((byte) 0);
                         bedHead.setRawData((byte) 8);
                         bedFoot.update(true, false);
                         bedHead.update(true, true);
                     } else if (face == BlockFace.EAST) {
                         Location l = gameTeam.getBedHead().getLocation();
-                        l.getBlock().setType(MaterialUtil.AIR());
-                        l.getBlock().setType(MaterialUtil.BED());
+                        l.getBlock().setType(MaterialWrapper.AIR());
+                        l.getBlock().setType(MaterialWrapper.BED());
                         Block block = gameTeam.getBedHead();
                         BlockState bedFoot = block.getState();
                         BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.WEST).getState();
-                        bedFoot.setType(MaterialUtil.BED());
-                        bedHead.setType(MaterialUtil.BED());
+                        bedFoot.setType(MaterialWrapper.BED());
+                        bedHead.setType(MaterialWrapper.BED());
                         bedFoot.setRawData((byte) 1);
                         bedHead.setRawData((byte) 9);
                         bedFoot.update(true, false);
                         bedHead.update(true, true);
                     } else if (face == BlockFace.SOUTH) {
                         Location l = gameTeam.getBedHead().getLocation();
-                        l.getBlock().setType(MaterialUtil.AIR());
-                        l.getBlock().setType(MaterialUtil.BED());
+                        l.getBlock().setType(MaterialWrapper.AIR());
+                        l.getBlock().setType(MaterialWrapper.BED());
                         Block block = gameTeam.getBedHead();
                         BlockState bedFoot = block.getState();
                         BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.NORTH).getState();
-                        bedFoot.setType(MaterialUtil.BED());
-                        bedHead.setType(MaterialUtil.BED());
+                        bedFoot.setType(MaterialWrapper.BED());
+                        bedHead.setType(MaterialWrapper.BED());
                         bedFoot.setRawData((byte) 2);
                         bedHead.setRawData((byte) 10);
                         bedFoot.update(true, false);
                         bedHead.update(true, true);
                     } else if (face == BlockFace.WEST) {
                         Location l = gameTeam.getBedHead().getLocation();
-                        l.getBlock().setType(MaterialUtil.AIR());
-                        l.getBlock().setType(MaterialUtil.BED());
+                        l.getBlock().setType(MaterialWrapper.AIR());
+                        l.getBlock().setType(MaterialWrapper.BED());
                         Block block = gameTeam.getBedHead();
                         BlockState bedFoot = block.getState();
                         BlockState bedHead = bedFoot.getBlock().getRelative(BlockFace.EAST).getState();
-                        bedFoot.setType(MaterialUtil.BED());
-                        bedHead.setType(MaterialUtil.BED());
+                        bedFoot.setType(MaterialWrapper.BED());
+                        bedHead.setType(MaterialWrapper.BED());
                         bedFoot.setRawData((byte) 3);
                         bedHead.setRawData((byte) 11);
                         bedFoot.update(true, false);
@@ -228,14 +228,14 @@ public class PlayerListener implements Listener {
                     gameTeam.setUnbed(true);
 
                     player.sendMessage("§a使用回春床成功!");
-                    gameManager.broadcastSound(SoundUtil.get("ENDERDRAGON_HIT", "ENTITY_ENDERDRAGON_HURT"), 10, 10);
+                    gameManager.broadcastSound(SoundWrapper.get("ENDERDRAGON_HIT", "ENTITY_ENDERDRAGON_HURT"), 10, 10);
                     gameManager.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
                     gameManager.broadcastMessage(" ");
                     gameManager.broadcastMessage(gameTeam.getChatColor() + gameTeam.getName() + " §c使用了回春床！");
                     gameManager.broadcastMessage(" ");
                     gameManager.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
                     return;
-                } else if (material == MaterialUtil.FIREBALL()) {
+                } else if (material == MaterialWrapper.FIREBALL()) {
                     event.setCancelled(true);
                     if (gamePlayer.isSpectator()) {
                         return;
@@ -260,7 +260,7 @@ public class PlayerListener implements Listener {
                     fireball.setIsIncendiary(false);
                     fireball.setMetadata("Game FIREBALL", new FixedMetadataValue(AzuraBedWars.getInstance(), player.getUniqueId()));
                     return;
-                } else if (material == MaterialUtil.WATER_BUCKET()) {
+                } else if (material == MaterialWrapper.WATER_BUCKET()) {
                     for (MapData.RawLocation rawLocation : gameManager.getMapData().getShops()) {
                         if (rawLocation.toLocation().distance(player.getLocation()) <= 5) {
                             event.setCancelled(true);
@@ -320,11 +320,11 @@ public class PlayerListener implements Listener {
             }
 
             if (itemStack.getType().toString().endsWith("_SWORD")) {
-                if (itemStack.getType() == MaterialUtil.WOODEN_SWORD()) {
+                if (itemStack.getType() == MaterialWrapper.WOODEN_SWORD()) {
                     event.getItemDrop().remove();
                 }
 
-                itemStack.removeEnchantment(EnchantmentUtil.DAMAGE_ALL());
+                itemStack.removeEnchantment(EnchantmentWrapper.DAMAGE_ALL());
                 int size = 0;
                 for (int i = 0; i < player.getInventory().getSize(); i++) {
                     ItemStack itemStack1 = player.getInventory().getItem(i);
@@ -358,7 +358,7 @@ public class PlayerListener implements Listener {
         }
 
 
-        if (itemStack.getType() == MaterialUtil.BED()) {
+        if (itemStack.getType() == MaterialWrapper.BED()) {
             if (itemStack.hasItemMeta() && itemStack.getItemMeta().getDisplayName() != null) {
                 return;
             }
@@ -367,15 +367,15 @@ public class PlayerListener implements Listener {
             event.getItem().remove();
         }
 
-        if (itemStack.getType() == MaterialUtil.WOODEN_SWORD() || itemStack.getType() == MaterialUtil.STONE_SWORD() || itemStack.getType() == MaterialUtil.IRON_SWORD() || itemStack.getType() == MaterialUtil.DIAMOND_SWORD()) {
+        if (itemStack.getType() == MaterialWrapper.WOODEN_SWORD() || itemStack.getType() == MaterialWrapper.STONE_SWORD() || itemStack.getType() == MaterialWrapper.IRON_SWORD() || itemStack.getType() == MaterialWrapper.DIAMOND_SWORD()) {
             if (gamePlayer.getGameTeam().isSharpenedSwords()) {
-                itemStack.addEnchantment(EnchantmentUtil.DAMAGE_ALL(), 1);
+                itemStack.addEnchantment(EnchantmentWrapper.DAMAGE_ALL(), 1);
             }
 
             for (int i = 0; i < player.getInventory().getSize(); i++) {
                 if (player.getInventory().getItem(i) != null) {
-                    if (Objects.requireNonNull(player.getInventory().getItem(i)).getType() == MaterialUtil.WOODEN_SWORD()) {
-                        player.getInventory().setItem(i, new ItemStack(MaterialUtil.AIR()));
+                    if (Objects.requireNonNull(player.getInventory().getItem(i)).getType() == MaterialWrapper.WOODEN_SWORD()) {
+                        player.getInventory().setItem(i, new ItemStack(MaterialWrapper.AIR()));
                         break;
                     }
                 }
@@ -385,7 +385,7 @@ public class PlayerListener implements Listener {
         // 当玩家将要捡起铁锭/金锭/钻石/绿宝石
         if (itemStack.getType() == Material.IRON_INGOT || itemStack.getType() == Material.GOLD_INGOT || itemStack.getType() == Material.DIAMOND || itemStack.getType() == Material.EMERALD) {
             // 玩家挂机状态不能拾取资源
-            if (AFKListener.afk.get(player.getUniqueId())) {
+            if (PlayerAFKListener.afk.get(player.getUniqueId())) {
                 event.setCancelled(true);
                 return;
             }
@@ -399,17 +399,17 @@ public class PlayerListener implements Listener {
                 xp = xp * 3;
             }
 
-            if (playerProfile.getModeType() == ModeType.DEFAULT) {
+            if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
                 event.setCancelled(true);
                 event.getItem().remove();
 
-                SoundUtil.playLevelUpSound(player);
+                SoundWrapper.playLevelUpSound(player);
                 player.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
-            } else if (playerProfile.getModeType() == ModeType.EXPERIENCE) {
+            } else if (playerProfile.getGameModeType() == GameModeType.EXPERIENCE) {
                 event.setCancelled(true);
                 event.getItem().remove();
 
-                SoundUtil.playLevelUpSound(player);
+                SoundWrapper.playLevelUpSound(player);
                 player.setLevel(player.getLevel() + xp);
             }
 
@@ -417,9 +417,9 @@ public class PlayerListener implements Listener {
                 Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName();
                 for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
                     if (entity instanceof Player players) {
-                        players.playSound(players.getLocation(), SoundUtil.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 10, 15);
+                        players.playSound(players.getLocation(), SoundWrapper.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 10, 15);
 
-                        if (GamePlayer.get(players.getUniqueId()).getPlayerProfile().getModeType() == ModeType.DEFAULT) {
+                        if (GamePlayer.get(players.getUniqueId()).getPlayerProfile().getGameModeType() == GameModeType.DEFAULT) {
                             players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
                         } else {
                             players.setLevel(players.getLevel() + xp);
@@ -430,7 +430,7 @@ public class PlayerListener implements Listener {
         }
 
         if (itemStack.getType() == Material.DIAMOND) {
-            if (playerProfile.getModeType() == ModeType.DEFAULT) {
+            if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
                 return;
             }
 
@@ -449,11 +449,11 @@ public class PlayerListener implements Listener {
 
             event.getItem().remove();
             player.setLevel((int) (player.getLevel() + xp));
-            SoundUtil.playLevelUpSound(player);
+            SoundWrapper.playLevelUpSound(player);
         }
 
         if (itemStack.getType() == Material.EMERALD) {
-            if (playerProfile.getModeType() == ModeType.DEFAULT) {
+            if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
                 return;
             }
 
@@ -472,7 +472,7 @@ public class PlayerListener implements Listener {
 
             event.getItem().remove();
             player.setLevel((int) (player.getLevel() + xp));
-            SoundUtil.playLevelUpSound(player);
+            SoundWrapper.playLevelUpSound(player);
         }
     }
 
@@ -511,8 +511,8 @@ public class PlayerListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (PlayerUtil.getItemInHand(player).getType() == MaterialUtil.GLASS_BOTTLE()) {
-                    PlayerUtil.setItemInHand(player, new ItemStack(MaterialUtil.AIR()));
+                if (PlayerUtil.getItemInHand(player).getType() == MaterialWrapper.GLASS_BOTTLE()) {
+                    PlayerUtil.setItemInHand(player, new ItemStack(MaterialWrapper.AIR()));
                 }
             }
         }.runTaskLater(AzuraBedWars.getInstance(), 0);
@@ -579,7 +579,7 @@ public class PlayerListener implements Listener {
                 }
 
                 gameManager.broadcastTeamTitle(gameTeam, 0, 8, 0, "", gameTeam.getChatColor() + gamePlayer.getNickName() + " 说: §c注意,我们的床有危险！");
-                gameManager.broadcastTeamSound(gameTeam, SoundUtil.get("CLICK", "UI_BUTTON_CLICK"), 1f, 1f);
+                gameManager.broadcastTeamSound(gameTeam, SoundWrapper.get("CLICK", "UI_BUTTON_CLICK"), 1f, 1f);
                 i++;
             }
         }.runTaskTimer(AzuraBedWars.getInstance(), 0, 10L);

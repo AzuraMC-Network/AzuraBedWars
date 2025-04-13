@@ -1,11 +1,11 @@
 package cc.azuramc.bedwars.commands.user;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.enums.GameState;
+import cc.azuramc.bedwars.game.manager.GameManager;
+import cc.azuramc.bedwars.game.data.GamePlayer;
+import cc.azuramc.bedwars.game.phase.GameState;
 import cc.azuramc.bedwars.listeners.chat.ChatListener;
-import cc.azuramc.bedwars.utils.CommandUtil;
+import cc.azuramc.bedwars.utils.command.CommandHelper;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Default;
 import revxrsal.commands.annotation.Dependency;
@@ -20,7 +20,7 @@ public class ShoutCommand {
     public void shoutInGame(BukkitCommandActor actor, @Default("") String message) {
         // 控制台执行
         if (actor.isConsole()) {
-            CommandUtil.sendLayout(actor, "&c该命令只能由玩家执行！");
+            CommandHelper.sendLayout(actor, "&c该命令只能由玩家执行！");
             return;
         }
 
@@ -29,13 +29,13 @@ public class ShoutCommand {
 
         // 游戏未开始时使用
         if (gameManager.getGameState() != GameState.RUNNING) {
-            CommandUtil.sendLayout(actor, "&c该命令只能在游戏开始后使用！");
+            CommandHelper.sendLayout(actor, "&c该命令只能在游戏开始后使用！");
             return;
         }
 
         // 消息为空时
         if (message.isEmpty()) {
-            CommandUtil.sendLayout(actor, "&c用法: /shout <message>");
+            CommandHelper.sendLayout(actor, "&c用法: /shout <message>");
             return;
         }
 

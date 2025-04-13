@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.utils;
 
-import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.data.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
