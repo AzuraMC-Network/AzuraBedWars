@@ -76,7 +76,7 @@ public class GameEventManager extends TimerTask {
         this.registerEvent(new EmeraldUpdateEvent(3, EVENT_DURATION_SECONDS, EMERALD_LEVEL3_PRIORITY));
         this.registerEvent(new BedDestroyedEvent());
         this.registerEvent(new GameOverEvent());
-        this.registerEvent(new GameEndEvent());
+        this.registerEvent(new GameShutdownEvent());
     }
 
     /**

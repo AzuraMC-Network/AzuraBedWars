@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.event.impl;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.GameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
@@ -9,12 +10,15 @@ import cc.azuramc.bedwars.event.GameEventRunnable;
  * 随着游戏进行，钻石生成速度会加快
  */
 public class DiamondUpdateEvent extends GameEvent {
+
+    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+
     // 钻石资源点刷新标识符
-    private static final String DIAMOND_REFRESH_KEY = "钻石刷新";
+    private static final String EVENT_NAME = plugin.getEventConfig().getDiamondUpdateEvent().getEventName();
     
     // 定义各等级的钻石刷新时间（秒）
-    private static final int LEVEL_2_REFRESH_SECONDS = 23;
-    private static final int LEVEL_3_REFRESH_SECONDS = 15;
+    private static final int LEVEL_2_REFRESH_SECONDS = plugin.getEventConfig().getDiamondUpdateEvent().getLevel2RefreshSecond();
+    private static final int LEVEL_3_REFRESH_SECONDS = plugin.getEventConfig().getDiamondUpdateEvent().getLevel3RefreshSecond();
     
     // 当前升级等级
     private final int level;
@@ -40,7 +44,7 @@ public class DiamondUpdateEvent extends GameEvent {
     @Override
     public void execute(GameManager gameManager) {
         // 获取钻石刷新任务
-        GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnables().get(DIAMOND_REFRESH_KEY);
+        GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnables().get(EVENT_NAME);
         if (gameEventRunnable == null) {
             return; // 防止NPE
         }

@@ -19,8 +19,13 @@ import java.util.Objects;
  * 负责处理游戏开始时的初始化和团队升级效果
  */
 public class GameStartEvent extends GameEvent {
+
+    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+
+    private static final String EVENT_NAME = plugin.getEventConfig().getStartEvent().getEventName();
+
     // 游戏开始倒计时时间（秒）
-    private static final int START_COUNTDOWN_SECONDS = 5;
+    private static final int START_COUNTDOWN_SECONDS = plugin.getEventConfig().getStartEvent().getCountDown();
     
     // 开始事件优先级
     private static final int START_EVENT_PRIORITY = 0;
@@ -42,15 +47,17 @@ public class GameStartEvent extends GameEvent {
     private static final double TRAP_TRIGGER_RANGE = 20.0;
     
     // 标题显示常量
-    private static final int TITLE_FADE_IN = 1;
-    private static final int TITLE_DURATION = 20;
-    private static final int TITLE_FADE_OUT = 1;
+    private static final String TITLE = plugin.getEventConfig().getStartEvent().getTitle().getTitleString();
+    private static final String SUBTITLE = plugin.getEventConfig().getStartEvent().getTitle().getSubtitle();
+    private static final int TITLE_FADE_IN = plugin.getEventConfig().getStartEvent().getTitle().getFadeIn();
+    private static final int TITLE_DURATION = plugin.getEventConfig().getStartEvent().getTitle().getTitleStay();
+    private static final int TITLE_FADE_OUT = plugin.getEventConfig().getStartEvent().getTitle().getFadeOut();
     
     /**
      * 创建游戏开始事件
      */
     public GameStartEvent() {
-        super("开始游戏", START_COUNTDOWN_SECONDS, START_EVENT_PRIORITY);
+        super(EVENT_NAME, START_COUNTDOWN_SECONDS, START_EVENT_PRIORITY);
     }
 
     /**
@@ -62,7 +69,7 @@ public class GameStartEvent extends GameEvent {
     @Override
     public void executeRunnable(GameManager gameManager, int seconds) {
         gameManager.broadcastSound(SoundWrapper.CLICK(), 1f, 1f);
-        gameManager.broadcastTitle(TITLE_FADE_IN, TITLE_DURATION, TITLE_FADE_OUT, "§c§l游戏即将开始", "§e§l" + seconds);
+        gameManager.broadcastTitle(TITLE_FADE_IN, TITLE_DURATION, TITLE_FADE_OUT, TITLE, SUBTITLE + seconds);
     }
 
     /**

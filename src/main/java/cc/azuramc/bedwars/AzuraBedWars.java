@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars;
 
 import cc.azuramc.bedwars.command.CommandRegistry;
+import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
@@ -77,6 +78,9 @@ public final class AzuraBedWars extends JavaPlugin {
     
     @Getter
     private SettingsConfig settingsConfig;
+
+    @Getter
+    private EventConfig eventConfig;
 
     @Override
     public void onEnable() {
@@ -362,12 +366,14 @@ public final class AzuraBedWars extends JavaPlugin {
         
         // 注册配置对象供应商
         configFactory.registerSupplier("settings", SettingsConfig::new);
+        configFactory.registerSupplier("events", EventConfig::new);
         
         // 初始化默认配置
         configFactory.initializeDefaults(configManager);
         
         // 获取配置对象
         settingsConfig = configManager.getConfig("settings", SettingsConfig.class);
+        eventConfig = configManager.getConfig("events", EventConfig.class);
         
         // 保存配置
         configManager.saveAll();

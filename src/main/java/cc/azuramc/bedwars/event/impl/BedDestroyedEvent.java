@@ -17,17 +17,20 @@ import java.util.logging.Level;
  * </p>
  */
 public class BedDestroyedEvent extends GameEvent {
+
+    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+
     // 事件相关常量
-    private static final String EVENT_NAME = "床自毁";
-    private static final int EXECUTE_SECONDS = 360; // 6分钟
+    private static final String EVENT_NAME = plugin.getEventConfig().getDestroyBedEvent().getEventName();
+    private static final int EXECUTE_SECONDS = plugin.getEventConfig().getDestroyBedEvent().getExecuteSecond();
     private static final int PRIORITY = 5;
     
     // 标题显示相关常量
-    private static final String TITLE = "§c§l床自毁";
-    private static final String SUBTITLE = "§e所有队伍床消失";
-    private static final int TITLE_FADE_IN = 10;
-    private static final int TITLE_STAY = 20;
-    private static final int TITLE_FADE_OUT = 10;
+    private static final String TITLE = plugin.getEventConfig().getDestroyBedEvent().getTitle().getTitleString();
+    private static final String SUBTITLE = plugin.getEventConfig().getDestroyBedEvent().getTitle().getSubtitle();
+    private static final int TITLE_FADE_IN = plugin.getEventConfig().getDestroyBedEvent().getTitle().getFadeIn();
+    private static final int TITLE_STAY = plugin.getEventConfig().getDestroyBedEvent().getTitle().getTitleStay();
+    private static final int TITLE_FADE_OUT = plugin.getEventConfig().getDestroyBedEvent().getTitle().getFadeOut();
 
     /**
      * 创建床自毁事件

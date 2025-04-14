@@ -20,7 +20,7 @@ import java.util.Objects;
  * 处理游戏结束后的逻辑，包括胜利消息显示、烟花效果、排行榜展示和服务器重启
  * </p>
  */
-public class GameLoopTask extends BukkitRunnable {
+public class GameOverTask extends BukkitRunnable {
     // 游戏结束倒计时时间(秒)
     private static final int DEFAULT_COUNTDOWN = 15;
     
@@ -58,7 +58,7 @@ public class GameLoopTask extends BukkitRunnable {
      *
      * @param gameManager 游戏实例
      */
-    public GameLoopTask(GameManager gameManager) {
+    public GameOverTask(GameManager gameManager) {
         this.gameManager = gameManager;
         this.runTaskTimer(AzuraBedWars.getInstance(), 0L, 20L);
     }

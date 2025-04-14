@@ -1,8 +1,9 @@
 package cc.azuramc.bedwars.event.impl;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameOverEvent;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.task.GameLoopTask;
+import cc.azuramc.bedwars.game.task.GameOverTask;
 import cc.azuramc.bedwars.event.GameEvent;
 import org.bukkit.Bukkit;
 
@@ -11,13 +12,23 @@ import org.bukkit.Bukkit;
  * 负责处理游戏结束时的逻辑，包括显示结束信息和切换到下一个事件
  */
 public class GameOverEvent extends GameEvent {
+
+    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+
+    private static final String EVENT_NAME = plugin.getEventConfig().getOverEvent().getEventName();
+
+    private static final int EXECUTE_SECOND = plugin.getEventConfig().getOverEvent().getExecuteSecond();
+
+    private static final int END_EVENT_PRIORITY = 6;
+
+
     public GameOverEvent() {
-        super("游戏结束", 600, 6);
+        super(EVENT_NAME, EXECUTE_SECOND, END_EVENT_PRIORITY);
     }
 
     public void execute(GameManager gameManager) {
         gameManager.getGameEventManager().setCurrentEvent(7);
         Bukkit.getPluginManager().callEvent(new BedwarsGameOverEvent(gameManager.getWinner()));
-        new GameLoopTask(gameManager);
+        new GameOverTask(gameManager);
     }
 }

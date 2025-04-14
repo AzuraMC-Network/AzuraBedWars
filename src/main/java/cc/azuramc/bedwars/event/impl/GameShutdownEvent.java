@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.event.impl;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.GameEvent;
@@ -10,10 +11,14 @@ import org.bukkit.Bukkit;
  * 游戏结束事件
  * 处理游戏结束时需要执行的清理工作和关服操作
  */
-public class GameEndEvent extends GameEvent {
+public class GameShutdownEvent extends GameEvent {
+
+    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+
+    private static final String EVENT_NAME = plugin.getEventConfig().getShutdownEvent().getEventName();
     
     // 游戏结束延迟关服时间（秒）
-    private static final int SHUTDOWN_DELAY_SECONDS = 30;
+    private static final int SHUTDOWN_DELAY_SECONDS = plugin.getEventConfig().getShutdownEvent().getShutdownDelaySecond();
     
     // 事件优先级（在所有事件结束后触发）
     private static final int END_EVENT_PRIORITY = 7;
@@ -21,8 +26,8 @@ public class GameEndEvent extends GameEvent {
     /**
      * 创建游戏结束事件
      */
-    public GameEndEvent() {
-        super("游戏结束！", SHUTDOWN_DELAY_SECONDS, END_EVENT_PRIORITY);
+    public GameShutdownEvent() {
+        super(EVENT_NAME, SHUTDOWN_DELAY_SECONDS, END_EVENT_PRIORITY);
     }
 
     /**
