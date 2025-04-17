@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.game.task;
 
+import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
@@ -21,33 +22,36 @@ import java.util.Objects;
  * </p>
  */
 public class GameOverTask extends BukkitRunnable {
+
+    private static final TaskConfig.GameOverConfig config = AzuraBedWars.getInstance().getTaskConfig().getGameOver();
+
     // 游戏结束倒计时时间(秒)
-    private static final int DEFAULT_COUNTDOWN = 15;
+    private static final int DEFAULT_COUNTDOWN = config.getDefaultCountdown();
     
     // 标题显示配置
-    private static final int TITLE_FADE_IN = 0;
-    private static final int TITLE_STAY = 40;
-    private static final int TITLE_FADE_OUT = 0;
+    private static final int TITLE_FADE_IN = config.getTitleFadeIn();
+    private static final int TITLE_STAY = config.getTitleStay();
+    private static final int TITLE_FADE_OUT = config.getTitleFadeOut();
     
     // 服务器关闭延迟(ticks)
-    private static final long SHUTDOWN_DELAY = 40L;
+    private static final long SHUTDOWN_DELAY = config.getShutdownDelay();
     
     // 烟花高度
-    private static final double FIREWORK_HEIGHT = 2.0D;
+    private static final double FIREWORK_HEIGHT = config.getFireworkHeight();
     
     // 胜利/失败消息
-    private static final String VICTORY_TITLE = "§6§l获胜！";
-    private static final String VICTORY_SUBTITLE = "§7你获得了最终的胜利";
-    private static final String DEFEAT_TITLE = "§c§l失败！";
-    private static final String DEFEAT_SUBTITLE = "§7你输掉了这场游戏";
+    private static final String VICTORY_TITLE = config.getVictoryTitle();
+    private static final String VICTORY_SUBTITLE = config.getVictorySubtitle();
+    private static final String DEFEAT_TITLE = config.getDefeatTitle();
+    private static final String DEFEAT_SUBTITLE = config.getDefeatSubtitle();
     
     // 排行榜标题及分隔线
-    private static final String[] lead = {"§e§l击杀数第一名", "§6§l击杀数第二名", "§c§l击杀数第三名"};
-    private static final String SEPARATOR_LINE = "§a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
-    private static final String GAME_TITLE = "§f                                              §l起床战争";
-    private static final String WINNERS_PREFIX = "                                    §e胜利者 §7- ";
-    private static final String NO_WINNER = "§7无";
-    private static final String RANK_PREFIX = "                          ";
+    private static final String[] lead = config.getLead();
+    private static final String SEPARATOR_LINE = config.getSeparatorLine();
+    private static final String GAME_TITLE = config.getGameTitle();
+    private static final String WINNERS_PREFIX = config.getWinnersPrefix();
+    private static final String NO_WINNER = config.getNoWinner();
+    private static final String RANK_PREFIX = config.getRankPrefix();
     
     private final GameManager gameManager;
     private int countdown = DEFAULT_COUNTDOWN;

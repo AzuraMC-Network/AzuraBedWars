@@ -1,5 +1,7 @@
 package cc.azuramc.bedwars.game.task;
 
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -16,29 +18,27 @@ import org.bukkit.scheduler.BukkitRunnable;
  * </p>
  */
 public class GameStartTask extends BukkitRunnable {
+
+    private static final TaskConfig.GameStartConfig config = AzuraBedWars.getInstance().getTaskConfig().getGameStart();
+
     // 倒计时常量
-    private static final int DEFAULT_COUNTDOWN = 120; // 默认倒计时时间(秒)
-    private static final int QUICK_START_COUNTDOWN = 10; // 人满时的快速开始时间
+    private static final int DEFAULT_COUNTDOWN = config.getDefaultCountdown();
+    private static final int QUICK_START_COUNTDOWN = config.getQuickStartCountdown();
     
     // 公告时间点
-    private static final int[] ANNOUNCEMENT_TIMES = {60, 30, 5, 4, 3, 2, 1};
+    private static final int[] ANNOUNCEMENT_TIMES = config.getAnnouncementTimes();
     
     // 标题显示配置
-    private static final int TITLE_FADE_IN = 1;
-    private static final int TITLE_STAY = 20;
-    private static final int TITLE_FADE_OUT = 1;
-    
-    // 消息颜色
-    private static final String MESSAGE_PREFIX = "§e";
-    private static final String TIME_COLOR = "§c";
-    private static final String ERROR_COLOR = "§c";
+    private static final String TITLE_COUNTDOWN = config.getTitle().getTitleCountdown();
+    private static final String SUBTITLE_TEXT = config.getTitle().getSubtitleText();
+    private static final int TITLE_FADE_IN = config.getTitle().getFadeIn();
+    private static final int TITLE_STAY = config.getTitle().getTitleStay();
+    private static final int TITLE_FADE_OUT = config.getTitle().getFadeOut();
     
     // 消息模板
-    private static final String MSG_COUNTDOWN = MESSAGE_PREFIX + "游戏将在" + TIME_COLOR + "%d" + MESSAGE_PREFIX + "秒后开始！";
-    private static final String MSG_NOT_ENOUGH_PLAYERS = ERROR_COLOR + "人数不足，取消倒计时！";
-    private static final String MSG_GAME_FULL = MESSAGE_PREFIX + "游戏人数已满," + QUICK_START_COUNTDOWN + "秒后开始游戏！";
-    private static final String TITLE_COUNTDOWN = TIME_COLOR + "§l%d";
-    private static final String SUBTITLE_TEXT = "§e§l准备战斗吧！";
+    private static final String MSG_COUNTDOWN = config.getMsgCountdown();
+    private static final String MSG_NOT_ENOUGH_PLAYERS = config.getMsgNotEnoughPlayers();
+    private static final String MSG_GAME_FULL = config.getMsgGameFull();
 
     private final GameManager gameManager;
     

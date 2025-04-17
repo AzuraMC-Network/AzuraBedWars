@@ -44,6 +44,15 @@ public final class ChatColorUtil {
         return toReturn;
     }
 
+    public static String[] color(String[] lines) {
+        String[] colored = new String[lines.length];
+        for (int i = 0; i < lines.length; i++) {
+            colored[i] = ChatColor.translateAlternateColorCodes('&', lines[i]);
+        }
+        return colored;
+    }
+
+
     public static String parse(Player player, String string) {
         if (usingPlaceholderAPI) {
             try {
