@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.event.GameEvent;
 import cc.azuramc.bedwars.compat.util.BedUtil;
+import cc.azuramc.bedwars.config.object.EventConfig;
 import java.util.logging.Level;
 
 /**
@@ -19,18 +20,19 @@ import java.util.logging.Level;
 public class BedDestroyedEvent extends GameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+    private static final EventConfig.DestroyBedEvent config = plugin.getEventConfig().getDestroyBedEvent();
 
     // 事件相关常量
-    private static final String EVENT_NAME = plugin.getEventConfig().getDestroyBedEvent().getEventName();
-    private static final int EXECUTE_SECONDS = plugin.getEventConfig().getDestroyBedEvent().getExecuteSecond();
+    private static final String EVENT_NAME = config.getEventName();
+    private static final int EXECUTE_SECONDS = config.getExecuteSecond();
     private static final int PRIORITY = 5;
     
     // 标题显示相关常量
-    private static final String TITLE = plugin.getEventConfig().getDestroyBedEvent().getTitle().getTitleString();
-    private static final String SUBTITLE = plugin.getEventConfig().getDestroyBedEvent().getTitle().getSubtitle();
-    private static final int TITLE_FADE_IN = plugin.getEventConfig().getDestroyBedEvent().getTitle().getFadeIn();
-    private static final int TITLE_STAY = plugin.getEventConfig().getDestroyBedEvent().getTitle().getTitleStay();
-    private static final int TITLE_FADE_OUT = plugin.getEventConfig().getDestroyBedEvent().getTitle().getFadeOut();
+    private static final String TITLE = config.getTitle().getTitleString();
+    private static final String SUBTITLE = config.getTitle().getSubtitle();
+    private static final int TITLE_FADE_IN = config.getTitle().getFadeIn();
+    private static final int TITLE_STAY = config.getTitle().getTitleStay();
+    private static final int TITLE_FADE_OUT = config.getTitle().getFadeOut();
 
     /**
      * 创建床自毁事件

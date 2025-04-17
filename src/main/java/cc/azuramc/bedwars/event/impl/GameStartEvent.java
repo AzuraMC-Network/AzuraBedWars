@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
@@ -21,43 +22,13 @@ import java.util.Objects;
 public class GameStartEvent extends GameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+    private static final EventConfig.StartEvent config = plugin.getEventConfig().getStartEvent();
 
-    private static final String EVENT_NAME = plugin.getEventConfig().getStartEvent().getEventName();
-
-    // 游戏开始倒计时时间（秒）
-    private static final int START_COUNTDOWN_SECONDS = plugin.getEventConfig().getStartEvent().getCountDown();
-    
-    // 开始事件优先级
-    private static final int START_EVENT_PRIORITY = 0;
-    
-    // 团队升级任务名称
-    private static final String TEAM_UPGRADE_TASK_NAME = "团队升级";
-    
-    // 药水效果相关常量
-    private static final int HASTE_EFFECT_DURATION = 40;
-    private static final int REGENERATION_EFFECT_DURATION = 60;
-    private static final int REGENERATION_EFFECT_AMPLIFIER = 1;
-    private static final int TRAP_EFFECT_DURATION = 200;
-    private static final int TRAP_EFFECT_AMPLIFIER = 1;
-    private static final int MINING_FATIGUE_EFFECT_DURATION = 200;
-    private static final int MINING_FATIGUE_EFFECT_AMPLIFIER = 0;
-    
-    // 距离阈值常量
-    private static final double HEALING_POOL_RANGE = 7.0;
-    private static final double TRAP_TRIGGER_RANGE = 20.0;
-    
-    // 标题显示常量
-    private static final String TITLE = plugin.getEventConfig().getStartEvent().getTitle().getTitleString();
-    private static final String SUBTITLE = plugin.getEventConfig().getStartEvent().getTitle().getSubtitle();
-    private static final int TITLE_FADE_IN = plugin.getEventConfig().getStartEvent().getTitle().getFadeIn();
-    private static final int TITLE_DURATION = plugin.getEventConfig().getStartEvent().getTitle().getTitleStay();
-    private static final int TITLE_FADE_OUT = plugin.getEventConfig().getStartEvent().getTitle().getFadeOut();
-    
     /**
      * 创建游戏开始事件
      */
     public GameStartEvent() {
-        super(EVENT_NAME, START_COUNTDOWN_SECONDS, START_EVENT_PRIORITY);
+        super(config.getEventName(), config.getCountDown(), config.getEventPriority());
     }
 
     /**
@@ -69,7 +40,13 @@ public class GameStartEvent extends GameEvent {
     @Override
     public void executeRunnable(GameManager gameManager, int seconds) {
         gameManager.broadcastSound(SoundWrapper.CLICK(), 1f, 1f);
-        gameManager.broadcastTitle(TITLE_FADE_IN, TITLE_DURATION, TITLE_FADE_OUT, TITLE, SUBTITLE + seconds);
+        gameManager.broadcastTitle(
+            config.getTitle().getFadeIn(),
+            config.getTitle().getTitleStay(),
+            config.getTitle().getFadeOut(),
+            config.getTitle().getTitleString(),
+            config.getTitle().getSubtitle() + seconds
+        );
     }
 
     /**
@@ -80,11 +57,8 @@ public class GameStartEvent extends GameEvent {
      */
     @Override
     public void execute(GameManager gameManager) {
-
         registerTeamUpgradeTask(gameManager);
-
         startResourceGenerators(gameManager);
-
         startCompassTracking();
     }
     
@@ -94,7 +68,7 @@ public class GameStartEvent extends GameEvent {
      * @param gameManager 游戏实例
      */
     private void registerTeamUpgradeTask(GameManager gameManager) {
-        gameManager.getGameEventManager().registerRunnable(TEAM_UPGRADE_TASK_NAME, (s, c) ->
+        gameManager.getGameEventManager().registerRunnable(config.getTeamUpgradeTaskName(), (s, c) ->
             GamePlayer.getOnlinePlayers().forEach(player -> {
                 if (player.isSpectator()) {
                     return;
@@ -135,8 +109,9 @@ public class GameStartEvent extends GameEvent {
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player -> {
             PotionEffectType fastDigging = PotionEffectWrapper.HASTE();
             if (fastDigging != null) {
-                player.getPlayer().addPotionEffect(new PotionEffect(fastDigging, HASTE_EFFECT_DURATION, 
-                        gameTeam.getManicMiner()));
+                player.getPlayer().addPotionEffect(new PotionEffect(fastDigging, 
+                    config.getUpgrade().getHasteEffectDuration(), 
+                    gameTeam.getManicMiner()));
             }
         })));
     }
@@ -150,12 +125,13 @@ public class GameStartEvent extends GameEvent {
     private void applyHealingPoolEffect(GamePlayer player, GameTeam gameTeam) {
         double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawn());
         
-        if (distance <= HEALING_POOL_RANGE && gameTeam.isHealPool()) {
+        if (distance <= config.getUpgrade().getHealingPoolRange() && gameTeam.isHealPool()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType regeneration = PotionEffectWrapper.REGENERATION();
                 if (regeneration != null) {
                     player.getPlayer().addPotionEffect(new PotionEffect(regeneration, 
-                            REGENERATION_EFFECT_DURATION, REGENERATION_EFFECT_AMPLIFIER));
+                        config.getUpgrade().getRegenerationEffectDuration(),
+                        config.getUpgrade().getRegenerationEffectAmplifier()));
                 }
             });
         }
@@ -170,7 +146,7 @@ public class GameStartEvent extends GameEvent {
     private void handleEnemyInTeamTerritory(GamePlayer player, GameTeam gameTeam) {
         double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawn());
         
-        if (distance <= TRAP_TRIGGER_RANGE && !gameTeam.isDead()) {
+        if (distance <= config.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
             // 触发普通陷阱
             if (gameTeam.isTrap()) {
                 triggerTrap(player, gameTeam);
@@ -197,7 +173,8 @@ public class GameStartEvent extends GameEvent {
             PotionEffectType blindness = PotionEffectWrapper.BLINDNESS();
             if (blindness != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(blindness, 
-                        TRAP_EFFECT_DURATION, TRAP_EFFECT_AMPLIFIER));
+                    config.getUpgrade().getTrapEffectDuration(),
+                    config.getUpgrade().getTrapEffectAmplifier()));
             }
         });
 
@@ -206,7 +183,8 @@ public class GameStartEvent extends GameEvent {
             PotionEffectType slowness = PotionEffectWrapper.SLOWNESS();
             if (slowness != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(slowness, 
-                        TRAP_EFFECT_DURATION, TRAP_EFFECT_AMPLIFIER));
+                    config.getUpgrade().getTrapEffectDuration(),
+                    config.getUpgrade().getTrapEffectAmplifier()));
             }
         });
 
@@ -228,7 +206,8 @@ public class GameStartEvent extends GameEvent {
             PotionEffectType miningFatigue = PotionEffectWrapper.MINING_FATIGUE();
             if (miningFatigue != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(miningFatigue, 
-                        MINING_FATIGUE_EFFECT_DURATION, MINING_FATIGUE_EFFECT_AMPLIFIER));
+                    config.getUpgrade().getMiningFatigueEffectDuration(),
+                    config.getUpgrade().getMiningFatigueEffectAmplifier()));
             }
         });
         gameTeam.setMiner(false);

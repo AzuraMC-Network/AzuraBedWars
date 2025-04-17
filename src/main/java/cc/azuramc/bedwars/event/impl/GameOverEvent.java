@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameOverEvent;
+import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.task.GameOverTask;
 import cc.azuramc.bedwars.event.GameEvent;
@@ -14,16 +15,10 @@ import org.bukkit.Bukkit;
 public class GameOverEvent extends GameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
-
-    private static final String EVENT_NAME = plugin.getEventConfig().getOverEvent().getEventName();
-
-    private static final int EXECUTE_SECOND = plugin.getEventConfig().getOverEvent().getExecuteSecond();
-
-    private static final int END_EVENT_PRIORITY = 6;
-
+    private static final EventConfig.OverEvent config = plugin.getEventConfig().getOverEvent();
 
     public GameOverEvent() {
-        super(EVENT_NAME, EXECUTE_SECOND, END_EVENT_PRIORITY);
+        super(config.getEventName(), config.getExecuteSecond(), 6);
     }
 
     public void execute(GameManager gameManager) {

@@ -40,7 +40,7 @@ public class GameEventManager extends TimerTask {
     
     // 定时任务和事件映射
     @Getter
-    private final HashMap<String, GameEventRunnable> runnables = new HashMap<>();
+    private final HashMap<String, GameEventRunnable> runnable = new HashMap<>();
     private final HashMap<Integer, GameEvent> events = new HashMap<>();
     
     // 计时器和状态变量
@@ -141,7 +141,7 @@ public class GameEventManager extends TimerTask {
      * 处理周期性任务
      */
     private void processRunnableTasks() {
-        runnables.values().forEach(runnable -> {
+        runnable.values().forEach(runnable -> {
             if (runnable.getSeconds() != 0) {
                 // 周期性任务
                 if (runnable.getNextSeconds() == runnable.getSeconds()) {
@@ -201,7 +201,7 @@ public class GameEventManager extends TimerTask {
      * @param runnable 任务执行逻辑
      */
     public void registerRunnable(String name, GameEventRunnable.Event runnable) {
-        this.runnables.put(name, new GameEventRunnable(0, 0, runnable));
+        this.runnable.put(name, new GameEventRunnable(0, 0, runnable));
     }
 
     /**
@@ -212,7 +212,7 @@ public class GameEventManager extends TimerTask {
      * @param seconds 执行周期（秒）
      */
     public void registerRunnable(String name, GameEventRunnable.Event runnable, int seconds) {
-        this.runnables.put(name, new GameEventRunnable(seconds, 0, runnable));
+        this.runnable.put(name, new GameEventRunnable(seconds, 0, runnable));
     }
 
     /**

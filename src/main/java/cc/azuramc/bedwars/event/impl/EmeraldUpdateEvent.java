@@ -44,7 +44,7 @@ public class EmeraldUpdateEvent extends GameEvent {
     @Override
     public void execute(GameManager gameManager) {
         // 获取绿宝石刷新任务
-        GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnables().get(EVENT_NAME);
+        GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().get(EVENT_NAME);
         if (gameEventRunnable == null) {
             return; // 防止NPE
         }

@@ -365,7 +365,7 @@ public class GeneratorTask {
     private void updateTimeDisplay(ArmorStand armorStand, String generatorName) {
         if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
             int timeRemaining = 0;
-            GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnables().getOrDefault(generatorName, null);
+            GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().getOrDefault(generatorName, null);
             
             if (gameEventRunnable != null) {
                 timeRemaining = gameEventRunnable.getSeconds() - gameEventRunnable.getNextSeconds();

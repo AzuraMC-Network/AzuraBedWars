@@ -70,8 +70,11 @@ public class EventConfig {
     public static class StartEvent {
 
         private Title title;
+        private Upgrade upgrade;
         private String eventName = ChatColorUtil.color("开始游戏");
         private int countDown = 5;
+        private int eventPriority = 0;
+        private String teamUpgradeTaskName = "团队升级";
 
         @Data
         public static class Title {
@@ -80,6 +83,20 @@ public class EventConfig {
             private int fadeIn = 1;
             private int titleStay = 20;
             private int fadeOut = 1;
+        }
+
+        @Data
+        public static class Upgrade {
+            private double healingPoolRange = 7.0;
+            private double trapTriggerRange = 20.0;
+
+            private int hasteEffectDuration = 40;
+            private int regenerationEffectDuration = 60;
+            private int regenerationEffectAmplifier = 1;
+            private int trapEffectDuration = 200;
+            private int trapEffectAmplifier = 1;
+            private int miningFatigueEffectDuration = 200;
+            private int miningFatigueEffectAmplifier = 0;
         }
     }
 
