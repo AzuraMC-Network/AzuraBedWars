@@ -67,6 +67,11 @@ public class ItemShopGUI extends CustomGUI {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
 
+        // 检查是否有DIYShop，如果没有则优先打开DefaultShop
+        if (slot == 0 && !hasDIYShop(playerProfile)) {
+            slot = 1; // 默认打开第一个非DIYShop的商店
+        }
+
         // 初始化商店导航栏
         initializeShopNavbar(player, slot, gameManager);
         
@@ -80,6 +85,26 @@ public class ItemShopGUI extends CustomGUI {
         } else {
             initializeRegularShop(gamePlayer, shopData, slot, gameManager);
         }
+    }
+
+    /**
+     * 检查玩家是否有DIYShop
+     * @param playerProfile 玩家档案
+     * @return 是否有DIYShop
+     */
+    private boolean hasDIYShop(PlayerProfile playerProfile) {
+        String[] shopSort = playerProfile.getShopSort();
+        if (shopSort == null || shopSort.length == 0) {
+            return false;
+        }
+        
+        // 检查是否有非"AIR"的槽位
+        for (String shopItemCode : shopSort) {
+            if (!shopItemCode.equals("AIR")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
