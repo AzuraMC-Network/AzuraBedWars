@@ -12,14 +12,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class TaskConfig {
 
-    // 资源生成器配置
-    private final GeneratorConfig generator;
-
-    // 游戏开始倒计时配置
-    private final GameStartConfig gameStart;
-
-    // 游戏结束倒计时配置
-    private final GameOverConfig gameOver;
+    private GeneratorConfig generator = new GeneratorConfig();
+    private GameStartConfig gameStart = new GameStartConfig();
+    private GameOverConfig gameOver = new GameOverConfig();
 
     /**
      * 资源生成器配置
@@ -27,8 +22,8 @@ public class TaskConfig {
     @Data
     public static class GeneratorConfig {
         // 资源生成时间间隔(秒)
-        private int ironSpawnInterval = 2;
-        private int goldSpawnInterval = 6;
+        private int ironSpawnInterval = 1;
+        private int goldSpawnInterval = 4;
         private int diamondSpawnInterval = 30;
         private int emeraldSpawnInterval = 55;
 
@@ -87,7 +82,7 @@ public class TaskConfig {
     @Data
     public static class GameStartConfig {
         // 倒计时常量
-        private Title title;
+        private Title title = new Title();
         private int defaultCountdown = 120;
         private int quickStartCountdown = 10;
 
@@ -116,31 +111,31 @@ public class TaskConfig {
     @Data
     public static class GameOverConfig {
         // 游戏结束倒计时时间(秒)
-        private final int defaultCountdown = 15;
+        private int defaultCountdown = 15;
 
         // 标题显示配置
-        private final int titleFadeIn = 0;
-        private final int titleStay = 40;
-        private final int titleFadeOut = 0;
+        private int titleFadeIn = 0;
+        private int titleStay = 40;
+        private int titleFadeOut = 0;
 
         // 服务器关闭延迟(ticks)
-        private final long shutdownDelay = 40L;
+        private long shutdownDelay = 40L;
 
         // 烟花高度
-        private final double fireworkHeight = 2.0D;
+        private double fireworkHeight = 2.0D;
 
         // 胜利/失败消息
-        private final String victoryTitle = ChatColorUtil.color("§6§l获胜！");
-        private final String victorySubtitle = ChatColorUtil.color("§7你获得了最终的胜利");
-        private final String defeatTitle = ChatColorUtil.color("§c§l失败！");
-        private final String defeatSubtitle = ChatColorUtil.color("§7你输掉了这场游戏");
+        private String victoryTitle = ChatColorUtil.color("§6§l获胜！");
+        private String victorySubtitle = ChatColorUtil.color("§7你获得了最终的胜利");
+        private String defeatTitle = ChatColorUtil.color("§c§l失败！");
+        private String defeatSubtitle = ChatColorUtil.color("§7你输掉了这场游戏");
 
         // 排行榜标题及分隔线
-        private final String[] lead = ChatColorUtil.color(new String[]{"§e§l击杀数第一名", "§6§l击杀数第二名", "§c§l击杀数第三名"});
-        private final String separatorLine = ChatColorUtil.color("§a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        private final String gameTitle = ChatColorUtil.color("§f                                              §l起床战争");
-        private final String winnersPrefix = ChatColorUtil.color("                                    §e胜利者 §7- ");
-        private final String noWinner = ChatColorUtil.color("§7无");
-        private final String rankPrefix = ChatColorUtil.color("                          ");
+        private String[] lead = ChatColorUtil.color(new String[]{"§e§l击杀数第一名", "§6§l击杀数第二名", "§c§l击杀数第三名"});
+        private String separatorLine = ChatColorUtil.color("§a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+        private String gameTitle = ChatColorUtil.color("§f                                              §l起床战争");
+        private String winnersPrefix = ChatColorUtil.color("                                    §e胜利者 §7- ");
+        private String noWinner = ChatColorUtil.color("§7无");
+        private String rankPrefix = ChatColorUtil.color("                          ");
     }
 } 

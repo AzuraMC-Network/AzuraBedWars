@@ -30,59 +30,58 @@ public class GeneratorTask {
     private final GameManager gameManager;
     private boolean timer;
     private int taskId = -1;
-    private static final TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
-    
+
     // 资源生成时间间隔（秒）
-    private static final int IRON_SPAWN_INTERVAL = config.getIronSpawnInterval();
-    private static final int GOLD_SPAWN_INTERVAL = config.getGoldSpawnInterval();
-    private static final int DIAMOND_SPAWN_INTERVAL = config.getDiamondSpawnInterval();
-    private static final int EMERALD_SPAWN_INTERVAL = config.getEmeraldSpawnInterval();
+    private final int IRON_SPAWN_INTERVAL;
+    private final int GOLD_SPAWN_INTERVAL;
+    private final int DIAMOND_SPAWN_INTERVAL;
+    private final int EMERALD_SPAWN_INTERVAL;
     
     // 基础资源生成最大堆叠数量（一级）
-    private static final int MAX_IRON_STACK_LEVEL_1 = config.getMaxIronStackLevel1();
-    private static final int MAX_GOLD_STACK_LEVEL_1 = config.getMaxGoldStackLevel1();
-    private static final int MAX_DIAMOND_STACK_LEVEL_1 = config.getMaxDiamondStackLevel1();
-    private static final int MAX_EMERALD_STACK_LEVEL_1 = config.getMaxEmeraldStackLevel1();
+    private final int MAX_IRON_STACK_LEVEL_1;
+    private final int MAX_GOLD_STACK_LEVEL_1;
+    private final int MAX_DIAMOND_STACK_LEVEL_1;
+    private final int MAX_EMERALD_STACK_LEVEL_1;
     
     // 二级资源生成最大堆叠数量
-    private static final int MAX_IRON_STACK_LEVEL_2 = config.getMaxIronStackLevel2();
-    private static final int MAX_GOLD_STACK_LEVEL_2 = config.getMaxGoldStackLevel2();
-    private static final int MAX_DIAMOND_STACK_LEVEL_2 = config.getMaxDiamondStackLevel2();
-    private static final int MAX_EMERALD_STACK_LEVEL_2 = config.getMaxEmeraldStackLevel2();
+    private final int MAX_IRON_STACK_LEVEL_2;
+    private final int MAX_GOLD_STACK_LEVEL_2;
+    private final int MAX_DIAMOND_STACK_LEVEL_2;
+    private final int MAX_EMERALD_STACK_LEVEL_2;
     
     // 三级资源生成最大堆叠数量
-    private static final int MAX_IRON_STACK_LEVEL_3 = config.getMaxIronStackLevel3();
-    private static final int MAX_GOLD_STACK_LEVEL_3 = config.getMaxGoldStackLevel3();
-    private static final int MAX_DIAMOND_STACK_LEVEL_3 = config.getMaxDiamondStackLevel3();
-    private static final int MAX_EMERALD_STACK_LEVEL_3 = config.getMaxDiamondStackLevel3();
+    private final int MAX_IRON_STACK_LEVEL_3;
+    private final int MAX_GOLD_STACK_LEVEL_3;
+    private final int MAX_DIAMOND_STACK_LEVEL_3;
+    private final int MAX_EMERALD_STACK_LEVEL_3;
     
     // 检测资源周围范围（方块）
-    private static final double RESOURCE_CHECK_RADIUS = config.getResourceCheckRadius();
+    private final double RESOURCE_CHECK_RADIUS;
     
     // 盔甲架标识
-    private static final float NAME_DISPLAY_HEIGHT = config.getNameDisplayHeight();
-    private static final float RESOURCE_TYPE_HEIGHT = config.getResourceTypeHeight();
-    private static final float LEVEL_DISPLAY_HEIGHT = config.getLevelDisplayHeight();
+    private final float NAME_DISPLAY_HEIGHT;
+    private final float RESOURCE_TYPE_HEIGHT;
+    private final float LEVEL_DISPLAY_HEIGHT;
     
     // 资源名称
-    private static final String IRON_GENERATOR_NAME = config.getIronGeneratorName();
-    private static final String GOLD_GENERATOR_NAME = config.getGoldGeneratorName();
-    private static final String DIAMOND_GENERATOR_NAME = config.getDiamondGeneratorName();
-    private static final String DIAMOND_TIME_DISPLAY = config.getDiamondTimeDisplay();
-    private static final String EMERALD_GENERATOR_NAME = config.getIronGeneratorName();
-    private static final String EMERALD_TIME_DISPLAY = config.getEmeraldTimeDisplay();
+    private final String IRON_GENERATOR_NAME;
+    private final String GOLD_GENERATOR_NAME;
+    private final String DIAMOND_GENERATOR_NAME;
+    private final String DIAMOND_TIME_DISPLAY;
+    private final String EMERALD_GENERATOR_NAME;
+    private final String EMERALD_TIME_DISPLAY;
     
     // 显示文本
-    private static final String TIME_REMAINING_FORMAT = config.getTimeRemainingFormat();
-    private static final String DIAMOND_NAME = config.getDiamondName();
-    private static final String EMERALD_NAME = config.getEmeraldGeneratorName();
-    private static final String LEVEL_I = config.getLevelI();
-    private static final String LEVEL_II = config.getLevelII();
-    private static final String LEVEL_III = config.getLevelIII();
+    private final String TIME_REMAINING_FORMAT;
+    private final String DIAMOND_NAME;
+    private final String EMERALD_NAME;
+    private final String LEVEL_I;
+    private final String LEVEL_II;
+    private final String LEVEL_III;
     
     // 物品属性
-    private static final String ITEM_DISPLAY_NAME = config.getItemDisplayName();
-    private static final Vector ITEM_VELOCITY = new Vector(config.getItemVelocityX(), config.getItemVelocityY(), config.getItemVelocityZ());
+    private final String ITEM_DISPLAY_NAME;
+    private final Vector ITEM_VELOCITY;
 
     /**
      * 创建资源生成计时器
@@ -91,6 +90,51 @@ public class GeneratorTask {
      */
     public GeneratorTask(GameManager gameManager) {
         this.gameManager = gameManager;
+        TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
+
+        // 初始化所有配置值
+        IRON_SPAWN_INTERVAL = config.getIronSpawnInterval();
+        GOLD_SPAWN_INTERVAL = config.getGoldSpawnInterval();
+        DIAMOND_SPAWN_INTERVAL = config.getDiamondSpawnInterval();
+        EMERALD_SPAWN_INTERVAL = config.getEmeraldSpawnInterval();
+
+        MAX_IRON_STACK_LEVEL_1 = config.getMaxIronStackLevel1();
+        MAX_GOLD_STACK_LEVEL_1 = config.getMaxGoldStackLevel1();
+        MAX_DIAMOND_STACK_LEVEL_1 = config.getMaxDiamondStackLevel1();
+        MAX_EMERALD_STACK_LEVEL_1 = config.getMaxEmeraldStackLevel1();
+
+        MAX_IRON_STACK_LEVEL_2 = config.getMaxIronStackLevel2();
+        MAX_GOLD_STACK_LEVEL_2 = config.getMaxGoldStackLevel2();
+        MAX_DIAMOND_STACK_LEVEL_2 = config.getMaxDiamondStackLevel2();
+        MAX_EMERALD_STACK_LEVEL_2 = config.getMaxEmeraldStackLevel2();
+
+        MAX_IRON_STACK_LEVEL_3 = config.getMaxIronStackLevel3();
+        MAX_GOLD_STACK_LEVEL_3 = config.getMaxGoldStackLevel3();
+        MAX_DIAMOND_STACK_LEVEL_3 = config.getMaxDiamondStackLevel3();
+        MAX_EMERALD_STACK_LEVEL_3 = config.getMaxEmeraldStackLevel3();
+
+        RESOURCE_CHECK_RADIUS = config.getResourceCheckRadius();
+
+        NAME_DISPLAY_HEIGHT = config.getNameDisplayHeight();
+        RESOURCE_TYPE_HEIGHT = config.getResourceTypeHeight();
+        LEVEL_DISPLAY_HEIGHT = config.getLevelDisplayHeight();
+
+        IRON_GENERATOR_NAME = config.getIronGeneratorName();
+        GOLD_GENERATOR_NAME = config.getGoldGeneratorName();
+        DIAMOND_GENERATOR_NAME = config.getDiamondGeneratorName();
+        DIAMOND_TIME_DISPLAY = config.getDiamondTimeDisplay();
+        EMERALD_GENERATOR_NAME = config.getEmeraldGeneratorName();
+        EMERALD_TIME_DISPLAY = config.getEmeraldTimeDisplay();
+
+        TIME_REMAINING_FORMAT = config.getTimeRemainingFormat();
+        DIAMOND_NAME = config.getDiamondName();
+        EMERALD_NAME = config.getEmeraldName();
+        LEVEL_I = config.getLevelI();
+        LEVEL_II = config.getLevelII();
+        LEVEL_III = config.getLevelIII();
+
+        ITEM_DISPLAY_NAME = config.getItemDisplayName();
+        ITEM_VELOCITY = new Vector(config.getItemVelocityX(), config.getItemVelocityY(), config.getItemVelocityZ());
     }
 
     /**

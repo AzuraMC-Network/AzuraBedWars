@@ -89,7 +89,6 @@ public final class AzuraBedWars extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        saveDefaultConfig();
         long startTime = System.currentTimeMillis();
         
         // 初始化基础服务
@@ -371,7 +370,7 @@ public final class AzuraBedWars extends JavaPlugin {
         // 注册配置对象供应商
         configFactory.registerSupplier("settings", SettingsConfig::new);
         configFactory.registerSupplier("events", EventConfig::new);
-        configFactory.registerSupplier("tasks", Throwable::new);
+        configFactory.registerSupplier("tasks", TaskConfig::new);
         
         // 初始化默认配置
         configFactory.initializeDefaults(configManager);

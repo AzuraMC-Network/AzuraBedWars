@@ -15,17 +15,17 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class EventConfig {
 
-    private DestroyBedEvent destroyBedEvent;
-    private DiamondUpdateEvent diamondUpdateEvent;
-    private EmeraldUpdateEvent emeraldUpdateEvent;
-    private ShutdownEvent shutdownEvent;
-    private OverEvent overEvent;
-    private StartEvent startEvent;
+    private DestroyBedEvent destroyBedEvent = new DestroyBedEvent();
+    private DiamondUpdateEvent diamondUpdateEvent = new DiamondUpdateEvent();
+    private EmeraldUpdateEvent emeraldUpdateEvent = new EmeraldUpdateEvent();
+    private ShutdownEvent shutdownEvent = new ShutdownEvent();
+    private OverEvent overEvent = new OverEvent();
+    private StartEvent startEvent = new StartEvent();
 
     @Data
     public static class DestroyBedEvent {
 
-        private Title title;
+        private Title title = new Title();
         private String eventName = ChatColorUtil.color("床自毁");
         private int executeSecond = 360;
 
@@ -69,8 +69,8 @@ public class EventConfig {
     @Data
     public static class StartEvent {
 
-        private Title title;
-        private Upgrade upgrade;
+        private Title title = new Title();
+        private Upgrade upgrade = new Upgrade();
         private String eventName = ChatColorUtil.color("开始游戏");
         private int countDown = 5;
         private int eventPriority = 0;
