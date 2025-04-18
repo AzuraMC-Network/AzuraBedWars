@@ -48,7 +48,6 @@ public class ConnectionPoolHandler {
                 
                 // 尝试创建数据库
                 statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + database);
-                Bukkit.getLogger().info("成功创建数据库: " + database);
                 
                 // 关闭临时连接
                 tempDataSource.close();
