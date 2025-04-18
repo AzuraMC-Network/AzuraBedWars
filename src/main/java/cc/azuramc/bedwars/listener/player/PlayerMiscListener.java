@@ -160,42 +160,4 @@ public class PlayerMiscListener implements Listener {
             }
         }
     }
-
-    @EventHandler
-    public void onContainerOpen(InventoryOpenEvent event) {
-        if (gameManager.getGameState() != GameState.RUNNING) {
-            return;
-        }
-
-        Player player = (Player) event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-
-        if (gamePlayer.isSpectator()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 检查容器是否有位置（比如玩家背包就没有位置）
-        if (event.getInventory().getLocation() == null) {
-            return;
-        }
-
-        Block block = event.getInventory().getLocation().getBlock();
-        Material blockType = block.getType();
-
-        // 只对末影箱和木箱进行判断
-        if (blockType != Material.ENDER_CHEST && blockType != Material.CHEST) {
-            return;
-        }
-
-        for (GameTeam team : gameManager.getGameTeams()) {
-            if (team.getSpawnLocation().distance(block.getLocation()) <= 18) {
-                if (!team.getAlivePlayers().isEmpty() && !team.isInTeam(gamePlayer)) {
-                    event.setCancelled(true);
-                    player.sendMessage("§c只有该队伍的玩家可以打开这个箱子");
-                }
-                break;
-            }
-        }
-    }
 }
