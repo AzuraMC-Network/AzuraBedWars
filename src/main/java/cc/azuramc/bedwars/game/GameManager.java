@@ -68,10 +68,10 @@ public class GameManager {
     /**
      * 创建一个新的游戏实例
      *
-     * @param main 插件主类实例
+     * @param plugin 插件主类实例
      */
-    public GameManager(AzuraBedWars main) {
-        this.main = main;
+    public GameManager(AzuraBedWars plugin) {
+        this.main = plugin;
         this.isForceStarted = false;
         this.gameTeams = new ArrayList<>();
         this.gameParties = new ArrayList<>();
