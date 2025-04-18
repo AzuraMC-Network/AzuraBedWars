@@ -24,7 +24,7 @@ public class ListenerRegistry {
         Bukkit.getPluginManager().registerEvents(new PlayerDamageListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerAFKListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new EggBridgeListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerInventoryListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerDragToolListener(), plugin);
 
