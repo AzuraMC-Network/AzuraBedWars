@@ -90,7 +90,7 @@ public class PlayerRespawnListener implements Listener {
         }
 
         // 如果玩家的床已经被摧毁，处理永久死亡
-        if (gameTeam != null && gameTeam.isBedDestroy()) {
+        if (gameTeam != null && gameTeam.isDestroyed()) {
             handlePermanentDeath(event, player, gamePlayer, gameTeam, playerProfile);
             return;
         }

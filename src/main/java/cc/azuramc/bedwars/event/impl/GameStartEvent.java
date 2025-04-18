@@ -125,7 +125,7 @@ public class GameStartEvent extends GameEvent {
     private void applyHealingPoolEffect(GamePlayer player, GameTeam gameTeam) {
         double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawn());
         
-        if (distance <= config.getUpgrade().getHealingPoolRange() && gameTeam.isHealPool()) {
+        if (distance <= config.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPool()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType regeneration = PotionEffectWrapper.REGENERATION();
                 if (regeneration != null) {
@@ -148,12 +148,12 @@ public class GameStartEvent extends GameEvent {
         
         if (distance <= config.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
             // 触发普通陷阱
-            if (gameTeam.isTrap()) {
+            if (gameTeam.isHasTrap()) {
                 triggerTrap(player, gameTeam);
             }
             
             // 触发挖掘疲劳陷阱
-            if (gameTeam.isMiner()) {
+            if (gameTeam.isHasMiner()) {
                 triggerMiningFatigueTrap(player, gameTeam);
             }
         }
@@ -166,7 +166,7 @@ public class GameStartEvent extends GameEvent {
      * @param gameTeam 拥有陷阱的团队
      */
     private void triggerTrap(GamePlayer player, GameTeam gameTeam) {
-        gameTeam.setTrap(false);
+        gameTeam.setHasTrap(false);
 
         // 给敌方玩家添加失明效果
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
@@ -210,7 +210,7 @@ public class GameStartEvent extends GameEvent {
                     config.getUpgrade().getMiningFatigueEffectAmplifier()));
             }
         });
-        gameTeam.setMiner(false);
+        gameTeam.setHasMiner(false);
     }
     
     /**

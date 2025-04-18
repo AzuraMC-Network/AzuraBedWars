@@ -20,11 +20,13 @@ public class ListenerRegistry {
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new ChatListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerRespawnListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerMiscListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerDamageListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerAFKListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new EggBridgeListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerInventoryListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerDropListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), plugin);
 
         if (VersionUtil.isLessThan113()) {
             Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerA(), plugin);

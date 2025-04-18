@@ -248,8 +248,8 @@ public class PlayerDamageListener implements Listener {
             }
             
             GameTeam killerTeam = killerPlayer.getGameTeam();
-            processKill(gamePlayer, gameTeam, killerPlayer, killerTeam, killer, player, gameTeam.isBedDestroy());
-            broadcastVoidKillMessage(gamePlayer, gameTeam, killerPlayer, killerTeam, gameTeam.isBedDestroy());
+            processKill(gamePlayer, gameTeam, killerPlayer, killerTeam, killer, player, gameTeam.isDestroyed());
+            broadcastVoidKillMessage(gamePlayer, gameTeam, killerPlayer, killerTeam, gameTeam.isDestroyed());
         } else {
             // 自杀消息
             gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + ")§e掉下了虚空");
@@ -342,7 +342,7 @@ public class PlayerDamageListener implements Listener {
         }
 
         GameTeam killerTeam = killerPlayer.getGameTeam();
-        boolean isFinalKill = gameTeam != null && gameTeam.isBedDestroy();
+        boolean isFinalKill = gameTeam != null && gameTeam.isDestroyed();
 
         // 处理最终击杀
         if (isFinalKill) {
@@ -412,19 +412,19 @@ public class PlayerDamageListener implements Listener {
      *
      * @param event 伤害事件
      * @param gamePlayer 受伤玩家
-     * @param damager 攻击者
+     * @param attacker 攻击者
      */
-    private void handlePlayerVsPlayerDamage(EntityDamageByEntityEvent event, GamePlayer gamePlayer, Entity damager) {
-        GamePlayer damagerPlayer = GamePlayer.get(damager.getUniqueId());
+    private void handlePlayerVsPlayerDamage(EntityDamageByEntityEvent event, GamePlayer gamePlayer, Entity attacker) {
+        GamePlayer attackPlayer = GamePlayer.get(attacker.getUniqueId());
 
         // 观察者不能造成伤害
-        if (damagerPlayer != null && damagerPlayer.isSpectator()) {
+        if (attackPlayer != null && attackPlayer.isSpectator()) {
             event.setCancelled(true);
             return;
         }
 
         // 阻止队友伤害
-        if (gamePlayer != null && gamePlayer.getGameTeam().isInTeam(damagerPlayer)) {
+        if (gamePlayer != null && gamePlayer.getGameTeam().isInTeam(attackPlayer)) {
             event.setCancelled(true);
         }
     }

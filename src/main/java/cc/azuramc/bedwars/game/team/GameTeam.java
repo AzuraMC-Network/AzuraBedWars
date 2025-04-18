@@ -34,19 +34,19 @@ public class GameTeam {
     private Block bedFeet;
     private Block bedHead;
     private BlockFace bedFace;
-    private boolean unbed;
-    private boolean bedDestroy;
+    private boolean hasBed;
+    private boolean isDestroyed;
     private GamePlayer destroyPlayer;
 
     // 团队升级属性
     private int forge;
     private int manicMiner;
-    private boolean sharpenedSwords;
+    private boolean hasSharpenedEnchant;
     private int reinforcedArmor;
-    private boolean healPool;
-    private boolean trap;
-    private boolean miner;
-    private boolean alarmTrap;
+    private boolean hasHealPool;
+    private boolean hasTrap;
+    private boolean hasMiner;
+    private boolean hasAlarmTrap;
 
     /**
      * 创建一个游戏团队
@@ -72,18 +72,18 @@ public class GameTeam {
      */
     private void initializeDefaults() {
         // 床状态初始化
-        this.unbed = false;
-        this.bedDestroy = false;
+        this.hasBed = false;
+        this.isDestroyed = false;
         
         // 团队升级初始化
-        this.sharpenedSwords = false;
+        this.hasSharpenedEnchant = false;
         this.reinforcedArmor = 0;
         this.manicMiner = 0;
         this.forge = 0;
-        this.miner = false;
-        this.healPool = false;
-        this.trap = false;
-        this.alarmTrap = false;
+        this.hasMiner = false;
+        this.hasHealPool = false;
+        this.hasTrap = false;
+        this.hasAlarmTrap = false;
     }
     
     /**
@@ -486,7 +486,7 @@ public class GameTeam {
      * @return 如果床被摧毁返回true，否则返回false
      */
     public boolean isBedDestroyed() {
-        return bedDestroy || unbed;
+        return isDestroyed || hasBed;
     }
     
     /**
@@ -496,7 +496,7 @@ public class GameTeam {
      * @param destroyer 摧毁床的玩家，可以为null
      */
     public void setBedDestroyed(boolean destroyed, GamePlayer destroyer) {
-        this.bedDestroy = destroyed;
+        this.isDestroyed = destroyed;
         
         if (destroyed) {
             this.destroyPlayer = destroyer;

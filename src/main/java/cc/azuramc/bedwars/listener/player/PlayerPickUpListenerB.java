@@ -55,7 +55,7 @@ public class PlayerPickUpListenerB implements Listener {
         }
 
         if (itemStack.getType() == MaterialWrapper.WOODEN_SWORD() || itemStack.getType() == MaterialWrapper.STONE_SWORD() || itemStack.getType() == MaterialWrapper.IRON_SWORD() || itemStack.getType() == MaterialWrapper.DIAMOND_SWORD()) {
-            if (gamePlayer.getGameTeam().isSharpenedSwords()) {
+            if (gamePlayer.getGameTeam().isHasSharpenedEnchant()) {
                 itemStack.addEnchantment(EnchantmentWrapper.DAMAGE_ALL(), 1);
             }
 

@@ -443,7 +443,7 @@ public class GamePlayer {
         if (remove) {
             player.getInventory().remove(MaterialWrapper.WOODEN_SWORD());
         }
-        if (gameTeam.isSharpenedSwords()) {
+        if (gameTeam.isHasSharpenedEnchant()) {
             player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.WOODEN_SWORD()).addEnchant(EnchantmentWrapper.DAMAGE_ALL(), 1).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
         } else {
             player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.WOODEN_SWORD()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());

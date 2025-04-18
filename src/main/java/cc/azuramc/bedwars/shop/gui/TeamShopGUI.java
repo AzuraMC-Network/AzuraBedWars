@@ -252,7 +252,7 @@ public class TeamShopGUI extends CustomGUI {
     private void addSharpenedSwordsUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
-        if (!gameTeam.isSharpenedSwords()) {
+        if (!gameTeam.isHasSharpenedEnchant()) {
             // 未升级状态
             int price = TIER_PRICES.get(SHARPENED_SWORDS).get(0);
             
@@ -267,7 +267,7 @@ public class TeamShopGUI extends CustomGUI {
                             return;
                         }
                         
-                        gameTeam.setSharpenedSwords(true);
+                        gameTeam.setHasSharpenedEnchant(true);
                         new TeamShopGUI(player, gameManager).open();
                         
                         // 为团队所有玩家的剑添加锋利附魔
@@ -394,7 +394,7 @@ public class TeamShopGUI extends CustomGUI {
     private void addMiningFatigueTrap(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
-        if (!gameTeam.isMiner()) {
+        if (!gameTeam.isHasMiner()) {
             // 未升级状态
             int price = TIER_PRICES.get(MINING_FATIGUE_TRAP).get(0);
             
@@ -415,7 +415,7 @@ public class TeamShopGUI extends CustomGUI {
                             return;
                         }
                         
-                        gameTeam.setMiner(true);
+                        gameTeam.setHasMiner(true);
                         new TeamShopGUI(player, gameManager).open();
                     }, false));
         } else {
@@ -443,7 +443,7 @@ public class TeamShopGUI extends CustomGUI {
     private void addHealingPoolUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
-        if (!gameTeam.isHealPool()) {
+        if (!gameTeam.isHasHealPool()) {
             // 未升级状态
             int price = TIER_PRICES.get(HEALING_POOL).get(0);
             
@@ -463,7 +463,7 @@ public class TeamShopGUI extends CustomGUI {
                             return;
                         }
                         
-                        gameTeam.setHealPool(true);
+                        gameTeam.setHasHealPool(true);
                         new TeamShopGUI(player, gameManager).open();
                     }, false));
         } else {
@@ -490,7 +490,7 @@ public class TeamShopGUI extends CustomGUI {
     private void addAlarmTrap(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
-        if (!gameTeam.isAlarmTrap()) {
+        if (!gameTeam.isHasAlarmTrap()) {
             // 未升级状态
             int price = TIER_PRICES.get(ALARM_TRAP).get(0);
             
@@ -510,7 +510,7 @@ public class TeamShopGUI extends CustomGUI {
                             return;
                         }
                         
-                        gameTeam.setAlarmTrap(true);
+                        gameTeam.setHasAlarmTrap(true);
                         new TeamShopGUI(player, gameManager).open();
                     }, false));
         } else {

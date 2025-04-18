@@ -155,7 +155,7 @@ public class GameBoardProvider implements Listener {
             StringBuilder teamLine = new StringBuilder()
                 .append(gameTeam.getName())
                 .append(" ")
-                .append(gameTeam.isBedDestroy() ? BED_DESTROYED : BED_ALIVE)
+                .append(gameTeam.isDestroyed() ? BED_DESTROYED : BED_ALIVE)
                 .append(SEPARATOR)
                 .append(gameTeam.getAlivePlayers().size());
             

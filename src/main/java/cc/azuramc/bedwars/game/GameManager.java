@@ -305,12 +305,12 @@ public class GameManager {
      * @param gameTeam 玩家所在团队
      */
     private void handleTeamPlayerLeave(GamePlayer gamePlayer, GameTeam gameTeam) {
-        if (gameTeam.isBedDestroy()) {
+        if (gameTeam.isDestroyed()) {
             gamePlayer.setGameTeam(null);
         }
 
-        if (gameTeam.getAlivePlayers().isEmpty() && !gameTeam.isBedDestroy()) {
-            gameTeam.setBedDestroy(true);
+        if (gameTeam.getAlivePlayers().isEmpty() && !gameTeam.isDestroyed()) {
+            gameTeam.setDestroyed(true);
         }
     }
 
@@ -668,7 +668,7 @@ public class GameManager {
     private void markEmptyTeams() {
         getGameTeams().forEach(team -> {
             if (team.getGamePlayers().isEmpty()) {
-                team.setBedDestroy(true);
+                team.setDestroyed(true);
             }
         });
     }
