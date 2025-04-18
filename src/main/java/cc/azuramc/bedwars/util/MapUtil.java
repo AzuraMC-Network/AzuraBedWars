@@ -31,7 +31,7 @@ public class MapUtil {
     public static boolean isProtectedRelativeLocation(Block block) {
         // 检查团队出生点保护
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            if (gameTeam.getSpawn().distance(block.getLocation()) <= TEAM_SPAWN_PROTECTION_RADIUS) {
+            if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= TEAM_SPAWN_PROTECTION_RADIUS) {
                 return true;
             }
         }
@@ -72,7 +72,7 @@ public class MapUtil {
 
         // 检查团队出生点保护
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            if (gameTeam.getSpawn().distance(location) <= TEAM_SPAWN_PROTECTION_RADIUS) {
+            if (gameTeam.getSpawnLocation().distance(location) <= TEAM_SPAWN_PROTECTION_RADIUS) {
                 return true;
             }
         }

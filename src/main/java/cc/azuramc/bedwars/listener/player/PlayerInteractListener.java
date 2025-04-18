@@ -134,7 +134,7 @@ public class PlayerInteractListener implements Listener {
                         return;
                     }
 
-                    if (player.getLocation().distance(gameTeam.getSpawn()) > 18) {
+                    if (player.getLocation().distance(gameTeam.getSpawnLocation()) > 18) {
                         player.sendMessage("§c请靠近出生点使用!");
                         return;
                     }
@@ -244,7 +244,7 @@ public class PlayerInteractListener implements Listener {
                     }
 
                     for (GameTeam gameTeam1 : gameManager.getGameTeams()) {
-                        if (gameTeam1.getSpawn().distance(player.getLocation()) <= 8) {
+                        if (gameTeam1.getSpawnLocation().distance(player.getLocation()) <= 8) {
                             event.setCancelled(true);
                             return;
                         }

@@ -60,7 +60,7 @@ public class GameStartTask extends BukkitRunnable {
     @Override
     public void run() {
         // 处理强制开始
-        if (gameManager.isForceStart()) {
+        if (gameManager.isForceStarted()) {
             cancel();
             return;
         }

@@ -17,7 +17,7 @@ public class StartCommand {
     public void forceStartGame(BukkitCommandActor actor) {
         GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
-        gameManager.setForceStart(true);
+        gameManager.setForceStarted(true);
         gameManager.start();
     }
 }

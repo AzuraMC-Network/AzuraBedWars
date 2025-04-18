@@ -36,14 +36,14 @@ public class BedBreakHandler {
         event.setCancelled(true);
 
         // 不能破坏自己的床
-        if (gameTeam.getSpawn().distance(block.getLocation()) <= BED_SEARCH_RADIUS) {
+        if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= BED_SEARCH_RADIUS) {
             player.sendMessage("§c你不能破坏你家的床");
             return;
         }
 
         // 查找床所属团队
         for (GameTeam targetTeam : gameManager.getGameTeams()) {
-            if (targetTeam.getSpawn().distance(block.getLocation()) <= BED_SEARCH_RADIUS) {
+            if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= BED_SEARCH_RADIUS) {
                 if (!targetTeam.isDead()) {
                     processBedDestruction(player, gamePlayer, gameTeam, targetTeam, block);
                     return;

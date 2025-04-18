@@ -240,7 +240,7 @@ public class PlayerRespawnListener implements Listener {
             PlayerUtil.showPlayer(otherPlayer.getPlayer(), player));
         
         // 传送到队伍出生点
-        player.teleport(gameTeam.getSpawn());
+        player.teleport(gameTeam.getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
         
         // 添加临时伤害保护

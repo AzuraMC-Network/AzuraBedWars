@@ -27,7 +27,7 @@ public class GameTeam {
     
     // 基本团队信息
     private final TeamColor teamColor;
-    private final Location spawn;
+    private final Location spawnLocation;
     private int maxPlayers;
     
     // 床相关属性
@@ -57,7 +57,7 @@ public class GameTeam {
      */
     public GameTeam(TeamColor teamColor, Location location, int maxPlayers) {
         this.teamColor = Objects.requireNonNull(teamColor, "团队颜色不能为空");
-        this.spawn = Objects.requireNonNull(location, "出生点位置不能为空");
+        this.spawnLocation = Objects.requireNonNull(location, "出生点位置不能为空");
         this.maxPlayers = maxPlayers;
         
         // 初始化默认值
@@ -112,7 +112,7 @@ public class GameTeam {
         for (int x = -BED_SEARCH_RADIUS; x < BED_SEARCH_RADIUS; x++) {
             for (int y = -BED_SEARCH_RADIUS; y < BED_SEARCH_RADIUS; y++) {
                 for (int z = -BED_SEARCH_RADIUS; z < BED_SEARCH_RADIUS; z++) {
-                    Block block = spawn.clone().add(x, y, z).getBlock();
+                    Block block = spawnLocation.clone().add(x, y, z).getBlock();
                     if (isBedBlock(block)) {
                         bedBlocks.add(block);
                         
@@ -309,8 +309,8 @@ public class GameTeam {
      * 当找不到床时设置默认值
      */
     private void setDefaultBedValues() {
-        this.bedHead = spawn.getBlock();
-        this.bedFeet = spawn.getBlock();
+        this.bedHead = spawnLocation.getBlock();
+        this.bedFeet = spawnLocation.getBlock();
         this.bedFace = DEFAULT_BED_FACE;
     }
     

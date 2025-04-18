@@ -76,7 +76,7 @@ public class GameStartEvent extends GameEvent {
                 
                 for (GameTeam gameTeam : gameManager.getGameTeams()) {
                     // 跳过不同世界的团队
-                    if (!Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawn().getWorld())) {
+                    if (!Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawnLocation().getWorld())) {
                         continue;
                     }
                     
@@ -123,7 +123,7 @@ public class GameStartEvent extends GameEvent {
      * @param gameTeam 游戏团队
      */
     private void applyHealingPoolEffect(GamePlayer player, GameTeam gameTeam) {
-        double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawn());
+        double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
         
         if (distance <= config.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPool()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
@@ -144,7 +144,7 @@ public class GameStartEvent extends GameEvent {
      * @param gameTeam 游戏团队
      */
     private void handleEnemyInTeamTerritory(GamePlayer player, GameTeam gameTeam) {
-        double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawn());
+        double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
         
         if (distance <= config.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
             // 触发普通陷阱

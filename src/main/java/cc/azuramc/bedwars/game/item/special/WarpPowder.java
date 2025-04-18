@@ -194,7 +194,7 @@ public class WarpPowder extends SpecialItem {
         }
         
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        if (gameTeam == null || gameTeam.getSpawn() == null) {
+        if (gameTeam == null || gameTeam.getSpawnLocation() == null) {
             gamePlayer.sendMessage("§c无法找到你的队伍出生点!");
             return false;
         }
@@ -234,7 +234,7 @@ public class WarpPowder extends SpecialItem {
                         return;
                     }
                     
-                    Location targetLoc = team.getSpawn();
+                    Location targetLoc = team.getSpawnLocation();
                     if (targetLoc == null) {
                         cancel();
                         WarpPowder.this.cancelTeleport(true, true);

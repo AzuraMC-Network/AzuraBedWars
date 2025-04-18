@@ -127,8 +127,8 @@ public class GameEventManager extends TimerTask {
     private void updatePlayerTracking() {
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
             gameTeam.getAlivePlayers().forEach(player -> {
-                if (Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawn().getWorld())) {
-                    int distance = (int) player.getPlayer().getLocation().distance(gameTeam.getSpawn());
+                if (Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawnLocation().getWorld())) {
+                    int distance = (int) player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
                     String trackingMessage = "§f队伍: " + gameTeam.getChatColor() + gameTeam.getName() + 
                                            "§f 追踪: " + gameTeam.getChatColor() + distance + "m";
                     player.sendActionBar(trackingMessage);

@@ -50,7 +50,7 @@ public class GameManager {
     private GameEventManager gameEventManager;
     private MapData mapData;
     private GameState gameState;
-    private boolean forceStart;
+    private boolean isForceStarted;
 
     private Location waitingLocation;
     private Location respawnLocation;
@@ -72,7 +72,7 @@ public class GameManager {
      */
     public GameManager(AzuraBedWars main) {
         this.main = main;
-        this.forceStart = false;
+        this.isForceStarted = false;
         this.gameTeams = new ArrayList<>();
         this.gameParties = new ArrayList<>();
         this.armorSande = new HashMap<>();
@@ -428,7 +428,7 @@ public class GameManager {
         for (GameTeam gameTeam : this.gameTeams) {
             for (GamePlayer gamePlayer : gameTeam.getAlivePlayers()) {
                 Player player = gamePlayer.getPlayer();
-                teleportPlayerSafely(player, gameTeam.getSpawn());
+                teleportPlayerSafely(player, gameTeam.getSpawnLocation());
             }
         }
     }

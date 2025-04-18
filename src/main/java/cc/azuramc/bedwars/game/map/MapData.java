@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -37,7 +38,7 @@ public class MapData {
 
     public void setWaitingLocation(Location location) {
         RawLocation rawLocation = new RawLocation();
-        rawLocation.setWorld(location.getWorld().getName());
+        rawLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
@@ -48,7 +49,7 @@ public class MapData {
 
     public void setReSpawn(Location location) {
         RawLocation rawLocation = new RawLocation();
-        rawLocation.setWorld(location.getWorld().getName());
+        rawLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
@@ -59,7 +60,7 @@ public class MapData {
 
     public void addBase(Location location) {
         RawLocation rawLocation = new RawLocation();
-        rawLocation.setWorld(location.getWorld().getName());
+        rawLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
@@ -70,7 +71,7 @@ public class MapData {
 
     public void setPos1(Location location) {
         RawLocation rawLocation = new RawLocation();
-        rawLocation.setWorld(location.getWorld().getName());
+        rawLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
@@ -81,7 +82,7 @@ public class MapData {
 
     public void setPos2(Location location) {
         RawLocation rawLocation = new RawLocation();
-        rawLocation.setWorld(location.getWorld().getName());
+        rawLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         rawLocation.setX(location.getX());
         rawLocation.setY(location.getY());
         rawLocation.setZ(location.getZ());
@@ -92,7 +93,7 @@ public class MapData {
 
     public void addDrop(DropType dropType, Location location) {
         DropRawLocation dropLocation = new DropRawLocation();
-        dropLocation.setWorld(location.getWorld().getName());
+        dropLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         dropLocation.setX(location.getX());
         dropLocation.setY(location.getY());
         dropLocation.setZ(location.getZ());
@@ -104,7 +105,7 @@ public class MapData {
 
     public void addShop(ShopType shopType, Location location) {
         ShopRawLocation shopLocation = new ShopRawLocation();
-        shopLocation.setWorld(location.getWorld().getName());
+        shopLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         shopLocation.setX(location.getX());
         shopLocation.setY(location.getY());
         shopLocation.setZ(location.getZ());
@@ -269,7 +270,7 @@ public class MapData {
                     Block block = new Location(pos1.getWorld(), x, y, z).getBlock();
 
                     // 使用版本兼容的方式检查方块类型
-                    if (isSkippableBlock(block)) {
+                    if (canSkippedBlock(block)) {
                         continue;
                     }
                     blocks.add(block.getLocation());
@@ -284,7 +285,7 @@ public class MapData {
      * 检查方块是否应该被跳过（不加入到blocks列表中）
      * 此方法兼容1.8和1.21版本
      */
-    private boolean isSkippableBlock(Block block) {
+    private boolean canSkippedBlock(Block block) {
         Material type = block.getType();
         String typeName = type.name();
 
@@ -308,11 +309,7 @@ public class MapData {
 
         // 检查DEAD_BUSH（枯灌木）
         // 在1.13+版本中名称保持一致，但为了安全起见使用字符串比较
-        if (typeName.equals("DEAD_BUSH") || typeName.contains("DEAD_BUSH")) {
-            return true;
-        }
-
-        return false;
+        return typeName.contains("DEAD_BUSH");
     }
 
     public boolean hasRegion(Location location) {
@@ -395,14 +392,14 @@ public class MapData {
 
     @Getter
     @Setter
-    public class Players {
+    public static class Players {
         private Integer team;
         private Integer min;
     }
 
     @Getter
     @Setter
-    public class Region {
+    public static class Region {
         private RawLocation pos1;
         private RawLocation pos2;
     }
