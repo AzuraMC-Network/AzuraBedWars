@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,8 +18,7 @@ public class PlayerAFKListener implements Listener {
     private static final int MAX_NO_MOVEMENT_TIME = 45;
 
     public static Map<UUID, Long> afkLastMovement = new HashMap<>();
-    public static Map<UUID, Boolean> afk = new HashMap<>();
-    public static int checkAFKTask;
+    private static int checkAFKTask;
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
@@ -43,26 +43,23 @@ public class PlayerAFKListener implements Listener {
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 UUID uuid = player.getUniqueId();
+                GamePlayer gamePlayer = GamePlayer.get(uuid);
                 long lastMove = afkLastMovement.getOrDefault(uuid, currentTime);
 
                 // 大于时间未移动
-                if (currentTime - lastMove >= MAX_NO_MOVEMENT_TIME * 1000L) {
-                    afk.put(uuid, true);
-                } else {
-                    afk.put(uuid, false);
-                }
+                gamePlayer.setAFK(currentTime - lastMove >= MAX_NO_MOVEMENT_TIME * 1000L);
             }
         }, 0L, 20L);
     }
 
     private void clearAFK(UUID uuid) {
         afkLastMovement.remove(uuid);
-        afk.remove(uuid);
+        GamePlayer.get(uuid).setAFK(false);
     }
 
     public static void stop() {
-        afk.clear();
+        GamePlayer.getGamePlayers().forEach(a -> a.setAFK(false));
         afkLastMovement.clear();
-        Bukkit.getScheduler().cancelTask(PlayerAFKListener.checkAFKTask);
+        Bukkit.getScheduler().cancelTask(checkAFKTask);
     }
 }

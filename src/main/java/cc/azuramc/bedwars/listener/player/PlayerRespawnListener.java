@@ -46,14 +46,14 @@ public class PlayerRespawnListener implements Listener {
     
     // 消息常量
     private static final String RESPAWN_COUNTDOWN_TITLE = "§e§l%d";
-    private static final String RESPAWN_COUNTDOWN_SUBTITLE = "§7你死了,将在稍后重生";
+    private static final String RESPAWN_COUNTDOWN_SUBTITLE = "§7你死了 将在稍后重生";
     private static final String RESPAWN_COMPLETE_TITLE = "§a已复活！";
-    private static final String RESPAWN_COMPLETE_SUBTITLE = "§7因为你的床还在所以你复活了";
+    private static final String RESPAWN_COMPLETE_SUBTITLE = "§7因为你的床还在 所以你复活了";
     private static final String DEATH_PERMANENT_TITLE = "§c你凉了！";
     private static final String DEATH_PERMANENT_SUBTITLE = "§7你没床了";
     private static final String TEAM_ELIMINATED_FORMAT = "§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃";
     private static final String TEAM_ELIMINATED_MSG = "%s §c凉了! §e挖床者: %s";
-    private static final String REJOIN_MESSAGE = "§c你凉了!想再来一局嘛? ";
+    private static final String REJOIN_MESSAGE = "§c你凉了!想再来一局吗? ";
     private static final String REJOIN_BUTTON = "§b§l点击这里!";
     private static final String REJOIN_COMMAND = "/queue join qc x";
     
