@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.listener.block.BlockBreakListener;
 import cc.azuramc.bedwars.listener.block.PlacementListener;
 import cc.azuramc.bedwars.listener.chat.ChatListener;
@@ -24,6 +25,12 @@ public class ListenerRegistry {
         Bukkit.getPluginManager().registerEvents(new PlayerAFKListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new EggBridgeListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerInventoryListener(), plugin);
+
+        if (VersionUtil.isLessThan113()) {
+            Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerA(), plugin);
+        } else {
+            Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerB(), plugin);
+        }
 
         // 游戏监听器
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), plugin);
