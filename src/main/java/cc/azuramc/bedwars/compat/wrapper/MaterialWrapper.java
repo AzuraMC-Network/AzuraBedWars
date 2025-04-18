@@ -353,9 +353,9 @@ public class MaterialWrapper {
                     .getItem();
         }
     }
-    
+
     public static byte getWoolData(DyeColor dyeColor) {
-        return (byte) dyeColor.getWoolData();
+        return dyeColor.getWoolData();
     }
     
     public static Material BED() {

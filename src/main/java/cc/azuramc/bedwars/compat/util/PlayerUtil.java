@@ -21,6 +21,7 @@ public class PlayerUtil {
      * @param player 玩家
      * @return 玩家手中物品
      */
+    @SuppressWarnings("deprecation")
     public static ItemStack getItemInHand(Player player) {
 
         if (VersionUtil.isLessThan113()) {
@@ -35,6 +36,7 @@ public class PlayerUtil {
      * @param player 玩家
      * @param item 要设置的物品
      */
+    @SuppressWarnings("deprecation")
     public static void setItemInHand(Player player, ItemStack item) {
         if (VersionUtil.isLessThan113()) {
             player.setItemInHand(item);
@@ -48,6 +50,7 @@ public class PlayerUtil {
      * @param player 玩家
      * @param target 准备隐藏的目标
      */
+    @SuppressWarnings("deprecation")
     public static void hidePlayer(Player player, Player target) {
         if (VersionUtil.isLessThan113()) {
             player.hidePlayer(target);
@@ -61,6 +64,7 @@ public class PlayerUtil {
      * @param player 玩家
      * @param target 准备显示的目标
      */
+    @SuppressWarnings("deprecation")
     public static void showPlayer(Player player, Player target) {
         if (VersionUtil.isLessThan113()) {
             player.showPlayer(target);
@@ -74,6 +78,7 @@ public class PlayerUtil {
      * @param player 玩家
      * @param respawnLocation 复活地点
      */
+    @SuppressWarnings("deprecation")
     public static void callPlayerRespawnEvent(Player player, Location respawnLocation) {
         if (VersionUtil.isLessThan113()) {
             Bukkit.getPluginManager().callEvent(new PlayerRespawnEvent(player, respawnLocation, false));

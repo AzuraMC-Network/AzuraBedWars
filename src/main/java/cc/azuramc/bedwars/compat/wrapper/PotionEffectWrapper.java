@@ -329,6 +329,7 @@ public class PotionEffectWrapper {
      * @param newName 1.13+版本的名称
      * @return 药水效果类型
      */
+    @SuppressWarnings("deprecation")
     public static PotionEffectType getCompatibleEffect(String oldName, String newName) {
         // 生成缓存键名
         String cacheKey = oldName + "_" + newName;

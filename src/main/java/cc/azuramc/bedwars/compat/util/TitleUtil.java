@@ -21,6 +21,7 @@ public class TitleUtil {
      * @param title    主标题
      * @param subTitle 副标题
      */
+    @SuppressWarnings("deprecation")
     public static void sendTitle(Player player, Integer fadeIn, Integer stay, Integer fadeOut, String title, String subTitle) {
         ProtocolManager pm = ProtocolLibrary.getProtocolManager();
         

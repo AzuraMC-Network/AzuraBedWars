@@ -54,6 +54,7 @@ public class BedUtil {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void dropTargetBlock(Block targetBlock) {
         if (isBedBlock(targetBlock)) {
             Block bedHead;

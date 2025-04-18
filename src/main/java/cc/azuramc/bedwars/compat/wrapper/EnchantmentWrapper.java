@@ -18,6 +18,7 @@ public class EnchantmentWrapper {
      * @param id 旧版本附魔ID
      * @return 附魔实例
      */
+    @SuppressWarnings("deprecation")
     public static Enchantment getEnchantment(String oldName, String newName, int id) {
         // 先检查缓存
         String cacheKey = oldName + ":" + newName;

@@ -90,6 +90,7 @@ public class ItemBuilder {
      * @param owner 所有者名称或UUID字符串
      * @return 构建器实例
      */
+    @SuppressWarnings("deprecation")
     public ItemBuilder setOwner(String owner) {
         Material skullMaterial = getPlayerSkullMaterial();
         itemStack.setType(skullMaterial);
@@ -199,6 +200,7 @@ public class ItemBuilder {
      * @param dyeColor 染料颜色
      * @return 构建器实例
      */
+    @SuppressWarnings("deprecation")
     public ItemBuilder setWoolColor(DyeColor dyeColor) {
         if (!VersionUtil.isLessThan113()) {
             // 1.13+版本使用特定的彩色羊毛材质
@@ -267,6 +269,7 @@ public class ItemBuilder {
      * @param item 物品
      * @return 耐久度
      */
+    @SuppressWarnings("deprecation")
     private short getDurabilityCompat(ItemStack item) {
         if (!VersionUtil.isLessThan113()) {
             try {
@@ -289,6 +292,7 @@ public class ItemBuilder {
      * @param item 物品
      * @param durability 耐久度/数据值
      */
+    @SuppressWarnings("deprecation")
     private void setDurabilityCompat(ItemStack item, short durability) {
         if (!VersionUtil.isLessThan113()) {
             // 1.13+尝试使用Damageable接口
