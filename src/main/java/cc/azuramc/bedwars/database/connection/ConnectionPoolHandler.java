@@ -2,9 +2,11 @@ package cc.azuramc.bedwars.database.connection;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.Bukkit;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,18 +33,33 @@ public class ConnectionPoolHandler {
                 continue;
             }
 
+            // 首先尝试连接到MySQL服务器（不指定数据库）
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:mysql://localhost/" + database);
+            config.setJdbcUrl("jdbc:mysql://localhost/");
             config.setUsername("root");
             config.setPassword("s*6tlO68FnEbyBn4");
             config.addDataSourceProperty("cachePrepStmts", "true");
             config.addDataSourceProperty("prepStmtCacheSize", "250");
             config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-            try {
+            try (HikariDataSource tempDataSource = new HikariDataSource(config);
+                 Connection connection = tempDataSource.getConnection();
+                 Statement statement = connection.createStatement()) {
+                
+                // 尝试创建数据库
+                statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + database);
+                Bukkit.getLogger().info("成功创建数据库: " + database);
+                
+                // 关闭临时连接
+                tempDataSource.close();
+                
+                // 创建新的连接池（指定数据库）
+                config.setJdbcUrl("jdbc:mysql://localhost/" + database);
                 HikariDataSource hikariDataSource = new HikariDataSource(config);
                 pools.put(database, hikariDataSource);
+                
             } catch (Exception e) {
+                Bukkit.getLogger().severe("创建数据库 " + database + " 失败: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -54,7 +71,6 @@ public class ConnectionPoolHandler {
         }
 
         databases.add(databaseName);
-
         loadPools();
     }
 
