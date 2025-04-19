@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.task.GameOverTask;
 import cc.azuramc.bedwars.event.GameEvent;
+import cc.azuramc.bedwars.jedis.event.JedisGameEndEvent;
 import org.bukkit.Bukkit;
 
 /**
@@ -24,6 +25,7 @@ public class GameOverEvent extends GameEvent {
     public void execute(GameManager gameManager) {
         gameManager.getGameEventManager().setCurrentEvent(7);
         Bukkit.getPluginManager().callEvent(new BedwarsGameOverEvent(gameManager.getWinner()));
+        Bukkit.getPluginManager().callEvent(new JedisGameEndEvent());
         new GameOverTask(gameManager);
     }
 }

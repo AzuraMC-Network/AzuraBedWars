@@ -7,6 +7,9 @@ import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.jedis.JedisManager;
+import cc.azuramc.bedwars.jedis.listener.PubSubListener;
+import cc.azuramc.bedwars.jedis.util.IPUtil;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.scoreboard.provider.GameBoardProvider;
 import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
@@ -86,6 +89,9 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter
     private TaskConfig taskConfig;
 
+    @Getter
+    private PubSubListener pubSubListener;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -95,6 +101,7 @@ public final class AzuraBedWars extends JavaPlugin {
         initDatabases();
         initMapSystem();
         initCommands();
+        intiChannelSystem();
         
         // 初始化配置系统
         initConfigSystem();
@@ -128,6 +135,17 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initCommands() {
         new CommandRegistry(this);
+    }
+
+    /**
+     * 初始化通信频道
+     */
+    private void intiChannelSystem() {
+        pubSubListener = new PubSubListener();
+        getServer().getScheduler().runTaskAsynchronously(this, pubSubListener);
+        JedisManager.getInstance().getServerData().setGameType("AzuraBedWars");
+        JedisManager.getInstance().getExpand().put("ver", getDescription().getVersion());
+        pubSubListener.addChannel("AZURA.BW." + IPUtil.getLocalIp());
     }
 
     /**
@@ -213,6 +231,10 @@ public final class AzuraBedWars extends JavaPlugin {
         // 保存配置
         if (configManager != null) {
             configManager.saveAll();
+        }
+
+        if (pubSubListener != null) {
+            pubSubListener.poison();
         }
     }
 

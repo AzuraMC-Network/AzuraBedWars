@@ -6,6 +6,9 @@ import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.team.TeamColor;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.game.task.GameStartTask;
+import cc.azuramc.bedwars.jedis.JedisManager;
+import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
+import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
@@ -101,6 +104,8 @@ public class GameManager {
 
         initializeTeams(mapData);
         this.gameState = GameState.WAITING;
+        JedisManager.getInstance().getExpand().put("map", mapData.getName());
+        Bukkit.getPluginManager().callEvent(new JedisGameLoadingEvent(getMaxPlayers()));
     }
 
     /**
@@ -627,6 +632,7 @@ public class GameManager {
      */
     public void start() {
         gameState = GameState.RUNNING;
+        Bukkit.getPluginManager().callEvent(new JedisGameStartEvent());
 
         moveFreePlayersToTeam();
         gameEventManager.start();
