@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.map.MapData;
+import cc.azuramc.bedwars.game.map.MapLoadManager;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.GameManager;
@@ -95,6 +96,9 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter
     private PubSubListener pubSubListener;
 
+    @Getter
+    private MapLoadManager mapLoadManager;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -105,6 +109,9 @@ public final class AzuraBedWars extends JavaPlugin {
         initMapSystem();
         initCommands();
         intiChannelSystem();
+        
+        // 初始化地图加载管理器
+        mapLoadManager = MapLoadManager.getInstance(this);
         
         // 初始化配置系统
         initConfigSystem();

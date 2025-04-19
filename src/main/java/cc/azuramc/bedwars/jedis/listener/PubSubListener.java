@@ -56,7 +56,7 @@ public class PubSubListener implements Runnable {
      * @param jedis Jedis连接
      */
     private void initializePubSub(Jedis jedis) {
-        jedisPubSubHandler = new JedisPubSubHandler();
+        jedisPubSubHandler = new JedisPubSubHandler(AzuraBedWars.getInstance());
         addedChannels.add(SERVER_NAME_QUERY_PREFIX + IPUtil.getLocalIp());
         addedChannels.add(RUN_COMMAND_CHANNEL);
         jedis.subscribe(jedisPubSubHandler, addedChannels.toArray(new String[0]));
