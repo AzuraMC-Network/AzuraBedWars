@@ -59,6 +59,7 @@ public class GamePlayer {
     @Getter private boolean spectator;
     @Getter @Setter private SpectatorTarget spectatorTarget;
     @Getter @Setter private GameTeam gameTeam;
+    @Getter private boolean afk;
     
     // 战斗数据
     @Getter private int kills;
@@ -70,11 +71,6 @@ public class GamePlayer {
     @Getter @Setter private ToolType axeType;
     @Getter @Setter private boolean shear;
 
-    // UI 状态
-    @Getter @Setter private boolean isInventoryOpening;
-    @Getter @Setter private boolean isChestOpening;
-    @Getter @Setter private boolean isEnderChestOpening;
-
     /**
      * 构造方法
      * 
@@ -85,10 +81,8 @@ public class GamePlayer {
         this.uuid = uuid;
         this.name = name;
 
-        // 初始化 UI 状态
-        this.isInventoryOpening = false;
-        this.isChestOpening = false;
-        this.isEnderChestOpening = false;
+        // 初始化 AFK 状态
+        this.afk = false;
 
         // 初始化装备状态
         this.armorType = ArmorType.DEFAULT;
@@ -261,30 +255,12 @@ public class GamePlayer {
     }
 
     /**
-     * 设置 背包UI 状态
+     * 设置挂机状态
      *
-     * @param state 状态
-     */
-    public void setViewingInventory(boolean state) {
-        isInventoryOpening = state;
-    }
-
-    /**
-     * 设置 普通箱子UI 状态
-     *
-     * @param state 状态
-     */
-    public void setViewingChest(boolean state) {
-        isInventoryOpening = state;
-    }
-
-    /**
-     * 设置 末影箱UI 状态
-     *
-     * @param state 状态
-     */
-    public void setViewingEnderChest(boolean state) {
-        isInventoryOpening = state;
+     * @param state 目标状态
+     * */
+    public void setAFK(boolean state) {
+        this.afk = state;
     }
 
     /**
@@ -329,10 +305,10 @@ public class GamePlayer {
      * 设置观察者物品栏
      */
     private void setupSpectatorInventory(Player player) {
-        player.getInventory().setItem(0, createSpectatorItem(MaterialWrapper.COMPASS(), "§a§l传送器§7(右键打开)"));
-        player.getInventory().setItem(4, createSpectatorItem(MaterialWrapper.COMPARATOR(), "§c§l旁观者设置§7(右键打开)"));
-        player.getInventory().setItem(7, createSpectatorItem(Material.PAPER, "§b§l快速加入§7(右键加入)"));
-        player.getInventory().setItem(8, createSpectatorItem(MaterialWrapper.SLIME_BALL(), "§c§l离开游戏§7(右键离开)"));
+        player.getInventory().setItem(0, createSpectatorItem(MaterialWrapper.COMPASS(), "§a§l传送器 §7(右键打开)"));
+        player.getInventory().setItem(4, createSpectatorItem(MaterialWrapper.COMPARATOR(), "§c§l旁观者设置 §7(右键打开)"));
+        player.getInventory().setItem(7, createSpectatorItem(Material.PAPER, "§b§l快速加入 §7(右键加入)"));
+        player.getInventory().setItem(8, createSpectatorItem(MaterialWrapper.SLIME_BALL(), "§c§l离开游戏 §7(右键离开)"));
     }
 
     /**
