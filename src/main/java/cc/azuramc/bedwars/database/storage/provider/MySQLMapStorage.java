@@ -58,7 +58,6 @@ public class MySQLMapStorage implements IMapStorage {
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "MapName VARCHAR(64) NOT NULL UNIQUE, " +
                     "Data TEXT NOT NULL, " +
-                    "URL VARCHAR(255), " +
                     "Author VARCHAR(64), " +
                     "CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                     "UpdateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
@@ -248,63 +247,5 @@ public class MySQLMapStorage implements IMapStorage {
         }
         
         return allSuccess;
-    }
-    
-    /**
-     * 设置地图的地址（物理位置）
-     * @param mapName 地图名称
-     * @param url 地图地址
-     * @return 是否设置成功
-     */
-    public boolean setMapUrl(String mapName, String url) {
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(databaseName)) {
-            if (connection == null) {
-                return false;
-            }
-            
-            String sql = "UPDATE " + tableName + " SET URL=? WHERE MapName=?";
-            
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, url);
-                statement.setString(2, mapName);
-                
-                int affected = statement.executeUpdate();
-                return affected > 0;
-            }
-        } catch (SQLException e) {
-            Bukkit.getLogger().severe("设置地图URL时出错: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    /**
-     * 获取地图的地址（物理位置）
-     * @param mapName 地图名称
-     * @return 地图地址，如果不存在则返回null
-     */
-    public String getMapUrl(String mapName) {
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(databaseName)) {
-            if (connection == null) {
-                return null;
-            }
-            
-            String sql = "SELECT URL FROM " + tableName + " WHERE MapName=?";
-            
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, mapName);
-                
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        return resultSet.getString("URL");
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            Bukkit.getLogger().severe("获取地图URL时出错: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return null;
     }
 } 

@@ -17,7 +17,7 @@ public class PlayerAFKListener implements Listener {
 
     private static final int MAX_NO_MOVEMENT_TIME = 45;
 
-    public static Map<UUID, Long> afkLastMovement = new HashMap<>();
+    private static final Map<UUID, Long> afkLastMovement = new HashMap<>();
     private static int checkAFKTask;
 
     @EventHandler

@@ -70,7 +70,7 @@ public class PlayerPickUpListenerA implements Listener {
         // 当玩家将要捡起铁锭/金锭/钻石/绿宝石
         if (itemStack.getType() == Material.IRON_INGOT || itemStack.getType() == Material.GOLD_INGOT || itemStack.getType() == Material.DIAMOND || itemStack.getType() == Material.EMERALD) {
             // 玩家挂机状态不能拾取资源
-            if (PlayerAFKListener.afk.get(player.getUniqueId())) {
+            if (gamePlayer.isAfk()) {
                 event.setCancelled(true);
                 return;
             }

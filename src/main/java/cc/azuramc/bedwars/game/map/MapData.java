@@ -21,11 +21,13 @@ public class MapData {
     private final List<DropRawLocation> drops;
     private final List<ShopRawLocation> shops;
     @Setter
-    private transient String name;
+    private String name;
     @Setter
     private String author;
     private RawLocation waitingLocation;
-    private RawLocation reSpawn;
+    private RawLocation respawnLocation;
+
+    @Getter @Setter private String fileUrl;
 
     public MapData(String mapName) {
         this.name = mapName;
@@ -47,7 +49,7 @@ public class MapData {
         waitingLocation = rawLocation;
     }
 
-    public void setReSpawn(Location location) {
+    public void setRespawnLocation(Location location) {
         RawLocation rawLocation = new RawLocation();
         rawLocation.setWorld(Objects.requireNonNull(location.getWorld()).getName());
         rawLocation.setX(location.getX());
@@ -55,7 +57,7 @@ public class MapData {
         rawLocation.setZ(location.getZ());
         rawLocation.setPitch(location.getPitch());
         rawLocation.setYaw(location.getYaw());
-        reSpawn = rawLocation;
+        respawnLocation = rawLocation;
     }
 
     public void addBase(Location location) {
@@ -129,14 +131,6 @@ public class MapData {
 
     public List<Location> getShopLocations(ShopType shopType) {
         return shops.stream().filter((e) -> e.getShopType() == shopType).map(RawLocation::toLocation).collect(Collectors.toList());
-    }
-
-    /**
-     * 获取重生点的Bukkit Location对象
-     * @return 地图重生点位置
-     */
-    public Location getReSpawnLocation() {
-        return reSpawn != null ? reSpawn.toLocation() : null;
     }
 
     /**
@@ -254,7 +248,7 @@ public class MapData {
     public boolean isValid() {
         return region.getPos1() != null && 
                region.getPos2() != null && 
-               reSpawn != null && 
+               respawnLocation != null &&
                !bases.isEmpty() &&
                players.getTeam() != null &&
                players.getMin() != null;

@@ -29,7 +29,7 @@ public class AdminCommand {
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助"));
         CommandUtil.sendLayout(actor, "");
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map &7查看地图相关指令帮助"));
-        CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/editorMode true/false &7开关编辑模式"));
+        CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw editorMode true/false &7开关编辑模式"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw toWorld <worldName> &7前往世界"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw loadWorld <worldName> &7加载世界"));
         CommandUtil.sendLayout(actor, ChatColorUtil.CHAT_BAR);
@@ -51,6 +51,7 @@ public class AdminCommand {
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: ITEM/UPGRADE)"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map setPos1 <mapName> &7设置地图边界1"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map setPos2 <mapName> &7设置地图边界2"));
+        CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map setUrl <url> &7设置地图文件物理路径"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map save <mapName> &7保存地图"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map load <mapName> &7加载地图配置"));
         CommandUtil.sendLayout(actor, "");
@@ -63,12 +64,13 @@ public class AdminCommand {
 
     @Subcommand("editorMode")
     public void editorMode(BukkitCommandActor actor, boolean value) {
-        if (plugin.getConfig().getBoolean("editorMode") == value) {
+        if (plugin.getSettingsConfig().isEditorMode() == value) {
             CommandUtil.sendLayout(actor, "&ceditorMode值已经是 " + value + "了");
             return;
         }
-        plugin.getConfig().set("editorMode", value);
-        plugin.saveConfig();
+        plugin.getSettingsConfig().setEditorMode(value);
+        CommandUtil.sendLayout(actor, "成功设置值为 " + value);
+        plugin.getConfigManager().saveConfig("settings");
     }
 
     @Subcommand("toWorld")

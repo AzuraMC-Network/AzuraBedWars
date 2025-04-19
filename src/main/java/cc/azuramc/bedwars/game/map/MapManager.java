@@ -168,26 +168,24 @@ public class MapManager {
      * @return 地图数据对象，如果失败则返回null
      */
     public MapData loadMapAndWorld(String mapName) {
-        // 从MySQL存储实现获取地图URL
-        String mapUrl = null;
-        if (defaultStorage instanceof MySQLMapStorage) {
-            mapUrl = ((MySQLMapStorage) defaultStorage).getMapUrl(mapName);
-        }
-        
-        if (mapUrl == null || mapUrl.isEmpty()) {
-            Bukkit.getLogger().warning("地图 " + mapName + " 没有设置物理路径(URL)");
-            return null;
-        }
-        
         // 加载地图数据
         MapData mapData = getAndLoadMapData(mapName);
         if (mapData == null) {
             return null;
         }
         
+        // 获取地图文件URL
+        String mapUrl = mapData.getFileUrl();
+        if (mapUrl == null || mapUrl.isEmpty()) {
+            Bukkit.getLogger().warning("地图 " + mapName + " 没有设置物理路径(URL)");
+            return null;
+        }
+        Bukkit.getLogger().info("正在从 " + mapUrl + "获取地图文件");
+        
         // 加载世界
         World world = loadMapWorld(mapName, mapUrl);
         if (world == null) {
+            Bukkit.getLogger().warning("world 加载失败");
             return null;
         }
         
@@ -201,12 +199,13 @@ public class MapManager {
      * @return 是否设置成功
      */
     public boolean setMapUrl(String mapName, String mapUrl) {
-        // 只有MySQL存储才支持设置URL
-        if (defaultStorage instanceof MySQLMapStorage) {
-            return ((MySQLMapStorage) defaultStorage).setMapUrl(mapName, mapUrl);
+        MapData mapData = loadedMaps.get(mapName);
+        if (mapData == null) {
+            return false;
         }
         
-        return false;
+        mapData.setFileUrl(mapUrl);
+        return saveMapData(mapName, mapData);
     }
     
     /**
@@ -215,12 +214,8 @@ public class MapManager {
      * @return 地图物理路径，如果不存在则返回null
      */
     public String getMapUrl(String mapName) {
-        // 只有MySQL存储才支持获取URL
-        if (defaultStorage instanceof MySQLMapStorage) {
-            return ((MySQLMapStorage) defaultStorage).getMapUrl(mapName);
-        }
-        
-        return null;
+        MapData mapData = loadedMaps.get(mapName);
+        return mapData != null ? mapData.getFileUrl() : null;
     }
 
 } 

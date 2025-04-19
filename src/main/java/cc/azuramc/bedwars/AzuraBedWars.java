@@ -90,6 +90,9 @@ public final class AzuraBedWars extends JavaPlugin {
     private TaskConfig taskConfig;
 
     @Getter
+    private JedisManager jedisManager;
+
+    @Getter
     private PubSubListener pubSubListener;
 
     @Override
@@ -107,7 +110,9 @@ public final class AzuraBedWars extends JavaPlugin {
         initConfigSystem();
         
         // 不在编辑模式下初始化游戏功能
-        if (!settingsConfig.isEditorMode()) {
+        if (settingsConfig.isEditorMode()) {
+            getLogger().info("当前处于编辑模式(editorMode) 取消游戏相关特性加载");
+        } else {
             initGameFeatures();
         }
 
@@ -141,6 +146,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 初始化通信频道
      */
     private void intiChannelSystem() {
+        jedisManager = new JedisManager(this);
         pubSubListener = new PubSubListener();
         getServer().getScheduler().runTaskAsynchronously(this, pubSubListener);
         JedisManager.getInstance().getServerData().setGameType("AzuraBedWars");
@@ -152,6 +158,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 初始化游戏相关功能
      */
     private void initGameFeatures() {
+        Bukkit.getLogger().info("开始加载游戏相关特性...");
         // 注册GUI监听器
         new GUIListener(this);
 
@@ -176,6 +183,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 配置世界设置
         configureWorlds();
+        Bukkit.getLogger().info("游戏相关特性加载完成");
     }
 
     /**
@@ -186,7 +194,7 @@ public final class AzuraBedWars extends JavaPlugin {
         String defaultMapName = settingsConfig.getDefaultMapName();
         
         if (defaultMapName != null && !defaultMapName.isEmpty()) {
-            mapData = mapManager.getAndLoadMapData(defaultMapName);
+            mapData = mapManager.loadMapAndWorld(defaultMapName);
         } else if (!mapManager.getLoadedMaps().isEmpty()) {
             mapData = mapManager.getLoadedMaps().entrySet().iterator().next().getValue();
         }

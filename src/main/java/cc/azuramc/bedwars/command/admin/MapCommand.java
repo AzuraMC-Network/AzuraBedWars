@@ -44,6 +44,7 @@ public class MapCommand {
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: ITEM/UPGRADE)"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map setPos1 <mapName> &7设置地图边界1"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map setPos2 <mapName> &7设置地图边界2"));
+        CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map setUrl <url> &7设置地图文件物理路径"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map save <mapName> &7保存地图"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map load <mapName> &7加载地图配置"));
         CommandUtil.sendLayout(actor, "");
@@ -75,7 +76,7 @@ public class MapCommand {
     @Subcommand("setRespawn")
     public void setRespawn(Player player, String mapName) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        mapData.setReSpawn(player.getLocation());
+        mapData.setRespawnLocation(player.getLocation());
         player.sendMessage(ChatColorUtil.color("&a地图重生点设置成功!"));
     }
 
@@ -121,8 +122,8 @@ public class MapCommand {
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&a地图最小人数置成功!"));
     }
 
-    @Subcommand("addDropLoc")
-    public void addDropLoc(Player player, String mapName, String value) {
+    @Subcommand("addDrop")
+    public void addDrop(Player player, String mapName, String value) {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.addDrop(MapData.DropType.valueOf(value.toUpperCase()), player.getLocation());
         switch (MapData.DropType.valueOf(value)) {
@@ -131,6 +132,19 @@ public class MapCommand {
             case EMERALD -> player.sendMessage(ChatColorUtil.color("&a成功添加绿宝石资源点"));
             default -> player.sendMessage(ChatColorUtil.color("&c添加资源点失败"));
         }
+    }
+
+
+    @Subcommand("setUrl")
+    public void setUrl(BukkitCommandActor actor, String mapName, String fileUrl) {
+        MapData mapData = mapManager.getLoadedMaps().get(mapName);
+        if (mapData == null) {
+            CommandUtil.sendLayout(actor, ChatColorUtil.color("&c找不到地图: " + mapName));
+            return;
+        }
+
+        mapData.setFileUrl(fileUrl);
+        CommandUtil.sendLayout(actor, ChatColorUtil.color("&a地图文件URL设置成功!"));
     }
 
     @Subcommand("addShop")
@@ -143,6 +157,12 @@ public class MapCommand {
         } else {
             player.sendMessage(ChatColorUtil.color("&a成功设置团队升级!"));
         }
+    }
+
+    @Subcommand("preloadMap")
+    public void preloadMap(BukkitCommandActor actor, String mapName) {
+        mapManager.getAndLoadMapData(mapName);
+        CommandUtil.sendLayout(actor, ChatColorUtil.color("&a地图预加载完成"));
     }
 
     @Subcommand("list")
@@ -230,10 +250,13 @@ public class MapCommand {
         CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &fPos1: &b" + mapData.getPos1Location()));
         CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &fPos2: &b" + mapData.getPos2Location()));
         CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &f大厅位置: &b" + mapData.getWaitingLocation()));
+        CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &f复活时位置: &b" + mapData.getRespawnLocation()));
         CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &f基地出生点: &b" + mapData.getBases()));
         CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE)));
         CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND)));
         CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &f绿宝石资源点: &b" + mapData.getDrops(MapData.DropType.EMERALD)));
+        CommandUtil.sendLayout(actor, " ");
+        CommandUtil.sendLayout(actor, ChatColorUtil.color(" &9&l▸ &f地图文件物理地址: &b" + mapData.getFileUrl()));
         CommandUtil.sendLayout(actor, ChatColorUtil.CHAT_BAR);
     }
 

@@ -49,7 +49,7 @@ public class GameManager {
     private static final Material LEAVE_GAME_MATERIAL = Material.SLIME_BALL;
     private static final String LEAVE_GAME_NAME = "§c离开游戏§7(右键离开)";
     
-    private AzuraBedWars main;
+    private AzuraBedWars plugin;
     private GameEventManager gameEventManager;
     private MapData mapData;
     private GameState gameState;
@@ -74,7 +74,7 @@ public class GameManager {
      * @param plugin 插件主类实例
      */
     public GameManager(AzuraBedWars plugin) {
-        this.main = plugin;
+        this.plugin = plugin;
         this.isForceStarted = false;
         this.gameTeams = new ArrayList<>();
         this.gameParties = new ArrayList<>();
@@ -97,10 +97,10 @@ public class GameManager {
         
         this.mapData = mapData;
         this.blocks = mapData.loadMap();
-        this.respawnLocation = mapData.getReSpawn().toLocation();
+        this.respawnLocation = mapData.getRespawnLocation().toLocation();
         this.waitingLocation = mapData.getWaitingLocation().toLocation();
 
-        LoadGameUtil.spawnAll(main);
+        LoadGameUtil.spawnAll(plugin);
 
         initializeTeams(mapData);
         this.gameState = GameState.WAITING;
@@ -275,7 +275,7 @@ public class GameManager {
     private void checkGameStart() {
         if (isStartable() && gameState == GameState.WAITING && getGameStartTask() == null) {
             GameStartTask lobbyCountdown = new GameStartTask(this);
-            lobbyCountdown.runTaskTimer(main, COUNTDOWN_TICK_PERIOD, COUNTDOWN_TICK_PERIOD);
+            lobbyCountdown.runTaskTimer(plugin, COUNTDOWN_TICK_PERIOD, COUNTDOWN_TICK_PERIOD);
             setGameStartTask(lobbyCountdown);
         }
     }
