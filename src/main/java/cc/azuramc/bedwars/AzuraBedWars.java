@@ -2,6 +2,7 @@ package cc.azuramc.bedwars;
 
 import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.object.EventConfig;
+import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapLoadManager;
@@ -89,6 +90,9 @@ public final class AzuraBedWars extends JavaPlugin {
 
     @Getter
     private TaskConfig taskConfig;
+
+    @Getter
+    private MessageConfig messageConfig;
 
     @Getter
     private JedisManager jedisManager;
@@ -416,6 +420,7 @@ public final class AzuraBedWars extends JavaPlugin {
         settingsConfig = configManager.getConfig("settings", SettingsConfig.class);
         eventConfig = configManager.getConfig("events", EventConfig.class);
         taskConfig = configManager.getConfig("tasks", TaskConfig.class);
+        messageConfig = configManager.getConfig("messages", MessageConfig.class);
         
         // 保存配置
         configManager.saveAll();

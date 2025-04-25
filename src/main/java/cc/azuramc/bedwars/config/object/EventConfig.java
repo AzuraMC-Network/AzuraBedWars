@@ -1,6 +1,5 @@
 package cc.azuramc.bedwars.config.object;
 
-import cc.azuramc.bedwars.util.ChatColorUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,13 +25,10 @@ public class EventConfig {
     public static class DestroyBedEvent {
 
         private Title title = new Title();
-        private String eventName = ChatColorUtil.color("床自毁");
         private int executeSecond = 360;
 
         @Data
         public static class Title {
-            private String titleString = ChatColorUtil.color("§c§l床自毁");
-            private String subtitle = ChatColorUtil.color("§e所有队伍床消失");
             private int fadeIn = 10;
             private int titleStay = 20;
             private int fadeOut = 10;
@@ -41,7 +37,6 @@ public class EventConfig {
 
     @Data
     public static class DiamondUpdateEvent {
-        private String eventName = ChatColorUtil.color("钻石刷新");
         private int level2RefreshSecond = 23;
         private int level3RefreshSecond = 15;
     }
@@ -49,20 +44,17 @@ public class EventConfig {
 
     @Data
     public static class EmeraldUpdateEvent {
-        private String eventName = ChatColorUtil.color("绿宝石刷新");
         private int level2RefreshSecond = 23;
         private int level3RefreshSecond = 15;
     }
 
     @Data
     public static class ShutdownEvent {
-        private String eventName = ChatColorUtil.color("游戏关闭");
         private int shutdownDelaySecond = 30;
     }
 
     @Data
     public static class OverEvent {
-        private String eventName = ChatColorUtil.color("游戏结束");
         private int executeSecond = 600;
     }
 
@@ -71,15 +63,11 @@ public class EventConfig {
 
         private Title title = new Title();
         private Upgrade upgrade = new Upgrade();
-        private String eventName = ChatColorUtil.color("开始游戏");
         private int countDown = 5;
         private int eventPriority = 0;
-        private String teamUpgradeTaskName = "团队升级";
 
         @Data
         public static class Title {
-            private String titleString = ChatColorUtil.color("§c§l游戏即将开始");
-            private String subtitle = ChatColorUtil.color("§e§l");
             private int fadeIn = 1;
             private int titleStay = 20;
             private int fadeOut = 1;

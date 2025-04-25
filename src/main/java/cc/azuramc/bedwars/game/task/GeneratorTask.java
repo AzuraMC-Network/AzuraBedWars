@@ -2,11 +2,13 @@ package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.util.ArmorStandUtil;
+import cc.azuramc.bedwars.util.ChatColorUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -91,6 +93,7 @@ public class GeneratorTask {
     public GeneratorTask(GameManager gameManager) {
         this.gameManager = gameManager;
         TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
+        MessageConfig.GeneratorConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGenerator();
 
         // 初始化所有配置值
         IRON_SPAWN_INTERVAL = config.getIronSpawnInterval();
@@ -119,21 +122,21 @@ public class GeneratorTask {
         RESOURCE_TYPE_HEIGHT = config.getResourceTypeHeight();
         LEVEL_DISPLAY_HEIGHT = config.getLevelDisplayHeight();
 
-        IRON_GENERATOR_NAME = config.getIronGeneratorName();
-        GOLD_GENERATOR_NAME = config.getGoldGeneratorName();
-        DIAMOND_GENERATOR_NAME = config.getDiamondGeneratorName();
-        DIAMOND_TIME_DISPLAY = config.getDiamondTimeDisplay();
-        EMERALD_GENERATOR_NAME = config.getEmeraldGeneratorName();
-        EMERALD_TIME_DISPLAY = config.getEmeraldTimeDisplay();
+        IRON_GENERATOR_NAME = messageConfig.getIronGeneratorName();
+        GOLD_GENERATOR_NAME = messageConfig.getGoldGeneratorName();
+        DIAMOND_GENERATOR_NAME = messageConfig.getDiamondGeneratorName();
+        DIAMOND_TIME_DISPLAY = messageConfig.getDiamondTimeDisplay();
+        EMERALD_GENERATOR_NAME = messageConfig.getEmeraldGeneratorName();
+        EMERALD_TIME_DISPLAY = messageConfig.getEmeraldTimeDisplay();
 
-        TIME_REMAINING_FORMAT = config.getTimeRemainingFormat();
-        DIAMOND_NAME = config.getDiamondName();
-        EMERALD_NAME = config.getEmeraldName();
-        LEVEL_I = config.getLevelI();
-        LEVEL_II = config.getLevelII();
-        LEVEL_III = config.getLevelIII();
+        TIME_REMAINING_FORMAT = messageConfig.getTimeRemainingFormat();
+        DIAMOND_NAME = messageConfig.getDiamondName();
+        EMERALD_NAME = messageConfig.getEmeraldName();
+        LEVEL_I = messageConfig.getLevelI();
+        LEVEL_II = messageConfig.getLevelII();
+        LEVEL_III = messageConfig.getLevelIII();
 
-        ITEM_DISPLAY_NAME = config.getItemDisplayName();
+        ITEM_DISPLAY_NAME = ChatColorUtil.color("&a&a&a&a&a&a");
         ITEM_VELOCITY = new Vector(config.getItemVelocityX(), config.getItemVelocityY(), config.getItemVelocityZ());
     }
 

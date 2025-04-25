@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.game.task;
 
+import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -24,6 +25,7 @@ import java.util.Objects;
 public class GameOverTask extends BukkitRunnable {
 
     private static final TaskConfig.GameOverConfig config = AzuraBedWars.getInstance().getTaskConfig().getGameOver();
+    private static final MessageConfig.GameOverConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameOver();
 
     // 游戏结束倒计时时间(秒)
     private static final int DEFAULT_COUNTDOWN = config.getDefaultCountdown();
@@ -40,18 +42,18 @@ public class GameOverTask extends BukkitRunnable {
     private static final double FIREWORK_HEIGHT = config.getFireworkHeight();
     
     // 胜利/失败消息
-    private static final String VICTORY_TITLE = config.getVictoryTitle();
-    private static final String VICTORY_SUBTITLE = config.getVictorySubtitle();
-    private static final String DEFEAT_TITLE = config.getDefeatTitle();
-    private static final String DEFEAT_SUBTITLE = config.getDefeatSubtitle();
+    private static final String VICTORY_TITLE = messageConfig.getVictoryTitle();
+    private static final String VICTORY_SUBTITLE = messageConfig.getVictorySubtitle();
+    private static final String DEFEAT_TITLE = messageConfig.getDefeatTitle();
+    private static final String DEFEAT_SUBTITLE = messageConfig.getDefeatSubtitle();
     
     // 排行榜标题及分隔线
-    private static final String[] lead = config.getLead();
-    private static final String SEPARATOR_LINE = config.getSeparatorLine();
-    private static final String GAME_TITLE = config.getGameTitle();
-    private static final String WINNERS_PREFIX = config.getWinnersPrefix();
-    private static final String NO_WINNER = config.getNoWinner();
-    private static final String RANK_PREFIX = config.getRankPrefix();
+    private static final String[] lead = messageConfig.getLead();
+    private static final String SEPARATOR_LINE = messageConfig.getSeparatorLine();
+    private static final String GAME_TITLE = messageConfig.getGameTitle();
+    private static final String WINNERS_PREFIX = messageConfig.getWinnersPrefix();
+    private static final String NO_WINNER = messageConfig.getNoWinner();
+    private static final String RANK_PREFIX = messageConfig.getRankPrefix();
     
     private final GameManager gameManager;
     private int countdown = DEFAULT_COUNTDOWN;
@@ -212,12 +214,10 @@ public class GameOverTask extends BukkitRunnable {
      */
     private void spawnVictoryFireworks(GameTeam winner) {
         if (winner != null) {
-            winner.getAlivePlayers().forEach(gamePlayer -> {
-                FireWorkUtil.spawnFireWork(
-                    gamePlayer.getPlayer().getLocation().add(0.0D, FIREWORK_HEIGHT, 0.0D),
-                        Objects.requireNonNull(gamePlayer.getPlayer().getLocation().getWorld())
-                );
-            });
+            winner.getAlivePlayers().forEach(gamePlayer -> FireWorkUtil.spawnFireWork(
+                gamePlayer.getPlayer().getLocation().add(0.0D, FIREWORK_HEIGHT, 0.0D),
+                    Objects.requireNonNull(gamePlayer.getPlayer().getLocation().getWorld())
+            ));
         }
     }
     

@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.EventConfig;
+import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
@@ -23,12 +24,13 @@ public class GameStartEvent extends GameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private static final EventConfig.StartEvent config = plugin.getEventConfig().getStartEvent();
+    private static final MessageConfig.StartEvent messageEvent = plugin.getMessageConfig().getStartEvent();
 
     /**
      * 创建游戏开始事件
      */
     public GameStartEvent() {
-        super(config.getEventName(), config.getCountDown(), config.getEventPriority());
+        super(messageEvent.getEventName(), config.getCountDown(), config.getEventPriority());
     }
 
     /**
@@ -44,8 +46,8 @@ public class GameStartEvent extends GameEvent {
             config.getTitle().getFadeIn(),
             config.getTitle().getTitleStay(),
             config.getTitle().getFadeOut(),
-            config.getTitle().getTitleString(),
-            config.getTitle().getSubtitle() + seconds
+            messageEvent.getTitle().getTitleString(),
+            messageEvent.getTitle().getSubtitle() + seconds
         );
     }
 
@@ -68,7 +70,7 @@ public class GameStartEvent extends GameEvent {
      * @param gameManager 游戏实例
      */
     private void registerTeamUpgradeTask(GameManager gameManager) {
-        gameManager.getGameEventManager().registerRunnable(config.getTeamUpgradeTaskName(), (s, c) ->
+        gameManager.getGameEventManager().registerRunnable(messageEvent.getTeamUpgradeTaskName(), (s, c) ->
             GamePlayer.getOnlinePlayers().forEach(player -> {
                 if (player.isSpectator()) {
                     return;

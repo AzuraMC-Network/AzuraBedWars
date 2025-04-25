@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameManager;
@@ -20,6 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class GameStartTask extends BukkitRunnable {
 
     private static final TaskConfig.GameStartConfig config = AzuraBedWars.getInstance().getTaskConfig().getGameStart();
+    private static final MessageConfig.GameStartConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameStart();
 
     // 倒计时常量
     private static final int DEFAULT_COUNTDOWN = config.getDefaultCountdown();
@@ -29,16 +31,16 @@ public class GameStartTask extends BukkitRunnable {
     private static final int[] ANNOUNCEMENT_TIMES = config.getAnnouncementTimes();
     
     // 标题显示配置
-    private static final String TITLE_COUNTDOWN = config.getTitle().getTitleCountdown();
-    private static final String SUBTITLE_TEXT = config.getTitle().getSubtitleText();
+    private static final String TITLE_COUNTDOWN = messageConfig.getTitle().getTitleCountdown();
+    private static final String SUBTITLE_TEXT = messageConfig.getTitle().getSubtitleText();
     private static final int TITLE_FADE_IN = config.getTitle().getFadeIn();
     private static final int TITLE_STAY = config.getTitle().getTitleStay();
     private static final int TITLE_FADE_OUT = config.getTitle().getFadeOut();
     
     // 消息模板
-    private static final String MSG_COUNTDOWN = config.getMsgCountdown();
-    private static final String MSG_NOT_ENOUGH_PLAYERS = config.getMsgNotEnoughPlayers();
-    private static final String MSG_GAME_FULL = config.getMsgGameFull();
+    private static final String MSG_COUNTDOWN = messageConfig.getMsgCountdown();
+    private static final String MSG_NOT_ENOUGH_PLAYERS = messageConfig.getMsgNotEnoughPlayers();
+    private static final String MSG_GAME_FULL = messageConfig.getMsgGameFull();
 
     private final GameManager gameManager;
     

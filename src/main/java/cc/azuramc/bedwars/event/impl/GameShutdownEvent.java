@@ -15,7 +15,7 @@ public class GameShutdownEvent extends GameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
-    private static final String EVENT_NAME = plugin.getEventConfig().getShutdownEvent().getEventName();
+    private static final String EVENT_NAME = plugin.getMessageConfig().getShutdownEvent().getEventName();
     
     // 游戏结束延迟关服时间（秒）
     private static final int SHUTDOWN_DELAY_SECONDS = plugin.getEventConfig().getShutdownEvent().getShutdownDelaySecond();
