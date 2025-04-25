@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.TitleUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
@@ -40,9 +41,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  */
 public class GamePlayer {
+
+    private static final PlayerConfig.GamePlayer config = AzuraBedWars.getInstance().getPlayerConfig().getGamePlayer();
+
     // 静态字段
     private static final ConcurrentHashMap<UUID, GamePlayer> gamePlayers = new ConcurrentHashMap<>();
-    private static final int MAX_HEALTH = 20;
+    private static final int MAX_HEALTH = config.getMaxHealth();
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
 

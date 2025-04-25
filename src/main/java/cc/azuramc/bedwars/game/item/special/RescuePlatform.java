@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.game.item.special;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Getter;
@@ -25,10 +26,13 @@ import java.util.stream.Collectors;
  * </p>
  */
 public class RescuePlatform extends SpecialItem {
+
+    private static final ItemConfig config = AzuraBedWars.getInstance().getItemConfig();
+
     // 常量定义
-    private static final int DEFAULT_BREAK_TIME = 12;      // 默认平台存在时间（秒）
-    private static final int DEFAULT_WAIT_TIME = 20;       // 默认使用冷却时间（秒）
-    private static final double JUMP_BOOST = 0.7;          // 跳跃提升力度
+    private static final int DEFAULT_BREAK_TIME = config.getRescuePlatform().getDefaultBreakTime();      // 默认平台存在时间（秒）
+    private static final int DEFAULT_WAIT_TIME = config.getRescuePlatform().getDefaultWaitTime();       // 默认使用冷却时间（秒）
+    private static final double JUMP_BOOST = config.getRescuePlatform().getJumpBoost();          // 跳跃提升力度
     private static final Material PLATFORM_MATERIAL = Material.SLIME_BLOCK;  // 平台方块材质
 
 

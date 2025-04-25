@@ -3,6 +3,8 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.config.object.ItemConfig;
+import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.team.TeamColor;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.game.task.GameStartTask;
@@ -33,19 +35,23 @@ import java.util.*;
  */
 @Data
 public class GameManager {
+
+    private static final ItemConfig.GameManager config = AzuraBedWars.getInstance().getItemConfig().getGameManager();
+    private static final MessageConfig.GameManager messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameManager();
+
     // 时间常量
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
     private static final int ASSIST_TIME_WINDOW_MS = 10000;
     
     // 消息常量
-    private static final String MSG_PLAYER_RECONNECT = "§7%s§a重连上线";
-    private static final String MSG_PLAYER_LEAVE = "§7%s§e离开游戏";
+    private static final String MSG_PLAYER_RECONNECT = messageConfig.getMsgPlayerReconnect();
+    private static final String MSG_PLAYER_LEAVE = messageConfig.getMsgPlayerLeave();
     
     // 物品常量
     private static final Material RESOURCE_SELECTOR_MATERIAL = Material.PAPER;
-    private static final String RESOURCE_SELECTOR_NAME = "§a资源类型选择§7(右键选择)";
+    private static final String RESOURCE_SELECTOR_NAME = config.getResourceSelectorName();
     private static final Material LEAVE_GAME_MATERIAL = Material.SLIME_BALL;
-    private static final String LEAVE_GAME_NAME = "§c离开游戏§7(右键离开)";
+    private static final String LEAVE_GAME_NAME = config.getLeaveGameName();
     
     private AzuraBedWars plugin;
     private GameEventManager gameEventManager;

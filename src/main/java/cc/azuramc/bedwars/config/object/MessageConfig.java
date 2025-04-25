@@ -20,8 +20,12 @@ public class MessageConfig {
     private GameStartConfig gameStart = new GameStartConfig();
     private GameOverConfig gameOver = new GameOverConfig();
 
+    private WarpPowder warpPowder = new WarpPowder();
+
+    private GameManager gameManager = new GameManager();
+
     @Data
-    public static class DestroyBedEvent{
+    public static class DestroyBedEvent {
 
         private Title title = new Title();
         private String eventName = ChatColorUtil.color("床自毁");
@@ -119,5 +123,17 @@ public class MessageConfig {
         private String winnersPrefix = ChatColorUtil.color("                                    &e胜利者 &7- ");
         private String noWinner = ChatColorUtil.color("&7无");
         private String rankPrefix = ChatColorUtil.color("                          ");
+    }
+
+    @Data
+    public static class WarpPowder {
+        private String teleportStartMessage = ChatColorUtil.color("&a在 &c%d&a 秒后你将被传送，请不要移动!");
+        private String teleportCancelMessage = ChatColorUtil.color("&c你的传送被取消!");
+    }
+
+    @Data
+    public static class GameManager {
+        private String msgPlayerReconnect = ChatColorUtil.color("&7%s&a重连上线");
+        private String msgPlayerLeave = ChatColorUtil.color("&7%s&e离开游戏");
     }
 }

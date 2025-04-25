@@ -2,6 +2,8 @@ package cc.azuramc.bedwars.game.item.special;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.config.object.ItemConfig;
+import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
@@ -31,20 +33,25 @@ import java.util.List;
  * </p>
  */
 public class WarpPowder extends SpecialItem {
+
+    private static final ItemConfig.WarpPowder config = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
+    private static final MessageConfig.WarpPowder messageConfig = AzuraBedWars.getInstance().getMessageConfig().getWarpPowder();
+
     // 常量定义
-    private static final int DEFAULT_TELEPORT_TIME = 6;           // 默认传送时间（秒）
-    private static final int CIRCLE_ELEMENTS = 20;                // 每个粒子环的粒子数量
-    private static final double PARTICLE_RADIUS = 1.0;            // 粒子环半径
-    private static final double PARTICLE_HEIGHT = 2.0;            // 粒子效果总高度
-    private static final double CIRCLE_COUNT = 15.0;              // 粒子环的数量
-    private static final String CANCEL_ITEM_NAME = "§4取消传送";    // 取消传送物品名称
-    private static final String TELEPORT_START_MESSAGE = "§a在 §c%d§a 秒后你将被传送，请不要移动!";
-    private static final String TELEPORT_CANCEL_MESSAGE = "§c你的传送被取消!";
+    private static final int DEFAULT_TELEPORT_TIME = config.getDefaultTeleportTime();           // 默认传送时间（秒）
+    private static final int CIRCLE_ELEMENTS = config.getCircleElements();                      // 每个粒子环的粒子数量
+    private static final double PARTICLE_RADIUS = config.getParticleRadius();                   // 粒子环半径
+    private static final double PARTICLE_HEIGHT = config.getParticleHeight();                   // 粒子效果总高度
+    private static final double CIRCLE_COUNT = config.getCircleCount();                         // 粒子环的数量
+
+    private static final String CANCEL_ITEM_NAME = config.getCancelItemName();                  // 取消传送物品名称
+    private static final String TELEPORT_START_MESSAGE = messageConfig.getTeleportStartMessage();
+    private static final String TELEPORT_CANCEL_MESSAGE = messageConfig.getTeleportCancelMessage();
     
     // 实例变量
     private final int fullTeleportingTime;      // 完整传送时间
     @Setter
-    private GameManager gameManager;                          // 游戏实例
+    private GameManager gameManager;            // 游戏实例
     private GamePlayer gamePlayer;              // 玩家
     @Getter
     private ItemStack stack;                    // 原始物品栈

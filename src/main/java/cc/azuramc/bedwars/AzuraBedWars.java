@@ -1,9 +1,7 @@
 package cc.azuramc.bedwars;
 
 import cc.azuramc.bedwars.command.CommandRegistry;
-import cc.azuramc.bedwars.config.object.EventConfig;
-import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.TaskConfig;
+import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapLoadManager;
 import cc.azuramc.bedwars.game.map.MapManager;
@@ -19,7 +17,6 @@ import cc.azuramc.bedwars.database.connection.ConnectionPoolHandler;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -92,6 +89,12 @@ public final class AzuraBedWars extends JavaPlugin {
 
     @Getter
     private MessageConfig messageConfig;
+
+    @Getter
+    private ItemConfig itemConfig;
+
+    @Getter
+    private PlayerConfig playerConfig;
 
     @Getter
     private JedisManager jedisManager;
@@ -414,7 +417,10 @@ public final class AzuraBedWars extends JavaPlugin {
         configFactory.registerSupplier("settings", SettingsConfig::new);
         configFactory.registerSupplier("events", EventConfig::new);
         configFactory.registerSupplier("tasks", TaskConfig::new);
-        
+        configFactory.registerSupplier("messages", MessageConfig::new);
+        configFactory.registerSupplier("items", ItemConfig::new);
+        configFactory.registerSupplier("player", PlayerConfig::new);
+
         // 初始化默认配置
         configFactory.initializeDefaults(configManager);
         
@@ -423,7 +429,9 @@ public final class AzuraBedWars extends JavaPlugin {
         eventConfig = configManager.getConfig("events", EventConfig.class);
         taskConfig = configManager.getConfig("tasks", TaskConfig.class);
         messageConfig = configManager.getConfig("messages", MessageConfig.class);
-        
+        itemConfig = configManager.getConfig("items", ItemConfig.class);
+        playerConfig = configManager.getConfig("player", PlayerConfig.class);
+
         // 保存配置
         configManager.saveAll();
     }
