@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.scoreboard.provider.GameBoardProvider;
 import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -15,8 +16,8 @@ import org.bukkit.event.Listener;
  */
 public class ScoreboardManager implements Listener {
     private final GameManager gameManager;
-    private GameBoardProvider gameBoardProvider;
-    private LobbyBoardProvider lobbyBoardProvider;
+    @Getter GameBoardProvider gameBoardProvider;
+    @Getter LobbyBoardProvider lobbyBoardProvider;
     
     /**
      * 构造函数
@@ -130,22 +131,5 @@ public class ScoreboardManager implements Listener {
         plugin.getServer().getPluginManager().registerEvents(gameBoardProvider, plugin);
         plugin.getServer().getPluginManager().registerEvents(lobbyBoardProvider, plugin);
     }
-    
-    /**
-     * 获取游戏计分板提供者
-     * 
-     * @return 游戏计分板提供者
-     */
-    public GameBoardProvider getGameBoardProvider() {
-        return gameBoardProvider;
-    }
-    
-    /**
-     * 获取大厅计分板提供者
-     * 
-     * @return 大厅计分板提供者
-     */
-    public LobbyBoardProvider getLobbyBoardProvider() {
-        return lobbyBoardProvider;
-    }
+
 }
