@@ -15,10 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 /**
  * 聊天监听器类
  * <p>
@@ -38,8 +34,6 @@ public class ChatListener implements Listener {
     private static final String TEAM_CHAT_TAG = config.getTeamChatTag();
     private static final String CHAT_SEPARATOR = config.getChatSeparator();
     private static final int GLOBAL_CHAT_COOLDOWN = config.getGlobalChatCooldown();
-
-    public static List<UUID> inShoutCoolDown = new ArrayList<>();
 
     private static GameManager gameManager;
     private static AzuraBedWars plugin;
@@ -81,32 +75,29 @@ public class ChatListener implements Listener {
 
         // 记录冷却
         if (gameManager.getGameState() == GameState.RUNNING && gamePlayer != null) {
-            processShoutCooldown(player);
+            checkShoutCooldown(gamePlayer);
         }
     }
 
     /**
      * 构建聊天消息
      *
-     * @param player 冷却玩家
+     * @param gamePlayer 游戏玩家
      */
-    public static void processShoutCooldown(Player player) {
-        // 避免重复执行检查任务
-        if (inShoutCoolDown.contains(player.getUniqueId())) {
+    public static void checkShoutCooldown(GamePlayer gamePlayer) {
+        // 玩家不为空且游戏未运行
+        if (gamePlayer == null || gameManager.getGameState() != GameState.RUNNING) {
             return;
         }
 
         // 有权限则绕过检查
-        if (player.hasPermission("azurabedwars.admin")) {
+        if (gamePlayer.getPlayer().hasPermission("azurabedwars.admin")) {
             return;
         }
 
         // 启动倒计时
-        inShoutCoolDown.add(player.getUniqueId());
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            inShoutCoolDown.remove(player.getUniqueId());
-            player.sendMessage(ChatColorUtil.color("&a喊话冷却结束！"));
-        }, GLOBAL_CHAT_COOLDOWN * 20L);
+        gamePlayer.setShoutCooldown(true);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> gamePlayer.setShoutCooldown(false), GLOBAL_CHAT_COOLDOWN * 20L);
     }
 
     /**
@@ -158,12 +149,12 @@ public class ChatListener implements Listener {
 
         // 发送消息
         if (isGlobalChat) {
-            if (inShoutCoolDown.contains(player.getUniqueId())) {
+            if (gamePlayer.isShoutCooldown()) {
                 gamePlayer.sendMessage(ChatColorUtil.color("&c喊话冷却中！"));
                 return;
             }
             gameManager.broadcastMessage(formattedMessage);
-            processShoutCooldown(player);
+            checkShoutCooldown(gamePlayer);
         } else {
             gameManager.broadcastTeamMessage(gameTeam, formattedMessage);
         }

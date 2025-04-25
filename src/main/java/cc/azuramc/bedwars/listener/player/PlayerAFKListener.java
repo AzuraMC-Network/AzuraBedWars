@@ -47,18 +47,18 @@ public class PlayerAFKListener implements Listener {
                 long lastMove = afkLastMovement.getOrDefault(uuid, currentTime);
 
                 // 大于时间未移动
-                gamePlayer.setAFK(currentTime - lastMove >= MAX_NO_MOVEMENT_TIME * 1000L);
+                gamePlayer.setAfk(currentTime - lastMove >= MAX_NO_MOVEMENT_TIME * 1000L);
             }
         }, 0L, 20L);
     }
 
     private void clearAFK(UUID uuid) {
         afkLastMovement.remove(uuid);
-        GamePlayer.get(uuid).setAFK(false);
+        GamePlayer.get(uuid).setAfk(false);
     }
 
     public static void stop() {
-        GamePlayer.getGamePlayers().forEach(a -> a.setAFK(false));
+        GamePlayer.getGamePlayers().forEach(a -> a.setAfk(false));
         afkLastMovement.clear();
         Bukkit.getScheduler().cancelTask(checkAFKTask);
     }

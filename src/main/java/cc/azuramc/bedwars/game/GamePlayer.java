@@ -63,7 +63,8 @@ public class GamePlayer {
     @Getter private boolean spectator;
     @Getter @Setter private SpectatorTarget spectatorTarget;
     @Getter @Setter private GameTeam gameTeam;
-    @Getter private boolean afk;
+    @Setter @Getter private boolean afk;
+    @Setter @Getter private boolean shoutCooldown;
     
     // 战斗数据
     @Getter private int kills;
@@ -87,6 +88,9 @@ public class GamePlayer {
 
         // 初始化 AFK 状态
         this.afk = false;
+
+        // 初始化 shoutCooldown 状态
+        this.shoutCooldown = false;
 
         // 初始化装备状态
         this.armorType = ArmorType.DEFAULT;
@@ -256,15 +260,6 @@ public class GamePlayer {
     public void playSound(Sound sound, float volume, float pitch) {
         if (!isOnline()) return;
         getPlayer().playSound(getPlayer().getLocation(), sound, volume, pitch);
-    }
-
-    /**
-     * 设置挂机状态
-     *
-     * @param state 目标状态
-     * */
-    public void setAFK(boolean state) {
-        this.afk = state;
     }
 
     /**
