@@ -13,8 +13,7 @@ import cc.azuramc.bedwars.jedis.JedisManager;
 import cc.azuramc.bedwars.jedis.listener.PubSubListener;
 import cc.azuramc.bedwars.jedis.util.IPUtil;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
-import cc.azuramc.bedwars.scoreboard.provider.GameBoardProvider;
-import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
+import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.game.item.special.SpecialItem;
 import cc.azuramc.bedwars.database.connection.ConnectionPoolHandler;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
@@ -102,6 +101,10 @@ public final class AzuraBedWars extends JavaPlugin {
 
     @Getter
     private MapLoadManager mapLoadManager;
+    
+    /** 计分板管理器 */
+    @Getter
+    private ScoreboardManager scoreboardManager;
 
     @Override
     public void onEnable() {
@@ -219,12 +222,11 @@ public final class AzuraBedWars extends JavaPlugin {
      * 注册所有事件监听器
      */
     private void registerEventListeners() {
-
         new ListenerRegistry(this);
         
-        // 记分板监听器
-        Bukkit.getPluginManager().registerEvents(new LobbyBoardProvider(gameManager), this);
-        Bukkit.getPluginManager().registerEvents(new GameBoardProvider(gameManager), this);
+        // 创建并初始化计分板管理器
+        scoreboardManager = new ScoreboardManager(gameManager);
+        scoreboardManager.initialize(this);
     }
 
     /**

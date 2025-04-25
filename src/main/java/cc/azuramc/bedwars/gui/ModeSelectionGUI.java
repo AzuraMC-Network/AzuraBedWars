@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.gui;
 
-import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
@@ -99,7 +99,7 @@ public class ModeSelectionGUI extends CustomGUI {
                     
                     playerProfile.setGameModeType(GameModeType.DEFAULT);
                     SoundWrapper.playOrbPickupSound(player);
-                    LobbyBoardProvider.updateBoard();
+                    AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
                     player.sendMessage("§a已选择普通模式!");
                 }, true));
     }
@@ -128,7 +128,7 @@ public class ModeSelectionGUI extends CustomGUI {
                     
                     playerProfile.setGameModeType(GameModeType.EXPERIENCE);
                     SoundWrapper.playOrbPickupSound(player);
-                    LobbyBoardProvider.updateBoard();
+                    AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
                     player.sendMessage("§a已选择经验模式!");
                 }, true));
     }

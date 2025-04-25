@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -118,7 +117,7 @@ public class GameStartTask extends BukkitRunnable {
         countdown = DEFAULT_COUNTDOWN;
         gameManager.setGameState(GameState.WAITING);
         gameManager.setGameStartTask(null);
-        LobbyBoardProvider.updateBoard();
+        AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
         cancel();
     }
 
@@ -164,7 +163,7 @@ public class GameStartTask extends BukkitRunnable {
      * 更新游戏状态和玩家体验条
      */
     private void updateGameState() {
-        LobbyBoardProvider.updateBoard();
+        AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
         updatePlayerExperience();
     }
 

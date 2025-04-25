@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.game.task.GameStartTask;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameModeType;
+import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.scoreboard.base.FastBoard;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,6 +46,9 @@ public class LobbyBoardProvider implements Listener {
     
     // 插件实例缓存
     private static AzuraBedWars plugin;
+    
+    // 计分板管理器引用
+    private static ScoreboardManager scoreboardManager;
 
     /**
      * 构造函数
@@ -54,6 +58,15 @@ public class LobbyBoardProvider implements Listener {
     public LobbyBoardProvider(GameManager gameManager) {
         LobbyBoardProvider.gameManager = gameManager;
         plugin = AzuraBedWars.getInstance();
+    }
+    
+    /**
+     * 设置计分板管理器
+     * 
+     * @param manager 计分板管理器
+     */
+    public static void setScoreboardManager(ScoreboardManager manager) {
+        LobbyBoardProvider.scoreboardManager = manager;
     }
 
     /**
@@ -237,10 +250,16 @@ public class LobbyBoardProvider implements Listener {
      */
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        // 为新加入的玩家创建计分板
-        show(e.getPlayer());
-        // 更新所有玩家的计分板
-        updateBoard();
+        if (scoreboardManager != null) {
+            // 使用计分板管理器显示对应计分板
+            scoreboardManager.showBoard(e.getPlayer());
+            scoreboardManager.updateAllBoards();
+        } else {
+            // 为新加入的玩家创建计分板
+            show(e.getPlayer());
+            // 更新所有玩家的计分板
+            updateBoard();
+        }
     }
     
     /**
@@ -250,10 +269,16 @@ public class LobbyBoardProvider implements Listener {
      */
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        // 清理玩家的计分板
-        removeBoard(e.getPlayer());
-        // 更新所有玩家的计分板
-        updateBoard();
+        if (scoreboardManager != null) {
+            // 使用计分板管理器移除计分板
+            scoreboardManager.removeBoard(e.getPlayer());
+            scoreboardManager.updateAllBoards();
+        } else {
+            // 清理玩家的计分板
+            removeBoard(e.getPlayer());
+            // 更新所有玩家的计分板
+            updateBoard();
+        }
     }
 
     /**

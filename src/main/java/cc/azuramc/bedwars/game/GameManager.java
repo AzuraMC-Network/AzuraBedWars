@@ -13,8 +13,6 @@ import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.event.GameEventManager;
-import cc.azuramc.bedwars.scoreboard.provider.GameBoardProvider;
-import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
 import cc.azuramc.bedwars.shop.ShopManager;
 import cc.azuramc.bedwars.game.item.special.SpecialItem;
 import cc.azuramc.bedwars.util.LoadGameUtil;
@@ -159,8 +157,8 @@ public class GameManager {
         player.teleport(waitingLocation);
 
         // 设置记分板
-        LobbyBoardProvider.show(player);
-        LobbyBoardProvider.updateBoard();
+        plugin.getScoreboardManager().showBoard(player);
+        plugin.getScoreboardManager().updateAllBoards();
 
         // 给予物品
         giveWaitingItems(player);
@@ -252,8 +250,8 @@ public class GameManager {
      */
     private void handlePlayerJoinRunningGame(GamePlayer gamePlayer, Player player) {
         // 设置记分板
-        GameBoardProvider.show(player);
-        GameBoardProvider.updateBoard();
+        plugin.getScoreboardManager().showBoard(player);
+        plugin.getScoreboardManager().updateAllBoards();
 
         // 检查玩家团队状态
         if (gamePlayer.getGameTeam() != null) {

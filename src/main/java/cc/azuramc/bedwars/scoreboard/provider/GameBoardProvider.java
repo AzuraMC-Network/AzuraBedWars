@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.scoreboard.base.FastBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -45,6 +46,9 @@ public class GameBoardProvider implements Listener {
     
     // 更新间隔（毫秒）
     private static final long UPDATE_INTERVAL = 500; // 默认为0.5秒更新一次
+    
+    // 计分板管理器引用
+    private static ScoreboardManager scoreboardManager;
 
     /**
      * 构造函数
@@ -53,6 +57,15 @@ public class GameBoardProvider implements Listener {
      */
     public GameBoardProvider(GameManager gameManager) {
         GameBoardProvider.gameManager = gameManager;
+    }
+    
+    /**
+     * 设置计分板管理器
+     * 
+     * @param manager 计分板管理器
+     */
+    public static void setScoreboardManager(ScoreboardManager manager) {
+        GameBoardProvider.scoreboardManager = manager;
     }
 
     /**
@@ -185,11 +198,25 @@ public class GameBoardProvider implements Listener {
      */
     @EventHandler
     public void onStart(BedwarsGameStartEvent e) {
-        // 为所有在线玩家显示计分板
-        Bukkit.getOnlinePlayers().forEach(GameBoardProvider::show);
+        if (scoreboardManager != null) {
+            // 使用计分板管理器切换到游戏模式
+            scoreboardManager.switchBoardMode();
+            
+            // 注册计分板更新任务
+            gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> {
+                if (scoreboardManager != null) {
+                    scoreboardManager.updateAllBoards();
+                } else {
+                    updateBoard();
+                }
+            });
+        } else {
+            // 为所有在线玩家显示计分板
+            Bukkit.getOnlinePlayers().forEach(GameBoardProvider::show);
 
-        // 注册计分板更新任务
-        gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> updateBoard());
+            // 注册计分板更新任务
+            gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> updateBoard());
+        }
     }
 
     /**
