@@ -440,7 +440,7 @@ public abstract class FastBoardBase<T> {
                     for (int i = oldLinesCopy.size(); i > linesSize; i--) {
                         sendTeamPacket(i - 1, TeamMode.REMOVE);
                         sendScorePacket(i - 1, ScoreboardAction.REMOVE);
-                        oldLines.remove(0);
+                        oldLines.removeFirst();
                     }
                 } else {
                     for (int i = oldLinesCopy.size(); i < linesSize; i++) {

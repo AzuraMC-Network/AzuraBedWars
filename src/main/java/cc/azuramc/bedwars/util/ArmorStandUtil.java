@@ -96,7 +96,7 @@ public class ArmorStandUtil {
         } else if (algebra == 43) {
             yaw += 2f * turn;
         } else if (algebra == 44) {
-            yaw += 1f * turn;
+            yaw += turn;
         } else if (algebra == 45) {
             yaw += -1f * turn;
         } else if (algebra == 46) {

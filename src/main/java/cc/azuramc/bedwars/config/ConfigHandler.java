@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.*;
+import org.bukkit.Bukkit;
 
 /**
  * 配置处理器
@@ -61,7 +62,11 @@ public class ConfigHandler<T> {
         try {
             // 确保父目录存在
             if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
+                boolean created = file.getParentFile().mkdirs();
+                if (!created) {
+                    Bukkit.getLogger().severe("无法创建配置文件目录：" + file.getParentFile().getAbsolutePath());
+                    return;
+                }
             }
             
             try (Writer writer = new FileWriter(file)) {

@@ -115,7 +115,10 @@ public class JedisManager {
     private void handleStartupStatus() {
         if (System.currentTimeMillis() - startTime > STARTUP_TIMEOUT) {
             if (serverManagerFile.exists()) {
-                serverManagerFile.delete();
+                boolean deleted = serverManagerFile.delete();
+                if (!deleted) {
+                    Bukkit.getLogger().severe("无法删除服务器管理文件：" + serverManagerFile.getAbsolutePath());
+                }
                 serverData.setServerType(ServerType.END);
             }
         }
@@ -130,7 +133,10 @@ public class JedisManager {
                 forceBOOMTime = System.currentTimeMillis();
             } else if (System.currentTimeMillis() - forceBOOMTime > EMPTY_SERVER_TIMEOUT) {
                 if (serverManagerFile.exists()) {
-                    serverManagerFile.delete();
+                    boolean deleted = serverManagerFile.delete();
+                    if (!deleted) {
+                        Bukkit.getLogger().severe("无法删除服务器管理文件：" + serverManagerFile.getAbsolutePath());
+                    }
                     serverData.setServerType(ServerType.END);
                 }
             }
@@ -156,7 +162,10 @@ public class JedisManager {
             if (serverData.getName() != null 
                 && serverData.getServerType() == ServerType.WAITING 
                 && !serverManagerFile.exists()) {
-                serverManagerFile.createNewFile();
+                boolean created = serverManagerFile.createNewFile();
+                if (!created) {
+                    Bukkit.getLogger().severe("无法创建服务器管理文件：" + serverManagerFile.getAbsolutePath());
+                }
             }
         } catch (Exception e) {
             Bukkit.getLogger().log(Level.SEVERE, "处理服务器管理文件失败", e);

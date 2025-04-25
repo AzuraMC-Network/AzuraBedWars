@@ -24,7 +24,10 @@ public class JsonMapStorage implements IMapStorage {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.mapDirectory = new File(AzuraBedWars.getInstance().getDataFolder(), "maps");
         if (!this.mapDirectory.exists()) {
-            this.mapDirectory.mkdirs();
+            boolean created = this.mapDirectory.mkdirs();
+            if (!created) {
+                AzuraBedWars.getInstance().getLogger().severe("无法创建地图数据目录：" + this.mapDirectory.getAbsolutePath());
+            }
         }
     }
     

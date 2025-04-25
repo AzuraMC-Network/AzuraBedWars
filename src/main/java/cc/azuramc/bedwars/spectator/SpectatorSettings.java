@@ -148,7 +148,6 @@ public class SpectatorSettings {
             case FIRSTPERSON -> firstPerson;
             case HIDEOTHER -> hideOther;
             case FLY -> fly;
-            default -> false;
         };
     }
 

@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class DefaultShopPage implements ShopData {
@@ -27,14 +28,14 @@ public class DefaultShopPage implements ShopData {
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.CHAINMAIL_BOOTS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "锁链装备§7（死亡不掉落）", ColorType.NONE, new PriceCost(MaterialWrapper.IRON_INGOT(), 40, 40)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.GOLDEN_APPLE()).getItem(), "金苹果", ColorType.NONE, new PriceCost(MaterialWrapper.GOLD_INGOT(), 3, 15)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.BOW()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "弓", ColorType.NONE, new PriceCost(MaterialWrapper.GOLD_INGOT(), 12, 60)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.POTION()).setPotionData(new PotionEffect(PotionEffectWrapper.SPEED(), 600, 1)).setDisplayName("§b速度药水§7（30秒）").getItem(), "速度药水§7（30秒）", ColorType.NONE, new PriceCost(MaterialWrapper.EMERALD(), 1, 100)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.POTION()).setPotionData(new PotionEffect(Objects.requireNonNull(PotionEffectWrapper.SPEED()), 600, 1)).setDisplayName("§b速度药水§7（30秒）").getItem(), "速度药水§7（30秒）", ColorType.NONE, new PriceCost(MaterialWrapper.EMERALD(), 1, 100)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.TNT()).getItem(), "TNT", ColorType.NONE, new PriceCost(MaterialWrapper.GOLD_INGOT(), 4, 40)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.OAK_PLANKS()).setAmount(16).getItem(), "橡木板", ColorType.NONE, new PriceCost(MaterialWrapper.GOLD_INGOT(), 4, 20)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.IRON_SWORD()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "铁剑", ColorType.NONE, new PriceCost(MaterialWrapper.GOLD_INGOT(), 7, 35)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.IRON_BOOTS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "铁装备§7（死亡不掉落）", ColorType.NONE, new PriceCost(MaterialWrapper.GOLD_INGOT(), 12, 60)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.FIREBALL()).getItem(), "火球", ColorType.NONE, new PriceCost(MaterialWrapper.IRON_INGOT(), 50, 50)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.ARROW()).setAmount(8).getItem(), "箭", ColorType.NONE, new PriceCost(MaterialWrapper.IRON_INGOT(), 8, 10)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.POTION()).setPotionData(new PotionEffect(PotionEffectWrapper.JUMP_BOOST(), 600, 1)).setDisplayName("跳跃药水§7（30秒）").getItem(), "跳跃药水§7（30秒）", ColorType.NONE, new PriceCost(MaterialWrapper.EMERALD(), 1, 100)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.POTION()).setPotionData(new PotionEffect(Objects.requireNonNull(PotionEffectWrapper.JUMP_BOOST()), 600, 1)).setDisplayName("跳跃药水§7（30秒）").getItem(), "跳跃药水§7（30秒）", ColorType.NONE, new PriceCost(MaterialWrapper.EMERALD(), 1, 100)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.WATER_BUCKET()).getItem(), "水桶", ColorType.NONE, new PriceCost(MaterialWrapper.EMERALD(), 1, 100)));
     }
 }

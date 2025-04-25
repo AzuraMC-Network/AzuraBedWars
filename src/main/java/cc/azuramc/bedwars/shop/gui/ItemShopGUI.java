@@ -94,7 +94,7 @@ public class ItemShopGUI extends CustomGUI {
      */
     private boolean hasDIYShop(PlayerProfile playerProfile) {
         String[] shopSort = playerProfile.getShopSort();
-        if (shopSort == null || shopSort.length == 0) {
+        if (shopSort == null) {
             return false;
         }
         

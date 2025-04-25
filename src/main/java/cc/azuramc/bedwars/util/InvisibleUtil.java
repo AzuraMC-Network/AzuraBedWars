@@ -9,23 +9,18 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 public class InvisibleUtil {
     private static final String VERSION;
     private static final boolean NEW_VERSION;
-    
-    // 反射缓存
-    private static Class<?> craftItemStackClass;
+
     private static Method asNMSCopyMethod;
-    private static Class<?> packetEquipmentClass;
     private static Constructor<?> packetEquipmentConstructor;
     private static Method getHandleMethod;
     private static Field playerConnectionField;
     private static Method sendPacketMethod;
-    private static Class<?> packetClass;
-    
-    // 新版本反射缓存
-    private static Class<?> enumItemSlotClass;
+
     private static Method enumItemSlotValueOf;
     
     static {
@@ -42,14 +37,17 @@ public class InvisibleUtil {
         
         try {
             // 初始化反射缓存
-            craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + VERSION + ".inventory.CraftItemStack");
+            // 反射缓存
+            Class<?> craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + VERSION + ".inventory.CraftItemStack");
             asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
             
             // 装备包和构造器初始化
+            Class<?> packetEquipmentClass;
             if (NEW_VERSION && Integer.parseInt(VERSION.split("_")[1]) >= 16) {
                 // 1.16+ 使用新API
                 packetEquipmentClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment");
-                enumItemSlotClass = Class.forName("net.minecraft.world.entity.EnumItemSlot");
+                // 新版本反射缓存
+                Class<?> enumItemSlotClass = Class.forName("net.minecraft.world.entity.EnumItemSlot");
                 enumItemSlotValueOf = enumItemSlotClass.getMethod("valueOf", String.class);
                 
                 try {
@@ -88,6 +86,7 @@ public class InvisibleUtil {
             getHandleMethod = craftPlayerClass.getMethod("getHandle");
             
             Class<?> entityPlayerClass;
+            Class<?> packetClass;
             if (NEW_VERSION && Integer.parseInt(VERSION.split("_")[1]) >= 17) {
                 entityPlayerClass = Class.forName("net.minecraft.server.level.EntityPlayer");
                 packetClass = Class.forName("net.minecraft.network.protocol.Packet");
@@ -161,7 +160,7 @@ public class InvisibleUtil {
         Object legsSlot = enumItemSlotValueOf.invoke(null, "LEGS");
         Object feetSlot = enumItemSlotValueOf.invoke(null, "FEET");
         
-        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getHelmet());
+        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, Objects.requireNonNull(player.getEquipment()).getHelmet());
         Object chestItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getChestplate());
         Object legsItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getLeggings());
         Object feetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getBoots());
@@ -187,7 +186,7 @@ public class InvisibleUtil {
         Object legsSlot = enumItemSlotValueOf.invoke(null, "LEGS");
         Object feetSlot = enumItemSlotValueOf.invoke(null, "FEET");
         
-        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getHelmet());
+        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, Objects.requireNonNull(player.getEquipment()).getHelmet());
         Object chestItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getChestplate());
         Object legsItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getLeggings());
         Object feetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getBoots());
@@ -207,7 +206,7 @@ public class InvisibleUtil {
         // 为1.8-1.14版本创建装备包
         Player player = gamePlayer.getPlayer();
         
-        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getHelmet());
+        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, Objects.requireNonNull(player.getEquipment()).getHelmet());
         Object chestItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getChestplate());
         Object legsItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getLeggings());
         Object feetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getBoots());

@@ -217,7 +217,7 @@ public class PlayerInteractListener implements Listener {
                         return;
                     }
 
-                    if (Math.abs(System.currentTimeMillis() - (player.hasMetadata("Game FIREBALL TIMER") ? player.getMetadata("Game FIREBALL TIMER").get(0).asLong() : 0L)) < 1000) {
+                    if (Math.abs(System.currentTimeMillis() - (player.hasMetadata("Game FIREBALL TIMER") ? player.getMetadata("Game FIREBALL TIMER").getFirst().asLong() : 0L)) < 1000) {
                         return;
                     }
 

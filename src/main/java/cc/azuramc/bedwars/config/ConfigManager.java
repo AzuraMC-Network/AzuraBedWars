@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  */
 public class ConfigManager {
-    private final Plugin plugin;
     @Getter
     private final File configDir;
     private final ConcurrentHashMap<String, ConfigHandler<?>> configHandlers;
@@ -25,14 +24,16 @@ public class ConfigManager {
      * @param plugin 插件实例
      */
     public ConfigManager(Plugin plugin) {
-        this.plugin = plugin;
         this.configDir = new File(plugin.getDataFolder(), "config");
         this.configHandlers = new ConcurrentHashMap<>();
         this.configObjects = new ConcurrentHashMap<>();
         
         // 确保配置目录存在
         if (!configDir.exists()) {
-            configDir.mkdirs();
+            boolean created = configDir.mkdirs();
+            if (!created) {
+                plugin.getLogger().severe("无法创建配置目录：" + configDir.getAbsolutePath());
+            }
         }
     }
 

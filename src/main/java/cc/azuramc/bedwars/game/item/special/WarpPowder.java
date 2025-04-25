@@ -341,7 +341,6 @@ public class WarpPowder extends SpecialItem {
         packet.getFloat().write(5, 0.0F);
         packet.getFloat().write(6, 0.0F);
         packet.getIntegers().write(0, 1);
-        gamePlayers.forEach(gamePlayer -> {protocolManager.sendServerPacket(gamePlayer.getPlayer(), packet);
-        });
+        gamePlayers.forEach(gamePlayer -> protocolManager.sendServerPacket(gamePlayer.getPlayer(), packet));
     }
 }

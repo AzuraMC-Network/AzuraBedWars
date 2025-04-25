@@ -182,12 +182,9 @@ public class GameTeam {
             BlockState state2 = block2.getState();
             
             // 检查是否可以获取MaterialData
-            if (state1.getData() instanceof org.bukkit.material.Bed && 
-                state2.getData() instanceof org.bukkit.material.Bed) {
-                
-                org.bukkit.material.Bed bedData1 = (org.bukkit.material.Bed) state1.getData();
-                org.bukkit.material.Bed bedData2 = (org.bukkit.material.Bed) state2.getData();
-                
+            if (state1.getData() instanceof org.bukkit.material.Bed bedData1 &&
+                    state2.getData() instanceof org.bukkit.material.Bed bedData2) {
+
                 if (bedData1.isHeadOfBed()) {
                     this.bedHead = block1;
                     this.bedFeet = block2;
