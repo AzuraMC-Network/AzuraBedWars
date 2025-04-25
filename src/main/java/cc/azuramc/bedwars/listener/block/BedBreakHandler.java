@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.BedUtil;
 import cc.azuramc.bedwars.api.event.BedwarsDestroyBedEvent;
+import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
@@ -16,12 +17,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class BedBreakHandler {
 
-    private static final int BED_SEARCH_RADIUS = 18;
-    private static final int BED_DESTROY_REWARD = 10;
-
-
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private static final GameManager gameManager = plugin.getGameManager();
+
+    private static final EventConfig.DestroyBedEvent config = AzuraBedWars.getInstance().getEventConfig().getDestroyBedEvent();
+
+    private static final int BED_SEARCH_RADIUS = config.getBedSearchRadius();
+    private static final int BED_DESTROY_REWARD = config.getBedDestroyReward();
 
     /**
      * 处理床方块破坏

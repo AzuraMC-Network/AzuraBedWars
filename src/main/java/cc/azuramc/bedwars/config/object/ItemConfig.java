@@ -10,8 +10,14 @@ public class ItemConfig {
 
     private RescuePlatform rescuePlatform = new RescuePlatform();
     private WarpPowder warpPowder = new WarpPowder();
+    private SpeedWoolHandler speedWoolHandler = new SpeedWoolHandler();
 
     private GameManager gameManager = new GameManager();
+
+    @Data
+    public static class SpeedWoolHandler {
+        private int maxSpeedWoolLength = 6;
+    }
 
     @Data
     public static class RescuePlatform {
@@ -22,11 +28,11 @@ public class ItemConfig {
 
     @Data
     public static class WarpPowder {
-        private int defaultTeleportTime = 6;                    // 默认传送时间（秒）
-        private int circleElements = 20;                       // 每个粒子环的粒子数量
-        private double particleRadius = 1.0;                   // 粒子环半径
-        private double particleHeight = 2.0;                   // 粒子效果总高度
-        private double circleCount = 15.0;                     // 粒子环的数量
+        private int defaultTeleportTime = 6;                 // 默认传送时间（秒）
+        private int circleElements = 20;                     // 每个粒子环的粒子数量
+        private double particleRadius = 1.0;                 // 粒子环半径
+        private double particleHeight = 2.0;                 // 粒子效果总高度
+        private double circleCount = 15.0;                   // 粒子环的数量
 
         private String cancelItemName = ChatColorUtil.color("&4取消传送");          // 取消传送物品名称
     }

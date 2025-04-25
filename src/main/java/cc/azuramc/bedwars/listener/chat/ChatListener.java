@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.chat;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.ChatConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -27,13 +28,16 @@ import java.util.UUID;
  * </p>
  */
 public class ChatListener implements Listener {
+
+    private static final ChatConfig config = AzuraBedWars.getInstance().getChatConfig();
+
     // 常量定义
-    public static final String GLOBAL_CHAT_PREFIX = "!";
-    private static final String SPECTATOR_PREFIX = "§7[旁观者]";
-    private static final String GLOBAL_CHAT_TAG = "§6[全局]";
-    private static final String TEAM_CHAT_TAG = "§9[团队]";
-    private static final String CHAT_SEPARATOR = "§7: ";
-    private static final int GLOBAL_CHAT_COOLDOWN = 10;
+    public static final String GLOBAL_CHAT_PREFIX = config.getGlobalChatPrefix();
+    private static final String SPECTATOR_PREFIX = config.getSpectatorPrefix();
+    private static final String GLOBAL_CHAT_TAG = config.getGlobalChatTag();
+    private static final String TEAM_CHAT_TAG = config.getTeamChatTag();
+    private static final String CHAT_SEPARATOR = config.getChatSeparator();
+    private static final int GLOBAL_CHAT_COOLDOWN = config.getGlobalChatCooldown();
 
     public static List<UUID> inShoutCoolDown = new ArrayList<>();
 

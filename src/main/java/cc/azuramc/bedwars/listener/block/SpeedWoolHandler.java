@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.util.MapUtil;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -15,7 +16,9 @@ import java.util.UUID;
 
 public class SpeedWoolHandler {
 
-    private static final int MAX_SPEED_WOOL_LENGTH = 6;
+    private static final ItemConfig.SpeedWoolHandler config = AzuraBedWars.getInstance().getItemConfig().getSpeedWoolHandler();
+
+    private static final int MAX_SPEED_WOOL_LENGTH = config.getMaxSpeedWoolLength();
     private static final String SPEED_WOOL_METADATA = "SPEED_WOOL";
 
     /**

@@ -27,6 +27,10 @@ public class EventConfig {
         private Title title = new Title();
         private int executeSecond = 360;
 
+        // BedBreakHandler
+        private int bedSearchRadius = 18;
+        private int bedDestroyReward = 10;
+
         @Data
         public static class Title {
             private int fadeIn = 10;
