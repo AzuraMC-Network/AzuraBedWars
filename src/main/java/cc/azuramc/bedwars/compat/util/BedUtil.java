@@ -41,7 +41,9 @@ public class BedUtil {
      * 使用反射调用旧版本的setTypeId方法设置方块为AIR
      */
     public static void setBlockTypeUsingReflection(Block block) {
-        if (block == null) return;
+        if (block == null) {
+            return;
+        }
 
         try {
             Method setTypeIdMethod = Block.class.getMethod("setTypeId", int.class);

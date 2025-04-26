@@ -93,7 +93,9 @@ public class ChunkListener implements Listener {
      * 在游戏结束时调用此方法
      */
     public static void releaseForceLoadedChunks() {
-        if (!SUPPORTS_FORCE_LOADED) return;
+        if (!SUPPORTS_FORCE_LOADED) {
+            return;
+        }
 
         for (String chunkKey : FORCE_LOADED_CHUNKS) {
             try {

@@ -78,8 +78,12 @@ public class BedDestroyedEvent extends GameEvent {
      */
     private void destroyAllBeds(GameManager gameManager) {
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            if (gameTeam == null) continue;
-            if (gameTeam.isDestroyed()) continue;
+            if (gameTeam == null) {
+                continue;
+            }
+            if (gameTeam.isDestroyed()) {
+                continue;
+            }
 
             BedUtil.destroyBed(gameTeam);
             gameTeam.setDestroyed(true);

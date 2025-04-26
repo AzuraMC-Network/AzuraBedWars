@@ -75,7 +75,9 @@ public class LobbyBoardProvider implements Listener {
      * @param player 玩家
      */
     public static void show(Player player) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
         
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         if (gamePlayer != null && gamePlayer.getBoard() == null) {
@@ -287,7 +289,9 @@ public class LobbyBoardProvider implements Listener {
      * @param player 玩家
      */
     public static void removeBoard(Player player) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
         
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         if (gamePlayer != null && gamePlayer.getBoard() != null) {

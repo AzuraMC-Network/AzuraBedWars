@@ -101,7 +101,9 @@ public class ItemBuilder {
         }
 
         SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
-        if (skullMeta == null) return this;
+        if (skullMeta == null) {
+            return this;
+        }
         
         try {
             // 尝试使用UUID
@@ -138,7 +140,9 @@ public class ItemBuilder {
      */
     public ItemBuilder setUnbreakable(boolean unbreakable, boolean hide) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta == null) return this;
+        if (itemMeta == null) {
+            return this;
+        }
         
         try {
             // 1.11+直接支持setUnbreakable
@@ -175,7 +179,9 @@ public class ItemBuilder {
      * @return 构建器实例
      */
     public ItemBuilder setPotionData(PotionEffect potionEffect) {
-        if (!(itemStack.getItemMeta() instanceof PotionMeta potionMeta)) return this;
+        if (!(itemStack.getItemMeta() instanceof PotionMeta potionMeta)) {
+            return this;
+        }
 
         potionMeta.addCustomEffect(potionEffect, true);
         itemStack.setItemMeta(potionMeta);
@@ -188,7 +194,9 @@ public class ItemBuilder {
      * @return 构建器实例
      */
     public ItemBuilder setColor(Color color) {
-        if (!(itemStack.getItemMeta() instanceof LeatherArmorMeta leatherArmorMeta)) return this;
+        if (!(itemStack.getItemMeta() instanceof LeatherArmorMeta leatherArmorMeta)) {
+            return this;
+        }
 
         leatherArmorMeta.setColor(color);
         itemStack.setItemMeta(leatherArmorMeta);
@@ -361,10 +369,14 @@ public class ItemBuilder {
      */
     public ItemBuilder addLore(String string) {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
-        if (itemMeta == null) return this;
+        if (itemMeta == null) {
+            return this;
+        }
         
         List<String> lore = itemMeta.getLore();
-        if (lore == null) lore = new ArrayList<>();
+        if (lore == null) {
+            lore = new ArrayList<>();
+        }
         
         lore.add(string);
         itemMeta.setLore(lore);
@@ -379,10 +391,14 @@ public class ItemBuilder {
      */
     public ItemBuilder addLores(String... strings) {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
-        if (itemMeta == null) return this;
+        if (itemMeta == null) {
+            return this;
+        }
         
         List<String> lore = itemMeta.getLore();
-        if (lore == null) lore = new ArrayList<>();
+        if (lore == null) {
+            lore = new ArrayList<>();
+        }
         
         lore.addAll(Arrays.asList(strings));
         itemMeta.setLore(lore);

@@ -131,7 +131,9 @@ public class PlayerDamageListener implements Listener {
           // 遍历背包 得到各类物品资源总数 存在 items 中
         Inventory inventory = player.getInventory();
         for (ItemStack item : inventory.getContents()) {
-            if (item == null) continue;
+            if (item == null) {
+                continue;
+            }
 
             Material itemType = item.getType();
             if (items.containsKey(itemType)) {

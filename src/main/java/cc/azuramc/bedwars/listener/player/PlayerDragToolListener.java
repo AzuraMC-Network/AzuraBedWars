@@ -31,7 +31,9 @@ public class PlayerDragToolListener implements Listener {
 
     // 检查是否是唯一一把该类型工具
     private boolean isOnlyOneTool(Player player, ItemStack tool) {
-        if (tool == null || !PROTECTED_TOOLS.contains(tool.getType())) return false;
+        if (tool == null || !PROTECTED_TOOLS.contains(tool.getType())) {
+            return false;
+        }
 
         Material type = tool.getType();
         int count = 0;
@@ -39,7 +41,9 @@ public class PlayerDragToolListener implements Listener {
         for (ItemStack item : player.getInventory().getContents()) {
             if (item != null && item.getType() == type) {
                 count += item.getAmount();
-                if (count > 1) return false;
+                if (count > 1) {
+                    return false;
+                }
             }
         }
 
@@ -48,10 +52,14 @@ public class PlayerDragToolListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!(event.getWhoClicked() instanceof Player player)) {
+            return;
+        }
 
         Inventory targetInventory = event.getInventory();
-        if (!isForbiddenContainer(targetInventory)) return;
+        if (!isForbiddenContainer(targetInventory)) {
+            return;
+        }
 
         ItemStack item = event.getCurrentItem();
         if (isOnlyOneTool(player, item)) {
@@ -61,10 +69,14 @@ public class PlayerDragToolListener implements Listener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) return;
+        if (!(event.getWhoClicked() instanceof Player player)) {
+            return;
+        }
 
         Inventory topInventory = event.getView().getTopInventory();
-        if (!isForbiddenContainer(topInventory)) return;
+        if (!isForbiddenContainer(topInventory)) {
+            return;
+        }
 
         ItemStack dragged = event.getOldCursor();
         if (isOnlyOneTool(player, dragged)) {

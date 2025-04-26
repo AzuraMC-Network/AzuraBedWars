@@ -42,7 +42,9 @@ public class ScoreboardManager implements Listener {
      * @param player 玩家
      */
     public void showBoard(Player player) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
         
         switch (gameManager.getGameState()) {
             case RUNNING:
@@ -76,7 +78,9 @@ public class ScoreboardManager implements Listener {
      * @param player 玩家
      */
     public void removeBoard(Player player) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
         
         // 同时移除两种计分板，确保清理完全
         GameBoardProvider.removeBoard(player);

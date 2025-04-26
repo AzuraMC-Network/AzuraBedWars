@@ -9,13 +9,11 @@ import cc.azuramc.bedwars.jedis.util.IPUtil;
 import cc.azuramc.bedwars.jedis.util.JedisUtil;
 import cc.azuramc.bedwars.jedis.util.JsonUtil;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 
 /**
@@ -29,11 +27,20 @@ public class JedisManager {
     private static final long TASK_INTERVAL = 1000L; // 1秒
     private static final String SERVER_MANAGER_LOG = "/data/serverManager.log";
     private static final String GAME_SERVER_MANAGER_CHANNEL = "GameServerManager";
+    
+    // 线程池设置
+    private static final int CORE_POOL_SIZE = 1;
+    private static final int MAX_POOL_SIZE = 1;
+    private static final long KEEP_ALIVE_TIME = 0L;
+    private static final int QUEUE_CAPACITY = 100;
 
     @Getter
     private static JedisManager instance;
     
-    private final Timer timer;
+    // 使用ThreadPoolExecutor替代Executors创建的ScheduledExecutorService
+    private final ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> statusUpdateTask;
+    
     @Getter
     private ServerData serverData;
     @Getter
@@ -49,7 +56,38 @@ public class JedisManager {
      */
     public JedisManager(AzuraBedWars plugin) {
         instance = this;
-        timer = new Timer();
+        
+        // 创建有界队列
+        BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
+        
+        // 创建线程工厂
+        ThreadFactory threadFactory = r -> {
+            Thread thread = new Thread(r, "JedisManager-Thread");
+            thread.setDaemon(true);
+            return thread;
+        };
+        
+        // 创建拒绝策略处理器
+        RejectedExecutionHandler handler = new ThreadPoolExecutor.CallerRunsPolicy();
+        
+        // 通过ThreadPoolExecutor创建线程池
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
+            CORE_POOL_SIZE,
+            MAX_POOL_SIZE,
+            KEEP_ALIVE_TIME,
+            TimeUnit.MILLISECONDS,
+            workQueue,
+            threadFactory,
+            handler
+        );
+        
+        // 将ThreadPoolExecutor包装为ScheduledExecutorService
+        this.scheduler = new ScheduledThreadPoolExecutor(
+            CORE_POOL_SIZE,
+            threadFactory,
+            handler
+        );
+        
         serverManagerFile = new File(SERVER_MANAGER_LOG);
 
         initializeServerData();
@@ -79,10 +117,9 @@ public class JedisManager {
      * 启动状态更新任务
      */
     private void startStatusUpdateTask() {
-        timer.schedule(new TimerTask() {
-            @SneakyThrows
-            @Override
-            public void run() {
+        // 使用scheduleAtFixedRate替代Timer.schedule
+        statusUpdateTask = scheduler.scheduleAtFixedRate(() -> {
+            try {
                 if (serverData.getGameType() == null) {
                     return;
                 }
@@ -90,8 +127,11 @@ public class JedisManager {
                 handleServerStatus();
                 publishServerStatus();
                 handleServerManagerFile();
+            } catch (Exception e) {
+                // 捕获异常但不中断任务执行
+                Bukkit.getLogger().log(Level.SEVERE, "服务器状态更新任务执行失败", e);
             }
-        }, TASK_INTERVAL, TASK_INTERVAL);
+        }, 0, TASK_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -176,6 +216,22 @@ public class JedisManager {
      * 关闭管理器
      */
     public void shutdown() {
-        timer.cancel();
+        // 取消任务
+        if (statusUpdateTask != null) {
+            statusUpdateTask.cancel(false);
+        }
+        
+        // 关闭调度器
+        if (scheduler != null) {
+            try {
+                scheduler.shutdown();
+                if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    scheduler.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }

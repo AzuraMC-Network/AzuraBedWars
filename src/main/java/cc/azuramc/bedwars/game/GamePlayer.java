@@ -222,7 +222,9 @@ public class GamePlayer {
      * @param message 消息内容
      */
     public void sendActionBar(String message) {
-        if (!isOnline()) return;
+        if (!isOnline()) {
+            return;
+        }
         ActionBarUtil.sendBar(getPlayer(), message);
     }
 
@@ -236,7 +238,9 @@ public class GamePlayer {
      * @param subTitle 副标题
      */
     public void sendTitle(int fadeIn, int stay, int fadeOut, String title, String subTitle) {
-        if (!isOnline()) return;
+        if (!isOnline()) {
+            return;
+        }
         TitleUtil.sendTitle(getPlayer(), fadeIn, stay, fadeOut, title, subTitle);
     }
 
@@ -246,7 +250,9 @@ public class GamePlayer {
      * @param message 消息内容
      */
     public void sendMessage(String message) {
-        if (!isOnline()) return;
+        if (!isOnline()) {
+            return;
+        }
         getPlayer().sendMessage(message);
     }
 
@@ -258,7 +264,9 @@ public class GamePlayer {
      * @param pitch 音调
      */
     public void playSound(Sound sound, float volume, float pitch) {
-        if (!isOnline()) return;
+        if (!isOnline()) {
+            return;
+        }
         getPlayer().playSound(getPlayer().getLocation(), sound, volume, pitch);
     }
 
@@ -433,15 +441,21 @@ public class GamePlayer {
                 player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.WOODEN_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case STONE:
-                if (remove) player.getInventory().remove(MaterialWrapper.WOODEN_PICKAXE());
+                if (remove) {
+                    player.getInventory().remove(MaterialWrapper.WOODEN_PICKAXE());
+                }
                 player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.STONE_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case IRON:
-                if (remove) player.getInventory().remove(MaterialWrapper.STONE_PICKAXE());
+                if (remove) {
+                    player.getInventory().remove(MaterialWrapper.STONE_PICKAXE());
+                }
                 player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.IRON_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case DIAMOND:
-                if (remove) player.getInventory().remove(MaterialWrapper.IRON_PICKAXE());
+                if (remove) {
+                    player.getInventory().remove(MaterialWrapper.IRON_PICKAXE());
+                }
                 player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.DIAMOND_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             default:
@@ -457,15 +471,21 @@ public class GamePlayer {
                 player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.WOODEN_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case STONE:
-                if (remove) player.getInventory().remove(MaterialWrapper.WOODEN_AXE());
+                if (remove) {
+                    player.getInventory().remove(MaterialWrapper.WOODEN_AXE());
+                }
                 player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.STONE_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case IRON:
-                if (remove) player.getInventory().remove(MaterialWrapper.STONE_AXE());
+                if (remove) {
+                    player.getInventory().remove(MaterialWrapper.STONE_AXE());
+                }
                 player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.IRON_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case DIAMOND:
-                if (remove) player.getInventory().remove(MaterialWrapper.IRON_AXE());
+                if (remove) {
+                    player.getInventory().remove(MaterialWrapper.IRON_AXE());
+                }
                 player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.DIAMOND_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             default:

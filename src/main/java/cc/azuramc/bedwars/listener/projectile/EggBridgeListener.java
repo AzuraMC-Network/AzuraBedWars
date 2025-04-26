@@ -55,7 +55,9 @@ public class EggBridgeListener implements Listener {
         // 存进生效的搭桥蛋列表
         bridges.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
         // 创建 3 秒冷却时间
-        if (!inBridgeCooldown.contains(shooter.getUniqueId())) inBridgeCooldown.add(shooter.getUniqueId());
+        if (!inBridgeCooldown.contains(shooter.getUniqueId())) {
+            inBridgeCooldown.add(shooter.getUniqueId());
+        }
         Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> inBridgeCooldown.remove(shooter.getUniqueId()), 60L);
 
     }

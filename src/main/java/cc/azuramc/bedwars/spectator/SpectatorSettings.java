@@ -10,8 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * 旁观者设置管理类
@@ -26,8 +25,22 @@ public class SpectatorSettings {
     private static final String TABLE_NAME = "bw_spectator_settings";
     private static final String[] COLUMNS = {"Name", "speed", "autoTp", "nightVision", "firstPerson", "hideOther", "fly"};
     
+    // 线程池参数
+    private static final int CORE_POOL_SIZE = THREAD_POOL_SIZE;
+    private static final int MAX_POOL_SIZE = THREAD_POOL_SIZE;
+    private static final long KEEP_ALIVE_TIME = 60L;
+    private static final int QUEUE_CAPACITY = 100;
+    
     // 线程池和缓存
-    private static final ExecutorService fixedThreadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+    private static final ExecutorService fixedThreadPool = new ThreadPoolExecutor(
+        CORE_POOL_SIZE,
+        MAX_POOL_SIZE,
+        KEEP_ALIVE_TIME,
+        TimeUnit.SECONDS,
+        new LinkedBlockingQueue<>(QUEUE_CAPACITY),
+        Executors.defaultThreadFactory(),
+        new ThreadPoolExecutor.CallerRunsPolicy()
+    );
     private static final Map<GamePlayer, SpectatorSettings> spectatorSettingsMap = new HashMap<>();
 
     // 实例变量

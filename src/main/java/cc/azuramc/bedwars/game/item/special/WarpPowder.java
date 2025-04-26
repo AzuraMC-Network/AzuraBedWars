@@ -129,7 +129,9 @@ public class WarpPowder extends SpecialItem {
      * @param player 玩家
      */
     private void restorePlayerItem(Player player) {
-        if (stack == null) return;
+        if (stack == null) {
+            return;
+        }
         
         // 减少物品数量
         setStackAmount(this.getStack().getAmount() - 1);

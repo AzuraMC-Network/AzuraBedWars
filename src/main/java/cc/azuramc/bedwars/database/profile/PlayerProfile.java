@@ -9,12 +9,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @Data
 public class PlayerProfile {
-    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+    // 线程池参数
+    private static final int CORE_POOL_SIZE = 5;
+    private static final int MAX_POOL_SIZE = 5;
+    private static final long KEEP_ALIVE_TIME = 60L;
+    private static final int QUEUE_CAPACITY = 100;
+
+    // 使用ThreadPoolExecutor替代Executors创建的线程池
+    private static ExecutorService fixedThreadPool = new ThreadPoolExecutor(
+        CORE_POOL_SIZE,
+        MAX_POOL_SIZE,
+        KEEP_ALIVE_TIME,
+        TimeUnit.SECONDS,
+        new LinkedBlockingQueue<>(QUEUE_CAPACITY),
+        Executors.defaultThreadFactory(),
+        new ThreadPoolExecutor.CallerRunsPolicy()
+    );
 
     private GamePlayer gamePlayer;
     private GameModeType gameModeType;

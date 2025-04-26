@@ -229,7 +229,9 @@ public class InvisibleUtil {
             }
             
             Player bukkitPlayer = otherPlayer.getPlayer();
-            if (bukkitPlayer == null) continue;
+            if (bukkitPlayer == null) {
+                continue;
+            }
             
             Object entityPlayer = getHandleMethod.invoke(bukkitPlayer);
             Object playerConnection = playerConnectionField.get(entityPlayer);

@@ -283,10 +283,18 @@ public class GameTeam {
      * @return 估计的床朝向
      */
     private BlockFace getEstimatedFacing(Block block1, Block block2) {
-        if (block1.getX() < block2.getX()) return BlockFace.EAST;
-        if (block1.getX() > block2.getX()) return BlockFace.WEST;
-        if (block1.getZ() < block2.getZ()) return BlockFace.SOUTH;
-        if (block1.getZ() > block2.getZ()) return BlockFace.NORTH;
+        if (block1.getX() < block2.getX()) {
+            return BlockFace.EAST;
+        }
+        if (block1.getX() > block2.getX()) {
+            return BlockFace.WEST;
+        }
+        if (block1.getZ() < block2.getZ()) {
+            return BlockFace.SOUTH;
+        }
+        if (block1.getZ() > block2.getZ()) {
+            return BlockFace.NORTH;
+        }
         return DEFAULT_BED_FACE;
     }
     

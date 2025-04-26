@@ -188,7 +188,9 @@ public class MapData {
      * @return 是否成功删除
      */
     public boolean removeBase(Location location) {
-        if (location == null) return false;
+        if (location == null) {
+            return false;
+        }
         
         for (int i = 0; i < bases.size(); i++) {
             RawLocation base = bases.get(i);
@@ -209,7 +211,9 @@ public class MapData {
      * @return 是否成功删除
      */
     public boolean removeDrop(Location location) {
-        if (location == null) return false;
+        if (location == null) {
+            return false;
+        }
         
         for (int i = 0; i < drops.size(); i++) {
             RawLocation drop = drops.get(i);
@@ -230,7 +234,9 @@ public class MapData {
      * @return 是否成功删除
      */
     public boolean removeShop(Location location) {
-        if (location == null) return false;
+        if (location == null) {
+            return false;
+        }
         
         for (int i = 0; i < shops.size(); i++) {
             RawLocation shop = shops.get(i);

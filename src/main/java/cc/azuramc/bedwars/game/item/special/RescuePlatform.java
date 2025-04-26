@@ -221,7 +221,9 @@ public class RescuePlatform extends SpecialItem {
      * @return 救援平台列表
      */
     private List<RescuePlatform> getLivingPlatforms() {
-        if (gameManager == null) return new ArrayList<>();
+        if (gameManager == null) {
+            return new ArrayList<>();
+        }
         
         return gameManager.getSpecialItems().stream()
                 .filter(item -> item instanceof RescuePlatform)

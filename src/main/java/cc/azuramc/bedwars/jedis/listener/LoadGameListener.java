@@ -14,7 +14,9 @@ public class LoadGameListener implements Listener {
     @EventHandler
     public void onMessage(BukkitPubSubMessageEvent event) {
         if (event.getChannel().equals("AZURA.BW." + IPUtil.getLocalIp())) {
-            if (isLoad) return;
+            if (isLoad) {
+                return;
+            }
 
             isLoad = true;
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {

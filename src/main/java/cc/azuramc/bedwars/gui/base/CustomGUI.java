@@ -52,7 +52,9 @@ public class CustomGUI {
 
     public void replace() {
         CustomGUI customGUI = GUIData.getLastReplaceGui().getOrDefault(player, GUIData.getCurrentGui().getOrDefault(player, null));
-        if(customGUI == null) return;
+        if(customGUI == null) {
+            return;
+        }
         GUIData.getLastReplaceGui().put(player, customGUI);
 
         for(GUIItem guiItem : customGUI.items){
@@ -63,7 +65,9 @@ public class CustomGUI {
                     break;
                 }
             }
-            if(s) items.add(guiItem);
+            if(s) {
+                items.add(guiItem);
+            }
         }
 
         open();

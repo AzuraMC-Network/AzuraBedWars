@@ -24,6 +24,7 @@ public class GameOverEvent extends GameEvent {
         super(messageConfig.getEventName(), config.getExecuteSecond(), 6);
     }
 
+    @Override
     public void execute(GameManager gameManager) {
         gameManager.getGameEventManager().setCurrentEvent(7);
         Bukkit.getPluginManager().callEvent(new BedwarsGameOverEvent(gameManager.getWinner()));

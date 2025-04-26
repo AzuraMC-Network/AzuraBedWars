@@ -31,7 +31,9 @@ public class GUIListener implements Listener {
      * 获取库存标题（不使用 InventoryView）
      */
     private String getTitle(CustomGUI gui) {
-        if (gui == null) return "";
+        if (gui == null) {
+            return "";
+        }
         return gui.getTitle();
     }
     

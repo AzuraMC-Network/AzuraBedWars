@@ -123,7 +123,9 @@ public class ItemShopGUI extends CustomGUI {
                     .setDisplayName(shopData.getMainShopItem().getDisplayName())
                     .getItem(), 
                     new GUIAction(0, () -> {
-                        if (finalI != slot) new ItemShopGUI(player, finalI, gameManager).open();
+                        if (finalI != slot) {
+                            new ItemShopGUI(player, finalI, gameManager).open();
+                        }
                     }, false));
             ++i;
         }
@@ -178,7 +180,9 @@ public class ItemShopGUI extends CustomGUI {
                     .setLores("§7这是一个快捷购买槽位!§bShift+左键", "§7将任意物品放到这里~")
                     .getItem(), 
                 new NewGUIAction(0, event -> {
-                    if (!event.getClick().isShiftClick()) return;
+                    if (!event.getClick().isShiftClick()) {
+                        return;
+                    }
                     player.sendMessage("§c这是个空的槽位!请使用Shift+左键添加物品到这里~");
                 }, false));
     }
@@ -362,7 +366,9 @@ public class ItemShopGUI extends CustomGUI {
         if (shopSlot == 0) {
             // 从快捷购买移除
             int slotIndex = Arrays.asList(SHOP_SLOTS).indexOf(displaySlot);
-            if (slotIndex == -1) return;
+            if (slotIndex == -1) {
+                return;
+            }
             
             playerProfile.getShopSort()[slotIndex] = "AIR";
             playerProfile.saveShops();

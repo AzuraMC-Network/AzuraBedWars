@@ -211,7 +211,9 @@ public class GameManager {
                 Player p2 = player2.getPlayer();
                 
                 // 跳过自己
-                if (player1.equals(player2)) continue;
+                if (player1.equals(player2)) {
+                    continue;
+                }
                 
                 // 如果是观察者，对其他玩家不可见
                 if (player1.isSpectator()) {

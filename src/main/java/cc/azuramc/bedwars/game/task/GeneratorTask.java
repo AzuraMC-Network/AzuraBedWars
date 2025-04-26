@@ -182,7 +182,9 @@ public class GeneratorTask {
             allArmor.addAll(gameManager.getArmorStand().keySet());
 
             for (ArmorStand as : allArmor) {
-                if (as == null) continue;
+                if (as == null) {
+                    continue;
+                }
 
                 Location loc = as.getLocation();
                 if (!loc.getChunk().isLoaded()) {
@@ -317,7 +319,9 @@ public class GeneratorTask {
      * @param maxStack 最大堆叠数量
      */
     private void dropItem(Location location, Material material, int maxStack) {
-        if (location == null || location.getWorld() == null) return;
+        if (location == null || location.getWorld() == null) {
+            return;
+        }
         
         // 计算当前位置已有的资源数量
         int currentAmount = countNearbyItems(location, material);
@@ -345,7 +349,9 @@ public class GeneratorTask {
      * @return 物品总数
      */
     private int countNearbyItems(Location location, Material material) {
-        if (location == null || location.getWorld() == null) return 0;
+        if (location == null || location.getWorld() == null) {
+            return 0;
+        }
         
         // 获取周围实体
         Collection<Entity> nearbyEntities = location.getWorld().getNearbyEntities(
@@ -381,7 +387,9 @@ public class GeneratorTask {
         gameManager.getGameEventManager().registerRunnable(displayName, (seconds, currentEvent) ->
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> {
                 for (ArmorStand armorStand : armorStands) {
-                    if (armorStand == null) continue;
+                    if (armorStand == null) {
+                        continue;
+                    }
                     
                     // 确保区块已加载
                     if (!armorStand.getLocation().getChunk().isLoaded()) {

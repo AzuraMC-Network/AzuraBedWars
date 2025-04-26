@@ -9,14 +9,13 @@ import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.*;
 
 /**
  * 游戏事件管理器
  * 负责注册、调度和执行游戏中的各种事件
  */
-public class GameEventManager extends TimerTask {
+public class GameEventManager implements Runnable {
     // 事件注册的优先级常量
     private static final int START_EVENT_PRIORITY = 0;
     private static final int DIAMOND_LEVEL2_PRIORITY = 1;
@@ -35,6 +34,10 @@ public class GameEventManager extends TimerTask {
     
     // 事件持续时间和资源刷新时间常量（秒）
     private static final int EVENT_DURATION_SECONDS = 360;
+    
+    // 线程池参数
+    private static final int CORE_POOL_SIZE = 1;
+    private static final int MAX_QUEUE_SIZE = 100;
 
     private final GameManager gameManager;
     
@@ -43,8 +46,9 @@ public class GameEventManager extends TimerTask {
     private final HashMap<String, GameEventRunnable> runnable = new HashMap<>();
     private final HashMap<Integer, GameEvent> events = new HashMap<>();
     
-    // 计时器和状态变量
-    private Timer timer;
+    // 使用ScheduledThreadPoolExecutor替代Executors
+    private ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> scheduledFuture;
     private int currentEvent = 0;
     
     @Getter
@@ -85,27 +89,33 @@ public class GameEventManager extends TimerTask {
      */
     @Override
     public void run() {
-        // 获取当前事件
-        GameEvent event = this.currentEvent();
+        try {
+            // 获取当前事件
+            GameEvent event = this.currentEvent();
 
-        // 执行事件倒计时回调
-        int remainingSeconds = event.getExecuteSeconds() - seconds;
-        event.executeRunnable(this.gameManager, remainingSeconds);
-        
-        // 检查事件是否应该执行
-        if (this.seconds >= event.getExecuteSeconds()) {
-            this.seconds = 0;
-            this.currentEvent = event.getPriority() + 1;
-            event.execute(this.gameManager);
+            // 执行事件倒计时回调
+            int remainingSeconds = event.getExecuteSeconds() - seconds;
+            event.executeRunnable(this.gameManager, remainingSeconds);
+            
+            // 检查事件是否应该执行
+            if (this.seconds >= event.getExecuteSeconds()) {
+                this.seconds = 0;
+                this.currentEvent = event.getPriority() + 1;
+                event.execute(this.gameManager);
+            }
+
+            handleGameOver();
+
+            updatePlayerTracking();
+
+            processRunnableTasks();
+
+            ++this.seconds;
+        } catch (Exception e) {
+            // 捕获并记录异常，但不中断定时任务的执行
+            Bukkit.getLogger().severe("游戏事件管理器执行错误: " + e.getMessage());
+            e.printStackTrace();
         }
-
-        handleGameOver();
-
-        updatePlayerTracking();
-
-        processRunnableTasks();
-
-        ++this.seconds;
     }
     
     /**
@@ -125,15 +135,19 @@ public class GameEventManager extends TimerTask {
      * 更新玩家位置追踪信息
      */
     private void updatePlayerTracking() {
-        for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            gameTeam.getAlivePlayers().forEach(player -> {
-                if (Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawnLocation().getWorld())) {
-                    int distance = (int) player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
-                    String trackingMessage = "§f队伍: " + gameTeam.getChatColor() + gameTeam.getName() + 
-                                           "§f 追踪: " + gameTeam.getChatColor() + distance + "m";
-                    player.sendActionBar(trackingMessage);
-                }
-            });
+        try {
+            for (GameTeam gameTeam : gameManager.getGameTeams()) {
+                gameTeam.getAlivePlayers().forEach(player -> {
+                    if (Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawnLocation().getWorld())) {
+                        int distance = (int) player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
+                        String trackingMessage = "§f队伍: " + gameTeam.getChatColor() + gameTeam.getName() + 
+                                               "§f 追踪: " + gameTeam.getChatColor() + distance + "m";
+                        player.sendActionBar(trackingMessage);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("玩家追踪更新错误: " + e.getMessage());
         }
     }
     
@@ -141,17 +155,21 @@ public class GameEventManager extends TimerTask {
      * 处理周期性任务
      */
     private void processRunnableTasks() {
-        runnable.values().forEach(runnable -> {
-            if (runnable.getSeconds() != 0) {
-                // 周期性任务
-                if (runnable.getNextSeconds() == runnable.getSeconds()) {
-                    runnable.getEvent().run(0, currentEvent);
-                    runnable.setNextSeconds(0);
+        runnable.forEach((name, task) -> {
+            try {
+                if (task.getSeconds() != 0) {
+                    // 周期性任务
+                    if (task.getNextSeconds() == task.getSeconds()) {
+                        task.getEvent().run(0, currentEvent);
+                        task.setNextSeconds(0);
+                    }
+                    task.setNextSeconds(task.getNextSeconds() + 1);
+                } else {
+                    // 持续性任务
+                    task.getEvent().run(seconds, currentEvent);
                 }
-                runnable.setNextSeconds(runnable.getNextSeconds() + 1);
-            } else {
-                // 持续性任务
-                runnable.getEvent().run(seconds, currentEvent);
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("任务 '" + name + "' 执行错误: " + e.getMessage());
             }
         });
     }
@@ -228,9 +246,31 @@ public class GameEventManager extends TimerTask {
      * 启动事件管理器
      */
     public void start() {
-        if (this.timer == null) {
-            timer = new Timer();
-            timer.schedule(this, 0, TIMER_PERIOD_MS);
+        if (this.scheduler == null) {
+            // 创建线程工厂
+            ThreadFactory threadFactory = r -> {
+                Thread thread = new Thread(r, "GameEventManager-Thread");
+                thread.setDaemon(true); // 设置为守护线程，便于JVM退出
+                return thread;
+            };
+            
+            // 创建拒绝策略处理器
+            RejectedExecutionHandler handler = new ThreadPoolExecutor.CallerRunsPolicy();
+            
+            // 创建ScheduledThreadPoolExecutor
+            this.scheduler = new ScheduledThreadPoolExecutor(
+                CORE_POOL_SIZE,
+                threadFactory,
+                handler
+            );
+            
+            // 设置队列大小限制
+            ((ScheduledThreadPoolExecutor) scheduler).setMaximumPoolSize(CORE_POOL_SIZE);
+            
+            // 调度执行任务
+            this.scheduledFuture = scheduler.scheduleAtFixedRate(
+                this, 0, TIMER_PERIOD_MS, TimeUnit.MILLISECONDS
+            );
         }
     }
 
@@ -238,8 +278,25 @@ public class GameEventManager extends TimerTask {
      * 停止事件管理器
      */
     public void stop() {
-        if (this.timer != null) {
-            timer.cancel();
+        if (this.scheduler != null) {
+            // 取消当前执行的任务
+            if (this.scheduledFuture != null) {
+                this.scheduledFuture.cancel(false);
+            }
+            
+            // 关闭调度器
+            this.scheduler.shutdown();
+            try {
+                // 等待任务完成
+                if (!this.scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    this.scheduler.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                this.scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+            
+            this.scheduler = null;
             this.currentEvent = 0;
             this.seconds = 0;
         }
