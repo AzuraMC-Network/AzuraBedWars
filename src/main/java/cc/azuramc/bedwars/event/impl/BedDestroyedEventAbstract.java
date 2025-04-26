@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.team.GameTeam;
-import cc.azuramc.bedwars.event.GameEvent;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.compat.util.BedUtil;
 import cc.azuramc.bedwars.config.object.EventConfig;
 import java.util.logging.Level;
@@ -18,7 +18,7 @@ import java.util.logging.Level;
  * 并显示床自毁的全屏提示。
  * </p>
  */
-public class BedDestroyedEvent extends GameEvent {
+public class BedDestroyedEventAbstract extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private static final EventConfig.DestroyBedEvent config = plugin.getEventConfig().getDestroyBedEvent();
@@ -40,7 +40,7 @@ public class BedDestroyedEvent extends GameEvent {
      * 创建床自毁事件
      * 默认在游戏开始6分钟后触发，优先级为5
      */
-    public BedDestroyedEvent() {
+    public BedDestroyedEventAbstract() {
         super(EVENT_NAME, EXECUTE_SECONDS, PRIORITY);
     }
 

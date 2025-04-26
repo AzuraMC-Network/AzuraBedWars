@@ -100,9 +100,9 @@ public class FireballHandler implements Listener {
         player.setVelocity(knockbackVector.multiply(FIREBALL_KNOCKBACK_MULTIPLIER));
     }
 
-    public static Vector getPosition(Location location1, Location location2, double Y) {
-        double X = location1.getX() - location2.getX();
-        double Z = location1.getZ() - location2.getZ();
-        return new Vector(X, Y, Z);
+    public static Vector getPosition(Location location1, Location location2, double y) {
+        double x = location1.getX() - location2.getX();
+        double z = location1.getZ() - location2.getZ();
+        return new Vector(x, y, z);
     }
 }

@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.event.impl;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.event.GameEvent;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
 import org.bukkit.Bukkit;
 
@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
  * 游戏结束事件
  * 处理游戏结束时需要执行的清理工作和关服操作
  */
-public class GameShutdownEvent extends GameEvent {
+public class AbstractGameShutdownEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
@@ -26,7 +26,7 @@ public class GameShutdownEvent extends GameEvent {
     /**
      * 创建游戏结束事件
      */
-    public GameShutdownEvent() {
+    public AbstractGameShutdownEvent() {
         super(EVENT_NAME, SHUTDOWN_DELAY_SECONDS, END_EVENT_PRIORITY);
     }
 

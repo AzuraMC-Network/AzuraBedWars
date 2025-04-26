@@ -2,14 +2,14 @@ package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.event.GameEvent;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 
 /**
  * 绿宝石资源点升级事件
  * 随着游戏进行，绿宝石生成速度会加快
  */
-public class EmeraldUpdateEvent extends GameEvent {
+public class EmeraldUpdateEventAbstract extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
@@ -30,7 +30,7 @@ public class EmeraldUpdateEvent extends GameEvent {
      * @param second 事件触发时间（秒）
      * @param priority 事件优先级
      */
-    public EmeraldUpdateEvent(int level, int second, int priority) {
+    public EmeraldUpdateEventAbstract(int level, int second, int priority) {
         super("绿宝石升级到" + level + "级", second, priority);
         this.level = level;
     }

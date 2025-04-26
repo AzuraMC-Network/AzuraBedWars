@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * 创建一个临时平台帮助玩家防止坠落
  * </p>
  */
-public class RescuePlatform extends SpecialItem {
+public class RescuePlatform extends AbstractSpecialItem {
 
     private static final ItemConfig config = AzuraBedWars.getInstance().getItemConfig();
 
@@ -225,7 +225,7 @@ public class RescuePlatform extends SpecialItem {
             return new ArrayList<>();
         }
         
-        return gameManager.getSpecialItems().stream()
+        return gameManager.getAbstractSpecialItems().stream()
                 .filter(item -> item instanceof RescuePlatform)
                 .map(item -> (RescuePlatform) item)
                 .filter(platform -> platform.getOwner() != null && platform.getOwner().equals(this.getOwner()))

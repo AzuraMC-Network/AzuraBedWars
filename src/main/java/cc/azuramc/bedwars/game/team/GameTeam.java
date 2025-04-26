@@ -174,6 +174,7 @@ public class GameTeam {
      * @param block1 第一个床方块
      * @param block2 第二个床方块
      */
+    @SuppressWarnings("deprecation")
     private void determineBedsForOldVersions(Block block1, Block block2) {
         // 首先尝试使用反射方法安全获取Bed数据
         try {

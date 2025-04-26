@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  * @author MrMicky
  * @version 2.1.4
  */
-public abstract class FastBoardBase<T> {
+public abstract class AbstractFastBoard<T> {
 
     // 缓存数据包类与字段关系，提高反射效率
     private static final Map<Class<?>, Field[]> PACKETS = new HashMap<>(8);
@@ -248,7 +248,7 @@ public abstract class FastBoardBase<T> {
      *
      * @param player 计分板的所有者（玩家）
      */
-    protected FastBoardBase(Player player) {
+    protected AbstractFastBoard(Player player) {
         this.player = Objects.requireNonNull(player, "player不能为null");
         this.id = "fb-" + Integer.toHexString(ThreadLocalRandom.current().nextInt());
 

@@ -13,39 +13,39 @@ import java.util.HashMap;
 
 public class ArmorStandUtil {
 
-    private static final HashMap<ArmorStand, Location> armorLoc = new HashMap<>();
-    private static final HashMap<ArmorStand, Boolean> armorUpward = new HashMap<>();
-    private static final HashMap<ArmorStand, Integer> armorAlgebra = new HashMap<>();
+    private static final HashMap<ArmorStand, Location> ARMOR_LOC = new HashMap<>();
+    private static final HashMap<ArmorStand, Boolean> ARMOR_UPWARD = new HashMap<>();
+    private static final HashMap<ArmorStand, Integer> ARMOR_ALGEBRA = new HashMap<>();
 
     public static void moveArmorStand(ArmorStand armorStand, double height) {
-        if (!armorLoc.containsKey(armorStand)) {
-            armorLoc.put(armorStand, armorStand.getLocation().clone());
+        if (!ARMOR_LOC.containsKey(armorStand)) {
+            ARMOR_LOC.put(armorStand, armorStand.getLocation().clone());
         }
-        if (!armorUpward.containsKey(armorStand)) {
-            armorUpward.put(armorStand, true);
+        if (!ARMOR_UPWARD.containsKey(armorStand)) {
+            ARMOR_UPWARD.put(armorStand, true);
         }
-        if (!armorAlgebra.containsKey(armorStand)) {
-            armorAlgebra.put(armorStand, 0);
+        if (!ARMOR_ALGEBRA.containsKey(armorStand)) {
+            ARMOR_ALGEBRA.put(armorStand, 0);
         }
-        armorAlgebra.put(armorStand, armorAlgebra.get(armorStand) + 1);
-        Location location = armorLoc.get(armorStand);
+        ARMOR_ALGEBRA.put(armorStand, ARMOR_ALGEBRA.get(armorStand) + 1);
+        Location location = ARMOR_LOC.get(armorStand);
         if (location.getY() >= height + 0.30) {
-            armorAlgebra.put(armorStand, 0);
-            armorUpward.put(armorStand, false);
+            ARMOR_ALGEBRA.put(armorStand, 0);
+            ARMOR_UPWARD.put(armorStand, false);
         } else if (location.getY() <= height - 0.30) {
-            armorAlgebra.put(armorStand, 0);
-            armorUpward.put(armorStand, true);
+            ARMOR_ALGEBRA.put(armorStand, 0);
+            ARMOR_UPWARD.put(armorStand, true);
         }
-        Integer algebra = armorAlgebra.get(armorStand);
+        Integer algebra = ARMOR_ALGEBRA.get(armorStand);
         if (39 > algebra || algebra >= 50) {
-            if (armorUpward.get(armorStand)) {
+            if (ARMOR_UPWARD.get(armorStand)) {
                 location.setY(location.getY() + 0.015);
             } else {
                 location.setY(location.getY() - 0.015);
             }
         }
         float turn = 1f;
-        if (!armorUpward.get(armorStand)) {
+        if (!ARMOR_UPWARD.get(armorStand)) {
             turn = -turn;
         }
         float yaw = location.getYaw();

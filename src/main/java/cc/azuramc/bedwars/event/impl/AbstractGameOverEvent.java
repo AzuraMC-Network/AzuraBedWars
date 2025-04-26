@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.task.GameOverTask;
-import cc.azuramc.bedwars.event.GameEvent;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameEndEvent;
 import org.bukkit.Bukkit;
 
@@ -14,13 +14,13 @@ import org.bukkit.Bukkit;
  * 游戏结束事件
  * 负责处理游戏结束时的逻辑，包括显示结束信息和切换到下一个事件
  */
-public class GameOverEvent extends GameEvent {
+public class AbstractGameOverEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private static final EventConfig.OverEvent config = plugin.getEventConfig().getOverEvent();
     private static final MessageConfig.OverEvent messageConfig = plugin.getMessageConfig().getOverEvent();
 
-    public GameOverEvent() {
+    public AbstractGameOverEvent() {
         super(messageConfig.getEventName(), config.getExecuteSecond(), 6);
     }
 

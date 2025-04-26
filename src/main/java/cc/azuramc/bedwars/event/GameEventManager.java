@@ -44,7 +44,7 @@ public class GameEventManager implements Runnable {
     // 定时任务和事件映射
     @Getter
     private final HashMap<String, GameEventRunnable> runnable = new HashMap<>();
-    private final HashMap<Integer, GameEvent> events = new HashMap<>();
+    private final HashMap<Integer, AbstractGameEvent> events = new HashMap<>();
     
     // 使用ScheduledThreadPoolExecutor替代Executors
     private ScheduledExecutorService scheduler;
@@ -73,14 +73,14 @@ public class GameEventManager implements Runnable {
      * 注册游戏中的所有事件
      */
     private void registerGameEvents() {
-        this.registerEvent(new GameStartEvent());
-        this.registerEvent(new DiamondUpdateEvent(2, EVENT_DURATION_SECONDS, DIAMOND_LEVEL2_PRIORITY));
-        this.registerEvent(new EmeraldUpdateEvent(2, EVENT_DURATION_SECONDS, EMERALD_LEVEL2_PRIORITY));
-        this.registerEvent(new DiamondUpdateEvent(3, EVENT_DURATION_SECONDS, DIAMOND_LEVEL3_PRIORITY));
-        this.registerEvent(new EmeraldUpdateEvent(3, EVENT_DURATION_SECONDS, EMERALD_LEVEL3_PRIORITY));
-        this.registerEvent(new BedDestroyedEvent());
-        this.registerEvent(new GameOverEvent());
-        this.registerEvent(new GameShutdownEvent());
+        this.registerEvent(new AbstractGameStartEvent());
+        this.registerEvent(new DiamondUpdateEventAbstract(2, EVENT_DURATION_SECONDS, DIAMOND_LEVEL2_PRIORITY));
+        this.registerEvent(new EmeraldUpdateEventAbstract(2, EVENT_DURATION_SECONDS, EMERALD_LEVEL2_PRIORITY));
+        this.registerEvent(new DiamondUpdateEventAbstract(3, EVENT_DURATION_SECONDS, DIAMOND_LEVEL3_PRIORITY));
+        this.registerEvent(new EmeraldUpdateEventAbstract(3, EVENT_DURATION_SECONDS, EMERALD_LEVEL3_PRIORITY));
+        this.registerEvent(new BedDestroyedEventAbstract());
+        this.registerEvent(new AbstractGameOverEvent());
+        this.registerEvent(new AbstractGameShutdownEvent());
     }
 
     /**
@@ -91,7 +91,7 @@ public class GameEventManager implements Runnable {
     public void run() {
         try {
             // 获取当前事件
-            GameEvent event = this.currentEvent();
+            AbstractGameEvent event = this.currentEvent();
 
             // 执行事件倒计时回调
             int remainingSeconds = event.getExecuteSeconds() - seconds;
@@ -179,7 +179,7 @@ public class GameEventManager implements Runnable {
      * 
      * @return 当前事件
      */
-    public GameEvent currentEvent() {
+    public AbstractGameEvent currentEvent() {
         return this.events.getOrDefault(this.currentEvent, this.events.get(OVER_EVENT_PRIORITY));
     }
 
@@ -208,7 +208,7 @@ public class GameEventManager implements Runnable {
      * @return 事件名称
      */
     public String formattedNextEvent() {
-        GameEvent currentEvent = this.currentEvent();
+        AbstractGameEvent currentEvent = this.currentEvent();
         return currentEvent.getName();
     }
 
@@ -238,7 +238,7 @@ public class GameEventManager implements Runnable {
      * 
      * @param event 事件实例
      */
-    private void registerEvent(GameEvent event) {
+    private void registerEvent(AbstractGameEvent event) {
         this.events.put(event.getPriority(), event);
     }
 

@@ -10,13 +10,13 @@ import org.bukkit.Material;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class SpecialItem {
+public abstract class AbstractSpecialItem {
     @Getter
-    private static final List<Class<? extends SpecialItem>> availableSpecials = new ArrayList<>();
+    private static final List<Class<? extends AbstractSpecialItem>> availableSpecials = new ArrayList<>();
 
     public static void loadSpecials() {
-        SpecialItem.availableSpecials.add(RescuePlatform.class);
-        SpecialItem.availableSpecials.add(WarpPowder.class);
+        AbstractSpecialItem.availableSpecials.add(RescuePlatform.class);
+        AbstractSpecialItem.availableSpecials.add(WarpPowder.class);
         Bukkit.getPluginManager().registerEvents(new RescuePlatformListener(), AzuraBedWars.getInstance());
         Bukkit.getPluginManager().registerEvents(new WarpPowderListener(), AzuraBedWars.getInstance());
     }

@@ -32,7 +32,7 @@ import java.util.List;
  * 允许玩家在原地等待几秒后传送回自己的基地
  * </p>
  */
-public class WarpPowder extends SpecialItem {
+public class WarpPowder extends AbstractSpecialItem {
 
     private static final ItemConfig.WarpPowder config = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
     private static final MessageConfig.WarpPowder messageConfig = AzuraBedWars.getInstance().getMessageConfig().getWarpPowder();

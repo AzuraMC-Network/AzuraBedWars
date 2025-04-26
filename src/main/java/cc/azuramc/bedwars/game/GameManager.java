@@ -16,7 +16,7 @@ import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.event.GameEventManager;
 import cc.azuramc.bedwars.shop.ShopManager;
-import cc.azuramc.bedwars.game.item.special.SpecialItem;
+import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import lombok.Data;
 import org.bukkit.*;
@@ -70,7 +70,7 @@ public class GameManager {
     private Map<ArmorStand, String> armorSande;
     private Map<ArmorStand, String> armorStand;
 
-    private List<SpecialItem> specialItems;
+    private List<AbstractSpecialItem> abstractSpecialItems;
 
     /**
      * 创建一个新的游戏实例
@@ -84,7 +84,7 @@ public class GameManager {
         this.gameParties = new ArrayList<>();
         this.armorSande = new HashMap<>();
         this.armorStand = new HashMap<>();
-        this.specialItems = new ArrayList<>();
+        this.abstractSpecialItems = new ArrayList<>();
         ShopManager.init(this);
         this.gameEventManager = new GameEventManager(this);
     }
@@ -472,19 +472,19 @@ public class GameManager {
     /**
      * 添加特殊物品到游戏中
      *
-     * @param specialItem 特殊物品
+     * @param abstractSpecialItem 特殊物品
      */
-    public void addSpecialItem(SpecialItem specialItem) {
-        this.specialItems.add(specialItem);
+    public void addSpecialItem(AbstractSpecialItem abstractSpecialItem) {
+        this.abstractSpecialItems.add(abstractSpecialItem);
     }
 
     /**
      * 从游戏中移除特殊物品
      *
-     * @param specialItem 特殊物品
+     * @param abstractSpecialItem 特殊物品
      */
-    public void removeSpecialItem(SpecialItem specialItem) {
-        this.specialItems.remove(specialItem);
+    public void removeSpecialItem(AbstractSpecialItem abstractSpecialItem) {
+        this.abstractSpecialItems.remove(abstractSpecialItem);
     }
 
     /**

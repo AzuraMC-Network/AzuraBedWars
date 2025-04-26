@@ -2,14 +2,14 @@ package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.event.GameEvent;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 
 /**
  * 钻石资源点升级事件
  * 随着游戏进行，钻石生成速度会加快
  */
-public class DiamondUpdateEvent extends GameEvent {
+public class DiamondUpdateEventAbstract extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
@@ -30,7 +30,7 @@ public class DiamondUpdateEvent extends GameEvent {
      * @param second 事件触发时间（秒）
      * @param priority 事件优先级
      */
-    public DiamondUpdateEvent(int level, int second, int priority) {
+    public DiamondUpdateEventAbstract(int level, int second, int priority) {
         super("钻石资源点升级到" + level + "级", second, priority);
         this.level = level;
     }

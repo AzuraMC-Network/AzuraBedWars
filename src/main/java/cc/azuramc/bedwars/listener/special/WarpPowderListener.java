@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.item.special.SpecialItem;
+import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.item.special.WarpPowder;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -44,7 +44,7 @@ public class WarpPowderListener implements Listener {
             return null;
         }
         
-        for (SpecialItem item : gameManager.getSpecialItems()) {
+        for (AbstractSpecialItem item : gameManager.getAbstractSpecialItems()) {
             if (item instanceof WarpPowder powder) {
                 if (powder.getPlayer() != null && powder.getPlayer().equals(gamePlayer)) {
                     return powder;

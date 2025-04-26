@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
-import cc.azuramc.bedwars.event.GameEvent;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
@@ -20,7 +20,7 @@ import java.util.Objects;
  * 游戏开始事件
  * 负责处理游戏开始时的初始化和团队升级效果
  */
-public class GameStartEvent extends GameEvent {
+public class AbstractGameStartEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private static final EventConfig.StartEvent config = plugin.getEventConfig().getStartEvent();
@@ -29,7 +29,7 @@ public class GameStartEvent extends GameEvent {
     /**
      * 创建游戏开始事件
      */
-    public GameStartEvent() {
+    public AbstractGameStartEvent() {
         super(messageEvent.getEventName(), config.getCountDown(), config.getEventPriority());
     }
 

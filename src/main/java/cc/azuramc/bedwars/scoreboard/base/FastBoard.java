@@ -12,7 +12,7 @@ import java.util.Objects;
  * 基于字符串的记分板实现，继承自FastBoardBase
  * 提供简单易用的API，用于创建和管理玩家记分板
  */
-public class FastBoard extends FastBoardBase<String> {
+public class FastBoard extends AbstractFastBoard<String> {
 
     // 反射相关常量
     private static final MethodHandle MESSAGE_FROM_STRING;
