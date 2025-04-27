@@ -1,12 +1,11 @@
 package cc.azuramc.bedwars.game.map;
 
+import cc.azuramc.bedwars.compat.util.WorldUtil;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
-import cc.azuramc.bedwars.database.storage.provider.MySQLMapStorage;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -146,12 +145,7 @@ public class MapManager {
             
             // 设置世界属性
             if (mapWorld != null) {
-                mapWorld.setAutoSave(false);
-                mapWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-                mapWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
-                mapWorld.setGameRuleValue("doMobSpawning", "false");
-                mapWorld.setGameRuleValue("doFireTick", "false");
-                return mapWorld;
+                return WorldUtil.setWorldRules(mapWorld);
             }
         } catch (IOException e) {
             Bukkit.getLogger().severe("加载地图世界时出错: " + e.getMessage());

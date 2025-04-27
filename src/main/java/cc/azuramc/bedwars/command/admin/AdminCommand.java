@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.command.admin;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.WorldUtil;
 import cc.azuramc.bedwars.util.ChatColorUtil;
 import cc.azuramc.bedwars.util.CommandUtil;
 import org.bukkit.*;
@@ -85,11 +86,7 @@ public class AdminCommand {
         World mapWorld = Bukkit.createWorld(creator);
 
         if (mapWorld != null) {
-            mapWorld.setAutoSave(false);
-            mapWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-            mapWorld.setGameRule(GameRule.DO_FIRE_TICK, false);
-            mapWorld.setGameRuleValue("doMobSpawning", "false");
-            mapWorld.setGameRuleValue("doFireTick", "false");
+            WorldUtil.setWorldRules(mapWorld);
         }
     }
 }
