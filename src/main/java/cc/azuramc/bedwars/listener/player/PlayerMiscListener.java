@@ -34,8 +34,8 @@ public class PlayerMiscListener implements Listener {
 
     @EventHandler
     public void craftItem(PrepareItemCraftEvent event) {
-        for (HumanEntity h : event.getViewers()) {
-            if (h instanceof Player) {
+        for (HumanEntity entity : event.getViewers()) {
+            if (entity instanceof Player) {
                 event.getInventory().setResult(new ItemStack(Material.AIR));
             }
         }

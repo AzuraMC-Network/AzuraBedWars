@@ -1,5 +1,8 @@
 package cc.azuramc.bedwars.spectator.gui;
 
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
@@ -20,38 +23,42 @@ import org.bukkit.potion.PotionEffectType;
  * </p>
  */
 public class SpectatorSettingGUI extends CustomGUI {
+
+    private static final MessageConfig.Spectator.SettingGUI messageConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getSettingGUI();
+    private static final PlayerConfig.Spectator.SettingGUI config = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getSettingGUI();
+
     // 常量定义
-    private static final String GUI_TITLE = "§8旁观者设置";
-    private static final int INVENTORY_SIZE = 36;
+    private static final String GUI_TITLE = messageConfig.getGuiTitle();
+    private static final int INVENTORY_SIZE = config.getInventorySize();
     private static final int MAX_POTION_DURATION = Integer.MAX_VALUE;
     
     // 速度效果槽位
-    private static final int SPEED_NONE_SLOT = 11;
-    private static final int SPEED_I_SLOT = 12;
-    private static final int SPEED_II_SLOT = 13;
-    private static final int SPEED_III_SLOT = 14;
-    private static final int SPEED_IV_SLOT = 15;
+    private static final int SPEED_NONE_SLOT = config.getSpeedNoneSlot();
+    private static final int SPEED_I_SLOT = config.getSpeedISlot();
+    private static final int SPEED_II_SLOT = config.getSpeedIISlot();
+    private static final int SPEED_III_SLOT = config.getSpeedIIISlot();
+    private static final int SPEED_IV_SLOT = config.getSpeedIVSlot();
     
     // 功能设置槽位
-    private static final int AUTO_TP_SLOT = 20;
-    private static final int NIGHT_VISION_SLOT = 21;
-    private static final int FIRST_PERSON_SLOT = 22;
-    private static final int HIDE_OTHERS_SLOT = 23;
-    private static final int FLY_SLOT = 24;
+    private static final int AUTO_TP_SLOT = config.getAutoTPSlot();
+    private static final int NIGHT_VISION_SLOT = config.getNightVersionSlot();
+    private static final int FIRST_PERSON_SLOT = config.getFirstPersonSlot();
+    private static final int HIDE_OTHERS_SLOT = config.getHideOthersSlot();
+    private static final int FLY_SLOT = config.getFlySlot();
     
     // 消息文本
-    private static final String SPEED_REMOVED = "§c你不再有任何速度效果！";
-    private static final String SPEED_ADDED = "§a你获得了 速度 %s 效果！";
-    private static final String AUTO_TP_ENABLED = "§a你开启了自动传送功能！";
-    private static final String AUTO_TP_DISABLED = "§c你不再被自动传送到目标位置！";
-    private static final String NIGHT_VISION_ENABLED = "§a你现在拥有了夜视！";
-    private static final String NIGHT_VISION_DISABLED = "§c你不再有夜视效果了！";
-    private static final String FIRST_PERSON_ENABLED = "§a当你用你的指南针现在一个玩家后，你会被自动传送到他那里！";
-    private static final String FIRST_PERSON_DISABLED = "§c你将默认使用第三人称模式！";
-    private static final String HIDE_OTHERS_ENABLED = "§c你不会再看到其他的旁观者！";
-    private static final String HIDE_OTHERS_DISABLED = "§a你现在可以看见其他旁观者了！";
-    private static final String FLY_ENABLED = "§a你现在不能停止飞行！";
-    private static final String FLY_DISABLED = "§a你现在能停止飞行！";
+    private static final String SPEED_REMOVED = messageConfig.getSpeedRemoved();
+    private static final String SPEED_ADDED = messageConfig.getSpeedAdded();
+    private static final String AUTO_TP_ENABLED = messageConfig.getAutoTPEnabled();
+    private static final String AUTO_TP_DISABLED = messageConfig.getAutoTPDisabled();
+    private static final String NIGHT_VISION_ENABLED = messageConfig.getNightVersionEnabled();
+    private static final String NIGHT_VISION_DISABLED = messageConfig.getNightVersionDisabled();
+    private static final String FIRST_PERSON_ENABLED = messageConfig.getFirstPersonEnabled();
+    private static final String FIRST_PERSON_DISABLED = messageConfig.getFirstPersonDisabled();
+    private static final String HIDE_OTHERS_ENABLED = messageConfig.getHideOthersEnabled();
+    private static final String HIDE_OTHERS_DISABLED = messageConfig.getHideOthersDisabled();
+    private static final String FLY_ENABLED = messageConfig.getFlyEnabled();
+    private static final String FLY_DISABLED = messageConfig.getFlyDisabled();
 
     /**
      * 构造函数

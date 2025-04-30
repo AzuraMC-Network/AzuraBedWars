@@ -93,7 +93,7 @@ public class GeneratorTask {
     public GeneratorTask(GameManager gameManager) {
         this.gameManager = gameManager;
         TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
-        MessageConfig.GeneratorConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGenerator();
+        MessageConfig.Generator messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGenerator();
 
         // 初始化所有配置值
         IRON_SPAWN_INTERVAL = config.getIronSpawnInterval();

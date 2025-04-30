@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.scoreboard.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.ScoreboardConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.task.GameStartTask;
@@ -27,22 +28,25 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  */
 public class LobbyBoardProvider implements Listener {
+
+    private static final ScoreboardConfig.LobbyScoreboard config = AzuraBedWars.getInstance().getScoreboardConfig().getLobbyScoreboard();
+
     // 游戏实例
     private static GameManager gameManager;
     
     // 常量定义
-    private static final String TITLE = "§e§l超级起床战争";
-    private static final String SERVER_INFO = "§bas.azuramc.cc";
-    private static final String WAITING_MESSAGE = "§f等待中...";
-    private static final String EMPTY_LINE = "";
-    private static final String DEFAULT_MODE = "普通模式";
-    private static final String EXP_MODE = "经验模式";
+    private static final String TITLE = config.getTitle();
+    private static final String SERVER_INFO = config.getServerInfo();
+    private static final String WAITING_MESSAGE = config.getWaitingMessage();
+    private static final String EMPTY_LINE = config.getEmptyLine();
+    private static final String DEFAULT_MODE = config.getDefaultMode();
+    private static final String EXP_MODE = config.getExpMode();
     
     // 玩家计分板更新状态缓存
     private static final ConcurrentHashMap<UUID, Long> lastUpdateTime = new ConcurrentHashMap<>();
     
     // 更新间隔（毫秒）
-    private static final long UPDATE_INTERVAL = 500; // 默认为0.5秒更新一次
+    private static final long UPDATE_INTERVAL = config.getUpdateInterval(); // 默认为0.5秒更新一次
     
     // 插件实例缓存
     private static AzuraBedWars plugin;

@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,7 +16,9 @@ import java.util.UUID;
 
 public class PlayerAFKListener implements Listener {
 
-    private static final int MAX_NO_MOVEMENT_TIME = 45;
+    private static final PlayerConfig.AFKCheck config = AzuraBedWars.getInstance().getPlayerConfig().getAfkCheck();
+
+    private static final int MAX_NO_MOVEMENT_TIME = config.getMaxNoMovementTime();
 
     private static final Map<UUID, Long> afkLastMovement = new HashMap<>();
     private static int checkAFKTask;

@@ -1,5 +1,8 @@
 package cc.azuramc.bedwars.spectator;
 
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -13,16 +16,20 @@ import java.text.DecimalFormat;
  * </p>
  */
 public class SpectatorTarget {
+
+    private static final MessageConfig.Spectator.Target messageConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getTarget();
+    private static final PlayerConfig.Spectator.Target config = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getTarget();
+
     // 常量定义
-    private static final String TARGET_LOST_MESSAGE = "§c§l目标已丢失或不在同一个世界";
-    private static final String FIRST_PERSON_TITLE = "§a正在旁观§7%s";
-    private static final String FIRST_PERSON_SUBTITLE = "§a点击左键打开菜单  §c按Shift键退出";
-    private static final String FIRST_PERSON_ACTION_BAR = "§f目标: §a§l%s  §f生命值: §a§l%d §c§l❤";
-    private static final String THIRD_PERSON_ACTION_BAR = "§f目标: §a§l%s  §f生命值: §a§l%d  §f距离: §a§l%s米";
-    private static final String MENU_HINT = "  §a点击左键打开菜单  §c按Shift退出";
-    private static final double AUTO_TP_DISTANCE = 20.0D;
+    private static final String TARGET_LOST_MESSAGE = messageConfig.getTargetLostMessage();
+    private static final String FIRST_PERSON_TITLE = messageConfig.getFirstPersonTitle();
+    private static final String FIRST_PERSON_SUBTITLE = messageConfig.getFirstPersonSubTitle();
+    private static final String FIRST_PERSON_ACTION_BAR = messageConfig.getFirstPersonActionBar();
+    private static final String THIRD_PERSON_ACTION_BAR = messageConfig.getThirdPersonActionBar();
+    private static final String MENU_HINT = messageConfig.getMenuHint();
+    private static final double AUTO_TP_DISTANCE = config.getAutoTPDistance();
     private static final int TITLE_FADE_IN = 0;
-    private static final int TITLE_DURATION = 20;
+    private static final int TITLE_DURATION = config.getTitleDuration();
     private static final int TITLE_FADE_OUT = 0;
     
     // 实例变量

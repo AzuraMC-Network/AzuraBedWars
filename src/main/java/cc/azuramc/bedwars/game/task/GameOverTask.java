@@ -25,7 +25,7 @@ import java.util.Objects;
 public class GameOverTask extends BukkitRunnable {
 
     private static final TaskConfig.GameOverConfig config = AzuraBedWars.getInstance().getTaskConfig().getGameOver();
-    private static final MessageConfig.GameOverConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameOver();
+    private static final MessageConfig.GameOver messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameOver();
 
     // 游戏结束倒计时时间(秒)
     private static final int DEFAULT_COUNTDOWN = config.getDefaultCountdown();

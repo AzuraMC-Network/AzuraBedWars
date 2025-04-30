@@ -3,6 +3,8 @@ package cc.azuramc.bedwars.listener.player;
 import cc.azuramc.bedwars.compat.util.TitleUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -35,27 +37,31 @@ import java.util.UUID;
  * </p>
  */
 public class PlayerRespawnListener implements Listener {
+
+    private final static PlayerConfig.PlayerRespawn config = AzuraBedWars.getInstance().getPlayerConfig().getPlayerRespawn();
+    private final static MessageConfig.PlayerRespawn messageConfig = AzuraBedWars.getInstance().getMessageConfig().getPlayerRespawn();
+
     // 常量定义
-    private static final int RESPAWN_COUNTDOWN_SECONDS = 5;
-    private static final int RESPAWN_PROTECTION_TICKS = 60;
+    private static final int RESPAWN_COUNTDOWN_SECONDS = config.getRespawnCountdownSeconds();
+    private static final int RESPAWN_PROTECTION_TICKS = config.getRespawnProtectionTicks();
     private static final int TITLE_FADE_IN = 1;
-    private static final int TITLE_STAY = 20;
+    private static final int TITLE_STAY = config.getTitleStay();
     private static final int TITLE_FADE_OUT = 1;
     private static final long RESPAWN_DELAY_TICKS = 1L;
     private static final long RESPAWN_TIMER_PERIOD = 20L;
     
     // 消息常量
-    private static final String RESPAWN_COUNTDOWN_TITLE = "§e§l%d";
-    private static final String RESPAWN_COUNTDOWN_SUBTITLE = "§7你死了 将在稍后重生";
-    private static final String RESPAWN_COMPLETE_TITLE = "§a已复活！";
-    private static final String RESPAWN_COMPLETE_SUBTITLE = "§7因为你的床还在 所以你复活了";
-    private static final String DEATH_PERMANENT_TITLE = "§c你凉了！";
-    private static final String DEATH_PERMANENT_SUBTITLE = "§7你没床了";
-    private static final String TEAM_ELIMINATED_FORMAT = "§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃";
-    private static final String TEAM_ELIMINATED_MSG = "%s §c凉了! §e挖床者: %s";
-    private static final String REJOIN_MESSAGE = "§c你凉了!想再来一局吗? ";
-    private static final String REJOIN_BUTTON = "§b§l点击这里!";
-    private static final String REJOIN_COMMAND = "/queue join qc x";
+    private static final String RESPAWN_COUNTDOWN_TITLE = messageConfig.getRespawnCountdownTitle();
+    private static final String RESPAWN_COUNTDOWN_SUBTITLE = messageConfig.getRespawnCountdownSubTitle();
+    private static final String RESPAWN_COMPLETE_TITLE = messageConfig.getRespawnCompleteTitle();
+    private static final String RESPAWN_COMPLETE_SUBTITLE = messageConfig.getRespawnCompleteSubTitle();
+    private static final String DEATH_PERMANENT_TITLE = messageConfig.getDeathPermanentTitle();
+    private static final String DEATH_PERMANENT_SUBTITLE = messageConfig.getDeathPermanentSubTitle();
+    private static final String TEAM_ELIMINATED_FORMAT = messageConfig.getTeamEliminatedFormat();
+    private static final String TEAM_ELIMINATED_MSG = messageConfig.getTeamEliminatedMessage();
+    private static final String REJOIN_MESSAGE = messageConfig.getRejoinMessage();
+    private static final String REJOIN_BUTTON = messageConfig.getRejoinButton();
+    private static final String REJOIN_COMMAND = messageConfig.getRejoinCommand();
     
     private final List<UUID> noDamage = new ArrayList<>();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();

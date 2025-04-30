@@ -8,9 +8,60 @@ import lombok.EqualsAndHashCode;
 public class PlayerConfig {
 
     private GamePlayer gamePlayer = new GamePlayer();
+    private AFKCheck afkCheck = new AFKCheck();
+    private PlayerDeath playerDeath = new PlayerDeath();
+    private PlayerRespawn playerRespawn = new PlayerRespawn();
+    private Spectator spectator = new Spectator();
 
     @Data
     public static class GamePlayer {
         private int maxHealth = 20;
+    }
+
+    @Data
+    public static class AFKCheck {
+        private int maxNoMovementTime = 45;
+    }
+
+    @Data
+    public static class PlayerDeath {
+        private int coinsActionBarTimes = 5;
+        private int actionBarPeriod = 10;
+        private int coinsReward = 1;
+    }
+
+    @Data
+    public static class PlayerRespawn {
+        private int respawnCountdownSeconds = 5;
+        private int respawnProtectionTicks = 60;
+        private int titleStay = 20;
+    }
+
+    @Data
+    public static class Spectator {
+
+        private SettingGUI settingGUI = new SettingGUI();
+        private Target target = new Target();
+
+        @Data
+        public static class SettingGUI {
+            private int inventorySize = 36;
+            private int speedNoneSlot = 11;
+            private int speedISlot = 12;
+            private int speedIISlot = 13;
+            private int speedIIISlot = 14;
+            private int speedIVSlot = 15;
+            private int autoTPSlot = 20;
+            private int nightVersionSlot = 21;
+            private int firstPersonSlot = 22;
+            private int hideOthersSlot = 23;
+            private int flySlot = 24;
+        }
+
+        @Data
+        public static class Target {
+            private double autoTPDistance = 20.0D;
+            private int titleDuration = 20;
+        }
     }
 }

@@ -20,7 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class GameStartTask extends BukkitRunnable {
 
     private static final TaskConfig.GameStartConfig config = AzuraBedWars.getInstance().getTaskConfig().getGameStart();
-    private static final MessageConfig.GameStartConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameStart();
+    private static final MessageConfig.GameStart messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameStart();
 
     // 倒计时常量
     private static final int DEFAULT_COUNTDOWN = config.getDefaultCountdown();

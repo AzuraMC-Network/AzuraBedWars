@@ -1,6 +1,8 @@
 package cc.azuramc.bedwars.scoreboard.provider;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
+import cc.azuramc.bedwars.config.object.ScoreboardConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
@@ -26,17 +28,20 @@ import java.util.UUID;
  * </p>
  */
 public class GameBoardProvider implements Listener {
+
+    private static final ScoreboardConfig.GameScoreboard config = AzuraBedWars.getInstance().getScoreboardConfig().getGameScoreboard();
+
     // 游戏实例
     private static GameManager gameManager;
     
     // 常量定义
-    private static final String TITLE = "§e§l超级起床战争";
-    private static final String SERVER_INFO = "§bas.azuramc.cc";
-    private static final String MY_TEAM_MARK = " §7(我的队伍)";
-    private static final String BED_DESTROYED = "§7❤";
-    private static final String BED_ALIVE = "§c❤";
-    private static final String SEPARATOR = "§f | ";
-    private static final String EMPTY_LINE = "";
+    private static final String TITLE = config.getTitle();
+    private static final String SERVER_INFO = config.getServerInfo();
+    private static final String MY_TEAM_MARK = config.getMyTeamMark();
+    private static final String BED_DESTROYED = config.getBedDestroyed();
+    private static final String BED_ALIVE = config.getBedAlive();
+    private static final String SEPARATOR = config.getSeparator();
+    private static final String EMPTY_LINE = config.getEmptyLine();
     
     // 日期格式化器缓存
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yy", Locale.CHINESE);
@@ -45,7 +50,7 @@ public class GameBoardProvider implements Listener {
     private static final ConcurrentHashMap<UUID, Long> lastUpdateTime = new ConcurrentHashMap<>();
     
     // 更新间隔（毫秒）
-    private static final long UPDATE_INTERVAL = 500; // 默认为0.5秒更新一次
+    private static final long UPDATE_INTERVAL = config.getUpdateInterval(); // 默认为0.5秒更新一次
     
     // 计分板管理器引用
     private static ScoreboardManager scoreboardManager;

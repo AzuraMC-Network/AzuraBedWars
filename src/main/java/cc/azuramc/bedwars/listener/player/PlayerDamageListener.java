@@ -4,6 +4,8 @@ import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.api.event.BedwarsPlayerKilleEvent;
+import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -35,18 +37,22 @@ import java.util.Map;
  * </p>
  */
 public class PlayerDamageListener implements Listener {
+
+    private final static MessageConfig.PlayerDeath messageConfig = AzuraBedWars.getInstance().getMessageConfig().getPlayerDeath();
+    private final static PlayerConfig.PlayerDeath config = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
+
     // 常量定义
     private static final String METADATA_VOID_PLAYER = "voidPlayer";
     private static final String METADATA_FIREBALL_NOFALL = "FIREBALL PLAYER NOFALL";
     private static final String METADATA_SHOP = "Shop";
     private static final String METADATA_SHOP2 = "Shop2";
-    private static final String COINS_ACTION_BAR = "§6+1个金币";
-    private static final String COINS_MESSAGE = "§6+1个金币 (最终击杀)";
-    private static final int COINS_ACTIONBAR_TIMES = 5;
-    private static final int ACTIONBAR_PERIOD = 10;
+    private static final String COINS_ACTION_BAR = messageConfig.getCoinsActionBar();
+    private static final String COINS_MESSAGE = messageConfig.getCoinsMessage();
+    private static final int COINS_ACTIONBAR_TIMES = config.getCoinsActionBarTimes();
+    private static final int ACTIONBAR_PERIOD = config.getActionBarPeriod();
     private static final int RESPAWN_DELAY = 10;
     private static final double VOID_DAMAGE = 100.0D;
-    private static final int COINS_REWARD = 1;
+    private static final int COINS_REWARD = config.getCoinsReward();
 
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();

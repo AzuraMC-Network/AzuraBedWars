@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.world;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import org.bukkit.Location;
@@ -15,11 +16,13 @@ import java.util.UUID;
 
 public class FireballHandler implements Listener {
 
-    private static final int FIREBALL_EXPLOSION_RADIUS_X = 4;
-    private static final int FIREBALL_EXPLOSION_RADIUS_Y = 3;
-    private static final int FIREBALL_EXPLOSION_RADIUS_Z = 4;
-    private static final int FIREBALL_DAMAGE = 3;
-    private static final double FIREBALL_KNOCKBACK_MULTIPLIER = 0.5;
+    private static final ItemConfig.FireBall config = AzuraBedWars.getInstance().getItemConfig().getFireBall();
+
+    private static final int FIREBALL_EXPLOSION_RADIUS_X = config.getFireballExplosionRadiusX();
+    private static final int FIREBALL_EXPLOSION_RADIUS_Y = config.getFireballExplosionRadiusY();
+    private static final int FIREBALL_EXPLOSION_RADIUS_Z = config.getFireballExplosionRadiusZ();
+    private static final int FIREBALL_DAMAGE = config.getFireballDamage();
+    private static final double FIREBALL_KNOCKBACK_MULTIPLIER = config.getFireballKnockbackMultiplier();
     private static final String FIREBALL_METADATA = "Game FIREBALL";
     private static final String NO_FALL_DAMAGE_METADATA = "FIREBALL PLAYER NOFALL";
 

@@ -25,7 +25,7 @@ public class PlayerJoinListener implements Listener {
             return;
         }
 
-        if ((player.hasPermission("bw.*"))) {
+        if ((player.hasPermission("azurabedwars.admin"))) {
             event.allow();
 
             if(gameManager.getGameState() == GameState.RUNNING) {

@@ -9,23 +9,27 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class MessageConfig {
 
-    private DestroyBedEvent destroyBedEvent = new DestroyBedEvent();
-    private DiamondUpdateEvent diamondUpdateEvent = new DiamondUpdateEvent();
-    private EmeraldUpdateEvent emeraldUpdateEvent = new EmeraldUpdateEvent();
-    private ShutdownEvent shutdownEvent = new ShutdownEvent();
-    private OverEvent overEvent = new OverEvent();
-    private StartEvent startEvent = new StartEvent();
+    private DestroyBed destroyBed = new DestroyBed();
+    private DiamondUpdate diamondUpdate = new DiamondUpdate();
+    private EmeraldUpdate emeraldUpdate = new EmeraldUpdate();
+    private Shutdown shutdown = new Shutdown();
+    private Over over = new Over();
+    private Start start = new Start();
 
-    private GeneratorConfig generator = new GeneratorConfig();
-    private GameStartConfig gameStart = new GameStartConfig();
-    private GameOverConfig gameOver = new GameOverConfig();
+    private Generator generator = new Generator();
+    private GameStart gameStart = new GameStart();
+    private GameOver gameOver = new GameOver();
 
     private WarpPowder warpPowder = new WarpPowder();
 
-    private GameManager gameManager = new GameManager();
+    private Game game = new Game();
+
+    private PlayerDeath playerDeath = new PlayerDeath();
+    private PlayerRespawn playerRespawn = new PlayerRespawn();
+    private Spectator spectator = new Spectator();
 
     @Data
-    public static class DestroyBedEvent {
+    public static class DestroyBed {
 
         private Title title = new Title();
         private String eventName = ChatColorUtil.color("床自毁");
@@ -38,27 +42,27 @@ public class MessageConfig {
     }
 
     @Data
-    public static class DiamondUpdateEvent {
+    public static class DiamondUpdate {
         private String eventName = ChatColorUtil.color("钻石刷新");
     }
 
     @Data
-    public static class EmeraldUpdateEvent {
+    public static class EmeraldUpdate {
         private String eventName = ChatColorUtil.color("绿宝石刷新");
     }
 
     @Data
-    public static class ShutdownEvent {
+    public static class Shutdown {
         private String eventName = ChatColorUtil.color("游戏关闭");
     }
 
     @Data
-    public static class OverEvent {
+    public static class Over {
         private String eventName = ChatColorUtil.color("游戏结束");
     }
 
     @Data
-    public static class StartEvent {
+    public static class Start {
 
         private Title title = new Title();
         private String eventName = ChatColorUtil.color("开始游戏");
@@ -72,7 +76,7 @@ public class MessageConfig {
     }
 
     @Data
-    public static class GeneratorConfig {
+    public static class Generator {
         // 资源名称
         private String ironGeneratorName = ChatColorUtil.color("铁刷新");
         private String goldGeneratorName = ChatColorUtil.color("金刷新");
@@ -91,7 +95,7 @@ public class MessageConfig {
     }
 
     @Data
-    public static class GameStartConfig {
+    public static class GameStart {
         // 倒计时常量
         private Title title = new Title();
 
@@ -109,7 +113,7 @@ public class MessageConfig {
     }
 
     @Data
-    public static class GameOverConfig {
+    public static class GameOver {
         // 胜利/失败消息
         private String victoryTitle = ChatColorUtil.color("&6&l获胜！");
         private String victorySubtitle = ChatColorUtil.color("&7你获得了最终的胜利");
@@ -132,8 +136,73 @@ public class MessageConfig {
     }
 
     @Data
-    public static class GameManager {
+    public static class Game {
         private String msgPlayerReconnect = ChatColorUtil.color("&7%s&a重连上线");
         private String msgPlayerLeave = ChatColorUtil.color("&7%s&e离开游戏");
+    }
+
+    @Data
+    public static class PlayerDeath {
+        private String coinsActionBar = ChatColorUtil.color("&6+1个金币");
+        private String coinsMessage = ChatColorUtil.color("&6+1个金币 (最终击杀)");
+    }
+
+    @Data
+    public static class PlayerRespawn {
+        private String respawnCountdownTitle = ChatColorUtil.color("&e&l%d");
+        private String respawnCountdownSubTitle = ChatColorUtil.color("&7你死了 将在稍后重生");
+        private String respawnCompleteTitle = ChatColorUtil.color("&a已复活！");
+        private String respawnCompleteSubTitle = ChatColorUtil.color("&7因为你的床还在 所以你复活了");
+        private String deathPermanentTitle = ChatColorUtil.color("&c你凉了！");
+        private String deathPermanentSubTitle = ChatColorUtil.color("&7你没床了");
+        private String teamEliminatedFormat = ChatColorUtil.color("&7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
+        private String teamEliminatedMessage = ChatColorUtil.color("%s &c凉了! &e挖床者: %s");
+        private String rejoinMessage = ChatColorUtil.color("&c你凉了!想再来一局吗? ");
+        private String rejoinButton = ChatColorUtil.color("&b&l点击这里!");
+        private String rejoinCommand = ChatColorUtil.color("/queue join qc x");
+    }
+
+    @Data
+    public static class Spectator {
+
+        private CompassGUI compassGUI = new CompassGUI();
+        private SettingGUI settingGUI = new SettingGUI();
+        private Target target = new Target();
+
+        @Data
+        public static class CompassGUI {
+            private String guiTitle = ChatColorUtil.color("&8选择一个玩家来传送");
+            private String healthFormat = ChatColorUtil.color("&f血量: &8%d");
+            private String foodFormat = ChatColorUtil.color("&f饥饿: &8%d");
+            private String levelFormat = ChatColorUtil.color("&f等级: &8%d");
+            private String distanceFormat = ChatColorUtil.color("&f距离: &8%d");
+        }
+
+        @Data
+        public static class SettingGUI {
+            private String guiTitle = ChatColorUtil.color("&8旁观者设置");
+            private String speedRemoved = ChatColorUtil.color("&c你不再有任何速度效果！");
+            private String speedAdded = ChatColorUtil.color("&a你获得了 速度 %s 效果！");
+            private String autoTPEnabled = ChatColorUtil.color("&a你开启了自动传送功能！");
+            private String autoTPDisabled = ChatColorUtil.color("&c你不再被自动传送到目标位置！");
+            private String nightVersionEnabled = ChatColorUtil.color("&a你现在拥有了夜视！");
+            private String nightVersionDisabled = ChatColorUtil.color("&c你不再有夜视效果了！");
+            private String firstPersonEnabled = ChatColorUtil.color("&a当你用你的指南针现在一个玩家后，你会被自动传送到他那里！");
+            private String firstPersonDisabled = ChatColorUtil.color("&c你将默认使用第三人称模式！");
+            private String hideOthersEnabled = ChatColorUtil.color("&c你不会再看到其他的旁观者！");
+            private String hideOthersDisabled = ChatColorUtil.color("&a你现在可以看见其他旁观者了！");
+            private String flyEnabled = ChatColorUtil.color("&a你现在不能停止飞行！");
+            private String flyDisabled = ChatColorUtil.color("&a你现在能停止飞行！");
+        }
+        
+        @Data
+        public static class Target {
+            private String targetLostMessage = ChatColorUtil.color("&c&l目标已丢失或不在同一个世界");
+            private String firstPersonTitle = ChatColorUtil.color("&a正在旁观&7%s");
+            private String firstPersonSubTitle = ChatColorUtil.color("&a点击左键打开菜单  &c按Shift键退出");
+            private String firstPersonActionBar = ChatColorUtil.color("&f目标: &a&l%s  &f生命值: &a&l%d &c&l❤");
+            private String thirdPersonActionBar = ChatColorUtil.color("&f目标: &a&l%s  &f生命值: &a&l%d  &f距离: &a&l%s米");
+            private String menuHint = ChatColorUtil.color("  &a点击左键打开菜单  &c按Shift退出");
+        }
     }
 }

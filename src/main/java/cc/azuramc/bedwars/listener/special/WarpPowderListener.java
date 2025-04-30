@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.special;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -29,8 +30,11 @@ import java.util.Objects;
  * </p>
  */
 public class WarpPowderListener implements Listener {
+
+    private static final ItemConfig.WarpPowder config = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
-    private static final String CANCEL_ITEM_NAME = "§4取消传送";
+    
+    private static final String CANCEL_ITEM_NAME = config.getCancelItemName();
 
     /**
      * 获取玩家当前使用的传送粉末

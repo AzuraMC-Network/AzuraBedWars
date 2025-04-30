@@ -37,7 +37,7 @@ import java.util.*;
 public class GameManager {
 
     private static final ItemConfig.GameManager config = AzuraBedWars.getInstance().getItemConfig().getGameManager();
-    private static final MessageConfig.GameManager messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameManager();
+    private static final MessageConfig.Game messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGame();
 
     // 时间常量
     private static final long COUNTDOWN_TICK_PERIOD = 20L;

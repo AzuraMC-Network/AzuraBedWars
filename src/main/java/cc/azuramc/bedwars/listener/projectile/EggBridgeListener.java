@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.projectile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -16,6 +17,11 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import java.util.*;
 
 public class EggBridgeListener implements Listener {
+
+    private static final ItemConfig.EggBridge config = AzuraBedWars.getInstance().getItemConfig().getEggBridge();
+
+    private static final int EGG_COOLDOWN_SECONDS = config.getEggCooldownSeconds();
+    private static final String EGG_COOLDOWN_MESSAGE = config.getEggCooldownMessage();
 
     private static final Map<Egg, EggBridgeHandler> bridges = new HashMap<>();
     public static List<UUID> inBridgeCooldown = new ArrayList<>();
@@ -42,7 +48,7 @@ public class EggBridgeListener implements Listener {
 
         // 在搭桥蛋 3 秒冷却中
         if (inBridgeCooldown.contains(shooter.getUniqueId())) {
-            shooter.sendMessage(ChatColorUtil.color("&c搭桥蛋冷却中！"));
+            shooter.sendMessage(ChatColorUtil.color(EGG_COOLDOWN_MESSAGE));
             event.setCancelled(true);
             return;
         }
@@ -58,7 +64,7 @@ public class EggBridgeListener implements Listener {
         if (!inBridgeCooldown.contains(shooter.getUniqueId())) {
             inBridgeCooldown.add(shooter.getUniqueId());
         }
-        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> inBridgeCooldown.remove(shooter.getUniqueId()), 60L);
+        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> inBridgeCooldown.remove(shooter.getUniqueId()), EGG_COOLDOWN_SECONDS * 20L);
 
     }
 
