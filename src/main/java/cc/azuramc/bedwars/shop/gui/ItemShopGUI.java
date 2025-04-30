@@ -320,13 +320,13 @@ public class ItemShopGUI extends CustomGUI {
         }
         
         // 添加价格说明
-        Material priceMaterial = shopItemType.getPriceCost().getMaterial();
+        Material priceMaterial = shopItemType.getPriceCost().material();
         String resourceName = RESOURCE_NAMES.getOrDefault(priceMaterial, "资源");
         
         if (gameModeType == GameModeType.EXPERIENCE) {
-            lore.add("§7花费: §3§l" + shopItemType.getPriceCost().getXp() + "级");
+            lore.add("§7花费: §3§l" + shopItemType.getPriceCost().xp() + "级");
         } else {
-            lore.add("§7花费: §3§l" + shopItemType.getPriceCost().getAmount() + " " + resourceName);
+            lore.add("§7花费: §3§l" + shopItemType.getPriceCost().amount() + " " + resourceName);
         }
         
         return lore;
@@ -455,8 +455,8 @@ public class ItemShopGUI extends CustomGUI {
      * 处理物品支付
      */
     private boolean processItemPayment(Player player, ShopItemType shopItemType) {
-        Material paymentMaterial = shopItemType.getPriceCost().getMaterial();
-        int requiredAmount = shopItemType.getPriceCost().getAmount();
+        Material paymentMaterial = shopItemType.getPriceCost().material();
+        int requiredAmount = shopItemType.getPriceCost().amount();
         
         // 计算玩家拥有的资源总数
         int playerTotal = 0;
@@ -499,7 +499,7 @@ public class ItemShopGUI extends CustomGUI {
      * 处理经验支付
      */
     private boolean processExperiencePayment(Player player, ShopItemType shopItemType) {
-        int requiredXp = shopItemType.getPriceCost().getXp();
+        int requiredXp = shopItemType.getPriceCost().xp();
         
         if (player.getLevel() < requiredXp) {
             SoundWrapper.playEndermanTeleportSound(player);
