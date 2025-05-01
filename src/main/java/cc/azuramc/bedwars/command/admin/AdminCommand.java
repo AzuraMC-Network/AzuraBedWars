@@ -29,11 +29,18 @@ public class AdminCommand {
         CommandUtil.sendLayout(actor, ChatColorUtil.CHAT_BAR);
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助"));
         CommandUtil.sendLayout(actor, "");
+        CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/reload &7重新加载配置文件"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map &7查看地图相关指令帮助"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw editorMode true/false &7开关编辑模式"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw toWorld <worldName> &7前往世界"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw loadWorld <worldName> &7加载世界"));
         CommandUtil.sendLayout(actor, ChatColorUtil.CHAT_BAR);
+    }
+
+    @Subcommand("reload")
+    public void reloadConfigFiles(BukkitCommandActor actor) {
+        plugin.getConfigManager().reloadAll();
+        CommandUtil.sendLayout(actor, "&a成功重载配置文件");
     }
 
     @Subcommand("map")
@@ -70,7 +77,7 @@ public class AdminCommand {
             return;
         }
         plugin.getSettingsConfig().setEditorMode(value);
-        CommandUtil.sendLayout(actor, "成功设置值为 " + value);
+        CommandUtil.sendLayout(actor, "&a成功设置值为 " + value);
         plugin.getConfigManager().saveConfig("settings");
     }
 
