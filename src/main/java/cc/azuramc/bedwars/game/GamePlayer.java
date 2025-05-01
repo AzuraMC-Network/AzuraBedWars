@@ -63,9 +63,9 @@ public class GamePlayer {
     @Getter private boolean spectator;
     @Getter @Setter private SpectatorTarget spectatorTarget;
     @Getter @Setter private GameTeam gameTeam;
-    @Setter @Getter private boolean afk;
-    @Setter @Getter private boolean shoutCooldown;
-    @Getter @Setter private boolean eggBridgeCooldown;
+    @Setter @Getter private boolean isAfk;
+    @Setter @Getter private boolean isShoutCooldown;
+    @Getter @Setter private boolean isEggBridgeCooldown;
     
     // 战斗数据
     @Getter private int kills;
@@ -88,10 +88,10 @@ public class GamePlayer {
         this.name = name;
 
         // 初始化 AFK 状态
-        this.afk = false;
+        this.isAfk = false;
 
         // 初始化 shoutCooldown 状态
-        this.shoutCooldown = false;
+        this.isShoutCooldown = false;
 
         // 初始化装备状态
         this.armorType = ArmorType.DEFAULT;
