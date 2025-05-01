@@ -14,7 +14,7 @@ public class DiamondUpdateEventAbstract extends AbstractGameEvent {
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     // 钻石资源点刷新标识符
-    private static final String EVENT_NAME = plugin.getMessageConfig().getDiamondUpdateEvent().getEventName();
+    private static final String EVENT_NAME = plugin.getMessageConfig().getDiamondUpdate().getEventName();
     
     // 定义各等级的钻石刷新时间（秒）
     private static final int LEVEL_2_REFRESH_SECONDS = plugin.getEventConfig().getDiamondUpdateEvent().getLevel2RefreshSecond();

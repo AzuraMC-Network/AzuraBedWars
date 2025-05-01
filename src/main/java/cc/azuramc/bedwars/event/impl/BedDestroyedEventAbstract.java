@@ -22,7 +22,7 @@ public class BedDestroyedEventAbstract extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private static final EventConfig.DestroyBedEvent config = plugin.getEventConfig().getDestroyBedEvent();
-    private static final MessageConfig.DestroyBedEvent messageConfig = plugin.getMessageConfig().getDestroyBedEvent();
+    private static final MessageConfig.DestroyBed messageConfig = plugin.getMessageConfig().getDestroyBed();
 
     // 事件相关常量
     private static final String EVENT_NAME = messageConfig.getEventName();

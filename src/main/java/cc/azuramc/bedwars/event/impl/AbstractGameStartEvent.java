@@ -24,7 +24,7 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private static final EventConfig.StartEvent config = plugin.getEventConfig().getStartEvent();
-    private static final MessageConfig.StartEvent messageEvent = plugin.getMessageConfig().getStartEvent();
+    private static final MessageConfig.Start messageEvent = plugin.getMessageConfig().getStart();
 
     /**
      * 创建游戏开始事件

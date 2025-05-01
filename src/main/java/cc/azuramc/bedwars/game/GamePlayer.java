@@ -65,6 +65,7 @@ public class GamePlayer {
     @Getter @Setter private GameTeam gameTeam;
     @Setter @Getter private boolean afk;
     @Setter @Getter private boolean shoutCooldown;
+    @Getter @Setter private boolean eggBridgeCooldown;
     
     // 战斗数据
     @Getter private int kills;

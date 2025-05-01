@@ -14,7 +14,7 @@ public class EmeraldUpdateEventAbstract extends AbstractGameEvent {
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     // 绿宝石资源点刷新标识符
-    private static final String EVENT_NAME = plugin.getMessageConfig().getEmeraldUpdateEvent().getEventName();
+    private static final String EVENT_NAME = plugin.getMessageConfig().getEmeraldUpdate().getEventName();
     
     // 定义各等级的绿宝石刷新时间（秒）
     private static final int LEVEL_2_REFRESH_SECONDS = plugin.getEventConfig().getEmeraldUpdateEvent().getLevel2RefreshSecond();

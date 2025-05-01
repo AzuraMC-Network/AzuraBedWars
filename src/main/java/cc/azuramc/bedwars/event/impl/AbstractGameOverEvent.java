@@ -18,7 +18,7 @@ public class AbstractGameOverEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private static final EventConfig.OverEvent config = plugin.getEventConfig().getOverEvent();
-    private static final MessageConfig.OverEvent messageConfig = plugin.getMessageConfig().getOverEvent();
+    private static final MessageConfig.Over messageConfig = plugin.getMessageConfig().getOver();
 
     public AbstractGameOverEvent() {
         super(messageConfig.getEventName(), config.getExecuteSecond(), 6);

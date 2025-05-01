@@ -24,7 +24,6 @@ public class EggBridgeListener implements Listener {
     private static final String EGG_COOLDOWN_MESSAGE = config.getEggCooldownMessage();
 
     private static final Map<Egg, EggBridgeHandler> bridges = new HashMap<>();
-    public static List<UUID> inBridgeCooldown = new ArrayList<>();
 
     private static final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
@@ -45,9 +44,14 @@ public class EggBridgeListener implements Listener {
             return;
         }
 
+        // 仅为游戏玩家
+        GamePlayer gamePlayer = GamePlayer.get(shooter.getUniqueId());
+        if (gamePlayer == null) {
+            return;
+        }
 
-        // 在搭桥蛋 3 秒冷却中
-        if (inBridgeCooldown.contains(shooter.getUniqueId())) {
+        // 搭桥蛋冷却中
+        if (gamePlayer.isEggBridgeCooldown()) {
             shooter.sendMessage(ChatColorUtil.color(EGG_COOLDOWN_MESSAGE));
             event.setCancelled(true);
             return;
@@ -60,23 +64,24 @@ public class EggBridgeListener implements Listener {
 
         // 存进生效的搭桥蛋列表
         bridges.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
-        // 创建 3 秒冷却时间
-        if (!inBridgeCooldown.contains(shooter.getUniqueId())) {
-            inBridgeCooldown.add(shooter.getUniqueId());
-        }
-        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> inBridgeCooldown.remove(shooter.getUniqueId()), EGG_COOLDOWN_SECONDS * 20L);
 
+        // 创建冷却
+        if (!gamePlayer.isEggBridgeCooldown()) {
+            gamePlayer.setEggBridgeCooldown(true);
+            Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> gamePlayer.setEggBridgeCooldown(false), EGG_COOLDOWN_SECONDS * 20L);
+        }
     }
 
     @EventHandler
     public void onHit(ProjectileHitEvent event) {
+        // 取消搭桥蛋命中实体
         if (event.getEntity() instanceof Egg) {
             removeEgg((Egg) event.getEntity());
         }
     }
 
     /**
-     * 从生效的搭桥蛋列表移除搭桥蛋
+     * 移除生效中的搭桥蛋
      */
     public static void removeEgg(Egg egg) {
         if (bridges.containsKey(egg)) {
