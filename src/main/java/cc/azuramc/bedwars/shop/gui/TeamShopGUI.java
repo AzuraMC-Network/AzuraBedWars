@@ -26,10 +26,9 @@ import java.util.List;
  */
 public class TeamShopGUI extends CustomGUI {
 
-    // 边框装饰颜色
-    private static final int BORDER_GLASS_COLOR = 7; // 灰色
+    /** 灰色 */
+    private static final int BORDER_GLASS_COLOR = 7;
 
-    // 升级项目名称
     private static final String SHARPENED_SWORDS = "磨刀石";
     private static final String REINFORCED_ARMOR = "精制护甲";
     private static final String MANIC_MINER = "疯狂矿工";
@@ -37,10 +36,10 @@ public class TeamShopGUI extends CustomGUI {
     private static final String HEALING_POOL = "治愈池";
     private static final String ALARM_TRAP = "警报陷阱";
 
-    // 资源类型名称缓存
+    /** 资源类型名称缓存 */
     private static final Map<Material, String> RESOURCE_NAMES = new HashMap<>();
     
-    // 升级价格缓存（二维：升级类型 -> 等级 -> 价格）
+    /** 升级价格缓存（二维：升级类型 -> 等级 -> 价格） */
     private static final Map<String, Map<Integer, Integer>> TIER_PRICES = new HashMap<>();
     
     // 静态初始化资源名称和价格

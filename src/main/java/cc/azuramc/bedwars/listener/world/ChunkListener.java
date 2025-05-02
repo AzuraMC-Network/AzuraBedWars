@@ -14,6 +14,9 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class ChunkListener implements Listener {
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     private static final boolean SUPPORTS_DIRECT_CANCEL;

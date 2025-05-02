@@ -23,36 +23,42 @@ import java.util.UUID;
 
 /**
  * 游戏计分板管理类
- * <p>
  * 负责创建、更新和删除玩家的计分板
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class GameBoardProvider implements Listener {
 
-    private static final ScoreboardConfig.GameScoreboard config = AzuraBedWars.getInstance().getScoreboardConfig().getGameScoreboard();
+    private static final ScoreboardConfig.GameScoreboard CONFIG = AzuraBedWars.getInstance().getScoreboardConfig().getGameScoreboard();
 
-    // 游戏实例
     private static GameManager gameManager;
-    
-    // 常量定义
-    private static final String TITLE = config.getTitle();
-    private static final String SERVER_INFO = config.getServerInfo();
-    private static final String MY_TEAM_MARK = config.getMyTeamMark();
-    private static final String BED_DESTROYED = config.getBedDestroyed();
-    private static final String BED_ALIVE = config.getBedAlive();
-    private static final String SEPARATOR = config.getSeparator();
-    private static final String EMPTY_LINE = config.getEmptyLine();
-    
-    // 日期格式化器缓存
+
+    private static final String TITLE = CONFIG.getTitle();
+    private static final String SERVER_INFO = CONFIG.getServerInfo();
+    private static final String MY_TEAM_MARK = CONFIG.getMyTeamMark();
+    private static final String BED_DESTROYED = CONFIG.getBedDestroyed();
+    private static final String BED_ALIVE = CONFIG.getBedAlive();
+    private static final String SEPARATOR = CONFIG.getSeparator();
+    private static final String EMPTY_LINE = CONFIG.getEmptyLine();
+
+    /**
+     * 日期格式化器缓存
+     */
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yy", Locale.CHINESE);
-    
-    // 玩家计分板更新状态缓存
-    private static final ConcurrentHashMap<UUID, Long> lastUpdateTime = new ConcurrentHashMap<>();
-    
-    // 更新间隔（毫秒）
-    private static final long UPDATE_INTERVAL = config.getUpdateInterval(); // 默认为0.5秒更新一次
-    
-    // 计分板管理器引用
+
+    /**
+     * 玩家计分板更新状态缓存
+     */
+    private static final ConcurrentHashMap<UUID, Long> LAST_UPDATE_TIME = new ConcurrentHashMap<>();
+
+    /**
+     * 更新间隔（毫秒）
+     */
+    private static final long UPDATE_INTERVAL = CONFIG.getUpdateInterval();
+
+    /**
+     * 计分板管理器引用
+     */
     private static ScoreboardManager scoreboardManager;
 
     /**
@@ -103,11 +109,11 @@ public class GameBoardProvider implements Listener {
         for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
             // 检查更新间隔
             UUID playerId = gamePlayer.getUuid();
-            long lastUpdate = lastUpdateTime.getOrDefault(playerId, 0L);
+            long lastUpdate = LAST_UPDATE_TIME.getOrDefault(playerId, 0L);
             
             if (currentTime - lastUpdate >= UPDATE_INTERVAL) {
                 updatePlayerBoard(gamePlayer);
-                lastUpdateTime.put(playerId, currentTime);
+                LAST_UPDATE_TIME.put(playerId, currentTime);
             }
         }
     }
@@ -243,7 +249,7 @@ public class GameBoardProvider implements Listener {
             gamePlayer.setBoard(null);
             
             // 移除缓存
-            lastUpdateTime.remove(player.getUniqueId());
+            LAST_UPDATE_TIME.remove(player.getUniqueId());
         }
     }
     
@@ -278,6 +284,6 @@ public class GameBoardProvider implements Listener {
                 removeBoard(player);
             }
         }
-        lastUpdateTime.clear();
+        LAST_UPDATE_TIME.clear();
     }
 }

@@ -4,6 +4,9 @@ import cc.azuramc.bedwars.compat.VersionUtil;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class WorldUtil {
 
     @SuppressWarnings("deprecation")

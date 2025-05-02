@@ -14,23 +14,25 @@ import java.util.Objects;
 
 /**
  * 游戏团队管理类
- * <p>
  * 负责管理游戏中的队伍，包括队伍颜色、出生点、床位置和队伍升级等信息
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 @Data
 public class GameTeam {
-    // 搜索床的范围
+    /**
+     * 搜索床的范围
+     */
     private static final int BED_SEARCH_RADIUS = 18;
-    // 默认床朝向
+    /**
+     * 默认床朝向
+     */
     private static final BlockFace DEFAULT_BED_FACE = BlockFace.NORTH;
-    
-    // 基本团队信息
+
     private final TeamColor teamColor;
     private final Location spawnLocation;
     private int maxPlayers;
-    
-    // 床相关属性
+
     private Block bedFeet;
     private Block bedHead;
     private BlockFace bedFace;
@@ -38,7 +40,6 @@ public class GameTeam {
     private boolean isDestroyed;
     private GamePlayer destroyPlayer;
 
-    // 团队升级属性
     private int forge;
     private int manicMiner;
     private boolean hasSharpenedEnchant;

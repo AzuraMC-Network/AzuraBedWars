@@ -10,9 +10,9 @@ import org.bukkit.event.Listener;
 
 /**
  * 计分板管理器
- * <p>
  * 统一管理游戏内和大厅的计分板提供者
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class ScoreboardManager implements Listener {
     private final GameManager gameManager;

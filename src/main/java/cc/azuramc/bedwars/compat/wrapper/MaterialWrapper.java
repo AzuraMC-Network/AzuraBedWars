@@ -10,6 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class MaterialWrapper {
 
     private static final Map<String, Material> MATERIAL_CACHE = new HashMap<>();

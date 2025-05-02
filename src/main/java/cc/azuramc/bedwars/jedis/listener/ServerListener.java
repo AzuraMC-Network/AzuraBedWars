@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 /**
  * 服务器状态监听器
  * 用于处理游戏不同阶段的状态转换事件
+ *
+ * @author an5w1r@163.com
  */
 public class ServerListener implements Listener {
 

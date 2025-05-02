@@ -10,17 +10,22 @@ import org.bukkit.Bukkit;
 /**
  * 游戏结束事件
  * 处理游戏结束时需要执行的清理工作和关服操作
+ * @author an5w1r@163.com
  */
 public class AbstractGameShutdownEvent extends AbstractGameEvent {
 
-    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+    private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
 
-    private static final String EVENT_NAME = plugin.getMessageConfig().getShutdown().getEventName();
-    
-    // 游戏结束延迟关服时间（秒）
-    private static final int SHUTDOWN_DELAY_SECONDS = plugin.getEventConfig().getShutdownEvent().getShutdownDelaySecond();
-    
-    // 事件优先级（在所有事件结束后触发）
+    private static final String EVENT_NAME = PLUGIN.getMessageConfig().getShutdown().getEventName();
+
+    /**
+     * 游戏结束延迟关服时间（秒）
+     */
+    private static final int SHUTDOWN_DELAY_SECONDS = PLUGIN.getEventConfig().getShutdownEvent().getShutdownDelaySecond();
+
+    /**
+     * 事件优先级（在所有事件结束后触发）
+     */
     private static final int END_EVENT_PRIORITY = 7;
     
     /**

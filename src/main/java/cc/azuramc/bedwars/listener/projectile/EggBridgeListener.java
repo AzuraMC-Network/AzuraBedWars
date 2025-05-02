@@ -16,21 +16,24 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 
 import java.util.*;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class EggBridgeListener implements Listener {
 
-    private static final ItemConfig.EggBridge config = AzuraBedWars.getInstance().getItemConfig().getEggBridge();
+    private static final ItemConfig.EggBridge CONFIG = AzuraBedWars.getInstance().getItemConfig().getEggBridge();
 
-    private static final int EGG_COOLDOWN_SECONDS = config.getEggCooldownSeconds();
-    private static final String EGG_COOLDOWN_MESSAGE = config.getEggCooldownMessage();
+    private static final int EGG_COOLDOWN_SECONDS = CONFIG.getEggCooldownSeconds();
+    private static final String EGG_COOLDOWN_MESSAGE = CONFIG.getEggCooldownMessage();
 
-    private static final Map<Egg, EggBridgeHandler> bridges = new HashMap<>();
+    private static final Map<Egg, EggBridgeHandler> BRIDGES = new HashMap<>();
 
-    private static final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
+    private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
 
     @EventHandler
     public void onThrow(ProjectileLaunchEvent event) {
         // 游戏运行判断
-        if (gameManager.getGameState() != GameState.RUNNING) {
+        if (GAME_MANAGER.getGameState() != GameState.RUNNING) {
             return;
         }
 
@@ -63,7 +66,7 @@ public class EggBridgeListener implements Listener {
         }
 
         // 存进生效的搭桥蛋列表
-        bridges.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
+        BRIDGES.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
 
         // 创建冷却
         if (!gamePlayer.isEggBridgeCooldown()) {
@@ -84,11 +87,11 @@ public class EggBridgeListener implements Listener {
      * 移除生效中的搭桥蛋
      */
     public static void removeEgg(Egg egg) {
-        if (bridges.containsKey(egg)) {
-            if (bridges.get(egg) != null) {
-                bridges.get(egg).cancel();
+        if (BRIDGES.containsKey(egg)) {
+            if (BRIDGES.get(egg) != null) {
+                BRIDGES.get(egg).cancel();
             }
-            bridges.remove(egg);
+            BRIDGES.remove(egg);
         }
     }
 }

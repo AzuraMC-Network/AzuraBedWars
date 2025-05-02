@@ -13,6 +13,9 @@ import org.bukkit.inventory.ItemFlag;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class BowShopPage implements ShopData {
     private final ShopItemType mainShopItem;
     private final List<ShopItemType> shopItems = new LinkedList<>();

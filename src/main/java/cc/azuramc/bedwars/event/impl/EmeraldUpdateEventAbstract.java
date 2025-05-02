@@ -8,19 +8,27 @@ import cc.azuramc.bedwars.event.GameEventRunnable;
 /**
  * 绿宝石资源点升级事件
  * 随着游戏进行，绿宝石生成速度会加快
+ *
+ * @author an5w1r@163.com
  */
 public class EmeraldUpdateEventAbstract extends AbstractGameEvent {
 
-    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+    private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
 
-    // 绿宝石资源点刷新标识符
-    private static final String EVENT_NAME = plugin.getMessageConfig().getEmeraldUpdate().getEventName();
-    
-    // 定义各等级的绿宝石刷新时间（秒）
-    private static final int LEVEL_2_REFRESH_SECONDS = plugin.getEventConfig().getEmeraldUpdateEvent().getLevel2RefreshSecond();
-    private static final int LEVEL_3_REFRESH_SECONDS = plugin.getEventConfig().getEmeraldUpdateEvent().getLevel3RefreshSecond();
-    
-    // 当前升级等级
+    /**
+     * 绿宝石资源点刷新标识符
+     */
+    private static final String EVENT_NAME = PLUGIN.getMessageConfig().getEmeraldUpdate().getEventName();
+
+    /**
+     * 定义各等级的绿宝石刷新时间（秒）
+     */
+    private static final int LEVEL_2_REFRESH_SECONDS = PLUGIN.getEventConfig().getEmeraldUpdateEvent().getLevel2RefreshSecond();
+    private static final int LEVEL_3_REFRESH_SECONDS = PLUGIN.getEventConfig().getEmeraldUpdateEvent().getLevel3RefreshSecond();
+
+    /**
+     * 当前升级等级
+     */
     private final int level;
 
     /**
@@ -65,7 +73,8 @@ public class EmeraldUpdateEventAbstract extends AbstractGameEvent {
         return switch (level) {
             case 2 -> LEVEL_2_REFRESH_SECONDS;
             case 3 -> LEVEL_3_REFRESH_SECONDS;
-            default -> LEVEL_2_REFRESH_SECONDS; // 默认使用2级刷新时间
+            // 默认使用2级刷新时间
+            default -> LEVEL_2_REFRESH_SECONDS;
         };
     }
     

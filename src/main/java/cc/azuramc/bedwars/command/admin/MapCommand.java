@@ -18,6 +18,9 @@ import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.List;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Command("map")
 @CommandPermission("azurabedwars.admin")
 public class MapCommand {

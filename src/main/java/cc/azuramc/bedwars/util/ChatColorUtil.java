@@ -1,8 +1,5 @@
 package cc.azuramc.bedwars.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.TitleUtil;
 import lombok.Setter;
@@ -10,6 +7,12 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author an5w1r@163.com
+ */
 public final class ChatColorUtil {
 
     @Setter

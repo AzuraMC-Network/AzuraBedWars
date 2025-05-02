@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 任务配置类
  * 包含所有任务相关的配置项
+ * @author an5w1r@163.com
  */
 @Data
 @EqualsAndHashCode

@@ -10,6 +10,9 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class SoundWrapper {
 
     private static final Map<String, Sound> SOUND_CACHE = new HashMap<>();

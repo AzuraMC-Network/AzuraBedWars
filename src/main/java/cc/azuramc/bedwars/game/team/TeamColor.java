@@ -5,8 +5,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 
+/**
+ * @author an5w1r@163.com
+ */
+
 @Getter
 public enum TeamColor {
+    /**
+     * 红色
+     */
     RED(Color.fromRGB(255, 85, 85), ChatColor.RED, DyeColor.RED, "§c红"),
     BLUE(Color.fromRGB(85, 85, 255), ChatColor.BLUE, DyeColor.LIGHT_BLUE, "§9蓝"),
     GREEN(Color.fromRGB(85, 255, 85), ChatColor.GREEN, DyeColor.LIME, "§a绿"),

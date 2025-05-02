@@ -18,47 +18,43 @@ import org.bukkit.potion.PotionEffectType;
 
 /**
  * 旁观者设置GUI
- * <p>
  * 提供旁观者各种设置的界面，包括速度效果、自动传送、夜视等
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class SpectatorSettingGUI extends CustomGUI {
 
-    private static final MessageConfig.Spectator.SettingGUI messageConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getSettingGUI();
-    private static final PlayerConfig.Spectator.SettingGUI config = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getSettingGUI();
+    private static final MessageConfig.Spectator.SettingGUI MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getSettingGUI();
+    private static final PlayerConfig.Spectator.SettingGUI CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getSettingGUI();
 
-    // 常量定义
-    private static final String GUI_TITLE = messageConfig.getGuiTitle();
-    private static final int INVENTORY_SIZE = config.getInventorySize();
+    private static final String GUI_TITLE = MESSAGE_CONFIG.getGuiTitle();
+    private static final int INVENTORY_SIZE = CONFIG.getInventorySize();
     private static final int MAX_POTION_DURATION = Integer.MAX_VALUE;
-    
-    // 速度效果槽位
-    private static final int SPEED_NONE_SLOT = config.getSpeedNoneSlot();
-    private static final int SPEED_I_SLOT = config.getSpeedISlot();
-    private static final int SPEED_II_SLOT = config.getSpeedIISlot();
-    private static final int SPEED_III_SLOT = config.getSpeedIIISlot();
-    private static final int SPEED_IV_SLOT = config.getSpeedIVSlot();
-    
-    // 功能设置槽位
-    private static final int AUTO_TP_SLOT = config.getAutoTPSlot();
-    private static final int NIGHT_VISION_SLOT = config.getNightVersionSlot();
-    private static final int FIRST_PERSON_SLOT = config.getFirstPersonSlot();
-    private static final int HIDE_OTHERS_SLOT = config.getHideOthersSlot();
-    private static final int FLY_SLOT = config.getFlySlot();
-    
-    // 消息文本
-    private static final String SPEED_REMOVED = messageConfig.getSpeedRemoved();
-    private static final String SPEED_ADDED = messageConfig.getSpeedAdded();
-    private static final String AUTO_TP_ENABLED = messageConfig.getAutoTPEnabled();
-    private static final String AUTO_TP_DISABLED = messageConfig.getAutoTPDisabled();
-    private static final String NIGHT_VISION_ENABLED = messageConfig.getNightVersionEnabled();
-    private static final String NIGHT_VISION_DISABLED = messageConfig.getNightVersionDisabled();
-    private static final String FIRST_PERSON_ENABLED = messageConfig.getFirstPersonEnabled();
-    private static final String FIRST_PERSON_DISABLED = messageConfig.getFirstPersonDisabled();
-    private static final String HIDE_OTHERS_ENABLED = messageConfig.getHideOthersEnabled();
-    private static final String HIDE_OTHERS_DISABLED = messageConfig.getHideOthersDisabled();
-    private static final String FLY_ENABLED = messageConfig.getFlyEnabled();
-    private static final String FLY_DISABLED = messageConfig.getFlyDisabled();
+
+    private static final int SPEED_NONE_SLOT = CONFIG.getSpeedNoneSlot();
+    private static final int SPEED_I_SLOT = CONFIG.getSpeedISlot();
+    private static final int SPEED_II_SLOT = CONFIG.getSpeedIISlot();
+    private static final int SPEED_III_SLOT = CONFIG.getSpeedIIISlot();
+    private static final int SPEED_IV_SLOT = CONFIG.getSpeedIVSlot();
+
+    private static final int AUTO_TP_SLOT = CONFIG.getAutoTPSlot();
+    private static final int NIGHT_VISION_SLOT = CONFIG.getNightVersionSlot();
+    private static final int FIRST_PERSON_SLOT = CONFIG.getFirstPersonSlot();
+    private static final int HIDE_OTHERS_SLOT = CONFIG.getHideOthersSlot();
+    private static final int FLY_SLOT = CONFIG.getFlySlot();
+
+    private static final String SPEED_REMOVED = MESSAGE_CONFIG.getSpeedRemoved();
+    private static final String SPEED_ADDED = MESSAGE_CONFIG.getSpeedAdded();
+    private static final String AUTO_TP_ENABLED = MESSAGE_CONFIG.getAutoTPEnabled();
+    private static final String AUTO_TP_DISABLED = MESSAGE_CONFIG.getAutoTPDisabled();
+    private static final String NIGHT_VISION_ENABLED = MESSAGE_CONFIG.getNightVersionEnabled();
+    private static final String NIGHT_VISION_DISABLED = MESSAGE_CONFIG.getNightVersionDisabled();
+    private static final String FIRST_PERSON_ENABLED = MESSAGE_CONFIG.getFirstPersonEnabled();
+    private static final String FIRST_PERSON_DISABLED = MESSAGE_CONFIG.getFirstPersonDisabled();
+    private static final String HIDE_OTHERS_ENABLED = MESSAGE_CONFIG.getHideOthersEnabled();
+    private static final String HIDE_OTHERS_DISABLED = MESSAGE_CONFIG.getHideOthersDisabled();
+    private static final String FLY_ENABLED = MESSAGE_CONFIG.getFlyEnabled();
+    private static final String FLY_DISABLED = MESSAGE_CONFIG.getFlyDisabled();
 
     /**
      * 构造函数
@@ -164,33 +160,33 @@ public class SpectatorSettingGUI extends CustomGUI {
         // 自动传送
         setItem(AUTO_TP_SLOT, createOptionItem(
             MaterialWrapper.COMPASS(),
-            settings.getOption(SpectatorSettings.Option.AUTOTP) ? "§c停用自动传送" : "§a启动自动传送",
-            settings.getOption(SpectatorSettings.Option.AUTOTP) ? "§7点击停用自动传送" : "§7点击启用自动传送"
+            settings.getOption(SpectatorSettings.Option.AUTO_TP) ? "§c停用自动传送" : "§a启动自动传送",
+            settings.getOption(SpectatorSettings.Option.AUTO_TP) ? "§7点击停用自动传送" : "§7点击启用自动传送"
         ), createAutoTpAction(player, settings));
 
         // 夜视
         setItem(NIGHT_VISION_SLOT, createOptionItem(
             MaterialWrapper.getMaterial("ENDER_EYE", "EYE_OF_ENDER"),
-            settings.getOption(SpectatorSettings.Option.NIGHTVISION) ? "§c停用夜视" : "§a启动夜视",
-            settings.getOption(SpectatorSettings.Option.NIGHTVISION) ? "§7点击停用夜视" : "§7点击启用夜视"
+            settings.getOption(SpectatorSettings.Option.NIGHT_VISION) ? "§c停用夜视" : "§a启动夜视",
+            settings.getOption(SpectatorSettings.Option.NIGHT_VISION) ? "§7点击停用夜视" : "§7点击启用夜视"
         ), createNightVisionAction(player, settings));
 
         // 第一人称
         setItem(FIRST_PERSON_SLOT, createOptionItem(
             MaterialWrapper.CLOCK(),
-            settings.getOption(SpectatorSettings.Option.FIRSTPERSON) ? "§c停用第一人称旁观" : "§a启动第一人称旁观",
-            settings.getOption(SpectatorSettings.Option.FIRSTPERSON) ? 
+            settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ? "§c停用第一人称旁观" : "§a启动第一人称旁观",
+            settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ?
                 "§7点击停用第一人称旁观" : 
                 "§7点击确认使用指南针时\n§7自动沿用第一人称旁观！\n§7你也可以右键点击一位玩家\n§7来启用第一人称旁观"
         ), createFirstPersonAction(player, gamePlayer, settings));
 
         // 隐藏其他旁观者
         setItem(HIDE_OTHERS_SLOT, createOptionItem(
-            settings.getOption(SpectatorSettings.Option.HIDEOTHER) ? 
+            settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ?
                 MaterialWrapper.getMaterial("REDSTONE", "REDSTONE") :
                 MaterialWrapper.getMaterial("GLOWSTONE_DUST", "GLOWSTONE_DUST"),
-            settings.getOption(SpectatorSettings.Option.HIDEOTHER) ? "§c隐藏旁观者" : "§a查看旁观者",
-            settings.getOption(SpectatorSettings.Option.HIDEOTHER) ? 
+            settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ? "§c隐藏旁观者" : "§a查看旁观者",
+            settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ?
                 "§7点击来隐藏其他旁观者" : "§7点击以显示其他旁观者"
         ), createHideOthersAction(player, settings));
 
@@ -227,8 +223,8 @@ public class SpectatorSettingGUI extends CustomGUI {
      */
     private GUIAction createAutoTpAction(Player player, SpectatorSettings settings) {
         return new GUIAction(0, () -> {
-            boolean newValue = !settings.getOption(SpectatorSettings.Option.AUTOTP);
-            settings.setOption(SpectatorSettings.Option.AUTOTP, newValue);
+            boolean newValue = !settings.getOption(SpectatorSettings.Option.AUTO_TP);
+            settings.setOption(SpectatorSettings.Option.AUTO_TP, newValue);
             player.sendMessage(newValue ? AUTO_TP_ENABLED : AUTO_TP_DISABLED);
         }, true);
     }
@@ -242,14 +238,14 @@ public class SpectatorSettingGUI extends CustomGUI {
      */
     private GUIAction createNightVisionAction(Player player, SpectatorSettings settings) {
         return new GUIAction(0, () -> {
-            boolean newValue = !settings.getOption(SpectatorSettings.Option.NIGHTVISION);
+            boolean newValue = !settings.getOption(SpectatorSettings.Option.NIGHT_VISION);
             if (player.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
                 player.removePotionEffect(PotionEffectType.NIGHT_VISION);
             }
             if (newValue) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, MAX_POTION_DURATION, 1));
             }
-            settings.setOption(SpectatorSettings.Option.NIGHTVISION, newValue);
+            settings.setOption(SpectatorSettings.Option.NIGHT_VISION, newValue);
             player.sendMessage(newValue ? NIGHT_VISION_ENABLED : NIGHT_VISION_DISABLED);
         }, true);
     }
@@ -264,8 +260,8 @@ public class SpectatorSettingGUI extends CustomGUI {
      */
     private GUIAction createFirstPersonAction(Player player, GamePlayer gamePlayer, SpectatorSettings settings) {
         return new GUIAction(0, () -> {
-            boolean newValue = !settings.getOption(SpectatorSettings.Option.FIRSTPERSON);
-            settings.setOption(SpectatorSettings.Option.FIRSTPERSON, newValue);
+            boolean newValue = !settings.getOption(SpectatorSettings.Option.FIRST_PERSON);
+            settings.setOption(SpectatorSettings.Option.FIRST_PERSON, newValue);
             player.sendMessage(newValue ? FIRST_PERSON_ENABLED : FIRST_PERSON_DISABLED);
             
             if (!newValue && gamePlayer.isSpectator() && player.getGameMode() == GameMode.SPECTATOR) {
@@ -286,8 +282,8 @@ public class SpectatorSettingGUI extends CustomGUI {
      */
     private GUIAction createHideOthersAction(Player player, SpectatorSettings settings) {
         return new GUIAction(0, () -> {
-            boolean newValue = !settings.getOption(SpectatorSettings.Option.HIDEOTHER);
-            settings.setOption(SpectatorSettings.Option.HIDEOTHER, newValue);
+            boolean newValue = !settings.getOption(SpectatorSettings.Option.HIDE_OTHER);
+            settings.setOption(SpectatorSettings.Option.HIDE_OTHER, newValue);
             player.sendMessage(newValue ? HIDE_OTHERS_ENABLED : HIDE_OTHERS_DISABLED);
         }, true);
     }

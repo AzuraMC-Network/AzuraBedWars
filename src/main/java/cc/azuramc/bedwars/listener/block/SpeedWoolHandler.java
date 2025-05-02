@@ -14,11 +14,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class SpeedWoolHandler {
 
-    private static final ItemConfig.SpeedWoolHandler config = AzuraBedWars.getInstance().getItemConfig().getSpeedWoolHandler();
+    private static final ItemConfig.SpeedWoolHandler CONFIG = AzuraBedWars.getInstance().getItemConfig().getSpeedWoolHandler();
 
-    private static final int MAX_SPEED_WOOL_LENGTH = config.getMaxSpeedWoolLength();
+    private static final int MAX_SPEED_WOOL_LENGTH = CONFIG.getMaxSpeedWoolLength();
     private static final String SPEED_WOOL_METADATA = "SPEED_WOOL";
 
     /**
@@ -65,7 +68,8 @@ public class SpeedWoolHandler {
 
                 i++;
             }
-        }.runTaskTimer(AzuraBedWars.getInstance(), 0, 2L); // 每2刻生成一格，比大桥蛋更快
+            // 每2刻生成一格
+        }.runTaskTimer(AzuraBedWars.getInstance(), 0, 2L);
     }
 
 }

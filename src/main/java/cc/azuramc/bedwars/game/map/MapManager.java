@@ -18,6 +18,8 @@ import java.util.Map;
 /**
  * 地图管理器
  * 整合了地图的加载、保存、物理文件管理等功能
+ *
+ * @author an5w1r@163.com
  */
 @Getter
 public class MapManager {

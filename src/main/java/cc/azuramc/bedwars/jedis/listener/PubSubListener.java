@@ -16,14 +16,17 @@ import java.util.logging.Level;
 /**
  * Redis PubSub监听器
  * 用于处理Redis的发布订阅功能
+ *
+ * @author an5w1r@163.com
  */
 public class PubSubListener implements Runnable {
-    // 常量定义
-    private static final int RECONNECT_DELAY = 5; // 重连延迟(秒)
+    /**
+     * 重连延迟(秒)
+     */
+    private static final int RECONNECT_DELAY = 5;
     private static final String SERVER_NAME_QUERY_PREFIX = "ServerManage.ServerNameQuery.";
     private static final String RUN_COMMAND_CHANNEL = "ServerManage.RunCommand";
 
-    // 成员变量
     private JedisPubSubHandler jedisPubSubHandler;
     private final Set<String> addedChannels = new HashSet<>();
 

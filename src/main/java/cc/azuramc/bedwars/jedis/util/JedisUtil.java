@@ -9,15 +9,25 @@ import java.util.logging.Level;
 /**
  * Redis工具类
  * 用于管理Redis连接池和发布消息
+ * @author an5w1r@163.com
  */
 public class JedisUtil {
-    // Redis连接池配置
+
     private static final String REDIS_HOST = "127.0.0.1";
     private static final int REDIS_PORT = 6379;
     private static final int MAX_TOTAL = 2000;
-    private static final int TIMEOUT = 5000; // 5秒超时
-    private static final int MAX_RETRIES = 3; // 最大重试次数
-    private static final long RETRY_DELAY = 5000; // 重试延迟(毫秒)
+    /**
+     * 5秒超时
+     */
+    private static final int TIMEOUT = 5000;
+    /**
+     * 最大重试次数
+     */
+    private static final int MAX_RETRIES = 3;
+    /**
+     * 重试延迟(毫秒)
+     */
+    private static final long RETRY_DELAY = 5000;
 
     private static JedisPool pool = null;
     private static int retryCount = 0;

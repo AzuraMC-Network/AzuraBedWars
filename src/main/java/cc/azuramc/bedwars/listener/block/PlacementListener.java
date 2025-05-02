@@ -16,9 +16,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class PlacementListener implements Listener {
 
-    private static final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
+    private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
 
     /**
      * 处理方块放置事件
@@ -31,8 +34,14 @@ public class PlacementListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         Block block = event.getBlock();
 
-        // 游戏未开始或玩家为观察者时不允许放置方块
-        if (gamePlayer != null && (gameManager.getGameState() == GameState.WAITING || gamePlayer.isSpectator())) {
+        // 游戏未开始时不允许放置方块
+        if (GAME_MANAGER.getGameState() == GameState.WAITING) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 玩家为观察者时不允许放置方块
+        if (gamePlayer != null && gamePlayer.isSpectator()) {
             event.setCancelled(true);
             return;
         }

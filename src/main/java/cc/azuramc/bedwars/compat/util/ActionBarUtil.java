@@ -4,6 +4,9 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class ActionBarUtil {
 
     public static void sendBar(Player player, String message) {

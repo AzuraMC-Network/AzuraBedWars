@@ -9,9 +9,8 @@ import java.util.function.Supplier;
 
 /**
  * 配置工厂
- * <p>
  * 负责创建和管理配置对象
- * </p>
+ * @author an5w1r@163.com
  */
 public class ConfigFactory {
     private final Map<String, Supplier<?>> configSuppliers;

@@ -8,19 +8,17 @@ import java.util.Objects;
 
 /**
  * 游戏队伍管理类
- * <p>
  * 负责管理玩家小队，包括队长、队员以及与游戏的关联关系
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class GameParty {
-    // 游戏实例引用
+
     private final GameManager gameManager;
-    
-    // 队长
+
     @Getter
     private final GamePlayer leader;
-    
-    // 队伍成员列表
+
     @Getter
     private final List<GamePlayer> players;
 

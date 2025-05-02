@@ -8,11 +8,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * 游戏加载事件
  * 当游戏开始加载时触发,用于设置服务器状态和最大玩家数量
+ *
+ * @author an5w1r@163.com
  */
 @Getter
 public class JedisGameLoadingEvent extends Event {
 
-    private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList HANDLERS = new HandlerList();
 
     private final int maxPlayers;
 
@@ -26,10 +28,6 @@ public class JedisGameLoadingEvent extends Event {
 
     @Override
     public @NotNull HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
+        return HANDLERS;
     }
 }

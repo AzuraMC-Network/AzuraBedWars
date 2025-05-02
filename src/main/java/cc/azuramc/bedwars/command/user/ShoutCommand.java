@@ -11,6 +11,9 @@ import revxrsal.commands.annotation.Default;
 import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 
+/**
+ * @author ant1aura@qq.com
+ */
 public class ShoutCommand {
 
     @Dependency

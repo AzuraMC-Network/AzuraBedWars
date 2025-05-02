@@ -19,16 +19,25 @@ import java.util.logging.Level;
 /**
  * Jedis管理器
  * 负责管理服务器状态、Redis通信和服务器生命周期
+ *
+ * @author an5w1r@163.com
  */
 public class JedisManager {
-    // 常量定义
-    private static final long STARTUP_TIMEOUT = 300000L; // 5分钟
-    private static final long EMPTY_SERVER_TIMEOUT = 300000L; // 5分钟
-    private static final long TASK_INTERVAL = 1000L; // 1秒
+    /**
+     * 5分钟
+     */
+    private static final long STARTUP_TIMEOUT = 300000L;
+    /**
+     * 5分钟
+     */
+    private static final long EMPTY_SERVER_TIMEOUT = 300000L;
+    /**
+     * 1秒
+     */
+    private static final long TASK_INTERVAL = 1000L;
     private static final String SERVER_MANAGER_LOG = "/data/serverManager.log";
     private static final String GAME_SERVER_MANAGER_CHANNEL = "GameServerManager";
-    
-    // 线程池设置
+
     private static final int CORE_POOL_SIZE = 1;
     private static final int MAX_POOL_SIZE = 1;
     private static final long KEEP_ALIVE_TIME = 0L;
@@ -36,8 +45,10 @@ public class JedisManager {
 
     @Getter
     private static JedisManager instance;
-    
-    // 使用ThreadPoolExecutor替代Executors创建的ScheduledExecutorService
+
+    /**
+     * 使用ThreadPoolExecutor替代Executors创建的ScheduledExecutorService
+     */
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture<?> statusUpdateTask;
     
@@ -47,7 +58,7 @@ public class JedisManager {
     private final HashMap<String, Object> expand = new HashMap<>();
     
     private final long startTime = System.currentTimeMillis();
-    private long forceBOOMTime = 0L;
+    private long forceBoomTime = 0L;
     private final File serverManagerFile;
 
     /**
@@ -169,9 +180,9 @@ public class JedisManager {
      */
     private void handleRunningStatus() {
         if (serverData.getPlayers() == 0) {
-            if (forceBOOMTime == 0) {
-                forceBOOMTime = System.currentTimeMillis();
-            } else if (System.currentTimeMillis() - forceBOOMTime > EMPTY_SERVER_TIMEOUT) {
+            if (forceBoomTime == 0) {
+                forceBoomTime = System.currentTimeMillis();
+            } else if (System.currentTimeMillis() - forceBoomTime > EMPTY_SERVER_TIMEOUT) {
                 if (serverManagerFile.exists()) {
                     boolean deleted = serverManagerFile.delete();
                     if (!deleted) {

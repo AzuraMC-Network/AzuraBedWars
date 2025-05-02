@@ -10,6 +10,9 @@ import org.bukkit.block.BlockFace;
 
 import java.lang.reflect.Method;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class BedUtil {
 
     /**

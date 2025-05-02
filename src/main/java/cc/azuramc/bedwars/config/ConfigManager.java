@@ -8,9 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 配置管理器
- * <p>
  * 负责管理所有配置对象的加载和保存
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class ConfigManager {
     @Getter

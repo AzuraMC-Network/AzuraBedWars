@@ -19,18 +19,19 @@ import java.util.Objects;
 /**
  * 游戏开始事件
  * 负责处理游戏开始时的初始化和团队升级效果
+ * @author an5w1r@163.com
  */
 public class AbstractGameStartEvent extends AbstractGameEvent {
 
-    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
-    private static final EventConfig.StartEvent config = plugin.getEventConfig().getStartEvent();
-    private static final MessageConfig.Start messageEvent = plugin.getMessageConfig().getStart();
+    private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
+    private static final EventConfig.StartEvent CONFIG = PLUGIN.getEventConfig().getStartEvent();
+    private static final MessageConfig.Start MESSAGE_EVENT = PLUGIN.getMessageConfig().getStart();
 
     /**
      * 创建游戏开始事件
      */
     public AbstractGameStartEvent() {
-        super(messageEvent.getEventName(), config.getCountDown(), config.getEventPriority());
+        super(MESSAGE_EVENT.getEventName(), CONFIG.getCountDown(), CONFIG.getEventPriority());
     }
 
     /**
@@ -43,11 +44,11 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
     public void executeRunnable(GameManager gameManager, int seconds) {
         gameManager.broadcastSound(SoundWrapper.CLICK(), 1f, 1f);
         gameManager.broadcastTitle(
-            config.getTitle().getFadeIn(),
-            config.getTitle().getTitleStay(),
-            config.getTitle().getFadeOut(),
-            messageEvent.getTitle().getTitleString(),
-            messageEvent.getTitle().getSubtitle() + seconds
+            CONFIG.getTitle().getFadeIn(),
+            CONFIG.getTitle().getTitleStay(),
+            CONFIG.getTitle().getFadeOut(),
+            MESSAGE_EVENT.getTitle().getTitleString(),
+            MESSAGE_EVENT.getTitle().getSubtitle() + seconds
         );
     }
 
@@ -70,7 +71,7 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
      * @param gameManager 游戏实例
      */
     private void registerTeamUpgradeTask(GameManager gameManager) {
-        gameManager.getGameEventManager().registerRunnable(messageEvent.getTeamUpgradeTaskName(), (s, c) ->
+        gameManager.getGameEventManager().registerRunnable(MESSAGE_EVENT.getTeamUpgradeTaskName(), (s, c) ->
             GamePlayer.getOnlinePlayers().forEach(player -> {
                 if (player.isSpectator()) {
                     return;
@@ -112,7 +113,7 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
             PotionEffectType fastDigging = PotionEffectWrapper.HASTE();
             if (fastDigging != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(fastDigging, 
-                    config.getUpgrade().getHasteEffectDuration(), 
+                    CONFIG.getUpgrade().getHasteEffectDuration(),
                     gameTeam.getManicMiner()));
             }
         })));
@@ -127,13 +128,13 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
     private void applyHealingPoolEffect(GamePlayer player, GameTeam gameTeam) {
         double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
         
-        if (distance <= config.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPool()) {
+        if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPool()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType regeneration = PotionEffectWrapper.REGENERATION();
                 if (regeneration != null) {
                     player.getPlayer().addPotionEffect(new PotionEffect(regeneration, 
-                        config.getUpgrade().getRegenerationEffectDuration(),
-                        config.getUpgrade().getRegenerationEffectAmplifier()));
+                        CONFIG.getUpgrade().getRegenerationEffectDuration(),
+                        CONFIG.getUpgrade().getRegenerationEffectAmplifier()));
                 }
             });
         }
@@ -148,7 +149,7 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
     private void handleEnemyInTeamTerritory(GamePlayer player, GameTeam gameTeam) {
         double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
         
-        if (distance <= config.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
+        if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
             // 触发普通陷阱
             if (gameTeam.isHasTrap()) {
                 triggerTrap(player, gameTeam);
@@ -175,8 +176,8 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
             PotionEffectType blindness = PotionEffectWrapper.BLINDNESS();
             if (blindness != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(blindness, 
-                    config.getUpgrade().getTrapEffectDuration(),
-                    config.getUpgrade().getTrapEffectAmplifier()));
+                    CONFIG.getUpgrade().getTrapEffectDuration(),
+                    CONFIG.getUpgrade().getTrapEffectAmplifier()));
             }
         });
 
@@ -185,8 +186,8 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
             PotionEffectType slowness = PotionEffectWrapper.SLOWNESS();
             if (slowness != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(slowness, 
-                    config.getUpgrade().getTrapEffectDuration(),
-                    config.getUpgrade().getTrapEffectAmplifier()));
+                    CONFIG.getUpgrade().getTrapEffectDuration(),
+                    CONFIG.getUpgrade().getTrapEffectAmplifier()));
             }
         });
 
@@ -208,8 +209,8 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
             PotionEffectType miningFatigue = PotionEffectWrapper.MINING_FATIGUE();
             if (miningFatigue != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(miningFatigue, 
-                    config.getUpgrade().getMiningFatigueEffectDuration(),
-                    config.getUpgrade().getMiningFatigueEffectAmplifier()));
+                    CONFIG.getUpgrade().getMiningFatigueEffectDuration(),
+                    CONFIG.getUpgrade().getMiningFatigueEffectAmplifier()));
             }
         });
         gameTeam.setHasMiner(false);

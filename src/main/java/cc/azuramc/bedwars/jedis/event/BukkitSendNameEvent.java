@@ -8,10 +8,12 @@ import org.jetbrains.annotations.NotNull;
 /**
  * 服务器名称设置事件
  * 用于在Bukkit端设置服务器名称
+ *
+ * @author an5w1r@163.com
  */
 @Getter
 public class BukkitSendNameEvent extends Event {
-    private static final HandlerList handlers = new HandlerList();
+    private static final HandlerList HANDLERS = new HandlerList();
 
     private final String serverName;
 
@@ -25,10 +27,6 @@ public class BukkitSendNameEvent extends Event {
 
     @Override
     public @NotNull HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
+        return HANDLERS;
     }
 }

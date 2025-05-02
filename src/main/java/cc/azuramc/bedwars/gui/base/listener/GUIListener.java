@@ -19,6 +19,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class GUIListener implements Listener {
     private final AzuraBedWars main;
     
@@ -51,12 +54,9 @@ public class GUIListener implements Listener {
     public void onClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
-        if (GUIData.getCurrentGui().containsKey(player)) {
-            CustomGUI customGUI = GUIData.getCurrentGui().get(player);
-            
-            // 使用 GUI 对象存储的标题，而不是从事件获取
-            String guiTitle = getTitle(customGUI);
-            
+        if (GUIData.getCURRENT_GUI().containsKey(player)) {
+            CustomGUI customGUI = GUIData.getCURRENT_GUI().get(player);
+
             // 检查玩家当前打开的 GUI 是否是我们的 GUI
             if (customGUI.getPlayer().equals(player)) {
                 event.setCancelled(true);
@@ -118,25 +118,25 @@ public class GUIListener implements Listener {
     public void onClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
 
-        if (GUIData.getCurrentGui().containsKey(player)) {
-            CustomGUI customGUI = GUIData.getCurrentGui().get(player);
+        if (GUIData.getCURRENT_GUI().containsKey(player)) {
+            CustomGUI customGUI = GUIData.getCURRENT_GUI().get(player);
             
             // 检查是否是同一个玩家
             if (customGUI.getPlayer().equals(player)) {
-                CustomGUI lastGui = GUIData.getLastGui().getOrDefault(player, null);
-                GUIData.getLastGui().remove(player);
+                CustomGUI lastGui = GUIData.getLAST_GUI().getOrDefault(player, null);
+                GUIData.getLAST_GUI().remove(player);
 
                 if (lastGui != null && lastGui.getPlayer().equals(player)) {
                     return;
                 }
 
-                GUIData.getCurrentGui().remove(player);
+                GUIData.getCURRENT_GUI().remove(player);
             }
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        GUIData.getLastReplaceGui().remove(event.getPlayer());
+        GUIData.getLAST_REPLACE_GUI().remove(event.getPlayer());
     }
 }

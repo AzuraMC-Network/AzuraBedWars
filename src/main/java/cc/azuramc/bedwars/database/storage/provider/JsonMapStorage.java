@@ -15,6 +15,8 @@ import java.util.List;
 /**
  * JSON文件存储实现
  * 使用JSON文件存储和读取地图数据
+ *
+ * @author an5w1r@163.com
  */
 public class JsonMapStorage implements IMapStorage {
     private final Gson gson;

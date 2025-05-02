@@ -14,25 +14,26 @@ import java.util.concurrent.*;
 
 /**
  * 旁观者设置管理类
- * <p>
  * 管理旁观者的各种设置，包括速度、自动传送、夜视等
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class SpectatorSettings {
-    // 常量定义
+
     private static final int THREAD_POOL_SIZE = 5;
     private static final String DATABASE_NAME = "bwstats";
     private static final String TABLE_NAME = "bw_spectator_settings";
     private static final String[] COLUMNS = {"Name", "speed", "autoTp", "nightVision", "firstPerson", "hideOther", "fly"};
-    
-    // 线程池参数
+
     private static final int CORE_POOL_SIZE = THREAD_POOL_SIZE;
     private static final int MAX_POOL_SIZE = THREAD_POOL_SIZE;
     private static final long KEEP_ALIVE_TIME = 60L;
     private static final int QUEUE_CAPACITY = 100;
-    
-    // 线程池和缓存
-    private static final ExecutorService fixedThreadPool = new ThreadPoolExecutor(
+
+    /**
+     * 线程池和缓存
+     */
+    private static final ExecutorService FIXED_THREAD_POOL = new ThreadPoolExecutor(
         CORE_POOL_SIZE,
         MAX_POOL_SIZE,
         KEEP_ALIVE_TIME,
@@ -41,9 +42,8 @@ public class SpectatorSettings {
         Executors.defaultThreadFactory(),
         new ThreadPoolExecutor.CallerRunsPolicy()
     );
-    private static final Map<GamePlayer, SpectatorSettings> spectatorSettingsMap = new HashMap<>();
+    private static final Map<GamePlayer, SpectatorSettings> SPECTATOR_SETTINGS_HASH_MAP = new HashMap<>();
 
-    // 实例变量
     private final GamePlayer gamePlayer;
     @Getter private int speed;
     private boolean autoTp;
@@ -132,7 +132,7 @@ public class SpectatorSettings {
      * @return 旁观者设置
      */
     public static SpectatorSettings get(GamePlayer player) {
-        return spectatorSettingsMap.computeIfAbsent(player, SpectatorSettings::new);
+        return SPECTATOR_SETTINGS_HASH_MAP.computeIfAbsent(player, SpectatorSettings::new);
     }
 
     /**
@@ -156,10 +156,10 @@ public class SpectatorSettings {
      */
     public boolean getOption(Option option) {
         return switch (option) {
-            case AUTOTP -> autoTp;
-            case NIGHTVISION -> nightVision;
-            case FIRSTPERSON -> firstPerson;
-            case HIDEOTHER -> hideOther;
+            case AUTO_TP -> autoTp;
+            case NIGHT_VISION -> nightVision;
+            case FIRST_PERSON -> firstPerson;
+            case HIDE_OTHER -> hideOther;
             case FLY -> fly;
         };
     }
@@ -176,19 +176,19 @@ public class SpectatorSettings {
         }
 
         switch (option) {
-            case AUTOTP:
+            case AUTO_TP:
                 autoTp = value;
                 updateSetting(COLUMNS[2], value);
                 break;
-            case NIGHTVISION:
+            case NIGHT_VISION:
                 nightVision = value;
                 updateSetting(COLUMNS[3], value);
                 break;
-            case FIRSTPERSON:
+            case FIRST_PERSON:
                 firstPerson = value;
                 updateSetting(COLUMNS[4], value);
                 break;
-            case HIDEOTHER:
+            case HIDE_OTHER:
                 hideOther = value;
                 updateSetting(COLUMNS[5], value);
                 break;
@@ -196,6 +196,7 @@ public class SpectatorSettings {
                 fly = value;
                 updateSetting(COLUMNS[6], value);
                 break;
+            default: break;
         }
     }
 
@@ -206,7 +207,7 @@ public class SpectatorSettings {
      * @param value 新值
      */
     private void updateSetting(String column, Object value) {
-        fixedThreadPool.execute(() -> {
+        FIXED_THREAD_POOL.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(DATABASE_NAME)) {
                 String updateQuery = String.format("UPDATE %s SET %s=? WHERE %s=?", TABLE_NAME, column, COLUMNS[0]);
                 try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
@@ -237,6 +238,11 @@ public class SpectatorSettings {
      * 旁观者选项枚举
      */
     public enum Option {
-        AUTOTP, NIGHTVISION, FIRSTPERSON, HIDEOTHER, FLY
+        /** 自动传送至跟随的玩家 */
+        AUTO_TP,
+        NIGHT_VISION,
+        FIRST_PERSON,
+        HIDE_OTHER,
+        FLY
     }
 }

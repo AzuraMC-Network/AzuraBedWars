@@ -10,6 +10,9 @@ import org.bukkit.inventory.meta.FireworkMeta;
 
 import java.util.Random;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class FireWorkUtil {
 
     public static void spawnFireWork(Location loc, World w) {

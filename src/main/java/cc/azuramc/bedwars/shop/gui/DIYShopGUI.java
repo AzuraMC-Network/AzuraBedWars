@@ -21,19 +21,24 @@ import java.util.Arrays;
 /**
  * 自定义商店GUI
  * 用于将物品添加到快捷购买菜单
+ *
+ * @author an5w1r@163.com
  */
 public class DIYShopGUI extends CustomGUI {
-    
-    // 商店可选择的槽位
+
+    /**
+     * 商店可选择的槽位
+     */
     private static final Integer[] SHOP_SLOTS = new Integer[]{
             19, 20, 21, 22, 23, 24, 25, 
             28, 29, 30, 31, 32, 33, 34, 
             37, 38, 39, 40, 41, 42, 43
     };
-    
-    // 商店边框装饰物品类型
-    private static final int BORDER_GLASS_COLOR = 7; // 灰色
-    private static final int EMPTY_SLOT_GLASS_COLOR = 14; // 红色
+
+    /** 灰色 */
+    private static final int BORDER_GLASS_COLOR = 7;
+    /** 红色 */
+    private static final int EMPTY_SLOT_GLASS_COLOR = 14;
 
     /**
      * 创建自定义商店GUI
@@ -45,7 +50,6 @@ public class DIYShopGUI extends CustomGUI {
      */
     public DIYShopGUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className) {
         super(gamePlayer.getPlayer(), "§8添加物品到快捷购买", 54);
-        Player player = gamePlayer.getPlayer();
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
 
         // 初始化界面
@@ -109,7 +113,7 @@ public class DIYShopGUI extends CustomGUI {
             int slotPosition = SHOP_SLOTS[i];
             
             // 解析槽位数据
-            String[] itemInfo = !slotData.equals("AIR") ? slotData.split("#") : null;
+            String[] itemInfo = !"AIR".equals(slotData) ? slotData.split("#") : null;
             ShopItemType shopItemType = findItemType(itemInfo);
             
             if (itemInfo == null || shopItemType == null) {
@@ -130,7 +134,7 @@ public class DIYShopGUI extends CustomGUI {
             return null;
         }
         
-        for (ShopData shopData : ShopManager.getShops()) {
+        for (ShopData shopData : ShopManager.getSHOPS()) {
             if (shopData.getClass().getSimpleName().equals(itemInfo[0])) {
                 return shopData.getShopItems().get(Integer.parseInt(itemInfo[1]) - 1);
             }

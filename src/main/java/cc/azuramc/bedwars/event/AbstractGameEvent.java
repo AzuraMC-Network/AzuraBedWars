@@ -3,6 +3,9 @@ package cc.azuramc.bedwars.event;
 import cc.azuramc.bedwars.game.GameManager;
 import lombok.Getter;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Getter
 public abstract class AbstractGameEvent {
     private final String name;

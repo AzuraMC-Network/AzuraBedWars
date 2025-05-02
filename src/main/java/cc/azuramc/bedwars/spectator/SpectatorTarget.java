@@ -11,28 +11,26 @@ import java.text.DecimalFormat;
 
 /**
  * 旁观目标管理类
- * <p>
  * 管理旁观者的目标玩家，包括目标跟踪、传送和状态显示
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class SpectatorTarget {
 
-    private static final MessageConfig.Spectator.Target messageConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getTarget();
-    private static final PlayerConfig.Spectator.Target config = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getTarget();
+    private static final MessageConfig.Spectator.Target MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getTarget();
+    private static final PlayerConfig.Spectator.Target CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getTarget();
 
-    // 常量定义
-    private static final String TARGET_LOST_MESSAGE = messageConfig.getTargetLostMessage();
-    private static final String FIRST_PERSON_TITLE = messageConfig.getFirstPersonTitle();
-    private static final String FIRST_PERSON_SUBTITLE = messageConfig.getFirstPersonSubTitle();
-    private static final String FIRST_PERSON_ACTION_BAR = messageConfig.getFirstPersonActionBar();
-    private static final String THIRD_PERSON_ACTION_BAR = messageConfig.getThirdPersonActionBar();
-    private static final String MENU_HINT = messageConfig.getMenuHint();
-    private static final double AUTO_TP_DISTANCE = config.getAutoTPDistance();
+    private static final String TARGET_LOST_MESSAGE = MESSAGE_CONFIG.getTargetLostMessage();
+    private static final String FIRST_PERSON_TITLE = MESSAGE_CONFIG.getFirstPersonTitle();
+    private static final String FIRST_PERSON_SUBTITLE = MESSAGE_CONFIG.getFirstPersonSubTitle();
+    private static final String FIRST_PERSON_ACTION_BAR = MESSAGE_CONFIG.getFirstPersonActionBar();
+    private static final String THIRD_PERSON_ACTION_BAR = MESSAGE_CONFIG.getThirdPersonActionBar();
+    private static final String MENU_HINT = MESSAGE_CONFIG.getMenuHint();
+    private static final double AUTO_TP_DISTANCE = CONFIG.getAutoTPDistance();
     private static final int TITLE_FADE_IN = 0;
-    private static final int TITLE_DURATION = config.getTitleDuration();
+    private static final int TITLE_DURATION = CONFIG.getTitleDuration();
     private static final int TITLE_FADE_OUT = 0;
-    
-    // 实例变量
+
     private final DecimalFormat df = new DecimalFormat("0.0");
     private final GamePlayer gamePlayer;
     private GamePlayer gameTarget;
@@ -117,11 +115,11 @@ public class SpectatorTarget {
         }
 
         SpectatorSettings settings = SpectatorSettings.get(gamePlayer);
-        if (settings.getOption(SpectatorSettings.Option.AUTOTP)) {
+        if (settings.getOption(SpectatorSettings.Option.AUTO_TP)) {
             if (!isSameWorld() || getDistance() >= AUTO_TP_DISTANCE) {
                 teleportToTarget();
 
-                if (settings.getOption(SpectatorSettings.Option.FIRSTPERSON)) {
+                if (settings.getOption(SpectatorSettings.Option.FIRST_PERSON)) {
                     activateFirstPersonView();
                 }
             }
@@ -136,7 +134,7 @@ public class SpectatorTarget {
             return;
         }
 
-        if (SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRSTPERSON)) {
+        if (SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) {
             teleportToTarget();
             activateFirstPersonView();
             return;

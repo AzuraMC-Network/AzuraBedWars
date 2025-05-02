@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlayerUtil {
 
-    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+    private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
 
     /**
      * 获取玩家手中的物品
@@ -55,7 +55,7 @@ public class PlayerUtil {
         if (VersionUtil.isLessThan113()) {
             player.hidePlayer(target);
         } else {
-            player.hidePlayer(plugin, target);
+            player.hidePlayer(PLUGIN, target);
         }
     }
 
@@ -69,7 +69,7 @@ public class PlayerUtil {
         if (VersionUtil.isLessThan113()) {
             player.showPlayer(target);
         } else {
-            player.showPlayer(plugin, target);
+            player.showPlayer(PLUGIN, target);
         }
     }
 

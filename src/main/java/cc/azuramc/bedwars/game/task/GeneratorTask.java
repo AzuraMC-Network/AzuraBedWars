@@ -27,61 +27,56 @@ import java.util.List;
  * 负责管理游戏中的资源生成，包括基地资源（铁锭、金锭）和地图资源（钻石、绿宝石）。
  * 同时管理资源点上的盔甲架显示，包括资源名称、等级和下次刷新时间的显示。
  * </p>
+ * @author an5w1r@163.com
  */
 public class GeneratorTask {
     private final GameManager gameManager;
     private boolean timer;
     private int taskId = -1;
 
-    // 资源生成时间间隔（秒）
     private final int IRON_SPAWN_INTERVAL;
     private final int GOLD_SPAWN_INTERVAL;
     private final int DIAMOND_SPAWN_INTERVAL;
     private final int EMERALD_SPAWN_INTERVAL;
-    
-    // 基础资源生成最大堆叠数量（一级）
+
     private final int MAX_IRON_STACK_LEVEL_1;
     private final int MAX_GOLD_STACK_LEVEL_1;
     private final int MAX_DIAMOND_STACK_LEVEL_1;
     private final int MAX_EMERALD_STACK_LEVEL_1;
-    
-    // 二级资源生成最大堆叠数量
+
     private final int MAX_IRON_STACK_LEVEL_2;
     private final int MAX_GOLD_STACK_LEVEL_2;
     private final int MAX_DIAMOND_STACK_LEVEL_2;
     private final int MAX_EMERALD_STACK_LEVEL_2;
-    
-    // 三级资源生成最大堆叠数量
+
     private final int MAX_IRON_STACK_LEVEL_3;
     private final int MAX_GOLD_STACK_LEVEL_3;
     private final int MAX_DIAMOND_STACK_LEVEL_3;
     private final int MAX_EMERALD_STACK_LEVEL_3;
-    
-    // 检测资源周围范围（方块）
+
+    /**
+     * 检测资源周围范围（方块）
+     */
     private final double RESOURCE_CHECK_RADIUS;
-    
-    // 盔甲架标识
+
     private final float NAME_DISPLAY_HEIGHT;
     private final float RESOURCE_TYPE_HEIGHT;
     private final float LEVEL_DISPLAY_HEIGHT;
-    
-    // 资源名称
+
     private final String IRON_GENERATOR_NAME;
     private final String GOLD_GENERATOR_NAME;
     private final String DIAMOND_GENERATOR_NAME;
     private final String DIAMOND_TIME_DISPLAY;
     private final String EMERALD_GENERATOR_NAME;
     private final String EMERALD_TIME_DISPLAY;
-    
-    // 显示文本
+
     private final String TIME_REMAINING_FORMAT;
     private final String DIAMOND_NAME;
     private final String EMERALD_NAME;
     private final String LEVEL_I;
     private final String LEVEL_II;
     private final String LEVEL_III;
-    
-    // 物品属性
+
     private final String ITEM_DISPLAY_NAME;
     private final Vector ITEM_VELOCITY;
 

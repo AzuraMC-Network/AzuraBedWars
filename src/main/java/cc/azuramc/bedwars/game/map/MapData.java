@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Getter
 public class MapData {
     private final Players players;
@@ -296,14 +299,13 @@ public class MapData {
 
         // 检查BED_BLOCK（床方块）
         // 在1.13+版本中变为BED、RED_BED等
-        if (typeName.equals("BED_BLOCK") || typeName.contains("_BED")) {
+        if (typeName.contains("_BED")) {
             return true;
         }
 
         // 检查LONG_GRASS（长草）
         // 在1.13+版本中变为GRASS、TALL_GRASS等
-        if (typeName.equals("LONG_GRASS") || typeName.equals("GRASS") ||
-                typeName.equals("TALL_GRASS") || typeName.contains("_GRASS")) {
+        if (typeName.equals("GRASS") || typeName.equals("TALL_GRASS") || typeName.contains("_GRASS")) {
             return true;
         }
 
@@ -312,10 +314,19 @@ public class MapData {
         return typeName.contains("DEAD_BUSH");
     }
 
+    /**
+     * 检查给定位置是否满足特定区域条件。
+     * 该条件为：位置的 X 和 Y 坐标在区域边界内，但 Z 坐标在区域边界外或边界上。
+     *
+     * @param location 要检查的位置
+     * @return 如果位置满足 X、Y 在内且 Z 在外的条件，则返回 true；否则返回 false。
+     */
     public boolean hasRegion(Location location) {
+        // 获取区域的两个对角点位置
         Location pos1 = region.getPos1().toLocation();
         Location pos2 = region.getPos2().toLocation();
 
+        // 获取两个点的整数坐标
         int x1 = pos1.getBlockX();
         int x2 = pos2.getBlockX();
         int y1 = pos1.getBlockY();
@@ -323,6 +334,8 @@ public class MapData {
         int z1 = pos1.getBlockZ();
         int z2 = pos2.getBlockZ();
 
+        // 计算包含边界的最小和最大坐标（包含边界，所以用 <= 和 >=）
+        // 这些 min/max 定义了检查范围的边界（不包含边界点本身）
         int minY = Math.min(y1, y2) - 1;
         int maxY = Math.max(y1, y2) + 1;
         int minZ = Math.min(z1, z2) - 1;
@@ -330,12 +343,22 @@ public class MapData {
         int minX = Math.min(x1, x2) - 1;
         int maxX = Math.max(x1, x2) + 1;
 
-        if (location.getX() > minX && location.getX() < maxX) {
-            if (location.getY() > minY && location.getY() < maxY) {
-                return !(location.getZ() > minZ) || !(location.getZ() < maxZ);
-            }
+        // 检查 X 坐标是否在 (minX, maxX) 开区间内
+        boolean withinX = location.getX() > minX && location.getX() < maxX;
+        // 检查 Y 坐标是否在 (minY, maxY) 开区间内
+        boolean withinY = location.getY() > minY && location.getY() < maxY;
+
+        // 如果 X 或 Y 坐标不在定义的范围内，则直接返回 false
+        if (!withinX || !withinY) {
+            return false;
         }
-        return true;
+
+        // 检查 Z 坐标是否在 (minZ, maxZ) 开区间的外部或边界上
+        // 这等同于原始的: !(location.getZ() > minZ) || !(location.getZ() < maxZ)
+        // 意味着 Z <= minZ 或者 Z >= maxZ
+
+        // 只有当 X 和 Y 在范围内，并且 Z 在指定范围之外 (或边界上) 时，才返回 true
+        return location.getZ() <= minZ || location.getZ() >= maxZ;
     }
 
     public boolean chunkIsInRegion(double x, double z) {
@@ -356,11 +379,28 @@ public class MapData {
     }
 
     public enum DropType {
-        BASE, DIAMOND, EMERALD
+        /**
+         * 基地资源点
+         */
+        BASE,
+        /**
+         * 钻石资源点
+         */
+        DIAMOND,
+        /**
+         * 绿宝石资源点
+         */
+        EMERALD
     }
 
     public enum ShopType {
+        /**
+         * 物品商店
+         */
         ITEM,
+        /**
+         * 升级商店
+         */
         UPGRADE
     }
 

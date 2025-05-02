@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
  * <p>
  * 存储插件的基本设置信息
  * </p>
+ * @author an5w1r@163.com
  */
 @Data
 @EqualsAndHashCode

@@ -13,15 +13,16 @@ import org.bukkit.Bukkit;
 /**
  * 游戏结束事件
  * 负责处理游戏结束时的逻辑，包括显示结束信息和切换到下一个事件
+ * @author an5w1r@163.com
  */
 public class AbstractGameOverEvent extends AbstractGameEvent {
 
-    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
-    private static final EventConfig.OverEvent config = plugin.getEventConfig().getOverEvent();
-    private static final MessageConfig.Over messageConfig = plugin.getMessageConfig().getOver();
+    private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
+    private static final EventConfig.OverEvent CONFIG = PLUGIN.getEventConfig().getOverEvent();
+    private static final MessageConfig.Over MESSAGE_CONFIG = PLUGIN.getMessageConfig().getOver();
 
     public AbstractGameOverEvent() {
-        super(messageConfig.getEventName(), config.getExecuteSecond(), 6);
+        super(MESSAGE_CONFIG.getEventName(), CONFIG.getExecuteSecond(), 6);
     }
 
     @Override

@@ -14,6 +14,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class PlayerDropListener implements Listener {
 
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();

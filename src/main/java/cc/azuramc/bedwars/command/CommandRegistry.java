@@ -9,6 +9,9 @@ import cc.azuramc.bedwars.command.user.StartCommand;
 import cc.azuramc.bedwars.command.user.ToggleDamageDisplayCommand;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class CommandRegistry {
 
     private final BukkitCommandHandler handler;

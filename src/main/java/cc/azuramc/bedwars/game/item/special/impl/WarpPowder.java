@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.game.item.special;
+package cc.azuramc.bedwars.game.item.special.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import com.comphenix.protocol.PacketType;

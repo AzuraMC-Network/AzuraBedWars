@@ -4,6 +4,9 @@ import revxrsal.commands.bukkit.BukkitCommandActor;
 
 import java.util.List;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class CommandUtil {
 
     public static void sendLayout(BukkitCommandActor actor, String message) {

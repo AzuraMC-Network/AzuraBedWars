@@ -26,6 +26,7 @@ import java.util.UUID;
  * 物品构建工具类
  * 用于快速创建和配置各种物品
  * 提供跨版本兼容性支持(1.8-1.19+)
+ * @author an5w1r@163.com
  */
 public class ItemBuilder {
     private ItemStack itemStack;

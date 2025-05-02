@@ -34,31 +34,28 @@ import java.util.*;
  * 负责管理整个起床战争游戏的生命周期、玩家、团队以及游戏状态。
  * 包含游戏开始、运行和结束的逻辑，以及玩家加入、离开和重新连接的处理。
  * </p>
+ * @author an5w1r@163.com
  */
 @Data
 public class GameManager {
 
-    private static final ItemConfig.GameManager itemConfig = AzuraBedWars.getInstance().getItemConfig().getGameManager();
-    private static final MessageConfig.Game messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGame();
-    private static final SettingsConfig.DisplayDamage settingsConfig = AzuraBedWars.getInstance().getSettingsConfig().getDisplayDamage();
+    private static final ItemConfig.GameManager ITEM_CONFIG = AzuraBedWars.getInstance().getItemConfig().getGameManager();
+    private static final MessageConfig.Game MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getGame();
+    private static final SettingsConfig.DisplayDamage SETTINGS_CONFIG = AzuraBedWars.getInstance().getSettingsConfig().getDisplayDamage();
 
-    // 时间常量
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
     private static final int ASSIST_TIME_WINDOW_MS = 10000;
-    
-    // 消息常量
-    private static final String MSG_PLAYER_RECONNECT = messageConfig.getMsgPlayerReconnect();
-    private static final String MSG_PLAYER_LEAVE = messageConfig.getMsgPlayerLeave();
-    
-    // 物品常量
-    private static final Material RESOURCE_SELECTOR_MATERIAL = Material.PAPER;
-    private static final String RESOURCE_SELECTOR_NAME = itemConfig.getResourceSelectorName();
-    private static final Material LEAVE_GAME_MATERIAL = Material.SLIME_BALL;
-    private static final String LEAVE_GAME_NAME = itemConfig.getLeaveGameName();
 
-    // 功能常量
-    @Getter private final boolean isArrowDisplayEnabled = settingsConfig.isArrowDisplayEnabled();
-    @Getter private final boolean isAttackDisplayEnabled = settingsConfig.isAttackDisplayEnabled();
+    private static final String MSG_PLAYER_RECONNECT = MESSAGE_CONFIG.getMsgPlayerReconnect();
+    private static final String MSG_PLAYER_LEAVE = MESSAGE_CONFIG.getMsgPlayerLeave();
+
+    private static final Material RESOURCE_SELECTOR_MATERIAL = Material.PAPER;
+    private static final String RESOURCE_SELECTOR_NAME = ITEM_CONFIG.getResourceSelectorName();
+    private static final Material LEAVE_GAME_MATERIAL = Material.SLIME_BALL;
+    private static final String LEAVE_GAME_NAME = ITEM_CONFIG.getLeaveGameName();
+
+    @Getter private final boolean isArrowDisplayEnabled = SETTINGS_CONFIG.isArrowDisplayEnabled();
+    @Getter private final boolean isAttackDisplayEnabled = SETTINGS_CONFIG.isAttackDisplayEnabled();
 
     private AzuraBedWars plugin;
     private GameEventManager gameEventManager;

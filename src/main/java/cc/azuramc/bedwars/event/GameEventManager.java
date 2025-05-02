@@ -14,9 +14,13 @@ import java.util.concurrent.*;
 /**
  * 游戏事件管理器
  * 负责注册、调度和执行游戏中的各种事件
+ *
+ * @author an5w1r@163.com
  */
 public class GameEventManager implements Runnable {
-    // 事件注册的优先级常量
+    /**
+     * 事件注册的优先级常量
+     */
     private static final int START_EVENT_PRIORITY = 0;
     private static final int DIAMOND_LEVEL2_PRIORITY = 1;
     private static final int EMERALD_LEVEL2_PRIORITY = 2;
@@ -25,28 +29,45 @@ public class GameEventManager implements Runnable {
     private static final int BED_DESTROYED_PRIORITY = 5;
     private static final int OVER_EVENT_PRIORITY = 6;
     private static final int END_EVENT_PRIORITY = 7;
-    
-    // 游戏结束强制跳转延迟（刻）
+
+    /**
+     * 游戏结束强制跳转延迟（刻）
+     */
     private static final long GAME_OVER_DELAY_TICKS = 40L;
-    
-    // 计时器执行间隔（毫秒）
+
+    /**
+     * 计时器执行间隔（毫秒）
+     */
     private static final long TIMER_PERIOD_MS = 1000;
-    
-    // 事件持续时间和资源刷新时间常量（秒）
+
+    /**
+     * 事件持续时间和资源刷新时间常量（秒）
+     */
     private static final int EVENT_DURATION_SECONDS = 360;
-    
-    // 线程池参数
+
+    /**
+     * 线程池参数
+     */
     private static final int CORE_POOL_SIZE = 1;
     private static final int MAX_QUEUE_SIZE = 100;
 
+    /**
+     * 停止事件管理器等待任务执行超时间 （秒）
+     */
+    private static final int AWAIT_TERMINATION_TIMEOUT = 5;
+
     private final GameManager gameManager;
-    
-    // 定时任务和事件映射
+
+    /**
+     * 定时任务和事件映射
+     */
     @Getter
     private final HashMap<String, GameEventRunnable> runnable = new HashMap<>();
     private final HashMap<Integer, AbstractGameEvent> events = new HashMap<>();
-    
-    // 使用ScheduledThreadPoolExecutor替代Executors
+
+    /**
+     * 使用ScheduledThreadPoolExecutor替代Executors
+     */
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> scheduledFuture;
     private int currentEvent = 0;
@@ -288,7 +309,7 @@ public class GameEventManager implements Runnable {
             this.scheduler.shutdown();
             try {
                 // 等待任务完成
-                if (!this.scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                if (!this.scheduler.awaitTermination(AWAIT_TERMINATION_TIMEOUT, TimeUnit.SECONDS)) {
                     this.scheduler.shutdownNow();
                 }
             } catch (InterruptedException e) {

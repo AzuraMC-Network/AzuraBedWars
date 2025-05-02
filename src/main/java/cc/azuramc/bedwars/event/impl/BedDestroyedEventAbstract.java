@@ -17,24 +17,29 @@ import java.util.logging.Level;
  * 使游戏进入到更激烈的阶段。该事件触发时，会向所有玩家播放末影龙咆哮音效
  * 并显示床自毁的全屏提示。
  * </p>
+ * @author an5w1r@163.com
  */
 public class BedDestroyedEventAbstract extends AbstractGameEvent {
 
-    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
-    private static final EventConfig.DestroyBedEvent config = plugin.getEventConfig().getDestroyBedEvent();
-    private static final MessageConfig.DestroyBed messageConfig = plugin.getMessageConfig().getDestroyBed();
+    private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
+    private static final EventConfig.DestroyBedEvent CONFIG = PLUGIN.getEventConfig().getDestroyBedEvent();
+    private static final MessageConfig.DestroyBed MESSAGE_CONFIG = PLUGIN.getMessageConfig().getDestroyBed();
 
-    // 事件相关常量
-    private static final String EVENT_NAME = messageConfig.getEventName();
-    private static final int EXECUTE_SECONDS = config.getExecuteSecond();
+    /**
+     * 事件相关常量
+     */
+    private static final String EVENT_NAME = MESSAGE_CONFIG.getEventName();
+    private static final int EXECUTE_SECONDS = CONFIG.getExecuteSecond();
     private static final int PRIORITY = 5;
-    
-    // 标题显示相关常量
-    private static final String TITLE = messageConfig.getTitle().getTitleString();
-    private static final String SUBTITLE = messageConfig.getTitle().getSubtitle();
-    private static final int TITLE_FADE_IN = config.getTitle().getFadeIn();
-    private static final int TITLE_STAY = config.getTitle().getTitleStay();
-    private static final int TITLE_FADE_OUT = config.getTitle().getFadeOut();
+
+    /**
+     * 标题显示相关常量
+     */
+    private static final String TITLE = MESSAGE_CONFIG.getTitle().getTitleString();
+    private static final String SUBTITLE = MESSAGE_CONFIG.getTitle().getSubtitle();
+    private static final int TITLE_FADE_IN = CONFIG.getTitle().getFadeIn();
+    private static final int TITLE_STAY = CONFIG.getTitle().getTitleStay();
+    private static final int TITLE_FADE_OUT = CONFIG.getTitle().getFadeOut();
 
     /**
      * 创建床自毁事件

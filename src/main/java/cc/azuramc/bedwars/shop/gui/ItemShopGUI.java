@@ -36,19 +36,21 @@ import java.util.Map;
 /**
  * 道具商店GUI类
  * 用于展示和处理各种可购买道具
+ *
+ * @author an5w1r@163.com
  */
 public class ItemShopGUI extends CustomGUI {
-    // 商店展示槽位
+    /** 商店展示槽位 */
     private static final Integer[] SHOP_SLOTS = new Integer[]{
             19, 20, 21, 22, 23, 24, 25, 
             28, 29, 30, 31, 32, 33, 34, 
             37, 38, 39, 40, 41, 42, 43
     };
     
-    // 资源名称缓存
+    /** 资源名称缓存 */
     private static final Map<Material, String> RESOURCE_NAMES = new HashMap<>();
     
-    // 静态初始化资源名称
+    /* 静态初始化资源名称 */
     static {
         RESOURCE_NAMES.put(MaterialWrapper.IRON_INGOT(), "铁");
         RESOURCE_NAMES.put(MaterialWrapper.GOLD_INGOT(), "金");
@@ -63,13 +65,14 @@ public class ItemShopGUI extends CustomGUI {
      * @param gameManager 游戏实例
      */
     public ItemShopGUI(Player player, int slot, GameManager gameManager) {
-        super(player, "§8道具商店 - " + ChatColor.stripColor(ShopManager.getShops().get(slot).getMainShopItem().getDisplayName()), 54);
+        super(player, "§8道具商店 - " + ChatColor.stripColor(ShopManager.getSHOPS().get(slot).getMainShopItem().getDisplayName()), 54);
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
 
         // 检查是否有DIYShop，如果没有则优先打开DefaultShop
         if (slot == 0 && !hasDIYShop(playerProfile)) {
-            slot = 1; // 默认打开第一个非DIYShop的商店
+            // 默认打开第一个非DIYShop的商店
+            slot = 1;
         }
 
         // 初始化商店导航栏
@@ -79,7 +82,7 @@ public class ItemShopGUI extends CustomGUI {
         initializeShopSeparator(slot);
 
         // 初始化商店内容
-        ShopData shopData = ShopManager.getShops().get(slot);
+        ShopData shopData = ShopManager.getSHOPS().get(slot);
         if (shopData instanceof DefaultShopPage) {
             initializeDefaultShop(gamePlayer, playerProfile, slot, gameManager);
         } else {
@@ -100,7 +103,7 @@ public class ItemShopGUI extends CustomGUI {
         
         // 检查是否有非"AIR"的槽位
         for (String shopItemCode : shopSort) {
-            if (!shopItemCode.equals("AIR")) {
+            if (!"AIR".equals(shopItemCode)) {
                 return true;
             }
         }
@@ -112,7 +115,7 @@ public class ItemShopGUI extends CustomGUI {
      */
     private void initializeShopNavbar(Player player, int slot, GameManager gameManager) {
         int i = 0;
-        for (ShopData shopData : ShopManager.getShops()) {
+        for (ShopData shopData : ShopManager.getSHOPS()) {
             if (i > 9) {
                 continue;
             }
@@ -154,7 +157,7 @@ public class ItemShopGUI extends CustomGUI {
             itemIndex++;
             
             // 解析商店物品代码
-            String[] itemInfo = !shopItemCode.equals("AIR") ? shopItemCode.split("#") : null;
+            String[] itemInfo = !"AIR".equals(shopItemCode) ? shopItemCode.split("#") : null;
             ShopItemType shopItemType = findItemType(itemInfo);
             
             if (itemInfo == null || shopItemType == null) {
@@ -195,7 +198,7 @@ public class ItemShopGUI extends CustomGUI {
             return null;
         }
         
-        for (ShopData shopData : ShopManager.getShops()) {
+        for (ShopData shopData : ShopManager.getSHOPS()) {
             if (shopData.getClass().getSimpleName().equals(itemInfo[0])) {
                 return shopData.getShopItems().get(Integer.parseInt(itemInfo[1]) - 1);
             }
@@ -376,7 +379,7 @@ public class ItemShopGUI extends CustomGUI {
         } else {
             // 添加到快捷购买
             new DIYShopGUI(gameManager, gamePlayer, itemBuilder.getItem().clone(),
-                          ShopManager.getShops().get(shopSlot).getClass().getSimpleName()
+                          ShopManager.getSHOPS().get(shopSlot).getClass().getSimpleName()
                           + "#" + (itemSlot + 1)).open();
         }
     }

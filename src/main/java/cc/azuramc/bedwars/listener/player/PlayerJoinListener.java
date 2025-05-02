@@ -13,6 +13,9 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class PlayerJoinListener implements Listener {
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 

@@ -12,6 +12,9 @@ import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 
+/**
+ * @author ant1aura@qq.com
+ */
 @Command({"displaydamage", "dd"})
 public class ToggleDamageDisplayCommand {
 

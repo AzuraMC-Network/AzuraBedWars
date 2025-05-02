@@ -7,6 +7,9 @@ import cc.azuramc.bedwars.jedis.util.IPUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class LoadGameListener implements Listener {
 
     private boolean isLoad;

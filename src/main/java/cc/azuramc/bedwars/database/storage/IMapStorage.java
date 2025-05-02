@@ -5,6 +5,8 @@ import cc.azuramc.bedwars.game.map.MapData;
 /**
  * 地图数据存储接口
  * 定义了地图数据存储的基本操作和迁移功能
+ *
+ * @author an5w1r@163.com
  */
 public interface IMapStorage {
     

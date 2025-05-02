@@ -11,6 +11,8 @@ import java.util.logging.Level;
 /**
  * 地图加载管理器
  * 负责处理地图加载的整个流程，包括加载状态管理、错误处理和日志记录
+ *
+ * @author an5w1r@163.com
  */
 public class MapLoadManager {
     private static final String LOG_PREFIX = "[MapLoad] ";
@@ -23,10 +25,9 @@ public class MapLoadManager {
     private boolean isMapLoading = false;
     @Getter
     private String currentLoadingMap = null;
-    
-    // 地图加载请求等待相关
+
     private CompletableFuture<String> mapLoadRequestFuture;
-    private static final long DEFAULT_WAIT_TIME = 30; // 默认等待30秒
+    private static final long DEFAULT_WAIT_TIME = 30;
     private static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.SECONDS;
     
     private MapLoadManager(AzuraBedWars plugin) {

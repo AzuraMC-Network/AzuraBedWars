@@ -7,6 +7,9 @@ import org.bukkit.enchantments.Enchantment;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class EnchantmentWrapper {
 
     private static final Map<String, Enchantment> ENCHANTMENT_CACHE = new HashMap<>();

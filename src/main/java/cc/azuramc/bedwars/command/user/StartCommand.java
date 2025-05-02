@@ -7,6 +7,9 @@ import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+/**
+ * @author ant1aura@qq.com
+ */
 public class StartCommand {
 
     @Dependency

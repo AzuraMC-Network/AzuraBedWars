@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Data
 @AllArgsConstructor
 public class GUIItem {

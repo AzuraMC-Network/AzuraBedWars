@@ -11,15 +11,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.*;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Data
 public class PlayerProfile {
-    // 线程池参数
     private static final int CORE_POOL_SIZE = 5;
     private static final int MAX_POOL_SIZE = 5;
     private static final long KEEP_ALIVE_TIME = 60L;
     private static final int QUEUE_CAPACITY = 100;
 
-    // 使用ThreadPoolExecutor替代Executors创建的线程池
+    /**
+     * 使用ThreadPoolExecutor替代Executors创建的线程池
+     */
     private static ExecutorService fixedThreadPool = new ThreadPoolExecutor(
         CORE_POOL_SIZE,
         MAX_POOL_SIZE,

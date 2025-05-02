@@ -31,17 +31,16 @@ import java.util.Map;
 
 /**
  * AzuraBedWars插件主类
- * <p>
  * 负责插件的初始化、配置加载、事件注册等核心功能
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 @Getter
 public final class AzuraBedWars extends JavaPlugin {
-    // 数据库相关常量
     private static final String DB_PLAYER_DATA = "bwdata";
     private static final String DB_PLAYER_STATS = "bwstats";
     
-    // 插件标识常量
+    /** 插件标识常量 */
     private static final String PLUGIN_PREFIX = "[AzuraBedWars] ";
 
     /** 玩家等级经验值映射表 */

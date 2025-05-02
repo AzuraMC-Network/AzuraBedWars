@@ -14,13 +14,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * @author ant1aura@qq.com
+ */
 public class PlayerAFKListener implements Listener {
 
-    private static final PlayerConfig.AFKCheck config = AzuraBedWars.getInstance().getPlayerConfig().getAfkCheck();
+    private static final PlayerConfig.AFKCheck CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getAfkCheck();
 
-    private static final int MAX_NO_MOVEMENT_TIME = config.getMaxNoMovementTime();
+    private static final int MAX_NO_MOVEMENT_TIME = CONFIG.getMaxNoMovementTime();
 
-    private static final Map<UUID, Long> afkLastMovement = new HashMap<>();
+    private static final Map<UUID, Long> AFK_LAST_MOVEMENT = new HashMap<>();
     private static int checkAFKTask;
 
     @EventHandler
@@ -28,7 +31,7 @@ public class PlayerAFKListener implements Listener {
         Player player = event.getPlayer();
 
         // 记录玩家上次移动的时间
-        afkLastMovement.put(player.getUniqueId(), System.currentTimeMillis());
+        AFK_LAST_MOVEMENT.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
     @EventHandler
@@ -47,7 +50,7 @@ public class PlayerAFKListener implements Listener {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 UUID uuid = player.getUniqueId();
                 GamePlayer gamePlayer = GamePlayer.get(uuid);
-                long lastMove = afkLastMovement.getOrDefault(uuid, currentTime);
+                long lastMove = AFK_LAST_MOVEMENT.getOrDefault(uuid, currentTime);
 
                 // 大于时间未移动
                 gamePlayer.setAfk(currentTime - lastMove >= MAX_NO_MOVEMENT_TIME * 1000L);
@@ -56,13 +59,13 @@ public class PlayerAFKListener implements Listener {
     }
 
     private void clearAFK(UUID uuid) {
-        afkLastMovement.remove(uuid);
+        AFK_LAST_MOVEMENT.remove(uuid);
         GamePlayer.get(uuid).setAfk(false);
     }
 
     public static void stop() {
         GamePlayer.getGamePlayers().forEach(a -> a.setAfk(false));
-        afkLastMovement.clear();
+        AFK_LAST_MOVEMENT.clear();
         Bukkit.getScheduler().cancelTask(checkAFKTask);
     }
 }

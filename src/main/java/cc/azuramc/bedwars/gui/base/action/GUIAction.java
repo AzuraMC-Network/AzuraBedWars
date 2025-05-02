@@ -3,6 +3,9 @@ package cc.azuramc.bedwars.gui.base.action;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Data
 @AllArgsConstructor
 public class GUIAction {

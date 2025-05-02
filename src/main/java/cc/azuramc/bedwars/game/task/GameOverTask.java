@@ -18,42 +18,45 @@ import java.util.Objects;
 
 /**
  * 游戏结束倒计时
- * <p>
  * 处理游戏结束后的逻辑，包括胜利消息显示、烟花效果、排行榜展示和服务器重启
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class GameOverTask extends BukkitRunnable {
 
-    private static final TaskConfig.GameOverConfig config = AzuraBedWars.getInstance().getTaskConfig().getGameOver();
-    private static final MessageConfig.GameOver messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameOver();
+    private static final TaskConfig.GameOverConfig CONFIG = AzuraBedWars.getInstance().getTaskConfig().getGameOver();
+    private static final MessageConfig.GameOver MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getGameOver();
 
-    // 游戏结束倒计时时间(秒)
-    private static final int DEFAULT_COUNTDOWN = config.getDefaultCountdown();
-    
-    // 标题显示配置
-    private static final int TITLE_FADE_IN = config.getTitleFadeIn();
-    private static final int TITLE_STAY = config.getTitleStay();
-    private static final int TITLE_FADE_OUT = config.getTitleFadeOut();
-    
-    // 服务器关闭延迟(ticks)
-    private static final long SHUTDOWN_DELAY = config.getShutdownDelay();
-    
-    // 烟花高度
-    private static final double FIREWORK_HEIGHT = config.getFireworkHeight();
-    
-    // 胜利/失败消息
-    private static final String VICTORY_TITLE = messageConfig.getVictoryTitle();
-    private static final String VICTORY_SUBTITLE = messageConfig.getVictorySubtitle();
-    private static final String DEFEAT_TITLE = messageConfig.getDefeatTitle();
-    private static final String DEFEAT_SUBTITLE = messageConfig.getDefeatSubtitle();
-    
-    // 排行榜标题及分隔线
-    private static final String[] lead = messageConfig.getLead();
-    private static final String SEPARATOR_LINE = messageConfig.getSeparatorLine();
-    private static final String GAME_TITLE = messageConfig.getGameTitle();
-    private static final String WINNERS_PREFIX = messageConfig.getWinnersPrefix();
-    private static final String NO_WINNER = messageConfig.getNoWinner();
-    private static final String RANK_PREFIX = messageConfig.getRankPrefix();
+    /**
+     * 游戏结束倒计时时间(秒)
+     */
+    private static final int DEFAULT_COUNTDOWN = CONFIG.getDefaultCountdown();
+
+    private static final int TITLE_FADE_IN = CONFIG.getTitleFadeIn();
+    private static final int TITLE_STAY = CONFIG.getTitleStay();
+    private static final int TITLE_FADE_OUT = CONFIG.getTitleFadeOut();
+
+    /**
+     * 服务器关闭延迟(ticks)
+     */
+    private static final long SHUTDOWN_DELAY = CONFIG.getShutdownDelay();
+
+    /**
+     * 烟花高度
+     */
+    private static final double FIREWORK_HEIGHT = CONFIG.getFireworkHeight();
+
+    private static final String VICTORY_TITLE = MESSAGE_CONFIG.getVictoryTitle();
+    private static final String VICTORY_SUBTITLE = MESSAGE_CONFIG.getVictorySubtitle();
+    private static final String DEFEAT_TITLE = MESSAGE_CONFIG.getDefeatTitle();
+    private static final String DEFEAT_SUBTITLE = MESSAGE_CONFIG.getDefeatSubtitle();
+
+    private static final String[] LEAD = MESSAGE_CONFIG.getLead();
+    private static final String SEPARATOR_LINE = MESSAGE_CONFIG.getSeparatorLine();
+    private static final String GAME_TITLE = MESSAGE_CONFIG.getGameTitle();
+    private static final String WINNERS_PREFIX = MESSAGE_CONFIG.getWinnersPrefix();
+    private static final String NO_WINNER = MESSAGE_CONFIG.getNoWinner();
+    private static final String RANK_PREFIX = MESSAGE_CONFIG.getRankPrefix();
     
     private final GameManager gameManager;
     private int countdown = DEFAULT_COUNTDOWN;
@@ -183,7 +186,7 @@ public class GameOverTask extends BukkitRunnable {
             if (i > 2) {
                 continue;
             }
-            messages.add(RANK_PREFIX + lead[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getFinalKills());
+            messages.add(RANK_PREFIX + LEAD[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getFinalKills());
             i++;
         }
         

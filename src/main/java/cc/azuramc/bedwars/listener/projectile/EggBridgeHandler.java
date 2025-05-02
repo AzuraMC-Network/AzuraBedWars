@@ -13,6 +13,9 @@ import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class EggBridgeHandler implements Runnable {
 
     @Getter

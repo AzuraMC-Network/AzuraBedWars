@@ -1,6 +1,9 @@
 package cc.azuramc.bedwars.spectator;
 
 
+/**
+ * @author an5w1r@163.com
+ */
 public class SpectatorManger/* implements Runnable, Listener*/ {
 /*    private final Game game;
     @Getter

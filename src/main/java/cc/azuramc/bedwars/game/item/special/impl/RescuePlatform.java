@@ -1,10 +1,11 @@
-package cc.azuramc.bedwars.game.item.special;
+package cc.azuramc.bedwars.game.item.special.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,27 +22,37 @@ import java.util.stream.Collectors;
 
 /**
  * 救援平台特殊物品
- * <p>
  * 创建一个临时平台帮助玩家防止坠落
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class RescuePlatform extends AbstractSpecialItem {
 
-    private static final ItemConfig config = AzuraBedWars.getInstance().getItemConfig();
+    private static final ItemConfig CONFIG = AzuraBedWars.getInstance().getItemConfig();
 
-    // 常量定义
-    private static final int DEFAULT_BREAK_TIME = config.getRescuePlatform().getDefaultBreakTime();      // 默认平台存在时间（秒）
-    private static final int DEFAULT_WAIT_TIME = config.getRescuePlatform().getDefaultWaitTime();       // 默认使用冷却时间（秒）
-    private static final double JUMP_BOOST = config.getRescuePlatform().getJumpBoost();          // 跳跃提升力度
-    private static final Material PLATFORM_MATERIAL = Material.SLIME_BLOCK;  // 平台方块材质
+    /**
+     * 默认平台存在时间（秒）
+     */
+    private static final int DEFAULT_BREAK_TIME = CONFIG.getRescuePlatform().getDefaultBreakTime();
+    /**
+     * 默认使用冷却时间（秒）
+     */
+    private static final int DEFAULT_WAIT_TIME = CONFIG.getRescuePlatform().getDefaultWaitTime();
+    /**
+     * 跳跃提升力度
+     */
+    private static final double JUMP_BOOST = CONFIG.getRescuePlatform().getJumpBoost();
+    /**
+     * 平台方块材质
+     */
+    private static final Material PLATFORM_MATERIAL = Material.SLIME_BLOCK;
 
 
     @Getter private GameManager gameManager;
     @Getter private int livingTime = 0;
     private GamePlayer ownerPlayer;
     private final List<Block> platformBlocks;
-    
-    // 配置变量
+
     private int breakTime = DEFAULT_BREAK_TIME;
     private int waitTime = DEFAULT_WAIT_TIME;
 

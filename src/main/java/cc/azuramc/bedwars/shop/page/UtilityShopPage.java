@@ -11,6 +11,9 @@ import lombok.Getter;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Getter
 public class UtilityShopPage implements ShopData {
     private final ShopItemType mainShopItem;

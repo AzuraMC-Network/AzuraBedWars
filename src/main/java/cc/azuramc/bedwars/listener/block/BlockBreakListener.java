@@ -13,18 +13,21 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class BlockBreakListener implements Listener {
 
-    private static final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
+    private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        if (gameManager.getGameState() == GameState.WAITING) {
+        if (GAME_MANAGER.getGameState() == GameState.WAITING) {
             event.setCancelled(true);
             return;
         }
 
-        if (gameManager.getGameState() == GameState.RUNNING) {
+        if (GAME_MANAGER.getGameState() == GameState.RUNNING) {
             Player player = event.getPlayer();
             Block block = event.getBlock();
             GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
@@ -47,7 +50,7 @@ public class BlockBreakListener implements Listener {
             }
 
             // 检查区域保护和玩家放置的方块
-            if (gameManager.getMapData().hasRegion(block.getLocation()) || gameManager.getBlocks().contains(block.getLocation())) {
+            if (GAME_MANAGER.getMapData().hasRegion(block.getLocation()) || GAME_MANAGER.getBlocks().contains(block.getLocation())) {
                 event.setCancelled(true);
             }
         }

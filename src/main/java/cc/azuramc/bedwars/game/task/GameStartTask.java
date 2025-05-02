@@ -13,40 +13,41 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * 游戏大厅倒计时
- * <p>
  * 负责管理游戏开始前的倒计时逻辑，包括时间提醒、人数检查和经验条显示
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class GameStartTask extends BukkitRunnable {
 
-    private static final TaskConfig.GameStartConfig config = AzuraBedWars.getInstance().getTaskConfig().getGameStart();
-    private static final MessageConfig.GameStart messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGameStart();
+    private static final TaskConfig.GameStartConfig CONFIG = AzuraBedWars.getInstance().getTaskConfig().getGameStart();
+    private static final MessageConfig.GameStart MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getGameStart();
 
-    // 倒计时常量
-    private static final int DEFAULT_COUNTDOWN = config.getDefaultCountdown();
-    private static final int QUICK_START_COUNTDOWN = config.getQuickStartCountdown();
-    
-    // 公告时间点
-    private static final int[] ANNOUNCEMENT_TIMES = config.getAnnouncementTimes();
-    
-    // 标题显示配置
-    private static final String TITLE_COUNTDOWN = messageConfig.getTitle().getTitleCountdown();
-    private static final String SUBTITLE_TEXT = messageConfig.getTitle().getSubtitleText();
-    private static final int TITLE_FADE_IN = config.getTitle().getFadeIn();
-    private static final int TITLE_STAY = config.getTitle().getTitleStay();
-    private static final int TITLE_FADE_OUT = config.getTitle().getFadeOut();
-    
-    // 消息模板
-    private static final String MSG_COUNTDOWN = messageConfig.getMsgCountdown();
-    private static final String MSG_NOT_ENOUGH_PLAYERS = messageConfig.getMsgNotEnoughPlayers();
-    private static final String MSG_GAME_FULL = messageConfig.getMsgGameFull();
+    private static final int DEFAULT_COUNTDOWN = CONFIG.getDefaultCountdown();
+    private static final int QUICK_START_COUNTDOWN = CONFIG.getQuickStartCountdown();
+
+    /**
+     * 公告时间点
+     */
+    private static final int[] ANNOUNCEMENT_TIMES = CONFIG.getAnnouncementTimes();
+
+    private static final String TITLE_COUNTDOWN = MESSAGE_CONFIG.getTitle().getTitleCountdown();
+    private static final String SUBTITLE_TEXT = MESSAGE_CONFIG.getTitle().getSubtitleText();
+    private static final int TITLE_FADE_IN = CONFIG.getTitle().getFadeIn();
+    private static final int TITLE_STAY = CONFIG.getTitle().getTitleStay();
+    private static final int TITLE_FADE_OUT = CONFIG.getTitle().getFadeOut();
+
+    private static final String MSG_COUNTDOWN = MESSAGE_CONFIG.getMsgCountdown();
+    private static final String MSG_NOT_ENOUGH_PLAYERS = MESSAGE_CONFIG.getMsgNotEnoughPlayers();
+    private static final String MSG_GAME_FULL = MESSAGE_CONFIG.getMsgGameFull();
 
     private final GameManager gameManager;
     
     @Getter
     private int countdown = DEFAULT_COUNTDOWN;
-    
-    // 是否处于快速开始状态
+
+    /**
+     * 是否处于快速开始状态
+     */
     private boolean isQuickStartMode = false;
 
     /**

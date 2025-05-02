@@ -10,6 +10,8 @@ import java.util.Enumeration;
 /**
  * IP工具类
  * 用于获取本地IP地址和端口
+ *
+ * @author an5w1r@163.com
  */
 public class IPUtil {
 

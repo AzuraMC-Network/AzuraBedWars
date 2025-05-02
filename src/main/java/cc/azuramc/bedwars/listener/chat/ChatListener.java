@@ -22,18 +22,19 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
  * 支持团队聊天和全局聊天
  * 包含玩家等级显示和权限控制
  * </p>
+ * @author an5w1r@163.com
  */
 public class ChatListener implements Listener {
 
-    private static final ChatConfig config = AzuraBedWars.getInstance().getChatConfig();
+    private static final ChatConfig CONFIG = AzuraBedWars.getInstance().getChatConfig();
 
     // 常量定义
-    public static final String GLOBAL_CHAT_PREFIX = config.getGlobalChatPrefix();
-    private static final String SPECTATOR_PREFIX = config.getSpectatorPrefix();
-    private static final String GLOBAL_CHAT_TAG = config.getGlobalChatTag();
-    private static final String TEAM_CHAT_TAG = config.getTeamChatTag();
-    private static final String CHAT_SEPARATOR = config.getChatSeparator();
-    private static final int GLOBAL_CHAT_COOLDOWN = config.getGlobalChatCooldown();
+    public static final String GLOBAL_CHAT_PREFIX = CONFIG.getGlobalChatPrefix();
+    private static final String SPECTATOR_PREFIX = CONFIG.getSpectatorPrefix();
+    private static final String GLOBAL_CHAT_TAG = CONFIG.getGlobalChatTag();
+    private static final String TEAM_CHAT_TAG = CONFIG.getTeamChatTag();
+    private static final String CHAT_SEPARATOR = CONFIG.getChatSeparator();
+    private static final int GLOBAL_CHAT_COOLDOWN = CONFIG.getGlobalChatCooldown();
 
     private static GameManager gameManager;
     private static AzuraBedWars plugin;

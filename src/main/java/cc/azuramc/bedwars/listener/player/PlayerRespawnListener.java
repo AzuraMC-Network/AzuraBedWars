@@ -35,33 +35,34 @@ import java.util.UUID;
  * 负责处理玩家死亡后的重生逻辑，包括床存在和床被摧毁的两种情况。
  * 同时也处理玩家重生后的无敌时间和工具等级降级。
  * </p>
+ * @author an5w1r@163.com
  */
 public class PlayerRespawnListener implements Listener {
 
-    private final static PlayerConfig.PlayerRespawn config = AzuraBedWars.getInstance().getPlayerConfig().getPlayerRespawn();
-    private final static MessageConfig.PlayerRespawn messageConfig = AzuraBedWars.getInstance().getMessageConfig().getPlayerRespawn();
+    private final static PlayerConfig.PlayerRespawn CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerRespawn();
+    private final static MessageConfig.PlayerRespawn MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getPlayerRespawn();
 
     // 常量定义
-    private static final int RESPAWN_COUNTDOWN_SECONDS = config.getRespawnCountdownSeconds();
-    private static final int RESPAWN_PROTECTION_TICKS = config.getRespawnProtectionTicks();
+    private static final int RESPAWN_COUNTDOWN_SECONDS = CONFIG.getRespawnCountdownSeconds();
+    private static final int RESPAWN_PROTECTION_TICKS = CONFIG.getRespawnProtectionTicks();
     private static final int TITLE_FADE_IN = 1;
-    private static final int TITLE_STAY = config.getTitleStay();
+    private static final int TITLE_STAY = CONFIG.getTitleStay();
     private static final int TITLE_FADE_OUT = 1;
     private static final long RESPAWN_DELAY_TICKS = 1L;
     private static final long RESPAWN_TIMER_PERIOD = 20L;
     
     // 消息常量
-    private static final String RESPAWN_COUNTDOWN_TITLE = messageConfig.getRespawnCountdownTitle();
-    private static final String RESPAWN_COUNTDOWN_SUBTITLE = messageConfig.getRespawnCountdownSubTitle();
-    private static final String RESPAWN_COMPLETE_TITLE = messageConfig.getRespawnCompleteTitle();
-    private static final String RESPAWN_COMPLETE_SUBTITLE = messageConfig.getRespawnCompleteSubTitle();
-    private static final String DEATH_PERMANENT_TITLE = messageConfig.getDeathPermanentTitle();
-    private static final String DEATH_PERMANENT_SUBTITLE = messageConfig.getDeathPermanentSubTitle();
-    private static final String TEAM_ELIMINATED_FORMAT = messageConfig.getTeamEliminatedFormat();
-    private static final String TEAM_ELIMINATED_MSG = messageConfig.getTeamEliminatedMessage();
-    private static final String REJOIN_MESSAGE = messageConfig.getRejoinMessage();
-    private static final String REJOIN_BUTTON = messageConfig.getRejoinButton();
-    private static final String REJOIN_COMMAND = messageConfig.getRejoinCommand();
+    private static final String RESPAWN_COUNTDOWN_TITLE = MESSAGE_CONFIG.getRespawnCountdownTitle();
+    private static final String RESPAWN_COUNTDOWN_SUBTITLE = MESSAGE_CONFIG.getRespawnCountdownSubTitle();
+    private static final String RESPAWN_COMPLETE_TITLE = MESSAGE_CONFIG.getRespawnCompleteTitle();
+    private static final String RESPAWN_COMPLETE_SUBTITLE = MESSAGE_CONFIG.getRespawnCompleteSubTitle();
+    private static final String DEATH_PERMANENT_TITLE = MESSAGE_CONFIG.getDeathPermanentTitle();
+    private static final String DEATH_PERMANENT_SUBTITLE = MESSAGE_CONFIG.getDeathPermanentSubTitle();
+    private static final String TEAM_ELIMINATED_FORMAT = MESSAGE_CONFIG.getTeamEliminatedFormat();
+    private static final String TEAM_ELIMINATED_MSG = MESSAGE_CONFIG.getTeamEliminatedMessage();
+    private static final String REJOIN_MESSAGE = MESSAGE_CONFIG.getRejoinMessage();
+    private static final String REJOIN_BUTTON = MESSAGE_CONFIG.getRejoinButton();
+    private static final String REJOIN_COMMAND = MESSAGE_CONFIG.getRejoinCommand();
     
     private final List<UUID> noDamage = new ArrayList<>();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();

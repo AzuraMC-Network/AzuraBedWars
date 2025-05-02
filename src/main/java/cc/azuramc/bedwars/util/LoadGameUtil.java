@@ -15,6 +15,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class LoadGameUtil {
 
     public static void spawnAll(AzuraBedWars plugin) {

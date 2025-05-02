@@ -11,6 +11,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class InvisibleUtil {
     private static final String VERSION;
     private static final boolean NEW_VERSION;

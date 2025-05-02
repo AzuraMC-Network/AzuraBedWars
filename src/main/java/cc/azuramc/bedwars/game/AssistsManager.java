@@ -13,13 +13,14 @@ import java.util.stream.Collectors;
  * 负责记录和管理玩家的助攻信息，包括最后一次造成伤害的时间和获取助攻列表。
  * 可以自动清理过期的助攻记录，提高内存使用效率。
  * </p>
+ * @author an5w1r@163.com
  */
 public class AssistsManager {
     /**
      * 助攻有效时间（毫秒）
      * 玩家造成伤害后在此时间内仍然计为助攻
      */
-    private static final long ASSIST_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(10); // 10秒
+    private static final long ASSIST_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(10);
     
     /**
      * 存储玩家最后伤害时间的映射

@@ -8,6 +8,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 /**
  * 地图存储工厂类
  * 用于创建和获取不同类型的存储实现
+ *
+ * @author an5w1r@163.com
  */
 public class MapStorageFactory {
     
@@ -15,7 +17,13 @@ public class MapStorageFactory {
      * 存储类型枚举
      */
     public enum StorageType {
+        /**
+         * JSON存储地图信息格式
+         */
         JSON,
+        /**
+         * MYSQL存储地图信息格式
+         */
         MYSQL
     }
     
@@ -71,13 +79,11 @@ public class MapStorageFactory {
      * @return 存储实现
      */
     public static IMapStorage getStorage(StorageType storageType) {
-        switch (storageType) {
-            case MYSQL:
-                return getMysqlStorage();
-            case JSON:
-            default:
-                return getJsonStorage();
-        }
+        return switch (storageType) {
+            case JSON -> getJsonStorage();
+            case MYSQL -> getMysqlStorage();
+            default -> getJsonStorage();
+        };
     }
     
     /**
@@ -89,7 +95,8 @@ public class MapStorageFactory {
      */
     public static boolean migrateStorage(StorageType sourceType, StorageType targetType, String mapName) {
         if (sourceType == targetType) {
-            return true; // 相同类型无需迁移
+            // 相同类型无需迁移
+            return true;
         }
         
         IMapStorage source = getStorage(sourceType);

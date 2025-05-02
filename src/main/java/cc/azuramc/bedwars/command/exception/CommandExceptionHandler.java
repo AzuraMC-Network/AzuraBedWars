@@ -7,6 +7,9 @@ import revxrsal.commands.command.CommandActor;
 import revxrsal.commands.exception.MissingArgumentException;
 import revxrsal.commands.exception.NoPermissionException;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class CommandExceptionHandler extends BukkitExceptionAdapter {
 
     @Override

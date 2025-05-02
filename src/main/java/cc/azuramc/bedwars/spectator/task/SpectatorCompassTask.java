@@ -15,18 +15,19 @@ import org.bukkit.inventory.ItemStack;
  * 负责更新玩家手持指南针时的目标追踪，以及处理观战玩家的目标追踪和传送。
  * 该任务以1tick为周期持续运行，确保指南针指向信息和观战信息的及时更新。
  * </p>
+ * @author an5w1r@163.com
  */
 public class SpectatorCompassTask {
-    // 任务运行状态标志
+    /** 任务运行状态标志 */
     private boolean isRunning;
     
-    // 任务ID，用于在需要时取消任务
+    /** 任务ID，用于在需要时取消任务 */
     private int taskId = -1;
     
-    // 更新频率（单位：tick）
+    /** 更新频率（单位：tick） */
     private static final long UPDATE_FREQUENCY = 1L;
     
-    // 指南针材质
+    /** 指南针材质 */
     private static final Material COMPASS_MATERIAL = Material.COMPASS;
 
     /**

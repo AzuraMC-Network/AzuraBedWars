@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.scoreboard.base;
 
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -16,7 +17,6 @@ import java.util.stream.Stream;
 /**
  * 基于数据包的轻量级计分板API，专为Bukkit插件设计
  * 可以安全地异步使用，因为所有操作都在数据包级别进行
- * <p>
  * 项目地址: <a href="https://github.com/MrMicky-FR/FastBoard">GitHub</a>
  *
  * @author MrMicky
@@ -24,18 +24,23 @@ import java.util.stream.Stream;
  */
 public abstract class AbstractFastBoard<T> {
 
-    // 缓存数据包类与字段关系，提高反射效率
+    /**
+     * 缓存数据包类与字段关系，提高反射效率
+     */
     private static final Map<Class<?>, Field[]> PACKETS = new HashMap<>(8);
-    
-    // 颜色代码数组，用于计分板行操作
+
+    /**
+     * 颜色代码数组，用于计分板行操作
+     */
     protected static final String[] COLOR_CODES = Arrays.stream(ChatColor.values())
             .map(Object::toString)
             .toArray(String[]::new);
-    
-    // 服务器版本类型
+
+    /**
+     * 服务器版本类型
+     */
     private static final VersionType VERSION_TYPE;
-    
-    // NMS类和组件相关
+
     private static final Class<?> CHAT_COMPONENT_CLASS;
     private static final Class<?> CHAT_FORMAT_ENUM;
     private static final Object RESET_FORMATTING;
@@ -43,8 +48,7 @@ public abstract class AbstractFastBoard<T> {
     private static final MethodHandle SEND_PACKET;
     private static final MethodHandle PLAYER_GET_HANDLE;
     private static final MethodHandle FIXED_NUMBER_FORMAT;
-    
-    // 计分板数据包构造器
+
     private static final FastReflection.PacketConstructor PACKET_SB_OBJ;
     private static final FastReflection.PacketConstructor PACKET_SB_DISPLAY_OBJ;
     private static final FastReflection.PacketConstructor PACKET_SB_TEAM;
@@ -52,8 +56,7 @@ public abstract class AbstractFastBoard<T> {
     private static final MethodHandle PACKET_SB_SET_SCORE;
     private static final MethodHandle PACKET_SB_RESET_SCORE;
     private static final boolean SCORE_OPTIONAL_COMPONENTS;
-    
-    // 计分板枚举和常量
+
     private static final Class<?> DISPLAY_SLOT_TYPE;
     private static final Class<?> ENUM_SB_HEALTH_DISPLAY;
     private static final Class<?> ENUM_SB_ACTION;
@@ -67,9 +70,9 @@ public abstract class AbstractFastBoard<T> {
     private static final Object ENUM_VISIBILITY_ALWAYS;
     private static final Object ENUM_COLLISION_RULE_ALWAYS;
 
-    /**
-     * 静态初始化块：初始化所有反射相关的字段和方法
-     * 根据不同Minecraft版本进行适配
+    /*
+      静态初始化块：初始化所有反射相关的字段和方法
+      根据不同Minecraft版本进行适配
      */
     static {
         try {
@@ -235,12 +238,15 @@ public abstract class AbstractFastBoard<T> {
         }
     }
 
-    // 计分板相关实例变量
+    @Getter
     private final Player player;
+    @Getter
     private final String id;
     private final List<T> lines = new ArrayList<>();
     private final List<T> scores = new ArrayList<>();
+    @Getter
     private T title = emptyLine();
+    @Getter
     private boolean deleted = false;
 
     /**
@@ -259,15 +265,6 @@ public abstract class AbstractFastBoard<T> {
         } catch (Throwable t) {
             throw new RuntimeException("无法创建计分板", t);
         }
-    }
-
-    /**
-     * 获取计分板标题
-     *
-     * @return 计分板标题
-     */
-    public T getTitle() {
-        return this.title;
     }
 
     /**
@@ -572,33 +569,6 @@ public abstract class AbstractFastBoard<T> {
     }
 
     /**
-     * 获取计分板所属的玩家
-     *
-     * @return 拥有此计分板的玩家
-     */
-    public Player getPlayer() {
-        return this.player;
-    }
-
-    /**
-     * 获取计分板ID
-     *
-     * @return 计分板ID
-     */
-    public String getId() {
-        return this.id;
-    }
-
-    /**
-     * 检查计分板是否已被删除
-     *
-     * @return 如果计分板已被删除则返回true
-     */
-    public boolean isDeleted() {
-        return this.deleted;
-    }
-
-    /**
      * 检查服务器是否支持自定义计分板分数（仅1.20.3+服务器支持）
      *
      * @return 如果服务器支持自定义分数则返回true
@@ -859,8 +829,10 @@ public abstract class AbstractFastBoard<T> {
 
         Object packet = PACKET_SB_TEAM.invoke();
 
-        setField(packet, String.class, this.id + ':' + score); // 团队名称
-        setField(packet, int.class, mode.ordinal(), VERSION_TYPE == VersionType.V1_8 ? 1 : 0); // 更新模式
+        // 团队名称
+        setField(packet, String.class, this.id + ':' + score);
+        // 更新模式
+        setField(packet, int.class, mode.ordinal(), VERSION_TYPE == VersionType.V1_8 ? 1 : 0);
 
         if (mode == TeamMode.REMOVE) {
             sendPacket(packet);
@@ -963,7 +935,11 @@ public abstract class AbstractFastBoard<T> {
         // 1.13+版本使用组件
         int i = 0;
         for (Field field : PACKETS.get(packet.getClass())) {
-            if ((field.getType() == String.class || field.getType() == CHAT_COMPONENT_CLASS) && count == i++) {
+            if (field.getType() == String.class) {
+                field.set(packet, toMinecraftComponent(value));
+                return;
+            }
+            if ((field.getType() == CHAT_COMPONENT_CLASS) && count == i++) {
                 field.set(packet, toMinecraftComponent(value));
             }
         }

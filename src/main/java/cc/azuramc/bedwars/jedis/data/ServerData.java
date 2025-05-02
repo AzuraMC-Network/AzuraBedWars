@@ -2,6 +2,9 @@ package cc.azuramc.bedwars.jedis.data;
 
 import lombok.Data;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Data
 public class ServerData {
     private String gameType;

@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.item.special.RescuePlatform;
+import cc.azuramc.bedwars.game.item.special.impl.RescuePlatform;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,9 +15,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
  * 救援平台监听器
- * <p>
  * 监听玩家使用救援平台物品的事件并激活救援平台功能
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class RescuePlatformListener implements Listener {
     

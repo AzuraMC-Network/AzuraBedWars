@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
-import cc.azuramc.bedwars.game.item.special.WarpPowder;
+import cc.azuramc.bedwars.game.item.special.impl.WarpPowder;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -25,16 +25,16 @@ import java.util.Objects;
 
 /**
  * 传送粉末监听器
- * <p>
  * 监听玩家使用传送粉末的事件并处理相关交互
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class WarpPowderListener implements Listener {
 
-    private static final ItemConfig.WarpPowder config = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
+    private static final ItemConfig.WarpPowder CONFIG = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     
-    private static final String CANCEL_ITEM_NAME = config.getCancelItemName();
+    private static final String CANCEL_ITEM_NAME = CONFIG.getCancelItemName();
 
     /**
      * 获取玩家当前使用的传送粉末

@@ -8,6 +8,8 @@ import org.bukkit.event.Listener;
 /**
  * 名称监听器
  * 用于处理服务器名称相关的事件
+ *
+ * @author an5w1r@163.com
  */
 public class NameListener implements Listener {
     

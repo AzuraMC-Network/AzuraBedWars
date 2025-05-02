@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class ConnectionPoolHandler {
     private final Map<String, HikariDataSource> pools = new HashMap<>();
     private final List<String> databases = new ArrayList<>();

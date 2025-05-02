@@ -14,17 +14,20 @@ import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class FireballHandler implements Listener {
 
-    private static final ItemConfig.FireBall config = AzuraBedWars.getInstance().getItemConfig().getFireBall();
+    private static final ItemConfig.FireBall CONFIG = AzuraBedWars.getInstance().getItemConfig().getFireBall();
 
-    private static final int FIREBALL_EXPLOSION_RADIUS_X = config.getFireballExplosionRadiusX();
-    private static final int FIREBALL_EXPLOSION_RADIUS_Y = config.getFireballExplosionRadiusY();
-    private static final int FIREBALL_EXPLOSION_RADIUS_Z = config.getFireballExplosionRadiusZ();
-    private static final int FIREBALL_DAMAGE = config.getFireballDamage();
-    private static final double FIREBALL_KNOCKBACK_MULTIPLIER = config.getFireballKnockbackMultiplier();
-    private static final String FIREBALL_METADATA = "Game FIREBALL";
-    private static final String NO_FALL_DAMAGE_METADATA = "FIREBALL PLAYER NOFALL";
+    private static final int FIREBALL_EXPLOSION_RADIUS_X = CONFIG.getFireballExplosionRadiusX();
+    private static final int FIREBALL_EXPLOSION_RADIUS_Y = CONFIG.getFireballExplosionRadiusY();
+    private static final int FIREBALL_EXPLOSION_RADIUS_Z = CONFIG.getFireballExplosionRadiusZ();
+    private static final int FIREBALL_DAMAGE = CONFIG.getFireballDamage();
+    private static final double FIREBALL_KNOCK_BACK_MULTIPLIER = CONFIG.getFireballKnockbackMultiplier();
+    private static final String FIREBALL_METADATA = "GAME_FIREBALL";
+    private static final String NO_FALL_DAMAGE_METADATA = "FIREBALL_PLAYER_NO_FALL";
 
 
     /**
@@ -100,7 +103,7 @@ public class FireballHandler implements Listener {
 
         // 应用击退效果
         Vector knockbackVector = getPosition(player.getLocation(), fireball.getLocation(), 1.5D);
-        player.setVelocity(knockbackVector.multiply(FIREBALL_KNOCKBACK_MULTIPLIER));
+        player.setVelocity(knockbackVector.multiply(FIREBALL_KNOCK_BACK_MULTIPLIER));
     }
 
     public static Vector getPosition(Location location1, Location location2, double y) {

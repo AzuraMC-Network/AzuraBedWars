@@ -8,6 +8,9 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class ServerListener implements Listener {
 
     @EventHandler

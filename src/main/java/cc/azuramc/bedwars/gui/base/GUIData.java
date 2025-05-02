@@ -5,15 +5,18 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Getter
 public class GUIData {
 
     @Getter
-    private static final HashMap<Player, CustomGUI> currentGui = new HashMap<>();
+    private static final HashMap<Player, CustomGUI> CURRENT_GUI = new HashMap<>();
 
     @Getter
-    private static final HashMap<Player, CustomGUI> lastGui = new HashMap<>();
+    private static final HashMap<Player, CustomGUI> LAST_GUI = new HashMap<>();
 
     @Getter
-    private static final HashMap<Player, CustomGUI> lastReplaceGui = new HashMap<>();
+    private static final HashMap<Player, CustomGUI> LAST_REPLACE_GUI = new HashMap<>();
 }

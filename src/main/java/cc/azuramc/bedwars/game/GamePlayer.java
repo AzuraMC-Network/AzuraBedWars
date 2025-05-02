@@ -39,25 +39,23 @@ import java.util.concurrent.ConcurrentHashMap;
  * 管理玩家在游戏中的状态、装备、数据等
  * 提供玩家相关的各种操作方法
  * </p>
+ * @author an5w1r@163.com
  */
 public class GamePlayer {
 
-    private static final PlayerConfig.GamePlayer config = AzuraBedWars.getInstance().getPlayerConfig().getGamePlayer();
+    private static final PlayerConfig.GamePlayer CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getGamePlayer();
 
-    // 静态字段
-    private static final ConcurrentHashMap<UUID, GamePlayer> gamePlayers = new ConcurrentHashMap<>();
-    private static final int MAX_HEALTH = config.getMaxHealth();
+    private static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
+    private static final int MAX_HEALTH = CONFIG.getMaxHealth();
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
 
-    // 基础属性
     @Getter private final UUID uuid;
     @Getter private final String name;
     @Getter private final AssistsManager assistsManager;
     @Getter private final PlayerProfile playerProfile;
     @Getter private final PlayerCompass playerCompass;
-    
-    // 游戏状态
+
     @Setter private String nickName;
     @Getter @Setter private FastBoard board;
     @Getter private boolean spectator;
@@ -69,7 +67,6 @@ public class GamePlayer {
     @Getter @Setter private boolean isViewingArrowDamage;
     @Getter @Setter private boolean isViewingAttackDamage;
 
-    // 战斗数据
     @Getter private int kills;
     @Getter private int finalKills;
     
@@ -115,7 +112,7 @@ public class GamePlayer {
      * @return 游戏玩家实例
      */
     public static GamePlayer create(UUID uuid, String name) {
-        return gamePlayers.computeIfAbsent(uuid, k -> new GamePlayer(uuid, name));
+        return GAME_PLAYERS.computeIfAbsent(uuid, k -> new GamePlayer(uuid, name));
     }
 
     /**
@@ -125,7 +122,7 @@ public class GamePlayer {
      * @return 游戏玩家实例
      */
     public static GamePlayer get(UUID uuid) {
-        return gamePlayers.get(uuid);
+        return GAME_PLAYERS.get(uuid);
     }
 
     /**
@@ -143,7 +140,7 @@ public class GamePlayer {
      * @return 游戏玩家列表
      */
     public static List<GamePlayer> getGamePlayers() {
-        return new ArrayList<>(gamePlayers.values());
+        return new ArrayList<>(GAME_PLAYERS.values());
     }
 
     /**
@@ -153,7 +150,7 @@ public class GamePlayer {
      */
     public static List<GamePlayer> getTeamPlayers() {
         List<GamePlayer> teamPlayers = new ArrayList<>();
-        for (GamePlayer player : gamePlayers.values()) {
+        for (GamePlayer player : GAME_PLAYERS.values()) {
             if (player.getGameTeam() != null) {
                 teamPlayers.add(player);
             }
@@ -168,7 +165,7 @@ public class GamePlayer {
      */
     public static List<GamePlayer> getOnlinePlayers() {
         List<GamePlayer> onlinePlayers = new ArrayList<>();
-        for (GamePlayer player : gamePlayers.values()) {
+        for (GamePlayer player : GAME_PLAYERS.values()) {
             if (player.isOnline()) {
                 onlinePlayers.add(player);
             }
@@ -183,7 +180,7 @@ public class GamePlayer {
      */
     public static List<GamePlayer> getSpectators() {
         List<GamePlayer> spectators = new ArrayList<>();
-        for (GamePlayer player : gamePlayers.values()) {
+        for (GamePlayer player : GAME_PLAYERS.values()) {
             if (player.isSpectator()) {
                 spectators.add(player);
             }
@@ -338,7 +335,7 @@ public class GamePlayer {
     private void setupSpectatorEffects(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
         SpectatorSettings spectatorSettings = SpectatorSettings.get(this);
-        if (spectatorSettings.getOption(SpectatorSettings.Option.NIGHTVISION)) {
+        if (spectatorSettings.getOption(SpectatorSettings.Option.NIGHT_VISION)) {
             if (player.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
                 player.removePotionEffect(PotionEffectType.NIGHT_VISION);
             }

@@ -8,19 +8,27 @@ import cc.azuramc.bedwars.event.GameEventRunnable;
 /**
  * 钻石资源点升级事件
  * 随着游戏进行，钻石生成速度会加快
+ *
+ * @author an5w1r@163.com
  */
 public class DiamondUpdateEventAbstract extends AbstractGameEvent {
 
-    private static final AzuraBedWars plugin = AzuraBedWars.getInstance();
+    private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
 
-    // 钻石资源点刷新标识符
-    private static final String EVENT_NAME = plugin.getMessageConfig().getDiamondUpdate().getEventName();
-    
-    // 定义各等级的钻石刷新时间（秒）
-    private static final int LEVEL_2_REFRESH_SECONDS = plugin.getEventConfig().getDiamondUpdateEvent().getLevel2RefreshSecond();
-    private static final int LEVEL_3_REFRESH_SECONDS = plugin.getEventConfig().getDiamondUpdateEvent().getLevel3RefreshSecond();
-    
-    // 当前升级等级
+    /**
+     * 钻石资源点刷新标识符
+     */
+    private static final String EVENT_NAME = PLUGIN.getMessageConfig().getDiamondUpdate().getEventName();
+
+    /**
+     *     定义各等级的钻石刷新时间（秒）
+     */
+    private static final int LEVEL_2_REFRESH_SECONDS = PLUGIN.getEventConfig().getDiamondUpdateEvent().getLevel2RefreshSecond();
+    private static final int LEVEL_3_REFRESH_SECONDS = PLUGIN.getEventConfig().getDiamondUpdateEvent().getLevel3RefreshSecond();
+
+    /**
+     * 当前升级等级
+     */
     private final int level;
 
     /**

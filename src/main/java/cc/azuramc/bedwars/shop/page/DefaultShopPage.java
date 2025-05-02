@@ -15,6 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Getter
 public class DefaultShopPage implements ShopData {
     private final ShopItemType mainShopItem;

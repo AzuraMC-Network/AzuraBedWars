@@ -9,6 +9,9 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class TitleUtil {
 
     /**

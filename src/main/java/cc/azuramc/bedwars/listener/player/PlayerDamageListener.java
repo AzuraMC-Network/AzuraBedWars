@@ -35,24 +35,24 @@ import java.util.Map;
  * <p>
  * 负责处理玩家伤害和死亡事件，包括虚空伤害、玩家击杀、团队伤害检测等
  * </p>
+ * @author an5w1r@163.com
  */
 public class PlayerDamageListener implements Listener {
 
-    private final static MessageConfig.PlayerDeath messageConfig = AzuraBedWars.getInstance().getMessageConfig().getPlayerDeath();
-    private final static PlayerConfig.PlayerDeath config = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
+    private final static MessageConfig.PlayerDeath MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getPlayerDeath();
+    private final static PlayerConfig.PlayerDeath CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
 
-    // 常量定义
     private static final String METADATA_VOID_PLAYER = "VOID_PLAYER";
-    private static final String METADATA_FIREBALL_NOFALL = "FIREBALL_PLAYER_NOFALL";
+    private static final String METADATA_FIREBALL_NO_FALL = "FIREBALL_PLAYER_NO_FALL";
     private static final String METADATA_SHOP = "Shop";
     private static final String METADATA_SHOP2 = "Shop2";
-    private static final String COINS_ACTION_BAR = messageConfig.getCoinsActionBar();
-    private static final String COINS_MESSAGE = messageConfig.getCoinsMessage();
-    private static final int COINS_ACTIONBAR_TIMES = config.getCoinsActionBarTimes();
-    private static final int ACTIONBAR_PERIOD = config.getActionBarPeriod();
+    private static final String COINS_ACTION_BAR = MESSAGE_CONFIG.getCoinsActionBar();
+    private static final String COINS_MESSAGE = MESSAGE_CONFIG.getCoinsMessage();
+    private static final int COINS_ACTIONBAR_TIMES = CONFIG.getCoinsActionBarTimes();
+    private static final int ACTIONBAR_PERIOD = CONFIG.getActionBarPeriod();
     private static final int RESPAWN_DELAY = 10;
     private static final double VOID_DAMAGE = 100.0D;
-    private static final int COINS_REWARD = config.getCoinsReward();
+    private static final int COINS_REWARD = CONFIG.getCoinsReward();
     private static final int ATTACK_DISPLAY_TITLE_TICKS = 10;
     private final boolean ARROW_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isArrowDisplayEnabled();
     private final boolean ATTACK_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isAttackDisplayEnabled();
@@ -249,9 +249,9 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 处理火球落地不受伤
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL && player.hasMetadata(METADATA_FIREBALL_NOFALL)) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL && player.hasMetadata(METADATA_FIREBALL_NO_FALL)) {
             event.setCancelled(true);
-            player.removeMetadata(METADATA_FIREBALL_NOFALL, plugin);
+            player.removeMetadata(METADATA_FIREBALL_NO_FALL, plugin);
         }
     }
 

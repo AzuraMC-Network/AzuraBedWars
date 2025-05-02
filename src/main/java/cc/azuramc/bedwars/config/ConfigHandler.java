@@ -3,16 +3,16 @@ package cc.azuramc.bedwars.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.bukkit.Bukkit;
 
 import java.io.*;
-import org.bukkit.Bukkit;
 
 /**
  * 配置处理器
- * <p>
  * 负责单个配置文件的加载和保存
- * </p>
- * 
+ *
+ * @author an5w1r@163.com
+ *
  * @param <T> 配置对象类型
  */
 public class ConfigHandler<T> {

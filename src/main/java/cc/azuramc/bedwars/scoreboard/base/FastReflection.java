@@ -16,19 +16,18 @@ import java.util.function.Predicate;
  * @author MrMicky
  */
 public final class FastReflection {
-    // 包常量
     private static final String NM_PACKAGE = "net.minecraft";
     private static final String OBC_PACKAGE = Bukkit.getServer().getClass().getPackage().getName();
     private static final String NMS_PACKAGE = OBC_PACKAGE.replace("org.bukkit.craftbukkit", NM_PACKAGE + ".server");
-    
-    // 方法类型常量
+
     private static final MethodType VOID_METHOD_TYPE = MethodType.methodType(void.class);
-    
-    // 版本检测标志
+
     private static final boolean NMS_REPACKAGED = optionalClass(NM_PACKAGE + ".network.protocol.Packet").isPresent();
     private static final boolean MOJANG_MAPPINGS = optionalClass(NM_PACKAGE + ".network.chat.Component").isPresent();
-    
-    // Unsafe 实例（懒加载）
+
+    /**
+     * Unsafe 实例（懒加载）
+     */
     private static volatile Object theUnsafe;
 
     /**

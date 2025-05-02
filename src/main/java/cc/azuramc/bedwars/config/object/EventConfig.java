@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
  * <p>
  * 存储插件的消息等内容
  * </p>
+ * @author an5w1r@163.com
  */
 @Data
 @EqualsAndHashCode

@@ -13,6 +13,9 @@ import org.bukkit.inventory.ItemFlag;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Getter
 public class BlockShopPage implements ShopData {
     private final ShopItemType mainShopItem;

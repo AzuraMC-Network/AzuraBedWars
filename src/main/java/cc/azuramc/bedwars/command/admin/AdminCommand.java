@@ -15,6 +15,9 @@ import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.Objects;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Command({"bedwars", "bw", "azurabedwars"})
 @CommandPermission("azurabedwars.admin")
 public class AdminCommand {

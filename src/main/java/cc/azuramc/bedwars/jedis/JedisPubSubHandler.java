@@ -11,6 +11,8 @@ import java.util.logging.Level;
 /**
  * Redis PubSub消息处理器
  * 用于处理从Redis订阅频道接收到的消息，包括地图加载等游戏相关功能
+ *
+ * @author an5w1r@163.com
  */
 public class JedisPubSubHandler extends JedisPubSub {
     
@@ -44,7 +46,12 @@ public class JedisPubSubHandler extends JedisPubSub {
                 // 提交地图加载请求
                 mapLoadManager.submitMapLoadRequest(message);
                 // 加载地图
-                mapLoadManager.loadMap(message);
+
+                if (mapLoadManager.loadMap(message)) {
+                    Bukkit.getLogger().info(LOG_PREFIX + "地图加载成功");
+                } else {
+                    Bukkit.getLogger().severe(LOG_PREFIX + "地图加载失败");
+                }
                 return;
             }
 

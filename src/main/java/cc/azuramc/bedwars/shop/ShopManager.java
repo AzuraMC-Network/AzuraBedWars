@@ -7,9 +7,12 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class ShopManager {
     @Getter
-    private static final List<ShopData> shops = new ArrayList<>();
+    private static final List<ShopData> SHOPS = new ArrayList<>();
 
     public static void init(GameManager gameManager) {
         registerShop(new DefaultShopPage());
@@ -24,11 +27,11 @@ public class ShopManager {
     }
 
     public static void registerShop(ShopData shopData) {
-        shops.add(shopData);
+        SHOPS.add(shopData);
     }
 
     public static ShopData getShop(String name) {
-        for (ShopData shop : shops) {
+        for (ShopData shop : SHOPS) {
             if (shop.getClass().getName().equals(name)) {
                 return shop;
             }

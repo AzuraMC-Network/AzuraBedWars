@@ -17,12 +17,18 @@ import java.util.Objects;
 /**
  * 模式选择GUI
  * 允许玩家选择普通模式或经验模式
+ *
+ * @author an5w1r@163.com
  */
 public class ModeSelectionGUI extends CustomGUI {
-    
-    // 边框装饰物品颜色
-    private static final int BORDER_GLASS_COLOR = 7; // 灰色
-    private static final int HIGHLIGHT_GLASS_COLOR = 5; // 绿色
+    /**
+     * 灰色
+     */
+    private static final int BORDER_GLASS_COLOR = 7;
+    /**
+     * 绿色
+     */
+    private static final int HIGHLIGHT_GLASS_COLOR = 5;
 
     /**
      * 创建模式选择GUI

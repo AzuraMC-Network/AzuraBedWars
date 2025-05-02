@@ -24,6 +24,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class PlayerMiscListener implements Listener {
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
@@ -81,7 +84,7 @@ public class PlayerMiscListener implements Listener {
             return;
         }
 
-        if (gamePlayer.isSpectator() && (SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRSTPERSON)) && player.getGameMode() == GameMode.SPECTATOR) {
+        if (gamePlayer.isSpectator() && (SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) && player.getGameMode() == GameMode.SPECTATOR) {
             gamePlayer.sendTitle(0, 20, 0, "§e退出旁观模式", "");
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);

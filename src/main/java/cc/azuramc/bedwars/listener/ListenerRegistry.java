@@ -12,10 +12,12 @@ import cc.azuramc.bedwars.listener.world.ChunkListener;
 import cc.azuramc.bedwars.listener.world.ExplodeListener;
 import org.bukkit.Bukkit;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class ListenerRegistry {
 
     public ListenerRegistry(AzuraBedWars plugin) {
-        // 玩家监听器
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new ChatListener(), plugin);
@@ -34,7 +36,6 @@ public class ListenerRegistry {
             Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerB(), plugin);
         }
 
-        // 游戏监听器
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new ExplodeListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlacementListener(), plugin);

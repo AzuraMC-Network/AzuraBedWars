@@ -4,6 +4,9 @@ import cc.azuramc.bedwars.util.ChatColorUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * @author ant1aura@qq.com
+ */
 @Data
 @EqualsAndHashCode
 public class ScoreboardConfig {

@@ -17,6 +17,8 @@ import java.util.List;
 /**
  * MySQL存储实现
  * 使用MySQL数据库存储和读取地图数据
+ *
+ * @author an5w1r@163.com
  */
 public class MySQLMapStorage implements IMapStorage {
     private final Gson gson;

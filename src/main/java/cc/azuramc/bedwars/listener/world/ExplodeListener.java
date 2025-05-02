@@ -17,9 +17,12 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class ExplodeListener implements Listener {
 
-    private static final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
+    private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
 
     /**
      * 处理实体爆炸事件
@@ -31,7 +34,7 @@ public class ExplodeListener implements Listener {
         Entity entity = event.getEntity();
 
         // 游戏未运行时取消爆炸
-        if (gameManager.getGameState() != GameState.RUNNING) {
+        if (GAME_MANAGER.getGameState() != GameState.RUNNING) {
             event.setCancelled(true);
             return;
         }
@@ -60,12 +63,12 @@ public class ExplodeListener implements Listener {
             Block block = event.blockList().get(i);
 
             // 检查受保护区域
-            if (gameManager.getMapData().hasRegion(block.getLocation())) {
+            if (GAME_MANAGER.getMapData().hasRegion(block.getLocation())) {
                 continue;
             }
 
             // 只处理玩家放置的方块，保护地图方块
-            if (!MapUtil.isProtectedBlockType(block) && !gameManager.getBlocks().contains(block.getLocation())) {
+            if (!MapUtil.isProtectedBlockType(block) && !GAME_MANAGER.getBlocks().contains(block.getLocation())) {
                 blocksToExplode.add(block);
             }
         }
@@ -87,7 +90,7 @@ public class ExplodeListener implements Listener {
             }
 
             // 从游戏放置的方块列表中移除
-            gameManager.getBlocks().remove(block.getLocation());
+            GAME_MANAGER.getBlocks().remove(block.getLocation());
         }
     }
 }

@@ -9,12 +9,12 @@ import java.util.LinkedHashMap;
 /**
  * JSON工具类
  * 用于处理服务器数据的JSON序列化和反序列化
+ * @author an5w1r@163.com
  */
 public class JsonUtil {
-    // JSON序列化器
+
     public static final Gson GSON = new Gson();
 
-    // JSON字段名常量
     private static final String SERVER_TYPE = "serverType";
     private static final String GAME_TYPE = "gameType";
     private static final String NAME = "name";

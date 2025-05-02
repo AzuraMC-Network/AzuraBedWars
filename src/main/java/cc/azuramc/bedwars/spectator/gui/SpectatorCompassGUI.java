@@ -1,34 +1,32 @@
 package cc.azuramc.bedwars.spectator.gui;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.ScoreboardConfig;
-import cc.azuramc.bedwars.gui.base.CustomGUI;
-import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
+import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.gui.base.CustomGUI;
+import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * 旁观者指南针GUI
- * <p>
  * 允许旁观者选择要观察的玩家并传送到其位置
- * </p>
+ *
+ * @author an5w1r@163.com
  */
 public class SpectatorCompassGUI extends CustomGUI {
 
-    private static final MessageConfig.Spectator.CompassGUI config = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getCompassGUI();
+    private static final MessageConfig.Spectator.CompassGUI CONFIG = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getCompassGUI();
 
-    // 常量定义
-    private static final String GUI_TITLE = config.getGuiTitle();
+    private static final String GUI_TITLE = CONFIG.getGuiTitle();
     private static final int SMALL_INVENTORY_SIZE = 27;
     private static final int LARGE_INVENTORY_SIZE = 54;
-    private static final String HEALTH_FORMAT = config.getHealthFormat();
-    private static final String FOOD_FORMAT = config.getFoodFormat();
-    private static final String LEVEL_FORMAT = config.getLevelFormat();
-    private static final String DISTANCE_FORMAT = config.getDistanceFormat();
+    private static final String HEALTH_FORMAT = CONFIG.getHealthFormat();
+    private static final String FOOD_FORMAT = CONFIG.getFoodFormat();
+    private static final String LEVEL_FORMAT = CONFIG.getLevelFormat();
+    private static final String DISTANCE_FORMAT = CONFIG.getDistanceFormat();
 
     /**
      * 构造函数

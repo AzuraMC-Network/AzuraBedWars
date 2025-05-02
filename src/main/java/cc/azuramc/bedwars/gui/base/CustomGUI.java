@@ -12,6 +12,9 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author an5w1r@163.com
+ */
 @Getter
 public class CustomGUI {
     public List<GUIItem> items;
@@ -42,20 +45,20 @@ public class CustomGUI {
             inventory.setItem(guiItem.getSize(), guiItem.getItemStack());
         }
 
-        if (GUIData.getCurrentGui().containsKey(player)) {
-            GUIData.getLastGui().put(player, GUIData.getCurrentGui().get(player));
+        if (GUIData.getCURRENT_GUI().containsKey(player)) {
+            GUIData.getLAST_GUI().put(player, GUIData.getCURRENT_GUI().get(player));
         }
-        GUIData.getCurrentGui().put(player, this);
+        GUIData.getCURRENT_GUI().put(player, this);
 
         player.openInventory(inventory);
     }
 
     public void replace() {
-        CustomGUI customGUI = GUIData.getLastReplaceGui().getOrDefault(player, GUIData.getCurrentGui().getOrDefault(player, null));
+        CustomGUI customGUI = GUIData.getLAST_REPLACE_GUI().getOrDefault(player, GUIData.getCURRENT_GUI().getOrDefault(player, null));
         if(customGUI == null) {
             return;
         }
-        GUIData.getLastReplaceGui().put(player, customGUI);
+        GUIData.getLAST_REPLACE_GUI().put(player, customGUI);
 
         for(GUIItem guiItem : customGUI.items){
             boolean s = true;

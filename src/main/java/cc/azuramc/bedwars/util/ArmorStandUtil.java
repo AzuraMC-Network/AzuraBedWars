@@ -11,6 +11,9 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
+/**
+ * @author an5w1r@163.com
+ */
 public class ArmorStandUtil {
 
     private static final HashMap<ArmorStand, Location> ARMOR_LOC = new HashMap<>();

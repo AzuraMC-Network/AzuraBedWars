@@ -9,6 +9,7 @@ import java.util.Map;
 /**
  * 药水效果工具类
  * 提供跨版本兼容的药水效果类型
+ * @author an5w1r@163.com
  */
 public class PotionEffectWrapper {
     
