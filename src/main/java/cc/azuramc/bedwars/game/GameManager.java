@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.team.TeamColor;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.game.task.GameStartTask;
@@ -19,6 +20,7 @@ import cc.azuramc.bedwars.shop.ShopManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import lombok.Data;
+import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -36,8 +38,9 @@ import java.util.*;
 @Data
 public class GameManager {
 
-    private static final ItemConfig.GameManager config = AzuraBedWars.getInstance().getItemConfig().getGameManager();
+    private static final ItemConfig.GameManager itemConfig = AzuraBedWars.getInstance().getItemConfig().getGameManager();
     private static final MessageConfig.Game messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGame();
+    private static final SettingsConfig.DisplayDamage settingsConfig = AzuraBedWars.getInstance().getSettingsConfig().getDisplayDamage();
 
     // 时间常量
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
@@ -49,10 +52,14 @@ public class GameManager {
     
     // 物品常量
     private static final Material RESOURCE_SELECTOR_MATERIAL = Material.PAPER;
-    private static final String RESOURCE_SELECTOR_NAME = config.getResourceSelectorName();
+    private static final String RESOURCE_SELECTOR_NAME = itemConfig.getResourceSelectorName();
     private static final Material LEAVE_GAME_MATERIAL = Material.SLIME_BALL;
-    private static final String LEAVE_GAME_NAME = config.getLeaveGameName();
-    
+    private static final String LEAVE_GAME_NAME = itemConfig.getLeaveGameName();
+
+    // 功能常量
+    @Getter private final boolean isArrowDisplayEnabled = settingsConfig.isArrowDisplayEnabled();
+    @Getter private final boolean isAttackDisplayEnabled = settingsConfig.isAttackDisplayEnabled();
+
     private AzuraBedWars plugin;
     private GameEventManager gameEventManager;
     private MapData mapData;

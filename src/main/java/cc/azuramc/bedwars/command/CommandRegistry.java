@@ -28,6 +28,8 @@ public class CommandRegistry {
         handler.register(new MapCommand());
         handler.register(new StartCommand());
         handler.register(new ShoutCommand());
-        handler.register(new ToggleDamageDisplayCommand());
+        if (AzuraBedWars.getInstance().getGameManager().isArrowDisplayEnabled() && AzuraBedWars.getInstance().getGameManager().isAttackDisplayEnabled()) {
+            handler.register(new ToggleDamageDisplayCommand());
+        }
     }
 }

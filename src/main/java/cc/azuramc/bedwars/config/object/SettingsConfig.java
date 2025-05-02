@@ -17,4 +17,12 @@ public class SettingsConfig {
     private String mapStorage = "JSON";
     private String databaseMapName = "bwdata";
     private String databaseMapTable = "maps";
+
+    private DisplayDamage displayDamage = new DisplayDamage();
+
+    @Data
+    public static class DisplayDamage {
+        private final boolean arrowDisplayEnabled = true;
+        private final boolean attackDisplayEnabled = true;
+    }
 } 

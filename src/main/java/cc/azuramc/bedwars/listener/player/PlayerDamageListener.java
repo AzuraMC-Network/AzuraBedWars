@@ -50,6 +50,9 @@ public class PlayerDamageListener implements Listener {
     private static final int RESPAWN_DELAY = 10;
     private static final double VOID_DAMAGE = 100.0D;
     private static final int COINS_REWARD = config.getCoinsReward();
+    private static final int ATTACK_DISPLAY_TITLE_TICKS = 10;
+    private final boolean ARROW_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isArrowDisplayEnabled();
+    private final boolean ATTACK_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isAttackDisplayEnabled();
 
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
@@ -455,8 +458,8 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 普通攻击伤害显示
-        if (attackPlayer.isViewingArrowDamage()) {
-            attackPlayer.sendTitle(1, 10, 5, "&r ", "&e伤害 " + String.format("%.1f", event.getFinalDamage()));
+        if (ATTACK_DISPLAY_ENABLED && attackPlayer.isViewingArrowDamage()) {
+            attackPlayer.sendTitle(1, ATTACK_DISPLAY_TITLE_TICKS, 5, "&r ", "&e伤害 " + String.format("%.1f", event.getFinalDamage()));
         }
     }
 
@@ -492,6 +495,10 @@ public class PlayerDamageListener implements Listener {
 
         // 检查投掷物是否为箭矢
         if (projectile.getType() == EntityType.ARROW) {
+
+            if (!ARROW_DISPLAY_ENABLED) {
+                return;
+            }
 
             // 检查攻击者是否开启弓箭伤害显示
             if (!attackerPlayer.isViewingArrowDamage()) {
