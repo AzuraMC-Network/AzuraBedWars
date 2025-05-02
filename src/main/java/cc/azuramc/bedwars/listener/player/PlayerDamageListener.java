@@ -42,8 +42,8 @@ public class PlayerDamageListener implements Listener {
     private final static PlayerConfig.PlayerDeath config = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
 
     // 常量定义
-    private static final String METADATA_VOID_PLAYER = "voidPlayer";
-    private static final String METADATA_FIREBALL_NOFALL = "FIREBALL PLAYER NOFALL";
+    private static final String METADATA_VOID_PLAYER = "VOID_PLAYER";
+    private static final String METADATA_FIREBALL_NOFALL = "FIREBALL_PLAYER_NOFALL";
     private static final String METADATA_SHOP = "Shop";
     private static final String METADATA_SHOP2 = "Shop2";
     private static final String COINS_ACTION_BAR = messageConfig.getCoinsActionBar();
@@ -104,14 +104,19 @@ public class PlayerDamageListener implements Listener {
 
         // 给予被击杀者身上的资源至击杀者（全部转换为经验）
         if (player.getKiller() != null && player.getKiller() instanceof Player killer) {
-            killer.giveExpLevels(getPlayerRewardEXP(player));
+            killer.giveExpLevels(getPlayerRewardExp(player));
         }
 
         // 清理死亡信息和物品
         cleanDeathDrops(event);
 
-        // 游戏未开始或玩家是观察者时不处理
-        if (gameManager.getGameState() == GameState.WAITING || (gamePlayer != null && gamePlayer.isSpectator())) {
+        // 游戏未开始
+        if (gameManager.getGameState() == GameState.WAITING) {
+            return;
+        }
+
+        // 玩家是观察者
+        if (gamePlayer != null && gamePlayer.isSpectator()) {
             return;
         }
 
@@ -130,7 +135,7 @@ public class PlayerDamageListener implements Listener {
      *
      * @param player 要获取的目标玩家（死亡玩家）
      */
-    private int getPlayerRewardEXP(Player player) {
+    private int getPlayerRewardExp(Player player) {
         // 处理物品类型资源
         Map<Material, Integer> items = new HashMap<>();
         items.put(Material.IRON_INGOT, 0);
@@ -175,7 +180,7 @@ public class PlayerDamageListener implements Listener {
         }
 
         Entity entity = event.getEntity();
-        Entity damager = event.getDamager();
+        Entity attacker = event.getDamager();
 
         GamePlayer gamePlayer = entity instanceof Player ? GamePlayer.get(entity.getUniqueId()) : null;
 
@@ -184,18 +189,16 @@ public class PlayerDamageListener implements Listener {
             return;
         }
 
-        // 攻击者为玩家或投掷物
-        if (damager instanceof Player || damager instanceof Projectile) {
+        // 攻击者不为玩家
+        if (attacker instanceof Player) {
+            // 玩家VS玩家处理
+            handlePlayerVsPlayerDamage(event, gamePlayer, attacker);
+        }
 
-            // 攻击者为玩家
-            if (damager instanceof Player) {
-                // 玩家VS玩家处理
-                handlePlayerVsPlayerDamage(event, gamePlayer, damager);
-            } else {  // 攻击者为投掷物
-                // 投掷物攻击玩家处理
-                handleProjectileDamage(event, gamePlayer, (Projectile) damager);
-            }
-
+        // 攻击者不为投掷物
+        if (attacker instanceof Projectile) {
+            // 投掷物攻击玩家处理
+            handleProjectileDamage(event, gamePlayer, (Projectile) attacker);
         }
     }
 
