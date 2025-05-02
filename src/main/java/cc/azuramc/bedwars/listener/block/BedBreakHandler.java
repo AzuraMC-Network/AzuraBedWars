@@ -66,6 +66,14 @@ public class BedBreakHandler {
      * @param block 床方块
      */
     private static void processBedDestruction(Player player, GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam, Block block) {
+
+        // 触发床被破坏事件
+        BedwarsDestroyBedEvent event = new BedwarsDestroyBedEvent(player, targetTeam);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
+
         // 掉落床方块物品
         BedUtil.dropTargetBlock(block);
 
@@ -74,9 +82,6 @@ public class BedBreakHandler {
 
         // 广播消息
         broadcastBedDestructionMessages(gamePlayer, gameTeam, targetTeam);
-
-        // 触发床被破坏事件
-        Bukkit.getPluginManager().callEvent(new BedwarsDestroyBedEvent(player, targetTeam));
 
         // 更新团队状态
         targetTeam.setDestroyPlayer(gamePlayer);

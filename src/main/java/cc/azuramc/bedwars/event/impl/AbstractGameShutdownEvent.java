@@ -2,8 +2,8 @@ package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameEndEvent;
-import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
+import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
 import org.bukkit.Bukkit;
 
@@ -39,9 +39,14 @@ public class AbstractGameShutdownEvent extends AbstractGameEvent {
     @Override
     public void execute(GameManager gameManager) {
 
-        performCleanup();
+        // 调用游戏结束事件
+        BedwarsGameEndEvent event = new BedwarsGameEndEvent();
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
 
-        fireGameEndEvent();
+        performCleanup();
 
         shutdownServer();
     }
@@ -52,13 +57,6 @@ public class AbstractGameShutdownEvent extends AbstractGameEvent {
     private void performCleanup() {
         // 释放强制加载的区块
         ChunkListener.releaseForceLoadedChunks();
-    }
-    
-    /**
-     * 触发游戏结束事件
-     */
-    private void fireGameEndEvent() {
-        Bukkit.getPluginManager().callEvent(new BedwarsGameEndEvent());
     }
     
     /**

@@ -201,10 +201,10 @@ public class GameBoardProvider implements Listener {
     /**
      * 游戏开始事件处理
      * 
-     * @param e 游戏开始事件
+     * @param event 游戏开始事件
      */
     @EventHandler
-    public void onStart(BedwarsGameStartEvent e) {
+    public void onStart(BedwarsGameStartEvent event) {
         if (scoreboardManager != null) {
             // 使用计分板管理器切换到游戏模式
             scoreboardManager.switchBoardMode();

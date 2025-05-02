@@ -17,10 +17,6 @@ public class BedwarsGameOverEvent extends Event implements Cancellable {
         this.winner = winner;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     @Override
     public @NotNull HandlerList getHandlers() {
         return handlers;

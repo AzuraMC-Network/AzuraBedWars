@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.listener.player;
 
-import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.api.event.BedwarsPlayerKilleEvent;
+import cc.azuramc.bedwars.compat.util.ActionBarUtil;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.game.GameManager;
@@ -12,7 +12,10 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -294,6 +297,13 @@ public class PlayerDamageListener implements Listener {
      * 处理普通击杀奖励和消息
      */
     private void processKill(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer killerPlayer, GameTeam killerTeam, Player killer, Player player, boolean isFinalKill) {
+
+        BedwarsPlayerKilleEvent event = new BedwarsPlayerKilleEvent(player, killer, isFinalKill);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
+
         if (isFinalKill) {
             // 最终击杀给金币奖励
             showCoinsReward(killer);
@@ -304,7 +314,6 @@ public class PlayerDamageListener implements Listener {
         }
 
         killerPlayer.getPlayerProfile().addKills();
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerKilleEvent(player, killer, isFinalKill));
     }
 
     /**
@@ -350,6 +359,7 @@ public class PlayerDamageListener implements Listener {
      * @param gameTeam   玩家队伍
      */
     private void handleNormalDeath(Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
+
         // 获取击杀者
         Player killer = findKiller(player, gamePlayer);
         if (killer == null) {
@@ -363,6 +373,12 @@ public class PlayerDamageListener implements Listener {
 
         GameTeam killerTeam = killerPlayer.getGameTeam();
         boolean isFinalKill = gameTeam != null && gameTeam.isDestroyed();
+
+        BedwarsPlayerKilleEvent event = new BedwarsPlayerKilleEvent(player, killer, isFinalKill);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
 
         // 处理最终击杀
         if (isFinalKill) {

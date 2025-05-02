@@ -4,9 +4,9 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameOverEvent;
 import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.task.GameOverTask;
-import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameEndEvent;
 import org.bukkit.Bukkit;
 
@@ -26,9 +26,15 @@ public class AbstractGameOverEvent extends AbstractGameEvent {
 
     @Override
     public void execute(GameManager gameManager) {
-        gameManager.getGameEventManager().setCurrentEvent(7);
-        Bukkit.getPluginManager().callEvent(new BedwarsGameOverEvent(gameManager.getWinner()));
+        BedwarsGameOverEvent bedwarsGameOverEvent = new BedwarsGameOverEvent(gameManager.getWinner());
+        Bukkit.getPluginManager().callEvent(bedwarsGameOverEvent);
+        if (bedwarsGameOverEvent.isCancelled()) {
+            return;
+        }
+
         Bukkit.getPluginManager().callEvent(new JedisGameEndEvent());
+
+        gameManager.getGameEventManager().setCurrentEvent(7);
         new GameOverTask(gameManager);
     }
 }

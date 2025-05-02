@@ -1,23 +1,23 @@
 package cc.azuramc.bedwars.game;
 
-import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
+import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
-import cc.azuramc.bedwars.game.team.TeamColor;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.event.GameEventManager;
+import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
+import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.task.GameStartTask;
+import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.team.TeamColor;
 import cc.azuramc.bedwars.jedis.JedisManager;
 import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
-import cc.azuramc.bedwars.game.map.MapData;
-import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
-import cc.azuramc.bedwars.event.GameEventManager;
 import cc.azuramc.bedwars.shop.ShopManager;
-import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import lombok.Data;
 import lombok.Getter;
@@ -644,8 +644,16 @@ public class GameManager {
      * 开始游戏
      */
     public void start() {
-        gameState = GameState.RUNNING;
+
+        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent();
+        Bukkit.getPluginManager().callEvent(bedwarsGameStartEvent);
+        if (bedwarsGameStartEvent.isCancelled()) {
+            return;
+        }
+
         Bukkit.getPluginManager().callEvent(new JedisGameStartEvent());
+
+        gameState = GameState.RUNNING;
 
         moveFreePlayersToTeam();
         gameEventManager.start();
@@ -655,7 +663,6 @@ public class GameManager {
         markEmptyTeams();
 
         GamePlayer.getOnlinePlayers().forEach(GamePlayer::giveInventory);
-        Bukkit.getPluginManager().callEvent(new BedwarsGameStartEvent());
 
         // 开始挂机状态检测
         PlayerAFKListener.startCheckAFKTask();

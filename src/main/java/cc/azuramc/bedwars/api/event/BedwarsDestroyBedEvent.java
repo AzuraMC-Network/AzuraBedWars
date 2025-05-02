@@ -21,10 +21,6 @@ public class BedwarsDestroyBedEvent extends Event implements Cancellable {
         this.gameTeam = gameTeam;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     @Override
     public @NotNull HandlerList getHandlers() {
         return handlers;

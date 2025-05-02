@@ -9,10 +9,6 @@ public class BedwarsGameEndEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled = false;
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
     @Override
     public @NotNull HandlerList getHandlers() {
         return handlers;
