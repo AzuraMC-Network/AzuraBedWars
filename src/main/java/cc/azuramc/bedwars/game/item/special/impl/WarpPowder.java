@@ -32,32 +32,43 @@ import java.util.List;
  * <p>
  * 允许玩家在原地等待几秒后传送回自己的基地
  * </p>
+ * @author an5w1r@163.com
  */
 public class WarpPowder extends AbstractSpecialItem {
 
-    private static final ItemConfig.WarpPowder config = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
-    private static final MessageConfig.WarpPowder messageConfig = AzuraBedWars.getInstance().getMessageConfig().getWarpPowder();
+    private static final ItemConfig.WarpPowder CONFIG = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
+    private static final MessageConfig.WarpPowder MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getWarpPowder();
 
-    // 常量定义
-    private static final int DEFAULT_TELEPORT_TIME = config.getDefaultTeleportTime();           // 默认传送时间（秒）
-    private static final int CIRCLE_ELEMENTS = config.getCircleElements();                      // 每个粒子环的粒子数量
-    private static final double PARTICLE_RADIUS = config.getParticleRadius();                   // 粒子环半径
-    private static final double PARTICLE_HEIGHT = config.getParticleHeight();                   // 粒子效果总高度
-    private static final double CIRCLE_COUNT = config.getCircleCount();                         // 粒子环的数量
+    /** 默认传送时间（秒） */
+    private static final int DEFAULT_TELEPORT_TIME = CONFIG.getDefaultTeleportTime();
+    /** 每个粒子环的粒子数量 */
+    private static final int CIRCLE_ELEMENTS = CONFIG.getCircleElements();
+    /** 粒子环半径 */
+    private static final double PARTICLE_RADIUS = CONFIG.getParticleRadius();
+    /** 粒子效果总高度 */
+    private static final double PARTICLE_HEIGHT = CONFIG.getParticleHeight();
+    /** 粒子环的数量 */
+    private static final double CIRCLE_COUNT = CONFIG.getCircleCount();
 
-    private static final String CANCEL_ITEM_NAME = config.getCancelItemName();                  // 取消传送物品名称
-    private static final String TELEPORT_START_MESSAGE = messageConfig.getTeleportStartMessage();
-    private static final String TELEPORT_CANCEL_MESSAGE = messageConfig.getTeleportCancelMessage();
+    /** 取消传送物品名称 */
+    private static final String CANCEL_ITEM_NAME = CONFIG.getCancelItemName();
+    private static final String TELEPORT_START_MESSAGE = MESSAGE_CONFIG.getTeleportStartMessage();
+    private static final String TELEPORT_CANCEL_MESSAGE = MESSAGE_CONFIG.getTeleportCancelMessage();
     
-    // 实例变量
-    private final int fullTeleportingTime;      // 完整传送时间
+    /** 完整传送时间 */
+    private final int fullTeleportingTime;
+    /** 游戏实例 */
     @Setter
-    private GameManager gameManager;            // 游戏实例
-    private GamePlayer gamePlayer;              // 玩家
+    private GameManager gameManager;
+    /** 玩家 */
+    private GamePlayer gamePlayer;
+    /** 原始物品栈 */
     @Getter
-    private ItemStack stack;                    // 原始物品栈
-    private BukkitTask teleportingTask;         // 传送任务
-    private double teleportingTime;             // 剩余传送时间
+    private ItemStack stack;
+    /** 传送任务 */
+    private BukkitTask teleportingTask;
+    /** 剩余传送时间 */
+    private double teleportingTime;
     
     /**
      * 默认构造函数
