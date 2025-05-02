@@ -66,7 +66,8 @@ public class GamePlayer {
     @Setter @Getter private boolean isAfk;
     @Setter @Getter private boolean isShoutCooldown;
     @Getter @Setter private boolean isEggBridgeCooldown;
-    
+    @Getter @Setter private boolean isViewingArrowDamage;
+
     // 战斗数据
     @Getter private int kills;
     @Getter private int finalKills;
@@ -87,11 +88,11 @@ public class GamePlayer {
         this.uuid = uuid;
         this.name = name;
 
-        // 初始化 AFK 状态
+        // 初始化游戏状态
         this.isAfk = false;
-
-        // 初始化 shoutCooldown 状态
         this.isShoutCooldown = false;
+        this.isEggBridgeCooldown = false;
+        this.isViewingArrowDamage = true;
 
         // 初始化装备状态
         this.armorType = ArmorType.DEFAULT;
