@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.command.admin.MapCommand;
 import cc.azuramc.bedwars.command.exception.CommandExceptionHandler;
 import cc.azuramc.bedwars.command.user.ShoutCommand;
 import cc.azuramc.bedwars.command.user.StartCommand;
+import cc.azuramc.bedwars.command.user.ToggleDamageDisplayCommand;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
 public class CommandRegistry {
@@ -27,5 +28,6 @@ public class CommandRegistry {
         handler.register(new MapCommand());
         handler.register(new StartCommand());
         handler.register(new ShoutCommand());
+        handler.register(new ToggleDamageDisplayCommand());
     }
 }

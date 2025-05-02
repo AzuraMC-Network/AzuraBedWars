@@ -67,6 +67,7 @@ public class GamePlayer {
     @Setter @Getter private boolean isShoutCooldown;
     @Getter @Setter private boolean isEggBridgeCooldown;
     @Getter @Setter private boolean isViewingArrowDamage;
+    @Getter @Setter private boolean isViewingAttackDamage;
 
     // 战斗数据
     @Getter private int kills;
@@ -93,6 +94,7 @@ public class GamePlayer {
         this.isShoutCooldown = false;
         this.isEggBridgeCooldown = false;
         this.isViewingArrowDamage = true;
+        this.isViewingAttackDamage = true;
 
         // 初始化装备状态
         this.armorType = ArmorType.DEFAULT;

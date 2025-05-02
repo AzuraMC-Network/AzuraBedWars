@@ -432,17 +432,31 @@ public class PlayerDamageListener implements Listener {
      * @param attacker   攻击者
      */
     private void handlePlayerVsPlayerDamage(EntityDamageByEntityEvent event, GamePlayer gamePlayer, Entity attacker) {
+
+        if (gamePlayer == null
+                || gamePlayer.isSpectator()
+                || gameManager.getGameState() != GameState.RUNNING
+                || !(attacker instanceof Player)) {
+            return;
+        }
+
         GamePlayer attackPlayer = GamePlayer.get(attacker.getUniqueId());
 
         // 观察者不能造成伤害
-        if (attackPlayer != null && attackPlayer.isSpectator()) {
+        if (attackPlayer.isSpectator()) {
             event.setCancelled(true);
             return;
         }
 
         // 阻止队友伤害
-        if (gamePlayer != null && gamePlayer.getGameTeam().isInTeam(attackPlayer)) {
+        if (gamePlayer.getGameTeam().isInTeam(attackPlayer)) {
             event.setCancelled(true);
+            return;
+        }
+
+        // 普通攻击伤害显示
+        if (attackPlayer.isViewingArrowDamage()) {
+            attackPlayer.sendTitle(1, 10, 5, "&r ", "&e伤害 " + String.format("%.1f", event.getFinalDamage()));
         }
     }
 
@@ -462,7 +476,6 @@ public class PlayerDamageListener implements Listener {
             return;
         }
 
-        // attackerPlayer 一定不为 null
         GamePlayer attackerPlayer = GamePlayer.get(((Player) projectile.getShooter()).getUniqueId());
 
         // 火球伤害特殊处理
