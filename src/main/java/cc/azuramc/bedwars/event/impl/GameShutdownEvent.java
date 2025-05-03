@@ -10,9 +10,10 @@ import org.bukkit.Bukkit;
 /**
  * 游戏结束事件
  * 处理游戏结束时需要执行的清理工作和关服操作
+ *
  * @author an5w1r@163.com
  */
-public class AbstractGameShutdownEvent extends AbstractGameEvent {
+public class GameShutdownEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
 
@@ -31,7 +32,7 @@ public class AbstractGameShutdownEvent extends AbstractGameEvent {
     /**
      * 创建游戏结束事件
      */
-    public AbstractGameShutdownEvent() {
+    public GameShutdownEvent() {
         super(EVENT_NAME, SHUTDOWN_DELAY_SECONDS, END_EVENT_PRIORITY);
     }
 

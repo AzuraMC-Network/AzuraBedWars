@@ -1,20 +1,20 @@
 package cc.azuramc.bedwars.game;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.TitleUtil;
-import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
+import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
-import cc.azuramc.bedwars.game.team.GameTeam;
-import cc.azuramc.bedwars.spectator.SpectatorSettings;
-import cc.azuramc.bedwars.spectator.SpectatorTarget;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
-import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
-import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.scoreboard.base.FastBoard;
+import cc.azuramc.bedwars.spectator.SpectatorSettings;
+import cc.azuramc.bedwars.spectator.SpectatorTarget;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -28,9 +28,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -57,6 +55,8 @@ public class GamePlayer {
     @Getter private final PlayerCompass playerCompass;
 
     @Getter @Setter GameModeType gameModeType;
+    /** 使用 HashMap 存储经验来源，键是资源名(String)，值是经验数量(Integer) */
+    @Getter Map<String, Integer> experienceSources;
 
     @Setter private String nickName;
     @Getter @Setter private FastBoard board;
@@ -107,6 +107,7 @@ public class GamePlayer {
 
         // 游戏模式
         this.gameModeType = getPlayerProfile().getGameModeType();
+        this.experienceSources = new HashMap<>();
     }
 
     /**
@@ -162,6 +163,54 @@ public class GamePlayer {
         }
         return teamPlayers;
     }
+
+    /**
+     * 增加指定资源来源的经验值
+     * @param resourceType 资源类型 (e.g., "iron")
+     * @param amount       增加的数量
+     */
+    public void addExperience(String resourceType, int amount) {
+        if (amount <= 0) {
+            Bukkit.getLogger().warning("addExperience 应该输入大于0的数值");
+            return;
+        }
+
+        int currentXp = this.experienceSources.getOrDefault(resourceType, 0);
+        this.experienceSources.put(resourceType, currentXp + amount);
+    }
+
+    /**
+     * 消耗指定资源来源的经验值
+     * @param resourceType 资源类型
+     * @param amount       消耗的数量
+     * @return true 如果消耗成功，否则返回 false
+     */
+    public boolean spendExperience(String resourceType, int amount) {
+        if (amount <= 0) {
+            Bukkit.getLogger().warning("spendExperience 应该输入大于0的数值");
+            return false;
+        }
+
+        int currentXp = this.experienceSources.getOrDefault(resourceType, 0);
+
+        // 检查扣除的经验是否大于本有的经验
+        if (currentXp >= amount) {
+            this.experienceSources.put(resourceType, currentXp - amount);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 获取指定资源来源的经验值
+     * @param resourceType 资源类型
+     * @return 经验数量，如果该类型不存在则返回 -1
+     */
+    public int getExperience(String resourceType) {
+        return this.experienceSources.getOrDefault(resourceType, -1);
+    }
+
 
     /**
      * 获取所有在线玩家

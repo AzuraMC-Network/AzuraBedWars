@@ -19,9 +19,10 @@ import java.util.Objects;
 /**
  * 游戏开始事件
  * 负责处理游戏开始时的初始化和团队升级效果
+ *
  * @author an5w1r@163.com
  */
-public class AbstractGameStartEvent extends AbstractGameEvent {
+public class GameStartEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
     private static final EventConfig.StartEvent CONFIG = PLUGIN.getEventConfig().getStartEvent();
@@ -30,7 +31,7 @@ public class AbstractGameStartEvent extends AbstractGameEvent {
     /**
      * 创建游戏开始事件
      */
-    public AbstractGameStartEvent() {
+    public GameStartEvent() {
         super(MESSAGE_EVENT.getEventName(), CONFIG.getCountDown(), CONFIG.getEventPriority());
     }
 

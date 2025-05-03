@@ -6,25 +6,25 @@ import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 
 /**
- * 绿宝石资源点升级事件
- * 随着游戏进行，绿宝石生成速度会加快
+ * 钻石资源点升级事件
+ * 随着游戏进行，钻石生成速度会加快
  *
  * @author an5w1r@163.com
  */
-public class EmeraldUpdateEventAbstract extends AbstractGameEvent {
+public class DiamondUpdateEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
 
     /**
-     * 绿宝石资源点刷新标识符
+     * 钻石资源点刷新标识符
      */
-    private static final String EVENT_NAME = PLUGIN.getMessageConfig().getEmeraldUpdate().getEventName();
+    private static final String EVENT_NAME = PLUGIN.getMessageConfig().getDiamondUpdate().getEventName();
 
     /**
-     * 定义各等级的绿宝石刷新时间（秒）
+     *     定义各等级的钻石刷新时间（秒）
      */
-    private static final int LEVEL_2_REFRESH_SECONDS = PLUGIN.getEventConfig().getEmeraldUpdateEvent().getLevel2RefreshSecond();
-    private static final int LEVEL_3_REFRESH_SECONDS = PLUGIN.getEventConfig().getEmeraldUpdateEvent().getLevel3RefreshSecond();
+    private static final int LEVEL_2_REFRESH_SECONDS = PLUGIN.getEventConfig().getDiamondUpdateEvent().getLevel2RefreshSecond();
+    private static final int LEVEL_3_REFRESH_SECONDS = PLUGIN.getEventConfig().getDiamondUpdateEvent().getLevel3RefreshSecond();
 
     /**
      * 当前升级等级
@@ -32,26 +32,26 @@ public class EmeraldUpdateEventAbstract extends AbstractGameEvent {
     private final int level;
 
     /**
-     * 创建绿宝石升级事件
+     * 创建钻石升级事件
      *
      * @param level 升级目标等级
      * @param second 事件触发时间（秒）
      * @param priority 事件优先级
      */
-    public EmeraldUpdateEventAbstract(int level, int second, int priority) {
-        super("绿宝石升级到" + level + "级", second, priority);
+    public DiamondUpdateEvent(int level, int second, int priority) {
+        super("钻石资源点升级到" + level + "级", second, priority);
         this.level = level;
     }
 
     /**
-     * 执行绿宝石升级事件
-     * 根据等级调整绿宝石刷新速度
+     * 执行钻石升级事件
+     * 根据等级调整钻石刷新速度
      *
      * @param gameManager 游戏实例
      */
     @Override
     public void execute(GameManager gameManager) {
-        // 获取绿宝石刷新任务
+        // 获取钻石刷新任务
         GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().get(EVENT_NAME);
         if (gameEventRunnable == null) {
             return; // 防止NPE
@@ -73,8 +73,7 @@ public class EmeraldUpdateEventAbstract extends AbstractGameEvent {
         return switch (level) {
             case 2 -> LEVEL_2_REFRESH_SECONDS;
             case 3 -> LEVEL_3_REFRESH_SECONDS;
-            // 默认使用2级刷新时间
-            default -> LEVEL_2_REFRESH_SECONDS;
+            default -> LEVEL_2_REFRESH_SECONDS; // 默认使用2级刷新时间
         };
     }
     

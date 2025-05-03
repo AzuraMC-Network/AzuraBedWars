@@ -143,7 +143,7 @@ public class PickupItemHandler {
         }
         
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
-        int xp = calculateIngotXp(itemStack);
+        int xp = calculateIngotXp(itemStack, gamePlayer);
         
         // 根据游戏模式处理拾取效果
         if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
@@ -167,11 +167,14 @@ public class PickupItemHandler {
     /**
      * 计算锭的经验值
      */
-    private static int calculateIngotXp(ItemStack itemStack) {
+    private static int calculateIngotXp(ItemStack itemStack, GamePlayer gamePlayer) {
         int xp = itemStack.getAmount();
-        
-        if (itemStack.getType() == Material.GOLD_INGOT) {
+
+        if (itemStack.getType() == Material.IRON_INGOT) {
+            gamePlayer.addExperience("IRON", xp);
+        } else {
             xp = xp * 3;
+            gamePlayer.addExperience("GOLD", xp);
         }
         
         return xp;
@@ -223,6 +226,7 @@ public class PickupItemHandler {
         
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
+        gamePlayer.addExperience("DIAMOND", (int) xp);
         SoundWrapper.playLevelUpSound(player);
         
         return true;
@@ -255,6 +259,7 @@ public class PickupItemHandler {
         
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
+        gamePlayer.addExperience("EMERALD", (int) xp);
         SoundWrapper.playLevelUpSound(player);
         
         return true;

@@ -224,13 +224,12 @@ public class ItemShopGUI extends CustomGUI {
     public void setItem(GamePlayer gamePlayer, int shopSlot, int displaySlot, GameManager gameManager, ShopItemType shopItemType, int itemSlot, List<String> moreLore) {
         Player player = gamePlayer.getPlayer();
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
-        GameModeType gameModeType = playerProfile.getGameModeType();
 
         // 准备物品显示
         ItemBuilder itemBuilder = prepareItemDisplay(gamePlayer, shopItemType);
         
         // 创建物品说明
-        List<String> lore = createItemLore(shopItemType, gameModeType, moreLore);
+        List<String> lore = createItemLore(shopItemType, gamePlayer.getGameModeType(), moreLore);
 
         // 设置商店项
         super.setItem(displaySlot, 
@@ -500,21 +499,100 @@ public class ItemShopGUI extends CustomGUI {
     
     /**
      * 处理经验支付
+     * 优先从当前资源扣除，不足时：
+     * - 如果是IRON/GOLD/DIAMOND不足，向上递增(IRON→GOLD→DIAMOND→EMERALD)
+     * - 如果是EMERALD不足，向下递减(EMERALD→DIAMOND→GOLD→IRON)
      */
     private boolean processExperiencePayment(Player player, ShopItemType shopItemType) {
         int requiredXp = shopItemType.getPriceCost().xp();
-        
+        String requiredResourceType = shopItemType.getPriceCost().material().toString().toUpperCase();
+
+        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+
+        // 检查玩家是否有足够的经验等级
         if (player.getLevel() < requiredXp) {
             SoundWrapper.playEndermanTeleportSound(player);
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
         
-        player.setLevel(player.getLevel() - requiredXp);
+        // 定义资源类型顺序（按价值递增）
+        final String[] resources = {"IRON", "GOLD", "DIAMOND", "EMERALD"};
+        
+        // 查找当前资源类型在列表中的位置
+        int resourceIndex = -1;
+        for (int i = 0; i < resources.length; i++) {
+            if (resources[i].equals(requiredResourceType)) {
+                resourceIndex = i;
+                break;
+            }
+        }
+        
+        // 如果不是标准资源类型，直接从经验中扣除
+        if (resourceIndex == -1) {
+            player.setLevel(player.getLevel() - requiredXp);
+            SoundWrapper.playItemPickupSound(player);
+            return true;
+        }
+        
+        // 首先尝试从指定资源类型中扣除
+        int remainingXp = requiredXp;
+        int available = gamePlayer.getExperience(requiredResourceType);
+        
+        if (available > 0) {
+            int toDeduct = Math.min(available, remainingXp);
+            gamePlayer.spendExperience(requiredResourceType, toDeduct);
+            remainingXp -= toDeduct;
+        }
+        
+        // 如果仍需扣除，根据资源类型选择向上递增或向下递减
+        if (remainingXp > 0) {
+            if (requiredResourceType.equals("EMERALD")) {
+                // 创建向下递减的资源列表 (DIAMOND → GOLD → IRON)
+                String[] lowerResources = {"DIAMOND", "GOLD", "IRON"};
+                
+                // 用forEach遍历低价值资源进行扣除
+                remainingXp = getRemainingXp(gamePlayer, remainingXp, lowerResources);
+            } else {
+                // 确定需要向上递增的资源列表
+                String[] higherResources = switch (requiredResourceType) {
+                    case "IRON" -> new String[]{"GOLD", "DIAMOND", "EMERALD"};
+                    case "GOLD" -> new String[]{"DIAMOND", "EMERALD"};
+                    case "DIAMOND" -> new String[]{"EMERALD"};
+                    default -> new String[0];
+                };
+
+                // 用forEach遍历高价值资源进行扣除
+                remainingXp = getRemainingXp(gamePlayer, remainingXp, higherResources);
+            }
+        }
+        
+        // 如果所有资源尝试后仍需扣除，从玩家经验等级中扣除
+        if (remainingXp > 0) {
+            player.setLevel(player.getLevel() - remainingXp);
+        }
+        
         SoundWrapper.playItemPickupSound(player);
         return true;
     }
-    
+
+    private int getRemainingXp(GamePlayer gamePlayer, int remainingXp, String[] lowerResources) {
+        int available;
+        for (String resource : lowerResources) {
+            if (remainingXp <= 0) {
+                break;
+            }
+
+            available = gamePlayer.getExperience(resource);
+            if (available > 0) {
+                int toDeduct = Math.min(available, remainingXp);
+                gamePlayer.spendExperience(resource, toDeduct);
+                remainingXp -= toDeduct;
+            }
+        }
+        return remainingXp;
+    }
+
     /**
      * 处理物品给予
      */

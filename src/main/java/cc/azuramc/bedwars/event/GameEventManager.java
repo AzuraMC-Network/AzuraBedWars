@@ -94,14 +94,14 @@ public class GameEventManager implements Runnable {
      * 注册游戏中的所有事件
      */
     private void registerGameEvents() {
-        this.registerEvent(new AbstractGameStartEvent());
-        this.registerEvent(new DiamondUpdateEventAbstract(2, EVENT_DURATION_SECONDS, DIAMOND_LEVEL2_PRIORITY));
-        this.registerEvent(new EmeraldUpdateEventAbstract(2, EVENT_DURATION_SECONDS, EMERALD_LEVEL2_PRIORITY));
-        this.registerEvent(new DiamondUpdateEventAbstract(3, EVENT_DURATION_SECONDS, DIAMOND_LEVEL3_PRIORITY));
-        this.registerEvent(new EmeraldUpdateEventAbstract(3, EVENT_DURATION_SECONDS, EMERALD_LEVEL3_PRIORITY));
-        this.registerEvent(new BedDestroyedEventAbstract());
-        this.registerEvent(new AbstractGameOverEvent());
-        this.registerEvent(new AbstractGameShutdownEvent());
+        this.registerEvent(new GameStartEvent());
+        this.registerEvent(new DiamondUpdateEvent(2, EVENT_DURATION_SECONDS, DIAMOND_LEVEL2_PRIORITY));
+        this.registerEvent(new EmeraldUpdateEvent(2, EVENT_DURATION_SECONDS, EMERALD_LEVEL2_PRIORITY));
+        this.registerEvent(new DiamondUpdateEvent(3, EVENT_DURATION_SECONDS, DIAMOND_LEVEL3_PRIORITY));
+        this.registerEvent(new EmeraldUpdateEvent(3, EVENT_DURATION_SECONDS, EMERALD_LEVEL3_PRIORITY));
+        this.registerEvent(new BedDestroyedEvent());
+        this.registerEvent(new GameOverEvent());
+        this.registerEvent(new GameShutdownEvent());
     }
 
     /**

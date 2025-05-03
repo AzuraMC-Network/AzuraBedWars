@@ -19,7 +19,7 @@ import java.util.logging.Level;
  * </p>
  * @author an5w1r@163.com
  */
-public class BedDestroyedEventAbstract extends AbstractGameEvent {
+public class BedDestroyedEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
     private static final EventConfig.DestroyBedEvent CONFIG = PLUGIN.getEventConfig().getDestroyBedEvent();
@@ -45,7 +45,7 @@ public class BedDestroyedEventAbstract extends AbstractGameEvent {
      * 创建床自毁事件
      * 默认在游戏开始6分钟后触发，优先级为5
      */
-    public BedDestroyedEventAbstract() {
+    public BedDestroyedEvent() {
         super(EVENT_NAME, EXECUTE_SECONDS, PRIORITY);
     }
 
