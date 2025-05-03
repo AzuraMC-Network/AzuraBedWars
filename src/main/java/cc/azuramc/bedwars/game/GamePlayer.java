@@ -56,6 +56,8 @@ public class GamePlayer {
     @Getter private final PlayerProfile playerProfile;
     @Getter private final PlayerCompass playerCompass;
 
+    @Getter @Setter GameModeType gameModeType;
+
     @Setter private String nickName;
     @Getter @Setter private FastBoard board;
     @Getter private boolean spectator;
@@ -86,6 +88,11 @@ public class GamePlayer {
         this.uuid = uuid;
         this.name = name;
 
+        // 初始化管理器
+        this.assistsManager = new AssistsManager(this);
+        this.playerProfile = new PlayerProfile(this);
+        this.playerCompass = new PlayerCompass(this);
+
         // 初始化游戏状态
         this.isAfk = false;
         this.isShoutCooldown = false;
@@ -97,11 +104,9 @@ public class GamePlayer {
         this.armorType = ArmorType.DEFAULT;
         this.pickaxeType = ToolType.NONE;
         this.axeType = ToolType.NONE;
-        
-        // 初始化管理器
-        this.assistsManager = new AssistsManager(this);
-        this.playerProfile = new PlayerProfile(this);
-        this.playerCompass = new PlayerCompass(this);
+
+        // 游戏模式
+        this.gameModeType = getPlayerProfile().getGameModeType();
     }
 
     /**

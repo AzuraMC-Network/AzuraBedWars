@@ -104,6 +104,8 @@ public class ModeSelectionGUI extends CustomGUI {
                     }
                     
                     playerProfile.setGameModeType(GameModeType.DEFAULT);
+                    GamePlayer.get(player.getUniqueId()).setGameModeType(GameModeType.DEFAULT);
+
                     SoundWrapper.playOrbPickupSound(player);
                     AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
                     player.sendMessage("§a已选择普通模式!");
@@ -133,6 +135,8 @@ public class ModeSelectionGUI extends CustomGUI {
                     }
                     
                     playerProfile.setGameModeType(GameModeType.EXPERIENCE);
+                    GamePlayer.get(player.getUniqueId()).setGameModeType(GameModeType.EXPERIENCE);
+
                     SoundWrapper.playOrbPickupSound(player);
                     AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
                     player.sendMessage("§a已选择经验模式!");
