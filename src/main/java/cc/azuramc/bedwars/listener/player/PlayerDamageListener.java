@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
@@ -26,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,35 +101,148 @@ public class PlayerDamageListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-        GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
+        Player killer = player.getKiller();
 
-        // 给予被击杀者身上的资源至击杀者（全部转换为经验）
-        if (player.getKiller() != null && player.getKiller() instanceof Player killer) {
-            killer.giveExpLevels(getPlayerRewardExp(player));
+        // 如果没有击杀者，直接清理掉落物并继续处理
+        if (killer == null) {
+            cleanDeathDrops(event);
+            
+            GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+            GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
+            
+            // 处理死亡后的游戏逻辑
+            processDeathGameLogic(player, gamePlayer, gameTeam);
+            return;
         }
 
-        // 清理死亡信息和物品
-        cleanDeathDrops(event);
+        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        GamePlayer killerPlayer = GamePlayer.get(killer.getUniqueId());
+        GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
 
+        // 处理击杀奖励
+        if (killerPlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+            // 1. 击杀者是经验模式
+            if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+                // 1.1 被击杀者也是经验模式，直接给经验，无需转换
+                // 从experienceSources直接给予经验
+                convertExperienceSourcesToExp(gamePlayer, killer);
+            } else {
+                // 1.2 被击杀者是default模式，需要将物品转换为经验
+                killer.giveExpLevels(getPlayerRewardExp(player));
+            }
+            // 清理死亡玩家物品
+            cleanDeathDrops(event);
+        } else {
+            // 2. 击杀者是default模式
+            if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+                // 2.1 被击杀者是经验模式，需要将经验转换为物品
+                convertExperienceSourcesToItems(gamePlayer, killer, event);
+            } else {
+                // 2.2 被击杀者是default模式，直接转移物品
+                transferItemsToKiller(player, killer, event);
+            }
+        }
+
+        // 处理死亡后的游戏逻辑
+        processDeathGameLogic(player, gamePlayer, gameTeam);
+    }
+
+    /**
+     * 处理玩家死亡后的游戏逻辑
+     * 
+     * @param player 死亡玩家
+     * @param gamePlayer 游戏玩家
+     * @param gameTeam 玩家所在队伍
+     */
+    private void processDeathGameLogic(Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
         // 游戏未开始
         if (gameManager.getGameState() == GameState.WAITING) {
             return;
         }
-
+        
         // 玩家是观察者
         if (gamePlayer != null && gamePlayer.isSpectator()) {
             return;
         }
-
+        
         // 处理非虚空死亡
         if (!player.hasMetadata(METADATA_VOID_PLAYER)) {
             handleNormalDeath(player, gamePlayer, gameTeam);
         }
-
+        
         // 移除虚空标记并处理重生
         player.removeMetadata(METADATA_VOID_PLAYER, plugin);
         handlePlayerRespawn(player);
+    }
+
+    /**
+     * 将死亡玩家的物品转移给击杀者
+     *
+     * @param player 死亡玩家
+     * @param killer 击杀者
+     * @param event 死亡事件
+     */
+    private void transferItemsToKiller(Player player, Player killer, PlayerDeathEvent event) {
+        Inventory playerInventory = player.getInventory();
+        Inventory killerInventory = killer.getInventory();
+
+        // 定义需要转移的资源类型
+        Material[] resourceTypes = {
+            Material.IRON_INGOT,
+            Material.GOLD_INGOT,
+            Material.DIAMOND,
+            Material.EMERALD
+        };
+
+        // 清除死亡消息和经验掉落
+        event.setDeathMessage(null);
+        event.setDroppedExp(0);
+
+        // 先把所有物品添加到掉落列表中
+        List<ItemStack> drops = new ArrayList<>();
+
+        // 收集所有死亡玩家的资源物品
+        for (ItemStack item : playerInventory.getContents()) {
+            if (item == null) {
+                continue;
+            }
+
+            Material itemType = item.getType();
+            boolean isResource = false;
+
+            // 检查是否为资源物品
+            for (Material resourceType : resourceTypes) {
+                if (resourceType.equals(itemType)) {
+                    isResource = true;
+                    break;
+                }
+            }
+
+            // 如果是资源物品，加入掉落列表
+            if (isResource) {
+                drops.add(item.clone());
+            }
+        }
+
+        // 尝试将资源给击杀者
+        for (ItemStack item : drops) {
+            // 尝试添加到击杀者背包
+            HashMap<Integer, ItemStack> leftover = killerInventory.addItem(item);
+
+            // 如果有剩余，掉落在死亡玩家位置
+            if (!leftover.isEmpty()) {
+                for (ItemStack leftItem : leftover.values()) {
+                    player.getWorld().dropItem(player.getLocation(), leftItem);
+                }
+            }
+        }
+
+        // 清空死亡玩家的物品栏
+        playerInventory.clear();
+
+        // 更新两个玩家的背包显示
+        player.updateInventory();
+        killer.updateInventory();
     }
 
     /**
@@ -527,5 +642,134 @@ public class PlayerDamageListener implements Listener {
             attackerPlayer.sendMessage("&e&l目标玩家 &c&l" + gamePlayer.getPlayer().getName() + " &e&l剩余血量: &c&l" + String.format("%.1f", gamePlayer.getPlayer().getHealth()) + " &c&l❤");
         }
 
+    }
+
+    /**
+     * 将被击杀者的经验来源转换为经验值给予击杀者
+     * 
+     * @param gamePlayer 被击杀的游戏玩家
+     * @param killer 击杀者
+     */
+    private void convertExperienceSourcesToExp(GamePlayer gamePlayer, Player killer) {
+        int totalExp = 0;
+        Map<String, Integer> expSources = gamePlayer.getExperienceSources();
+        
+        // 按照不同资源类型计算总经验值
+        for (Map.Entry<String, Integer> entry : expSources.entrySet()) {
+            String resourceType = entry.getKey();
+            int amount = entry.getValue();
+            
+            // 不同资源类型的经验转换倍率
+            switch (resourceType) {
+                case "IRON":
+                    // IRON 不用转换
+                    totalExp += amount;
+                    break;
+                case "GOLD":
+                    // GOLD 除以3
+                    totalExp += amount * 3;
+                    break;
+                case "DIAMOND":
+                    // DIAMOND 除以40
+                    totalExp += amount * 40;
+                    break;
+                case "EMERALD":
+                    // EMERALD 除以80
+                    totalExp += amount * 80;
+                    break;
+                default:
+                    // 其他资源类型直接加上原值
+                    totalExp += amount;
+                    break;
+            }
+        }
+        
+        // 加上被击杀者的经验等级
+        totalExp += gamePlayer.getPlayer().getLevel();
+        
+        // 给予击杀者经验
+        killer.giveExpLevels(totalExp);
+    }
+    
+    /**
+     * 将被击杀者的经验来源转换为物品给予击杀者
+     * 
+     * @param gamePlayer 被击杀的游戏玩家
+     * @param killer 击杀者
+     * @param event 死亡事件
+     */
+    private void convertExperienceSourcesToItems(GamePlayer gamePlayer, Player killer, PlayerDeathEvent event) {
+        Inventory killerInventory = killer.getInventory();
+        Map<String, Integer> expSources = gamePlayer.getExperienceSources();
+        List<ItemStack> drops = new ArrayList<>();
+        
+        // 清除死亡消息和经验掉落
+        event.setDeathMessage(null);
+        event.setDroppedExp(0);
+        
+        // 从经验源转换为相应的物品数量
+        for (Map.Entry<String, Integer> entry : expSources.entrySet()) {
+            String resourceType = entry.getKey();
+            int expAmount = entry.getValue();
+            int itemAmount;
+            Material material;
+            
+            // 根据资源类型进行转换
+            switch (resourceType) {
+                case "IRON":
+                    // IRON 不用转换
+                    itemAmount = expAmount;
+                    material = Material.IRON_INGOT;
+                    break;
+                case "GOLD":
+                    // GOLD 除以3
+                    itemAmount = (int) Math.floor(expAmount / 3.0);
+                    material = Material.GOLD_INGOT;
+                    break;
+                case "DIAMOND":
+                    // DIAMOND 除以40
+                    itemAmount = (int) Math.floor(expAmount / 40.0);
+                    material = Material.DIAMOND;
+                    break;
+                case "EMERALD":
+                    // EMERALD 除以80
+                    itemAmount = (int) Math.floor(expAmount / 80.0);
+                    material = Material.EMERALD;
+                    break;
+                default:
+                    continue;
+            }
+            
+            // 如果转换后数量大于0，创建物品堆并添加到掉落列表
+            if (itemAmount > 0) {
+                // 创建物品 - 每个物品栈最多64个
+                while (itemAmount > 0) {
+                    int stackSize = Math.min(itemAmount, 64);
+                    ItemStack item = new ItemStack(material, stackSize);
+                    drops.add(item);
+                    itemAmount -= stackSize;
+                }
+            }
+        }
+        
+        // 给予击杀者物品或掉落在地上
+        for (ItemStack item : drops) {
+            // 尝试添加到击杀者背包
+            HashMap<Integer, ItemStack> leftover = killerInventory.addItem(item);
+            
+            // 如果有剩余，掉落在死亡玩家位置
+            if (!leftover.isEmpty()) {
+                for (ItemStack leftItem : leftover.values()) {
+                    gamePlayer.getPlayer().getWorld().dropItem(gamePlayer.getPlayer().getLocation(), leftItem);
+                }
+            }
+        }
+        
+        // 清空死亡玩家的物品栏
+        gamePlayer.getPlayer().getInventory().clear();
+        
+        // 更新两个玩家的背包显示
+        gamePlayer.getPlayer().updateInventory();
+        killer.updateInventory();
     }
 }
