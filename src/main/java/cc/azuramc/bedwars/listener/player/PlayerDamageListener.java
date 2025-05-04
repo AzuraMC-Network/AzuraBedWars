@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsPlayerKilleEvent;
-import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
@@ -11,6 +10,7 @@ import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.util.ChatColorUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -450,7 +450,7 @@ public class PlayerDamageListener implements Listener {
                     cancel();
                     return;
                 }
-                ActionBarUtil.sendBar(player, COINS_ACTION_BAR);
+                ChatColorUtil.sendActionBar(player, COINS_ACTION_BAR);
                 i++;
             }
         }.runTaskTimerAsynchronously(plugin, 0, ACTIONBAR_PERIOD);

@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
@@ -12,6 +11,7 @@ import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.scoreboard.base.FastBoard;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
+import cc.azuramc.bedwars.util.ChatColorUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.messages.Titles;
@@ -280,7 +280,7 @@ public class GamePlayer {
         if (!isOnline()) {
             return;
         }
-        ActionBarUtil.sendBar(getPlayer(), message);
+        ChatColorUtil.sendActionBar(getPlayer(), message);
     }
 
     /**

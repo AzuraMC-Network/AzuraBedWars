@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.util;
 
-import cc.azuramc.bedwars.compat.util.ActionBarUtil;
+import com.cryptomorin.xseries.messages.ActionBar;
 import com.cryptomorin.xseries.messages.Titles;
 import lombok.Setter;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -26,7 +26,7 @@ public final class ChatColorUtil {
     }
 
     public static void sendActionBar(Player player, String message) {
-        ActionBarUtil.sendBar(player, color(message));
+        ActionBar.sendActionBar(player, color(message));
     }
 
     public static void sendMessage(Player player, String message) {

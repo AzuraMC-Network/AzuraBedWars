@@ -2,12 +2,12 @@ package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsDestroyBedEvent;
-import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.BedUtil;
 import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.util.ChatColorUtil;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -110,7 +110,7 @@ public class BedBreakHandler {
                     cancel();
                     return;
                 }
-                ActionBarUtil.sendBar(player, "§6+" + BED_DESTROY_REWARD + "个金币");
+                ChatColorUtil.sendActionBar(player, "§6+" + BED_DESTROY_REWARD + "个金币");
                 i++;
             }
         }.runTaskTimerAsynchronously(PLUGIN, 0, 10);
