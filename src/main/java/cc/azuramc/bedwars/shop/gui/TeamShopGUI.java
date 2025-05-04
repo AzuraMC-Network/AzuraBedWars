@@ -1,24 +1,24 @@
 package cc.azuramc.bedwars.shop.gui;
 
-import cc.azuramc.bedwars.gui.base.CustomGUI;
-import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.team.GameTeam;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GameModeType;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.gui.base.CustomGUI;
+import cc.azuramc.bedwars.gui.base.action.GUIAction;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 团队商店GUI
@@ -45,7 +45,7 @@ public class TeamShopGUI extends CustomGUI {
     // 静态初始化资源名称和价格
     static {
         // 初始化资源名称
-        RESOURCE_NAMES.put(Material.DIAMOND, "钻石");
+        RESOURCE_NAMES.put(XMaterial.DIAMOND.get(), "钻石");
         
         // 初始化保护价格
         Map<Integer, Integer> armorPrices = new HashMap<>();
@@ -112,20 +112,20 @@ public class TeamShopGUI extends CustomGUI {
     private void setupBorders() {
         // 设置顶部边框
         for (int i = 0; i < 9; i++) {
-            setItem(i, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+            setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         }
         
         // 设置左右边框
         for (int row = 1; row < 5; row++) {
             int leftBorder = row * 9;
             int rightBorder = row * 9 + 8;
-            setItem(leftBorder, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
-            setItem(rightBorder, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+            setItem(leftBorder, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+            setItem(rightBorder, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         }
         
         // 设置底部边框
         for (int i = 36; i < 45; i++) {
-            setItem(i, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+            setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         }
     }
 
@@ -256,7 +256,7 @@ public class TeamShopGUI extends CustomGUI {
             int price = TIER_PRICES.get(SHARPENED_SWORDS).get(0);
             
             setItem(11, new ItemBuilder()
-                    .setType(Material.IRON_SWORD)
+                    .setType(XMaterial.IRON_SWORD.get())
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                     .setDisplayName("§a" + SHARPENED_SWORDS)
                     .setLores(getSwordUpgradeLore(false, gameModeType))
@@ -284,7 +284,7 @@ public class TeamShopGUI extends CustomGUI {
         } else {
             // 已升级状态
             setItem(11, new ItemBuilder()
-                    .setType(Material.IRON_SWORD)
+                    .setType(XMaterial.IRON_SWORD.get())
                     .addEnchant(EnchantmentWrapper.DAMAGE_ALL(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
@@ -308,7 +308,7 @@ public class TeamShopGUI extends CustomGUI {
             int nextLevel = currentLevel + 1;
             
             setItem(12, new ItemBuilder()
-                    .setType(MaterialWrapper.IRON_CHESTPLATE())
+                    .setType(XMaterial.IRON_CHESTPLATE.get())
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                     .setDisplayName("§a" + REINFORCED_ARMOR)
                     .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
@@ -336,7 +336,7 @@ public class TeamShopGUI extends CustomGUI {
         } else {
             // 已达到最高级
             setItem(12, new ItemBuilder()
-                    .setType(MaterialWrapper.IRON_CHESTPLATE())
+                    .setType(XMaterial.IRON_CHESTPLATE.get())
                     .addEnchant(EnchantmentWrapper.PROTECTION_ENVIRONMENTAL(), 4)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
@@ -360,7 +360,7 @@ public class TeamShopGUI extends CustomGUI {
             int nextLevel = currentLevel + 1;
             
             setItem(13, new ItemBuilder()
-                    .setType(MaterialWrapper.GOLDEN_PICKAXE())
+                    .setType(XMaterial.GOLDEN_PICKAXE.get())
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                     .setDisplayName("§a" + MANIC_MINER)
                     .setLores(getMinerUpgradeLore(currentLevel, gameModeType))
@@ -376,7 +376,7 @@ public class TeamShopGUI extends CustomGUI {
         } else {
             // 已达到最高级
             setItem(13, new ItemBuilder()
-                    .setType(MaterialWrapper.GOLDEN_PICKAXE())
+                    .setType(XMaterial.GOLDEN_PICKAXE.get())
                     .addEnchant(EnchantmentWrapper.DIG_SPEED(), 2)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
@@ -398,7 +398,7 @@ public class TeamShopGUI extends CustomGUI {
             int price = TIER_PRICES.get(MINING_FATIGUE_TRAP).get(0);
             
             setItem(14, new ItemBuilder()
-                    .setType(MaterialWrapper.IRON_PICKAXE())
+                    .setType(XMaterial.IRON_PICKAXE.get())
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                     .setDisplayName("§a" + MINING_FATIGUE_TRAP)
                     .setLores(
@@ -420,7 +420,7 @@ public class TeamShopGUI extends CustomGUI {
         } else {
             // 已升级状态
             setItem(14, new ItemBuilder()
-                    .setType(MaterialWrapper.IRON_PICKAXE())
+                    .setType(XMaterial.IRON_PICKAXE.get())
                     .addEnchant(EnchantmentWrapper.DIG_SPEED(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
@@ -447,7 +447,7 @@ public class TeamShopGUI extends CustomGUI {
             int price = TIER_PRICES.get(HEALING_POOL).get(0);
             
             setItem(15, new ItemBuilder()
-                    .setType(MaterialWrapper.BEACON())
+                    .setType(XMaterial.BEACON.get())
                     .setDisplayName("§a" + HEALING_POOL)
                     .setLores(
                         "§7基地附近的队伍成员获得",
@@ -468,7 +468,7 @@ public class TeamShopGUI extends CustomGUI {
         } else {
             // 已升级状态
             setItem(15, new ItemBuilder()
-                    .setType(MaterialWrapper.BEACON())
+                    .setType(XMaterial.BEACON.get())
                     .addEnchant(EnchantmentWrapper.DIG_SPEED(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .setDisplayName("§a" + HEALING_POOL)
@@ -494,7 +494,7 @@ public class TeamShopGUI extends CustomGUI {
             int price = TIER_PRICES.get(ALARM_TRAP).get(0);
             
             setItem(16, new ItemBuilder()
-                    .setType(Material.REDSTONE_TORCH)
+                    .setType(XMaterial.REDSTONE_TORCH.get())
                     .setDisplayName("§a" + ALARM_TRAP)
                     .setLores(
                         "§7下一个进入基地的敌人会触发警报",
@@ -515,7 +515,7 @@ public class TeamShopGUI extends CustomGUI {
         } else {
             // 已升级状态
             setItem(16, new ItemBuilder()
-                    .setType(Material.REDSTONE_TORCH)
+                    .setType(XMaterial.REDSTONE_TORCH.get())
                     .addEnchant(EnchantmentWrapper.DIG_SPEED(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .setDisplayName("§a" + ALARM_TRAP)
@@ -540,7 +540,7 @@ public class TeamShopGUI extends CustomGUI {
     private boolean processPayment(Player player, int price, GameModeType gameModeType) {
         if (gameModeType == GameModeType.DEFAULT) {
             // 默认模式：支付钻石
-            return processItemPayment(player, Material.DIAMOND, price);
+            return processItemPayment(player, XMaterial.DIAMOND.get(), price);
         } else {
             // 经验模式：支付经验
             return processExperiencePayment(player, price * 100);
@@ -618,7 +618,7 @@ public class TeamShopGUI extends CustomGUI {
      */
     private String formatPrice(int price, GameModeType gameModeType) {
         if (gameModeType == GameModeType.DEFAULT) {
-            return price + " " + RESOURCE_NAMES.get(Material.DIAMOND);
+            return price + " " + RESOURCE_NAMES.get(XMaterial.DIAMOND.get());
         } else {
             return (price * 100) + "级";
         }

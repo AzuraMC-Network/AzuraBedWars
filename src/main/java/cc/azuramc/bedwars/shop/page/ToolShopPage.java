@@ -1,12 +1,12 @@
 package cc.azuramc.bedwars.shop.page;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.shop.ShopData;
-import cc.azuramc.bedwars.shop.ColorType;
-import cc.azuramc.bedwars.shop.ShopItemType;
-import cc.azuramc.bedwars.shop.PriceCost;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
+import cc.azuramc.bedwars.shop.ColorType;
+import cc.azuramc.bedwars.shop.PriceCost;
+import cc.azuramc.bedwars.shop.ShopData;
+import cc.azuramc.bedwars.shop.ShopItemType;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import org.bukkit.inventory.ItemFlag;
 
@@ -22,11 +22,11 @@ public class ToolShopPage implements ShopData {
     private final List<ShopItemType> shopItems = new LinkedList<>();
 
     public ToolShopPage() {
-        mainShopItem = new ShopItemType(new ItemBuilder().setType(MaterialWrapper.STONE_PICKAXE()).setLores("§e点击查看！").addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "§a工具", ColorType.NONE, null);
+        mainShopItem = new ShopItemType(new ItemBuilder().setType(XMaterial.STONE_PICKAXE.get()).setLores("§e点击查看！").addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "§a工具", ColorType.NONE, null);
 
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.WOODEN_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem(), "稿子", ColorType.PICKAXE, new PriceCost(MaterialWrapper.IRON_INGOT(), 10, 10)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.WOODEN_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem(), "斧子", ColorType.AXE, new PriceCost(MaterialWrapper.IRON_INGOT(), 10, 10)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(MaterialWrapper.SHEARS()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "剪刀", ColorType.NONE, new PriceCost(MaterialWrapper.IRON_INGOT(), 30, 30)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WOODEN_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem(), "稿子", ColorType.PICKAXE, new PriceCost(XMaterial.IRON_INGOT.get(), 10, 10)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WOODEN_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem(), "斧子", ColorType.AXE, new PriceCost(XMaterial.IRON_INGOT.get(), 10, 10)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.SHEARS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "剪刀", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 30, 30)));
     }
 
 }

@@ -1,25 +1,21 @@
 package cc.azuramc.bedwars.shop.gui;
 
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.compat.util.ItemBuilder;
+import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
+import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import cc.azuramc.bedwars.database.profile.PlayerProfile;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GameModeType;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.item.armor.ArmorType;
+import cc.azuramc.bedwars.game.item.tool.ToolType;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
-import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.database.profile.PlayerProfile;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.shop.ShopManager;
-import cc.azuramc.bedwars.shop.ShopData;
+import cc.azuramc.bedwars.shop.*;
 import cc.azuramc.bedwars.shop.page.DefaultShopPage;
-import cc.azuramc.bedwars.shop.ColorType;
-import cc.azuramc.bedwars.shop.ShopItemType;
-import cc.azuramc.bedwars.shop.PriceCost;
-import cc.azuramc.bedwars.game.item.armor.ArmorType;
-import cc.azuramc.bedwars.game.GameModeType;
-import cc.azuramc.bedwars.game.item.tool.ToolType;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
-import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import cc.azuramc.bedwars.util.ChatColorUtil;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -27,11 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 道具商店GUI类
@@ -52,10 +44,10 @@ public class ItemShopGUI extends CustomGUI {
     
     /* 静态初始化资源名称 */
     static {
-        RESOURCE_NAMES.put(MaterialWrapper.IRON_INGOT(), "铁");
-        RESOURCE_NAMES.put(MaterialWrapper.GOLD_INGOT(), "金");
-        RESOURCE_NAMES.put(MaterialWrapper.EMERALD(), "绿宝石");
-        RESOURCE_NAMES.put(MaterialWrapper.DIAMOND(), "钻石");
+        RESOURCE_NAMES.put(XMaterial.IRON_INGOT.get(), "铁");
+        RESOURCE_NAMES.put(XMaterial.GOLD_INGOT.get(), "金");
+        RESOURCE_NAMES.put(XMaterial.EMERALD.get(), "绿宝石");
+        RESOURCE_NAMES.put(XMaterial.DIAMOND.get(), "钻石");
     }
 
     /**
@@ -141,9 +133,9 @@ public class ItemShopGUI extends CustomGUI {
         for (int i = 9; i < 18; i++) {
             if (i == (currentShopSlot + 9)) {
                 // 高亮当前选中的商店分类
-                setItem(i, MaterialWrapper.getStainedGlassPane(5), new GUIAction(0, () -> {}, false));
+                setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:5").orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
             } else {
-                setItem(i, MaterialWrapper.getStainedGlassPane(7), new GUIAction(0, () -> {}, false));
+                setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:7").orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
             }
         }
     }
@@ -178,7 +170,7 @@ public class ItemShopGUI extends CustomGUI {
     private void setEmptySlot(Player player, int slotPosition, int shopSlot, GameManager gameManager) {
         setItem(slotPosition, 
                 new ItemBuilder()
-                    .setItemStack(MaterialWrapper.getStainedGlassPane(14))
+                    .setItemStack(XMaterial.matchXMaterial("STAINED_GLASS_PANE:14").orElse(XMaterial.GLASS_PANE).parseItem())
                     .setDisplayName("§c空闲的槽位")
                     .setLores("§7这是一个快捷购买槽位!§bShift+左键", "§7将任意物品放到这里~")
                     .getItem(), 
@@ -263,21 +255,21 @@ public class ItemShopGUI extends CustomGUI {
     private void updatePickaxeDisplay(GamePlayer gamePlayer, ItemBuilder itemBuilder, ShopItemType shopItemType) {
         switch (gamePlayer.getPickaxeType()) {
             case WOOD:
-                itemBuilder.setType(MaterialWrapper.STONE_PICKAXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.IRON_INGOT(), 20, 20));
+                itemBuilder.setType(XMaterial.STONE_PICKAXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 20, 20));
                 break;
             case STONE:
-                itemBuilder.setType(MaterialWrapper.IRON_PICKAXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.GOLD_INGOT(), 8, 24));
+                itemBuilder.setType(XMaterial.IRON_PICKAXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 8, 24));
                 break;
             case IRON:
             case DIAMOND:
-                itemBuilder.setType(MaterialWrapper.DIAMOND_PICKAXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.GOLD_INGOT(), 12, 36));
+                itemBuilder.setType(XMaterial.DIAMOND_PICKAXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 12, 36));
                 break;
             default:
-                itemBuilder.setType(MaterialWrapper.WOODEN_PICKAXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.IRON_INGOT(), 10, 10));
+                itemBuilder.setType(XMaterial.WOODEN_PICKAXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 10, 10));
                 break;
         }
     }
@@ -288,21 +280,21 @@ public class ItemShopGUI extends CustomGUI {
     private void updateAxeDisplay(GamePlayer gamePlayer, ItemBuilder itemBuilder, ShopItemType shopItemType) {
         switch (gamePlayer.getAxeType()) {
             case WOOD:
-                itemBuilder.setType(MaterialWrapper.STONE_AXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.IRON_INGOT(), 20, 20));
+                itemBuilder.setType(XMaterial.STONE_AXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 20, 20));
                 break;
             case STONE:
-                itemBuilder.setType(MaterialWrapper.IRON_AXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.GOLD_INGOT(), 8, 24));
+                itemBuilder.setType(XMaterial.IRON_AXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 8, 24));
                 break;
             case IRON:
             case DIAMOND:
-                itemBuilder.setType(MaterialWrapper.DIAMOND_AXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.GOLD_INGOT(), 12, 36));
+                itemBuilder.setType(XMaterial.DIAMOND_AXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 12, 36));
                 break;
             default:
-                itemBuilder.setType(MaterialWrapper.WOODEN_AXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.IRON_INGOT(), 10, 10));
+                itemBuilder.setType(XMaterial.WOODEN_AXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 10, 10));
                 break;
         }
     }
@@ -398,32 +390,32 @@ public class ItemShopGUI extends CustomGUI {
         }
 
         // 如果已经有剪刀则不卖
-        if (MaterialWrapper.SHEARS().equals(itemMaterial) && gamePlayer.isShear()) {
+        if (XMaterial.SHEARS.get().equals(itemMaterial) && gamePlayer.isShear()) {
             return false;
         }
 
         // 如果买锁链且当前不是皮革则不卖
-        if (itemMaterial == Material.CHAINMAIL_BOOTS && gamePlayer.getArmorType() != ArmorType.DEFAULT) {
+        if (itemMaterial == XMaterial.CHAINMAIL_BOOTS.get() && gamePlayer.getArmorType() != ArmorType.DEFAULT) {
             return false;
         }
 
         // 如果买铁套且当前是铁套/钻套则不卖
-        if (itemMaterial == Material.IRON_BOOTS && (gamePlayer.getArmorType() == ArmorType.IRON || gamePlayer.getArmorType() == ArmorType.DIAMOND)) {
+        if (itemMaterial == XMaterial.IRON_BOOTS.get() && (gamePlayer.getArmorType() == ArmorType.IRON || gamePlayer.getArmorType() == ArmorType.DIAMOND)) {
             return false;
         }
 
         // 如果买钻套且当前是钻套则不卖
-        if (itemMaterial == Material.DIAMOND_BOOTS && gamePlayer.getArmorType() == ArmorType.DIAMOND) {
+        if (itemMaterial == XMaterial.DIAMOND_BOOTS.get() && gamePlayer.getArmorType() == ArmorType.DIAMOND) {
             return false;
         }
 
         // 如果买木镐且背包有空格子则卖
-        if ((itemMaterial == Material.WOODEN_PICKAXE && gamePlayer.getPickaxeType() == ToolType.NONE) && hasEmptySlot(gamePlayer)) {
+        if ((itemMaterial == XMaterial.WOODEN_PICKAXE.get() && gamePlayer.getPickaxeType() == ToolType.NONE) && hasEmptySlot(gamePlayer)) {
             return true;
         }
 
         // 如果买木斧且背包有空格子则卖
-        if ((itemMaterial == Material.WOODEN_AXE && gamePlayer.getAxeType() == ToolType.NONE) && hasEmptySlot(gamePlayer)) {
+        if ((itemMaterial == XMaterial.WOODEN_AXE.get() && gamePlayer.getAxeType() == ToolType.NONE) && hasEmptySlot(gamePlayer)) {
             return true;
         }
 
@@ -618,19 +610,19 @@ public class ItemShopGUI extends CustomGUI {
      * 处理护甲给予
      */
     private boolean handleArmorGiving(Player player, GamePlayer gamePlayer, int shopSlot, Material material, GameManager gameManager) {
-        if (MaterialWrapper.CHAINMAIL_BOOTS().equals(material)) {
+        if (XMaterial.CHAINMAIL_BOOTS.get().name().equals(material)) {
             gamePlayer.setArmorType(ArmorType.CHAINMAIL);
             gamePlayer.giveArmor();
             player.updateInventory();
             new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
-        } else if (MaterialWrapper.IRON_BOOTS().equals(material)) {
+        } else if (XMaterial.IRON_BOOTS.get().name().equals(material)) {
             gamePlayer.setArmorType(ArmorType.IRON);
             gamePlayer.giveArmor();
             player.updateInventory();
             new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
-        } else if (MaterialWrapper.DIAMOND_BOOTS().equals(material)) {
+        } else if (XMaterial.DIAMOND_BOOTS.get().name().equals(material)) {
             gamePlayer.setArmorType(ArmorType.DIAMOND);
             gamePlayer.giveArmor();
             player.updateInventory();
@@ -645,22 +637,22 @@ public class ItemShopGUI extends CustomGUI {
      */
     private boolean handleToolGiving(Player player, GamePlayer gamePlayer, int shopSlot, Material material, GameManager gameManager) {
         // 镐
-        if (MaterialWrapper.WOODEN_PICKAXE().equals(material)) {
+        if (XMaterial.WOODEN_PICKAXE.get().equals(material)) {
             gamePlayer.setPickaxeType(ToolType.WOOD);
             gamePlayer.givePickaxe(false);
             new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
-        } else if (MaterialWrapper.STONE_PICKAXE().equals(material)) {
+        } else if (XMaterial.STONE_PICKAXE.get().equals(material)) {
             gamePlayer.setPickaxeType(ToolType.STONE);
             gamePlayer.givePickaxe(true);
             new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
-        } else if (MaterialWrapper.IRON_PICKAXE().equals(material)) {
+        } else if (XMaterial.IRON_PICKAXE.get().equals(material)) {
             gamePlayer.setPickaxeType(ToolType.IRON);
             gamePlayer.givePickaxe(true);
             new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
-        } else if (MaterialWrapper.DIAMOND_PICKAXE().equals(material)) {
+        } else if (XMaterial.DIAMOND_PICKAXE.get().equals(material)) {
             gamePlayer.setPickaxeType(ToolType.DIAMOND);
             gamePlayer.givePickaxe(true);
             new ItemShopGUI(player, shopSlot, gameManager).open();
@@ -668,22 +660,22 @@ public class ItemShopGUI extends CustomGUI {
         }
         
         // 斧
-        else if (MaterialWrapper.WOODEN_AXE().equals(material)) {
+        else if (XMaterial.WOODEN_AXE.get().equals(material)) {
             gamePlayer.setAxeType(ToolType.WOOD);
             gamePlayer.giveAxe(false);
             new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
-        } else if (MaterialWrapper.STONE_AXE().equals(material)) {
+        } else if (XMaterial.STONE_AXE.get().equals(material)) {
             gamePlayer.setAxeType(ToolType.STONE);
             gamePlayer.giveAxe(true);
             new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
-        } else if (MaterialWrapper.IRON_AXE().equals(material)) {
+        } else if (XMaterial.IRON_AXE.get().equals(material)) {
             gamePlayer.setAxeType(ToolType.IRON);
             gamePlayer.giveAxe(true);
             new ItemShopGUI(player, shopSlot, gameManager).open();
             return true;
-        } else if (MaterialWrapper.DIAMOND_AXE().equals(material)) {
+        } else if (XMaterial.DIAMOND_AXE.get().equals(material)) {
             gamePlayer.setAxeType(ToolType.DIAMOND);
             gamePlayer.giveAxe(true);
             new ItemShopGUI(player, shopSlot, gameManager).open();
@@ -691,7 +683,7 @@ public class ItemShopGUI extends CustomGUI {
         }
         
         // 剪刀
-        else if (MaterialWrapper.SHEARS().equals(material)) {
+        else if (XMaterial.SHEARS.get().equals(material)) {
             gamePlayer.setShear(true);
             gamePlayer.giveShear();
             new ItemShopGUI(player, shopSlot, gameManager).open();
@@ -710,7 +702,7 @@ public class ItemShopGUI extends CustomGUI {
         // 处理剑特殊情况
         String itemTypeName = shopItemType.getItemStack().getType().toString();
         if (itemTypeName.endsWith("_SWORD") || itemTypeName.endsWith("SWORD")) {
-            player.getInventory().remove(MaterialWrapper.WOODEN_SWORD());
+            player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
             
             // 添加锋利附魔
             if (gamePlayer.getGameTeam().isHasSharpenedEnchant()) {
@@ -724,7 +716,7 @@ public class ItemShopGUI extends CustomGUI {
         // 处理有颜色的方块
         if (shopItemType.getColorType() == ColorType.COLOR) {
             // 处理羊毛
-            if (MaterialWrapper.isWool(shopItemType.getItemStack().getType())) {
+            if (shopItemType.getItemStack().getType().name().toUpperCase().equals("WOOL")) {
                 // 创建带颜色的羊毛
                 ItemBuilder woolBuilder = new ItemBuilder();
                 woolBuilder.setWoolColor(gamePlayer.getGameTeam().getDyeColor());
@@ -740,7 +732,7 @@ public class ItemShopGUI extends CustomGUI {
                 return; // 已经添加到物品栏，直接返回
             } else {
                 // 对于非羊毛的颜色方块，使用旧方法
-                itemBuilder.setDurability(MaterialWrapper.getWoolData(gamePlayer.getGameTeam().getDyeColor()));
+                itemBuilder.setDurability(gamePlayer.getGameTeam().getDyeColor().getDyeData());
             }
         }
         

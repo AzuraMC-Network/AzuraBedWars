@@ -1,12 +1,12 @@
 package cc.azuramc.bedwars.listener.world;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
-import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.MapUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
@@ -79,7 +79,7 @@ public class ExplodeListener implements Listener {
         // 处理可爆炸的方块
         for (Block block : blocksToExplode) {
             // 清除方块并显示爆炸效果
-            block.setType(MaterialWrapper.AIR());
+            block.setType(Material.AIR);
 
             // 播放爆炸音效
             try {

@@ -1,12 +1,13 @@
 package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.MapUtil;
+import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -15,6 +16,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Optional;
 
 /**
  * @author an5w1r@163.com
@@ -59,7 +62,7 @@ public class PlacementListener implements Listener {
         }
 
         // 处理TNT放置
-        if (block.getType() == MaterialWrapper.TNT()) {
+        if (block.getType() == XMaterial.TNT.get()) {
             TNTPlacementHandler.handleTNTPlacement(event, player);
             return;
         }
@@ -104,6 +107,21 @@ public class PlacementListener implements Listener {
      * @return 如果是火速羊毛返回true，否则返回false
      */
     private boolean isSpeedWool(ItemStack item) {
-        return item != null && MaterialWrapper.isWool(item.getType()) && !item.getEnchantments().isEmpty();
+        return item != null && isWoolMaterialByName(item.getType()) && !item.getEnchantments().isEmpty();
     }
+
+    /**
+     * 通过检查 XMaterial 名称是否以 "_WOOL" 结尾来判断是否是羊毛。
+     *
+     * @param material 要检查的 Material
+     * @return 如果物品材质名称以 _WOOL 结尾则返回 true，否则 false
+     */
+    private boolean isWoolMaterialByName(Material material) {
+        Optional<XMaterial> xMaterialOptional = Optional.of(XMaterial.matchXMaterial(material));
+
+        // 检查 XMaterial 的名称是否以 "_WOOL" 结尾
+        return xMaterialOptional.map(xMat -> xMat.name().endsWith("_WOOL"))
+                .orElse(false);
+    }
+
 }

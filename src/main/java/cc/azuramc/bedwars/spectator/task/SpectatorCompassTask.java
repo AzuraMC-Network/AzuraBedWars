@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,7 +29,7 @@ public class SpectatorCompassTask {
     private static final long UPDATE_FREQUENCY = 1L;
     
     /** 指南针材质 */
-    private static final Material COMPASS_MATERIAL = Material.COMPASS;
+    private static final Material COMPASS_MATERIAL = XMaterial.COMPASS.get();
 
     /**
      * 启动指南针追踪任务

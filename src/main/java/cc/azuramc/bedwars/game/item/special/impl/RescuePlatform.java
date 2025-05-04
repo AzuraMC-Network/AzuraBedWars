@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,7 +46,7 @@ public class RescuePlatform extends AbstractSpecialItem {
     /**
      * 平台方块材质
      */
-    private static final Material PLATFORM_MATERIAL = Material.SLIME_BLOCK;
+    private static final Material PLATFORM_MATERIAL = XMaterial.SLIME_BLOCK.get();
 
 
     @Getter private GameManager gameManager;
@@ -173,15 +174,19 @@ public class RescuePlatform extends AbstractSpecialItem {
             if (placed.getType() != Material.AIR) {
                 continue;
             }
-            
-            placed.setType(PLATFORM_MATERIAL);
+
+            if (PLATFORM_MATERIAL != null) {
+                placed.setType(PLATFORM_MATERIAL);
+            }
             this.addPlatformBlock(placed);
             anyBlockPlaced = true;
         }
         
         // 放置中间的方块
         if (mid.getBlock().getType() == Material.AIR) {
-            mid.getBlock().setType(PLATFORM_MATERIAL);
+            if (PLATFORM_MATERIAL != null) {
+                mid.getBlock().setType(PLATFORM_MATERIAL);
+            }
             this.addPlatformBlock(mid.getBlock());
             anyBlockPlaced = true;
         }
@@ -223,7 +228,7 @@ public class RescuePlatform extends AbstractSpecialItem {
 
     @Override
     public Material getItemMaterial() {
-        return Material.BLAZE_ROD;
+        return XMaterial.BLAZE_ROD.get();
     }
 
     /**

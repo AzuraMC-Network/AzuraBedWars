@@ -1,22 +1,19 @@
 package cc.azuramc.bedwars.shop.gui;
 
-import cc.azuramc.bedwars.gui.base.CustomGUI;
-import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
+import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.shop.ShopManager;
-import cc.azuramc.bedwars.shop.ShopData;
-import cc.azuramc.bedwars.shop.ColorType;
-import cc.azuramc.bedwars.shop.ShopItemType;
-import cc.azuramc.bedwars.shop.PriceCost;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import cc.azuramc.bedwars.gui.base.CustomGUI;
+import cc.azuramc.bedwars.gui.base.action.GUIAction;
+import cc.azuramc.bedwars.shop.*;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 自定义商店GUI
@@ -83,7 +80,7 @@ public class DIYShopGUI extends CustomGUI {
         // 设置顶部边框
         for (int i = 0; i < 9; i++) {
             if (i != 4) { // 跳过中间物品展示位置
-                setItem(i, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+                setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
             }
         }
         
@@ -91,13 +88,13 @@ public class DIYShopGUI extends CustomGUI {
         for (int row = 1; row < 6; row++) {
             int leftBorder = row * 9;
             int rightBorder = row * 9 + 8;
-            setItem(leftBorder, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
-            setItem(rightBorder, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+            setItem(leftBorder, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+            setItem(rightBorder, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         }
         
         // 设置底部边框
         for (int i = 45; i < 54; i++) {
-            setItem(i, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+            setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         }
     }
     
@@ -149,7 +146,7 @@ public class DIYShopGUI extends CustomGUI {
     private void setupEmptySlot(GameManager gameManager, Player player, int slotPosition, int slotIndex, String className, PlayerProfile playerProfile) {
         setItem(slotPosition, 
                 new ItemBuilder()
-                    .setItemStack(MaterialWrapper.getStainedGlassPane(EMPTY_SLOT_GLASS_COLOR))
+                    .setItemStack(Objects.requireNonNull(XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + EMPTY_SLOT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem()))
                     .setDisplayName("§c空闲的槽位")
                     .setLores("§e点击设置该位置为当前物品")
                     .getItem(), 
@@ -221,20 +218,20 @@ public class DIYShopGUI extends CustomGUI {
     private void updatePickaxeDisplay(GamePlayer gamePlayer, ItemBuilder itemBuilder, ShopItemType shopItemType) {
         switch (gamePlayer.getPickaxeType()) {
             case STONE:
-                itemBuilder.setType(MaterialWrapper.STONE_PICKAXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.IRON_INGOT(), 20, 20));
+                itemBuilder.setType(XMaterial.STONE_PICKAXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 20, 20));
                 break;
             case IRON:
-                itemBuilder.setType(MaterialWrapper.IRON_PICKAXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.GOLD_INGOT(), 8, 24));
+                itemBuilder.setType(XMaterial.IRON_PICKAXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 8, 24));
                 break;
             case DIAMOND:
-                itemBuilder.setType(MaterialWrapper.DIAMOND_PICKAXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.GOLD_INGOT(), 12, 36));
+                itemBuilder.setType(XMaterial.DIAMOND_PICKAXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 12, 36));
                 break;
             default:
-                itemBuilder.setType(MaterialWrapper.WOODEN_PICKAXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.IRON_INGOT(), 10, 10));
+                itemBuilder.setType(XMaterial.WOODEN_PICKAXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 10, 10));
                 break;
         }
     }
@@ -245,20 +242,20 @@ public class DIYShopGUI extends CustomGUI {
     private void updateAxeDisplay(GamePlayer gamePlayer, ItemBuilder itemBuilder, ShopItemType shopItemType) {
         switch (gamePlayer.getAxeType()) {
             case STONE:
-                itemBuilder.setType(MaterialWrapper.STONE_AXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.IRON_INGOT(), 20, 20));
+                itemBuilder.setType(XMaterial.STONE_AXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 20, 20));
                 break;
             case IRON:
-                itemBuilder.setType(MaterialWrapper.IRON_AXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.GOLD_INGOT(), 8, 24));
+                itemBuilder.setType(XMaterial.IRON_AXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 8, 24));
                 break;
             case DIAMOND:
-                itemBuilder.setType(MaterialWrapper.DIAMOND_AXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.GOLD_INGOT(), 12, 36));
+                itemBuilder.setType(XMaterial.DIAMOND_AXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 12, 36));
                 break;
             default:
-                itemBuilder.setType(MaterialWrapper.WOODEN_AXE());
-                shopItemType.setPriceCost(new PriceCost(MaterialWrapper.IRON_INGOT(), 10, 10));
+                itemBuilder.setType(XMaterial.WOODEN_AXE.get());
+                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 10, 10));
                 break;
         }
     }

@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -15,6 +14,7 @@ import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.gui.SpectatorCompassGUI;
 import cc.azuramc.bedwars.spectator.gui.SpectatorSettingGUI;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -144,7 +144,7 @@ public class PlayerInteractListener implements Listener {
         
         // 检查是否有旁观目标且物品是指南针
         boolean hasSpectatorTargetWithCompass = gamePlayer.getSpectatorTarget() != null && 
-                                                material == Material.COMPASS;
+                                                material == XMaterial.COMPASS.get();
         
         // 如果同时满足上述条件，执行传送
         if (isLeftClick && hasSpectatorTargetWithCompass) {
@@ -160,19 +160,19 @@ public class PlayerInteractListener implements Listener {
     private void handleRightClickAction(PlayerInteractEvent event, Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
         Material material = event.getMaterial();
         
-        if (material == MaterialWrapper.COMPASS()) {
+        if (material == XMaterial.COMPASS.get()) {
             handleCompassInteraction(event, player, gamePlayer);
-        } else if (material == MaterialWrapper.REDSTONE_COMPARATOR()) {
+        } else if (material == XMaterial.COMPARATOR.get()) {
             new SpectatorSettingGUI(player).open();
-        } else if (material == Material.PAPER) {
+        } else if (material == XMaterial.PAPER.get()) {
             handlePaperInteraction(event, player);
-        } else if (material == MaterialWrapper.SLIME_BALL()) {
+        } else if (material == XMaterial.SLIME_BALL.get()) {
             handleSlimeBallInteraction(event);
-        } else if (material == MaterialWrapper.BED()) {
+        } else if (material.name().toUpperCase().contains("BED")) {
             handleBedInteraction(event, player, gamePlayer, gameTeam);
-        } else if (material == MaterialWrapper.FIREBALL()) {
+        } else if (material == XMaterial.FIRE_CHARGE.get()) {
             handleFireballInteraction(event, player, gamePlayer);
-        } else if (material == MaterialWrapper.WATER_BUCKET()) {
+        } else if (material.name().toUpperCase().contains("WATER_BUCKIT")) {
             handleWaterBucketInteraction(event, player);
         }
     }
@@ -270,8 +270,8 @@ public class PlayerInteractListener implements Listener {
     private void placeBedForTeam(GameTeam gameTeam) {
         BlockFace face = gameTeam.getBedFace();
         Location bedLocation = gameTeam.getBedHead().getLocation();
-        bedLocation.getBlock().setType(MaterialWrapper.AIR());
-        bedLocation.getBlock().setType(MaterialWrapper.BED());
+        bedLocation.getBlock().setType(Material.AIR);
+        bedLocation.getBlock().setType(XMaterial.RED_BED.get());
         Block block = gameTeam.getBedHead();
         
         BlockState bedFoot = block.getState();
@@ -280,29 +280,29 @@ public class PlayerInteractListener implements Listener {
         switch (face) {
             case NORTH:
                 bedHead = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
-                bedFoot.setType(MaterialWrapper.BED());
-                bedHead.setType(MaterialWrapper.BED());
+                bedFoot.setType(XMaterial.RED_BED.get());
+                bedHead.setType(XMaterial.RED_BED.get());
                 bedFoot.setRawData((byte) 0);
                 bedHead.setRawData((byte) 8);
                 break;
             case EAST:
                 bedHead = bedFoot.getBlock().getRelative(BlockFace.WEST).getState();
-                bedFoot.setType(MaterialWrapper.BED());
-                bedHead.setType(MaterialWrapper.BED());
+                bedFoot.setType(XMaterial.RED_BED.get());
+                bedHead.setType(XMaterial.RED_BED.get());
                 bedFoot.setRawData((byte) 1);
                 bedHead.setRawData((byte) 9);
                 break;
             case SOUTH:
                 bedHead = bedFoot.getBlock().getRelative(BlockFace.NORTH).getState();
-                bedFoot.setType(MaterialWrapper.BED());
-                bedHead.setType(MaterialWrapper.BED());
+                bedFoot.setType(XMaterial.RED_BED.get());
+                bedHead.setType(XMaterial.RED_BED.get());
                 bedFoot.setRawData((byte) 2);
                 bedHead.setRawData((byte) 10);
                 break;
             case WEST:
                 bedHead = bedFoot.getBlock().getRelative(BlockFace.EAST).getState();
-                bedFoot.setType(MaterialWrapper.BED());
-                bedHead.setType(MaterialWrapper.BED());
+                bedFoot.setType(XMaterial.RED_BED.get());
+                bedHead.setType(XMaterial.RED_BED.get());
                 bedFoot.setRawData((byte) 3);
                 bedHead.setRawData((byte) 11);
                 break;

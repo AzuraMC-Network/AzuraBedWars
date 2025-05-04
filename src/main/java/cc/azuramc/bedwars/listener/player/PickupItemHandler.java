@@ -2,13 +2,13 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -52,7 +52,7 @@ public class PickupItemHandler {
      * @return 如果已处理返回true
      */
     public static boolean handleBedPickup(ItemStack itemStack, Item item) {
-        if (itemStack.getType() != MaterialWrapper.BED()) {
+        if (!itemStack.getType().name().toUpperCase().contains("BED")) {
             return false;
         }
         
@@ -76,10 +76,10 @@ public class PickupItemHandler {
      */
     public static void handleSwordPickup(ItemStack itemStack, Player player, GamePlayer gamePlayer) {
         // 检查是否是剑类物品
-        boolean isSword = itemStack.getType() == MaterialWrapper.WOODEN_SWORD() || 
-                          itemStack.getType() == MaterialWrapper.STONE_SWORD() || 
-                          itemStack.getType() == MaterialWrapper.IRON_SWORD() || 
-                          itemStack.getType() == MaterialWrapper.DIAMOND_SWORD();
+        boolean isSword = itemStack.getType() == XMaterial.WOODEN_SWORD.get() ||
+                          itemStack.getType() == XMaterial.STONE_SWORD.get() ||
+                          itemStack.getType() == XMaterial.IRON_SWORD.get() ||
+                          itemStack.getType() == XMaterial.DIAMOND_SWORD.get();
         
         if (!isSword) {
             return;
@@ -101,8 +101,8 @@ public class PickupItemHandler {
     private static void removeWoodenSwordFromInventory(Player player) {
         for (int i = 0; i < player.getInventory().getSize(); i++) {
             if (player.getInventory().getItem(i) != null) {
-                if (Objects.requireNonNull(player.getInventory().getItem(i)).getType() == MaterialWrapper.WOODEN_SWORD()) {
-                    player.getInventory().setItem(i, new ItemStack(MaterialWrapper.AIR()));
+                if (Objects.requireNonNull(player.getInventory().getItem(i)).getType() == XMaterial.WOODEN_SWORD.get()) {
+                    player.getInventory().setItem(i, new ItemStack(Material.AIR));
                     break;
                 }
             }
@@ -117,10 +117,10 @@ public class PickupItemHandler {
      * @return 如果玩家挂机且尝试拾取资源返回true
      */
     public static boolean checkAfkResourcePickup(ItemStack itemStack, GamePlayer gamePlayer) {
-        boolean isResource = itemStack.getType() == Material.IRON_INGOT || 
-                            itemStack.getType() == Material.GOLD_INGOT || 
-                            itemStack.getType() == Material.DIAMOND || 
-                            itemStack.getType() == Material.EMERALD;
+        boolean isResource = itemStack.getType() == XMaterial.IRON_INGOT.get() ||
+                            itemStack.getType() == XMaterial.GOLD_INGOT.get() ||
+                            itemStack.getType() == XMaterial.DIAMOND.get() ||
+                            itemStack.getType() == XMaterial.EMERALD.get();
         
         // 玩家挂机状态不能拾取资源
         return isResource && gamePlayer.isAfk();
@@ -136,7 +136,7 @@ public class PickupItemHandler {
      * @return 如果已处理返回true
      */
     public static boolean handleIngotPickup(ItemStack itemStack, Player player, GamePlayer gamePlayer, Item item) {
-        boolean isIngot = itemStack.getType() == Material.IRON_INGOT || itemStack.getType() == Material.GOLD_INGOT;
+        boolean isIngot = itemStack.getType() == XMaterial.IRON_INGOT.get() || itemStack.getType() == XMaterial.GOLD_INGOT.get();
         
         if (!isIngot) {
             return false;
@@ -170,7 +170,7 @@ public class PickupItemHandler {
     private static int calculateIngotXp(ItemStack itemStack, GamePlayer gamePlayer) {
         int xp = itemStack.getAmount();
 
-        if (itemStack.getType() == Material.IRON_INGOT) {
+        if (itemStack.getType() == XMaterial.IRON_INGOT.get()) {
             gamePlayer.addExperience("IRON", xp);
         } else {
             xp = xp * 3;
@@ -209,7 +209,7 @@ public class PickupItemHandler {
      * @return 如果已处理返回true
      */
     public static boolean handleDiamondPickup(ItemStack itemStack, Player player, GamePlayer gamePlayer, Item item) {
-        if (itemStack.getType() != Material.DIAMOND) {
+        if (itemStack.getType() != XMaterial.DIAMOND.get()) {
             return false;
         }
         
@@ -242,7 +242,7 @@ public class PickupItemHandler {
      * @return 如果已处理返回true
      */
     public static boolean handleEmeraldPickup(ItemStack itemStack, Player player, GamePlayer gamePlayer, Item item) {
-        if (itemStack.getType() != Material.EMERALD) {
+        if (itemStack.getType() != XMaterial.EMERALD.get()) {
             return false;
         }
         

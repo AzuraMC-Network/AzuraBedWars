@@ -2,9 +2,8 @@ package cc.azuramc.bedwars.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
-import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -220,7 +219,7 @@ public class MapUtil {
         try {
             // 对于羊毛等染色方块，我们可以直接替换为对应颜色的方块
             Material type = block.getType();
-            if (MaterialWrapper.isWool(type)) {
+            if (type.name().toUpperCase().contains("WOOL")) {
                 String colorName = getColorNameFromData(data);
                 Material newType = Material.getMaterial(colorName + "_WOOL");
                 if (newType != null) {
@@ -231,7 +230,7 @@ public class MapUtil {
 
             // 最后的回退方案：重新放置相同类型的方块
             // 这不会保留数据值，但至少保证方块类型正确
-            if (block.getType() != MaterialWrapper.AIR()) {
+            if (block.getType() != Material.AIR) {
                 Material currentType = block.getType();
                 block.setType(currentType);
             }

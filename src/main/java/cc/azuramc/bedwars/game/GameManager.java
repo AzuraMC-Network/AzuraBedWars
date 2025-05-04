@@ -19,6 +19,7 @@ import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
 import cc.azuramc.bedwars.util.LoadGameUtil;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import lombok.Getter;
 import org.bukkit.*;
@@ -49,9 +50,9 @@ public class GameManager {
     private static final String MSG_PLAYER_RECONNECT = MESSAGE_CONFIG.getMsgPlayerReconnect();
     private static final String MSG_PLAYER_LEAVE = MESSAGE_CONFIG.getMsgPlayerLeave();
 
-    private static final Material RESOURCE_SELECTOR_MATERIAL = Material.PAPER;
+    private static final Material RESOURCE_SELECTOR_MATERIAL = XMaterial.PAPER.get();
     private static final String RESOURCE_SELECTOR_NAME = ITEM_CONFIG.getResourceSelectorName();
-    private static final Material LEAVE_GAME_MATERIAL = Material.SLIME_BALL;
+    private static final Material LEAVE_GAME_MATERIAL = XMaterial.SLIME_BALL.get();
     private static final String LEAVE_GAME_NAME = ITEM_CONFIG.getLeaveGameName();
 
     @Getter private final boolean isArrowDisplayEnabled = SETTINGS_CONFIG.isArrowDisplayEnabled();

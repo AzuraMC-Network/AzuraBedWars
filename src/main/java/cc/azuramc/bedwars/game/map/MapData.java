@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.game.map;
 
+import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -293,19 +294,18 @@ public class MapData {
         String typeName = type.name();
 
         // 检查AIR（空气方块）- 两个版本都有
-        if (type == Material.AIR) {
+        if (type == XMaterial.AIR.get()) {
             return true;
         }
 
         // 检查BED_BLOCK（床方块）
         // 在1.13+版本中变为BED、RED_BED等
-        if (typeName.contains("_BED")) {
+        if (typeName.contains("BED")) {
             return true;
         }
 
-        // 检查LONG_GRASS（长草）
-        // 在1.13+版本中变为GRASS、TALL_GRASS等
-        if (typeName.equals("GRASS") || typeName.equals("TALL_GRASS") || typeName.contains("_GRASS")) {
+        // 检查GRASS（草）
+        if (typeName.contains("GRASS")) {
             return true;
         }
 

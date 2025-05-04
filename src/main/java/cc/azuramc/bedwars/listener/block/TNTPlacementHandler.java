@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.block;
 
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -24,14 +24,14 @@ public class TNTPlacementHandler {
     public static void handleTNTPlacement(BlockPlaceEvent event, Player player) {
         event.setCancelled(true);
         Block block = event.getBlock();
-        block.setType(MaterialWrapper.AIR());
+        block.setType(Material.AIR);
 
         // 生成已激活的TNT实体
         TNTPrimed tnt = block.getWorld().spawn(block.getLocation().add(0.5D, 0.0D, 0.5D), TNTPrimed.class);
         tnt.setVelocity(new Vector(0, 0, 0));
 
         // 减少玩家物品栏中的TNT数量
-        consumeItem(player, MaterialWrapper.TNT());
+        consumeItem(player, XMaterial.TNT.get());
     }
 
     /**

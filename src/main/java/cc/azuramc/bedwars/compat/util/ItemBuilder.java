@@ -1,11 +1,8 @@
 package cc.azuramc.bedwars.compat.util;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Bukkit;
+import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +10,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.Wool;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.Method;
@@ -35,7 +31,9 @@ public class ItemBuilder {
      * 创建空物品构建器
      */
     public ItemBuilder() {
-        itemStack = new ItemStack(Material.AIR);
+        if (XMaterial.AIR.get() != null) {
+            itemStack = new ItemStack(XMaterial.AIR.get());
+        }
     }
     
     /**
@@ -59,11 +57,7 @@ public class ItemBuilder {
      * @return 玩家头颅的Material
      */
     public static Material getPlayerSkullMaterial() {
-        if (!VersionUtil.isLessThan113()) {
-            return Material.valueOf("PLAYER_HEAD");
-        } else {
-            return Material.valueOf("SKULL_ITEM");
-        }
+        return XMaterial.PLAYER_HEAD.get();
     }
 
     /**
@@ -209,29 +203,11 @@ public class ItemBuilder {
      * @param dyeColor 染料颜色
      * @return 构建器实例
      */
-    @SuppressWarnings("deprecation")
     public ItemBuilder setWoolColor(DyeColor dyeColor) {
-        if (!VersionUtil.isLessThan113()) {
-            // 1.13+版本使用特定的彩色羊毛材质
-            try {
-                String woolName = dyeColor.toString() + "_WOOL";
-                Material woolMaterial = Material.valueOf(woolName);
-                itemStack = new ItemStack(woolMaterial);
-            } catch (Exception e) {
-                // 如果找不到特定颜色，使用白色羊毛
-                itemStack = new ItemStack(Material.valueOf("WHITE_WOOL"));
-            }
-        } else {
-            // 1.8-1.12版本使用数据值区分颜色
-            try {
-                Wool wool = new Wool(dyeColor);
-                itemStack = wool.toItemStack(1);
-            } catch (Exception e) {
-                // 备用方案：使用原始WOOL材质并设置数据值
-                itemStack = new ItemStack(Material.valueOf("WOOL"));
-                setDurabilityCompat(itemStack, (short) dyeColor.ordinal());
-            }
-        }
+        this.itemStack = XMaterial.matchXMaterial(dyeColor.toString() + "_WOOL")
+                // 找不到颜色名则用白色
+                .orElse(XMaterial.WHITE_WOOL)
+                .parseItem();
         return this;
     }
 
@@ -266,11 +242,7 @@ public class ItemBuilder {
      * @return 是否是玩家头颅
      */
     private boolean isPlayerSkull(Material material) {
-        if (!VersionUtil.isLessThan113()) {
-            return material.name().equals("PLAYER_HEAD");
-        } else {
-            return material.name().equals("SKULL_ITEM");
-        }
+        return XMaterial.PLAYER_HEAD.get() == material;
     }
     
     /**

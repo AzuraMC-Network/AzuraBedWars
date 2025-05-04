@@ -1,17 +1,19 @@
 package cc.azuramc.bedwars.listener.projectile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.team.TeamColor;
 import cc.azuramc.bedwars.util.MapUtil;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.Objects;
 
 /**
  * @author an5w1r@163.com
@@ -77,7 +79,7 @@ public class EggBridgeHandler implements Runnable {
             // 检查是否为空气方块
             if (block.getType() == Material.AIR) {
                 // 改变 AIR 为 指定颜色的羊毛
-                block.setType(MaterialWrapper.getColoredWool(teamColor.getDyeColor()).getType());
+                block.setType(Objects.requireNonNull(XMaterial.matchXMaterial(teamColor.getDyeColor().toString() + "WOOL").orElse(XMaterial.WHITE_WOOL).get()));
                 // 播放超级无敌音效
                 SoundWrapper.playOrbPickupSound(getPlayer());
             }

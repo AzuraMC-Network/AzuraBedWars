@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.listener.player;
 
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,9 +23,9 @@ public class PlayerDragToolListener implements Listener {
      * 定义受保护的工具类型
      */
     private static final Set<Material> PROTECTED_TOOLS = EnumSet.of(
-            MaterialWrapper.DIAMOND_PICKAXE(), MaterialWrapper.GOLDEN_PICKAXE(), MaterialWrapper.IRON_PICKAXE(), MaterialWrapper.STONE_PICKAXE(), MaterialWrapper.WOODEN_PICKAXE(), Material.NETHERITE_PICKAXE,
-            MaterialWrapper.DIAMOND_AXE(), MaterialWrapper.GOLDEN_AXE(), MaterialWrapper.IRON_AXE(), MaterialWrapper.STONE_AXE(), MaterialWrapper.WOODEN_AXE(), Material.NETHERITE_AXE,
-            MaterialWrapper.DIAMOND_SWORD(), MaterialWrapper.GOLDEN_SWORD(), MaterialWrapper.IRON_SWORD(), MaterialWrapper.STONE_SWORD(), MaterialWrapper.WOODEN_SWORD(), Material.NETHERITE_SWORD
+            XMaterial.DIAMOND_PICKAXE.get(), XMaterial.GOLDEN_PICKAXE.get(), XMaterial.IRON_PICKAXE.get(), XMaterial.STONE_PICKAXE.get(), XMaterial.WOODEN_PICKAXE.get(), XMaterial.NETHERITE_PICKAXE.get(),
+            XMaterial.DIAMOND_AXE.get(), XMaterial.GOLDEN_AXE.get(), XMaterial.IRON_AXE.get(), XMaterial.STONE_AXE.get(), XMaterial.WOODEN_AXE.get(), XMaterial.NETHERITE_AXE.get(),
+            XMaterial.DIAMOND_SWORD.get(), XMaterial.GOLDEN_SWORD.get(), XMaterial.IRON_SWORD.get(), XMaterial.STONE_SWORD.get(), XMaterial.WOODEN_SWORD.get(), XMaterial.NETHERITE_SWORD.get()
     );
 
     /**

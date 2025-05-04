@@ -2,10 +2,10 @@ package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.util.MapUtil;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -53,7 +53,7 @@ public class SpeedWoolHandler {
                 }
 
                 // 放置方块
-                if (relativeBlock.getType() == MaterialWrapper.AIR()) {
+                if (relativeBlock.getType() == Material.AIR) {
                     relativeBlock.setType(item.getType());
                     if (!VersionUtil.isLessThan113() && item.getData() != null) {
                         MapUtil.setBlockData(relativeBlock, item.getData().getData());

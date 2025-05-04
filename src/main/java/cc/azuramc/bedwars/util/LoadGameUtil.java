@@ -1,12 +1,12 @@
 package cc.azuramc.bedwars.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.game.team.TeamColor;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
@@ -108,7 +108,7 @@ public class LoadGameUtil {
             as.setGravity(false);
             as.setVisible(false);
             as.setFallDistance(7.0F);
-            as.setHelmet(new ItemStack(Material.EMERALD_BLOCK));
+            as.setHelmet(new ItemStack(XMaterial.EMERALD_BLOCK.get()));
             gameManager.getArmorSande().put(as, name);
 
             as = location.getWorld().spawn(location, ArmorStand.class);
@@ -141,7 +141,7 @@ public class LoadGameUtil {
             as.setGravity(false);
             as.setVisible(false);
             as.setFallDistance(7.0F);
-            as.setHelmet(new ItemStack(Material.DIAMOND_BLOCK));
+            as.setHelmet(new ItemStack(XMaterial.DIAMOND_BLOCK.get()));
             gameManager.getArmorStand().put(as, name);
 
             as = location.getWorld().spawn(location, ArmorStand.class);

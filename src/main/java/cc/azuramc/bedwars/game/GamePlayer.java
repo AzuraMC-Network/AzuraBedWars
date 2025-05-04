@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.TitleUtil;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
@@ -15,6 +14,7 @@ import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.scoreboard.base.FastBoard;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -367,10 +367,10 @@ public class GamePlayer {
      * 设置观察者物品栏
      */
     private void setupSpectatorInventory(Player player) {
-        player.getInventory().setItem(0, createSpectatorItem(MaterialWrapper.COMPASS(), "§a§l传送器 §7(右键打开)"));
-        player.getInventory().setItem(4, createSpectatorItem(MaterialWrapper.COMPARATOR(), "§c§l旁观者设置 §7(右键打开)"));
-        player.getInventory().setItem(7, createSpectatorItem(Material.PAPER, "§b§l快速加入 §7(右键加入)"));
-        player.getInventory().setItem(8, createSpectatorItem(MaterialWrapper.SLIME_BALL(), "§c§l离开游戏 §7(右键离开)"));
+        player.getInventory().setItem(0, createSpectatorItem(XMaterial.COMPASS.get(), "§a§l传送器 §7(右键打开)"));
+        player.getInventory().setItem(4, createSpectatorItem(XMaterial.COMPARATOR.get(), "§c§l旁观者设置 §7(右键打开)"));
+        player.getInventory().setItem(7, createSpectatorItem(XMaterial.PAPER.get(), "§b§l快速加入 §7(右键加入)"));
+        player.getInventory().setItem(8, createSpectatorItem(XMaterial.SLIME_BALL.get(), "§c§l离开游戏 §7(右键离开)"));
     }
 
     /**
@@ -435,8 +435,8 @@ public class GamePlayer {
      */
     public void giveInventory() {
         Player player = getPlayer();
-        player.getInventory().setHelmet(new ItemBuilder().setType(Material.LEATHER_HELMET).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-        player.getInventory().setChestplate(new ItemBuilder().setType(Material.LEATHER_CHESTPLATE).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+        player.getInventory().setHelmet(new ItemBuilder().setType(XMaterial.LEATHER_HELMET.get()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+        player.getInventory().setChestplate(new ItemBuilder().setType(XMaterial.LEATHER_CHESTPLATE.get()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
         giveArmor();
         giveSword(false);
         givePickaxe(false);
@@ -451,20 +451,20 @@ public class GamePlayer {
 
         switch (armorType) {
             case CHAINMAIL:
-                player.getInventory().setLeggings(new ItemBuilder().setType(Material.CHAINMAIL_LEGGINGS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilder().setType(Material.CHAINMAIL_BOOTS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setLeggings(new ItemBuilder().setType(XMaterial.CHAINMAIL_LEGGINGS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setBoots(new ItemBuilder().setType(XMaterial.CHAINMAIL_BOOTS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
                 break;
             case IRON:
-                player.getInventory().setLeggings(new ItemBuilder().setType(Material.IRON_LEGGINGS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilder().setType(Material.IRON_BOOTS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setLeggings(new ItemBuilder().setType(XMaterial.IRON_LEGGINGS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setBoots(new ItemBuilder().setType(XMaterial.IRON_BOOTS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
                 break;
             case DIAMOND:
-                player.getInventory().setLeggings(new ItemBuilder().setType(Material.DIAMOND_LEGGINGS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilder().setType(Material.DIAMOND_BOOTS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setLeggings(new ItemBuilder().setType(XMaterial.DIAMOND_LEGGINGS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setBoots(new ItemBuilder().setType(XMaterial.DIAMOND_BOOTS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
                 break;
             default:
-                player.getInventory().setLeggings(new ItemBuilder().setType(Material.LEATHER_LEGGINGS).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilder().setType(Material.LEATHER_BOOTS).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setLeggings(new ItemBuilder().setType(XMaterial.LEATHER_LEGGINGS.get()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                player.getInventory().setBoots(new ItemBuilder().setType(XMaterial.LEATHER_BOOTS.get()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
                 break;
         }
 
@@ -479,12 +479,14 @@ public class GamePlayer {
         Player player = getPlayer();
 
         if (remove) {
-            player.getInventory().remove(MaterialWrapper.WOODEN_SWORD());
+            if (XMaterial.WOODEN_SWORD.get() != null) {
+                player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
+            }
         }
         if (gameTeam.isHasSharpenedEnchant()) {
-            player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.WOODEN_SWORD()).addEnchant(EnchantmentWrapper.DAMAGE_ALL(), 1).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
+            player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addEnchant(EnchantmentWrapper.DAMAGE_ALL(), 1).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
         } else {
-            player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.WOODEN_SWORD()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
+            player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
         }
     }
 
@@ -493,25 +495,31 @@ public class GamePlayer {
 
         switch (pickaxeType) {
             case WOOD:
-                player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.WOODEN_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case STONE:
                 if (remove) {
-                    player.getInventory().remove(MaterialWrapper.WOODEN_PICKAXE());
+                    if (XMaterial.WOODEN_PICKAXE.get() != null) {
+                        player.getInventory().remove(XMaterial.WOODEN_PICKAXE.get());
+                    }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.STONE_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.STONE_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case IRON:
                 if (remove) {
-                    player.getInventory().remove(MaterialWrapper.STONE_PICKAXE());
+                    if (XMaterial.STONE_PICKAXE.get() != null) {
+                        player.getInventory().remove(XMaterial.STONE_PICKAXE.get());
+                    }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.IRON_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.IRON_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case DIAMOND:
                 if (remove) {
-                    player.getInventory().remove(MaterialWrapper.IRON_PICKAXE());
+                    if (XMaterial.IRON_PICKAXE.get() != null) {
+                        player.getInventory().remove(XMaterial.IRON_PICKAXE.get());
+                    }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.DIAMOND_PICKAXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.DIAMOND_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             default:
                 break;
@@ -523,25 +531,31 @@ public class GamePlayer {
 
         switch (axeType) {
             case WOOD:
-                player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.WOODEN_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case STONE:
                 if (remove) {
-                    player.getInventory().remove(MaterialWrapper.WOODEN_AXE());
+                    if (XMaterial.WOODEN_AXE.get() != null) {
+                        player.getInventory().remove(XMaterial.WOODEN_AXE.get());
+                    }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.STONE_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.STONE_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case IRON:
                 if (remove) {
-                    player.getInventory().remove(MaterialWrapper.STONE_AXE());
+                    if (XMaterial.STONE_AXE.get() != null) {
+                        player.getInventory().remove(XMaterial.STONE_AXE.get());
+                    }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.IRON_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.IRON_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             case DIAMOND:
                 if (remove) {
-                    player.getInventory().remove(MaterialWrapper.IRON_AXE());
+                    if (XMaterial.IRON_AXE.get() != null) {
+                        player.getInventory().remove(XMaterial.IRON_AXE.get());
+                    }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(MaterialWrapper.DIAMOND_AXE()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.DIAMOND_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
                 break;
             default:
                 break;
@@ -552,7 +566,7 @@ public class GamePlayer {
         Player player = getPlayer();
 
         if (shear) {
-            player.getInventory().addItem(new ItemBuilder().setType(Material.SHEARS).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+            player.getInventory().addItem(new ItemBuilder().setType(XMaterial.SHEARS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
         }
     }
     /**

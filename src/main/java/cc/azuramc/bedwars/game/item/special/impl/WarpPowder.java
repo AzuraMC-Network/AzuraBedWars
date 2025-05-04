@@ -8,12 +8,12 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.team.GameTeam;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -158,7 +158,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
     @Override
     public Material getActivatedMaterial() {
-        return MaterialWrapper.getMaterial("GLOWSTONE_DUST", "GLOWSTONE_DUST");
+        return XMaterial.GLOWSTONE_DUST.get();
     }
 
     /**
@@ -178,7 +178,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
     @Override
     public Material getItemMaterial() {
-        return MaterialWrapper.GUNPOWDER();
+        return XMaterial.GUNPOWDER.get();
     }
 
     /**

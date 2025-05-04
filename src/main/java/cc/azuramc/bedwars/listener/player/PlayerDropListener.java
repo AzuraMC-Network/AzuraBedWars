@@ -2,12 +2,11 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,13 +42,13 @@ public class PlayerDropListener implements Listener {
                 return;
             }
 
-            if (itemStack.getType().toString().endsWith("_AXE") || itemStack.getType().toString().endsWith("PICKAXE") || itemStack.getType() == Material.SHEARS) {
+            if (itemStack.getType().toString().endsWith("_AXE") || itemStack.getType().toString().endsWith("PICKAXE") || itemStack.getType() == XMaterial.SHEARS.get()) {
                 event.setCancelled(true);
                 return;
             }
 
             if (itemStack.getType().toString().endsWith("_SWORD")) {
-                if (itemStack.getType() == MaterialWrapper.WOODEN_SWORD()) {
+                if (itemStack.getType() == XMaterial.WOODEN_SWORD.get()) {
                     event.getItemDrop().remove();
                 }
 

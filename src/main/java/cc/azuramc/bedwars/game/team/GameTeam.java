@@ -3,7 +3,10 @@ package cc.azuramc.bedwars.game.team;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Data;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -328,17 +331,7 @@ public class GameTeam {
      * @return 如果是床方块返回true，否则返回false
      */
     private boolean isBedBlock(Block block) {
-        if (!VersionUtil.isLessThan113()) {
-            // 1.13+版本，床拆分为多种颜色的床
-            return block.getType().name().endsWith("_BED");
-        } else {
-            // 1.8-1.12版本，使用BED_BLOCK
-            try {
-                return block.getType() == Material.valueOf("BED_BLOCK");
-            } catch (IllegalArgumentException e) {
-                return false;
-            }
-        }
+        return block.getType().name().toUpperCase().contains("BED");
     }
 
     /**

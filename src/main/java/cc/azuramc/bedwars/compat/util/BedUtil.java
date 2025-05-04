@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.compat.util;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,12 +21,12 @@ public class BedUtil {
     public static void destroyBed(GameTeam gameTeam) {
         try {
             // 设置床头和床脚方块为AIR
-            if (gameTeam.getBedHead() != null) {
-                gameTeam.getBedHead().setType(Material.AIR);
+            if (gameTeam.getBedHead() != null && XMaterial.AIR.get() != null) {
+                gameTeam.getBedHead().setType(XMaterial.AIR.get());
             }
 
-            if (gameTeam.getBedFeet() != null) {
-                gameTeam.getBedFeet().setType(Material.AIR);
+            if (gameTeam.getBedFeet() != null && XMaterial.AIR.get() != null) {
+                gameTeam.getBedFeet().setType(XMaterial.AIR.get());
             }
         } catch (Exception e) {
             Bukkit.getLogger().warning("销毁床时出现异常: " + e.getMessage());
@@ -50,10 +50,13 @@ public class BedUtil {
 
         try {
             Method setTypeIdMethod = Block.class.getMethod("setTypeId", int.class);
-            setTypeIdMethod.invoke(block, 0); // AIR ID = 0
+            // AIR ID = 0
+            setTypeIdMethod.invoke(block, 0);
         } catch (Exception e) {
             try {
-                block.setType(Material.AIR);
+                if (XMaterial.AIR.get() != null) {
+                    block.setType(XMaterial.AIR.get());
+                }
             } catch (Exception ignored) {
             }
         }
@@ -116,16 +119,7 @@ public class BedUtil {
             return false;
         }
 
-        if (!VersionUtil.isLessThan113()) {
-            return isBed.getType().name().endsWith("_BED");
-        } else {
-            try {
-                Material bedBlock = Material.valueOf("BED_BLOCK");
-                return (MaterialWrapper.BED().equals(isBed.getType()) || bedBlock.equals(isBed.getType()));
-            } catch (IllegalArgumentException e) {
-                return MaterialWrapper.BED().equals(isBed.getType());
-            }
-        }
+        return isBed.getType().name().toUpperCase().contains("BED");
     }
 
 }

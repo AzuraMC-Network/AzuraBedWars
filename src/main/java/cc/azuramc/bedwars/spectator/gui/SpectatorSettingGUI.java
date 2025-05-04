@@ -7,7 +7,6 @@ import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -78,23 +77,23 @@ public class SpectatorSettingGUI extends CustomGUI {
      */
     private void initializeSpeedItems(Player player, SpectatorSettings settings) {
         // 无速度效果
-        setItem(SPEED_NONE_SLOT, createSpeedItem(MaterialWrapper.LEATHER_BOOTS(), "§a没有速度效果"),
+        setItem(SPEED_NONE_SLOT, createSpeedItem(XMaterial.LEATHER_BOOTS.get(), "§a没有速度效果"),
             createSpeedAction(player, settings, 0));
-        
+
         // 速度 I
-        setItem(SPEED_I_SLOT, createSpeedItem(MaterialWrapper.CHAINMAIL_BOOTS(), "§a速度 I"),
+        setItem(SPEED_I_SLOT, createSpeedItem(XMaterial.CHAINMAIL_BOOTS.get(), "§a速度 I"),
             createSpeedAction(player, settings, 1));
         
         // 速度 II
-        setItem(SPEED_II_SLOT, createSpeedItem(MaterialWrapper.IRON_BOOTS(), "§a速度 II"),
+        setItem(SPEED_II_SLOT, createSpeedItem(XMaterial.IRON_BOOTS.get(), "§a速度 II"),
             createSpeedAction(player, settings, 2));
         
         // 速度 III
-        setItem(SPEED_III_SLOT, createSpeedItem(MaterialWrapper.GOLDEN_BOOTS(), "§a速度 III"),
+        setItem(SPEED_III_SLOT, createSpeedItem(XMaterial.GOLDEN_BOOTS.get(), "§a速度 III"),
             createSpeedAction(player, settings, 3));
         
         // 速度 IV
-        setItem(SPEED_IV_SLOT, createSpeedItem(MaterialWrapper.DIAMOND_BOOTS(), "§a速度 IV"),
+        setItem(SPEED_IV_SLOT, createSpeedItem(XMaterial.DIAMOND_BOOTS.get(), "§a速度 IV"),
             createSpeedAction(player, settings, 4));
     }
 
@@ -159,21 +158,21 @@ public class SpectatorSettingGUI extends CustomGUI {
     private void initializeOptionItems(Player player, GamePlayer gamePlayer, SpectatorSettings settings) {
         // 自动传送
         setItem(AUTO_TP_SLOT, createOptionItem(
-            MaterialWrapper.COMPASS(),
+            XMaterial.COMPASS.get(),
             settings.getOption(SpectatorSettings.Option.AUTO_TP) ? "§c停用自动传送" : "§a启动自动传送",
             settings.getOption(SpectatorSettings.Option.AUTO_TP) ? "§7点击停用自动传送" : "§7点击启用自动传送"
         ), createAutoTpAction(player, settings));
 
         // 夜视
         setItem(NIGHT_VISION_SLOT, createOptionItem(
-            MaterialWrapper.getMaterial("ENDER_EYE", "EYE_OF_ENDER"),
+            XMaterial.ENDER_EYE.get(),
             settings.getOption(SpectatorSettings.Option.NIGHT_VISION) ? "§c停用夜视" : "§a启动夜视",
             settings.getOption(SpectatorSettings.Option.NIGHT_VISION) ? "§7点击停用夜视" : "§7点击启用夜视"
         ), createNightVisionAction(player, settings));
 
         // 第一人称
         setItem(FIRST_PERSON_SLOT, createOptionItem(
-            MaterialWrapper.CLOCK(),
+            XMaterial.CLOCK.get(),
             settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ? "§c停用第一人称旁观" : "§a启动第一人称旁观",
             settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ?
                 "§7点击停用第一人称旁观" : 
@@ -183,8 +182,8 @@ public class SpectatorSettingGUI extends CustomGUI {
         // 隐藏其他旁观者
         setItem(HIDE_OTHERS_SLOT, createOptionItem(
             settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ?
-                MaterialWrapper.getMaterial("REDSTONE", "REDSTONE") :
-                MaterialWrapper.getMaterial("GLOWSTONE_DUST", "GLOWSTONE_DUST"),
+                XMaterial.REDSTONE.get() :
+                XMaterial.GLOWSTONE_DUST.get(),
             settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ? "§c隐藏旁观者" : "§a查看旁观者",
             settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ?
                 "§7点击来隐藏其他旁观者" : "§7点击以显示其他旁观者"
@@ -192,7 +191,7 @@ public class SpectatorSettingGUI extends CustomGUI {
 
         // 飞行
         setItem(FLY_SLOT, createOptionItem(
-            MaterialWrapper.getMaterial("FEATHER", "FEATHER"),
+            XMaterial.FEATHER.get(),
             settings.getOption(SpectatorSettings.Option.FLY) ? "§c停用持续飞行" : "§a启动持续飞行",
             settings.getOption(SpectatorSettings.Option.FLY) ? "§7点击停用飞行" : "§7点击启用飞行"
         ), createFlyAction(player, settings));

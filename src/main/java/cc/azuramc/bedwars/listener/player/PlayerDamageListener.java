@@ -11,6 +11,7 @@ import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -188,10 +189,10 @@ public class PlayerDamageListener implements Listener {
 
         // 定义需要转移的资源类型
         Material[] resourceTypes = {
-            Material.IRON_INGOT,
-            Material.GOLD_INGOT,
-            Material.DIAMOND,
-            Material.EMERALD
+            XMaterial.IRON_INGOT.get(),
+            XMaterial.GOLD_INGOT.get(),
+            XMaterial.DIAMOND.get(),
+            XMaterial.EMERALD.get()
         };
 
         // 清除死亡消息和经验掉落
@@ -253,10 +254,10 @@ public class PlayerDamageListener implements Listener {
     private int getPlayerRewardExp(Player player) {
         // 处理物品类型资源
         Map<Material, Integer> items = new HashMap<>();
-        items.put(Material.IRON_INGOT, 0);
-        items.put(Material.GOLD_INGOT, 0);
-        items.put(Material.DIAMOND, 0);
-        items.put(Material.EMERALD, 0);
+        items.put(XMaterial.IRON_INGOT.get(), 0);
+        items.put(XMaterial.GOLD_INGOT.get(), 0);
+        items.put(XMaterial.DIAMOND.get(), 0);
+        items.put(XMaterial.EMERALD.get(), 0);
         // 遍历背包 得到各类物品资源总数 存在 items 中
         Inventory inventory = player.getInventory();
         for (ItemStack item : inventory.getContents()) {
@@ -272,10 +273,10 @@ public class PlayerDamageListener implements Listener {
 
         // 处理经验资源
         int oldExp = player.getLevel();
-        int ironExp = items.get(Material.IRON_INGOT);
-        int goldExp = items.get(Material.GOLD_INGOT) * 3;
-        int diamondExp = items.get(Material.DIAMOND) * 40;
-        int emeraldExp = items.get(Material.EMERALD) * 80;
+        int ironExp = items.get(XMaterial.IRON_INGOT.get());
+        int goldExp = items.get(XMaterial.GOLD_INGOT.get()) * 3;
+        int diamondExp = items.get(XMaterial.DIAMOND.get()) * 40;
+        int emeraldExp = items.get(XMaterial.EMERALD.get()) * 80;
 
         // 目标玩家的全部身家 :w:
         return oldExp + ironExp + goldExp + diamondExp + emeraldExp;
@@ -719,22 +720,22 @@ public class PlayerDamageListener implements Listener {
                 case "IRON":
                     // IRON 不用转换
                     itemAmount = expAmount;
-                    material = Material.IRON_INGOT;
+                    material = XMaterial.IRON_INGOT.get();
                     break;
                 case "GOLD":
                     // GOLD 除以3
                     itemAmount = (int) Math.floor(expAmount / 3.0);
-                    material = Material.GOLD_INGOT;
+                    material = XMaterial.GOLD_INGOT.get();
                     break;
                 case "DIAMOND":
                     // DIAMOND 除以40
                     itemAmount = (int) Math.floor(expAmount / 40.0);
-                    material = Material.DIAMOND;
+                    material = XMaterial.DIAMOND.get();
                     break;
                 case "EMERALD":
                     // EMERALD 除以80
                     itemAmount = (int) Math.floor(expAmount / 80.0);
-                    material = Material.EMERALD;
+                    material = XMaterial.EMERALD.get();
                     break;
                 default:
                     continue;

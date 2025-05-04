@@ -2,13 +2,13 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -18,8 +18,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.inventory.*;
-import org.bukkit.event.player.*;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -61,15 +65,15 @@ public class PlayerMiscListener implements Listener {
     public void onConsume(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getItem().getType() != Material.POTION) {
+        if (event.getItem().getType() != XMaterial.POTION.get()) {
             return;
         }
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (PlayerUtil.getItemInHand(player).getType() == MaterialWrapper.GLASS_BOTTLE()) {
-                    PlayerUtil.setItemInHand(player, new ItemStack(MaterialWrapper.AIR()));
+                if (PlayerUtil.getItemInHand(player).getType() == XMaterial.GLASS_BOTTLE.get()) {
+                    PlayerUtil.setItemInHand(player, new ItemStack(Material.AIR));
                 }
             }
         }.runTaskLater(AzuraBedWars.getInstance(), 0);
@@ -141,7 +145,7 @@ public class PlayerMiscListener implements Listener {
         }
 
         // 只对木箱进行判断
-        if (blockType != Material.CHEST) {
+        if (blockType != XMaterial.CHEST.get()) {
             return;
         }
 

@@ -1,14 +1,15 @@
 package cc.azuramc.bedwars.game.task;
 
-import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
-import cc.azuramc.bedwars.game.map.MapData;
-import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.GameEventRunnable;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.util.ArmorStandUtil;
 import cc.azuramc.bedwars.util.ChatColorUtil;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -263,7 +264,7 @@ public class GeneratorTask {
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
                 gameManager.getMapData().getDropLocations(MapData.DropType.BASE)
                     .forEach(location -> 
-                        dropItem(location, Material.IRON_INGOT, getMaxIronStack(currentEvent))
+                        dropItem(location, XMaterial.IRON_INGOT.get(), getMaxIronStack(currentEvent))
                     )
             ), IRON_SPAWN_INTERVAL);
         
@@ -272,7 +273,7 @@ public class GeneratorTask {
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
                 gameManager.getMapData().getDropLocations(MapData.DropType.BASE)
                     .forEach(location -> 
-                        dropItem(location, Material.GOLD_INGOT, getMaxGoldStack(currentEvent))
+                        dropItem(location, XMaterial.GOLD_INGOT.get(), getMaxGoldStack(currentEvent))
                     )
             ), GOLD_SPAWN_INTERVAL);
         
@@ -281,7 +282,7 @@ public class GeneratorTask {
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
                 gameManager.getMapData().getDropLocations(MapData.DropType.DIAMOND)
                     .forEach(location -> 
-                        dropItem(location, Material.DIAMOND, getMaxDiamondStack(currentEvent))
+                        dropItem(location, XMaterial.DIAMOND.get(), getMaxDiamondStack(currentEvent))
                     )
             ), DIAMOND_SPAWN_INTERVAL);
         
@@ -290,7 +291,7 @@ public class GeneratorTask {
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> 
                 gameManager.getMapData().getDropLocations(MapData.DropType.EMERALD)
                     .forEach(location -> 
-                        dropItem(location, Material.EMERALD, getMaxEmeraldStack(currentEvent))
+                        dropItem(location, XMaterial.EMERALD.get(), getMaxEmeraldStack(currentEvent))
                     )
             ), EMERALD_SPAWN_INTERVAL);
     }

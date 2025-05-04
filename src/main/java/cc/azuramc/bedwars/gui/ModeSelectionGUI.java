@@ -1,15 +1,15 @@
 package cc.azuramc.bedwars.gui;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.MaterialWrapper;
-import cc.azuramc.bedwars.gui.base.CustomGUI;
-import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
+import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameModeType;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.gui.base.CustomGUI;
+import cc.azuramc.bedwars.gui.base.action.GUIAction;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -62,23 +62,23 @@ public class ModeSelectionGUI extends CustomGUI {
     private void setupBorders() {
         // 设置顶部边框
         for (int i = 0; i < 9; i++) {
-            setItem(i, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+            setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         }
         
         // 设置左右边框
-        setItem(9, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
-        setItem(17, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+        setItem(9, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+        setItem(17, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         
         // 设置底部边框
         for (int i = 18; i < 27; i++) {
-            setItem(i, MaterialWrapper.getStainedGlassPane(BORDER_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+            setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         }
         
         // 设置选择区域装饰
-        setItem(10, MaterialWrapper.getStainedGlassPane(HIGHLIGHT_GLASS_COLOR), new GUIAction(0, () -> {}, false));
-        setItem(12, MaterialWrapper.getStainedGlassPane(HIGHLIGHT_GLASS_COLOR), new GUIAction(0, () -> {}, false));
-        setItem(14, MaterialWrapper.getStainedGlassPane(HIGHLIGHT_GLASS_COLOR), new GUIAction(0, () -> {}, false));
-        setItem(16, MaterialWrapper.getStainedGlassPane(HIGHLIGHT_GLASS_COLOR), new GUIAction(0, () -> {}, false));
+        setItem(10, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + HIGHLIGHT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+        setItem(12, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + HIGHLIGHT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+        setItem(14, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + HIGHLIGHT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+        setItem(16, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + HIGHLIGHT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
     }
     
     /**
@@ -88,7 +88,7 @@ public class ModeSelectionGUI extends CustomGUI {
         boolean isSelected = playerProfile.getGameModeType() == GameModeType.DEFAULT;
         
         setItem(11, new ItemBuilder()
-                .setType(MaterialWrapper.BED())
+                .setType(XMaterial.RED_BED.get())
                 .setDisplayName("§a普通模式")
                 .setLores(
                     "§7使用资源购买物品的模式",
@@ -119,7 +119,7 @@ public class ModeSelectionGUI extends CustomGUI {
         boolean isSelected = playerProfile.getGameModeType() == GameModeType.EXPERIENCE;
         
         setItem(15, new ItemBuilder()
-                .setType(MaterialWrapper.EXPERIENCE_BOTTLE())
+                .setType(XMaterial.EXPERIENCE_BOTTLE.get())
                 .setDisplayName("§a经验模式")
                 .setLores(
                     "§7使用经验等级购买物品的模式",
