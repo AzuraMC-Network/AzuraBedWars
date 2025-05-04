@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.PotionEffectWrapper;
 import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
@@ -10,6 +9,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
+import com.cryptomorin.xseries.XPotion;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -111,7 +111,7 @@ public class GameStartEvent extends AbstractGameEvent {
         }
         
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player -> {
-            PotionEffectType fastDigging = PotionEffectWrapper.HASTE();
+            PotionEffectType fastDigging = XPotion.HASTE.get();
             if (fastDigging != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(fastDigging, 
                     CONFIG.getUpgrade().getHasteEffectDuration(),
@@ -131,7 +131,7 @@ public class GameStartEvent extends AbstractGameEvent {
         
         if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPool()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-                PotionEffectType regeneration = PotionEffectWrapper.REGENERATION();
+                PotionEffectType regeneration = XPotion.REGENERATION.get();
                 if (regeneration != null) {
                     player.getPlayer().addPotionEffect(new PotionEffect(regeneration, 
                         CONFIG.getUpgrade().getRegenerationEffectDuration(),
@@ -174,7 +174,7 @@ public class GameStartEvent extends AbstractGameEvent {
 
         // 给敌方玩家添加失明效果
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            PotionEffectType blindness = PotionEffectWrapper.BLINDNESS();
+            PotionEffectType blindness = XPotion.BLINDNESS.get();
             if (blindness != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(blindness, 
                     CONFIG.getUpgrade().getTrapEffectDuration(),
@@ -184,7 +184,7 @@ public class GameStartEvent extends AbstractGameEvent {
 
         // 给敌方玩家添加缓慢效果
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            PotionEffectType slowness = PotionEffectWrapper.SLOWNESS();
+            PotionEffectType slowness = XPotion.SLOWNESS.get();
             if (slowness != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(slowness, 
                     CONFIG.getUpgrade().getTrapEffectDuration(),
@@ -207,7 +207,7 @@ public class GameStartEvent extends AbstractGameEvent {
      */
     private void triggerMiningFatigueTrap(GamePlayer player, GameTeam gameTeam) {
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            PotionEffectType miningFatigue = PotionEffectWrapper.MINING_FATIGUE();
+            PotionEffectType miningFatigue = XPotion.MINING_FATIGUE.get();
             if (miningFatigue != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(miningFatigue, 
                     CONFIG.getUpgrade().getMiningFatigueEffectDuration(),
