@@ -1,16 +1,16 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.wrapper.PotionEffectWrapper;
 import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.team.GameTeam;
-import cc.azuramc.bedwars.event.AbstractGameEvent;
-import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
-import cc.azuramc.bedwars.compat.wrapper.PotionEffectWrapper;
+import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -43,7 +43,7 @@ public class GameStartEvent extends AbstractGameEvent {
      */
     @Override
     public void executeRunnable(GameManager gameManager, int seconds) {
-        gameManager.broadcastSound(SoundWrapper.CLICK(), 1f, 1f);
+        gameManager.broadcastSound(XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
         gameManager.broadcastTitle(
             CONFIG.getTitle().getFadeIn(),
             CONFIG.getTitle().getTitleStay(),
@@ -195,7 +195,7 @@ public class GameStartEvent extends AbstractGameEvent {
         // 通知团队成员陷阱被触发
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
             player1.sendTitle(0, 20, 0, "§c§l陷阱触发！", null);
-            SoundWrapper.playEndermanTeleportSound(player1);
+            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
         })));
     }
     

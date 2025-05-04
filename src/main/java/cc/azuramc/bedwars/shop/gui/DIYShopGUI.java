@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.shop.gui;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -9,6 +8,7 @@ import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.shop.*;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -156,7 +156,7 @@ public class DIYShopGUI extends CustomGUI {
                     playerProfile.saveShops();
                     
                     // 播放确认音效
-                    SoundWrapper.playClickSound(player);
+                    player.playSound(player.getLocation(), XSound.UI_BUTTON_CLICK.get(), 1, 10F);
                     
                     // 返回物品商店
                     new ItemShopGUI(player, 0, gameManager).open();
@@ -188,7 +188,7 @@ public class DIYShopGUI extends CustomGUI {
                     playerProfile.saveShops();
                     
                     // 播放确认音效
-                    SoundWrapper.playClickSound(player);
+                    player.playSound(player.getLocation(), XSound.UI_BUTTON_CLICK.get(), 1, 10F);
                     
                     // 返回物品商店
                     new ItemShopGUI(player, 0, gameManager).open();

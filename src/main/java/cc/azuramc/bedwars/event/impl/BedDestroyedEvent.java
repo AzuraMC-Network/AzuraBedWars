@@ -1,13 +1,14 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.compat.util.BedUtil;
 import cc.azuramc.bedwars.config.object.EventConfig;
+import com.cryptomorin.xseries.XSound;
+
 import java.util.logging.Level;
 
 /**
@@ -72,7 +73,7 @@ public class BedDestroyedEvent extends AbstractGameEvent {
         });
 
         // 播放音效和显示标题
-        SoundWrapper.broadcastEnderDragonGrowl(gameManager);
+        gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 1, 1);
         gameManager.broadcastTitle(TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT, TITLE, SUBTITLE);
     }
     

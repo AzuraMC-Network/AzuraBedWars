@@ -1,17 +1,17 @@
 package cc.azuramc.bedwars.listener.player;
 
-import cc.azuramc.bedwars.compat.util.TitleUtil;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.compat.util.TitleUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import cc.azuramc.bedwars.game.team.GameTeam;
+import com.cryptomorin.xseries.XSound;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -174,7 +174,7 @@ public class PlayerRespawnListener implements Listener {
     private void announceTeamElimination(GameTeam gameTeam) {
         String destroyerName = gameTeam.getDestroyPlayer() != null ? gameTeam.getDestroyPlayer().getNickName() : "null";
         
-        gameManager.broadcastSound(SoundWrapper.ENDERDRAGON_HIT(), 10, 10);
+        gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
         gameManager.broadcastMessage(TEAM_ELIMINATED_FORMAT);
         gameManager.broadcastMessage(" ");
         gameManager.broadcastMessage(String.format(TEAM_ELIMINATED_MSG, gameTeam.getChatColor() + gameTeam.getName(), destroyerName));

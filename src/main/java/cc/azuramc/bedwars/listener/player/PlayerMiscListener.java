@@ -2,13 +2,13 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -121,7 +121,7 @@ public class PlayerMiscListener implements Listener {
                 }
 
                 gameManager.broadcastTeamTitle(gameTeam, 0, 8, 0, "", gameTeam.getChatColor() + gamePlayer.getNickName() + " 说: §c注意,我们的床有危险！");
-                gameManager.broadcastTeamSound(gameTeam, SoundWrapper.get("CLICK", "UI_BUTTON_CLICK"), 1f, 1f);
+                gameManager.broadcastTeamSound(gameTeam, XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
                 i++;
             }
         }.runTaskTimer(AzuraBedWars.getInstance(), 0, 10L);

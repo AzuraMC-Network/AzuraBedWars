@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.shop.gui;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
@@ -16,6 +15,7 @@ import cc.azuramc.bedwars.shop.*;
 import cc.azuramc.bedwars.shop.page.DefaultShopPage;
 import cc.azuramc.bedwars.util.ChatColorUtil;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -464,7 +464,7 @@ public class ItemShopGUI extends CustomGUI {
         
         // 检查是否有足够资源
         if (playerTotal < requiredAmount) {
-            SoundWrapper.playEndermanTeleportSound(player);
+            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
@@ -484,8 +484,8 @@ public class ItemShopGUI extends CustomGUI {
                 player.getInventory().setItem(i, item);
             }
         }
-        
-        SoundWrapper.playItemPickupSound(player);
+
+        player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
     }
     
@@ -503,7 +503,7 @@ public class ItemShopGUI extends CustomGUI {
 
         // 检查玩家是否有足够的经验等级
         if (player.getLevel() < requiredXp) {
-            SoundWrapper.playEndermanTeleportSound(player);
+            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
@@ -523,7 +523,7 @@ public class ItemShopGUI extends CustomGUI {
         // 如果不是标准资源类型，直接从经验中扣除
         if (resourceIndex == -1) {
             player.setLevel(player.getLevel() - requiredXp);
-            SoundWrapper.playItemPickupSound(player);
+            player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
             return true;
         }
         
@@ -564,7 +564,7 @@ public class ItemShopGUI extends CustomGUI {
             player.setLevel(player.getLevel() - remainingXp);
         }
         
-        SoundWrapper.playItemPickupSound(player);
+        player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
     }
 

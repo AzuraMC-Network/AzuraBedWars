@@ -2,9 +2,9 @@ package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.util.MapUtil;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -63,7 +63,7 @@ public class SpeedWoolHandler {
                     relativeBlock.setMetadata(SPEED_WOOL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), taskId.toString()));
 
                     // 播放羊毛放置声音
-                    block.getWorld().playSound(relativeBlock.getLocation(), SoundWrapper.STEP_WOOL(), 0.3f, 1.5f);
+                    block.getWorld().playSound(relativeBlock.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 0.3f, 1.5f);
                 }
 
                 i++;

@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -135,7 +135,7 @@ public class GameStartTask extends BukkitRunnable {
                 String.format(TITLE_COUNTDOWN, countdown), 
                 SUBTITLE_TEXT
             );
-            player.playSound(SoundWrapper.LEVEL_UP(), 1F, 10F);
+            player.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 1F, 10F);
         }
     }
 

@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.shop.gui;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -10,6 +9,7 @@ import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -567,7 +567,7 @@ public class TeamShopGUI extends CustomGUI {
         
         // 检查是否有足够资源
         if (playerTotal < amount) {
-            SoundWrapper.playEndermanTeleportSound(player);
+            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
@@ -588,7 +588,7 @@ public class TeamShopGUI extends CustomGUI {
             }
         }
         
-        SoundWrapper.playItemPickupSound(player);
+        player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
     }
     
@@ -600,13 +600,13 @@ public class TeamShopGUI extends CustomGUI {
      */
     private boolean processExperiencePayment(Player player, int xpLevel) {
         if (player.getLevel() < xpLevel) {
-            SoundWrapper.playEndermanTeleportSound(player);
+            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
         
         player.setLevel(player.getLevel() - xpLevel);
-        SoundWrapper.playItemPickupSound(player);
+        player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
     }
     

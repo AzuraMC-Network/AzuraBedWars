@@ -1,14 +1,14 @@
 package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
+import cc.azuramc.bedwars.api.event.BedwarsDestroyBedEvent;
 import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.BedUtil;
-import cc.azuramc.bedwars.api.event.BedwarsDestroyBedEvent;
 import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -131,7 +131,7 @@ public class BedBreakHandler {
      */
     private static void broadcastBedDestructionMessages(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam) {
         // 播放全局音效
-        GAME_MANAGER.broadcastSound(SoundWrapper.ENDERDRAGON_HIT(), 10, 10);
+        GAME_MANAGER.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
 
         // 发送全局消息
         GAME_MANAGER.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");

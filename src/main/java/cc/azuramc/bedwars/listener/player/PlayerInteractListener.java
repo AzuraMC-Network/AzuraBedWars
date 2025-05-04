@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -15,6 +14,7 @@ import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.gui.SpectatorCompassGUI;
 import cc.azuramc.bedwars.spectator.gui.SpectatorSettingGUI;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -330,7 +330,7 @@ public class PlayerInteractListener implements Listener {
      */
     private void announceRejuvenationBedUsed(Player player, GameTeam gameTeam) {
         player.sendMessage("§a使用回春床成功!");
-        gameManager.broadcastSound(SoundWrapper.get("ENDERDRAGON_HIT", "ENTITY_ENDERDRAGON_HURT"), 10, 10);
+        gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
         gameManager.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
         gameManager.broadcastMessage(" ");
         gameManager.broadcastMessage(gameTeam.getChatColor() + gameTeam.getName() + " §c使用了回春床！");

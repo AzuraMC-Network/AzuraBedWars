@@ -2,13 +2,13 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -148,11 +148,11 @@ public class PickupItemHandler {
         // 根据游戏模式处理拾取效果
         if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
             item.remove();
-            SoundWrapper.playLevelUpSound(player);
+            player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
         } else if (playerProfile.getGameModeType() == GameModeType.EXPERIENCE) {
             item.remove();
-            SoundWrapper.playLevelUpSound(player);
+            player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.setLevel(player.getLevel() + xp);
         }
         
@@ -187,7 +187,7 @@ public class PickupItemHandler {
         Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName();
         for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
             if (entity instanceof Player players) {
-                players.playSound(players.getLocation(), SoundWrapper.get("LEVEL_UP", "ENTITY_PLAYER_LEVELUP"), 10, 15);
+                player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
                 
                 GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
                 if (nearbyPlayer.getPlayerProfile().getGameModeType() == GameModeType.DEFAULT) {
@@ -227,7 +227,7 @@ public class PickupItemHandler {
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
         gamePlayer.addExperience("DIAMOND", (int) xp);
-        SoundWrapper.playLevelUpSound(player);
+        player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
         
         return true;
     }
@@ -260,7 +260,7 @@ public class PickupItemHandler {
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
         gamePlayer.addExperience("EMERALD", (int) xp);
-        SoundWrapper.playLevelUpSound(player);
+        player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
         
         return true;
     }

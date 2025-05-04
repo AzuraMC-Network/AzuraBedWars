@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.gui;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.compat.wrapper.SoundWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
@@ -10,6 +9,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.entity.Player;
 
 import java.util.Objects;
@@ -106,7 +106,7 @@ public class ModeSelectionGUI extends CustomGUI {
                     playerProfile.setGameModeType(GameModeType.DEFAULT);
                     GamePlayer.get(player.getUniqueId()).setGameModeType(GameModeType.DEFAULT);
 
-                    SoundWrapper.playOrbPickupSound(player);
+                    player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 10F, 1F);
                     AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
                     player.sendMessage("§a已选择普通模式!");
                 }, true));
@@ -137,7 +137,7 @@ public class ModeSelectionGUI extends CustomGUI {
                     playerProfile.setGameModeType(GameModeType.EXPERIENCE);
                     GamePlayer.get(player.getUniqueId()).setGameModeType(GameModeType.EXPERIENCE);
 
-                    SoundWrapper.playOrbPickupSound(player);
+                    player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 10F, 1F);
                     AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
                     player.sendMessage("§a已选择经验模式!");
                 }, true));
