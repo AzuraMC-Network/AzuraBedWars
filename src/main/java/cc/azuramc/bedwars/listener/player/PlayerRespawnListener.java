@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.compat.util.TitleUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
@@ -12,6 +11,7 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import com.cryptomorin.xseries.XSound;
+import com.cryptomorin.xseries.messages.Titles;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -210,7 +210,7 @@ public class PlayerRespawnListener implements Listener {
                 
                 if (this.delay > 0) {
                     // 显示倒计时
-                    TitleUtil.sendTitle(player, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT, 
+                    Titles.sendTitle(player, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT,
                         String.format(RESPAWN_COUNTDOWN_TITLE, delay), RESPAWN_COUNTDOWN_SUBTITLE);
                     this.delay -= 1;
                     return;
@@ -254,7 +254,7 @@ public class PlayerRespawnListener implements Listener {
         applyDamageProtection(player);
 
         // 显示重生成功标题
-        TitleUtil.sendTitle(player, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT,
+        Titles.sendTitle(player, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT,
             RESPAWN_COMPLETE_TITLE, RESPAWN_COMPLETE_SUBTITLE);
     }
 

@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.compat.util.TitleUtil;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
@@ -15,6 +14,7 @@ import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.messages.Titles;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -296,7 +296,7 @@ public class GamePlayer {
         if (!isOnline()) {
             return;
         }
-        TitleUtil.sendTitle(getPlayer(), fadeIn, stay, fadeOut, title, subTitle);
+        Titles.sendTitle(getPlayer(), fadeIn, stay, fadeOut, title, subTitle);
     }
 
     /**

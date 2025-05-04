@@ -70,7 +70,7 @@ public class SpectatorManger/* implements Runnable, Listener*/ {
             if (!(player.getSpectatorTarget() instanceof Player)) return;
 
             Player spectatorTarget = (Player) player.getSpectatorTarget();
-            TitleUtil.sendTitle(player, 0, 20, 0, "§a正在旁观§7" + Nick.get().getCache().getOrDefault(spectatorTarget.getName(), spectatorTarget.getName()), "§a点击左键打开菜单   §c按Shift键退出");
+            Titles.sendTitle(player, 0, 20, 0, "§a正在旁观§7" + Nick.get().getCache().getOrDefault(spectatorTarget.getName(), spectatorTarget.getName()), "§a点击左键打开菜单   §c按Shift键退出");
         }
     }
 
@@ -98,7 +98,7 @@ public class SpectatorManger/* implements Runnable, Listener*/ {
     }
 
     public void levelSpectator(Player player) {
-        TitleUtil.sendTitle(player, 10, 30, 15, "", "§e退出旁观模式");
+        Titles.sendTitle(player, 10, 30, 15, "", "§e退出旁观模式");
         player.setGameMode(GameMode.ADVENTURE);
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
         player.setAllowFlight(true);

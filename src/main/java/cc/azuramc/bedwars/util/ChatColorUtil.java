@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.util;
 
 import cc.azuramc.bedwars.compat.util.ActionBarUtil;
-import cc.azuramc.bedwars.compat.util.TitleUtil;
+import com.cryptomorin.xseries.messages.Titles;
 import lombok.Setter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
@@ -22,7 +22,7 @@ public final class ChatColorUtil {
             + "------------------------------------------------";
 
     public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
-        TitleUtil.sendTitle(player, fadeIn, stay, fadeOut, color(title), color(subtitle));
+        Titles.sendTitle(player, fadeIn, stay, fadeOut, color(title), color(subtitle));
     }
 
     public static void sendActionBar(Player player, String message) {
