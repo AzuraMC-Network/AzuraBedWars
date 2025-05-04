@@ -1,11 +1,11 @@
 package cc.azuramc.bedwars.shop.page;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import cc.azuramc.bedwars.shop.ColorType;
 import cc.azuramc.bedwars.shop.PriceCost;
 import cc.azuramc.bedwars.shop.ShopData;
 import cc.azuramc.bedwars.shop.ShopItemType;
+import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import org.bukkit.inventory.ItemFlag;
@@ -25,7 +25,7 @@ public class BlockShopPage implements ShopData {
         mainShopItem = new ShopItemType(new ItemBuilder().setType(XMaterial.TERRACOTTA.get()).setLores("§e点击查看！").getItem(), "§a方块", ColorType.NONE, null);
 
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WHITE_WOOL.get()).setAmount(16).getItem(), "羊毛", ColorType.COLOR, new PriceCost(XMaterial.IRON_INGOT.get(), 4, 4)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WHITE_WOOL.get()).setAmount(4).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).getItem(), "火速羊毛", ColorType.COLOR, new PriceCost(XMaterial.IRON_INGOT.get(), 4, 4)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WHITE_WOOL.get()).setAmount(4).addEnchant(XEnchantment.EFFICIENCY.get(), 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).getItem(), "火速羊毛", ColorType.COLOR, new PriceCost(XMaterial.IRON_INGOT.get(), 4, 4)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.TERRACOTTA.get()).setAmount(16).getItem(), "硬化粘土", ColorType.COLOR, new PriceCost(XMaterial.IRON_INGOT.get(), 12, 12)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.GLASS.get()).setAmount(4).getItem(), "防爆玻璃", ColorType.COLOR, new PriceCost(XMaterial.IRON_INGOT.get(), 12, 12)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.END_STONE.get()).setAmount(12).getItem(), "末地石", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 24, 24)));

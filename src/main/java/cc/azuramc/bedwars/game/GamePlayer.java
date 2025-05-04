@@ -5,7 +5,6 @@ import cc.azuramc.bedwars.compat.util.ActionBarUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.TitleUtil;
-import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
@@ -14,6 +13,7 @@ import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.scoreboard.base.FastBoard;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
+import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import lombok.Setter;
@@ -470,7 +470,7 @@ public class GamePlayer {
 
         if (gameTeam.getReinforcedArmor() > 0) {
             for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
-                player.getInventory().getArmorContents()[i].addEnchantment(EnchantmentWrapper.PROTECTION_ENVIRONMENTAL(), gameTeam.getReinforcedArmor());
+                player.getInventory().getArmorContents()[i].addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getReinforcedArmor());
             }
         }
     }
@@ -484,7 +484,7 @@ public class GamePlayer {
             }
         }
         if (gameTeam.isHasSharpenedEnchant()) {
-            player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addEnchant(EnchantmentWrapper.DAMAGE_ALL(), 1).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
+            player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addEnchant(XEnchantment.SHARPNESS.get(), 1).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
         } else {
             player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
         }
@@ -495,7 +495,7 @@ public class GamePlayer {
 
         switch (pickaxeType) {
             case WOOD:
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
                 break;
             case STONE:
                 if (remove) {
@@ -503,7 +503,7 @@ public class GamePlayer {
                         player.getInventory().remove(XMaterial.WOODEN_PICKAXE.get());
                     }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.STONE_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.STONE_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
                 break;
             case IRON:
                 if (remove) {
@@ -511,7 +511,7 @@ public class GamePlayer {
                         player.getInventory().remove(XMaterial.STONE_PICKAXE.get());
                     }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.IRON_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.IRON_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
                 break;
             case DIAMOND:
                 if (remove) {
@@ -519,7 +519,7 @@ public class GamePlayer {
                         player.getInventory().remove(XMaterial.IRON_PICKAXE.get());
                     }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.DIAMOND_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.DIAMOND_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
                 break;
             default:
                 break;
@@ -531,7 +531,7 @@ public class GamePlayer {
 
         switch (axeType) {
             case WOOD:
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
                 break;
             case STONE:
                 if (remove) {
@@ -539,7 +539,7 @@ public class GamePlayer {
                         player.getInventory().remove(XMaterial.WOODEN_AXE.get());
                     }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.STONE_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.STONE_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
                 break;
             case IRON:
                 if (remove) {
@@ -547,7 +547,7 @@ public class GamePlayer {
                         player.getInventory().remove(XMaterial.STONE_AXE.get());
                     }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.IRON_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.IRON_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
                 break;
             case DIAMOND:
                 if (remove) {
@@ -555,7 +555,7 @@ public class GamePlayer {
                         player.getInventory().remove(XMaterial.IRON_AXE.get());
                     }
                 }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.DIAMOND_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(EnchantmentWrapper.DIG_SPEED(), 1).getItem());
+                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.DIAMOND_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
                 break;
             default:
                 break;

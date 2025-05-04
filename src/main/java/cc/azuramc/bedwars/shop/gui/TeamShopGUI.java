@@ -1,13 +1,13 @@
 package cc.azuramc.bedwars.shop.gui;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
+import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
@@ -276,7 +276,7 @@ public class TeamShopGUI extends CustomGUI {
                             for (int i = 0; i < p.getInventory().getContents().length; i++) {
                                 ItemStack item = p.getInventory().getContents()[i];
                                 if (item != null && item.getType().toString().endsWith("_SWORD")) {
-                                    item.addEnchantment(EnchantmentWrapper.DAMAGE_ALL(), 1);
+                                    item.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
                                 }
                             }
                         }
@@ -285,7 +285,7 @@ public class TeamShopGUI extends CustomGUI {
             // 已升级状态
             setItem(11, new ItemBuilder()
                     .setType(XMaterial.IRON_SWORD.get())
-                    .addEnchant(EnchantmentWrapper.DAMAGE_ALL(), 1)
+                    .addEnchant(XEnchantment.SHARPNESS.get(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                     .setDisplayName("§a" + SHARPENED_SWORDS)
@@ -328,7 +328,7 @@ public class TeamShopGUI extends CustomGUI {
                             for (int i = 0; i < p.getInventory().getArmorContents().length; i++) {
                                 ItemStack armor = p.getInventory().getArmorContents()[i];
                                 if (armor != null) {
-                                    armor.addEnchantment(EnchantmentWrapper.PROTECTION_ENVIRONMENTAL(), nextLevel);
+                                    armor.addEnchantment(XEnchantment.PROTECTION.get(), nextLevel);
                                 }
                             }
                         }
@@ -337,7 +337,7 @@ public class TeamShopGUI extends CustomGUI {
             // 已达到最高级
             setItem(12, new ItemBuilder()
                     .setType(XMaterial.IRON_CHESTPLATE.get())
-                    .addEnchant(EnchantmentWrapper.PROTECTION_ENVIRONMENTAL(), 4)
+                    .addEnchant(XEnchantment.PROTECTION.get(), 4)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                     .setDisplayName("§a" + REINFORCED_ARMOR)
@@ -377,7 +377,7 @@ public class TeamShopGUI extends CustomGUI {
             // 已达到最高级
             setItem(13, new ItemBuilder()
                     .setType(XMaterial.GOLDEN_PICKAXE.get())
-                    .addEnchant(EnchantmentWrapper.DIG_SPEED(), 2)
+                    .addEnchant(XEnchantment.EFFICIENCY.get(), 2)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                     .setDisplayName("§a" + MANIC_MINER)
@@ -421,7 +421,7 @@ public class TeamShopGUI extends CustomGUI {
             // 已升级状态
             setItem(14, new ItemBuilder()
                     .setType(XMaterial.IRON_PICKAXE.get())
-                    .addEnchant(EnchantmentWrapper.DIG_SPEED(), 1)
+                    .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                     .setDisplayName("§a" + MINING_FATIGUE_TRAP)
@@ -469,7 +469,7 @@ public class TeamShopGUI extends CustomGUI {
             // 已升级状态
             setItem(15, new ItemBuilder()
                     .setType(XMaterial.BEACON.get())
-                    .addEnchant(EnchantmentWrapper.DIG_SPEED(), 1)
+                    .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .setDisplayName("§a" + HEALING_POOL)
                     .setLores(
@@ -516,7 +516,7 @@ public class TeamShopGUI extends CustomGUI {
             // 已升级状态
             setItem(16, new ItemBuilder()
                     .setType(XMaterial.REDSTONE_TORCH.get())
-                    .addEnchant(EnchantmentWrapper.DIG_SPEED(), 1)
+                    .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                     .setDisplayName("§a" + ALARM_TRAP)
                     .setLores(

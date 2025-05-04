@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.shop.gui;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
@@ -14,6 +13,7 @@ import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
 import cc.azuramc.bedwars.shop.*;
 import cc.azuramc.bedwars.shop.page.DefaultShopPage;
 import cc.azuramc.bedwars.util.ChatColorUtil;
+import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.ChatColor;
@@ -706,7 +706,7 @@ public class ItemShopGUI extends CustomGUI {
             
             // 添加锋利附魔
             if (gamePlayer.getGameTeam().isHasSharpenedEnchant()) {
-                Enchantment sharpness = EnchantmentWrapper.DAMAGE_ALL();
+                Enchantment sharpness = XEnchantment.SHARPNESS.get();
                 if (sharpness != null) {
                     itemBuilder.addEnchant(sharpness, 1);
                 }

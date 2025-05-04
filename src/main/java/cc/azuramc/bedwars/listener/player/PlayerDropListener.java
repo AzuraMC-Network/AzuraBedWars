@@ -1,10 +1,10 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -52,7 +52,7 @@ public class PlayerDropListener implements Listener {
                     event.getItemDrop().remove();
                 }
 
-                itemStack.removeEnchantment(EnchantmentWrapper.DAMAGE_ALL());
+                itemStack.removeEnchantment(XEnchantment.SHARPNESS.get());
                 int size = 0;
                 for (int i = 0; i < player.getInventory().getSize(); i++) {
                     ItemStack itemStack1 = player.getInventory().getItem(i);

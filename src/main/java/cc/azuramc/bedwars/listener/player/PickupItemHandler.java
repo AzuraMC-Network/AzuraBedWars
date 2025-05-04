@@ -1,12 +1,12 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.wrapper.EnchantmentWrapper;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
@@ -87,7 +87,7 @@ public class PickupItemHandler {
         
         // 添加锋利附魔
         if (gamePlayer.getGameTeam().isHasSharpenedEnchant()) {
-            itemStack.addEnchantment(EnchantmentWrapper.DAMAGE_ALL(), 1);
+            itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
         }
         
         // 移除木剑
