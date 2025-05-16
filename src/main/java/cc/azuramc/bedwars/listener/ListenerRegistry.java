@@ -36,6 +36,13 @@ public class ListenerRegistry {
             Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerB(), plugin);
         }
 
+        try {
+//            PlayerAttemptPickupItemHandler.initPlayerAttemptPickupItemEvent();
+            Bukkit.getPluginManager().registerEvents(new PlayerAttemptPickupListener(), plugin);
+        } catch (Exception e) {
+            Bukkit.getLogger().warning( "初始化Event错误");
+        }
+
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new ExplodeListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlacementListener(), plugin);

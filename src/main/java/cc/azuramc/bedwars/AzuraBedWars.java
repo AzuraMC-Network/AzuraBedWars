@@ -351,7 +351,8 @@ public final class AzuraBedWars extends JavaPlugin {
      * @return 玩家等级
      */
     public int getLevel(int experience) {
-        int level = 1; // 默认最低等级为1
+        // 默认最低等级为1
+        int level = 1;
         
         for (Map.Entry<Integer, Integer> entry : PLAYER_LEVEL.entrySet()) {
             if (experience >= entry.getValue()) {
