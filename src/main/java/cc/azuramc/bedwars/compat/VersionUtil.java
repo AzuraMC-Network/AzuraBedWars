@@ -91,20 +91,21 @@ public class VersionUtil {
      * 判断是否是1.13及以下版本
      */
     public static boolean isLessThan113() {
-        return isLessThan(1, 13);
+        return MAJOR_VERSION < 13;
     }
 
     /**
      * 判断是否是1.16及以下版本
      */
     public static boolean isLessThan116() {
-        return isLessThan(1, 16);
+        return MAJOR_VERSION < 16;
     }
 
     /**
-     * 判断是否是1.19及以上版本
+     * 检查服务器版本是否是1.8.x
+     * @return 是否是1.8.x版本
      */
-    public static boolean isLatestVersion() {
-        return isGreaterOrEqual(1, 19);
+    public static boolean isVersion18() {
+        return MAJOR_VERSION == 8;
     }
 }

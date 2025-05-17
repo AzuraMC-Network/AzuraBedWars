@@ -27,6 +27,39 @@ import java.util.UUID;
 public class ItemBuilder {
     private ItemStack itemStack;
     
+    // 反射缓存
+    private static Class<?> craftItemStackClass;
+    private static Class<?> nmsItemStackClass;
+    private static Class<?> nbtTagCompoundClass;
+    private static Method asNMSCopyMethod;
+    private static Method getTagMethod;
+    private static Method setBooleanMethod;
+    private static Method setTagMethod;
+    private static Method asBukkitCopyMethod;
+    private static boolean reflectionInitialized = false;
+    
+    // 静态初始化块，在类首次加载时初始化反射缓存
+    static {
+        if (VersionUtil.isVersion18()) {
+            try {
+                craftItemStackClass = Class.forName("org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack");
+                nmsItemStackClass = Class.forName("net.minecraft.server.v1_8_R3.ItemStack");
+                nbtTagCompoundClass = Class.forName("net.minecraft.server.v1_8_R3.NBTTagCompound");
+                
+                asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
+                getTagMethod = nmsItemStackClass.getMethod("getTag");
+                setBooleanMethod = nbtTagCompoundClass.getMethod("setBoolean", String.class, boolean.class);
+                setTagMethod = nmsItemStackClass.getMethod("setTag", nbtTagCompoundClass);
+                asBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
+                
+                reflectionInitialized = true;
+            } catch (Exception e) {
+                // 记录初始化失败，稍后会回退到备用方法
+                Bukkit.getLogger().warning("无法初始化NMS反射: " + e.getMessage());
+            }
+        }
+    }
+    
     /**
      * 创建空物品构建器
      */
@@ -141,31 +174,57 @@ public class ItemBuilder {
         
         try {
             // 1.11+直接支持setUnbreakable
-            if (!VersionUtil.isLessThan116()) {
+            if (!VersionUtil.isVersion18()) {
                 itemMeta.setUnbreakable(unbreakable);
-            } else {
-                // 1.8-1.10使用spigot API
-                try {
-                    Method spigot = ItemMeta.class.getMethod("spigot");
-                    Object spigotMeta = spigot.invoke(itemMeta);
-                    
-                    Method setUnbreakableMethod = spigotMeta.getClass().getMethod("setUnbreakable", boolean.class);
-                    setUnbreakableMethod.invoke(spigotMeta, unbreakable);
-                } catch (Exception ex) {
-                    // 忽略异常
-                }
+                return this;
             }
-            
-            // 隐藏无法破坏标签
-            if (unbreakable && hide) {
-                itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-            }
-        } catch (Exception e) {
-            // 忽略异常
+
+            // 1.8 NMS
+            this.itemStack = setUnbreakableNbt(this.itemStack);
+            return this;
+
+        } catch (Exception ignored) {
+            Bukkit.getLogger().warning("ItemBuilder在当前版本不支持setUnbreakable");
         }
         
         itemStack.setItemMeta(itemMeta);
         return this;
+    }
+    
+    /**
+     * 使用NBT标签设置物品为不可破坏(适用于1.8)
+     * @param item 需要设置的物品
+     * @return 设置后的物品
+     */
+    @SuppressWarnings("deprecation")
+    private ItemStack setUnbreakableNbt(ItemStack item) {
+        // 如果反射初始化失败，返回原物品
+        if (!reflectionInitialized) {
+            return item;
+        }
+        
+        try {
+            // 使用缓存的反射对象
+            Object nmsItem = asNMSCopyMethod.invoke(null, item);
+            Object tag = getTagMethod.invoke(nmsItem);
+            
+            // 如果没有标签就创建一个
+            if (tag == null) {
+                tag = nbtTagCompoundClass.newInstance();
+            }
+            
+            // 设置Unbreakable标签
+            setBooleanMethod.invoke(tag, "Unbreakable", true);
+            
+            // 将标签设置回物品
+            setTagMethod.invoke(nmsItem, tag);
+            
+            // 转换回Bukkit物品
+            return (ItemStack) asBukkitCopyMethod.invoke(null, nmsItem);
+        } catch (Exception e) {
+            // 异常时返回原物品
+            return item;
+        }
     }
 
     /**

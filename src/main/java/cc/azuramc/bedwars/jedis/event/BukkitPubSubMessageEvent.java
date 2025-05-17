@@ -19,6 +19,10 @@ public class BukkitPubSubMessageEvent extends Event {
     private final String channel;
     private final String message;
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     @Override
     public @NotNull HandlerList getHandlers() {
         return HANDLERS;

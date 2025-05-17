@@ -16,6 +16,10 @@ public class JedisGameEndEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
     private boolean cancelled = false;
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     @Override
     public @NotNull HandlerList getHandlers() {
         return HANDLERS;

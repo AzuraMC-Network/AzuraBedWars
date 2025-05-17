@@ -18,6 +18,10 @@ public class JedisGameLoadingEvent extends Event {
 
     private final int maxPlayers;
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     /**
      * 构造函数
      * @param maxPlayers 游戏最大玩家数量

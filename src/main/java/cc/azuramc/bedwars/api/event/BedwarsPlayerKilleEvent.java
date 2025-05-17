@@ -19,6 +19,10 @@ public class BedwarsPlayerKilleEvent extends Event implements Cancellable {
     private final Player killer;
     private final boolean last;
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     public BedwarsPlayerKilleEvent(Player player, Player killer, boolean last) {
         this.player = player;
         this.killer = killer;

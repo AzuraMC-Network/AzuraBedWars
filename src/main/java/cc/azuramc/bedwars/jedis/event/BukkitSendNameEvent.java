@@ -17,6 +17,10 @@ public class BukkitSendNameEvent extends Event {
 
     private final String serverName;
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     /**
      * 构造函数
      * @param serverName 要设置的服务器名称

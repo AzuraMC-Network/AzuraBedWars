@@ -21,6 +21,10 @@ public class BedwarsDestroyBedEvent extends Event implements Cancellable {
     private final GameTeam gameTeam;
     private boolean cancelled = false;
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     public BedwarsDestroyBedEvent(Player player, GameTeam gameTeam) {
         this.player = player;
         this.gameTeam = gameTeam;

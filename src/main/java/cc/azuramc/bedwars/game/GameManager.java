@@ -40,23 +40,23 @@ import java.util.*;
 @Data
 public class GameManager {
 
-    private static final ItemConfig.GameManager ITEM_CONFIG = AzuraBedWars.getInstance().getItemConfig().getGameManager();
-    private static final MessageConfig.Game MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getGame();
-    private static final SettingsConfig.DisplayDamage SETTINGS_CONFIG = AzuraBedWars.getInstance().getSettingsConfig().getDisplayDamage();
+    private ItemConfig.GameManager itemConfig;
+    private MessageConfig.Game messageConfig;
+    private SettingsConfig.DisplayDamage settingsConfig;
 
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
     private static final int ASSIST_TIME_WINDOW_MS = 10000;
 
-    private static final String MSG_PLAYER_RECONNECT = MESSAGE_CONFIG.getMsgPlayerReconnect();
-    private static final String MSG_PLAYER_LEAVE = MESSAGE_CONFIG.getMsgPlayerLeave();
+    private String msgPlayerReconnect;
+    private String msgPlayerLeave;
 
-    private static final Material RESOURCE_SELECTOR_MATERIAL = XMaterial.PAPER.get();
-    private static final String RESOURCE_SELECTOR_NAME = ITEM_CONFIG.getResourceSelectorName();
-    private static final Material LEAVE_GAME_MATERIAL = XMaterial.SLIME_BALL.get();
-    private static final String LEAVE_GAME_NAME = ITEM_CONFIG.getLeaveGameName();
+    private Material resourceSelectorMaterial;
+    private String resourceSelectorName;
+    private Material leaveGameMaterial;
+    private String leaveGameName;
 
-    @Getter private final boolean isArrowDisplayEnabled = SETTINGS_CONFIG.isArrowDisplayEnabled();
-    @Getter private final boolean isAttackDisplayEnabled = SETTINGS_CONFIG.isAttackDisplayEnabled();
+    @Getter private boolean arrowDisplayEnabled;
+    @Getter private boolean attackDisplayEnabled;
 
     private AzuraBedWars plugin;
     private GameEventManager gameEventManager;
@@ -92,6 +92,24 @@ public class GameManager {
         this.abstractSpecialItems = new ArrayList<>();
         ShopManager.init(this);
         this.gameEventManager = new GameEventManager(this);
+        initializeConfigs();
+    }
+
+    private void initializeConfigs() {
+        this.itemConfig = plugin.getItemConfig().getGameManager();
+        this.messageConfig = plugin.getMessageConfig().getGame();
+        this.settingsConfig = plugin.getSettingsConfig().getDisplayDamage();
+
+        this.msgPlayerReconnect = messageConfig.getMsgPlayerReconnect();
+        this.msgPlayerLeave = messageConfig.getMsgPlayerLeave();
+
+        this.resourceSelectorMaterial = XMaterial.PAPER.get();
+        this.resourceSelectorName = itemConfig.getResourceSelectorName();
+        this.leaveGameMaterial = XMaterial.SLIME_BALL.get();
+        this.leaveGameName = itemConfig.getLeaveGameName();
+
+        this.arrowDisplayEnabled = settingsConfig.isArrowDisplayEnabled();
+        this.attackDisplayEnabled = settingsConfig.isAttackDisplayEnabled();
     }
 
     /**
@@ -242,15 +260,15 @@ public class GameManager {
     private void giveWaitingItems(Player player) {
         player.getInventory().addItem(
             new ItemBuilder()
-                .setType(RESOURCE_SELECTOR_MATERIAL)
-                .setDisplayName(RESOURCE_SELECTOR_NAME)
+                .setType(resourceSelectorMaterial)
+                .setDisplayName(resourceSelectorName)
                 .getItem()
         );
         
         player.getInventory().setItem(8, 
             new ItemBuilder()
-                .setType(LEAVE_GAME_MATERIAL)
-                .setDisplayName(LEAVE_GAME_NAME)
+                .setType(leaveGameMaterial)
+                .setDisplayName(leaveGameName)
                 .getItem()
         );
     }
@@ -271,7 +289,7 @@ public class GameManager {
             if (!gamePlayer.getGameTeam().isDead()) {
                 LoadGameUtil.setPlayerTeamTab();
                 PlayerUtil.callPlayerRespawnEvent(player, respawnLocation);
-                broadcastMessage(String.format(MSG_PLAYER_RECONNECT, gamePlayer.getNickName()));
+                broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
                 return;
             }
         }
@@ -298,7 +316,7 @@ public class GameManager {
      */
     public void removePlayers(GamePlayer gamePlayer) {
         if (gameState == GameState.WAITING) {
-            broadcastMessage(String.format(MSG_PLAYER_LEAVE, gamePlayer.getNickName()));
+            broadcastMessage(String.format(msgPlayerLeave, gamePlayer.getNickName()));
         }
 
         if (gameState == GameState.RUNNING && gamePlayer.isSpectator()) {

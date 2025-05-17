@@ -18,6 +18,10 @@ public class BedwarsGameOverEvent extends Event implements Cancellable {
     private final GameTeam winner;
     private boolean cancelled = false;
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     public BedwarsGameOverEvent(GameTeam winner) {
         this.winner = winner;
     }
