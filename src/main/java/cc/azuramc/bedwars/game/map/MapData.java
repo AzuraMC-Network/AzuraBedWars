@@ -256,6 +256,16 @@ public class MapData {
     }
 
     public boolean isValid() {
+        // 如果team为null，默认设置为1
+        if (players.getTeam() == null) {
+            players.setTeam(1);
+        }
+        
+        // 如果min为null，默认设置为2
+        if (players.getMin() == null) {
+            players.setMin(2);
+        }
+        
         return region.getPos1() != null && 
                region.getPos2() != null && 
                respawnLocation != null &&

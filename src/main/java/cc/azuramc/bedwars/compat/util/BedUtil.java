@@ -68,19 +68,10 @@ public class BedUtil {
             Block bedHead;
             Block bedFeet;
 
-
             try {
-                if (!VersionUtil.isLessThan113()) {
-                    org.bukkit.block.data.type.Bed bedBlock = (org.bukkit.block.data.type.Bed) targetBlock.getBlockData();
-
-                    if (bedBlock.getPart() == org.bukkit.block.data.type.Bed.Part.FOOT) {
-                        bedFeet = targetBlock;
-                        bedHead = getBedNeighborBlock(bedFeet);
-                    } else {
-                        bedHead = targetBlock;
-                        bedFeet = getBedNeighborBlock(bedHead);
-                    }
-                } else {
+                // 使用兼容性代码处理床方块
+                if (VersionUtil.isLessThan113()) {
+                    // 1.8-1.12版本使用旧API
                     org.bukkit.material.Bed bedBlock = (org.bukkit.material.Bed) targetBlock.getState().getData();
 
                     if (!bedBlock.isHeadOfBed()) {
@@ -90,11 +81,30 @@ public class BedUtil {
                         bedHead = targetBlock;
                         bedFeet = getBedNeighborBlock(bedHead);
                     }
+                } else {
+                    // 1.13+版本，但我们避免直接引用BlockData API
+                    // 使用方向检测 - 此方法也适用于1.8
+                    bedHead = targetBlock;
+                    // 尝试寻找床的另一部分
+                    bedFeet = getBedNeighborBlock(bedHead);
+                    
+                    // 如果第一次尝试找不到，可能现在的方块是床脚
+                    if (bedFeet == null) {
+                        bedFeet = targetBlock;
+                        bedHead = getBedNeighborBlock(bedFeet);
+                    }
                 }
 
-                bedHead.setType(Material.AIR);
-                bedFeet.setType(Material.AIR);
+                // 安全销毁床的两个部分
+                if (bedHead != null) {
+                    bedHead.setType(Material.AIR);
+                }
+                if (bedFeet != null) {
+                    bedFeet.setType(Material.AIR);
+                }
             } catch (Exception e) {
+                Bukkit.getLogger().warning("销毁床时出错: " + e.getMessage());
+                // 兜底方案：直接设置目标方块为AIR
                 targetBlock.setType(Material.AIR);
             }
         } else {
@@ -102,16 +112,15 @@ public class BedUtil {
         }
     }
 
-    private static Block getBedNeighborBlock(Block head) {
-        if (isBedBlock(head.getRelative(BlockFace.EAST))) {
-            return head.getRelative(BlockFace.EAST);
-        } else if (isBedBlock(head.getRelative(BlockFace.WEST))) {
-            return head.getRelative(BlockFace.WEST);
-        } else if (isBedBlock(head.getRelative(BlockFace.SOUTH))) {
-            return head.getRelative(BlockFace.SOUTH);
-        } else {
-            return head.getRelative(BlockFace.NORTH);
+    private static Block getBedNeighborBlock(Block block) {
+        // 检查所有四个方向
+        for (BlockFace face : new BlockFace[]{BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH}) {
+            Block relative = block.getRelative(face);
+            if (isBedBlock(relative)) {
+                return relative;
+            }
         }
+        return null;
     }
 
     private static boolean isBedBlock(Block isBed) {

@@ -26,6 +26,9 @@ import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.Location;
 
 import java.util.*;
 
@@ -129,10 +132,22 @@ public class GameManager {
 
         LoadGameUtil.spawnAll(plugin);
 
+        // 在初始化团队前检查必要的队伍配置
+        if (mapData.getPlayers().getTeam() == null) {
+            plugin.getLogger().warning("地图 " + mapData.getName() + " 的每个队伍玩家数未设置，使用默认值1");
+            mapData.getPlayers().setTeam(1);
+        }
+
         initializeTeams(mapData);
         this.gameState = GameState.WAITING;
-        JedisManager.getInstance().getExpand().put("map", mapData.getName());
-        Bukkit.getPluginManager().callEvent(new JedisGameLoadingEvent(getMaxPlayers()));
+        
+        // 添加JedisManager的空值检查
+        if (JedisManager.getInstance() != null) {
+            JedisManager.getInstance().getExpand().put("map", mapData.getName());
+            Bukkit.getPluginManager().callEvent(new JedisGameLoadingEvent(getMaxPlayers()));
+        } else {
+            plugin.getLogger().warning("JedisManager实例为null，跳过Jedis相关操作");
+        }
     }
 
     /**
@@ -141,13 +156,137 @@ public class GameManager {
      * @param mapData 地图数据
      */
     private void initializeTeams(MapData mapData) {
+        // 旧的方法是按顺序分配颜色
+        // for (int i = 0; i < mapData.getBases().size(); i++) {
+        //     gameTeams.add(new GameTeam(
+        //         TeamColor.values()[i],
+        //         mapData.getBases().get(i).toLocation(), 
+        //         mapData.getPlayers().getTeam()
+        //     ));
+        // }
+        
+        // 新 检测基地附近的羊毛颜色来确定队伍颜色
         for (int i = 0; i < mapData.getBases().size(); i++) {
+            Location baseLocation = mapData.getBases().get(i).toLocation();
+            TeamColor teamColor = detectTeamColorFromWool(baseLocation);
+            
+            // 如果无法检测到羊毛颜色，则使用默认顺序
+            if (teamColor == null) {
+                teamColor = TeamColor.values()[i % TeamColor.values().length];
+            }
+            
+            // 获取每个队伍的玩家数量，添加空值检查防止NPE
+            Integer teamSize = mapData.getPlayers().getTeam();
+            if (teamSize == null) {
+                // 设置默认值为1
+                teamSize = 1;
+            }
+            
             gameTeams.add(new GameTeam(
-                TeamColor.values()[i],
-                mapData.getBases().get(i).toLocation(), 
-                mapData.getPlayers().getTeam()
+                teamColor,
+                baseLocation,
+                teamSize
             ));
         }
+    }
+    
+    /**
+     * 从基地位置附近检测羊毛颜色来确定队伍颜色
+     * 
+     * @param location 基地位置
+     * @return 检测到的队伍颜色，如果没有检测到则返回null
+     */
+    private TeamColor detectTeamColorFromWool(Location location) {
+        // 搜索范围，可以根据实际情况调整
+        int radius = 5;
+        World world = location.getWorld();
+        
+        // 遍历位置周围的方块
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    Block block = null;
+                    if (world != null) {
+                        block = world.getBlockAt(
+                            location.getBlockX() + x,
+                            location.getBlockY() + y,
+                            location.getBlockZ() + z
+                        );
+                    }
+
+                    // 检查方块是否为羊毛
+                    if (block != null && "WOOL".equals(block.getType().name())) {
+                        // 根据羊毛颜色确定队伍颜色
+                        return getTeamColorFromWoolBlock(block);
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * 从羊毛方块确定对应的队伍颜色
+     * 
+     * @param block 羊毛方块
+     * @return 对应的队伍颜色
+     */
+    private TeamColor getTeamColorFromWoolBlock(Block block) {
+        // 获取方块数据值（旧版本）或方块材质（新版本）
+        String blockType = block.getType().name();
+
+        // 1.13+版本的羊毛命名格式为 COLOR_WOOL
+        if (blockType.contains("_WOOL")) {
+            String colorName = blockType.substring(0, blockType.length() - 5);
+            
+            // 映射颜色名称到TeamColor
+            return switch (colorName) {
+                case "RED" -> TeamColor.RED;
+                case "BLUE" -> TeamColor.BLUE;
+                case "GREEN" -> TeamColor.GREEN;
+                case "LIME" -> TeamColor.LIME;
+                case "YELLOW" -> TeamColor.YELLOW;
+                case "CYAN" -> TeamColor.CYAN;
+                case "LIGHT_BLUE" -> TeamColor.LIGHT_BLUE;
+                case "WHITE" -> TeamColor.WHITE;
+                case "PINK" -> TeamColor.PINK;
+                case "MAGENTA" -> TeamColor.MAGENTA;
+                case "PURPLE" -> TeamColor.PURPLE;
+                case "GRAY" -> TeamColor.GRAY;
+                case "BLACK" -> TeamColor.BLACK;
+                case "ORANGE" -> TeamColor.ORANGE;
+                case "BROWN" -> TeamColor.BROWN;
+                default -> null;
+            };
+        } 
+        // 1.12-版本需要检查数据值
+        else if ("WOOL".equals(blockType)) {
+            @SuppressWarnings("deprecation")
+            byte data = block.getData();
+            
+            // 根据羊毛的数据值映射到TeamColor
+            return switch (data) {
+                case 0 -> TeamColor.WHITE;
+                case 1 -> TeamColor.ORANGE;
+                case 2 -> TeamColor.MAGENTA;
+                case 3 -> TeamColor.LIGHT_BLUE;
+                case 4 -> TeamColor.YELLOW;
+                case 5 -> TeamColor.LIME;
+                case 6 -> TeamColor.PINK;
+                case 7 -> TeamColor.GRAY;
+                case 9 -> TeamColor.CYAN;
+                case 10 -> TeamColor.PURPLE;
+                case 11 -> TeamColor.BLUE;
+                case 12 -> TeamColor.BROWN;
+                case 13 -> TeamColor.GREEN;
+                case 14 -> TeamColor.RED;
+                case 15 -> TeamColor.BLACK;
+                default -> null;
+            };
+        }
+        
+        return null;
     }
 
     /**

@@ -34,6 +34,7 @@ public class AdminCommand {
         CommandUtil.sendLayout(actor, "");
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw reload &7重新加载配置文件"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/map &7查看地图相关指令帮助"));
+        CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/setup &7查看快速配置相关指令"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw editorMode true/false &7开关编辑模式"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw toWorld <worldName> &7前往世界"));
         CommandUtil.sendLayout(actor, ChatColorUtil.color("&7 • &f/bw loadWorld <worldName> &7加载世界"));

@@ -20,7 +20,10 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 资源生成计时器
@@ -173,20 +176,47 @@ public class GeneratorTask {
      */
     private void startArmorStandUpdateTask() {
         taskId = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> {
-            List<ArmorStand> allArmor = new ArrayList<>();
-            allArmor.addAll(gameManager.getArmorSande().keySet());
-            allArmor.addAll(gameManager.getArmorStand().keySet());
-
-            for (ArmorStand as : allArmor) {
-                if (as == null) {
-                    continue;
+            try {
+                List<ArmorStand> allArmor = new ArrayList<>();
+                
+                // 安全地添加盔甲架到列表中
+                if (gameManager.getArmorSande() != null) {
+                    Set<ArmorStand> armorSandeSet = gameManager.getArmorSande().keySet();
+                    allArmor.addAll(armorSandeSet);
+                }
+                
+                if (gameManager.getArmorStand() != null) {
+                    Set<ArmorStand> armorStandSet = gameManager.getArmorStand().keySet();
+                    allArmor.addAll(armorStandSet);
                 }
 
-                Location loc = as.getLocation();
-                if (!loc.getChunk().isLoaded()) {
-                    loc.getChunk().load();
+                // 过滤掉无效的盔甲架
+                Iterator<ArmorStand> iterator = allArmor.iterator();
+                while (iterator.hasNext()) {
+                    ArmorStand as = iterator.next();
+                    if (as == null || !as.isValid()) {
+                        iterator.remove();
+                        continue;
+                    }
+                    
+                    try {
+                        Location loc = as.getLocation();
+                        if (loc.getWorld() != null) {
+                            loc.getChunk();
+                            if (!loc.getChunk().isLoaded()) {
+                                loc.getChunk().load();
+                            }
+                        }
+                        ArmorStandUtil.moveArmorStand(as, as.getLocation().getY());
+                    } catch (Exception e) {
+                        // 记录异常但继续处理其他盔甲架
+                        Bukkit.getLogger().warning("处理盔甲架时出错: " + e.getMessage());
+                        iterator.remove(); // 移除有问题的盔甲架
+                    }
                 }
-                ArmorStandUtil.moveArmorStand(as, as.getLocation().getY());
+            } catch (Exception e) {
+                // 捕获总体异常，确保任务不会终止
+                Bukkit.getLogger().warning("盔甲架更新任务出错: " + e.getMessage());
             }
         }, 0L, 1L).getTaskId();
     }
@@ -300,11 +330,25 @@ public class GeneratorTask {
      * 注册资源显示更新器
      */
     private void registerDisplayUpdaters() {
-        // 钻石显示更新
-        registerResourceDisplay(DIAMOND_TIME_DISPLAY, DIAMOND_GENERATOR_NAME, gameManager.getArmorStand().keySet(), DIAMOND_NAME);
-        
-        // 绿宝石显示更新
-        registerResourceDisplay(EMERALD_TIME_DISPLAY, EMERALD_GENERATOR_NAME, gameManager.getArmorSande().keySet(), EMERALD_NAME);
+        try {
+            // 钻石显示更新
+            if (gameManager.getArmorStand() != null && !gameManager.getArmorStand().isEmpty()) {
+                registerResourceDisplay(DIAMOND_TIME_DISPLAY, DIAMOND_GENERATOR_NAME, 
+                    gameManager.getArmorStand().keySet(), DIAMOND_NAME);
+            } else {
+                Bukkit.getLogger().warning("无法注册钻石显示更新：盔甲架集合为空");
+            }
+            
+            // 绿宝石显示更新
+            if (gameManager.getArmorSande() != null && !gameManager.getArmorSande().isEmpty()) {
+                registerResourceDisplay(EMERALD_TIME_DISPLAY, EMERALD_GENERATOR_NAME, 
+                    gameManager.getArmorSande().keySet(), EMERALD_NAME);
+            } else {
+                Bukkit.getLogger().warning("无法注册绿宝石显示更新：盔甲架集合为空");
+            }
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("注册资源显示更新器时出错: " + e.getMessage());
+        }
     }
     
     /**
@@ -380,30 +424,57 @@ public class GeneratorTask {
      */
     private void registerResourceDisplay(String displayName, String generatorName, 
                                        java.util.Set<ArmorStand> armorStands, String resourceName) {
+        if (armorStands == null || armorStands.isEmpty()) {
+            Bukkit.getLogger().warning("尝试注册资源显示，但盔甲架集合为空: " + displayName);
+            return;
+        }
+        
+        // 创建盔甲架的安全副本，避免并发修改异常
+        final Set<ArmorStand> safeArmorStands = new HashSet<>(armorStands);
+        
         gameManager.getGameEventManager().registerRunnable(displayName, (seconds, currentEvent) ->
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> {
-                for (ArmorStand armorStand : armorStands) {
-                    if (armorStand == null) {
-                        continue;
+                try {
+                    Iterator<ArmorStand> iterator = safeArmorStands.iterator();
+                    while (iterator.hasNext()) {
+                        ArmorStand armorStand = iterator.next();
+                        if (armorStand == null || !armorStand.isValid()) {
+                            iterator.remove();
+                            continue;
+                        }
+                        
+                        try {
+                            // 确保区块已加载
+                            Location location = armorStand.getLocation();
+                            if (location.getWorld() == null) {
+                                iterator.remove();
+                                continue;
+                            }
+                            
+                            if (!location.getChunk().isLoaded()) {
+                                location.getChunk().load();
+                            }
+                            
+                            // 更新倒计时显示
+                            updateTimeDisplay(armorStand, generatorName);
+                            
+                            // 更新资源名称显示
+                            if (armorStand.getFallDistance() == RESOURCE_TYPE_HEIGHT) {
+                                armorStand.setCustomName(resourceName);
+                            }
+                            
+                            // 更新等级显示
+                            if (armorStand.getFallDistance() == LEVEL_DISPLAY_HEIGHT) {
+                                updateLevelDisplay(armorStand, currentEvent);
+                            }
+                        } catch (Exception e) {
+                            Bukkit.getLogger().warning("更新盔甲架显示时出错: " + e.getMessage());
+                            // 移除问题盔甲架
+                            iterator.remove();
+                        }
                     }
-                    
-                    // 确保区块已加载
-                    if (!armorStand.getLocation().getChunk().isLoaded()) {
-                        armorStand.getLocation().getChunk().load();
-                    }
-                    
-                    // 更新倒计时显示
-                    updateTimeDisplay(armorStand, generatorName);
-                    
-                    // 更新资源名称显示
-                    if (armorStand.getFallDistance() == RESOURCE_TYPE_HEIGHT) {
-                        armorStand.setCustomName(resourceName);
-                    }
-                    
-                    // 更新等级显示
-                    if (armorStand.getFallDistance() == LEVEL_DISPLAY_HEIGHT) {
-                        updateLevelDisplay(armorStand, currentEvent);
-                    }
+                } catch (Exception e) {
+                    Bukkit.getLogger().warning("处理资源显示更新时出错: " + e.getMessage());
                 }
             })
         );
@@ -416,15 +487,24 @@ public class GeneratorTask {
      * @param generatorName 生成器名称
      */
     private void updateTimeDisplay(ArmorStand armorStand, String generatorName) {
-        if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
-            int timeRemaining = 0;
-            GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().getOrDefault(generatorName, null);
-            
-            if (gameEventRunnable != null) {
-                timeRemaining = gameEventRunnable.getSeconds() - gameEventRunnable.getNextSeconds();
+        try {
+            if (armorStand == null || !armorStand.isValid()) {
+                return;
             }
             
-            armorStand.setCustomName(String.format(TIME_REMAINING_FORMAT, timeRemaining));
+            if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
+                int timeRemaining = 0;
+                GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().getOrDefault(generatorName, null);
+                
+                if (gameEventRunnable != null) {
+                    timeRemaining = gameEventRunnable.getSeconds() - gameEventRunnable.getNextSeconds();
+                }
+                
+                String displayText = String.format(TIME_REMAINING_FORMAT, timeRemaining);
+                armorStand.setCustomName(displayText);
+            }
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("更新时间显示时出错: " + e.getMessage());
         }
     }
     
@@ -435,12 +515,23 @@ public class GeneratorTask {
      * @param currentEvent 当前事件等级
      */
     private void updateLevelDisplay(ArmorStand armorStand, int currentEvent) {
-        if (currentEvent <= 1) {
-            armorStand.setCustomName(LEVEL_I);
-        } else if (currentEvent == 2) {
-            armorStand.setCustomName(LEVEL_II);
-        } else {
-            armorStand.setCustomName(LEVEL_III);
+        try {
+            if (armorStand == null || !armorStand.isValid()) {
+                return;
+            }
+            
+            String levelDisplay;
+            if (currentEvent <= 1) {
+                levelDisplay = LEVEL_I;
+            } else if (currentEvent == 2) {
+                levelDisplay = LEVEL_II;
+            } else {
+                levelDisplay = LEVEL_III;
+            }
+            
+            armorStand.setCustomName(levelDisplay);
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("更新等级显示时出错: " + e.getMessage());
         }
     }
 }

@@ -1,5 +1,7 @@
 package cc.azuramc.bedwars.util;
 
+import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.util.nms.NMSUtils;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -9,6 +11,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 /**
@@ -122,6 +126,15 @@ public class ArmorStandUtil {
         }
 
         try {
+            if (VersionUtil.isVersion18()) {
+                Constructor constructor = NMSUtils.getNMSClass("PacketPlayOutEntityTeleport").getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
+                Method method = NMSUtils.getNMSClass("MathHelper").getMethod("floor", double.class);
+                Object packet = constructor.newInstance(armorStand.getEntityId(), method.invoke(null, location.getX() * 32.0D), method.invoke(null, location.getY() * 32.0D), method.invoke(null, location.getZ() * 32.0D), (byte) (location.getYaw() * 256.0f / 360.0f), (byte) (location.getPitch() * 256.0f / 360.0f), true);
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    NMSUtils.sendPacket(player, packet);
+                }
+                return;
+            }
             // 使用 ProtocolLib 发送实体传送数据包
             ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
             PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);

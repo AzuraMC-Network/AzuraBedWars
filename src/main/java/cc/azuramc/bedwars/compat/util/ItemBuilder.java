@@ -163,43 +163,101 @@ public class ItemBuilder {
     /**
      * 设置物品是否无法破坏
      * @param unbreakable 是否无法破坏
+     * @return 构建器实例
+     */
+    public ItemBuilder setUnbreakable(boolean unbreakable) {
+        return setUnbreakable(unbreakable, false);
+    }
+
+    /**
+     * 设置物品是否无法破坏
+     * @param unbreakable 是否无法破坏
      * @param hide 是否隐藏无法破坏标签
      * @return 构建器实例
      */
     public ItemBuilder setUnbreakable(boolean unbreakable, boolean hide) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta == null) {
-            return this;
-        }
-        
         try {
-            // 1.11+直接支持setUnbreakable
-            if (!VersionUtil.isVersion18()) {
-                itemMeta.setUnbreakable(unbreakable);
+            // 优先使用NMS方法设置Unbreakable标签（适用于1.8）
+            if (VersionUtil.isVersion18()) {
+                this.itemStack = setUnbreakableNbt(this.itemStack, unbreakable);
+                
+                // 如果需要隐藏标签且物品元数据存在
+                if (hide && this.itemStack.getItemMeta() != null) {
+                    ItemMeta meta = this.itemStack.getItemMeta();
+                    try {
+                        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+                    } catch (Exception ignored) {
+                        // 1.8可能不支持HIDE_UNBREAKABLE，忽略错误
+                    }
+                    this.itemStack.setItemMeta(meta);
+                }
                 return this;
             }
-
-            // 1.8 NMS
-            this.itemStack = setUnbreakableNbt(this.itemStack);
-            return this;
-
-        } catch (Exception ignored) {
-            Bukkit.getLogger().warning("ItemBuilder在当前版本不支持setUnbreakable");
+            
+            // 对于更高版本，尝试使用原生API
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            if (itemMeta != null) {
+                try {
+                    // 尝试使用反射调用setUnbreakable方法（1.9-1.10）
+                    Method setUnbreakableMethod = ItemMeta.class.getDeclaredMethod("setUnbreakable", boolean.class);
+                    setUnbreakableMethod.invoke(itemMeta, unbreakable);
+                    
+                    if (hide) {
+                        try {
+                            itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+                        } catch (Exception ignored) {
+                            // 某些版本可能不支持此标志
+                        }
+                    }
+                    
+                    itemStack.setItemMeta(itemMeta);
+                } catch (Exception e) {
+                    // 如果反射失败，尝试使用NBT方法
+                    this.itemStack = setUnbreakableNbt(this.itemStack, unbreakable);
+                }
+            }
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("设置物品不可破坏失败: " + e.getMessage());
         }
         
-        itemStack.setItemMeta(itemMeta);
         return this;
     }
     
     /**
      * 使用NBT标签设置物品为不可破坏(适用于1.8)
      * @param item 需要设置的物品
+     * @param unbreakable 是否不可破坏
      * @return 设置后的物品
      */
-    @SuppressWarnings("deprecation")
-    private ItemStack setUnbreakableNbt(ItemStack item) {
-        // 如果反射初始化失败，返回原物品
-        if (!reflectionInitialized) {
+    private ItemStack setUnbreakableNbt(ItemStack item, boolean unbreakable) {
+        if (item == null) {
+            return null;
+        }
+        
+        // 如果反射未初始化且需要设置为不可破坏，尝试初始化反射
+        if (!reflectionInitialized && unbreakable) {
+            try {
+                String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                
+                craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + version + ".inventory.CraftItemStack");
+                nmsItemStackClass = Class.forName("net.minecraft.server." + version + ".ItemStack");
+                nbtTagCompoundClass = Class.forName("net.minecraft.server." + version + ".NBTTagCompound");
+                
+                asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
+                getTagMethod = nmsItemStackClass.getMethod("getTag");
+                setBooleanMethod = nbtTagCompoundClass.getMethod("setBoolean", String.class, boolean.class);
+                setTagMethod = nmsItemStackClass.getMethod("setTag", nbtTagCompoundClass);
+                asBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
+                
+                reflectionInitialized = true;
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("无法初始化NMS反射: " + e.getMessage());
+                return item;
+            }
+        }
+        
+        // 如果反射初始化失败或不需要设置为不可破坏，直接返回原物品
+        if (!reflectionInitialized || !unbreakable) {
             return item;
         }
         
@@ -222,7 +280,7 @@ public class ItemBuilder {
             // 转换回Bukkit物品
             return (ItemStack) asBukkitCopyMethod.invoke(null, nmsItem);
         } catch (Exception e) {
-            // 异常时返回原物品
+            Bukkit.getLogger().warning("使用NBT设置不可破坏失败: " + e.getMessage());
             return item;
         }
     }

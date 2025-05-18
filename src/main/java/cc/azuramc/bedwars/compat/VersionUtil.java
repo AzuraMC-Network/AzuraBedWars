@@ -77,7 +77,12 @@ public class VersionUtil {
      * 判断是否大于等于指定版本
      */
     public static boolean isGreaterOrEqual(int major, int minor) {
-        return MAJOR_VERSION > major;
+        if (MAJOR_VERSION > major) {
+            return true;
+        } else if (MAJOR_VERSION == major) {
+            return MINOR_VERSION >= minor;
+        }
+        return false;
     }
 
     /**
@@ -91,14 +96,24 @@ public class VersionUtil {
      * 判断是否是1.13及以下版本
      */
     public static boolean isLessThan113() {
-        return MAJOR_VERSION < 13;
+        // 首先直接检查版本字符串，如果包含1_8, 1_9, 1_10, 1_11, 1_12，则确定是1.13以下版本
+        if (VERSION.contains("1_8") || 
+            VERSION.contains("1_9") || 
+            VERSION.contains("1_10") || 
+            VERSION.contains("1_11") || 
+            VERSION.contains("1_12")) {
+            return true;
+        }
+        
+        // 如果字符串检查未能确定，再使用数字版本比较
+        return isLessThan(1, 13);
     }
 
     /**
      * 判断是否是1.16及以下版本
      */
     public static boolean isLessThan116() {
-        return MAJOR_VERSION < 16;
+        return isLessThan(1, 16);
     }
 
     /**
@@ -106,6 +121,12 @@ public class VersionUtil {
      * @return 是否是1.8.x版本
      */
     public static boolean isVersion18() {
-        return MAJOR_VERSION == 8;
+        // 检查版本字符串，因为服务器版本字符串一般是 v1_8_Rx 格式
+        if (VERSION.contains("1_8")) {
+            return true;
+        }
+        
+        // 同时检查主版本号和次版本号
+        return MAJOR_VERSION == 1 && MINOR_VERSION == 8;
     }
 }

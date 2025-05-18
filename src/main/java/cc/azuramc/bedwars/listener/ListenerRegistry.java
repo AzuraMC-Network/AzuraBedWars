@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.listener.chat.ChatListener;
 import cc.azuramc.bedwars.listener.player.*;
 import cc.azuramc.bedwars.listener.projectile.EggBridgeListener;
 import cc.azuramc.bedwars.listener.server.ServerListener;
+import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
 import cc.azuramc.bedwars.listener.world.ExplodeListener;
 import org.bukkit.Bukkit;
@@ -36,11 +37,8 @@ public class ListenerRegistry {
             Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerB(), plugin);
         }
 
-        try {
-//            PlayerAttemptPickupItemHandler.initPlayerAttemptPickupItemEvent();
-            Bukkit.getPluginManager().registerEvents(new PlayerAttemptPickupListener(), plugin);
-        } catch (Exception e) {
-            Bukkit.getLogger().warning( "初始化Event错误");
+        if (plugin.getSettingsConfig().isEditorMode()) {
+            new SetupItemListener(plugin);
         }
 
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), plugin);

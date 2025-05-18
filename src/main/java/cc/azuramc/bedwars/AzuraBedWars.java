@@ -1,22 +1,23 @@
 package cc.azuramc.bedwars;
 
 import cc.azuramc.bedwars.command.CommandRegistry;
+import cc.azuramc.bedwars.config.ConfigFactory;
+import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
+import cc.azuramc.bedwars.database.connection.ConnectionPoolHandler;
+import cc.azuramc.bedwars.database.storage.MapStorageFactory;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapLoadManager;
 import cc.azuramc.bedwars.game.map.MapManager;
-import cc.azuramc.bedwars.database.storage.MapStorageFactory;
-import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.jedis.JedisManager;
 import cc.azuramc.bedwars.jedis.listener.PubSubListener;
 import cc.azuramc.bedwars.jedis.util.IPUtil;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
-import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
-import cc.azuramc.bedwars.database.connection.ConnectionPoolHandler;
-import cc.azuramc.bedwars.gui.base.listener.GUIListener;
-import cc.azuramc.bedwars.config.ConfigFactory;
-import cc.azuramc.bedwars.config.ConfigManager;
+import cc.azuramc.bedwars.util.SetupItemManager;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -114,6 +115,9 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter
     private ScoreboardManager scoreboardManager;
 
+    @Getter
+    private SetupItemManager setupItemManager;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -122,8 +126,6 @@ public final class AzuraBedWars extends JavaPlugin {
         // 初始化基础服务
         initDatabases();
         initMapSystem();
-        initCommands();
-        intiChannelSystem();
         
         // 初始化地图加载管理器
         mapLoadManager = MapLoadManager.getInstance(this);
@@ -131,9 +133,14 @@ public final class AzuraBedWars extends JavaPlugin {
         // 初始化配置系统
         initConfigSystem();
         
-        // 不在编辑模式下初始化游戏功能
+        // 初始化命令和通信系统
+        initCommands();
+        intiChannelSystem();
+        
+        // 根据配置决定加载游戏模式还是编辑模式
         if (settingsConfig.isEditorMode()) {
             getLogger().info("当前处于编辑模式(editorMode) 取消游戏相关特性加载");
+            initEditorFeatures();
         } else {
             initGameFeatures();
         }
@@ -174,6 +181,20 @@ public final class AzuraBedWars extends JavaPlugin {
         JedisManager.getInstance().getServerData().setGameType("AzuraBedWars");
         JedisManager.getInstance().getExpand().put("ver", getDescription().getVersion());
         pubSubListener.addChannel("AZURA.BW." + IPUtil.getLocalIp());
+    }
+
+    /**
+     * 初始化编辑模式下的功能
+     */
+    private void initEditorFeatures() {
+        // 初始化地图编辑工具
+        setupItemManager = new SetupItemManager();
+        
+        // 确保SetupItemListener被创建
+        System.out.println("[调试] 创建并注册SetupItemListener");
+        new cc.azuramc.bedwars.listener.setup.SetupItemListener(this);
+
+        getLogger().info("地图编辑工具已加载");
     }
 
     /**

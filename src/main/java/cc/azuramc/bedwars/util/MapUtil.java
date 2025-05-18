@@ -10,8 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 
 import java.lang.reflect.Method;
 
@@ -134,18 +132,9 @@ public class MapUtil {
                 // 1.8 - 1.12版本使用反射调用setData方法
                 Method setDataMethod = Block.class.getMethod("setData", byte.class);
                 setDataMethod.invoke(block, data);
-            } else if (VersionUtil.isLessThan116()) {
-                // 1.13 - 1.15版本，可以通过BlockData API设置
-                BlockData blockData = block.getBlockData();
-                // 根据方块类型处理方向数据
-                if (blockData instanceof Directional directional) {
-                    // 将旧版本的数据值转换为方向
-                    BlockFace face = convertDataToBlockFace(data);
-                    if (face != null && directional.getFaces().contains(face)) {
-                        directional.setFacing(face);
-                        block.setBlockData(directional);
-                    }
-                }
+            } else {
+                // 1.13+ 版本不使用 BlockData API，改为使用回退方法
+                fallbackSetBlockData(block, data);
             }
         } catch (Exception e) {
             Bukkit.getLogger().warning("无法设置方块数据: " + e.getMessage());
@@ -196,7 +185,7 @@ public class MapUtil {
             case 5 -> "LIME";
             case 6 -> "PINK";
             case 7 -> "GRAY";
-            case 8 -> "LIGHT_GRAY";
+            case 8 -> "SILVER";
             case 9 -> "CYAN";
             case 10 -> "PURPLE";
             case 11 -> "BLUE";
