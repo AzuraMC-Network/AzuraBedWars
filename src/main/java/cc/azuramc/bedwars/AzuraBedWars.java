@@ -13,9 +13,12 @@ import cc.azuramc.bedwars.game.map.MapLoadManager;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.jedis.JedisManager;
+import cc.azuramc.bedwars.jedis.event.BukkitPubSubMessageEvent;
 import cc.azuramc.bedwars.jedis.listener.PubSubListener;
 import cc.azuramc.bedwars.jedis.util.IPUtil;
+import cc.azuramc.bedwars.jedis.util.JedisUtil;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
+import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import lombok.Getter;
@@ -24,11 +27,16 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * AzuraBedWars插件主类
@@ -46,77 +54,28 @@ public final class AzuraBedWars extends JavaPlugin {
 
     /** 玩家等级经验值映射表 */
     private static final HashMap<Integer, Integer> PLAYER_LEVEL = new HashMap<>();
-    
-    /** 插件实例 */
-    @Getter
-    private static AzuraBedWars instance;
-    
-    /** 游戏实例 */
-    @Getter
-    private GameManager gameManager;
-    
-    /** 地图管理器 */
-    @Getter
-    private MapManager mapManager;
-    
-    /** 当前地图数据 */
-    @Getter
-    private MapData mapData;
-    
-    /** 经济系统接口 */
-    @Getter
-    private Economy econ = null;
-    
-    /** 聊天系统接口 */
-    @Getter
-    private Chat chat = null;
-    
-    /** 数据库连接池管理器 */
-    @Getter
-    private ConnectionPoolHandler connectionPoolHandler;
 
-    @Getter
-    private ConfigManager configManager;
-    
-    @Getter
-    private SettingsConfig settingsConfig;
-
-    @Getter
-    private EventConfig eventConfig;
-
-    @Getter
-    private TaskConfig taskConfig;
-
-    @Getter
-    private MessageConfig messageConfig;
-
-    @Getter
-    private ItemConfig itemConfig;
-
-    @Getter
-    private PlayerConfig playerConfig;
-
-    @Getter
-    private ChatConfig chatConfig;
-
-    @Getter
-    private ScoreboardConfig scoreboardConfig;
-
-    @Getter
-    private JedisManager jedisManager;
-
-    @Getter
-    private PubSubListener pubSubListener;
-
-    @Getter
-    private MapLoadManager mapLoadManager;
-    
-    /** 计分板管理器 */
-    @Getter
-    private ScoreboardManager scoreboardManager;
-
-    @Getter
-    private SetupItemManager setupItemManager;
+    @Getter private static AzuraBedWars instance;
+    @Getter private GameManager gameManager;
+    @Getter private MapManager mapManager;
+    @Getter private MapData mapData;
+    @Getter private Economy econ = null;
+    @Getter private Chat chat = null;
+    @Getter private ConnectionPoolHandler connectionPoolHandler;
+    @Getter private ConfigManager configManager;
+    @Getter private SettingsConfig settingsConfig;
+    @Getter private EventConfig eventConfig;
+    @Getter private TaskConfig taskConfig;
+    @Getter private MessageConfig messageConfig;
+    @Getter private ItemConfig itemConfig;
+    @Getter private PlayerConfig playerConfig;
+    @Getter private ChatConfig chatConfig;
+    @Getter private ScoreboardConfig scoreboardConfig;
+    @Getter private JedisManager jedisManager;
+    @Getter private PubSubListener pubSubListener;
+    @Getter private MapLoadManager mapLoadManager;
+    @Getter private ScoreboardManager scoreboardManager;
+    @Getter private SetupItemManager setupItemManager;
 
     @Override
     public void onEnable() {
@@ -189,10 +148,8 @@ public final class AzuraBedWars extends JavaPlugin {
     private void initEditorFeatures() {
         // 初始化地图编辑工具
         setupItemManager = new SetupItemManager();
-        
-        // 确保SetupItemListener被创建
-        System.out.println("[调试] 创建并注册SetupItemListener");
-        new cc.azuramc.bedwars.listener.setup.SetupItemListener(this);
+
+        new SetupItemListener(this);
 
         getLogger().info("地图编辑工具已加载");
     }
@@ -209,9 +166,10 @@ public final class AzuraBedWars extends JavaPlugin {
         setupEconomy();
         setupChat();
 
-        // 初始化地图存储和加载默认地图
+        // 初始化地图存储
         initMapStorage();
-        loadDefaultMap();
+        // 加载地图（Jedis请求+超时处理）
+        loadMapWithJedisRequest();
 
         // 创建并加载游戏实例
         gameManager = new GameManager(this);
@@ -230,18 +188,61 @@ public final class AzuraBedWars extends JavaPlugin {
     }
 
     /**
-     * 加载默认地图
+     * 通过Jedis请求地图，等待30秒，优先加载返回地图，超时则加载默认地图
      */
-    private void loadDefaultMap() {
+    private void loadMapWithJedisRequest() {
         mapManager.preloadAllMaps();
-        String defaultMapName = settingsConfig.getDefaultMapName();
-        
+        String responseChannel = "AZURA.BW." + IPUtil.getLocalIp();
+        CompletableFuture<String> mapFuture = new CompletableFuture<>();
+
+        // 注册一次性监听器
+        Listener listener = new Listener() {
+            @EventHandler
+            public void onMessage(BukkitPubSubMessageEvent event) {
+                if (event.getChannel().equals(responseChannel)) {
+                    mapFuture.complete(event.getMessage());
+                    HandlerList.unregisterAll(this);
+                }
+            }
+        };
+        getServer().getPluginManager().registerEvents(listener, this);
+
+        Bukkit.getLogger().info("正在通过Jedis请求地图");
+        JedisUtil.publish(responseChannel, "requestMap");
+
+        String mapName = null;
+        try {
+            // 最多等待30秒
+            mapName = mapFuture.get(30, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            Bukkit.getLogger().info("地图请求超时，使用默认地图");
+        }
+
+        // 优先加载Jedis返回地图
+        if (mapName != null && !mapName.isEmpty()) {
+            mapData = mapManager.loadMapAndWorld(mapName);
+            if (mapData != null) {
+                return;
+            }
+            Bukkit.getLogger().warning("Jedis返回地图加载失败，尝试加载默认地图");
+        }
+
+        // 加载默认地图
+        String defaultMapName = settingsConfig.getDatabaseMapName();
+
         if (defaultMapName != null && !defaultMapName.isEmpty()) {
             mapData = mapManager.loadMapAndWorld(defaultMapName);
-        } else if (!mapManager.getLoadedMaps().isEmpty()) {
-            mapData = mapManager.getLoadedMaps().entrySet().iterator().next().getValue();
+            if (mapData != null) {
+                return;
+            }
         }
-        
+        // 如果依然没有，尝试加载任意已加载地图
+        if (!mapManager.getLoadedMaps().isEmpty()) {
+            mapData = mapManager.getLoadedMaps().entrySet().iterator().next().getValue();
+            if (mapData != null) {
+                return;
+            }
+        }
         if (mapData == null) {
             Bukkit.getLogger().info("preloadMap 为空, 请先打开editorMode为服务端设置地图");
         }
