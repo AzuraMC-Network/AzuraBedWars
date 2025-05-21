@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.api.event;
 
+import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import lombok.Getter;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -16,7 +16,7 @@ public class BedwarsDestroyBedEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 
     @Getter
-    private final Player player;
+    private final GamePlayer gamePlayer;
     @Getter
     private final GameTeam gameTeam;
     private boolean cancelled = false;
@@ -25,8 +25,8 @@ public class BedwarsDestroyBedEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
-    public BedwarsDestroyBedEvent(Player player, GameTeam gameTeam) {
-        this.player = player;
+    public BedwarsDestroyBedEvent(GamePlayer gamePlayer, GameTeam gameTeam) {
+        this.gamePlayer = gamePlayer;
         this.gameTeam = gameTeam;
     }
 

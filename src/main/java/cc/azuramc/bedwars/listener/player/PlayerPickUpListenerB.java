@@ -25,7 +25,7 @@ public class PlayerPickUpListenerB implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         
         // 基本条件检查
-        if (PickupItemHandler.isPickupDisabled(player)) {
+        if (PickupItemHandler.isPickupDisabled(gamePlayer)) {
             event.setCancelled(true);
             return;
         }
@@ -37,7 +37,7 @@ public class PlayerPickUpListenerB implements Listener {
         }
         
         // 处理剑的拾取
-        PickupItemHandler.handleSwordPickup(itemStack, player);
+        PickupItemHandler.handleSwordPickup(itemStack, gamePlayer);
         
         // 检查AFK玩家拾取资源
         if (PickupItemHandler.checkAfkResourcePickup(itemStack, gamePlayer)) {
@@ -46,19 +46,19 @@ public class PlayerPickUpListenerB implements Listener {
         }
         
         // 处理金铁锭拾取
-        if (PickupItemHandler.handleIngotPickup(itemStack, player, gamePlayer, event.getItem())) {
+        if (PickupItemHandler.handleIngotPickup(itemStack, gamePlayer, event.getItem())) {
             event.setCancelled(true);
             return;
         }
         
         // 处理钻石拾取
-        if (PickupItemHandler.handleDiamondPickup(itemStack, player, gamePlayer, event.getItem())) {
+        if (PickupItemHandler.handleDiamondPickup(itemStack, gamePlayer, event.getItem())) {
             event.setCancelled(true);
             return;
         }
         
         // 处理绿宝石拾取
-        if (PickupItemHandler.handleEmeraldPickup(itemStack, player, gamePlayer, event.getItem())) {
+        if (PickupItemHandler.handleEmeraldPickup(itemStack, gamePlayer, event.getItem())) {
             event.setCancelled(true);
         }
     }

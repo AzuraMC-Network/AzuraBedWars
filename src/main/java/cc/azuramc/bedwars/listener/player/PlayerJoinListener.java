@@ -63,7 +63,7 @@ public class PlayerJoinListener implements Listener {
         event.setJoinMessage(null);
 
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        GamePlayer gamePlayer = GamePlayer.get(player);
         if (gamePlayer == null) {
             player.kickPlayer("玩家异常状态");
             return;

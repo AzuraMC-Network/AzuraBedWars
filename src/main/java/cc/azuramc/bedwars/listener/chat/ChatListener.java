@@ -63,12 +63,12 @@ public class ChatListener implements Listener {
         // 构建基础聊天消息
         String chatMessage = null;
         if (gamePlayer != null) {
-            chatMessage = buildChatMessage(player, gamePlayer, message);
+            chatMessage = buildChatMessage(gamePlayer, message);
         }
 
         // 根据游戏状态发送消息
         if (gameManager.getGameState() == GameState.RUNNING && !gameManager.getGameEventManager().isOver() && gamePlayer != null) {
-            handleInGameChat(player, gamePlayer, message);
+            handleInGameChat(gamePlayer, message);
         } else {
             // 游戏未开始或已结束时的聊天，全服可见
             gameManager.broadcastMessage(chatMessage);
@@ -104,15 +104,14 @@ public class ChatListener implements Listener {
     /**
      * 构建聊天消息
      *
-     * @param player 玩家
      * @param gamePlayer 游戏玩家对象
      * @param message 原始消息
      * @return 格式化后的聊天消息
      */
-    public static String buildChatMessage(Player player, GamePlayer gamePlayer, String message) {
+    public static String buildChatMessage(GamePlayer gamePlayer, String message) {
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
         int level = calculatePlayerLevel(playerProfile);
-        String globalPrefix = ChatColor.translateAlternateColorCodes('&', plugin.getChat().getPlayerPrefix(player));
+        String globalPrefix = ChatColor.translateAlternateColorCodes('&', plugin.getChat().getPlayerPrefix(gamePlayer.getPlayer()));
 
         return "§6[" + plugin.getLevel(level) + "✫]" + globalPrefix + "§7" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
     }
@@ -132,13 +131,12 @@ public class ChatListener implements Listener {
     /**
      * 处理游戏中的聊天消息
      *
-     * @param player     玩家
      * @param gamePlayer 游戏玩家对象
      * @param message    消息内容
      */
-    public static void handleInGameChat(Player player, GamePlayer gamePlayer, String message) {
+    public static void handleInGameChat(GamePlayer gamePlayer, String message) {
         if (gamePlayer.isSpectator()) {
-            handleSpectatorChat(player, gamePlayer, message);
+            handleSpectatorChat(gamePlayer, message);
             return;
         }
 
@@ -164,14 +162,13 @@ public class ChatListener implements Listener {
     /**
      * 处理观察者聊天
      *
-     * @param player     玩家
      * @param gamePlayer 游戏玩家对象
      * @param message    消息内容
      */
-    public static void handleSpectatorChat(Player player, GamePlayer gamePlayer, String message) {
+    public static void handleSpectatorChat(GamePlayer gamePlayer, String message) {
         String spectatorMessage = SPECTATOR_PREFIX + "§f" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
 
-        if (player.hasPermission("azurabedwars.admin")) {
+        if (gamePlayer.getPlayer().hasPermission("azurabedwars.admin")) {
             gameManager.broadcastMessage(spectatorMessage);
         } else {
             gameManager.broadcastSpectatorMessage(spectatorMessage);

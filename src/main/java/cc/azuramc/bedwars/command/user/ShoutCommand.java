@@ -43,6 +43,6 @@ public class ShoutCommand {
         }
 
         // 发全局消息
-        ChatListener.handleInGameChat(gamePlayer.getPlayer(), gamePlayer, ChatListener.GLOBAL_CHAT_PREFIX + message);
+        ChatListener.handleInGameChat(gamePlayer, ChatListener.GLOBAL_CHAT_PREFIX + message);
     }
 }

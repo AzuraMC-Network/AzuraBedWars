@@ -118,7 +118,7 @@ public class WarpPowderListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        GamePlayer gamePlayer = GamePlayer.get(player);
         
         // 检查游戏状态
         if (gameManager.getGameState() != GameState.RUNNING || gamePlayer == null) {
@@ -145,12 +145,12 @@ public class WarpPowderListener implements Listener {
 
         // 处理取消传送物品
         if (material.equals(warpPowder.getActivatedMaterial())) {
-            handleCancelItem(event, item, player, activePowder);
+            handleCancelItem(event, item, gamePlayer, activePowder);
             return;
         }
 
         // 处理传送粉末使用
-        handleWarpPowderUse(event, player, gamePlayer, activePowder, warpPowder);
+        handleWarpPowderUse(event, gamePlayer, activePowder, warpPowder);
     }
     
     /**
@@ -158,10 +158,10 @@ public class WarpPowderListener implements Listener {
      * 
      * @param event 交互事件
      * @param item 物品
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      * @param activePowder 已激活的传送粉末
      */
-    private void handleCancelItem(PlayerInteractEvent event, ItemStack item, Player player, WarpPowder activePowder) {
+    private void handleCancelItem(PlayerInteractEvent event, ItemStack item, GamePlayer gamePlayer, WarpPowder activePowder) {
         ItemMeta meta = item.getItemMeta();
         if (meta == null || !CANCEL_ITEM_NAME.equals(meta.getDisplayName())) {
             return;
@@ -169,7 +169,7 @@ public class WarpPowderListener implements Listener {
 
         if (activePowder != null) {
             activePowder.setStackAmount(activePowder.getStack().getAmount() + 1);
-            player.updateInventory();
+            gamePlayer.getPlayer().updateInventory();
             activePowder.cancelTeleport(true, true);
             event.setCancelled(true);
         }
@@ -179,22 +179,20 @@ public class WarpPowderListener implements Listener {
      * 处理传送粉末的使用
      * 
      * @param event 交互事件
-     * @param player 玩家
      * @param gamePlayer 游戏玩家
      * @param activePowder 已激活的传送粉末
      * @param warpPowder 新的传送粉末
      */
-    private void handleWarpPowderUse(PlayerInteractEvent event, Player player, GamePlayer gamePlayer, 
-                                     WarpPowder activePowder, WarpPowder warpPowder) {
+    private void handleWarpPowderUse(PlayerInteractEvent event, GamePlayer gamePlayer, WarpPowder activePowder, WarpPowder warpPowder) {
         // 检查是否已有激活的传送粉末
         if (activePowder != null) {
-            player.sendMessage("§c你已经开始了一个传送!");
+            gamePlayer.sendMessage("§c你已经开始了一个传送!");
             return;
         }
 
         // 检查玩家是否在空中
-        if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
-            player.sendMessage("§c你不能在空中使用传送粉末!");
+        if (gamePlayer.getPlayer().getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
+            gamePlayer.sendMessage("§c你不能在空中使用传送粉末!");
             return;
         }
 

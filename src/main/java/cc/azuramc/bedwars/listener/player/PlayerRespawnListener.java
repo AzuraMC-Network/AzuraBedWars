@@ -11,7 +11,6 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import com.cryptomorin.xseries.XSound;
-import com.cryptomorin.xseries.messages.Titles;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -42,7 +41,6 @@ public class PlayerRespawnListener implements Listener {
     private final static PlayerConfig.PlayerRespawn CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerRespawn();
     private final static MessageConfig.PlayerRespawn MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getPlayerRespawn();
 
-    // 常量定义
     private static final int RESPAWN_COUNTDOWN_SECONDS = CONFIG.getRespawnCountdownSeconds();
     private static final int RESPAWN_PROTECTION_TICKS = CONFIG.getRespawnProtectionTicks();
     private static final int TITLE_FADE_IN = 1;
@@ -50,8 +48,7 @@ public class PlayerRespawnListener implements Listener {
     private static final int TITLE_FADE_OUT = 1;
     private static final long RESPAWN_DELAY_TICKS = 1L;
     private static final long RESPAWN_TIMER_PERIOD = 20L;
-    
-    // 消息常量
+
     private static final String RESPAWN_COUNTDOWN_TITLE = MESSAGE_CONFIG.getRespawnCountdownTitle();
     private static final String RESPAWN_COUNTDOWN_SUBTITLE = MESSAGE_CONFIG.getRespawnCountdownSubTitle();
     private static final String RESPAWN_COMPLETE_TITLE = MESSAGE_CONFIG.getRespawnCompleteTitle();
@@ -75,7 +72,7 @@ public class PlayerRespawnListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        GamePlayer gamePlayer = GamePlayer.get(player);
 
         GameTeam gameTeam = null;
         if (gamePlayer != null) {
@@ -98,12 +95,12 @@ public class PlayerRespawnListener implements Listener {
 
         // 如果玩家的床已经被摧毁，处理永久死亡
         if (gameTeam != null && gameTeam.isDestroyed()) {
-            handlePermanentDeath(event, player, gamePlayer, gameTeam, playerProfile);
+            handlePermanentDeath(event, gamePlayer, gameTeam, playerProfile);
             return;
         }
 
         // 处理临时死亡（床还在）
-        handleTemporaryDeath(event, player, gamePlayer, gameTeam);
+        handleTemporaryDeath(event, gamePlayer, gameTeam);
     }
 
     /**
@@ -122,24 +119,23 @@ public class PlayerRespawnListener implements Listener {
      * 处理床被摧毁后的永久死亡
      *
      * @param event 玩家重生事件
-     * @param player 玩家
      * @param gamePlayer 游戏玩家
      * @param gameTeam 玩家所在队伍
      * @param playerProfile 玩家数据
      */
-    private void handlePermanentDeath(PlayerRespawnEvent event, Player player, GamePlayer gamePlayer, GameTeam gameTeam, PlayerProfile playerProfile) {
+    private void handlePermanentDeath(PlayerRespawnEvent event, GamePlayer gamePlayer, GameTeam gameTeam, PlayerProfile playerProfile) {
         new BukkitRunnable() {
             @Override
             public void run() {
                 // 显示重新加入游戏的提示
-                sendRejoinMessage(player);
+                sendRejoinMessage(gamePlayer);
 
                 // 设置重生位置和移动状态
-                teleportToRespawnLocation(event, player);
+                teleportToRespawnLocation(event);
                 
                 // 隐藏死亡玩家
                 GamePlayer.getOnlinePlayers().forEach(otherPlayer -> 
-                    PlayerUtil.hidePlayer(otherPlayer.getPlayer(), player));
+                    PlayerUtil.hidePlayer(otherPlayer.getPlayer(), gamePlayer.getPlayer()));
 
                 // 设置为观察者
                 gamePlayer.toSpectator(DEATH_PERMANENT_TITLE, DEATH_PERMANENT_SUBTITLE);
@@ -157,13 +153,13 @@ public class PlayerRespawnListener implements Listener {
     /**
      * 发送重新加入游戏的消息
      *
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      */
-    private void sendRejoinMessage(Player player) {
+    private void sendRejoinMessage(GamePlayer gamePlayer) {
         TextComponent textComponent = new TextComponent(REJOIN_MESSAGE);
         textComponent.addExtra(REJOIN_BUTTON);
         textComponent.getExtra().getFirst().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, REJOIN_COMMAND));
-        player.spigot().sendMessage(textComponent);
+        gamePlayer.getPlayer().spigot().sendMessage(textComponent);
     }
 
     /**
@@ -186,13 +182,13 @@ public class PlayerRespawnListener implements Listener {
      * 处理床存在时的临时死亡
      *
      * @param event 玩家重生事件
-     * @param player 玩家
      * @param gamePlayer 游戏玩家
      * @param gameTeam 玩家所在队伍
      */
-    private void handleTemporaryDeath(PlayerRespawnEvent event, Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
+    private void handleTemporaryDeath(PlayerRespawnEvent event, GamePlayer gamePlayer, GameTeam gameTeam) {
+        Player player = event.getPlayer();
         // 设置重生位置和玩家状态
-        teleportToRespawnLocation(event, player);
+        teleportToRespawnLocation(event);
         
         player.setGameMode(GameMode.SPECTATOR);
         player.setFlying(true);
@@ -210,14 +206,14 @@ public class PlayerRespawnListener implements Listener {
                 
                 if (this.delay > 0) {
                     // 显示倒计时
-                    Titles.sendTitle(player, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT,
-                        String.format(RESPAWN_COUNTDOWN_TITLE, delay), RESPAWN_COUNTDOWN_SUBTITLE);
+                    gamePlayer.sendTitle(String.format(RESPAWN_COUNTDOWN_TITLE, delay), RESPAWN_COUNTDOWN_SUBTITLE,
+                            TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
                     this.delay -= 1;
                     return;
                 }
 
                 // 重置玩家状态
-                resetPlayerState(player, gamePlayer, gameTeam);
+                resetPlayerState(gamePlayer, gameTeam);
                 cancel();
             }
         }.runTaskTimer(AzuraBedWars.getInstance(), RESPAWN_TIMER_PERIOD, RESPAWN_TIMER_PERIOD);
@@ -226,11 +222,11 @@ public class PlayerRespawnListener implements Listener {
     /**
      * 重置玩家状态，完成重生
      *
-     * @param player 玩家
      * @param gamePlayer 游戏玩家
      * @param gameTeam 玩家所在队伍
      */
-    private void resetPlayerState(Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
+    private void resetPlayerState(GamePlayer gamePlayer, GameTeam gameTeam) {
+        Player player = gamePlayer.getPlayer();
         // 重置经验和等级
         player.setExp(0f);
         player.setLevel(0);
@@ -251,11 +247,10 @@ public class PlayerRespawnListener implements Listener {
         player.setGameMode(GameMode.SURVIVAL);
         
         // 添加临时伤害保护
-        applyDamageProtection(player);
+        applyDamageProtection(gamePlayer);
 
         // 显示重生成功标题
-        Titles.sendTitle(player, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT,
-            RESPAWN_COMPLETE_TITLE, RESPAWN_COMPLETE_SUBTITLE);
+        gamePlayer.sendTitle(RESPAWN_COMPLETE_TITLE, RESPAWN_COMPLETE_SUBTITLE, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
     }
 
     /**
@@ -293,13 +288,13 @@ public class PlayerRespawnListener implements Listener {
     /**
      * 应用伤害保护效果
      *
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家玩家
      */
-    private void applyDamageProtection(Player player) {
-        noDamage.add(player.getUniqueId());
+    private void applyDamageProtection(GamePlayer gamePlayer) {
+        noDamage.add(gamePlayer.getUuid());
         Bukkit.getScheduler().runTaskLater(
             AzuraBedWars.getInstance(), 
-            () -> noDamage.remove(player.getUniqueId()), 
+            () -> noDamage.remove(gamePlayer.getUuid()),
             RESPAWN_PROTECTION_TICKS
         );
     }
@@ -308,9 +303,9 @@ public class PlayerRespawnListener implements Listener {
      * 传送到重生位置并重置移动状态
      *
      * @param event 玩家重生事件
-     * @param player 玩家
      */
-    private void teleportToRespawnLocation(PlayerRespawnEvent event, Player player) {
+    private void teleportToRespawnLocation(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
         event.setRespawnLocation(gameManager.getRespawnLocation());
         player.setVelocity(new Vector(0, 0, 0));
         player.setFallDistance(0.0F);

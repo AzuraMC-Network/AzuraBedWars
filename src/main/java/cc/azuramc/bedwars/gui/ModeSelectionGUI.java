@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.gui;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
-import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
@@ -11,8 +10,6 @@ import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.entity.Player;
-
-import java.util.Objects;
 
 /**
  * 模式选择GUI
@@ -32,28 +29,19 @@ public class ModeSelectionGUI extends CustomGUI {
 
     /**
      * 创建模式选择GUI
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      */
-    public ModeSelectionGUI(Player player) {
-        this(player, null);
-    }
-    
-    /**
-     * 创建模式选择GUI
-     * @param player 玩家
-     * @param gameManager 游戏实例（可为空）
-     */
-    public ModeSelectionGUI(Player player, GameManager gameManager) {
-        super(player, "§8资源类型选择", 27);
+    public ModeSelectionGUI(GamePlayer gamePlayer) {
+        super(gamePlayer, "§8资源类型选择", 27);
         
-        PlayerProfile playerProfile = Objects.requireNonNull(GamePlayer.get(player.getUniqueId())).getPlayerProfile();
+        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
         
         // 设置界面边框
         setupBorders();
         
         // 设置模式选项
-        setupDefaultModeItem(player, playerProfile);
-        setupExperienceModeItem(player, playerProfile);
+        setupDefaultModeItem(gamePlayer, playerProfile);
+        setupExperienceModeItem(gamePlayer, playerProfile);
     }
     
     /**
@@ -84,8 +72,9 @@ public class ModeSelectionGUI extends CustomGUI {
     /**
      * 设置普通模式选项
      */
-    private void setupDefaultModeItem(Player player, PlayerProfile playerProfile) {
+    private void setupDefaultModeItem(GamePlayer gamePlayer, PlayerProfile playerProfile) {
         boolean isSelected = playerProfile.getGameModeType() == GameModeType.DEFAULT;
+        Player player = gamePlayer.getPlayer();
         
         setItem(11, new ItemBuilder()
                 .setType(XMaterial.RED_BED.get())
@@ -115,8 +104,9 @@ public class ModeSelectionGUI extends CustomGUI {
     /**
      * 设置经验模式选项
      */
-    private void setupExperienceModeItem(Player player, PlayerProfile playerProfile) {
+    private void setupExperienceModeItem(GamePlayer gamePlayer, PlayerProfile playerProfile) {
         boolean isSelected = playerProfile.getGameModeType() == GameModeType.EXPERIENCE;
+        Player player = gamePlayer.getPlayer();
         
         setItem(15, new ItemBuilder()
                 .setType(XMaterial.EXPERIENCE_BOTTLE.get())

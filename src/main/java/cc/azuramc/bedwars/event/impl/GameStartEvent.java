@@ -192,7 +192,7 @@ public class GameStartEvent extends AbstractGameEvent {
 
         // 通知团队成员陷阱被触发
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
-            player1.sendTitle(0, 20, 0, "§c§l陷阱触发！", null);
+            player1.sendTitle("§c§l陷阱触发！", null, 0, 20, 0);
             player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
         })));
     }

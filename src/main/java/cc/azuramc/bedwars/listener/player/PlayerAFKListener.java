@@ -29,7 +29,7 @@ public class PlayerAFKListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-
+        GamePlayer gamePlayer = GamePlayer.get(player);
         // 记录玩家上次移动的时间
         AFK_LAST_MOVEMENT.put(player.getUniqueId(), System.currentTimeMillis());
     }

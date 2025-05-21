@@ -31,10 +31,10 @@ public class SpectatorCompassGUI extends CustomGUI {
     /**
      * 构造函数
      * 
-     * @param player 打开GUI的玩家
+     * @param gamePlayer 打开GUI的玩家
      */
-    public SpectatorCompassGUI(Player player) {
-        super(player, GUI_TITLE, calculateInventorySize());
+    public SpectatorCompassGUI(GamePlayer gamePlayer) {
+        super(gamePlayer, GUI_TITLE, calculateInventorySize());
         initializeItems();
     }
 

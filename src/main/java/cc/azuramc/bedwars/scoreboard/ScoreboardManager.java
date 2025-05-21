@@ -5,7 +5,6 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.scoreboard.provider.GameBoardProvider;
 import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
 import lombok.Getter;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 /**
@@ -39,20 +38,20 @@ public class ScoreboardManager implements Listener {
     /**
      * 根据游戏状态显示对应的计分板
      * 
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      */
-    public void showBoard(Player player) {
-        if (player == null) {
+    public void showBoard(GamePlayer gamePlayer) {
+        if (gamePlayer == null) {
             return;
         }
         
         switch (gameManager.getGameState()) {
             case RUNNING:
-                GameBoardProvider.show(player);
+                GameBoardProvider.show(gamePlayer.getPlayer());
                 break;
             case WAITING:
             default:
-                LobbyBoardProvider.show(player);
+                LobbyBoardProvider.show(gamePlayer.getPlayer());
                 break;
         }
     }
@@ -75,16 +74,16 @@ public class ScoreboardManager implements Listener {
     /**
      * 移除玩家的计分板
      * 
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      */
-    public void removeBoard(Player player) {
-        if (player == null) {
+    public void removeBoard(GamePlayer gamePlayer) {
+        if (gamePlayer == null) {
             return;
         }
         
         // 同时移除两种计分板，确保清理完全
-        GameBoardProvider.removeBoard(player);
-        LobbyBoardProvider.removeBoard(player);
+        GameBoardProvider.removeBoard(gamePlayer.getPlayer());
+        LobbyBoardProvider.removeBoard(gamePlayer.getPlayer());
     }
     
     /**
@@ -101,12 +100,11 @@ public class ScoreboardManager implements Listener {
      */
     public void switchBoardMode() {
         for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
-            Player player = gamePlayer.getPlayer();
-            if (player != null) {
+            if (gamePlayer != null) {
                 // 先移除所有计分板
-                removeBoard(player);
+                removeBoard(gamePlayer);
                 // 然后显示对应状态的计分板
-                showBoard(player);
+                showBoard(gamePlayer);
             }
         }
     }

@@ -204,11 +204,9 @@ public class SpectatorTarget {
      */
     private void activateFirstPersonView() {
         gamePlayer.sendTitle(
-            TITLE_FADE_IN, 
+                String.format(FIRST_PERSON_TITLE, target.getName()), FIRST_PERSON_SUBTITLE, TITLE_FADE_IN,
             TITLE_DURATION, 
-            TITLE_FADE_OUT, 
-            String.format(FIRST_PERSON_TITLE, target.getName()), 
-            FIRST_PERSON_SUBTITLE
+            TITLE_FADE_OUT
         );
         player.setGameMode(GameMode.SPECTATOR);
         player.setSpectatorTarget(target);

@@ -264,7 +264,7 @@ public class LobbyBoardProvider implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         if (scoreboardManager != null) {
             // 使用计分板管理器显示对应计分板
-            scoreboardManager.showBoard(e.getPlayer());
+            scoreboardManager.showBoard(GamePlayer.get(e.getPlayer()));
             scoreboardManager.updateAllBoards();
         } else {
             // 为新加入的玩家创建计分板
@@ -283,7 +283,7 @@ public class LobbyBoardProvider implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         if (scoreboardManager != null) {
             // 使用计分板管理器移除计分板
-            scoreboardManager.removeBoard(e.getPlayer());
+            scoreboardManager.removeBoard(GamePlayer.get(e.getPlayer()));
             scoreboardManager.updateAllBoards();
         } else {
             // 清理玩家的计分板

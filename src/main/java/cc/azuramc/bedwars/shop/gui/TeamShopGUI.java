@@ -23,6 +23,8 @@ import java.util.Map;
 /**
  * 团队商店GUI
  * 用于展示和处理各种团队升级选项
+ * 
+ * @author an5w1r@163.com
  */
 public class TeamShopGUI extends CustomGUI {
 
@@ -49,61 +51,69 @@ public class TeamShopGUI extends CustomGUI {
         
         // 初始化保护价格
         Map<Integer, Integer> armorPrices = new HashMap<>();
-        armorPrices.put(0, 2);  // 护甲保护 I
-        armorPrices.put(1, 4);  // 护甲保护 II
-        armorPrices.put(2, 6);  // 护甲保护 III
-        armorPrices.put(3, 8);  // 护甲保护 IV
+        // 护甲保护 I
+        armorPrices.put(0, 2);
+        // 护甲保护 II
+        armorPrices.put(1, 4);
+        // 护甲保护 III
+        armorPrices.put(2, 6);
+        // 护甲保护 IV
+        armorPrices.put(3, 8);
         TIER_PRICES.put(REINFORCED_ARMOR, armorPrices);
         
         // 初始化疯狂矿工价格
         Map<Integer, Integer> minerPrices = new HashMap<>();
-        minerPrices.put(0, 2);  // 急迫 I
-        minerPrices.put(1, 4);  // 急迫 II
+        // 急迫 I
+        minerPrices.put(0, 2);
+        // 急迫 II
+        minerPrices.put(1, 4);
         TIER_PRICES.put(MANIC_MINER, minerPrices);
         
         // 初始化陷阱和其他升级价格
         Map<Integer, Integer> trapPrices = new HashMap<>();
-        trapPrices.put(0, 2);  // 挖掘疲劳陷阱
+        // 挖掘疲劳陷阱
+        trapPrices.put(0, 2);
         TIER_PRICES.put(MINING_FATIGUE_TRAP, trapPrices);
         
         Map<Integer, Integer> alarmPrices = new HashMap<>();
-        alarmPrices.put(0, 2);  // 警报陷阱
+        // 警报陷阱
+        alarmPrices.put(0, 2);
         TIER_PRICES.put(ALARM_TRAP, alarmPrices);
         
         Map<Integer, Integer> healingPrices = new HashMap<>();
-        healingPrices.put(0, 4);  // 治愈池
+        // 治愈池
+        healingPrices.put(0, 4);
         TIER_PRICES.put(HEALING_POOL, healingPrices);
         
         Map<Integer, Integer> swordPrices = new HashMap<>();
-        swordPrices.put(0, 4);  // 锋利
+        // 锋利
+        swordPrices.put(0, 4);
         TIER_PRICES.put(SHARPENED_SWORDS, swordPrices);
     }
 
     /**
      * 创建团队商店GUI
-     * @param player 玩家
+     * @param gamePlayer 玩家
      * @param gameManager 游戏实例
      */
-    public TeamShopGUI(Player player, GameManager gameManager) {
-        super(player, "§8团队升级", 45);
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+    public TeamShopGUI(GamePlayer gamePlayer, GameManager gameManager) {
+        super(gamePlayer, "§8团队升级", 45);
         if (gamePlayer == null) {
             return;
         }
 
         GameModeType gameModeType = gamePlayer.getPlayerProfile().getGameModeType();
-        GameTeam gameTeam = gamePlayer.getGameTeam();
         
         // 设置界面边框
         setupBorders();
         
         // 设置升级选项
-        addSharpenedSwordsUpgrade(player, gamePlayer, gameManager, gameModeType);
-        addReinforcedArmorUpgrade(player, gamePlayer, gameManager, gameModeType);
-        addManicMinerUpgrade(player, gamePlayer, gameManager, gameModeType);
-        addMiningFatigueTrap(player, gamePlayer, gameManager, gameModeType);
-        addHealingPoolUpgrade(player, gamePlayer, gameManager, gameModeType);
-        addAlarmTrap(player, gamePlayer, gameManager, gameModeType);
+        addSharpenedSwordsUpgrade(gamePlayer, gameManager, gameModeType);
+        addReinforcedArmorUpgrade(gamePlayer, gameManager, gameModeType);
+        addManicMinerUpgrade(gamePlayer, gameManager, gameModeType);
+        addMiningFatigueTrap(gamePlayer, gameManager, gameModeType);
+        addHealingPoolUpgrade(gamePlayer, gameManager, gameModeType);
+        addAlarmTrap(gamePlayer, gameManager, gameModeType);
     }
     
     /**
@@ -159,11 +169,14 @@ public class TeamShopGUI extends CustomGUI {
         for (int tier = 0; tier < 4; tier++) {
             String tierColor;
             if (tier < currentTier) {
-                tierColor = "§a"; // 已购买的等级
+                // 已购买的等级
+                tierColor = "§a";
             } else if (tier == currentTier) {
-                tierColor = "§e"; // 当前可购买的等级
+                // 当前可购买的等级
+                tierColor = "§e";
             } else {
-                tierColor = "§7"; // 未解锁的等级
+                // 未解锁的等级
+                tierColor = "§7";
             }
             
             int displayTier = tier + 1;
@@ -196,13 +209,16 @@ public class TeamShopGUI extends CustomGUI {
         for (int tier = 0; tier < 2; tier++) {
             String tierColor;
             if (tier < currentTier) {
-                tierColor = "§a"; // 已购买的等级
+                // 已购买的等级
+                tierColor = "§a";
             } else if (tier == currentTier) {
-                tierColor = "§e"; // 当前可购买的等级
+                // 当前可购买的等级
+                tierColor = "§e";
             } else {
-                tierColor = "§7"; // 未解锁的等级
+                // 未解锁的等级
+                tierColor = "§7";
             }
-            
+
             int displayTier = tier + 1;
             int price = TIER_PRICES.get(MANIC_MINER).get(tier);
             
@@ -248,7 +264,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加锋利升级选项
      */
-    private void addSharpenedSwordsUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void addSharpenedSwordsUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         if (!gameTeam.isHasSharpenedEnchant()) {
@@ -262,12 +278,12 @@ public class TeamShopGUI extends CustomGUI {
                     .setLores(getSwordUpgradeLore(false, gameModeType))
                     .getItem(), 
                     new GUIAction(0, () -> {
-                        if (!processPayment(player, price, gameModeType)) {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
                             return;
                         }
                         
                         gameTeam.setHasSharpenedEnchant(true);
-                        new TeamShopGUI(player, gameManager).open();
+                        new TeamShopGUI(gamePlayer, gameManager).open();
                         
                         // 为团队所有玩家的剑添加锋利附魔
                         for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
@@ -298,7 +314,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加保护升级选项
      */
-    private void addReinforcedArmorUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void addReinforcedArmorUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         int currentLevel = gameTeam.getReinforcedArmor();
         
@@ -314,12 +330,12 @@ public class TeamShopGUI extends CustomGUI {
                     .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
                     .getItem(), 
                     new GUIAction(0, () -> {
-                        if (!processPayment(player, price, gameModeType)) {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
                             return;
                         }
                         
                         gameTeam.setReinforcedArmor(nextLevel);
-                        new TeamShopGUI(player, gameManager).open();
+                        new TeamShopGUI(gamePlayer, gameManager).open();
                         
                         // 为团队所有玩家的护甲添加保护附魔
                         for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
@@ -350,7 +366,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加疯狂矿工升级选项
      */
-    private void addManicMinerUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void addManicMinerUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         int currentLevel = gameTeam.getManicMiner();
         
@@ -366,12 +382,12 @@ public class TeamShopGUI extends CustomGUI {
                     .setLores(getMinerUpgradeLore(currentLevel, gameModeType))
                     .getItem(), 
                     new GUIAction(0, () -> {
-                        if (!processPayment(player, price, gameModeType)) {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
                             return;
                         }
                         
                         gameTeam.setManicMiner(nextLevel);
-                        new TeamShopGUI(player, gameManager).open();
+                        new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
         } else {
             // 已达到最高级
@@ -390,7 +406,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加挖掘疲劳陷阱升级选项
      */
-    private void addMiningFatigueTrap(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void addMiningFatigueTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         if (!gameTeam.isHasMiner()) {
@@ -410,12 +426,12 @@ public class TeamShopGUI extends CustomGUI {
                     )
                     .getItem(), 
                     new GUIAction(0, () -> {
-                        if (!processPayment(player, price, gameModeType)) {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
                             return;
                         }
                         
                         gameTeam.setHasMiner(true);
-                        new TeamShopGUI(player, gameManager).open();
+                        new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
         } else {
             // 已升级状态
@@ -439,7 +455,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加治愈池升级选项
      */
-    private void addHealingPoolUpgrade(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void addHealingPoolUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         if (!gameTeam.isHasHealPool()) {
@@ -458,12 +474,12 @@ public class TeamShopGUI extends CustomGUI {
                     )
                     .getItem(), 
                     new GUIAction(0, () -> {
-                        if (!processPayment(player, price, gameModeType)) {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
                             return;
                         }
                         
                         gameTeam.setHasHealPool(true);
-                        new TeamShopGUI(player, gameManager).open();
+                        new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
         } else {
             // 已升级状态
@@ -486,7 +502,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加警报陷阱升级选项
      */
-    private void addAlarmTrap(Player player, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void addAlarmTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         
         if (!gameTeam.isHasAlarmTrap()) {
@@ -505,12 +521,12 @@ public class TeamShopGUI extends CustomGUI {
                     )
                     .getItem(), 
                     new GUIAction(0, () -> {
-                        if (!processPayment(player, price, gameModeType)) {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
                             return;
                         }
                         
                         gameTeam.setHasAlarmTrap(true);
-                        new TeamShopGUI(player, gameManager).open();
+                        new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
         } else {
             // 已升级状态
@@ -532,29 +548,31 @@ public class TeamShopGUI extends CustomGUI {
     
     /**
      * 处理支付
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      * @param price 价格
      * @param gameModeType 游戏模式
      * @return 是否支付成功
      */
-    private boolean processPayment(Player player, int price, GameModeType gameModeType) {
+    private boolean processPayment(GamePlayer gamePlayer, int price, GameModeType gameModeType) {
         if (gameModeType == GameModeType.DEFAULT) {
             // 默认模式：支付钻石
-            return processItemPayment(player, XMaterial.DIAMOND.get(), price);
+            return processItemPayment(gamePlayer, XMaterial.DIAMOND.get(), price);
         } else {
             // 经验模式：支付经验
-            return processExperiencePayment(player, price * 100);
+            return processExperiencePayment(gamePlayer, price * 100);
         }
     }
     
     /**
      * 处理物品支付
-     * @param player 玩家
+     * @param gamePlayer 玩家
      * @param material 物品类型
      * @param amount 数量
      * @return 是否支付成功
      */
-    private boolean processItemPayment(Player player, Material material, int amount) {
+    private boolean processItemPayment(GamePlayer gamePlayer, Material material, int amount) {
+        Player player = gamePlayer.getPlayer();
+
         // 计算玩家拥有的资源总数
         int playerTotal = 0;
         ItemStack[] inventory = player.getInventory().getContents();
@@ -594,11 +612,12 @@ public class TeamShopGUI extends CustomGUI {
     
     /**
      * 处理经验支付
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      * @param xpLevel 经验等级
      * @return 是否支付成功
      */
-    private boolean processExperiencePayment(Player player, int xpLevel) {
+    private boolean processExperiencePayment(GamePlayer gamePlayer, int xpLevel) {
+        Player player = gamePlayer.getPlayer();
         if (player.getLevel() < xpLevel) {
             player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             player.sendMessage("§c没有足够资源购买！");

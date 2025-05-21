@@ -82,14 +82,14 @@ public class PlayerMiscListener implements Listener {
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        GamePlayer gamePlayer = GamePlayer.get(player);
 
         if (gameManager.getGameState() != GameState.RUNNING) {
             return;
         }
 
         if (gamePlayer.isSpectator() && (SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) && player.getGameMode() == GameMode.SPECTATOR) {
-            gamePlayer.sendTitle(0, 20, 0, "§e退出旁观模式", "");
+            gamePlayer.sendTitle("§e退出旁观模式", "", 0, 20, 0);
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);
             player.setFlying(true);
@@ -105,7 +105,6 @@ public class PlayerMiscListener implements Listener {
         }
 
         player.setMetadata("等待上一次求救", new FixedMetadataValue(AzuraBedWars.getInstance(), ""));
-
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
 
@@ -150,7 +149,7 @@ public class PlayerMiscListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        GamePlayer gamePlayer = GamePlayer.get(player);
 
         if (gamePlayer.isSpectator()) {
             event.setCancelled(true);

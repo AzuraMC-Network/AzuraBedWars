@@ -59,43 +59,42 @@ public class SpectatorSettingGUI extends CustomGUI {
     /**
      * 构造函数
      * 
-     * @param player 打开GUI的玩家
+     * @param gamePlayer 打开GUI的玩家
      */
-    public SpectatorSettingGUI(Player player) {
-        super(player, GUI_TITLE, INVENTORY_SIZE);
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+    public SpectatorSettingGUI(GamePlayer gamePlayer) {
+        super(gamePlayer, GUI_TITLE, INVENTORY_SIZE);
         SpectatorSettings spectatorSettings = SpectatorSettings.get(gamePlayer);
         
-        initializeSpeedItems(player, spectatorSettings);
-        initializeOptionItems(player, gamePlayer, spectatorSettings);
+        initializeSpeedItems(gamePlayer, spectatorSettings);
+        initializeOptionItems(gamePlayer, spectatorSettings);
     }
 
     /**
      * 初始化速度效果选项
      * 
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      * @param settings 旁观者设置
      */
-    private void initializeSpeedItems(Player player, SpectatorSettings settings) {
+    private void initializeSpeedItems(GamePlayer gamePlayer, SpectatorSettings settings) {
         // 无速度效果
         setItem(SPEED_NONE_SLOT, createSpeedItem(XMaterial.LEATHER_BOOTS.get(), "§a没有速度效果"),
-            createSpeedAction(player, settings, 0));
+            createSpeedAction(gamePlayer, settings, 0));
 
         // 速度 I
         setItem(SPEED_I_SLOT, createSpeedItem(XMaterial.CHAINMAIL_BOOTS.get(), "§a速度 I"),
-            createSpeedAction(player, settings, 1));
+            createSpeedAction(gamePlayer, settings, 1));
         
         // 速度 II
         setItem(SPEED_II_SLOT, createSpeedItem(XMaterial.IRON_BOOTS.get(), "§a速度 II"),
-            createSpeedAction(player, settings, 2));
+            createSpeedAction(gamePlayer, settings, 2));
         
         // 速度 III
         setItem(SPEED_III_SLOT, createSpeedItem(XMaterial.GOLDEN_BOOTS.get(), "§a速度 III"),
-            createSpeedAction(player, settings, 3));
+            createSpeedAction(gamePlayer, settings, 3));
         
         // 速度 IV
         setItem(SPEED_IV_SLOT, createSpeedItem(XMaterial.DIAMOND_BOOTS.get(), "§a速度 IV"),
-            createSpeedAction(player, settings, 4));
+            createSpeedAction(gamePlayer, settings, 4));
     }
 
     /**
@@ -115,19 +114,21 @@ public class SpectatorSettingGUI extends CustomGUI {
     /**
      * 创建速度效果动作
      * 
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      * @param settings 旁观者设置
      * @param level 速度等级
      * @return GUI动作
      */
-    private GUIAction createSpeedAction(Player player, SpectatorSettings settings, int level) {
+    private GUIAction createSpeedAction(GamePlayer gamePlayer, SpectatorSettings settings, int level) {
+        Player player = gamePlayer.getPlayer();
+
         return new GUIAction(0, () -> {
             if (settings.getSpeed() == level) {
-                removeSpeedEffect(player);
+                removeSpeedEffect(gamePlayer);
                 return;
             }
             
-            removeSpeedEffect(player);
+            removeSpeedEffect(gamePlayer);
             if (level > 0) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, MAX_POTION_DURATION, level - 1));
                 player.sendMessage(String.format(SPEED_ADDED, level));
@@ -141,9 +142,11 @@ public class SpectatorSettingGUI extends CustomGUI {
     /**
      * 移除速度效果
      * 
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      */
-    private void removeSpeedEffect(Player player) {
+    private void removeSpeedEffect(GamePlayer gamePlayer) {
+        Player player = gamePlayer.getPlayer();
+
         if (player.hasPotionEffect(PotionEffectType.SPEED)) {
             player.removePotionEffect(PotionEffectType.SPEED);
         }
@@ -151,18 +154,18 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 初始化功能选项
-     * 
-     * @param player 玩家
+     *
      * @param gamePlayer 游戏玩家
      * @param settings 旁观者设置
      */
-    private void initializeOptionItems(Player player, GamePlayer gamePlayer, SpectatorSettings settings) {
+    private void initializeOptionItems(GamePlayer gamePlayer, SpectatorSettings settings) {
+        Player player = gamePlayer.getPlayer();
         // 自动传送
         setItem(AUTO_TP_SLOT, createOptionItem(
             XMaterial.COMPASS.get(),
             settings.getOption(SpectatorSettings.Option.AUTO_TP) ? "§c停用自动传送" : "§a启动自动传送",
             settings.getOption(SpectatorSettings.Option.AUTO_TP) ? "§7点击停用自动传送" : "§7点击启用自动传送"
-        ), createAutoTpAction(player, settings));
+        ), createAutoTpAction(gamePlayer, settings));
 
         // 夜视
         setItem(NIGHT_VISION_SLOT, createOptionItem(
@@ -178,7 +181,7 @@ public class SpectatorSettingGUI extends CustomGUI {
             settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ?
                 "§7点击停用第一人称旁观" : 
                 "§7点击确认使用指南针时\n§7自动沿用第一人称旁观！\n§7你也可以右键点击一位玩家\n§7来启用第一人称旁观"
-        ), createFirstPersonAction(player, gamePlayer, settings));
+        ), createFirstPersonAction(gamePlayer, settings));
 
         // 隐藏其他旁观者
         setItem(HIDE_OTHERS_SLOT, createOptionItem(
@@ -188,14 +191,14 @@ public class SpectatorSettingGUI extends CustomGUI {
             settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ? "§c隐藏旁观者" : "§a查看旁观者",
             settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ?
                 "§7点击来隐藏其他旁观者" : "§7点击以显示其他旁观者"
-        ), createHideOthersAction(player, settings));
+        ), createHideOthersAction(gamePlayer, settings));
 
         // 飞行
         setItem(FLY_SLOT, createOptionItem(
             XMaterial.FEATHER.get(),
             settings.getOption(SpectatorSettings.Option.FLY) ? "§c停用持续飞行" : "§a启动持续飞行",
             settings.getOption(SpectatorSettings.Option.FLY) ? "§7点击停用飞行" : "§7点击启用飞行"
-        ), createFlyAction(player, settings));
+        ), createFlyAction(gamePlayer, settings));
     }
 
     /**
@@ -216,16 +219,15 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 创建自动传送动作
-     * 
-     * @param player 玩家
+     *
      * @param settings 旁观者设置
      * @return GUI动作
      */
-    private GUIAction createAutoTpAction(Player player, SpectatorSettings settings) {
+    private GUIAction createAutoTpAction(GamePlayer gamePlayer, SpectatorSettings settings) {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.AUTO_TP);
             settings.setOption(SpectatorSettings.Option.AUTO_TP, newValue);
-            player.sendMessage(newValue ? AUTO_TP_ENABLED : AUTO_TP_DISABLED);
+            gamePlayer.sendMessage(newValue ? AUTO_TP_ENABLED : AUTO_TP_DISABLED);
         }, true);
     }
 
@@ -251,21 +253,22 @@ public class SpectatorSettingGUI extends CustomGUI {
     }
 
     /**
-     * 创建第一人称动作
-     * 
-     * @param player 玩家
+     * 创建第一人称Action
+     *
      * @param gamePlayer 游戏玩家
      * @param settings 旁观者设置
      * @return GUI动作
      */
-    private GUIAction createFirstPersonAction(Player player, GamePlayer gamePlayer, SpectatorSettings settings) {
+    private GUIAction createFirstPersonAction(GamePlayer gamePlayer, SpectatorSettings settings) {
+        Player player = gamePlayer.getPlayer();
+
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.FIRST_PERSON);
             settings.setOption(SpectatorSettings.Option.FIRST_PERSON, newValue);
-            player.sendMessage(newValue ? FIRST_PERSON_ENABLED : FIRST_PERSON_DISABLED);
+            gamePlayer.sendMessage(newValue ? FIRST_PERSON_ENABLED : FIRST_PERSON_DISABLED);
             
             if (!newValue && gamePlayer.isSpectator() && player.getGameMode() == GameMode.SPECTATOR) {
-                gamePlayer.sendTitle(0, 20, 0, "§e退出旁观模式", null);
+                gamePlayer.sendTitle("§e退出旁观模式", null, 0, 20, 0);
                 player.setGameMode(GameMode.ADVENTURE);
                 player.setAllowFlight(true);
                 player.setFlying(true);
@@ -275,31 +278,32 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 创建隐藏其他旁观者动作
-     * 
-     * @param player 玩家
+     *
      * @param settings 旁观者设置
      * @return GUI动作
      */
-    private GUIAction createHideOthersAction(Player player, SpectatorSettings settings) {
+    private GUIAction createHideOthersAction(GamePlayer gamePlayer, SpectatorSettings settings) {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.HIDE_OTHER);
             settings.setOption(SpectatorSettings.Option.HIDE_OTHER, newValue);
-            player.sendMessage(newValue ? HIDE_OTHERS_ENABLED : HIDE_OTHERS_DISABLED);
+            gamePlayer.sendMessage(newValue ? HIDE_OTHERS_ENABLED : HIDE_OTHERS_DISABLED);
         }, true);
     }
 
     /**
      * 创建飞行动作
      * 
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      * @param settings 旁观者设置
      * @return GUI动作
      */
-    private GUIAction createFlyAction(Player player, SpectatorSettings settings) {
+    private GUIAction createFlyAction(GamePlayer gamePlayer, SpectatorSettings settings) {
+        Player player = gamePlayer.getPlayer();
+
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.FLY);
             settings.setOption(SpectatorSettings.Option.FLY, newValue);
-            player.sendMessage(newValue ? FLY_ENABLED : FLY_DISABLED);
+            gamePlayer.sendMessage(newValue ? FLY_ENABLED : FLY_DISABLED);
             
             if (newValue) {
                 if (player.isOnGround()) {

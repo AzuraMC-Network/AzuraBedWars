@@ -30,12 +30,12 @@ public class PickupItemHandler {
     /**
      * 检查玩家是否能够拾取物品的基本条件
      * 
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      * @return 如果玩家不能拾取返回true
      */
-    public static boolean isPickupDisabled(Player player) {
+    public static boolean isPickupDisabled(GamePlayer gamePlayer) {
         // 旁观者不能拾取物品
-        if (GamePlayer.get(player.getUniqueId()).isSpectator()) {
+        if (gamePlayer.isSpectator()) {
             return true;
         }
         
@@ -70,9 +70,10 @@ public class PickupItemHandler {
      * 处理剑的拾取
      *
      * @param itemStack  物品堆
-     * @param player     玩家
+     * @param gamePlayer 游戏玩家对象
      */
-    public static void handleSwordPickup(ItemStack itemStack, Player player) {
+    public static void handleSwordPickup(ItemStack itemStack, GamePlayer gamePlayer) {
+        Player player = gamePlayer.getPlayer();
         // 检查是否是剑类物品
         boolean isSword = itemStack.getType() == XMaterial.WOODEN_SWORD.get() ||
                           itemStack.getType() == XMaterial.STONE_SWORD.get() ||
@@ -84,13 +85,12 @@ public class PickupItemHandler {
         }
         
         // 添加锋利附魔
-        if (GamePlayer.get(player.getUniqueId()).getGameTeam().isHasSharpenedEnchant()) {
+        if (gamePlayer.getGameTeam().isHasSharpenedEnchant()) {
             itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
         }
         
         // 移除木剑
         removeWoodenSwordFromInventory(player);
-
     }
     
     /**
@@ -128,12 +128,11 @@ public class PickupItemHandler {
      * 处理金铁锭的拾取
      * 
      * @param itemStack 物品堆
-     * @param player 玩家
      * @param gamePlayer 游戏玩家对象
      * @param item 物品实体
      * @return 如果已处理返回true
      */
-    public static boolean handleIngotPickup(ItemStack itemStack, Player player, GamePlayer gamePlayer, Item item) {
+    public static boolean handleIngotPickup(ItemStack itemStack, GamePlayer gamePlayer, Item item) {
         boolean isIngot = itemStack.getType() == XMaterial.IRON_INGOT.get() || itemStack.getType() == XMaterial.GOLD_INGOT.get();
         
         if (!isIngot) {
@@ -141,22 +140,23 @@ public class PickupItemHandler {
         }
         
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
+        Player player = gamePlayer.getPlayer();
         int xp = calculateIngotXp(itemStack, gamePlayer);
         
         // 根据游戏模式处理拾取效果
         if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
             item.remove();
-            player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+            gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
         } else if (playerProfile.getGameModeType() == GameModeType.EXPERIENCE) {
             item.remove();
-            player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+            gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.setLevel(player.getLevel() + xp);
         }
         
         // 处理团队拾取效果
         if (itemStack.hasItemMeta()) {
-            handleTeamIngotPickup(player, itemStack, xp);
+            handleTeamIngotPickup(gamePlayer, itemStack, xp);
         }
         
         return true;
@@ -181,11 +181,12 @@ public class PickupItemHandler {
     /**
      * 处理团队锭拾取
      */
-    private static void handleTeamIngotPickup(Player player, ItemStack itemStack, int xp) {
+    private static void handleTeamIngotPickup(GamePlayer gamePlayer, ItemStack itemStack, int xp) {
         Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName();
+        Player player = gamePlayer.getPlayer();
         for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
             if (entity instanceof Player players) {
-                player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+                gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
                 
                 GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
                 if (nearbyPlayer.getPlayerProfile().getGameModeType() == GameModeType.DEFAULT) {
@@ -201,16 +202,16 @@ public class PickupItemHandler {
      * 处理钻石的拾取
      * 
      * @param itemStack 物品堆
-     * @param player 玩家
      * @param gamePlayer 游戏玩家对象
      * @param item 物品实体
      * @return 如果已处理返回true
      */
-    public static boolean handleDiamondPickup(ItemStack itemStack, Player player, GamePlayer gamePlayer, Item item) {
+    public static boolean handleDiamondPickup(ItemStack itemStack, GamePlayer gamePlayer, Item item) {
         if (itemStack.getType() != XMaterial.DIAMOND.get()) {
             return false;
         }
-        
+
+        Player player = gamePlayer.getPlayer();
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
         
         // 默认模式下不做特殊处理
@@ -225,7 +226,7 @@ public class PickupItemHandler {
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
         gamePlayer.addExperience("DIAMOND", (int) xp);
-        player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+        gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
         
         return true;
     }
@@ -234,16 +235,16 @@ public class PickupItemHandler {
      * 处理绿宝石的拾取
      * 
      * @param itemStack 物品堆
-     * @param player 玩家
      * @param gamePlayer 游戏玩家对象
      * @param item 物品实体
      * @return 如果已处理返回true
      */
-    public static boolean handleEmeraldPickup(ItemStack itemStack, Player player, GamePlayer gamePlayer, Item item) {
+    public static boolean handleEmeraldPickup(ItemStack itemStack, GamePlayer gamePlayer, Item item) {
         if (itemStack.getType() != XMaterial.EMERALD.get()) {
             return false;
         }
-        
+
+        Player player = gamePlayer.getPlayer();
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
         
         // 默认模式下不做特殊处理
@@ -258,7 +259,7 @@ public class PickupItemHandler {
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
         gamePlayer.addExperience("EMERALD", (int) xp);
-        player.playSound(player.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+        gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
         
         return true;
     }

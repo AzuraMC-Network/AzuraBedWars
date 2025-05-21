@@ -17,6 +17,7 @@ public class PlayerQuitListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         event.setQuitMessage(null);
-        gameManager.removePlayers(GamePlayer.get(event.getPlayer().getUniqueId()));
+        GamePlayer gamePlayer = GamePlayer.get(event.getPlayer());
+        gameManager.removePlayers(gamePlayer);
     }
 }

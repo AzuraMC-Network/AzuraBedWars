@@ -32,17 +32,16 @@ public class BedBreakHandler {
      * 处理床方块破坏
      *
      * @param event 方块破坏事件
-     * @param player 玩家
      * @param block 方块
      * @param gamePlayer 游戏玩家
      * @param gameTeam 玩家所在团队
      */
-    public static void handleBedBreak(BlockBreakEvent event, Player player, Block block, GamePlayer gamePlayer, GameTeam gameTeam) {
+    public static void handleBedBreak(BlockBreakEvent event, Block block, GamePlayer gamePlayer, GameTeam gameTeam) {
         event.setCancelled(true);
 
         // 不能破坏自己的床
         if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= BED_SEARCH_RADIUS) {
-            player.sendMessage("§c你不能破坏你家的床");
+            gamePlayer.sendMessage("§c你不能破坏你家的床");
             return;
         }
 
@@ -50,10 +49,10 @@ public class BedBreakHandler {
         for (GameTeam targetTeam : GAME_MANAGER.getGameTeams()) {
             if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= BED_SEARCH_RADIUS) {
                 if (!targetTeam.isDead()) {
-                    processBedDestruction(player, gamePlayer, gameTeam, targetTeam, block);
+                    processBedDestruction(gamePlayer, gameTeam, targetTeam, block);
                     return;
                 }
-                player.sendMessage("§c此床没有队伍");
+                gamePlayer.sendMessage("§c此床没有队伍");
                 return;
             }
         }
@@ -62,16 +61,15 @@ public class BedBreakHandler {
     /**
      * 处理床被破坏的逻辑
      *
-     * @param player 玩家
      * @param gamePlayer 游戏玩家
      * @param gameTeam 玩家所在团队
      * @param targetTeam 床所属团队
      * @param block 床方块
      */
-    private static void processBedDestruction(Player player, GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam, Block block) {
+    private static void processBedDestruction(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam, Block block) {
 
         // 触发床被破坏事件
-        BedwarsDestroyBedEvent event = new BedwarsDestroyBedEvent(player, targetTeam);
+        BedwarsDestroyBedEvent event = new BedwarsDestroyBedEvent(gamePlayer, targetTeam);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
@@ -81,7 +79,7 @@ public class BedBreakHandler {
         BedUtil.dropTargetBlock(block);
 
         // 奖励金币
-        rewardBedDestruction(player);
+        rewardBedDestruction(gamePlayer);
 
         // 广播消息
         broadcastBedDestructionMessages(gamePlayer, gameTeam, targetTeam);
@@ -97,9 +95,9 @@ public class BedBreakHandler {
     /**
      * 奖励破坏床的玩家金币
      *
-     * @param player 玩家
+     * @param gamePlayer 游戏玩家
      */
-    private static void rewardBedDestruction(Player player) {
+    private static void rewardBedDestruction(GamePlayer gamePlayer) {
         // 动作栏显示奖励
         new BukkitRunnable() {
             int i = 0;
@@ -110,16 +108,16 @@ public class BedBreakHandler {
                     cancel();
                     return;
                 }
-                ChatColorUtil.sendActionBar(player, "§6+" + BED_DESTROY_REWARD + "个金币");
+                gamePlayer.sendActionBar("§6+" + BED_DESTROY_REWARD + "个金币");
                 i++;
             }
         }.runTaskTimerAsynchronously(PLUGIN, 0, 10);
 
         // 聊天栏显示奖励
-        player.sendMessage("§6+" + BED_DESTROY_REWARD + "个金币 (破坏床)");
+        gamePlayer.sendMessage("§6+" + BED_DESTROY_REWARD + "个金币 (破坏床)");
 
         // 实际奖励金币
-        PLUGIN.getEcon().depositPlayer(player, BED_DESTROY_REWARD);
+        PLUGIN.getEcon().depositPlayer(gamePlayer.getPlayer(), BED_DESTROY_REWARD);
     }
 
     /**

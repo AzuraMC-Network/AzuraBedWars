@@ -66,7 +66,7 @@ public class FireballHandler implements Listener {
 
             // 对敌人造成伤害和击退
             if (gamePlayer != null) {
-                applyFireballDamage(player, gamePlayer, ownerPlayer, fireball);
+                applyFireballDamage(gamePlayer, ownerPlayer, fireball);
             }
         }
     }
@@ -86,12 +86,12 @@ public class FireballHandler implements Listener {
     /**
      * 对玩家应用火球伤害和击退效果
      *
-     * @param player 玩家
      * @param gamePlayer 游戏玩家对象
      * @param ownerPlayer 火球发射者
      * @param fireball 火球实体
      */
-    private static void applyFireballDamage(Player player, GamePlayer gamePlayer, GamePlayer ownerPlayer, Fireball fireball) {
+    private static void applyFireballDamage(GamePlayer gamePlayer, GamePlayer ownerPlayer, Fireball fireball) {
+        Player player = gamePlayer.getPlayer();
         // 造成伤害
         player.damage(FIREBALL_DAMAGE);
 

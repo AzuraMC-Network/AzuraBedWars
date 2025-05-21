@@ -129,11 +129,9 @@ public class GameStartTask extends BukkitRunnable {
         for (GamePlayer player : GamePlayer.getOnlinePlayers()) {
             player.sendMessage(String.format(MSG_COUNTDOWN, countdown));
             player.sendTitle(
-                TITLE_FADE_IN, 
+                    String.format(TITLE_COUNTDOWN, countdown), SUBTITLE_TEXT, TITLE_FADE_IN,
                 TITLE_STAY, 
-                TITLE_FADE_OUT, 
-                String.format(TITLE_COUNTDOWN, countdown), 
-                SUBTITLE_TEXT
+                TITLE_FADE_OUT
             );
             player.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 1F, 10F);
         }

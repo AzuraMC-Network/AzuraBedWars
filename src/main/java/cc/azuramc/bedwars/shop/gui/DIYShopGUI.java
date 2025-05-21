@@ -40,13 +40,13 @@ public class DIYShopGUI extends CustomGUI {
     /**
      * 创建自定义商店GUI
      *
+     * @param gamePlayer  游戏玩家
      * @param gameManager 游戏实例
-     * @param gamePlayer 游戏玩家
-     * @param itemStack 要添加的物品
-     * @param className 物品分类名称
+     * @param itemStack   要添加的物品
+     * @param className   物品分类名称
      */
-    public DIYShopGUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className) {
-        super(gamePlayer.getPlayer(), "§8添加物品到快捷购买", 54);
+    public DIYShopGUI(GamePlayer gamePlayer, GameManager gameManager, ItemStack itemStack, String className) {
+        super(gamePlayer, "§8添加物品到快捷购买", 54);
         PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
 
         // 初始化界面
@@ -57,7 +57,6 @@ public class DIYShopGUI extends CustomGUI {
      * 初始化用户界面
      */
     private void initializeUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className, PlayerProfile playerProfile) {
-        Player player = gamePlayer.getPlayer();
         
         // 设置顶部展示物品
         setItem(4, new ItemBuilder()
@@ -116,7 +115,7 @@ public class DIYShopGUI extends CustomGUI {
             
             if (itemInfo == null || shopItemType == null) {
                 // 空槽位
-                setupEmptySlot(gameManager, player, slotPosition, i, className, playerProfile);
+                setupEmptySlot(gameManager, gamePlayer, slotPosition, i, className, playerProfile);
             } else {
                 // 已有物品的槽位
                 setupOccupiedSlot(gameManager, gamePlayer, slotPosition, shopItemType, className);
@@ -144,7 +143,7 @@ public class DIYShopGUI extends CustomGUI {
     /**
      * 设置空槽位
      */
-    private void setupEmptySlot(GameManager gameManager, Player player, int slotPosition, int slotIndex, String className, PlayerProfile playerProfile) {
+    private void setupEmptySlot(GameManager gameManager, GamePlayer gamePlayer, int slotPosition, int slotIndex, String className, PlayerProfile playerProfile) {
         setItem(slotPosition, 
                 new ItemBuilder()
                     .setItemStack(Objects.requireNonNull(XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + EMPTY_SLOT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem()))
@@ -157,10 +156,10 @@ public class DIYShopGUI extends CustomGUI {
                     playerProfile.saveShops();
                     
                     // 播放确认音效
-                    player.playSound(player.getLocation(), XSound.UI_BUTTON_CLICK.get(), 1, 10F);
+                    gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
                     
                     // 返回物品商店
-                    new ItemShopGUI(player, 0, gameManager).open();
+                    new ItemShopGUI(gamePlayer, 0, gameManager).open();
                 }, false));
     }
     
@@ -192,7 +191,7 @@ public class DIYShopGUI extends CustomGUI {
                     player.playSound(player.getLocation(), XSound.UI_BUTTON_CLICK.get(), 1, 10F);
                     
                     // 返回物品商店
-                    new ItemShopGUI(player, 0, gameManager).open();
+                    new ItemShopGUI(gamePlayer, 0, gameManager).open();
                 }, false));
     }
 

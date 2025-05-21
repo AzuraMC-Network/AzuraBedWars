@@ -45,7 +45,7 @@ public class BlockBreakListener implements Listener {
 
             // 处理床方块破坏
             if (MapUtil.isBedBlock(block)) {
-                BedBreakHandler.handleBedBreak(event, player, block, gamePlayer, gameTeam);
+                BedBreakHandler.handleBedBreak(event, block, gamePlayer, gameTeam);
                 return;
             }
 

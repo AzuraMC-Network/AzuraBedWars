@@ -46,27 +46,28 @@ public class PlayerInteractListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        GamePlayer gamePlayer = GamePlayer.get(player);
         Material interactingMaterial = event.getMaterial();
 
         if (gameManager.getGameState() == GameState.WAITING) {
-            handleWaitingState(event, player, interactingMaterial);
+            handleWaitingState(event, gamePlayer, interactingMaterial);
             return;
         }
 
         if (gameManager.getGameState() == GameState.RUNNING) {
-            handleRunningState(event, player, interactingMaterial);
+            handleRunningState(event, gamePlayer, interactingMaterial);
         }
     }
     
     /**
      * 处理等待状态下的交互事件
      */
-    private void handleWaitingState(PlayerInteractEvent event, Player player, Material interactingMaterial) {
+    private void handleWaitingState(PlayerInteractEvent event, GamePlayer gamePlayer, Material interactingMaterial) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
             event.setCancelled(true);
             switch (interactingMaterial) {
                 case PAPER:
-                    new ModeSelectionGUI(player).open();
+                    new ModeSelectionGUI(gamePlayer).open();
                     break;
                 case SLIME_BALL:
                     // 回大厅
@@ -80,8 +81,7 @@ public class PlayerInteractListener implements Listener {
     /**
      * 处理游戏运行状态下的交互事件
      */
-    private void handleRunningState(PlayerInteractEvent event, Player player, Material interactingMaterial) {
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+    private void handleRunningState(PlayerInteractEvent event, GamePlayer gamePlayer, Material interactingMaterial) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
 
         if (event.getAction() == Action.PHYSICAL) {
@@ -98,7 +98,7 @@ public class PlayerInteractListener implements Listener {
         }
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
-            handleRightClickAction(event, player, gamePlayer, gameTeam);
+            handleRightClickAction(event, gamePlayer, gameTeam);
         }
     }
     
@@ -157,43 +157,45 @@ public class PlayerInteractListener implements Listener {
     /**
      * 处理右键点击动作
      */
-    private void handleRightClickAction(PlayerInteractEvent event, Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
+    private void handleRightClickAction(PlayerInteractEvent event, GamePlayer gamePlayer, GameTeam gameTeam) {
+
+        Player player = gamePlayer.getPlayer();
         Material material = event.getMaterial();
         
         if (material == XMaterial.COMPASS.get()) {
-            handleCompassInteraction(event, player, gamePlayer);
+            handleCompassInteraction(event, gamePlayer);
         } else if (material == XMaterial.COMPARATOR.get()) {
-            new SpectatorSettingGUI(player).open();
+            new SpectatorSettingGUI(gamePlayer).open();
         } else if (material == XMaterial.PAPER.get()) {
-            handlePaperInteraction(event, player);
+            handlePaperInteraction(event, gamePlayer);
         } else if (material == XMaterial.SLIME_BALL.get()) {
             handleSlimeBallInteraction(event);
         } else if (material.name().toUpperCase().contains("BED")) {
-            handleBedInteraction(event, player, gamePlayer, gameTeam);
+            handleBedInteraction(event, gamePlayer, gameTeam);
         } else if (material == XMaterial.FIRE_CHARGE.get()) {
-            handleFireballInteraction(event, player, gamePlayer);
+            handleFireballInteraction(event, gamePlayer);
         } else if (material.name().toUpperCase().contains("WATER_BUCKIT")) {
-            handleWaterBucketInteraction(event, player);
+            handleWaterBucketInteraction(event, gamePlayer);
         }
     }
     
     /**
      * 处理指南针交互
      */
-    private void handleCompassInteraction(PlayerInteractEvent event, Player player, GamePlayer gamePlayer) {
+    private void handleCompassInteraction(PlayerInteractEvent event, GamePlayer gamePlayer) {
         event.setCancelled(true);
         if (!gamePlayer.isSpectator()) {
             return;
         }
-        new SpectatorCompassGUI(player).open();
+        new SpectatorCompassGUI(gamePlayer).open();
     }
     
     /**
      * 处理纸交互
      */
-    private void handlePaperInteraction(PlayerInteractEvent event, Player player) {
+    private void handlePaperInteraction(PlayerInteractEvent event, GamePlayer gamePlayer) {
         event.setCancelled(true);
-        Bukkit.dispatchCommand(player, "azurabedwars nextgame");
+        Bukkit.dispatchCommand(gamePlayer.getPlayer(), "azurabedwars nextgame");
     }
     
     /**
@@ -207,14 +209,14 @@ public class PlayerInteractListener implements Listener {
     /**
      * 处理床交互（回春床功能）
      */
-    private void handleBedInteraction(PlayerInteractEvent event, Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
+    private void handleBedInteraction(PlayerInteractEvent event, GamePlayer gamePlayer, GameTeam gameTeam) {
         event.setCancelled(true);
         if (gamePlayer.isSpectator()) {
             return;
         }
 
         // 验证能否使用回春床
-        if (!canUseRejuvenationBed(player, gamePlayer, gameTeam)) {
+        if (!canUseRejuvenationBed(gamePlayer, gameTeam)) {
             return;
         }
 
@@ -222,42 +224,42 @@ public class PlayerInteractListener implements Listener {
         placeBedForTeam(gameTeam);
 
         // 减少物品
-        reduceItemInHand(player);
+        reduceItemInHand(gamePlayer);
 
         // 更新队伍状态
         gameTeam.setDestroyed(false);
         gameTeam.setHasBed(true);
 
         // 广播消息
-        announceRejuvenationBedUsed(player, gameTeam);
+        announceRejuvenationBedUsed(gamePlayer, gameTeam);
     }
     
     /**
      * 检查玩家是否可以使用回春床
      */
-    private boolean canUseRejuvenationBed(Player player, GamePlayer gamePlayer, GameTeam gameTeam) {
+    private boolean canUseRejuvenationBed(GamePlayer gamePlayer, GameTeam gameTeam) {
         int priority = gameManager.getGameEventManager().currentEvent().getPriority();
         int leftTime = gameManager.getGameEventManager().getLeftTime();
         
         // 检查游戏时间是否已超过10分钟
         boolean isTimeExceeded = priority > 2 || (priority == 2 && leftTime <= 120);
         if (isTimeExceeded) {
-            player.sendMessage("§c开局已超过10分钟.");
+            gamePlayer.sendMessage("§c开局已超过10分钟.");
             return false;
         }
 
         if (gameTeam.isHasBed()) {
-            player.sendMessage("§c已使用过回春床了");
+            gamePlayer.sendMessage("§c已使用过回春床了");
             return false;
         }
 
         if (!gameTeam.isDestroyed()) {
-            player.sendMessage("§c床仍然存在 无法使用回春床");
+            gamePlayer.sendMessage("§c床仍然存在 无法使用回春床");
             return false;
         }
 
-        if (player.getLocation().distance(gameTeam.getSpawnLocation()) > 18) {
-            player.sendMessage("§c请靠近出生点使用!");
+        if (gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation()) > 18) {
+            gamePlayer.sendMessage("§c请靠近出生点使用!");
             return false;
         }
         
@@ -317,7 +319,8 @@ public class PlayerInteractListener implements Listener {
     /**
      * 减少玩家手中的物品数量
      */
-    private void reduceItemInHand(Player player) {
+    private void reduceItemInHand(GamePlayer gamePlayer) {
+        Player player = gamePlayer.getPlayer();
         if (PlayerUtil.getItemInHand(player).getAmount() == 1) {
             PlayerUtil.setItemInHand(player, null);
         } else {
@@ -328,8 +331,8 @@ public class PlayerInteractListener implements Listener {
     /**
      * 广播使用回春床的消息
      */
-    private void announceRejuvenationBedUsed(Player player, GameTeam gameTeam) {
-        player.sendMessage("§a使用回春床成功!");
+    private void announceRejuvenationBedUsed(GamePlayer gamePlayer, GameTeam gameTeam) {
+        gamePlayer.sendMessage("§a使用回春床成功!");
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
         gameManager.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
         gameManager.broadcastMessage(" ");
@@ -341,14 +344,14 @@ public class PlayerInteractListener implements Listener {
     /**
      * 处理火球交互
      */
-    private void handleFireballInteraction(PlayerInteractEvent event, Player player, GamePlayer gamePlayer) {
+    private void handleFireballInteraction(PlayerInteractEvent event, GamePlayer gamePlayer) {
         event.setCancelled(true);
         if (gamePlayer.isSpectator()) {
             return;
         }
 
         // 检查冷却时间
-        long lastFireballTime = getLastFireballTime(player);
+        long lastFireballTime = getLastFireballTime(gamePlayer);
         long currentTime = System.currentTimeMillis();
         long cooldownTime = 1000;
         
@@ -357,20 +360,21 @@ public class PlayerInteractListener implements Listener {
         }
 
         // 减少物品
-        reduceItemInHand(player);
+        reduceItemInHand(gamePlayer);
 
         // 设置冷却时间
-        player.setMetadata(fireballCooldownMetadata, new FixedMetadataValue(AzuraBedWars.getInstance(), currentTime));
+        gamePlayer.getPlayer().setMetadata(fireballCooldownMetadata, new FixedMetadataValue(AzuraBedWars.getInstance(), currentTime));
 
         // 发射火球
-        launchFireball(player);
+        launchFireball(gamePlayer);
     }
     
     /**
      * 获取玩家上次使用火球的时间
      * @return 返回上次使用时间的时间戳，如果没有使用过返回0
      */
-    private long getLastFireballTime(Player player) {
+    private long getLastFireballTime(GamePlayer gamePlayer) {
+        Player player  = gamePlayer.getPlayer();
         if (player.hasMetadata(fireballCooldownMetadata)) {
             return player.getMetadata(fireballCooldownMetadata).getFirst().asLong();
         }
@@ -380,22 +384,22 @@ public class PlayerInteractListener implements Listener {
     /**
      * 发射火球
      */
-    private void launchFireball(Player player) {
-        Fireball fireball = player.launchProjectile(Fireball.class);
+    private void launchFireball(GamePlayer gamePlayer) {
+        Fireball fireball = gamePlayer.getPlayer().launchProjectile(Fireball.class);
         fireball.setVelocity(fireball.getVelocity().multiply(2));
         fireball.setYield(3.0F);
         fireball.setBounce(false);
         fireball.setIsIncendiary(false);
-        fireball.setMetadata("Game FIREBALL", new FixedMetadataValue(AzuraBedWars.getInstance(), player.getUniqueId()));
+        fireball.setMetadata("Game FIREBALL", new FixedMetadataValue(AzuraBedWars.getInstance(), gamePlayer.getUuid()));
     }
     
     /**
      * 处理水桶交互
      */
-    private void handleWaterBucketInteraction(PlayerInteractEvent event, Player player) {
+    private void handleWaterBucketInteraction(PlayerInteractEvent event, GamePlayer gamePlayer) {
         // 检查是否靠近商店
         for (MapData.RawLocation rawLocation : gameManager.getMapData().getShops()) {
-            if (rawLocation.toLocation().distance(player.getLocation()) <= 5) {
+            if (rawLocation.toLocation().distance(gamePlayer.getPlayer().getLocation()) <= 5) {
                 event.setCancelled(true);
                 return;
             }
@@ -403,7 +407,7 @@ public class PlayerInteractListener implements Listener {
 
         // 检查是否靠近出生点
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            if (gameTeam.getSpawnLocation().distance(player.getLocation()) <= 8) {
+            if (gameTeam.getSpawnLocation().distance(gamePlayer.getPlayer().getLocation()) <= 8) {
                 event.setCancelled(true);
                 return;
             }
@@ -439,7 +443,7 @@ public class PlayerInteractListener implements Listener {
      * 启用第一人称旁观模式
      */
     private void enableFirstPersonSpectating(GamePlayer gamePlayer, Player spectator, Player target) {
-        gamePlayer.sendTitle(0, 20, 0, "§a正在旁观§7" + target.getName(), "§a点击左键打开菜单  §c按Shift键退出");
+        gamePlayer.sendTitle("§a正在旁观§7" + target.getName(), "§a点击左键打开菜单  §c按Shift键退出", 0, 20, 0);
         spectator.setGameMode(GameMode.SPECTATOR);
         spectator.setSpectatorTarget(target);
     }
@@ -450,34 +454,34 @@ public class PlayerInteractListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
 
         if (event.getRightClicked().hasMetadata("Shop")) {
-            handleItemShopInteraction(event, player, gamePlayer);
+            handleItemShopInteraction(event, gamePlayer);
             return;
         }
 
         if (event.getRightClicked().hasMetadata("Shop2")) {
-            handleTeamShopInteraction(event, player, gamePlayer);
+            handleTeamShopInteraction(event, gamePlayer);
         }
     }
     
     /**
      * 处理物品商店交互
      */
-    private void handleItemShopInteraction(PlayerInteractEntityEvent event, Player player, GamePlayer gamePlayer) {
+    private void handleItemShopInteraction(PlayerInteractEntityEvent event, GamePlayer gamePlayer) {
         event.setCancelled(true);
         if (gamePlayer.isSpectator()) {
             return;
         }
-        new ItemShopGUI(player, 0, gameManager).open();
+        new ItemShopGUI(gamePlayer, 0, gameManager).open();
     }
     
     /**
      * 处理队伍商店交互
      */
-    private void handleTeamShopInteraction(PlayerInteractEntityEvent event, Player player, GamePlayer gamePlayer) {
+    private void handleTeamShopInteraction(PlayerInteractEntityEvent event, GamePlayer gamePlayer) {
         event.setCancelled(true);
         if (gamePlayer.isSpectator()) {
             return;
         }
-        new TeamShopGUI(player, gameManager).open();
+        new TeamShopGUI(gamePlayer, gameManager).open();
     }
 }

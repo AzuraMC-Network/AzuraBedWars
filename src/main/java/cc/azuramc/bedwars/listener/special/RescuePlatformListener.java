@@ -36,7 +36,7 @@ public class RescuePlatformListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        GamePlayer gamePlayer = GamePlayer.get(player);
 
         if (gameManager.getGameState() != GameState.RUNNING) {
             return;

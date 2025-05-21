@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.setup;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,6 +28,7 @@ public class SetupItemListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+        GamePlayer gamePlayer = GamePlayer.get(player);
 
         // 检查玩家是否有权限
         if (!player.hasPermission("azurabedwars.admin")) {

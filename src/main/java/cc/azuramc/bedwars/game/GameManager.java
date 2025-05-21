@@ -295,25 +295,24 @@ public class GameManager {
      * @param gamePlayer 游戏玩家
      */
     public void addPlayer(GamePlayer gamePlayer) {
-        Player player = gamePlayer.getPlayer();
 
         if (gameState == GameState.RUNNING) {
-            handlePlayerJoinRunningGame(gamePlayer, player);
+            handlePlayerJoinRunningGame(gamePlayer);
             return;
         }
 
-        handlePlayerJoinWaitingGame(gamePlayer, player);
+        handlePlayerJoinWaitingGame(gamePlayer);
     }
 
     /**
      * 处理玩家加入等待状态的游戏
      *
      * @param gamePlayer 游戏玩家
-     * @param player 原始玩家对象
      */
-    private void handlePlayerJoinWaitingGame(GamePlayer gamePlayer, Player player) {
+    private void handlePlayerJoinWaitingGame(GamePlayer gamePlayer) {
+        Player player = gamePlayer.getPlayer();
         // 处理玩家可见性
-        updatePlayerVisibility(gamePlayer, player);
+        updatePlayerVisibility(gamePlayer);
 
         // 设置玩家基本状态
         player.spigot().respawn();
@@ -325,11 +324,11 @@ public class GameManager {
         player.teleport(waitingLocation);
 
         // 设置记分板
-        plugin.getScoreboardManager().showBoard(player);
+        plugin.getScoreboardManager().showBoard(gamePlayer);
         plugin.getScoreboardManager().updateAllBoards();
 
         // 给予物品
-        giveWaitingItems(player);
+        giveWaitingItems(gamePlayer);
 
         // 检查是否可以开始游戏
         checkGameStart();
@@ -339,9 +338,9 @@ public class GameManager {
      * 更新玩家可见性设置
      * 
      * @param gamePlayer 游戏玩家
-     * @param player 原始玩家对象
      */
-    private void updatePlayerVisibility(GamePlayer gamePlayer, Player player) {
+    private void updatePlayerVisibility(GamePlayer gamePlayer) {
+        Player player = gamePlayer.getPlayer();
         // 使当前玩家可见
         for (GamePlayer otherPlayer : GamePlayer.getOnlinePlayers()) {
             Player otherPlayerObj = otherPlayer.getPlayer();
@@ -394,9 +393,11 @@ public class GameManager {
     /**
      * 给予玩家等待时的物品
      *
-     * @param player 玩家
+     * @param gamePlayer 玩家
      */
-    private void giveWaitingItems(Player player) {
+    private void giveWaitingItems(GamePlayer gamePlayer) {
+        Player player = gamePlayer.getPlayer();
+
         player.getInventory().addItem(
             new ItemBuilder()
                 .setType(resourceSelectorMaterial)
@@ -416,18 +417,17 @@ public class GameManager {
      * 处理玩家加入正在运行的游戏
      *
      * @param gamePlayer 游戏玩家
-     * @param player 原始玩家对象
      */
-    private void handlePlayerJoinRunningGame(GamePlayer gamePlayer, Player player) {
+    private void handlePlayerJoinRunningGame(GamePlayer gamePlayer) {
         // 设置记分板
-        plugin.getScoreboardManager().showBoard(player);
+        plugin.getScoreboardManager().showBoard(gamePlayer);
         plugin.getScoreboardManager().updateAllBoards();
 
         // 检查玩家团队状态
         if (gamePlayer.getGameTeam() != null) {
             if (!gamePlayer.getGameTeam().isDead()) {
                 LoadGameUtil.setPlayerTeamTab();
-                PlayerUtil.callPlayerRespawnEvent(player, respawnLocation);
+                PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
                 broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
                 return;
             }
@@ -660,7 +660,7 @@ public class GameManager {
      */
     public void broadcastTitleToAll(String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
         GamePlayer.getOnlinePlayers().forEach(gamePlayer -> 
-            gamePlayer.sendTitle(fadeIn, stay, fadeOut, title, subTitle));
+            gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
 
     /**
@@ -675,7 +675,7 @@ public class GameManager {
      */
     public void broadcastTeamTitle(GameTeam gameTeam, String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
         gameTeam.getAlivePlayers().forEach(gamePlayer -> 
-            gamePlayer.sendTitle(fadeIn, stay, fadeOut, title, subTitle));
+            gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
 
     /**

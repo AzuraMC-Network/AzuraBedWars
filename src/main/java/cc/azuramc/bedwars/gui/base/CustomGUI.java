@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.gui.base;
 
+import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.gui.base.component.GUIItem;
 import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
@@ -18,12 +19,14 @@ import java.util.List;
 @Getter
 public class CustomGUI {
     public List<GUIItem> items;
+    private final GamePlayer gamePlayer;
     private final Player player;
     private final String title;
     private final int size;
 
-    public CustomGUI(Player player, String title, int size) {
-        this.player = player;
+    public CustomGUI(GamePlayer gamePlayer, String title, int size) {
+        this.gamePlayer = gamePlayer;
+        this.player = gamePlayer.getPlayer();
         this.title = title;
         this.size = size;
 

@@ -14,7 +14,6 @@ import cc.azuramc.bedwars.spectator.SpectatorTarget;
 import cc.azuramc.bedwars.util.ChatColorUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
-import com.cryptomorin.xseries.messages.Titles;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -36,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * 管理玩家在游戏中的状态、装备、数据等
  * 提供玩家相关的各种操作方法
+ * <b>【重构说明】业务层统一只用GamePlayer，Player仅用于与Bukkit API交互</b>
  * </p>
  * @author an5w1r@163.com
  */
@@ -129,6 +129,18 @@ public class GamePlayer {
      */
     public static GamePlayer get(UUID uuid) {
         return GAME_PLAYERS.get(uuid);
+    }
+
+    /**
+     * 通过Bukkit Player对象获取GamePlayer实例
+     * @param player Bukkit Player对象
+     * @return GamePlayer实例
+     */
+    public static GamePlayer get(Player player) {
+        if (player == null) {
+            return null;
+        }
+        return get(player.getUniqueId());
     }
 
     /**
@@ -285,18 +297,18 @@ public class GamePlayer {
 
     /**
      * 发送标题消息
-     * 
-     * @param fadeIn 淡入时间
-     * @param stay 停留时间
-     * @param fadeOut 淡出时间
-     * @param title 主标题
+     *
+     * @param title    主标题
      * @param subTitle 副标题
+     * @param fadeIn   淡入时间
+     * @param stay     停留时间
+     * @param fadeOut  淡出时间
      */
-    public void sendTitle(int fadeIn, int stay, int fadeOut, String title, String subTitle) {
+    public void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         if (!isOnline()) {
             return;
         }
-        Titles.sendTitle(getPlayer(), fadeIn, stay, fadeOut, title, subTitle);
+        ChatColorUtil.sendTitle(getPlayer(), title, subTitle, fadeIn, stay, fadeOut);
     }
 
     /**
@@ -353,7 +365,7 @@ public class GamePlayer {
      * 设置观察者玩家状态
      */
     private void setupSpectatorPlayer(Player player, String title, String subTitle) {
-        sendTitle(10, 20, 10, title, subTitle);
+        sendTitle(title, subTitle, 10, 20, 10);
         for (GamePlayer gamePlayer1 : getOnlinePlayers()) {
             PlayerUtil.hidePlayer(gamePlayer1.getPlayer(), player);
         }
