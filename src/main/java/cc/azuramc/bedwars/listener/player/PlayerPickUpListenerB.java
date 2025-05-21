@@ -37,7 +37,7 @@ public class PlayerPickUpListenerB implements Listener {
         }
         
         // 处理剑的拾取
-        PickupItemHandler.handleSwordPickup(itemStack, player, gamePlayer);
+        PickupItemHandler.handleSwordPickup(itemStack, player);
         
         // 检查AFK玩家拾取资源
         if (PickupItemHandler.checkAfkResourcePickup(itemStack, gamePlayer)) {

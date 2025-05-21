@@ -441,7 +441,7 @@ public class GameManager {
      * 检查是否可以开始游戏倒计时
      */
     private void checkGameStart() {
-        if (isStartable() && gameState == GameState.WAITING && getGameStartTask() == null) {
+        if (canStart() && gameState == GameState.WAITING && getGameStartTask() == null) {
             GameStartTask lobbyCountdown = new GameStartTask(this);
             lobbyCountdown.runTaskTimer(plugin, COUNTDOWN_TICK_PERIOD, COUNTDOWN_TICK_PERIOD);
             setGameStartTask(lobbyCountdown);
@@ -652,13 +652,13 @@ public class GameManager {
     /**
      * 向所有玩家广播标题
      *
-     * @param fadeIn 淡入时间
-     * @param stay 停留时间
-     * @param fadeOut 淡出时间
-     * @param title 主标题
+     * @param title    主标题
      * @param subTitle 副标题
+     * @param fadeIn   淡入时间
+     * @param stay     停留时间
+     * @param fadeOut  淡出时间
      */
-    public void broadcastTitle(Integer fadeIn, Integer stay, Integer fadeOut, String title, String subTitle) {
+    public void broadcastTitleToAll(String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
         GamePlayer.getOnlinePlayers().forEach(gamePlayer -> 
             gamePlayer.sendTitle(fadeIn, stay, fadeOut, title, subTitle));
     }
@@ -667,13 +667,13 @@ public class GameManager {
      * 向特定团队广播标题
      *
      * @param gameTeam 目标团队
-     * @param fadeIn 淡入时间
-     * @param stay 停留时间
-     * @param fadeOut 淡出时间
-     * @param title 主标题
+     * @param title    主标题
      * @param subTitle 副标题
+     * @param fadeIn   淡入时间
+     * @param stay     停留时间
+     * @param fadeOut  淡出时间
      */
-    public void broadcastTeamTitle(GameTeam gameTeam, Integer fadeIn, Integer stay, Integer fadeOut, String title, String subTitle) {
+    public void broadcastTeamTitle(GameTeam gameTeam, String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
         gameTeam.getAlivePlayers().forEach(gamePlayer -> 
             gamePlayer.sendTitle(fadeIn, stay, fadeOut, title, subTitle));
     }
@@ -687,6 +687,17 @@ public class GameManager {
     public void broadcastTeamMessage(GameTeam gameTeam, String... texts) {
         gameTeam.getAlivePlayers().forEach(player -> 
             Arrays.asList(texts).forEach(player::sendMessage));
+    }
+
+    /**
+     * 向特定团队广播消息
+     *
+     * @param gameTeam 目标团队
+     * @param textList 消息文本
+     */
+    public void broadcastTeamMessage(GameTeam gameTeam,List<String> textList) {
+        gameTeam.getAlivePlayers().forEach(player ->
+                textList.forEach(player::sendMessage));
     }
 
     /**
@@ -713,6 +724,16 @@ public class GameManager {
     }
 
     /**
+     * 向所有观察者广播消息
+     *
+     * @param textList 消息文本
+     */
+    public void broadcastSpectatorMessage(List<String> textList) {
+        GamePlayer.getSpectators().forEach(gamePlayer ->
+                textList.forEach(gamePlayer::sendMessage));
+    }
+
+    /**
      * 向所有玩家广播消息
      *
      * @param texts 消息文本
@@ -720,6 +741,16 @@ public class GameManager {
     public void broadcastMessage(String... texts) {
         GamePlayer.getOnlinePlayers().forEach(gamePlayer -> 
             Arrays.asList(texts).forEach(gamePlayer::sendMessage));
+    }
+
+    /**
+     * 向所有玩家广播消息
+     *
+     * @param textList 消息文本
+     */
+    public void broadcastMessage(List<String> textList) {
+        GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
+                textList.forEach(gamePlayer::sendMessage));
     }
 
     /**
@@ -739,7 +770,7 @@ public class GameManager {
      *
      * @return 是否可以开始
      */
-    public boolean isStartable() {
+    public boolean canStart() {
         return (this.hasEnoughPlayers() && this.hasEnoughTeams());
     }
 

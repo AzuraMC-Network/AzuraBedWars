@@ -35,10 +35,8 @@ public class SetupItemManager {
     private final Map<String, String> playerMapContext = new HashMap<>();
 
     public SetupItemManager() {
-        System.out.println("[调试] SetupItemManager 构造函数被调用");
         this.itemCommands = new HashMap<>();
         registerItemCommands();
-        System.out.println("[调试] SetupItemManager 初始化完成，命令映射数量: " + itemCommands.size());
     }
     
     /**

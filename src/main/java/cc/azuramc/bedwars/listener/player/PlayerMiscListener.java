@@ -120,7 +120,7 @@ public class PlayerMiscListener implements Listener {
                     return;
                 }
 
-                gameManager.broadcastTeamTitle(gameTeam, 0, 8, 0, "", gameTeam.getChatColor() + gamePlayer.getNickName() + " 说: §c注意,我们的床有危险！");
+                gameManager.broadcastTeamTitle(gameTeam, "", gameTeam.getChatColor() + gamePlayer.getNickName() + " 说: §c注意,我们的床有危险！", 0, 8, 0);
                 gameManager.broadcastTeamSound(gameTeam, XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
                 i++;
             }

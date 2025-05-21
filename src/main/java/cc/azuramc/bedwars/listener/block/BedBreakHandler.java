@@ -141,7 +141,7 @@ public class BedBreakHandler {
         GAME_MANAGER.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
 
         // 向受影响的团队发送标题提示
-        GAME_MANAGER.broadcastTeamTitle(targetTeam, 1, 20, 1, "§c§l床被摧毁", "§c死亡将无法复活");
+        GAME_MANAGER.broadcastTeamTitle(targetTeam, "§c§l床被摧毁", "§c死亡将无法复活", 1, 20, 1);
     }
 
 

@@ -44,12 +44,10 @@ public class GameStartEvent extends AbstractGameEvent {
     @Override
     public void executeRunnable(GameManager gameManager, int seconds) {
         gameManager.broadcastSound(XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
-        gameManager.broadcastTitle(
-            CONFIG.getTitle().getFadeIn(),
+        gameManager.broadcastTitleToAll(
+                MESSAGE_EVENT.getTitle().getTitleString(), MESSAGE_EVENT.getTitle().getSubtitle() + seconds, CONFIG.getTitle().getFadeIn(),
             CONFIG.getTitle().getTitleStay(),
-            CONFIG.getTitle().getFadeOut(),
-            MESSAGE_EVENT.getTitle().getTitleString(),
-            MESSAGE_EVENT.getTitle().getSubtitle() + seconds
+            CONFIG.getTitle().getFadeOut()
         );
     }
 

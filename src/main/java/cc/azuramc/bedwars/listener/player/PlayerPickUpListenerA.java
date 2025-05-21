@@ -22,7 +22,7 @@ public class PlayerPickUpListenerA implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         
         // 基本条件检查
-        if (PickupItemHandler.isPickupDisabled(player, gamePlayer)) {
+        if (PickupItemHandler.isPickupDisabled(player)) {
             event.setCancelled(true);
             return;
         }
@@ -34,7 +34,7 @@ public class PlayerPickUpListenerA implements Listener {
         }
         
         // 处理剑的拾取
-        PickupItemHandler.handleSwordPickup(itemStack, player, gamePlayer);
+        PickupItemHandler.handleSwordPickup(itemStack, player);
         
         // 检查AFK玩家拾取资源
         if (PickupItemHandler.checkAfkResourcePickup(itemStack, gamePlayer)) {

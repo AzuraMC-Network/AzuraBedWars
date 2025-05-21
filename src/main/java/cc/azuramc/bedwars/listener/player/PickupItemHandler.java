@@ -72,9 +72,8 @@ public class PickupItemHandler {
      *
      * @param itemStack  物品堆
      * @param player     玩家
-     * @param gamePlayer 游戏玩家对象
      */
-    public static void handleSwordPickup(ItemStack itemStack, Player player, GamePlayer gamePlayer) {
+    public static void handleSwordPickup(ItemStack itemStack, Player player) {
         // 检查是否是剑类物品
         boolean isSword = itemStack.getType() == XMaterial.WOODEN_SWORD.get() ||
                           itemStack.getType() == XMaterial.STONE_SWORD.get() ||
@@ -86,7 +85,7 @@ public class PickupItemHandler {
         }
         
         // 添加锋利附魔
-        if (gamePlayer.getGameTeam().isHasSharpenedEnchant()) {
+        if (GamePlayer.get(player.getUniqueId()).getGameTeam().isHasSharpenedEnchant()) {
             itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
         }
         

@@ -79,7 +79,8 @@ public class DIYShopGUI extends CustomGUI {
     private void setupBorders() {
         // 设置顶部边框
         for (int i = 0; i < 9; i++) {
-            if (i != 4) { // 跳过中间物品展示位置
+            // 跳过中间物品展示位置
+            if (i != 4) {
                 setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
             }
         }

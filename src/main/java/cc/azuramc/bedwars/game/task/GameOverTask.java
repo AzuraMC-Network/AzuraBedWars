@@ -129,11 +129,11 @@ public class GameOverTask extends BukkitRunnable {
         gameManager.getGameTeams().forEach(team -> {
             boolean isWinner = winner != null && winner.getName().equals(team.getName());
             if (isWinner) {
-                gameManager.broadcastTeamTitle(team, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT,
-                                       VICTORY_TITLE, VICTORY_SUBTITLE);
+                gameManager.broadcastTeamTitle(team, VICTORY_TITLE, VICTORY_SUBTITLE, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT
+                );
             } else {
-                gameManager.broadcastTeamTitle(team, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT,
-                                       DEFEAT_TITLE, DEFEAT_SUBTITLE);
+                gameManager.broadcastTeamTitle(team, DEFEAT_TITLE, DEFEAT_SUBTITLE, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT
+                );
             }
         });
     }

@@ -74,7 +74,7 @@ public class BedDestroyedEvent extends AbstractGameEvent {
 
         // 播放音效和显示标题
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 1, 1);
-        gameManager.broadcastTitle(TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT, TITLE, SUBTITLE);
+        gameManager.broadcastTitleToAll(TITLE, SUBTITLE, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
     }
     
     /**
