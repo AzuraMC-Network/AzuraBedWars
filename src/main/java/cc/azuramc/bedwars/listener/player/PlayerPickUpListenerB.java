@@ -25,7 +25,7 @@ public class PlayerPickUpListenerB implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         
         // 基本条件检查
-        if (PickupItemHandler.isPickupDisabled(player, gamePlayer)) {
+        if (PickupItemHandler.isPickupDisabled(player)) {
             event.setCancelled(true);
             return;
         }

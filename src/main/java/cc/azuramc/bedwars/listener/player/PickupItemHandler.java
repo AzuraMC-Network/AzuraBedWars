@@ -31,12 +31,11 @@ public class PickupItemHandler {
      * 检查玩家是否能够拾取物品的基本条件
      * 
      * @param player 玩家
-     * @param gamePlayer 游戏玩家对象
      * @return 如果玩家不能拾取返回true
      */
-    public static boolean isPickupDisabled(Player player, GamePlayer gamePlayer) {
+    public static boolean isPickupDisabled(Player player) {
         // 旁观者不能拾取物品
-        if (gamePlayer.isSpectator()) {
+        if (GamePlayer.get(player.getUniqueId()).isSpectator()) {
             return true;
         }
         
