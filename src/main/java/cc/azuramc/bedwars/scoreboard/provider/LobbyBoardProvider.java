@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.ScoreboardConfig;
 import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.level.PlayerLevelMap;
 import cc.azuramc.bedwars.game.task.GameStartTask;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -48,7 +49,7 @@ public class LobbyBoardProvider implements Listener {
     /**
      * 更新间隔（毫秒）
      */
-    private static final long UPDATE_INTERVAL = CONFIG.getUpdateInterval(); // 默认为0.5秒更新一次
+    private static final long UPDATE_INTERVAL = CONFIG.getUpdateInterval();
 
     /**
      * 插件实例缓存
@@ -166,7 +167,7 @@ public class LobbyBoardProvider implements Listener {
         int expPoints = (playerProfile.getKills() * 2) +
                        (playerProfile.getDestroyedBeds() * 10) +
                        (playerProfile.getWins() * 15);
-        int level = plugin.getLevel(expPoints);
+        int level = PlayerLevelMap.getLevel(expPoints);
         player.setLevel(level);
     }
     
