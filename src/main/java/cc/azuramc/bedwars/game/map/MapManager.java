@@ -179,6 +179,9 @@ public class MapManager {
         Bukkit.getLogger().info("正在从 " + mapUrl + "获取地图文件");
         
         // 加载世界
+        if (Bukkit.getWorld(mapName) != null) {
+            Bukkit.unloadWorld(mapName, false);
+        }
         World world = loadMapWorld(mapName, mapUrl);
         if (world == null) {
             Bukkit.getLogger().warning("world 加载失败");

@@ -12,7 +12,7 @@ public class WorldUtil {
     @SuppressWarnings("deprecation")
     public static World setWorldRules(World world) {
         world.setAutoSave(false);
-        if (VersionUtil.isLessThan113()) {
+        if (!VersionUtil.isLessThan113()) {
             world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
             world.setGameRule(GameRule.DO_FIRE_TICK, false);
         } else {

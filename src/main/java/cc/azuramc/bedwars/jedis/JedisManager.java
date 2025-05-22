@@ -23,17 +23,11 @@ import java.util.logging.Level;
  * @author an5w1r@163.com
  */
 public class JedisManager {
-    /**
-     * 5分钟
-     */
+    /** 5分钟 */
     private static final long STARTUP_TIMEOUT = 300000L;
-    /**
-     * 5分钟
-     */
+    /** 5分钟 */
     private static final long EMPTY_SERVER_TIMEOUT = 300000L;
-    /**
-     * 1秒
-     */
+    /** 1秒 */
     private static final long TASK_INTERVAL = 1000L;
     private static final String SERVER_MANAGER_LOG = "/data/serverManager.log";
     private static final String GAME_SERVER_MANAGER_CHANNEL = "GameServerManager";
@@ -43,8 +37,7 @@ public class JedisManager {
     private static final long KEEP_ALIVE_TIME = 0L;
     private static final int QUEUE_CAPACITY = 100;
 
-    @Getter
-    private static JedisManager instance;
+    @Getter private static JedisManager instance;
 
     /**
      * 使用ThreadPoolExecutor替代Executors创建的ScheduledExecutorService
@@ -52,10 +45,8 @@ public class JedisManager {
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture<?> statusUpdateTask;
     
-    @Getter
-    private ServerData serverData;
-    @Getter
-    private final HashMap<String, Object> expand = new HashMap<>();
+    @Getter private ServerData serverData;
+    @Getter private final HashMap<String, Object> expand = new HashMap<>();
     
     private final long startTime = System.currentTimeMillis();
     private long forceBoomTime = 0L;
@@ -156,6 +147,9 @@ public class JedisManager {
             case RUNNING:
             case END:
                 handleRunningStatus();
+                break;
+            case UNKNOWN:
+            default:
                 break;
         }
     }

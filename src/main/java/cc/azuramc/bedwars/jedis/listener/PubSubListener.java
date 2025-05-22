@@ -24,11 +24,11 @@ public class PubSubListener implements Runnable {
      * 重连延迟(秒)
      */
     private static final int RECONNECT_DELAY = 5;
-    private static final String SERVER_NAME_QUERY_PREFIX = "ServerManage.ServerNameQuery.";
-    private static final String RUN_COMMAND_CHANNEL = "ServerManage.RunCommand";
 
     private JedisPubSubHandler jedisPubSubHandler;
     private final Set<String> addedChannels = new HashSet<>();
+    private boolean isInitialized = false;
+    private Thread subscribeThread;
 
     /**
      * 运行监听器
@@ -36,60 +36,52 @@ public class PubSubListener implements Runnable {
      */
     @Override
     public void run() {
-        boolean connectionBroken = false;
-        
-        try (Jedis jedis = JedisUtil.getJedis()) {
-            try {
-                initializePubSub(jedis);
-            } catch (Exception e) {
-                handleSubscriptionError(e);
-                connectionBroken = true;
-            }
-        } catch (JedisConnectionException e) {
-            handleConnectionError();
-        }
-
-        if (connectionBroken) {
-            run();
+        if (!isInitialized) {
+            initializePubSub();
+            isInitialized = true;
         }
     }
 
     /**
      * 初始化PubSub订阅
-     * @param jedis Jedis连接
      */
-    private void initializePubSub(Jedis jedis) {
-        jedisPubSubHandler = new JedisPubSubHandler(AzuraBedWars.getInstance());
-        addedChannels.add(SERVER_NAME_QUERY_PREFIX + IPUtil.getLocalIp());
-        addedChannels.add(RUN_COMMAND_CHANNEL);
-        jedis.subscribe(jedisPubSubHandler, addedChannels.toArray(new String[0]));
-    }
-
-    /**
-     * 处理订阅错误
-     * @param e 异常
-     */
-    private void handleSubscriptionError(Exception e) {
-        Bukkit.getLogger().log(Level.WARNING, "PubSub订阅错误,尝试恢复", e);
+    private void initializePubSub() {
         try {
-            if (jedisPubSubHandler != null) {
-                jedisPubSubHandler.unsubscribe();
-            }
-        } catch (Exception ignored) {
-            // 忽略取消订阅时的错误
+            jedisPubSubHandler = new JedisPubSubHandler(AzuraBedWars.getInstance());
+            
+            // 添加所有需要的频道
+            String channel = "AZURA.BW." + IPUtil.getLocalIp();
+            addedChannels.add(channel);
+            
+            // 记录订阅的频道
+            Bukkit.getLogger().info("正在订阅以下频道: " + String.join(", ", addedChannels));
+            
+            // 在单独的线程中执行订阅操作
+            subscribeThread = new Thread(() -> {
+                try (Jedis jedis = JedisUtil.getJedis()) {
+                    jedis.subscribe(jedisPubSubHandler, addedChannels.toArray(new String[0]));
+                } catch (JedisConnectionException e) {
+                    Bukkit.getLogger().log(Level.SEVERE, "Redis连接失败，将在" + RECONNECT_DELAY + "秒后重试", e);
+                    scheduleReconnect();
+                } catch (Exception e) {
+                    Bukkit.getLogger().log(Level.SEVERE, "初始化PubSub订阅失败", e);
+                }
+            }, "Redis-Subscribe-Thread");
+            
+            subscribeThread.start();
+        } catch (Exception e) {
+            Bukkit.getLogger().log(Level.SEVERE, "初始化PubSub订阅失败", e);
         }
     }
 
     /**
-     * 处理连接错误
+     * 安排重连
      */
-    private void handleConnectionError() {
-        Bukkit.getLogger().info("PubSub连接错误,将在" + RECONNECT_DELAY + "秒后重试");
+    private void scheduleReconnect() {
         AzuraBedWars.getInstance().getServer().getScheduler()
-            .runTaskTimerAsynchronously(
+            .runTaskLaterAsynchronously(
                 AzuraBedWars.getInstance(), 
                 this, 
-                0, 
                 20 * RECONNECT_DELAY
             );
     }
@@ -125,5 +117,9 @@ public class PubSubListener implements Runnable {
         if (jedisPubSubHandler != null) {
             jedisPubSubHandler.unsubscribe();
         }
+        if (subscribeThread != null && subscribeThread.isAlive()) {
+            subscribeThread.interrupt();
+        }
+        isInitialized = false;
     }
 }

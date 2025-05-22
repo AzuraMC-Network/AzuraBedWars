@@ -10,32 +10,24 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.level.PlayerLevelMap;
 import cc.azuramc.bedwars.game.map.MapData;
-import cc.azuramc.bedwars.game.map.MapLoadManager;
+import cc.azuramc.bedwars.game.map.MapLoader;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.jedis.JedisManager;
-import cc.azuramc.bedwars.jedis.event.BukkitPubSubMessageEvent;
 import cc.azuramc.bedwars.jedis.listener.PubSubListener;
-import cc.azuramc.bedwars.jedis.util.IPUtil;
-import cc.azuramc.bedwars.jedis.util.JedisUtil;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import lombok.Getter;
+import lombok.Setter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * AzuraBedWars插件主类
@@ -54,7 +46,7 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private static AzuraBedWars instance;
     @Getter private GameManager gameManager;
     @Getter private MapManager mapManager;
-    @Getter private MapData mapData;
+    @Getter @Setter private MapData mapData;
     @Getter private Economy econ = null;
     @Getter private Chat chat = null;
     @Getter private ConnectionPoolHandler connectionPoolHandler;
@@ -69,21 +61,18 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private ScoreboardConfig scoreboardConfig;
     @Getter private JedisManager jedisManager;
     @Getter private PubSubListener pubSubListener;
-    @Getter private MapLoadManager mapLoadManager;
+    @Getter private MapLoader mapLoader;
     @Getter private ScoreboardManager scoreboardManager;
     @Getter private SetupItemManager setupItemManager;
 
     @Override
     public void onEnable() {
-        instance = this;
         long startTime = System.currentTimeMillis();
-        
+        instance = this;
+
         // 初始化基础服务
         initDatabases();
         initMapSystem();
-        
-        // 初始化地图加载管理器
-        mapLoadManager = MapLoadManager.getInstance(this);
         
         // 初始化配置系统
         initConfigSystem();
@@ -132,10 +121,15 @@ public final class AzuraBedWars extends JavaPlugin {
     private void intiChannelSystem() {
         jedisManager = new JedisManager(this);
         pubSubListener = new PubSubListener();
+        
+        // 先运行一次初始化
+        pubSubListener.run();
+        
+        // 然后设置为异步任务
         getServer().getScheduler().runTaskAsynchronously(this, pubSubListener);
+        
         JedisManager.getInstance().getServerData().setGameType("AzuraBedWars");
         JedisManager.getInstance().getExpand().put("ver", getDescription().getVersion());
-        pubSubListener.addChannel("AZURA.BW." + IPUtil.getLocalIp());
     }
 
     /**
@@ -164,11 +158,17 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 初始化地图存储
         initMapStorage();
-        // 加载地图（Jedis请求+超时处理）
-        loadMapWithJedisRequest();
+        
+        // 初始化地图加载管理器
+        mapLoader = new MapLoader(this);
 
-        // 创建并加载游戏实例
+        // 创建游戏管理器
         gameManager = new GameManager(this);
+
+        //TODO: 在已有World且Bukkit默认加载World的情况下覆写World会出现问题
+
+        // 加载地图
+        mapLoader.loadMap();
         gameManager.loadGame(mapData);
 
         // 注册各种事件监听器
@@ -181,67 +181,6 @@ public final class AzuraBedWars extends JavaPlugin {
         // 配置世界设置
         configureWorlds();
         Bukkit.getLogger().info("游戏相关特性加载完成");
-    }
-
-    /**
-     * 通过Jedis请求地图，等待30秒，优先加载返回地图，超时则加载默认地图
-     */
-    private void loadMapWithJedisRequest() {
-        mapManager.preloadAllMaps();
-        String responseChannel = "AZURA.BW." + IPUtil.getLocalIp();
-        CompletableFuture<String> mapFuture = new CompletableFuture<>();
-
-        // 注册一次性监听器
-        Listener listener = new Listener() {
-            @EventHandler
-            public void onMessage(BukkitPubSubMessageEvent event) {
-                if (event.getChannel().equals(responseChannel)) {
-                    mapFuture.complete(event.getMessage());
-                    HandlerList.unregisterAll(this);
-                }
-            }
-        };
-        getServer().getPluginManager().registerEvents(listener, this);
-
-        Bukkit.getLogger().info("正在通过Jedis请求地图");
-        JedisUtil.publish(responseChannel, "requestMap");
-
-        String mapName = null;
-        try {
-            // 最多等待30秒
-            mapName = mapFuture.get(30, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            Bukkit.getLogger().info("地图请求超时，使用默认地图");
-        }
-
-        // 优先加载Jedis返回地图
-        if (mapName != null && !mapName.isEmpty()) {
-            mapData = mapManager.loadMapAndWorld(mapName);
-            if (mapData != null) {
-                return;
-            }
-            Bukkit.getLogger().warning("Jedis返回地图加载失败，尝试加载默认地图");
-        }
-
-        // 加载默认地图
-        String defaultMapName = settingsConfig.getDatabaseMapName();
-
-        if (defaultMapName != null && !defaultMapName.isEmpty()) {
-            mapData = mapManager.loadMapAndWorld(defaultMapName);
-            if (mapData != null) {
-                return;
-            }
-        }
-        // 如果依然没有，尝试加载任意已加载地图
-        if (!mapManager.getLoadedMaps().isEmpty()) {
-            mapData = mapManager.getLoadedMaps().entrySet().iterator().next().getValue();
-            if (mapData != null) {
-                return;
-            }
-        }
-        if (mapData == null) {
-            Bukkit.getLogger().info("preloadMap 为空, 请先打开editorMode为服务端设置地图");
-        }
     }
 
     /**
@@ -282,6 +221,10 @@ public final class AzuraBedWars extends JavaPlugin {
 
         if (pubSubListener != null) {
             pubSubListener.poison();
+        }
+
+        if (jedisManager != null) {
+            jedisManager.shutdown();
         }
     }
 
