@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapManager;
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -35,8 +35,8 @@ public class MapCommand {
      */
     private boolean checkEditorMode(Player player) {
         if (!plugin.getSettingsConfig().isEditorMode()) {
-            player.sendMessage(ChatColorUtil.color("&c错误: 该命令只能在编辑模式下使用"));
-            player.sendMessage(ChatColorUtil.color("&c请在配置文件中设置 editorMode: true 并重启服务器"));
+            player.sendMessage(MessageUtil.color("&c错误: 该命令只能在编辑模式下使用"));
+            player.sendMessage(MessageUtil.color("&c请在配置文件中设置 editorMode: true 并重启服务器"));
             return true;
         }
         return false;
@@ -48,30 +48,30 @@ public class MapCommand {
             return;
         }
         
-        player.sendMessage(ChatColorUtil.CHAT_BAR);
-        player.sendMessage(ChatColorUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置"));
+        player.sendMessage(MessageUtil.CHAT_BAR);
+        player.sendMessage(MessageUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置"));
         player.sendMessage("");
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map create <mapName> &7创建新的地图"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map setWaiting <mapName> &7设置等待大厅位置"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map setAuthor <mapName> <authorName> &7设置地图作者名"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map setTeamPlayers <mapName> <number> &7设置队伍最大人数"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map setMinPlayers <mapName> <number> &7设置地图最小需要人数"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map setRespawn <mapName> &7设置地图重生点"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map addBase <mapName> &7增加基地出生点"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map addDrop <mapName> <type> &7增加资源点 (类型: BASE/DIAMOND/EMERALD)"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: ITEM/UPGRADE)"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map setPos1 <mapName> &7设置地图边界1"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map setPos2 <mapName> &7设置地图边界2"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map setUrl <url> &7设置地图文件物理路径"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map save <mapName> &7保存地图"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map load <mapName> &7加载地图配置"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map create <mapName> &7创建新的地图"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map setWaiting <mapName> &7设置等待大厅位置"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map setAuthor <mapName> <authorName> &7设置地图作者名"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map setTeamPlayers <mapName> <number> &7设置队伍最大人数"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map setMinPlayers <mapName> <number> &7设置地图最小需要人数"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map setRespawn <mapName> &7设置地图重生点"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map addBase <mapName> &7增加基地出生点"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map addDrop <mapName> <type> &7增加资源点 (类型: BASE/DIAMOND/EMERALD)"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: ITEM/UPGRADE)"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map setPos1 <mapName> &7设置地图边界1"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map setPos2 <mapName> &7设置地图边界2"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map setUrl <url> &7设置地图文件物理路径"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map save <mapName> &7保存地图"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map load <mapName> &7加载地图配置"));
         player.sendMessage("");
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map list <type> &7查看指定存储方式地图列表"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: JSON/MYSQL)"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map info <mapName> &7查看地图信息"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/map align &7对齐玩家位置和视角为整数值"));
-        player.sendMessage(ChatColorUtil.CHAT_BAR);
+        player.sendMessage(MessageUtil.color("&7 • &f/map list <type> &7查看指定存储方式地图列表"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: JSON/MYSQL)"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map info <mapName> &7查看地图信息"));
+        player.sendMessage(MessageUtil.color("&7 • &f/map align &7对齐玩家位置和视角为整数值"));
+        player.sendMessage(MessageUtil.CHAT_BAR);
     }
 
     @Subcommand("check")
@@ -89,7 +89,7 @@ public class MapCommand {
         }
         mapManager.getLoadedMaps().put(mapName, new MapData(mapName));
         mapManager.saveMapData(mapName);
-        player.sendMessage(ChatColorUtil.color("&a地图创建成功!"));
+        player.sendMessage(MessageUtil.color("&a地图创建成功!"));
     }
 
     @Subcommand("setWaiting")
@@ -99,7 +99,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setWaitingLocation(player.getLocation());
-        player.sendMessage(ChatColorUtil.color("&a地图等待大厅设置成功!"));
+        player.sendMessage(MessageUtil.color("&a地图等待大厅设置成功!"));
     }
 
     @Subcommand("setRespawn")
@@ -109,7 +109,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setRespawnLocation(player.getLocation());
-        player.sendMessage(ChatColorUtil.color("&a地图重生点设置成功!"));
+        player.sendMessage(MessageUtil.color("&a地图重生点设置成功!"));
     }
 
     @Subcommand("addBase")
@@ -119,7 +119,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.addBase(player.getLocation());
-        player.sendMessage(ChatColorUtil.color("&a基地出生点增加成功!"));
+        player.sendMessage(MessageUtil.color("&a基地出生点增加成功!"));
     }
 
     @Subcommand("setPos1")
@@ -129,7 +129,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setPos1(player.getLocation());
-        player.sendMessage(ChatColorUtil.color("&a设置地图边界 1 成功!"));
+        player.sendMessage(MessageUtil.color("&a设置地图边界 1 成功!"));
     }
 
     @Subcommand("setPos2")
@@ -139,7 +139,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setPos2(player.getLocation());
-        player.sendMessage(ChatColorUtil.color("&a设置地图边界 2 成功!"));
+        player.sendMessage(MessageUtil.color("&a设置地图边界 2 成功!"));
     }
 
     @Subcommand("setAuthor")
@@ -149,7 +149,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.setAuthor(authorName);
-        player.sendMessage(ChatColorUtil.color("&a地图作者设置成功!"));
+        player.sendMessage(MessageUtil.color("&a地图作者设置成功!"));
     }
 
     @Subcommand("setTeamPlayers")
@@ -159,7 +159,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.getPlayers().setTeam(value);
-        player.sendMessage(ChatColorUtil.color("&a队伍最大人数设置成功!"));
+        player.sendMessage(MessageUtil.color("&a队伍最大人数设置成功!"));
     }
 
     @Subcommand("setMinPlayers")
@@ -169,7 +169,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.getPlayers().setMin(value);
-        player.sendMessage(ChatColorUtil.color("&a地图最小人数置成功!"));
+        player.sendMessage(MessageUtil.color("&a地图最小人数置成功!"));
     }
 
     @Subcommand("addDrop")
@@ -180,10 +180,10 @@ public class MapCommand {
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.addDrop(MapData.DropType.valueOf(value.toUpperCase()), player.getLocation());
         switch (MapData.DropType.valueOf(value)) {
-            case BASE -> player.sendMessage(ChatColorUtil.color("&a成功添加基地资源点"));
-            case DIAMOND -> player.sendMessage(ChatColorUtil.color("&a成功添加钻石资源点"));
-            case EMERALD -> player.sendMessage(ChatColorUtil.color("&a成功添加绿宝石资源点"));
-            default -> player.sendMessage(ChatColorUtil.color("&c添加资源点失败"));
+            case BASE -> player.sendMessage(MessageUtil.color("&a成功添加基地资源点"));
+            case DIAMOND -> player.sendMessage(MessageUtil.color("&a成功添加钻石资源点"));
+            case EMERALD -> player.sendMessage(MessageUtil.color("&a成功添加绿宝石资源点"));
+            default -> player.sendMessage(MessageUtil.color("&c添加资源点失败"));
         }
     }
 
@@ -195,12 +195,12 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         if (mapData == null) {
-            player.sendMessage(ChatColorUtil.color("&c找不到地图: " + mapName));
+            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
             return;
         }
 
         mapData.setFileUrl(fileUrl);
-        player.sendMessage(ChatColorUtil.color("&a地图文件URL设置成功!"));
+        player.sendMessage(MessageUtil.color("&a地图文件URL设置成功!"));
     }
 
     @Subcommand("addShop")
@@ -212,9 +212,9 @@ public class MapCommand {
         MapData.ShopType shopType = MapData.ShopType.valueOf(value.toUpperCase());
         mapData.addShop(shopType, player.getLocation());
         if (shopType == MapData.ShopType.ITEM) {
-            player.sendMessage(ChatColorUtil.color("&a成功设置物品商店!"));
+            player.sendMessage(MessageUtil.color("&a成功设置物品商店!"));
         } else {
-            player.sendMessage(ChatColorUtil.color("&a成功设置团队升级!"));
+            player.sendMessage(MessageUtil.color("&a成功设置团队升级!"));
         }
     }
 
@@ -224,7 +224,7 @@ public class MapCommand {
             return;
         }
         mapManager.getAndLoadMapData(mapName);
-        player.sendMessage(ChatColorUtil.color("&a地图预加载完成"));
+        player.sendMessage(MessageUtil.color("&a地图预加载完成"));
     }
 
     @Subcommand("list")
@@ -237,16 +237,16 @@ public class MapCommand {
         try {
             storageType = MapStorageFactory.StorageType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
-            player.sendMessage(ChatColorUtil.color("&c无效的存储类型: " + type));
+            player.sendMessage(MessageUtil.color("&c无效的存储类型: " + type));
         }
 
         IMapStorage storage = MapStorageFactory.getStorage(storageType);
         List<String> mapNames = storage.getAllMapNames();
 
-        player.sendMessage(ChatColorUtil.color("&a存储类型 [" + storageType.name() + "] 中的地图列表 (" + mapNames.size() + "):"));
+        player.sendMessage(MessageUtil.color("&a存储类型 [" + storageType.name() + "] 中的地图列表 (" + mapNames.size() + "):"));
 
         if (mapNames.isEmpty()) {
-            player.sendMessage(ChatColorUtil.color("&e没有找到地图"));
+            player.sendMessage(MessageUtil.color("&e没有找到地图"));
         } else {
             for (String mapName : mapNames) {
                 player.sendMessage(ChatColor.YELLOW + "  - " + mapName);
@@ -310,25 +310,25 @@ public class MapCommand {
             player.sendMessage(ChatColor.RED + "找不到地图: " + mapName);
             return;
         }
-        player.sendMessage(ChatColorUtil.CHAT_BAR);
-        player.sendMessage(ChatColorUtil.color("&b地图信息"));
+        player.sendMessage(MessageUtil.CHAT_BAR);
+        player.sendMessage(MessageUtil.color("&b地图信息"));
         player.sendMessage(" ");
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f名称: &b" + mapData.getName()));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f作者: &b" + mapData.getAuthor()));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f地图最小人数: &b" + mapData.getPlayers().getMin()));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f队伍最大人数: &b" + mapData.getPlayers().getTeam()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f名称: &b" + mapData.getName()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f作者: &b" + mapData.getAuthor()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f地图最小人数: &b" + mapData.getPlayers().getMin()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f队伍最大人数: &b" + mapData.getPlayers().getTeam()));
         player.sendMessage(" ");
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &fPos1: &b" + mapData.getPos1Location()));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &fPos2: &b" + mapData.getPos2Location()));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f大厅位置: &b" + mapData.getWaitingLocation()));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f复活时位置: &b" + mapData.getRespawnLocation()));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f基地出生点: &b" + mapData.getBases()));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE)));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND)));
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f绿宝石资源点: &b" + mapData.getDrops(MapData.DropType.EMERALD)));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &fPos1: &b" + mapData.getPos1Location()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &fPos2: &b" + mapData.getPos2Location()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f大厅位置: &b" + mapData.getWaitingLocation()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f复活时位置: &b" + mapData.getRespawnLocation()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f基地出生点: &b" + mapData.getBases()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE)));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND)));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f绿宝石资源点: &b" + mapData.getDrops(MapData.DropType.EMERALD)));
         player.sendMessage(" ");
-        player.sendMessage(ChatColorUtil.color(" &9&l▸ &f地图文件物理地址: &b" + mapData.getFileUrl()));
-        player.sendMessage(ChatColorUtil.CHAT_BAR);
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f地图文件物理地址: &b" + mapData.getFileUrl()));
+        player.sendMessage(MessageUtil.CHAT_BAR);
     }
 
     @Subcommand("save")
@@ -337,10 +337,10 @@ public class MapCommand {
             return;
         }
         if (mapManager.saveMapData(mapName)) {
-            player.sendMessage(ChatColorUtil.color("&a保存成功!"));
+            player.sendMessage(MessageUtil.color("&a保存成功!"));
             return;
         }
-        player.sendMessage(ChatColorUtil.color("&c地图保存失败!"));
+        player.sendMessage(MessageUtil.color("&c地图保存失败!"));
     }
 
     @Subcommand("load")
@@ -349,7 +349,7 @@ public class MapCommand {
             return;
         }
         mapManager.getAndLoadMapData(mapName);
-        player.sendMessage(ChatColorUtil.color("&a地图加载成功!"));
+        player.sendMessage(MessageUtil.color("&a地图加载成功!"));
     }
 
     @Subcommand("align")
@@ -375,7 +375,7 @@ public class MapCommand {
         // 传送玩家
         player.teleport(newLoc);
         
-        player.sendMessage(ChatColorUtil.color("&a位置已对齐到整数坐标! &7X: " + x + ", Y: " + y + ", Z: " + z));
-        player.sendMessage(ChatColorUtil.color("&a视角已对齐到90度! &7Yaw: " + yaw + ", Pitch: " + pitch));
+        player.sendMessage(MessageUtil.color("&a位置已对齐到整数坐标! &7X: " + x + ", Y: " + y + ", Z: " + z));
+        player.sendMessage(MessageUtil.color("&a视角已对齐到90度! &7Yaw: " + yaw + ", Pitch: " + pitch));
     }
 }

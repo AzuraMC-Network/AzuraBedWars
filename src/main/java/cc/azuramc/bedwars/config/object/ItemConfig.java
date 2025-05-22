@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.config.object;
 
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -39,13 +39,13 @@ public class ItemConfig {
         private double particleHeight = 2.0;                 // 粒子效果总高度
         private double circleCount = 15.0;                   // 粒子环的数量
 
-        private String cancelItemName = ChatColorUtil.color("&4取消传送");          // 取消传送物品名称
+        private String cancelItemName = MessageUtil.color("&4取消传送");          // 取消传送物品名称
     }
 
     @Data
     public static class GameManager {
-        private String resourceSelectorName = ChatColorUtil.color("&a资源类型选择 &7(右键选择)");
-        private String leaveGameName = ChatColorUtil.color("&c离开游戏 &7(右键离开)");
+        private String resourceSelectorName = MessageUtil.color("&a资源类型选择 &7(右键选择)");
+        private String leaveGameName = MessageUtil.color("&c离开游戏 &7(右键离开)");
     }
 
     @Data

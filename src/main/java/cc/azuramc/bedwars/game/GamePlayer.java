@@ -11,7 +11,7 @@ import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.scoreboard.base.FastBoard;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
@@ -292,7 +292,7 @@ public class GamePlayer {
         if (!isOnline()) {
             return;
         }
-        ChatColorUtil.sendActionBar(getPlayer(), message);
+        MessageUtil.sendActionBar(getPlayer(), message);
     }
 
     /**
@@ -308,7 +308,7 @@ public class GamePlayer {
         if (!isOnline()) {
             return;
         }
-        ChatColorUtil.sendTitle(getPlayer(), title, subTitle, fadeIn, stay, fadeOut);
+        MessageUtil.sendTitle(getPlayer(), title, subTitle, fadeIn, stay, fadeOut);
     }
 
     /**

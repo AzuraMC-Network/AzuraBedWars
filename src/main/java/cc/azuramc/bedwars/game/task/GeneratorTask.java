@@ -8,7 +8,7 @@ import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.util.ArmorStandUtil;
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -135,7 +135,7 @@ public class GeneratorTask {
         LEVEL_II = messageConfig.getLevelII();
         LEVEL_III = messageConfig.getLevelIII();
 
-        ITEM_DISPLAY_NAME = ChatColorUtil.color("&a&a&a&a&a&a");
+        ITEM_DISPLAY_NAME = MessageUtil.color("&a&a&a&a&a&a");
         ITEM_VELOCITY = new Vector(config.getItemVelocityX(), config.getItemVelocityY(), config.getItemVelocityZ());
     }
 

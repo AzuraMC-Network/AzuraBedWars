@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
@@ -55,7 +55,7 @@ public class EggBridgeListener implements Listener {
 
         // 搭桥蛋冷却中
         if (gamePlayer.isEggBridgeCooldown()) {
-            shooter.sendMessage(ChatColorUtil.color(EGG_COOLDOWN_MESSAGE));
+            shooter.sendMessage(MessageUtil.color(EGG_COOLDOWN_MESSAGE));
             event.setCancelled(true);
             return;
         }

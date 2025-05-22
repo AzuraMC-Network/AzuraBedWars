@@ -97,7 +97,7 @@ public class SetupItemManager {
         // 保存地图
         player.getInventory().setItem(slot, createItem(Material.MAP, "§a" + ITEM_SAVE_MAP, "点击保存当前地图配置"));
         
-        player.sendMessage(ChatColorUtil.color("&a已给予地图「" + mapName + "」的设置物品!"));
+        player.sendMessage(MessageUtil.color("&a已给予地图「" + mapName + "」的设置物品!"));
     }
     
     /**
@@ -112,9 +112,9 @@ public class SetupItemManager {
         if (command != null) {
             String formattedCommand = String.format(command, mapName);
             if (player.performCommand(formattedCommand)) {
-                player.sendMessage(ChatColorUtil.color("&a命令执行成功"));
+                player.sendMessage(MessageUtil.color("&a命令执行成功"));
             } else {
-                player.sendMessage(ChatColorUtil.color("&c命令执行失败: " + formattedCommand));
+                player.sendMessage(MessageUtil.color("&c命令执行失败: " + formattedCommand));
             }
             return true;
         }
@@ -134,7 +134,7 @@ public class SetupItemManager {
         if (meta != null) {
             meta.setDisplayName(name);
             List<String> loreList = new ArrayList<>();
-            loreList.add(ChatColorUtil.color("&7" + lore));
+            loreList.add(MessageUtil.color("&7" + lore));
             meta.setLore(loreList);
             item.setItemMeta(meta);
         }

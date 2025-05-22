@@ -7,7 +7,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -149,7 +149,7 @@ public class ChatListener implements Listener {
         // 发送消息
         if (isGlobalChat) {
             if (gamePlayer.isShoutCooldown()) {
-                gamePlayer.sendMessage(ChatColorUtil.color("&c喊话冷却中！"));
+                gamePlayer.sendMessage(MessageUtil.color("&c喊话冷却中！"));
                 return;
             }
             gameManager.broadcastMessage(formattedMessage);

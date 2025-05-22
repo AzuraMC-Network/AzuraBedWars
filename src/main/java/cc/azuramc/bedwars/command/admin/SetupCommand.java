@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.command.admin;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.Command;
@@ -34,8 +34,8 @@ public class SetupCommand {
      */
     private boolean checkEditorMode(Player player) {
         if (!plugin.getSettingsConfig().isEditorMode()) {
-            player.sendMessage(ChatColorUtil.color("&c错误: 该命令只能在编辑模式下使用"));
-            player.sendMessage(ChatColorUtil.color("&c请在配置文件中设置 editorMode: true 并重启服务器"));
+            player.sendMessage(MessageUtil.color("&c错误: 该命令只能在编辑模式下使用"));
+            player.sendMessage(MessageUtil.color("&c请在配置文件中设置 editorMode: true 并重启服务器"));
             return true;
         }
         return false;
@@ -47,13 +47,13 @@ public class SetupCommand {
             return;
         }
 
-        player.sendMessage(ChatColorUtil.CHAT_BAR);
-        player.sendMessage(ChatColorUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 设置工具"));
+        player.sendMessage(MessageUtil.CHAT_BAR);
+        player.sendMessage(MessageUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 设置工具"));
         player.sendMessage("");
-        player.sendMessage(ChatColorUtil.color("&7 • &f/setup start <mapName> &7开始配置地图"));
-        player.sendMessage(ChatColorUtil.color("&7 • &f/setup stop <mapName> &7结束配置地图"));
+        player.sendMessage(MessageUtil.color("&7 • &f/setup start <mapName> &7开始配置地图"));
+        player.sendMessage(MessageUtil.color("&7 • &f/setup stop <mapName> &7结束配置地图"));
         player.sendMessage("");
-        player.sendMessage(ChatColorUtil.CHAT_BAR);
+        player.sendMessage(MessageUtil.CHAT_BAR);
     }
 
     @Subcommand("start")
@@ -65,7 +65,7 @@ public class SetupCommand {
 
         setupItemManager.giveSetupItems(player, mapName);
         setupItemManager.setPlayerMapContext(player.getName(), mapName);
-        player.sendMessage(ChatColorUtil.color("&a已进入地图「" + mapName + "」的设置模式！"));
+        player.sendMessage(MessageUtil.color("&a已进入地图「" + mapName + "」的设置模式！"));
     }
 
 
@@ -77,6 +77,6 @@ public class SetupCommand {
 
         setupItemManager.removePlayerMapContext(player.getName());
         player.getInventory().clear();
-        player.sendMessage(ChatColorUtil.color("&a已退出地图设置模式！"));
+        player.sendMessage(MessageUtil.color("&a已退出地图设置模式！"));
     }
 } 

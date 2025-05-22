@@ -13,19 +13,21 @@ import java.util.List;
 /**
  * @author an5w1r@163.com
  */
-public final class ChatColorUtil {
+public final class MessageUtil {
 
-    @Setter
-    static boolean usingPlaceholderAPI = false;
+    @Setter private static boolean usingPlaceholderAPI = false;
 
     public static final String CHAT_BAR = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH
             + "------------------------------------------------";
 
     public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        title = parse(player, title);
+        subtitle = parse(player, subtitle);
         Titles.sendTitle(player, fadeIn, stay, fadeOut, color(title), color(subtitle));
     }
 
     public static void sendActionBar(Player player, String message) {
+        message = parse(player, message);
         ActionBar.sendActionBar(player, color(message));
     }
 

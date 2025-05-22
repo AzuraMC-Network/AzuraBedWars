@@ -11,17 +11,17 @@ public class CommandUtil {
 
     public static void sendLayout(BukkitCommandActor actor, String message) {
         if (actor.isPlayer()) {
-            actor.requirePlayer().sendMessage(ChatColorUtil.color(message));
+            actor.requirePlayer().sendMessage(MessageUtil.color(message));
         } else {
-            actor.requireConsole().sendMessage(ChatColorUtil.color(message));
+            actor.requireConsole().sendMessage(MessageUtil.color(message));
         }
     }
 
     public static void sendLayout(BukkitCommandActor actor, List<String> message) {
         if (actor.isPlayer()) {
-            ChatColorUtil.color(message).forEach(actor.requirePlayer()::sendMessage);
+            MessageUtil.color(message).forEach(actor.requirePlayer()::sendMessage);
         } else {
-            ChatColorUtil.color(message).forEach(actor.requireConsole()::sendMessage);
+            MessageUtil.color(message).forEach(actor.requireConsole()::sendMessage);
         }
     }
 }

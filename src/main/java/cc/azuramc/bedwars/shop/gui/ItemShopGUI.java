@@ -12,7 +12,7 @@ import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
 import cc.azuramc.bedwars.shop.*;
 import cc.azuramc.bedwars.shop.page.DefaultShopPage;
-import cc.azuramc.bedwars.util.ChatColorUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -420,7 +420,7 @@ public class ItemShopGUI extends CustomGUI {
 
         // 如果背包已满则不卖
         if (!hasEmptySlot(gamePlayer)) {
-            gamePlayer.sendMessage(ChatColorUtil.color("&c背包已满！"));
+            gamePlayer.sendMessage(MessageUtil.color("&c背包已满！"));
             return false;
         }
 
