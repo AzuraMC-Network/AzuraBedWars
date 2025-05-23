@@ -78,7 +78,7 @@ public class ConnectionPoolHandler {
             
             // 创建玩家统计表
             statement.executeUpdate(
-                "CREATE TABLE IF NOT EXISTS bw_player_stats (" +
+                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_DATA_TABLE + " (" +
                 "Name VARCHAR(36) PRIMARY KEY," +
                 "Mode VARCHAR(20) NOT NULL," +
                 "kills INT DEFAULT 0," +
@@ -94,18 +94,18 @@ public class ConnectionPoolHandler {
 
             // 创建玩家商店设置表
             statement.executeUpdate(
-                "CREATE TABLE IF NOT EXISTS bw_player_shop (" +
+                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_SHOP_TABLE + " (" +
                 "Name VARCHAR(36) PRIMARY KEY," +
                 "data TEXT NOT NULL," +
                 "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-                "FOREIGN KEY (Name) REFERENCES bw_player_stats(Name) ON DELETE CASCADE" +
+                "FOREIGN KEY (Name) REFERENCES bw_players_stats(Name) ON DELETE CASCADE" +
                 ")"
             );
 
             // 创建观战者设置表
             statement.executeUpdate(
-                "CREATE TABLE IF NOT EXISTS bw_player_spectator (" +
+                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.SPECTATOR_SETTINGS_TABLE + " (" +
                 "Name VARCHAR(36) PRIMARY KEY," +
                 "speed INT DEFAULT 0," +
                 "autoTp BOOLEAN DEFAULT false," +
@@ -115,13 +115,13 @@ public class ConnectionPoolHandler {
                 "fly BOOLEAN DEFAULT false," +
                 "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-                "FOREIGN KEY (Name) REFERENCES bw_player_stats(Name) ON DELETE CASCADE" +
+                "FOREIGN KEY (Name) REFERENCES bw_players_stats(Name) ON DELETE CASCADE" +
                 ")"
             );
 
             // 创建地图表
             statement.executeUpdate(
-                "CREATE TABLE IF NOT EXISTS bw_maps (" +
+                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.MAP_TABLE_NAME + " (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY," +
                 "name VARCHAR(32) NOT NULL UNIQUE," +
                 "display_name VARCHAR(64) NOT NULL," +

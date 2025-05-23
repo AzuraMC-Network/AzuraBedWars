@@ -68,7 +68,7 @@ public class PlayerProfile {
                 this.games = resultSet.getInt("games");
             } else {
                 this.gameModeType = GameModeType.DEFAULT;
-                preparedStatement = connection.prepareStatement("INSERT INTO bw_player_stats (Name,Mode,kills,deaths,destroyedBeds,wins,loses,games) VALUES (?,?,0,0,0,0,0,0)");
+                preparedStatement = connection.prepareStatement("INSERT INTO " + PLAYER_DATA_TABLE + " (Name,Mode,kills,deaths,destroyedBeds,wins,loses,games) VALUES (?,?,0,0,0,0,0,0)");
                 preparedStatement.setString(1, gamePlayer.getName());
                 preparedStatement.setString(2, GameModeType.DEFAULT.toString());
                 preparedStatement.executeUpdate();

@@ -21,8 +21,6 @@ import java.util.concurrent.*;
 public class SpectatorSettings {
 
     private static final int THREAD_POOL_SIZE = 5;
-    private static final String DATABASE_NAME = "bwstats";
-    private static final String TABLE_NAME = "bw_player_spectator";
     private static final String[] COLUMNS = {"Name", "speed", "autoTp", "nightVision", "firstPerson", "hideOther", "fly"};
 
     private static final int CORE_POOL_SIZE = THREAD_POOL_SIZE;
@@ -68,7 +66,7 @@ public class SpectatorSettings {
     private void loadSettings() {
         try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
             // 查询现有设置
-            String selectQuery = String.format("SELECT * FROM %s WHERE %s=?", TABLE_NAME, COLUMNS[0]);
+            String selectQuery = String.format("SELECT * FROM %s WHERE %s=?", AzuraBedWars.SPECTATOR_SETTINGS_TABLE, COLUMNS[0]);
             try (PreparedStatement selectStmt = connection.prepareStatement(selectQuery)) {
                 selectStmt.setString(1, gamePlayer.getName());
                 try (ResultSet resultSet = selectStmt.executeQuery()) {
@@ -108,7 +106,7 @@ public class SpectatorSettings {
     private void createDefaultSettings(Connection connection) throws SQLException {
         String insertQuery = String.format(
             "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) VALUES (?,0,0,0,1,0,0)",
-            TABLE_NAME, COLUMNS[0], COLUMNS[1], COLUMNS[2], COLUMNS[3], COLUMNS[4], COLUMNS[5], COLUMNS[6]
+                AzuraBedWars.SPECTATOR_SETTINGS_TABLE, COLUMNS[0], COLUMNS[1], COLUMNS[2], COLUMNS[3], COLUMNS[4], COLUMNS[5], COLUMNS[6]
         );
         
         try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
@@ -209,7 +207,7 @@ public class SpectatorSettings {
     private void updateSetting(String column, Object value) {
         FIXED_THREAD_POOL.execute(() -> {
             try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                String updateQuery = String.format("UPDATE %s SET %s=? WHERE %s=?", TABLE_NAME, column, COLUMNS[0]);
+                String updateQuery = String.format("UPDATE %s SET %s=? WHERE %s=?", AzuraBedWars.SPECTATOR_SETTINGS_TABLE, column, COLUMNS[0]);
                 try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
                     if (value instanceof Boolean) {
                         stmt.setBoolean(1, (Boolean) value);
