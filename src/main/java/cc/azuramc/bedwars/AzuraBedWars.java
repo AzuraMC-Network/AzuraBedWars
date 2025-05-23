@@ -121,11 +121,10 @@ public final class AzuraBedWars extends JavaPlugin {
     private void intiChannelSystem() {
         jedisManager = new JedisManager(this);
         pubSubListener = new PubSubListener();
-        
-        // 先运行一次初始化
+
         pubSubListener.run();
         
-        // 然后设置为异步任务
+        // 设置为异步任务
         getServer().getScheduler().runTaskAsynchronously(this, pubSubListener);
         
         JedisManager.getInstance().getServerData().setGameType("AzuraBedWars");
@@ -164,8 +163,6 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 创建游戏管理器
         gameManager = new GameManager(this);
-
-        //TODO: 在已有World且Bukkit默认加载World的情况下覆写World会出现问题
 
         // 加载地图
         mapLoader.loadMap();

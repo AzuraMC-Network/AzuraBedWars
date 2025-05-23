@@ -131,14 +131,34 @@ public class MapManager {
         }
         
         try {
+            // 如果世界已经存在，先卸载它
+            World existingWorld = Bukkit.getWorld(mapName);
+            if (existingWorld != null) {
+                Bukkit.getLogger().info("正在卸载已经存在的世界 " + mapName);
+                Bukkit.unloadWorld(existingWorld, false);
+            }
+            
             // 检查目标目录是否存在，存在则删除
             File targetDir = new File(Bukkit.getWorldContainer(), mapName);
             if (targetDir.exists()) {
+                Bukkit.getLogger().info("正在删除已经存在的世界 " + mapName);
                 FileUtils.deleteDirectory(targetDir);
+                // 确保目录被完全删除
+                if (targetDir.exists()) {
+                    Bukkit.getLogger().warning("无法删除目标目录: " + targetDir.getAbsolutePath());
+                    return null;
+                }
+            }
+            
+            // 确保源目录存在
+            File sourceDir = new File(mapUrl);
+            if (!sourceDir.exists() || !sourceDir.isDirectory()) {
+                Bukkit.getLogger().warning("源地图目录不存在: " + mapUrl);
+                return null;
             }
             
             // 复制地图文件
-            FileUtils.copyDirectory(new File(mapUrl), targetDir);
+            FileUtils.copyDirectory(sourceDir, targetDir);
             
             // 创建世界
             WorldCreator worldCreator = new WorldCreator(mapName);
@@ -177,11 +197,7 @@ public class MapManager {
             return null;
         }
         Bukkit.getLogger().info("正在从 " + mapUrl + "获取地图文件");
-        
-        // 加载世界
-        if (Bukkit.getWorld(mapName) != null) {
-            Bukkit.unloadWorld(mapName, false);
-        }
+
         World world = loadMapWorld(mapName, mapUrl);
         if (world == null) {
             Bukkit.getLogger().warning("world 加载失败");
