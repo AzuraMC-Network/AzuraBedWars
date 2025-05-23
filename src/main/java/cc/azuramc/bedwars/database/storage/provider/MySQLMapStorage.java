@@ -39,17 +39,10 @@ public class MySQLMapStorage implements IMapStorage {
     }
     
     /**
-     * 默认构造函数，使用默认的数据库和表名
-     */
-    public MySQLMapStorage() {
-        this("bwdata", "BWMaps");
-    }
-    
-    /**
      * 设置数据库表结构
      */
     private void setupDatabase() {
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(databaseName)) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
             if (connection == null) {
                 Bukkit.getLogger().severe("无法连接到数据库: " + databaseName);
                 return;
@@ -80,7 +73,7 @@ public class MySQLMapStorage implements IMapStorage {
             return false;
         }
         
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(databaseName)) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
             if (connection == null) {
                 return false;
             }
@@ -119,7 +112,7 @@ public class MySQLMapStorage implements IMapStorage {
     
     @Override
     public MapData loadMap(String mapName) {
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(databaseName)) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
             if (connection == null) {
                 return null;
             }
@@ -155,7 +148,7 @@ public class MySQLMapStorage implements IMapStorage {
     
     @Override
     public boolean deleteMap(String mapName) {
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(databaseName)) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
             if (connection == null) {
                 return false;
             }
@@ -176,7 +169,7 @@ public class MySQLMapStorage implements IMapStorage {
     
     @Override
     public boolean exists(String mapName) {
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(databaseName)) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
             if (connection == null) {
                 return false;
             }
@@ -201,7 +194,7 @@ public class MySQLMapStorage implements IMapStorage {
     public List<String> getAllMapNames() {
         List<String> mapNames = new ArrayList<>();
         
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(databaseName)) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
             if (connection == null) {
                 return mapNames;
             }

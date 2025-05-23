@@ -99,7 +99,8 @@ public class JsonMapStorage implements IMapStorage {
         if (files != null) {
             for (File file : files) {
                 String filename = file.getName();
-                mapNames.add(filename.substring(0, filename.length() - 5)); // 去掉.json后缀
+                // 去掉.json后缀
+                mapNames.add(filename.substring(0, filename.length() - 5));
             }
         }
         

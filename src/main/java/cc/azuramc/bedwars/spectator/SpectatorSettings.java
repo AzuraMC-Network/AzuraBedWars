@@ -22,7 +22,7 @@ public class SpectatorSettings {
 
     private static final int THREAD_POOL_SIZE = 5;
     private static final String DATABASE_NAME = "bwstats";
-    private static final String TABLE_NAME = "bw_spectator_settings";
+    private static final String TABLE_NAME = "bw_player_spectator";
     private static final String[] COLUMNS = {"Name", "speed", "autoTp", "nightVision", "firstPerson", "hideOther", "fly"};
 
     private static final int CORE_POOL_SIZE = THREAD_POOL_SIZE;
@@ -66,7 +66,7 @@ public class SpectatorSettings {
      * 从数据库加载设置
      */
     private void loadSettings() {
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(DATABASE_NAME)) {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
             // 查询现有设置
             String selectQuery = String.format("SELECT * FROM %s WHERE %s=?", TABLE_NAME, COLUMNS[0]);
             try (PreparedStatement selectStmt = connection.prepareStatement(selectQuery)) {
@@ -208,7 +208,7 @@ public class SpectatorSettings {
      */
     private void updateSetting(String column, Object value) {
         FIXED_THREAD_POOL.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection(DATABASE_NAME)) {
+            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
                 String updateQuery = String.format("UPDATE %s SET %s=? WHERE %s=?", TABLE_NAME, column, COLUMNS[0]);
                 try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
                     if (value instanceof Boolean) {

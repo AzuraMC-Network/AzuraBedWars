@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.database.storage;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.storage.provider.JsonMapStorage;
 import cc.azuramc.bedwars.database.storage.provider.MySQLMapStorage;
-import org.bukkit.configuration.file.FileConfiguration;
 
 /**
  * 地图存储工厂类
@@ -17,13 +16,9 @@ public class MapStorageFactory {
      * 存储类型枚举
      */
     public enum StorageType {
-        /**
-         * JSON存储地图信息格式
-         */
+        /** JSON存储地图信息格式 */
         JSON,
-        /**
-         * MYSQL存储地图信息格式
-         */
+        /** MYSQL存储地图信息格式 */
         MYSQL
     }
     
@@ -47,9 +42,8 @@ public class MapStorageFactory {
      */
     public static MySQLMapStorage getMysqlStorage() {
         if (mysqlMapStorage == null) {
-            FileConfiguration config = AzuraBedWars.getInstance().getConfig();
-            String database = config.getString("database.maps.name", "bwdata");
-            String table = config.getString("database.maps.table", "BWMaps");
+            String database = AzuraBedWars.getInstance().getDatabaseName();
+            String table = AzuraBedWars.MAP_TABLE_NAME;
             mysqlMapStorage = new MySQLMapStorage(database, table);
         }
         return mysqlMapStorage;
@@ -61,11 +55,8 @@ public class MapStorageFactory {
      * @return 默认存储实现
      */
     public static IMapStorage getDefaultStorage() {
-        FileConfiguration config = AzuraBedWars.getInstance().getConfig();
-        String storageTypeStr = config.getString("map.storage", "JSON");
-        
         try {
-            StorageType storageType = StorageType.valueOf(storageTypeStr.toUpperCase());
+            StorageType storageType = StorageType.valueOf(AzuraBedWars.getInstance().getSettingsConfig().getMapStorage().toUpperCase());
             return getStorage(storageType);
         } catch (IllegalArgumentException e) {
             // 配置错误，默认使用JSON

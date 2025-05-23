@@ -1,100 +1,161 @@
 package cc.azuramc.bedwars.database.connection;
 
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
+ * 数据库连接池处理器
+ * 使用HikariCP连接池管理数据库连接
+ *
  * @author an5w1r@163.com
  */
+@Getter
 public class ConnectionPoolHandler {
-    private final Map<String, HikariDataSource> pools = new HashMap<>();
-    private final List<String> databases = new ArrayList<>();
+    private HikariDataSource dataSource;
 
     public ConnectionPoolHandler() {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
+        SettingsConfig.DatabaseConfig database = AzuraBedWars.getInstance().getSettingsConfig().getDatabase();
+        
+        // 首先尝试连接到MySQL服务器（不指定数据库）
+        HikariConfig tempConfig = new HikariConfig();
+        tempConfig.setJdbcUrl(String.format("jdbc:mysql://%s:%d/", 
+            database.getHost(),
+            database.getPort()));
+        tempConfig.setUsername(database.getUsername());
+        tempConfig.setPassword(database.getPassword());
+        
+        try (HikariDataSource tempDataSource = new HikariDataSource(tempConfig);
+             Connection connection = tempDataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            
+            // 尝试创建数据库
+            statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + database.getDatabase());
+            
+            // 关闭临时连接
+            tempDataSource.close();
 
-        loadPools();
-    }
-
-    public void loadPools() {
-        for (String database : databases) {
-            if (pools.containsKey(database)) {
-                continue;
-            }
-
-            // 首先尝试连接到MySQL服务器（不指定数据库）
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:mysql://localhost/");
-            config.setUsername("root");
-            config.setPassword("s*6tlO68FnEbyBn4");
-            config.addDataSourceProperty("cachePrepStmts", "true");
-            config.addDataSourceProperty("prepStmtCacheSize", "250");
-            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-
-            try (HikariDataSource tempDataSource = new HikariDataSource(config);
-                 Connection connection = tempDataSource.getConnection();
-                 Statement statement = connection.createStatement()) {
-                
-                // 尝试创建数据库
-                statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + database);
-                
-                // 关闭临时连接
-                tempDataSource.close();
-                
-                // 创建新的连接池（指定数据库）
-                config.setJdbcUrl("jdbc:mysql://localhost/" + database);
-                HikariDataSource hikariDataSource = new HikariDataSource(config);
-                pools.put(database, hikariDataSource);
-                
-            } catch (Exception e) {
-                Bukkit.getLogger().severe("创建数据库 " + database + " 失败: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void registerDatabase(String databaseName) {
-        if (databases.contains(databaseName)) {
-            return;
-        }
-
-        databases.add(databaseName);
-        loadPools();
-    }
-
-    public void unregisterDatabase(String databaseName) {
-        databases.remove(databaseName);
-    }
-
-    public Connection getConnection(String databaseName) {
-        try {
-            HikariDataSource dataSource = pools.get(databaseName);
-            if (dataSource == null) {
-                return null;
-            }
-
-            return dataSource.getConnection();
+            config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s", 
+                database.getHost(),
+                database.getPort(),
+                database.getDatabase()));
+            config.setUsername(database.getUsername());
+            config.setPassword(database.getPassword());
+            
+            // 连接池配置
+            config.setMaximumPoolSize(10);
+            config.setMinimumIdle(5);
+            config.setIdleTimeout(300000);
+            config.setConnectionTimeout(20000);
+            config.setMaxLifetime(1200000);
+            
+            // 创建数据源
+            this.dataSource = new HikariDataSource(config);
+            
+            // 创建所需的表
+            createTables();
+            
         } catch (SQLException e) {
+            Bukkit.getLogger().severe("创建数据库 " + database.getDatabase() + " 失败: " + e.getMessage());
             e.printStackTrace();
-            return null;
         }
     }
 
-    public void closeAll() {
-        pools.values().forEach(HikariDataSource::close);
+    /**
+     * 创建所需的数据库表
+     */
+    private void createTables() {
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            
+            // 创建玩家统计表
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS bw_player_stats (" +
+                "Name VARCHAR(36) PRIMARY KEY," +
+                "Mode VARCHAR(20) NOT NULL," +
+                "kills INT DEFAULT 0," +
+                "deaths INT DEFAULT 0," +
+                "destroyedBeds INT DEFAULT 0," +
+                "wins INT DEFAULT 0," +
+                "loses INT DEFAULT 0," +
+                "games INT DEFAULT 0," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                ")"
+            );
+
+            // 创建玩家商店设置表
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS bw_player_shop (" +
+                "Name VARCHAR(36) PRIMARY KEY," +
+                "data TEXT NOT NULL," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+                "FOREIGN KEY (Name) REFERENCES bw_player_stats(Name) ON DELETE CASCADE" +
+                ")"
+            );
+
+            // 创建观战者设置表
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS bw_player_spectator (" +
+                "Name VARCHAR(36) PRIMARY KEY," +
+                "speed INT DEFAULT 0," +
+                "autoTp BOOLEAN DEFAULT false," +
+                "nightVision BOOLEAN DEFAULT false," +
+                "firstPerson BOOLEAN DEFAULT true," +
+                "hideOther BOOLEAN DEFAULT false," +
+                "fly BOOLEAN DEFAULT false," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+                "FOREIGN KEY (Name) REFERENCES bw_player_stats(Name) ON DELETE CASCADE" +
+                ")"
+            );
+
+            // 创建地图表
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS bw_maps (" +
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "name VARCHAR(32) NOT NULL UNIQUE," +
+                "display_name VARCHAR(64) NOT NULL," +
+                "min_players INT NOT NULL," +
+                "max_players INT NOT NULL," +
+                "teams INT NOT NULL," +
+                "data TEXT NOT NULL," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                ")"
+            );
+
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("创建数据库表失败: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取数据库连接
+     * 
+     * @return 数据库连接
+     * @throws SQLException SQL异常
+     */
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    /**
+     * 关闭连接池
+     */
+    public void close() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+        }
     }
 }

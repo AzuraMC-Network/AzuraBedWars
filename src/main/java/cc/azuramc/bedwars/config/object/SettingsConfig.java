@@ -16,10 +16,19 @@ public class SettingsConfig {
     private boolean editorMode = false;
     private String defaultMapName = "";
     private String mapStorage = "JSON";
-    private String databaseMapName = "bwdata";
-    private String databaseMapTable = "maps";
+
+    private DatabaseConfig database = new DatabaseConfig();
 
     private DisplayDamage displayDamage = new DisplayDamage();
+
+    @Data
+    public static class DatabaseConfig {
+        private String host = "localhost";
+        private int port = 3306;
+        private String username = "root";
+        private String password = "";
+        private String database = "azurabw";
+    }
 
     @Data
     public static class DisplayDamage {

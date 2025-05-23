@@ -37,9 +37,6 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 @Getter
 public final class AzuraBedWars extends JavaPlugin {
-    private static final String DB_PLAYER_DATA = "bwdata";
-    private static final String DB_PLAYER_STATS = "bwstats";
-    
     /** 插件标识常量 */
     private static final String PLUGIN_PREFIX = "[AzuraBedWars] ";
 
@@ -64,18 +61,24 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private MapLoader mapLoader;
     @Getter private ScoreboardManager scoreboardManager;
     @Getter private SetupItemManager setupItemManager;
+    @Getter private String databaseName;
+
+    public static final String MAP_TABLE_NAME = "bw_map";
+    public static final String PLAYER_DATA_TABLE = "bw_players_data";
+    public static final String PLAYER_SHOP_TABLE = "bw_players_shop";
+    public static final String SPECTATOR_SETTINGS_TABLE = "bw_spectator_settings";
 
     @Override
     public void onEnable() {
         long startTime = System.currentTimeMillis();
         instance = this;
 
+        // 初始化配置系统
+        initConfigSystem();
+
         // 初始化基础服务
         initDatabases();
         initMapSystem();
-        
-        // 初始化配置系统
-        initConfigSystem();
         
         // 初始化命令和通信系统
         initCommands();
@@ -97,8 +100,7 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initDatabases() {
         connectionPoolHandler = new ConnectionPoolHandler();
-        connectionPoolHandler.registerDatabase(DB_PLAYER_DATA);
-        connectionPoolHandler.registerDatabase(DB_PLAYER_STATS);
+        databaseName = settingsConfig.getDatabase().getDatabase();
     }
 
     /**
@@ -204,7 +206,7 @@ public final class AzuraBedWars extends JavaPlugin {
     @Override
     public void onDisable() {
         if (connectionPoolHandler != null) {
-            connectionPoolHandler.closeAll();
+            connectionPoolHandler.close();
         }
         
         if (gameManager != null && gameManager.getGameEventManager() != null) {
@@ -267,10 +269,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 初始化地图存储系统
      */
     private void initMapStorage() {
-        // 确保数据库连接已注册
-        String dbName = settingsConfig.getDatabaseMapName();
-        connectionPoolHandler.registerDatabase(dbName);
-        
+
         // 初始化默认存储
         MapStorageFactory.getDefaultStorage();
         
