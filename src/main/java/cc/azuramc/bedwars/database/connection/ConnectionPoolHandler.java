@@ -79,8 +79,8 @@ public class ConnectionPoolHandler {
             // 创建玩家统计表
             statement.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_DATA_TABLE + " (" +
-                "Name VARCHAR(36) PRIMARY KEY," +
-                "Mode VARCHAR(20) NOT NULL," +
+                "name VARCHAR(36) PRIMARY KEY," +
+                "mode VARCHAR(20) NOT NULL," +
                 "kills INT DEFAULT 0," +
                 "deaths INT DEFAULT 0," +
                 "destroyedBeds INT DEFAULT 0," +
@@ -95,18 +95,18 @@ public class ConnectionPoolHandler {
             // 创建玩家商店设置表
             statement.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_SHOP_TABLE + " (" +
-                "Name VARCHAR(36) PRIMARY KEY," +
+                "name VARCHAR(36) PRIMARY KEY," +
                 "data TEXT NOT NULL," +
                 "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-                "FOREIGN KEY (Name) REFERENCES bw_players_stats(Name) ON DELETE CASCADE" +
+                "FOREIGN KEY (name) REFERENCES bw_players_stats(name) ON DELETE CASCADE" +
                 ")"
             );
 
             // 创建观战者设置表
             statement.executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.SPECTATOR_SETTINGS_TABLE + " (" +
-                "Name VARCHAR(36) PRIMARY KEY," +
+                "name VARCHAR(36) PRIMARY KEY," +
                 "speed INT DEFAULT 0," +
                 "autoTp BOOLEAN DEFAULT false," +
                 "nightVision BOOLEAN DEFAULT false," +
@@ -115,7 +115,7 @@ public class ConnectionPoolHandler {
                 "fly BOOLEAN DEFAULT false," +
                 "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-                "FOREIGN KEY (Name) REFERENCES bw_players_stats(Name) ON DELETE CASCADE" +
+                "FOREIGN KEY (name) REFERENCES bw_players_stats(name) ON DELETE CASCADE" +
                 ")"
             );
 

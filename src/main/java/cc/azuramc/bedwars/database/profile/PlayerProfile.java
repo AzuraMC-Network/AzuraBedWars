@@ -54,12 +54,12 @@ public class PlayerProfile {
             // 确保表存在
             ensureStatsTableExists(connection);
             
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + PLAYER_DATA_TABLE + " Where Name=?");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + PLAYER_DATA_TABLE + " Where mame=?");
             preparedStatement.setString(1, gamePlayer.getName());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                this.gameModeType = GameModeType.valueOf(resultSet.getString("Mode"));
+                this.gameModeType = GameModeType.valueOf(resultSet.getString("mode"));
                 this.kills = resultSet.getInt("kills");
                 this.deaths = resultSet.getInt("deaths");
                 this.destroyedBeds = resultSet.getInt("destroyedBeds");
@@ -68,7 +68,7 @@ public class PlayerProfile {
                 this.games = resultSet.getInt("games");
             } else {
                 this.gameModeType = GameModeType.DEFAULT;
-                preparedStatement = connection.prepareStatement("INSERT INTO " + PLAYER_DATA_TABLE + " (Name,Mode,kills,deaths,destroyedBeds,wins,loses,games) VALUES (?,?,0,0,0,0,0,0)");
+                preparedStatement = connection.prepareStatement("INSERT INTO " + PLAYER_DATA_TABLE + " (name,mode,kills,deaths,destroyedBeds,wins,loses,games) VALUES (?,?,0,0,0,0,0,0)");
                 preparedStatement.setString(1, gamePlayer.getName());
                 preparedStatement.setString(2, GameModeType.DEFAULT.toString());
                 preparedStatement.executeUpdate();
@@ -82,8 +82,8 @@ public class PlayerProfile {
     
     private void ensureStatsTableExists(Connection connection) throws SQLException {
         String createStatsTable = "CREATE TABLE IF NOT EXISTS " + PLAYER_DATA_TABLE + " (" +
-                "Name VARCHAR(36) PRIMARY KEY, " +
-                "Mode VARCHAR(20) NOT NULL, " +
+                "name VARCHAR(36) PRIMARY KEY, " +
+                "mode VARCHAR(20) NOT NULL, " +
                 "kills INT DEFAULT 0, " +
                 "deaths INT DEFAULT 0, " +
                 "destroyedBeds INT DEFAULT 0, " +
@@ -98,7 +98,7 @@ public class PlayerProfile {
     
     private void ensureShopTableExists(Connection connection) throws SQLException {
         String createShopTable = "CREATE TABLE IF NOT EXISTS " + PLAYER_SHOP_TABLE + " (" +
-                "Name VARCHAR(36) PRIMARY KEY, " +
+                "name VARCHAR(36) PRIMARY KEY, " +
                 "data TEXT NOT NULL" +
                 ")";
         try (PreparedStatement statement = connection.prepareStatement(createShopTable)) {
@@ -108,7 +108,7 @@ public class PlayerProfile {
     
     private void ensureSpectatorSettingsTableExists(Connection connection) throws SQLException {
         String createSpectatorTable = "CREATE TABLE IF NOT EXISTS " + SPECTATOR_SETTINGS_TABLE + " (" +
-                "Name VARCHAR(36) PRIMARY KEY, " +
+                "name VARCHAR(36) PRIMARY KEY, " +
                 "firstPerson BOOLEAN DEFAULT TRUE, " +
                 "hideSpectators BOOLEAN DEFAULT TRUE, " +
                 "nightVision BOOLEAN DEFAULT FALSE, " +
@@ -125,7 +125,7 @@ public class PlayerProfile {
                 // 确保表存在
                 ensureShopTableExists(connection);
                 
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + PLAYER_SHOP_TABLE + " Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + PLAYER_SHOP_TABLE + " Where name=?");
                 preparedStatement.setString(1, gamePlayer.getName());
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -143,7 +143,7 @@ public class PlayerProfile {
 
                         string.append(s).append(", ");
                     }
-                    preparedStatement = connection.prepareStatement("INSERT INTO " + PLAYER_SHOP_TABLE + " (Name,data) VALUES (?,?)");
+                    preparedStatement = connection.prepareStatement("INSERT INTO " + PLAYER_SHOP_TABLE + " (name,data) VALUES (?,?)");
                     preparedStatement.setString(1, gamePlayer.getName());
                     preparedStatement.setString(2, string.substring(0, string.length() - 2));
                 }
@@ -172,7 +172,7 @@ public class PlayerProfile {
                     string.append(s).append(", ");
                 }
 
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_SHOP_TABLE + " SET data=? Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_SHOP_TABLE + " SET data=? Where name=?");
                 if (string != null) {
                     preparedStatement.setString(1, string.substring(0, string.length() - 2));
                 }
@@ -196,7 +196,7 @@ public class PlayerProfile {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET Mode=? Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET mode=? Where name=?");
                 preparedStatement.setString(1, gameModeType.toString());
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
@@ -216,7 +216,7 @@ public class PlayerProfile {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET kills=? Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET kills=? Where name=?");
                 preparedStatement.setInt(1, kills);
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
@@ -239,7 +239,7 @@ public class PlayerProfile {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET deaths=? Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET deaths=? Where name=?");
                 preparedStatement.setInt(1, deaths);
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
@@ -258,7 +258,7 @@ public class PlayerProfile {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET destroyedBeds=? Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET destroyedBeds=? Where name=?");
                 preparedStatement.setInt(1, destroyedBeds);
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
@@ -277,7 +277,7 @@ public class PlayerProfile {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET wins=? Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET wins=? Where name=?");
                 preparedStatement.setInt(1, wins);
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
@@ -296,7 +296,7 @@ public class PlayerProfile {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET loses=? Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET loses=? Where name=?");
                 preparedStatement.setInt(1, loses);
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
@@ -316,7 +316,7 @@ public class PlayerProfile {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET games=? Where Name=?");
+                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET games=? Where name=?");
                 preparedStatement.setInt(1, games);
                 preparedStatement.setString(2, gamePlayer.getName());
                 preparedStatement.executeUpdate();
