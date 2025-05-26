@@ -63,10 +63,11 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private SetupItemManager setupItemManager;
     @Getter private String databaseName;
 
-    public static final String MAP_TABLE_NAME = "bw_map";
-    public static final String PLAYER_DATA_TABLE = "bw_players_data";
-    public static final String PLAYER_SHOP_TABLE = "bw_players_shop";
-    public static final String SPECTATOR_SETTINGS_TABLE = "bw_spectator_settings";
+    // 表名常量
+    public static final String PLAYER_DATA_TABLE = "azura_bedwars_player_data";
+    public static final String PLAYER_SHOP_TABLE = "azura_bedwars_player_shop";
+    public static final String SPECTATOR_SETTINGS_TABLE = "azura_bedwars_spectator_settings";
+    public static final String MAP_TABLE_NAME = "azura_bedwars_maps";
 
     @Override
     public void onEnable() {
@@ -101,6 +102,13 @@ public final class AzuraBedWars extends JavaPlugin {
     private void initDatabases() {
         connectionPoolHandler = new ConnectionPoolHandler();
         databaseName = settingsConfig.getDatabase().getDatabase();
+        
+        // 在连接池处理器完全初始化后创建表
+        if (connectionPoolHandler != null) {
+            connectionPoolHandler.createTables();
+        } else {
+            getLogger().severe("无法初始化数据库连接池，请检查数据库配置");
+        }
     }
 
     /**

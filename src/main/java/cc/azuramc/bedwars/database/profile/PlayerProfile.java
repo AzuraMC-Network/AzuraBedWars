@@ -1,43 +1,15 @@
 package cc.azuramc.bedwars.database.profile;
 
-import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.database.dao.PlayerProfileDAO;
 import cc.azuramc.bedwars.game.GameModeType;
+import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Data;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.concurrent.*;
 
 /**
  * @author an5w1r@163.com
  */
 @Data
 public class PlayerProfile {
-    private static final String PLAYER_DATA_TABLE = AzuraBedWars.PLAYER_DATA_TABLE;
-    private static final String PLAYER_SHOP_TABLE = AzuraBedWars.PLAYER_SHOP_TABLE;
-    private static final String SPECTATOR_SETTINGS_TABLE = AzuraBedWars.SPECTATOR_SETTINGS_TABLE;
-
-    private static final int CORE_POOL_SIZE = 5;
-    private static final int MAX_POOL_SIZE = 5;
-    private static final long KEEP_ALIVE_TIME = 60L;
-    private static final int QUEUE_CAPACITY = 100;
-
-    /**
-     * 使用ThreadPoolExecutor替代Executors创建的线程池
-     */
-    private static ExecutorService fixedThreadPool = new ThreadPoolExecutor(
-        CORE_POOL_SIZE,
-        MAX_POOL_SIZE,
-        KEEP_ALIVE_TIME,
-        TimeUnit.SECONDS,
-        new LinkedBlockingQueue<>(QUEUE_CAPACITY),
-        Executors.defaultThreadFactory(),
-        new ThreadPoolExecutor.CallerRunsPolicy()
-    );
-
     private GamePlayer gamePlayer;
     private GameModeType gameModeType;
     private int kills;
@@ -48,283 +20,121 @@ public class PlayerProfile {
     private int games;
     private String[] shopSort;
 
+    /**
+     * 创建一个新的玩家数据对象
+     * 
+     * @param gamePlayer 游戏玩家对象
+     */
     public PlayerProfile(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-            // 确保表存在
-            ensureStatsTableExists(connection);
-            
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + PLAYER_DATA_TABLE + " Where mame=?");
-            preparedStatement.setString(1, gamePlayer.getName());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                this.gameModeType = GameModeType.valueOf(resultSet.getString("mode"));
-                this.kills = resultSet.getInt("kills");
-                this.deaths = resultSet.getInt("deaths");
-                this.destroyedBeds = resultSet.getInt("destroyedBeds");
-                this.wins = resultSet.getInt("wins");
-                this.loses = resultSet.getInt("loses");
-                this.games = resultSet.getInt("games");
-            } else {
-                this.gameModeType = GameModeType.DEFAULT;
-                preparedStatement = connection.prepareStatement("INSERT INTO " + PLAYER_DATA_TABLE + " (name,mode,kills,deaths,destroyedBeds,wins,loses,games) VALUES (?,?,0,0,0,0,0,0)");
-                preparedStatement.setString(1, gamePlayer.getName());
-                preparedStatement.setString(2, GameModeType.DEFAULT.toString());
-                preparedStatement.executeUpdate();
-            }
-            preparedStatement.close();
-            resultSet.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    private void ensureStatsTableExists(Connection connection) throws SQLException {
-        String createStatsTable = "CREATE TABLE IF NOT EXISTS " + PLAYER_DATA_TABLE + " (" +
-                "name VARCHAR(36) PRIMARY KEY, " +
-                "mode VARCHAR(20) NOT NULL, " +
-                "kills INT DEFAULT 0, " +
-                "deaths INT DEFAULT 0, " +
-                "destroyedBeds INT DEFAULT 0, " +
-                "wins INT DEFAULT 0, " +
-                "loses INT DEFAULT 0, " +
-                "games INT DEFAULT 0" +
-                ")";
-        try (PreparedStatement statement = connection.prepareStatement(createStatsTable)) {
-            statement.executeUpdate();
-        }
-    }
-    
-    private void ensureShopTableExists(Connection connection) throws SQLException {
-        String createShopTable = "CREATE TABLE IF NOT EXISTS " + PLAYER_SHOP_TABLE + " (" +
-                "name VARCHAR(36) PRIMARY KEY, " +
-                "data TEXT NOT NULL" +
-                ")";
-        try (PreparedStatement statement = connection.prepareStatement(createShopTable)) {
-            statement.executeUpdate();
-        }
-    }
-    
-    private void ensureSpectatorSettingsTableExists(Connection connection) throws SQLException {
-        String createSpectatorTable = "CREATE TABLE IF NOT EXISTS " + SPECTATOR_SETTINGS_TABLE + " (" +
-                "name VARCHAR(36) PRIMARY KEY, " +
-                "firstPerson BOOLEAN DEFAULT TRUE, " +
-                "hideSpectators BOOLEAN DEFAULT TRUE, " +
-                "nightVision BOOLEAN DEFAULT FALSE, " +
-                "speedLevel INT DEFAULT 1" +
-                ")";
-        try (PreparedStatement statement = connection.prepareStatement(createSpectatorTable)) {
-            statement.executeUpdate();
+        
+        // 使用DAO加载玩家数据
+        PlayerProfile loadedProfile = PlayerProfileDAO.getInstance().loadPlayerProfile(gamePlayer);
+        
+        if (loadedProfile != null) {
+            // 将加载的数据复制到当前对象
+            this.gameModeType = loadedProfile.getGameModeType();
+            this.kills = loadedProfile.getKills();
+            this.deaths = loadedProfile.getDeaths();
+            this.destroyedBeds = loadedProfile.getDestroyedBeds();
+            this.wins = loadedProfile.getWins();
+            this.loses = loadedProfile.getLoses();
+            this.games = loadedProfile.getGames();
+        } else {
+            // 创建默认数据
+            this.gameModeType = GameModeType.DEFAULT;
+            this.kills = 0;
+            this.deaths = 0;
+            this.destroyedBeds = 0;
+            this.wins = 0;
+            this.loses = 0;
+            this.games = 0;
         }
     }
 
+    /**
+     * 异步加载商店数据
+     */
     public void asyncLoadShop() {
-        fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureShopTableExists(connection);
-                
-                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + PLAYER_SHOP_TABLE + " Where name=?");
-                preparedStatement.setString(1, gamePlayer.getName());
-                ResultSet resultSet = preparedStatement.executeQuery();
-
-                if (resultSet.next()) {
-                    shopSort = resultSet.getString("data").split(", ");
-                } else {
-                    shopSort = new String[]{"BlockShop#1", "SwordShop#1", "ArmorShop#1", "FoodShop#1", "BowShop#2", "PotionShop#1", "UtilityShop#2", "BlockShop#8", "SwordShop#2", "ArmorShop#2", "UtilityShop#1", "BowShop#1", "PotionShop#2", "UtilityShop#4", "AIR", "AIR", "AIR", "AIR", "AIR", "AIR", "AIR"};
-
-                    StringBuilder string = null;
-                    for (String s : shopSort) {
-                        if (string == null) {
-                            string = new StringBuilder(s + ", ");
-                            continue;
-                        }
-
-                        string.append(s).append(", ");
-                    }
-                    preparedStatement = connection.prepareStatement("INSERT INTO " + PLAYER_SHOP_TABLE + " (name,data) VALUES (?,?)");
-                    preparedStatement.setString(1, gamePlayer.getName());
-                    preparedStatement.setString(2, string.substring(0, string.length() - 2));
+        PlayerProfileDAO.getInstance().loadPlayerShopAsync(this)
+            .thenAccept(shopData -> {
+                if (shopData != null) {
+                    this.shopSort = shopData;
                 }
-
-                resultSet.close();
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+            });
     }
 
+    /**
+     * 保存商店数据
+     */
     public void saveShops() {
-        PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureShopTableExists(connection);
-                
-                StringBuilder string = null;
-                for (String s : shopSort) {
-                    if (string == null) {
-                        string = new StringBuilder(s + ", ");
-                        continue;
-                    }
-
-                    string.append(s).append(", ");
-                }
-
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_SHOP_TABLE + " SET data=? Where name=?");
-                if (string != null) {
-                    preparedStatement.setString(1, string.substring(0, string.length() - 2));
-                }
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        PlayerProfileDAO.getInstance().savePlayerShopAsync(this);
     }
 
+    /**
+     * 设置游戏模式类型
+     * 
+     * @param gameModeType 游戏模式类型
+     */
     public void setGameModeType(GameModeType gameModeType) {
         if (this.gameModeType == gameModeType) {
             return;
         }
 
-        PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureStatsTableExists(connection);
-                
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET mode=? Where name=?");
-                preparedStatement.setString(1, gameModeType.toString());
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-        this.gameModeType = gameModeType;
+        PlayerProfileDAO.getInstance().updateGameModeAsync(this, gameModeType)
+            .thenAccept(success -> {
+                if (success) {
+                    this.gameModeType = gameModeType;
+                }
+            });
     }
 
+    /**
+     * 增加击杀数
+     */
     public void addKills() {
-        kills += 1;
-        PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureStatsTableExists(connection);
-                
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET kills=? Where name=?");
-                preparedStatement.setInt(1, kills);
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        PlayerProfileDAO.getInstance().incrementKillsAsync(this);
     }
 
+    /**
+     * 增加最终击杀数
+     */
     public void addFinalKills() {
         //finalKills += 1;
     }
 
+    /**
+     * 增加死亡数
+     */
     public void addDeaths() {
-        deaths += 1;
-        PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureStatsTableExists(connection);
-                
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET deaths=? Where name=?");
-                preparedStatement.setInt(1, deaths);
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        PlayerProfileDAO.getInstance().incrementDeathsAsync(this);
     }
 
+    /**
+     * 增加摧毁床数
+     */
     public void addDestroyedBeds() {
-        destroyedBeds += 1;
-        PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureStatsTableExists(connection);
-                
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET destroyedBeds=? Where name=?");
-                preparedStatement.setInt(1, destroyedBeds);
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        PlayerProfileDAO.getInstance().incrementDestroyedBedsAsync(this);
     }
 
+    /**
+     * 增加胜利数
+     */
     public void addWins() {
-        wins += 1;
-        PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureStatsTableExists(connection);
-                
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET wins=? Where name=?");
-                preparedStatement.setInt(1, wins);
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        PlayerProfileDAO.getInstance().incrementWinsAsync(this);
     }
 
+    /**
+     * 增加失败数
+     */
     public void addLoses() {
-        loses += 1;
-        PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureStatsTableExists(connection);
-                
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET loses=? Where name=?");
-                preparedStatement.setInt(1, loses);
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        PlayerProfileDAO.getInstance().incrementLosesAsync(this);
     }
 
-
+    /**
+     * 增加游戏数
+     */
     public void addGames() {
-        games += 1;
-        PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
-                // 确保表存在
-                ensureStatsTableExists(connection);
-                
-                PreparedStatement preparedStatement = connection.prepareStatement("UPDATE " + PLAYER_DATA_TABLE + " SET games=? Where name=?");
-                preparedStatement.setInt(1, games);
-                preparedStatement.setString(2, gamePlayer.getName());
-                preparedStatement.executeUpdate();
-
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        PlayerProfileDAO.getInstance().incrementGamesAsync(this);
     }
 }
