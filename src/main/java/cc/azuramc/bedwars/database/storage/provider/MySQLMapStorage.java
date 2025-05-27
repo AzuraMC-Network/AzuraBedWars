@@ -1,11 +1,17 @@
 package cc.azuramc.bedwars.database.storage.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.dao.MapDAO;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.game.map.MapData;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +21,9 @@ import java.util.List;
  * @author an5w1r@163.com
  */
 public class MySQLMapStorage implements IMapStorage {
-    private final MapDAO mapDAO;
+    private final Gson gson;
+    private final String databaseName;
+    private final String tableName;
     
     /**
      * 创建一个MySQL存储实现
@@ -23,8 +31,40 @@ public class MySQLMapStorage implements IMapStorage {
      * @param tableName 表名称
      */
     public MySQLMapStorage(String databaseName, String tableName) {
-        // 使用MapDAO替代直接的数据库操作
-        this.mapDAO = MapDAO.getInstance();
+        this.gson = new GsonBuilder().create();
+        this.databaseName = databaseName;
+        this.tableName = tableName;
+
+        setupDatabase();
+    }
+    
+    /**
+     * 设置数据库表结构
+     */
+    private void setupDatabase() {
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            if (connection == null) {
+                Bukkit.getLogger().severe("无法连接到数据库: " + databaseName);
+                return;
+            }
+            
+            // 创建地图数据表
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "MapName VARCHAR(64) NOT NULL UNIQUE, " +
+                    "Data TEXT NOT NULL, " +
+                    "Author VARCHAR(64), " +
+                    "CreateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                    "UpdateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                    ")";
+            
+            try (PreparedStatement statement = connection.prepareStatement(createTableSQL)) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("设置数据库表结构时出错: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     @Override
@@ -33,27 +73,147 @@ public class MySQLMapStorage implements IMapStorage {
             return false;
         }
         
-        return mapDAO.saveMap(mapName, mapData);
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            if (connection == null) {
+                return false;
+            }
+            
+            String sql;
+            if (exists(mapName)) {
+                // 更新现有记录
+                sql = "UPDATE " + tableName + " SET Data=?, Author=? WHERE MapName=?";
+            } else {
+                // 插入新记录
+                sql = "INSERT INTO " + tableName + " (MapName, Data, Author) VALUES (?, ?, ?)";
+            }
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                String jsonData = gson.toJson(mapData);
+                
+                if (exists(mapName)) {
+                    statement.setString(1, jsonData);
+                    statement.setString(2, mapData.getAuthor());
+                    statement.setString(3, mapName);
+                } else {
+                    statement.setString(1, mapName);
+                    statement.setString(2, jsonData);
+                    statement.setString(3, mapData.getAuthor());
+                }
+                
+                int affected = statement.executeUpdate();
+                return affected > 0;
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("保存地图数据到MySQL时出错: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
     
     @Override
     public MapData loadMap(String mapName) {
-        return mapDAO.loadMap(mapName);
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            if (connection == null) {
+                return null;
+            }
+            
+            String sql = "SELECT * FROM " + tableName + " WHERE MapName=?";
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, mapName);
+                
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        String jsonData = resultSet.getString("Data");
+                        MapData mapData = gson.fromJson(jsonData, MapData.class);
+                        mapData.setName(mapName);
+                        
+                        // 设置作者信息
+                        String author = resultSet.getString("Author");
+                        if (author != null && !author.isEmpty()) {
+                            mapData.setAuthor(author);
+                        }
+                        
+                        return mapData;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("从MySQL加载地图数据时出错: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null;
     }
     
     @Override
     public boolean deleteMap(String mapName) {
-        return mapDAO.deleteMap(mapName);
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            if (connection == null) {
+                return false;
+            }
+            
+            String sql = "DELETE FROM " + tableName + " WHERE MapName=?";
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, mapName);
+                int affected = statement.executeUpdate();
+                return affected > 0;
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("从MySQL删除地图数据时出错: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
     
     @Override
     public boolean exists(String mapName) {
-        return mapDAO.exists(mapName);
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            if (connection == null) {
+                return false;
+            }
+            
+            String sql = "SELECT 1 FROM " + tableName + " WHERE MapName=?";
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, mapName);
+                
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    return resultSet.next();
+                }
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("检查地图是否存在时出错: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
     
     @Override
     public List<String> getAllMapNames() {
-        return mapDAO.getAllMapNames();
+        List<String> mapNames = new ArrayList<>();
+        
+        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            if (connection == null) {
+                return mapNames;
+            }
+            
+            String sql = "SELECT MapName FROM " + tableName;
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql);
+                 ResultSet resultSet = statement.executeQuery()) {
+                
+                while (resultSet.next()) {
+                    mapNames.add(resultSet.getString("MapName"));
+                }
+            }
+        } catch (SQLException e) {
+            Bukkit.getLogger().severe("获取所有地图名称时出错: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return mapNames;
     }
     
     @Override

@@ -24,9 +24,10 @@ public class MapData {
     private final List<RawLocation> bases;
     private final List<DropRawLocation> drops;
     private final List<ShopRawLocation> shops;
-    @Setter private String name;
-    @Setter private String author;
-    @Setter private String displayName;
+    @Setter
+    private String name;
+    @Setter
+    private String author;
     private RawLocation waitingLocation;
     private RawLocation respawnLocation;
 
@@ -34,58 +35,11 @@ public class MapData {
 
     public MapData(String mapName) {
         this.name = mapName;
-        this.displayName = mapName;
         this.players = new Players();
         this.region = new Region();
         this.bases = new ArrayList<>();
         this.drops = new ArrayList<>();
         this.shops = new ArrayList<>();
-    }
-
-    /**
-     * 获取地图的最小玩家数
-     * @return 最小玩家数，如果未设置则返回默认值2
-     */
-    public int getMinPlayers() {
-        return players.getMin() != null ? players.getMin() : 2;
-    }
-
-    /**
-     * 设置地图的最小玩家数
-     * @param minPlayers 最小玩家数
-     */
-    public void setMinPlayers(int minPlayers) {
-        players.setMin(minPlayers);
-    }
-
-    /**
-     * 获取地图的最大玩家数
-     * @return 最大玩家数，计算为队伍数乘以每队最大人数
-     */
-    public int getMaxPlayers() {
-        // 假设每个队伍最多4名玩家
-        int maxPlayersPerTeam = 4;
-        return getTeams() * maxPlayersPerTeam;
-    }
-
-    /**
-     * 获取地图的队伍数
-     * @return 队伍数，如果未设置则返回基地数量或默认值1
-     */
-    public int getTeams() {
-        if (players.getTeam() != null) {
-            return players.getTeam();
-        }
-        // 如果没有明确设置，则使用基地数量作为队伍数
-        return bases.isEmpty() ? 1 : bases.size();
-    }
-
-    /**
-     * 设置地图的队伍数
-     * @param teams 队伍数
-     */
-    public void setTeams(int teams) {
-        players.setTeam(teams);
     }
 
     public void setWaitingLocation(Location location) {

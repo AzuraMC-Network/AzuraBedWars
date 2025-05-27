@@ -2,9 +2,6 @@ package cc.azuramc.bedwars.database.connection;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
-import cc.azuramc.bedwars.database.DatabaseConstants;
-import cc.azuramc.bedwars.database.dao.DatabaseManager;
-import cc.azuramc.bedwars.database.query.QueryBuilder;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
@@ -23,7 +20,6 @@ import java.sql.Statement;
 @Getter
 public class ConnectionPoolHandler {
     private HikariDataSource dataSource;
-    private boolean initialized = false;
 
     public ConnectionPoolHandler() {
         SettingsConfig.DatabaseConfig database = AzuraBedWars.getInstance().getSettingsConfig().getDatabase();
@@ -55,20 +51,17 @@ public class ConnectionPoolHandler {
             config.setPassword(database.getPassword());
             
             // 连接池配置
-            config.setMaximumPoolSize(DatabaseConstants.POOL_MAX_SIZE);
-            config.setMinimumIdle(DatabaseConstants.POOL_MIN_IDLE);
-            config.setIdleTimeout(DatabaseConstants.POOL_IDLE_TIMEOUT);
-            config.setConnectionTimeout(DatabaseConstants.POOL_CONNECTION_TIMEOUT);
-            config.setMaxLifetime(DatabaseConstants.POOL_MAX_LIFETIME);
+            config.setMaximumPoolSize(10);
+            config.setMinimumIdle(5);
+            config.setIdleTimeout(300000);
+            config.setConnectionTimeout(20000);
+            config.setMaxLifetime(1200000);
             
             // 创建数据源
             this.dataSource = new HikariDataSource(config);
             
-            // 标记初始化完成
-            this.initialized = true;
-            
-            // 注意：不再在构造函数中调用createTables()
-            // 在AzuraBedWars主类中完成ConnectionPoolHandler初始化后调用
+            // 创建所需的表
+            createTables();
             
         } catch (SQLException e) {
             Bukkit.getLogger().severe("创建数据库 " + database.getDatabase() + " 失败: " + e.getMessage());
@@ -79,31 +72,68 @@ public class ConnectionPoolHandler {
     /**
      * 创建所需的数据库表
      */
-    public void createTables() {
-        if (!initialized || dataSource == null) {
-            Bukkit.getLogger().severe("数据源未初始化，无法创建数据表");
-            return;
-        }
-        
+    private void createTables() {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             
             // 创建玩家统计表
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_DATA_TABLE + " (" 
-                + DatabaseConstants.PLAYER_STATS_TABLE_DEFINITION + ")");
-            
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_DATA_TABLE + " (" +
+                "name VARCHAR(36) PRIMARY KEY," +
+                "mode VARCHAR(20) NOT NULL," +
+                "kills INT DEFAULT 0," +
+                "deaths INT DEFAULT 0," +
+                "destroyedBeds INT DEFAULT 0," +
+                "wins INT DEFAULT 0," +
+                "loses INT DEFAULT 0," +
+                "games INT DEFAULT 0," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                ")"
+            );
+
             // 创建玩家商店设置表
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_SHOP_TABLE + " (" 
-                + DatabaseConstants.PLAYER_SHOP_TABLE_DEFINITION + ")");
-            
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_SHOP_TABLE + " (" +
+                "name VARCHAR(36) PRIMARY KEY," +
+                "data TEXT NOT NULL," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+                "FOREIGN KEY (name) REFERENCES bw_players_stats(name) ON DELETE CASCADE" +
+                ")"
+            );
+
             // 创建观战者设置表
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + AzuraBedWars.SPECTATOR_SETTINGS_TABLE + " (" 
-                + DatabaseConstants.SPECTATOR_TABLE_DEFINITION + ")");
-            
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.SPECTATOR_SETTINGS_TABLE + " (" +
+                "name VARCHAR(36) PRIMARY KEY," +
+                "speed INT DEFAULT 0," +
+                "autoTp BOOLEAN DEFAULT false," +
+                "nightVision BOOLEAN DEFAULT false," +
+                "firstPerson BOOLEAN DEFAULT true," +
+                "hideOther BOOLEAN DEFAULT false," +
+                "fly BOOLEAN DEFAULT false," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+                "FOREIGN KEY (name) REFERENCES bw_players_stats(name) ON DELETE CASCADE" +
+                ")"
+            );
+
             // 创建地图表
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + AzuraBedWars.MAP_TABLE_NAME + " (" 
-                + DatabaseConstants.MAP_TABLE_DEFINITION + ")");
-            
+            statement.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.MAP_TABLE_NAME + " (" +
+                "id INT AUTO_INCREMENT PRIMARY KEY," +
+                "name VARCHAR(32) NOT NULL UNIQUE," +
+                "display_name VARCHAR(64) NOT NULL," +
+                "min_players INT NOT NULL," +
+                "max_players INT NOT NULL," +
+                "teams INT NOT NULL," +
+                "data TEXT NOT NULL," +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                ")"
+            );
+
         } catch (SQLException e) {
             Bukkit.getLogger().severe("创建数据库表失败: " + e.getMessage());
             e.printStackTrace();
@@ -117,9 +147,6 @@ public class ConnectionPoolHandler {
      * @throws SQLException SQL异常
      */
     public Connection getConnection() throws SQLException {
-        if (!initialized || dataSource == null) {
-            throw new SQLException("数据源未初始化");
-        }
         return dataSource.getConnection();
     }
 
