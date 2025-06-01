@@ -2,14 +2,20 @@ package cc.azuramc.bedwars.database.connection;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.database.builder.DataType;
+import cc.azuramc.bedwars.database.builder.PreparedStatementBuildManager;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import static cc.azuramc.bedwars.database.builder.DataType.PK_INT;
+import static cc.azuramc.bedwars.database.builder.DataType.Type.VARCHAR;
 
 /**
  * 数据库连接池处理器
@@ -20,6 +26,7 @@ import java.sql.Statement;
 @Getter
 public class ConnectionPoolHandler {
     private HikariDataSource dataSource;
+    private PreparedStatementBuildManager preparedStatementBuildManager;
 
     public ConnectionPoolHandler() {
         SettingsConfig.DatabaseConfig database = AzuraBedWars.getInstance().getSettingsConfig().getDatabase();
@@ -59,6 +66,7 @@ public class ConnectionPoolHandler {
             
             // 创建数据源
             this.dataSource = new HikariDataSource(config);
+            this.preparedStatementBuildManager = new PreparedStatementBuildManager(connection, true);
             
             // 创建所需的表
             createTables();
@@ -75,6 +83,21 @@ public class ConnectionPoolHandler {
     private void createTables() {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
+            try (PreparedStatement stmt = preparedStatementBuildManager.createTable(AzuraBedWars.PLAYER_DATA_TABLE)
+                    .column("key", PK_INT())
+                    .column("name", VARCHAR.size(36))
+                    .column("mode", DataType.VARCHAR_NOT_NULL(20))
+                    .column("kills", DataType.DEFAULT(0))
+                    .column("deaths", DataType.DEFAULT(0))
+                    .column("destroyedBeds", DataType.DEFAULT(0))
+                    .column("wins", DataType.DEFAULT(0))
+                    .column("loses", DataType.DEFAULT(0))
+                    .column("games", DataType.DEFAULT(0))
+                    .column("created_at", DataType.TIMESTAMP_DEFAULT_CURRENT())
+                    .column("created_at", DataType.TIMESTAMP_DEFAULT_CURRENT_ON_UPDATE())
+                    .prepare()) {
+                preparedStatementBuildManager.execute(stmt);
+            }
             
             // 创建玩家统计表
             statement.executeUpdate(
