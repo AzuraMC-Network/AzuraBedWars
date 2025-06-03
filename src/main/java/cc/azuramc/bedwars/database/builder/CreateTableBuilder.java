@@ -15,7 +15,7 @@ import java.util.Map;
  *      .column("name", "VARCHAR(100)", "NOT NULL")
  *      .column("age", "INT")
  *      .prepare();
- * 
+ * <p>
  * 或者使用DataType工具类:
  * 示例: new CreateTableBuilder(conn).createTable("users")
  *      .column("id", DataType.PK_INT())

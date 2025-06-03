@@ -1,9 +1,12 @@
 package cc.azuramc.bedwars.database.builder;
 
+import lombok.Getter;
+
 /**
  * 表示SQL查询中的WHERE条件
  * @author an5w1r@163.com
  */
+@Getter
 public class WhereCondition {
     private String column;
     private String operator;
@@ -22,38 +25,6 @@ public class WhereCondition {
         this.operator = operator;
         this.value = value;
         this.logicalOperator = logicalOperator;
-    }
-
-    /**
-     * 获取列名
-     * @return 列名
-     */
-    public String getColumn() {
-        return column;
-    }
-
-    /**
-     * 获取操作符
-     * @return 操作符
-     */
-    public String getOperator() {
-        return operator;
-    }
-
-    /**
-     * 获取值
-     * @return 值
-     */
-    public Object getValue() {
-        return value;
-    }
-
-    /**
-     * 获取逻辑操作符
-     * @return 逻辑操作符
-     */
-    public String getLogicalOperator() {
-        return logicalOperator;
     }
 
     /**

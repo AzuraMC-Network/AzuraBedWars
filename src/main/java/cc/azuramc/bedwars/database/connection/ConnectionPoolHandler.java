@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.database.connection;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.database.PlayerDataTable;
 import cc.azuramc.bedwars.database.builder.DataType;
 import cc.azuramc.bedwars.database.builder.PreparedStatementBuildManager;
 import com.zaxxer.hikari.HikariConfig;
@@ -83,37 +84,21 @@ public class ConnectionPoolHandler {
     private void createTables() {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
-            try (PreparedStatement stmt = preparedStatementBuildManager.createTable(AzuraBedWars.PLAYER_DATA_TABLE)
-                    .column("key", PK_INT())
-                    .column("name", VARCHAR.size(36))
-                    .column("mode", DataType.VARCHAR_NOT_NULL(20))
-                    .column("kills", DataType.DEFAULT(0))
-                    .column("deaths", DataType.DEFAULT(0))
-                    .column("destroyedBeds", DataType.DEFAULT(0))
-                    .column("wins", DataType.DEFAULT(0))
-                    .column("loses", DataType.DEFAULT(0))
-                    .column("games", DataType.DEFAULT(0))
-                    .column("created_at", DataType.TIMESTAMP_DEFAULT_CURRENT())
-                    .column("created_at", DataType.TIMESTAMP_DEFAULT_CURRENT_ON_UPDATE())
+            try (PreparedStatement stmt = preparedStatementBuildManager.createTable(PlayerDataTable.TABLE_NAME.getString())
+                    .column(PlayerDataTable.KEY.getString(), PK_INT())
+                    .column(PlayerDataTable.NAME.getString(), VARCHAR.size(36))
+                    .column(PlayerDataTable.MODE.getString(), DataType.VARCHAR_NOT_NULL(20))
+                    .column(PlayerDataTable.KILLS.getString(), DataType.DEFAULT(0))
+                    .column(PlayerDataTable.DEATHS.getString(), DataType.DEFAULT(0))
+                    .column(PlayerDataTable.DESTROYED_BEDS.getString(), DataType.DEFAULT(0))
+                    .column(PlayerDataTable.WINS.getString(), DataType.DEFAULT(0))
+                    .column(PlayerDataTable.LOSSES.getString(), DataType.DEFAULT(0))
+                    .column(PlayerDataTable.GAMES.getString(), DataType.DEFAULT(0))
+                    .column(PlayerDataTable.CREATED_AT.getString(), DataType.TIMESTAMP_DEFAULT_CURRENT())
+                    .column(PlayerDataTable.UPDATED_AT.getString(), DataType.TIMESTAMP_DEFAULT_CURRENT_ON_UPDATE())
                     .prepare()) {
                 preparedStatementBuildManager.execute(stmt);
             }
-            
-            // 创建玩家统计表
-            statement.executeUpdate(
-                "CREATE TABLE IF NOT EXISTS " + AzuraBedWars.PLAYER_DATA_TABLE + " (" +
-                "name VARCHAR(36) PRIMARY KEY," +
-                "mode VARCHAR(20) NOT NULL," +
-                "kills INT DEFAULT 0," +
-                "deaths INT DEFAULT 0," +
-                "destroyedBeds INT DEFAULT 0," +
-                "wins INT DEFAULT 0," +
-                "loses INT DEFAULT 0," +
-                "games INT DEFAULT 0," +
-                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
-                ")"
-            );
 
             // 创建玩家商店设置表
             statement.executeUpdate(
@@ -122,7 +107,7 @@ public class ConnectionPoolHandler {
                 "data TEXT NOT NULL," +
                 "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
                 "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-                "FOREIGN KEY (name) REFERENCES bw_players_stats(name) ON DELETE CASCADE" +
+                "FOREIGN KEY (key) REFERENCES bw_players_stats(key) ON DELETE CASCADE" +
                 ")"
             );
 
