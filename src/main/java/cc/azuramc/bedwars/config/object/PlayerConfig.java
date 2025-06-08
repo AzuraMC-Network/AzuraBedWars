@@ -31,6 +31,9 @@ public class PlayerConfig {
         private int coinsActionBarTimes = 5;
         private int actionBarPeriod = 10;
         private int coinsReward = 1;
+        private double fireballFallenDamageRate = 0.4;
+        private double normalFallenDamageRate = 0.6;
+        private double explosionDamageRate = 0.4;
     }
 
     @Data

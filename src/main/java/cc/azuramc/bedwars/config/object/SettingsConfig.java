@@ -21,6 +21,8 @@ public class SettingsConfig {
 
     private DisplayDamage displayDamage = new DisplayDamage();
 
+    private SetupMap setupMap = new SetupMap();
+
     @Data
     public static class DatabaseConfig {
         private String host = "localhost";
@@ -34,5 +36,10 @@ public class SettingsConfig {
     public static class DisplayDamage {
         private final boolean arrowDisplayEnabled = true;
         private final boolean attackDisplayEnabled = true;
+    }
+
+    @Data
+    public static class SetupMap {
+        private final int teamBlockSearchRadius = 5;
     }
 } 

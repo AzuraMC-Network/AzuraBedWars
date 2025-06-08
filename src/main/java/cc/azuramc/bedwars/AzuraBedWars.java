@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
-import cc.azuramc.bedwars.database.connection.ConnectionPoolHandler;
+import cc.azuramc.bedwars.database.connection.ORMHander;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
@@ -46,7 +46,7 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter @Setter private MapData mapData;
     @Getter private Economy econ = null;
     @Getter private Chat chat = null;
-    @Getter private ConnectionPoolHandler connectionPoolHandler;
+    @Getter private ORMHander ormHander = null;
     @Getter private ConfigManager configManager;
     @Getter private SettingsConfig settingsConfig;
     @Getter private EventConfig eventConfig;
@@ -99,8 +99,8 @@ public final class AzuraBedWars extends JavaPlugin {
      * 初始化数据库连接
      */
     private void initDatabases() {
-        connectionPoolHandler = new ConnectionPoolHandler();
         databaseName = settingsConfig.getDatabase().getDatabase();
+        ormHander = new ORMHander();
     }
 
     /**
@@ -205,8 +205,8 @@ public final class AzuraBedWars extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (connectionPoolHandler != null) {
-            connectionPoolHandler.close();
+        if (ormHander != null) {
+            ormHander.shutdown();
         }
         
         if (gameManager != null && gameManager.getGameEventManager() != null) {

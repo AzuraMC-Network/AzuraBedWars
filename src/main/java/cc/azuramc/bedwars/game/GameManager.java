@@ -45,7 +45,7 @@ public class GameManager {
 
     private ItemConfig.GameManager itemConfig;
     private MessageConfig.Game messageConfig;
-    private SettingsConfig.DisplayDamage settingsConfig;
+    private SettingsConfig settingsConfig;
 
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
     private static final int ASSIST_TIME_WINDOW_MS = 10000;
@@ -80,6 +80,8 @@ public class GameManager {
 
     private List<AbstractSpecialItem> abstractSpecialItems;
 
+    private final int TEAM_BLOCK_SEARCH_RADIUS = settingsConfig.getSetupMap().getTeamBlockSearchRadius();
+
     /**
      * 创建一个新的游戏实例
      *
@@ -101,7 +103,7 @@ public class GameManager {
     private void initializeConfigs() {
         this.itemConfig = plugin.getItemConfig().getGameManager();
         this.messageConfig = plugin.getMessageConfig().getGame();
-        this.settingsConfig = plugin.getSettingsConfig().getDisplayDamage();
+        this.settingsConfig = plugin.getSettingsConfig();
 
         this.msgPlayerReconnect = messageConfig.getMsgPlayerReconnect();
         this.msgPlayerLeave = messageConfig.getMsgPlayerLeave();
@@ -111,8 +113,8 @@ public class GameManager {
         this.leaveGameMaterial = XMaterial.SLIME_BALL.get();
         this.leaveGameName = itemConfig.getLeaveGameName();
 
-        this.arrowDisplayEnabled = settingsConfig.isArrowDisplayEnabled();
-        this.attackDisplayEnabled = settingsConfig.isAttackDisplayEnabled();
+        this.arrowDisplayEnabled = settingsConfig.getDisplayDamage().isArrowDisplayEnabled();
+        this.attackDisplayEnabled = settingsConfig.getDisplayDamage().isAttackDisplayEnabled();
     }
 
     /**
@@ -198,7 +200,7 @@ public class GameManager {
      */
     private TeamColor detectTeamColorFromWool(Location location) {
         // 搜索范围，可以根据实际情况调整
-        int radius = 5;
+        int radius = TEAM_BLOCK_SEARCH_RADIUS;
         World world = location.getWorld();
         
         // 遍历位置周围的方块

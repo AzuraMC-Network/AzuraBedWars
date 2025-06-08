@@ -37,7 +37,7 @@ public class PlayerAFKListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         // 退出时清理挂机状态检测遗留
-        clearAFK(event.getPlayer().getUniqueId());
+        clearAfk(event.getPlayer().getUniqueId());
     }
 
     /**
@@ -58,7 +58,7 @@ public class PlayerAFKListener implements Listener {
         }, 0L, 20L);
     }
 
-    private void clearAFK(UUID uuid) {
+    private void clearAfk(UUID uuid) {
         AFK_LAST_MOVEMENT.remove(uuid);
         GamePlayer.get(uuid).setAfk(false);
     }

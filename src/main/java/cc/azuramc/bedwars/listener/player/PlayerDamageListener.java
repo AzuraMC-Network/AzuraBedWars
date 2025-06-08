@@ -45,7 +45,7 @@ public class PlayerDamageListener implements Listener {
     private final static PlayerConfig.PlayerDeath CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
 
     private static final String METADATA_VOID_PLAYER = "VOID_PLAYER";
-    private static final String METADATA_FIREBALL_NO_FALL = "FIREBALL_PLAYER_NO_FALL";
+    private static final String METADATA_FIREBALL_FALL_MODIFY = "FIREBALL_PLAYER_FALL_MODIFY";
     private static final String METADATA_SHOP = "Shop";
     private static final String METADATA_SHOP2 = "Shop2";
     private static final String COINS_ACTION_BAR = MESSAGE_CONFIG.getCoinsActionBar();
@@ -58,6 +58,9 @@ public class PlayerDamageListener implements Listener {
     private static final int ATTACK_DISPLAY_TITLE_TICKS = 10;
     private final boolean ARROW_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isArrowDisplayEnabled();
     private final boolean ATTACK_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isAttackDisplayEnabled();
+    private final double FIREBALL_FALLEN_DAMAGE_RATE = CONFIG.getFireballFallenDamageRate();
+    private final double NORMAL_FALLEN_DAMAGE_RATE = CONFIG.getNormalFallenDamageRate();
+    private final double EXPLOSION_DAMAGE_RATE = CONFIG.getExplosionDamageRate();
 
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
@@ -120,6 +123,13 @@ public class PlayerDamageListener implements Listener {
         GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
 
         // 处理击杀奖励
+        processKillReward(event, gamePlayer, gameKiller);
+
+        // 处理死亡后的游戏逻辑
+        processDeathGameLogic(gamePlayer, gameTeam);
+    }
+
+    private void processKillReward(PlayerDeathEvent event, GamePlayer gamePlayer, GamePlayer gameKiller) {
         if (gameKiller.getGameModeType() == GameModeType.EXPERIENCE) {
             // 1. 击杀者是经验模式
             if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
@@ -128,7 +138,7 @@ public class PlayerDamageListener implements Listener {
                 convertExperienceSourcesToExp(gamePlayer, gameKiller);
             } else {
                 // 1.2 被击杀者是default模式，需要将物品转换为经验
-                killer.giveExpLevels(getPlayerRewardExp(player));
+                gameKiller.getPlayer().giveExpLevels(getPlayerRewardExp(gamePlayer.getPlayer()));
             }
             // 清理死亡玩家物品
             cleanDeathDrops(event);
@@ -139,12 +149,9 @@ public class PlayerDamageListener implements Listener {
                 convertExperienceSourcesToItems(gamePlayer, gameKiller, event);
             } else {
                 // 2.2 被击杀者是default模式，直接转移物品
-                transferItemsToKiller(player, killer, event);
+                transferItemsToKiller(gamePlayer.getPlayer(), gameKiller.getPlayer(), event);
             }
         }
-
-        // 处理死亡后的游戏逻辑
-        processDeathGameLogic(gamePlayer, gameTeam);
     }
 
     /**
@@ -348,8 +355,12 @@ public class PlayerDamageListener implements Listener {
             return;
         }
 
+        if (gamePlayer == null) {
+            return;
+        }
+
         // 观察者不受伤害
-        if (gamePlayer != null && gamePlayer.isSpectator()) {
+        if (gamePlayer.isSpectator()) {
             event.setCancelled(true);
             if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
                 gamePlayer.getSpectatorTarget().tp();
@@ -358,15 +369,27 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 处理虚空伤害
-        if (event.getCause() == EntityDamageEvent.DamageCause.VOID && gamePlayer != null) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
             handleVoidDamage(event, gamePlayer);
             return;
         }
 
-        // 处理火球落地不受伤
-        if (gamePlayer != null && event.getCause() == EntityDamageEvent.DamageCause.FALL && gamePlayer.getPlayer().hasMetadata(METADATA_FIREBALL_NO_FALL)) {
-            event.setCancelled(true);
-            gamePlayer.getPlayer().removeMetadata(METADATA_FIREBALL_NO_FALL, plugin);
+        // 处理火球落地伤害修改
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL && gamePlayer.getPlayer().hasMetadata(METADATA_FIREBALL_FALL_MODIFY)) {
+            event.setDamage(event.getFinalDamage() * FIREBALL_FALLEN_DAMAGE_RATE);
+            gamePlayer.getPlayer().removeMetadata(METADATA_FIREBALL_FALL_MODIFY, plugin);
+            return;
+        }
+
+        // 处理普通摔落伤害修改
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+            event.setDamage(event.getFinalDamage() * NORMAL_FALLEN_DAMAGE_RATE);
+            return;
+        }
+
+        // 处理爆炸伤害修改
+        if ((event.getCause() == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
+            event.setDamage(event.getFinalDamage() * EXPLOSION_DAMAGE_RATE);
         }
     }
 

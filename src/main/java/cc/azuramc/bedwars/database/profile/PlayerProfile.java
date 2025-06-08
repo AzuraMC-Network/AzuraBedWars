@@ -50,7 +50,7 @@ public class PlayerProfile {
 
     public PlayerProfile(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
-        try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+        try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
             // 确保表存在
             ensureStatsTableExists(connection);
             
@@ -121,7 +121,7 @@ public class PlayerProfile {
 
     public void asyncLoadShop() {
         fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureShopTableExists(connection);
                 
@@ -158,7 +158,7 @@ public class PlayerProfile {
 
     public void saveShops() {
         PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureShopTableExists(connection);
                 
@@ -192,7 +192,7 @@ public class PlayerProfile {
         }
 
         PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
@@ -212,7 +212,7 @@ public class PlayerProfile {
     public void addKills() {
         kills += 1;
         PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
@@ -235,7 +235,7 @@ public class PlayerProfile {
     public void addDeaths() {
         deaths += 1;
         PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
@@ -254,7 +254,7 @@ public class PlayerProfile {
     public void addDestroyedBeds() {
         destroyedBeds += 1;
         PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
@@ -273,7 +273,7 @@ public class PlayerProfile {
     public void addWins() {
         wins += 1;
         PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
@@ -292,7 +292,7 @@ public class PlayerProfile {
     public void addLoses() {
         loses += 1;
         PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
@@ -312,7 +312,7 @@ public class PlayerProfile {
     public void addGames() {
         games += 1;
         PlayerProfile.fixedThreadPool.execute(() -> {
-            try (Connection connection = AzuraBedWars.getInstance().getConnectionPoolHandler().getConnection()) {
+            try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
                 // 确保表存在
                 ensureStatsTableExists(connection);
                 
