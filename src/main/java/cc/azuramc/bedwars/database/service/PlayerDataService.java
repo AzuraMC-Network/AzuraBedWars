@@ -20,7 +20,7 @@ public class PlayerDataService {
         this.playerDataDao = plugin.getPlayerDataDao();
     }
 
-    /** 存储GamePlayer与对应PlayerData的ID关系 */
+    /** 存储GamePlayer与对应ID(主键)关系 */
     public HashMap<GamePlayer, Integer> playerIdMap = new HashMap<>();
 
     /** 存储GamePlayer与对应PlayerData的关系 */
@@ -58,10 +58,16 @@ public class PlayerDataService {
      */
     public PlayerData selectPlayerData(GamePlayer gamePlayer) {
         try {
-            int playerId = playerDataDao.selectPlayerDataIdByUuid(gamePlayer.getUuid());
-            PlayerData playerData = playerDataDao.selectPlayerDataById(playerId);
-            playerIdMap.put(gamePlayer, playerId);
-            playerDataMap.put(gamePlayer, playerData);
+            PlayerData playerData = playerDataMap.get(gamePlayer);
+            int playerId = playerIdMap.get(gamePlayer);
+            if(playerData == null || playerId == 0) {
+                playerData = playerDataDao.selectPlayerDataById(playerId);
+                playerId = playerDataDao.selectPlayerDataIdByUuid(gamePlayer.getUuid());
+
+                playerIdMap.put(gamePlayer, playerId);
+                playerDataMap.put(gamePlayer, playerData);
+            }
+
             return playerData;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,5 +104,13 @@ public class PlayerDataService {
         }
 
         return null;
+    }
+
+    public PlayerData getPlayerData(GamePlayer gamePlayer) {
+        return playerDataMap.get(gamePlayer);
+    }
+
+    public int getPlayerId(GamePlayer gamePlayer) {
+        return playerIdMap.get(gamePlayer);
     }
 }

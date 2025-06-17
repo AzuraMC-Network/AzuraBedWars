@@ -205,7 +205,7 @@ public class GameOverTask extends BukkitRunnable {
     private void updatePlayerStats(GameTeam winner) {
         if (winner != null) {
             for (GamePlayer gamePlayer : winner.getAlivePlayers()) {
-                gamePlayer.getPlayerProfile().addWins();
+                gamePlayer.getPlayerData().addWins();
             }
         }
     }

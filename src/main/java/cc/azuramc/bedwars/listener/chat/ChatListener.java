@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.listener.chat;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.ChatConfig;
-import cc.azuramc.bedwars.database.profile.PlayerProfile;
+import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -110,8 +110,7 @@ public class ChatListener implements Listener {
      * @return 格式化后的聊天消息
      */
     public static String buildChatMessage(GamePlayer gamePlayer, String message) {
-        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
-        int level = calculatePlayerLevel(playerProfile);
+        int level = calculatePlayerLevel(gamePlayer.getPlayerData());
         String globalPrefix = ChatColor.translateAlternateColorCodes('&', plugin.getChat().getPlayerPrefix(gamePlayer.getPlayer()));
 
         return "§6[" + PlayerLevelMap.getLevel(level) + "✫]" + globalPrefix + "§7" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
@@ -120,13 +119,13 @@ public class ChatListener implements Listener {
     /**
      * 计算玩家等级
      *
-     * @param playerProfile 玩家数据
+     * @param playerData 玩家数据
      * @return 玩家等级
      */
-    private static int calculatePlayerLevel(PlayerProfile playerProfile) {
-        return (playerProfile.getKills() * 2) +
-                (playerProfile.getDestroyedBeds() * 10) +
-                (playerProfile.getWins() * 15);
+    private static int calculatePlayerLevel(PlayerData playerData) {
+        return (playerData.getKills() * 2) +
+                (playerData.getDestroyedBeds() * 10) +
+                (playerData.getWins() * 15);
     }
 
     /**

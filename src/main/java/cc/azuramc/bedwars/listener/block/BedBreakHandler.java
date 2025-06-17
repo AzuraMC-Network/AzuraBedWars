@@ -87,7 +87,7 @@ public class BedBreakHandler {
         targetTeam.setDestroyed(true);
 
         // 更新玩家统计数据
-        gamePlayer.getPlayerProfile().addDestroyedBeds();
+        gamePlayer.getPlayerData().addDestroyedBeds();
     }
 
     /**

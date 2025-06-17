@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.scoreboard.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.ScoreboardConfig;
-import cc.azuramc.bedwars.database.profile.PlayerProfile;
+import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.level.PlayerLevelMap;
 import cc.azuramc.bedwars.game.task.GameStartTask;
@@ -131,7 +131,7 @@ public class LobbyBoardProvider implements Listener {
         }
         
         // 更新玩家等级
-        updatePlayerLevel(player, gamePlayer.getPlayerProfile());
+        updatePlayerLevel(player, gamePlayer.getPlayerData());
         
         List<String> lines = new ArrayList<>();
         
@@ -145,7 +145,7 @@ public class LobbyBoardProvider implements Listener {
         addCountdownInfo(lines);
         
         // 添加模式信息
-        addModeInfo(lines, gamePlayer.getPlayerProfile());
+        addModeInfo(lines, gamePlayer.getPlayerData());
         
         // 添加版本信息
         addVersionInfo(lines);
@@ -159,14 +159,14 @@ public class LobbyBoardProvider implements Listener {
     
     /**
      * 更新玩家等级
-     * 
-     * @param player 玩家
-     * @param playerProfile 玩家数据
+     *
+     * @param player     玩家
+     * @param playerData 玩家数据
      */
-    private static void updatePlayerLevel(Player player, PlayerProfile playerProfile) {
-        int expPoints = (playerProfile.getKills() * 2) +
-                       (playerProfile.getDestroyedBeds() * 10) +
-                       (playerProfile.getWins() * 15);
+    private static void updatePlayerLevel(Player player, PlayerData playerData) {
+        int expPoints = (playerData.getKills() * 2) +
+                       (playerData.getDestroyedBeds() * 10) +
+                       (playerData.getWins() * 15);
         int level = PlayerLevelMap.getLevel(expPoints);
         player.setLevel(level);
     }
@@ -211,10 +211,10 @@ public class LobbyBoardProvider implements Listener {
      * 添加模式信息到计分板
      * 
      * @param lines 计分板行列表
-     * @param playerProfile 玩家数据
+     * @param playerData 玩家数据
      */
-    private static void addModeInfo(List<String> lines, PlayerProfile playerProfile) {
-        String modeText = playerProfile.getGameModeType() == GameModeType.DEFAULT ? DEFAULT_MODE : EXP_MODE;
+    private static void addModeInfo(List<String> lines, PlayerData playerData) {
+        String modeText = playerData.getMode() == GameModeType.DEFAULT ? DEFAULT_MODE : EXP_MODE;
         lines.add("§f你的模式: §a" + modeText);
         lines.add(EMPTY_LINE);
     }

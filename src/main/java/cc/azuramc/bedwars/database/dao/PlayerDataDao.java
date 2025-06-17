@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -35,6 +34,20 @@ public class PlayerDataDao {
      * 建表
      */
     public void createPlayerDataTable() throws SQLException {
+        String[] defaultShopData = new String[]{"BlockShop#1", "SwordShop#1", "ArmorShop#1", "FoodShop#1", "BowShop#2", "PotionShop#1",
+                "UtilityShop#2", "BlockShop#8", "SwordShop#2", "ArmorShop#2", "UtilityShop#1", "BowShop#1", "PotionShop#2",
+                "UtilityShop#4", "AIR", "AIR", "AIR", "AIR", "AIR", "AIR", "AIR"};
+        StringBuilder string = null;
+        for (String s : defaultShopData) {
+            if (string == null) {
+                string = new StringBuilder(s + ", ");
+                continue;
+            }
+
+            string.append(s).append(", ");
+        }
+        String dataToStore = string.toString();
+
         PreparedStatement createUsersStmt = ormClient.createTable(conn)
                 .createTable(PlayerDataTableKey.tableName)
                 .ifNotExists()
@@ -50,7 +63,7 @@ public class PlayerDataDao {
                 .column(PlayerDataTableKey.wins, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                 .column(PlayerDataTableKey.losses, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                 .column(PlayerDataTableKey.games, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
-                .column(PlayerDataTableKey.shopData, DataType.TEXT_NOT_NULL())
+                .column(PlayerDataTableKey.shopData, DataType.DEFAULT(dataToStore))
                 .addTimestamps()
                 .engine("InnoDB")
                 .charset("utf8mb4")
@@ -162,7 +175,7 @@ public class PlayerDataDao {
             playerData.setWins(resultSet.getInt(PlayerDataTableKey.wins));
             playerData.setLosses(resultSet.getInt(PlayerDataTableKey.losses));
             playerData.setGames(resultSet.getInt(PlayerDataTableKey.games));
-            playerData.setShopData(Arrays.toString(resultSet.getString(PlayerDataTableKey.shopData).split(", ")));
+            playerData.setShopData(resultSet.getString(PlayerDataTableKey.shopData).split(", "));
             playerData.setCreatedAt(resultSet.getTimestamp(PlayerDataTableKey.createdAt));
             playerData.setUpdatedAt(resultSet.getTimestamp(PlayerDataTableKey.updatedAt));
         }

@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.gui;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
@@ -18,13 +17,9 @@ import org.bukkit.entity.Player;
  * @author an5w1r@163.com
  */
 public class ModeSelectionGUI extends CustomGUI {
-    /**
-     * 灰色
-     */
+    /** 灰色 */
     private static final int BORDER_GLASS_COLOR = 7;
-    /**
-     * 绿色
-     */
+    /** 绿色 */
     private static final int HIGHLIGHT_GLASS_COLOR = 5;
 
     /**
@@ -34,14 +29,12 @@ public class ModeSelectionGUI extends CustomGUI {
     public ModeSelectionGUI(GamePlayer gamePlayer) {
         super(gamePlayer, "§8资源类型选择", 27);
         
-        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
-        
         // 设置界面边框
         setupBorders();
         
         // 设置模式选项
-        setupDefaultModeItem(gamePlayer, playerProfile);
-        setupExperienceModeItem(gamePlayer, playerProfile);
+        setupDefaultModeItem(gamePlayer);
+        setupExperienceModeItem(gamePlayer);
     }
     
     /**
@@ -72,8 +65,8 @@ public class ModeSelectionGUI extends CustomGUI {
     /**
      * 设置普通模式选项
      */
-    private void setupDefaultModeItem(GamePlayer gamePlayer, PlayerProfile playerProfile) {
-        boolean isSelected = playerProfile.getGameModeType() == GameModeType.DEFAULT;
+    private void setupDefaultModeItem(GamePlayer gamePlayer) {
+        boolean isSelected = gamePlayer.getPlayerData().getMode() == GameModeType.DEFAULT;
         Player player = gamePlayer.getPlayer();
         
         setItem(11, new ItemBuilder()
@@ -91,8 +84,8 @@ public class ModeSelectionGUI extends CustomGUI {
                         player.sendMessage("§a你已经选择了普通模式!");
                         return;
                     }
-                    
-                    playerProfile.setGameModeType(GameModeType.DEFAULT);
+
+                    gamePlayer.getPlayerData().setMode(GameModeType.DEFAULT);
                     GamePlayer.get(player.getUniqueId()).setGameModeType(GameModeType.DEFAULT);
 
                     player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 10F, 1F);
@@ -104,8 +97,8 @@ public class ModeSelectionGUI extends CustomGUI {
     /**
      * 设置经验模式选项
      */
-    private void setupExperienceModeItem(GamePlayer gamePlayer, PlayerProfile playerProfile) {
-        boolean isSelected = playerProfile.getGameModeType() == GameModeType.EXPERIENCE;
+    private void setupExperienceModeItem(GamePlayer gamePlayer) {
+        boolean isSelected = gamePlayer.getPlayerData().getMode() == GameModeType.EXPERIENCE;
         Player player = gamePlayer.getPlayer();
         
         setItem(15, new ItemBuilder()
@@ -123,8 +116,8 @@ public class ModeSelectionGUI extends CustomGUI {
                         player.sendMessage("§a你已经选择了经验模式!");
                         return;
                     }
-                    
-                    playerProfile.setGameModeType(GameModeType.EXPERIENCE);
+
+                    gamePlayer.getPlayerData().setMode(GameModeType.EXPERIENCE);
                     GamePlayer.get(player.getUniqueId()).setGameModeType(GameModeType.EXPERIENCE);
 
                     player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 10F, 1F);

@@ -412,7 +412,7 @@ public class PlayerDamageListener implements Listener {
         } else {
             // 自杀消息
             gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + ")§e掉下了虚空");
-            gamePlayer.getPlayerProfile().addDeaths();
+            gamePlayer.getPlayerData().addDeaths();
         }
 
         gamePlayer.getPlayer().setMetadata(METADATA_VOID_PLAYER, new FixedMetadataValue(plugin, ""));
@@ -449,7 +449,7 @@ public class PlayerDamageListener implements Listener {
             gameKiller.addKills();
         }
 
-        gameKiller.getPlayerProfile().addKills();
+        gameKiller.getPlayerData().addKills();
     }
 
     /**
@@ -527,8 +527,8 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 更新玩家数据
-        gameKiller.getPlayerProfile().addKills();
-        gamePlayer.getPlayerProfile().addDeaths();
+        gameKiller.getPlayerData().addKills();
+        gamePlayer.getPlayerData().addDeaths();
     }
 
     /**

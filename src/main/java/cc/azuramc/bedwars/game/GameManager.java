@@ -873,7 +873,7 @@ public class GameManager {
             player.setFlying(false);
             player.setGameMode(GameMode.SURVIVAL);
             gamePlayer.cleanState();
-            gamePlayer.getPlayerProfile().addGames();
+            gamePlayer.getPlayerData().addGames();
         }
     }
 
