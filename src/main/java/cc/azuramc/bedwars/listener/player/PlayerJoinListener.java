@@ -68,7 +68,6 @@ public class PlayerJoinListener implements Listener {
             player.kickPlayer("玩家异常状态");
             return;
         }
-        gamePlayer.getPlayerProfile().asyncLoadShop();
         FastBoard board = new FastBoard(player);
         board.updateTitle("§e§l起床战争");
         board.updateLines("Test");

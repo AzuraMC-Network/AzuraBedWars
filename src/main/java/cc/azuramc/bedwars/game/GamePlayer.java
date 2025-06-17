@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
-import cc.azuramc.bedwars.database.profile.PlayerProfile;
+import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
 import cc.azuramc.bedwars.game.team.GameTeam;
@@ -51,7 +51,7 @@ public class GamePlayer {
     @Getter private final UUID uuid;
     @Getter private final String name;
     @Getter private final AssistsManager assistsManager;
-    @Getter private final PlayerProfile playerProfile;
+    @Getter private final PlayerData playerData;
     @Getter private final PlayerCompass playerCompass;
 
     @Getter @Setter GameModeType gameModeType;
@@ -90,7 +90,7 @@ public class GamePlayer {
 
         // 初始化管理器
         this.assistsManager = new AssistsManager(this);
-        this.playerProfile = new PlayerProfile(this);
+        this.playerData = new PlayerData();
         this.playerCompass = new PlayerCompass(this);
 
         // 初始化游戏状态
@@ -106,7 +106,7 @@ public class GamePlayer {
         this.axeType = ToolType.NONE;
 
         // 游戏模式
-        this.gameModeType = getPlayerProfile().getGameModeType();
+        this.gameModeType = playerData.getMode();
         this.experienceSources = new HashMap<>();
     }
 

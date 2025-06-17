@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.shop.gui;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.database.profile.PlayerProfile;
+import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
@@ -47,16 +47,16 @@ public class DIYShopGUI extends CustomGUI {
      */
     public DIYShopGUI(GamePlayer gamePlayer, GameManager gameManager, ItemStack itemStack, String className) {
         super(gamePlayer, "§8添加物品到快捷购买", 54);
-        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
+        PlayerData playerData = gamePlayer.getPlayerData();
 
         // 初始化界面
-        initializeUI(gameManager, gamePlayer, itemStack, className, playerProfile);
+        initializeUI(gameManager, gamePlayer, itemStack, className, playerData);
     }
     
     /**
      * 初始化用户界面
      */
-    private void initializeUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className, PlayerProfile playerProfile) {
+    private void initializeUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className, PlayerData playerData) {
         
         // 设置顶部展示物品
         setItem(4, new ItemBuilder()
@@ -69,7 +69,7 @@ public class DIYShopGUI extends CustomGUI {
         setupBorders();
         
         // 设置快捷购买槽位
-        setupShopSlots(gameManager, gamePlayer, className, playerProfile);
+        setupShopSlots(gameManager, gamePlayer, className, playerData);
     }
     
     /**
@@ -101,12 +101,11 @@ public class DIYShopGUI extends CustomGUI {
     /**
      * 设置商店槽位
      */
-    private void setupShopSlots(GameManager gameManager, GamePlayer gamePlayer, String className, PlayerProfile playerProfile) {
-        Player player = gamePlayer.getPlayer();
-        String[] shopSort = playerProfile.getShopSort();
+    private void setupShopSlots(GameManager gameManager, GamePlayer gamePlayer, String className, PlayerData playerData) {
+        String[] shopData = playerData.getShopData();
         
         for (int i = 0; i < SHOP_SLOTS.length; i++) {
-            String slotData = shopSort[i];
+            String slotData = shopData[i];
             int slotPosition = SHOP_SLOTS[i];
             
             // 解析槽位数据
@@ -115,7 +114,7 @@ public class DIYShopGUI extends CustomGUI {
             
             if (itemInfo == null || shopItemType == null) {
                 // 空槽位
-                setupEmptySlot(gameManager, gamePlayer, slotPosition, i, className, playerProfile);
+                setupEmptySlot(gameManager, gamePlayer, slotPosition, i, className, playerData);
             } else {
                 // 已有物品的槽位
                 setupOccupiedSlot(gameManager, gamePlayer, slotPosition, shopItemType, className);
@@ -143,7 +142,7 @@ public class DIYShopGUI extends CustomGUI {
     /**
      * 设置空槽位
      */
-    private void setupEmptySlot(GameManager gameManager, GamePlayer gamePlayer, int slotPosition, int slotIndex, String className, PlayerProfile playerProfile) {
+    private void setupEmptySlot(GameManager gameManager, GamePlayer gamePlayer, int slotPosition, int slotIndex, String className, PlayerData playerData) {
         setItem(slotPosition, 
                 new ItemBuilder()
                     .setItemStack(Objects.requireNonNull(XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + EMPTY_SLOT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem()))
@@ -152,8 +151,9 @@ public class DIYShopGUI extends CustomGUI {
                     .getItem(), 
                 new GUIAction(0, () -> {
                     // 更新玩家数据
-                    playerProfile.getShopSort()[slotIndex] = className;
-                    playerProfile.saveShops();
+                    String[] shopData = playerData.getShopData();
+                    shopData[slotIndex] = className;
+                    playerData.setShopData(shopData);
                     
                     // 播放确认音效
                     gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
@@ -178,14 +178,14 @@ public class DIYShopGUI extends CustomGUI {
                     .getItem(), 
                 new GUIAction(0, () -> {
                     Player player = gamePlayer.getPlayer();
-                    PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
+                    PlayerData playerData = gamePlayer.getPlayerData();
                     
                     // 获取槽位索引
                     int slotIndex = Arrays.asList(SHOP_SLOTS).indexOf(slotPosition);
                     
                     // 更新玩家数据
-                    playerProfile.getShopSort()[slotIndex] = className;
-                    playerProfile.saveShops();
+                    playerData.getShopData()[slotIndex] = className;
+
                     
                     // 播放确认音效
                     player.playSound(player.getLocation(), XSound.UI_BUTTON_CLICK.get(), 1, 10F);

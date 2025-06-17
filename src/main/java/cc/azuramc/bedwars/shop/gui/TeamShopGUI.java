@@ -102,7 +102,7 @@ public class TeamShopGUI extends CustomGUI {
             return;
         }
 
-        GameModeType gameModeType = gamePlayer.getPlayerProfile().getGameModeType();
+        GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
         
         // 设置界面边框
         setupBorders();

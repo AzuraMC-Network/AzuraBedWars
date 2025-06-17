@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.profile.PlayerProfile;
+import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -138,17 +138,17 @@ public class PickupItemHandler {
         if (!isIngot) {
             return false;
         }
-        
-        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
+
+        PlayerData playerData = gamePlayer.getPlayerData();
         Player player = gamePlayer.getPlayer();
         int xp = calculateIngotXp(itemStack, gamePlayer);
         
         // 根据游戏模式处理拾取效果
-        if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
+        if (playerData.getMode() == GameModeType.DEFAULT) {
             item.remove();
             gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
-        } else if (playerProfile.getGameModeType() == GameModeType.EXPERIENCE) {
+        } else if (playerData.getMode() == GameModeType.EXPERIENCE) {
             item.remove();
             gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.setLevel(player.getLevel() + xp);
@@ -189,7 +189,7 @@ public class PickupItemHandler {
                 gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
                 
                 GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
-                if (nearbyPlayer.getPlayerProfile().getGameModeType() == GameModeType.DEFAULT) {
+                if (nearbyPlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
                     players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
                 } else {
                     players.setLevel(players.getLevel() + xp);
@@ -212,10 +212,10 @@ public class PickupItemHandler {
         }
 
         Player player = gamePlayer.getPlayer();
-        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
+        PlayerData playerData = gamePlayer.getPlayerData();
         
         // 默认模式下不做特殊处理
-        if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
+        if (playerData.getMode() == GameModeType.DEFAULT) {
             return false;
         }
         
@@ -245,10 +245,10 @@ public class PickupItemHandler {
         }
 
         Player player = gamePlayer.getPlayer();
-        PlayerProfile playerProfile = gamePlayer.getPlayerProfile();
+        PlayerData playerData = gamePlayer.getPlayerData();
         
         // 默认模式下不做特殊处理
-        if (playerProfile.getGameModeType() == GameModeType.DEFAULT) {
+        if (playerData.getMode() == GameModeType.DEFAULT) {
             return false;
         }
         

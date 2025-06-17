@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
-import cc.azuramc.bedwars.database.profile.PlayerProfile;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -79,11 +78,6 @@ public class PlayerRespawnListener implements Listener {
             gameTeam = gamePlayer.getGameTeam();
         }
 
-        PlayerProfile playerProfile = null;
-        if (gamePlayer != null) {
-            playerProfile = gamePlayer.getPlayerProfile();
-        }
-
         // 游戏未运行时不处理
         if (gameManager.getGameState() != GameState.RUNNING) {
             return;
@@ -95,7 +89,7 @@ public class PlayerRespawnListener implements Listener {
 
         // 如果玩家的床已经被摧毁，处理永久死亡
         if (gameTeam != null && gameTeam.isDestroyed()) {
-            handlePermanentDeath(event, gamePlayer, gameTeam, playerProfile);
+            handlePermanentDeath(event, gamePlayer, gameTeam);
             return;
         }
 
@@ -121,9 +115,8 @@ public class PlayerRespawnListener implements Listener {
      * @param event 玩家重生事件
      * @param gamePlayer 游戏玩家
      * @param gameTeam 玩家所在队伍
-     * @param playerProfile 玩家数据
      */
-    private void handlePermanentDeath(PlayerRespawnEvent event, GamePlayer gamePlayer, GameTeam gameTeam, PlayerProfile playerProfile) {
+    private void handlePermanentDeath(PlayerRespawnEvent event, GamePlayer gamePlayer, GameTeam gameTeam) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -142,7 +135,7 @@ public class PlayerRespawnListener implements Listener {
             }
         }.runTaskLater(AzuraBedWars.getInstance(), RESPAWN_DELAY_TICKS);
         
-        playerProfile.addLoses();
+        gamePlayer.getPlayerData().addLosses();
 
         // 如果整个队伍都被消灭，广播消息
         if (gameTeam.isDead()) {

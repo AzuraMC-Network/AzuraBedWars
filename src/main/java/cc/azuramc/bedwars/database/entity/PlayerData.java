@@ -29,7 +29,7 @@ public class PlayerData implements ChangeManager.DirtyTracker {
     private int wins;
     private int losses;
     private int games;
-    private String shopData;
+    private String[] shopData;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -95,6 +95,89 @@ public class PlayerData implements ChangeManager.DirtyTracker {
         playerDataService.changeManager.registerDirty(this);
         this.games = games;
     }
+
+    public void addKills(int kills) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.kills = this.kills + kills;
+    }
+    public void addDeaths(int deaths) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.deaths = this.deaths + deaths;
+    }
+    public void addAssists(int assists) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.assists = this.assists + assists;
+    }
+    public void addFinalKills(int finalKills) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.finalKills = this.finalKills + finalKills;
+    }
+    public void addDestroyedBeds(int destroyedBeds) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.destroyedBeds = this.destroyedBeds + destroyedBeds;
+    }
+    public void addWins(int wins) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.wins = this.wins + wins;
+    }
+    public void addLosses(int losses) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.losses = this.losses + losses;
+    }
+    public void addGames(int games) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.games = this.games + games;
+    }
+
+    public void addKills() {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.kills++;
+    }
+    public void addDeaths() {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.deaths++;
+    }
+    public void addAssists() {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.assists++;
+    }
+    public void addFinalKills() {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.finalKills++;
+    }
+    public void addDestroyedBeds() {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.destroyedBeds++;
+    }
+    public void addWins() {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.wins++;
+    }
+    public void addLosses() {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.losses++;
+    }
+    public void addGames() {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.games++;
+    }
+
     public void setCreatedAt(Timestamp createdAt) {
         this.isDirty = true;
         playerDataService.changeManager.registerDirty(this);
@@ -105,10 +188,24 @@ public class PlayerData implements ChangeManager.DirtyTracker {
         playerDataService.changeManager.registerDirty(this);
         this.updatedAt = updatedAt;
     }
-    public void setShopData(String shopData) {
+    public void setShopData(String[] shopData) {
         this.isDirty = true;
         playerDataService.changeManager.registerDirty(this);
-        this.shopData = shopData;
+        StringBuilder string = null;
+        for (String s : shopData) {
+            if (string == null) {
+                string = new StringBuilder(s + ", ");
+                continue;
+            }
+
+            string.append(s).append(", ");
+        }
+
+        String finalShopDataString = null;
+        if (string != null) {
+            finalShopDataString = string.substring(0, string.length() - 2);
+            this.shopData = finalShopDataString.split(",");
+        }
     }
 
     @Override
