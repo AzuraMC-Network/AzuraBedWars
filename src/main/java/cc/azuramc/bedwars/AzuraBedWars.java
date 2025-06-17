@@ -5,6 +5,8 @@ import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.connection.ORMHander;
+import cc.azuramc.bedwars.database.dao.PlayerDataDao;
+import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
@@ -19,6 +21,9 @@ import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.util.SetupItemManager;
+import cc.azuramc.orm.AzuraORM;
+import cc.azuramc.orm.AzuraOrmClient;
+import cc.azuramc.orm.config.DatabaseConfig;
 import lombok.Getter;
 import lombok.Setter;
 import net.milkbowl.vault.chat.Chat;
@@ -37,7 +42,6 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 @Getter
 public final class AzuraBedWars extends JavaPlugin {
-    /** 插件标识常量 */
     private static final String PLUGIN_PREFIX = "[AzuraBedWars] ";
 
     @Getter private static AzuraBedWars instance;
@@ -62,6 +66,9 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private ScoreboardManager scoreboardManager;
     @Getter private SetupItemManager setupItemManager;
     @Getter private String databaseName;
+    @Getter private AzuraOrmClient ormClient;
+    @Getter private PlayerDataDao playerDataDao;
+    @Getter private PlayerDataService playerDataService;
 
     public static final String MAP_TABLE_NAME = "bw_map";
     public static final String PLAYER_DATA_TABLE = "bw_players_data";
@@ -100,7 +107,27 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initDatabases() {
         databaseName = settingsConfig.getDatabase().getDatabase();
-        ormHander = new ORMHander();
+        SettingsConfig.DatabaseConfig database = settingsConfig.getDatabase();
+        DatabaseConfig config = new DatabaseConfig()
+                .setUrl("jdbc:mysql://" + database.getHost() + ":"
+                        + database.getPort() + "/" + database.getDatabase())
+                .setUsername(database.getUsername())
+                .setPassword(database.getPassword())
+                .setMaximumPoolSize(25)
+                .setMinimumIdle(5)
+                .setConnectionTimeout(10000L)
+                .setIdleTimeout(300000L)
+                .setMaxLifetime(900000L)
+                .setLeakDetectionThreshold(30000L)
+                .setPoolName("AzuraBedWars-Pool")
+                .setRegisterMbeans(true)
+                .setAutoCommit(false);
+
+        AzuraORM.initialize(config, true);
+        ormClient = AzuraORM.getClient();
+        playerDataDao = new PlayerDataDao(this);
+        playerDataService = new PlayerDataService(this);
+        ormHander = new ORMHander(this);
     }
 
     /**

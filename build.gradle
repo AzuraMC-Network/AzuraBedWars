@@ -52,6 +52,7 @@ dependencies {
     // https://mvnrepository.com/artifact/redis.clients/jedis
     implementation 'redis.clients:jedis:5.1.5'
     implementation 'com.github.cryptomorin:XSeries:13.2.0'
+    implementation files('libs/AzuraORM-1.0.0-all.jar')
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
 
