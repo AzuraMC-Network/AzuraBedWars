@@ -5,12 +5,8 @@ package cc.azuramc.bedwars.game;
  */
 
 public enum GameState {
-    /**
-     * 游戏实例运行中
-     */
+    /** 游戏实例运行中 */
     RUNNING,
-    /**
-     * 游戏实例等待中
-     */
+    /** 游戏实例等待中 */
     WAITING
 }

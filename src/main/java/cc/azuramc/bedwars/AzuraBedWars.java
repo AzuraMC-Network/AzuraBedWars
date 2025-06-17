@@ -20,6 +20,7 @@ import cc.azuramc.bedwars.jedis.listener.PubSubListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
+import cc.azuramc.bedwars.util.ServerMOTD;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
@@ -69,6 +70,7 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private AzuraOrmClient ormClient;
     @Getter private PlayerDataDao playerDataDao;
     @Getter private PlayerDataService playerDataService;
+    @Getter private ServerMOTD serverMOTD;
 
     public static final String MAP_TABLE_NAME = "bw_map";
     public static final String PLAYER_DATA_TABLE = "bw_players_data";
@@ -192,6 +194,9 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 创建游戏管理器
         gameManager = new GameManager(this);
+
+        // 初始化服务器MOTD
+        serverMOTD = new ServerMOTD();
 
         // 加载地图
         mapLoader.loadMap();

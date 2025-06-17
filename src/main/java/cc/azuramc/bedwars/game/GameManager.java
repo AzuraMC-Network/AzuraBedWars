@@ -119,6 +119,15 @@ public class GameManager {
     }
 
     /**
+     * 更新服务器MOTD
+     */
+    private void updateServerMOTD() {
+        if (AzuraBedWars.getInstance().getServerMOTD() != null) {
+            AzuraBedWars.getInstance().getServerMOTD().updateMOTD();
+        }
+    }
+
+    /**
      * 加载游戏地图和相关设置
      *
      * @param mapData 地图数据
@@ -143,6 +152,8 @@ public class GameManager {
 
         initializeTeams(mapData);
         this.gameState = GameState.WAITING;
+        // 更新MOTD
+        updateServerMOTD();
         
         // 添加JedisManager的空值检查
         if (JedisManager.getInstance() != null) {
@@ -843,6 +854,8 @@ public class GameManager {
         Bukkit.getPluginManager().callEvent(new JedisGameStartEvent());
 
         gameState = GameState.RUNNING;
+        // 更新MOTD
+        updateServerMOTD();
 
         moveFreePlayersToTeam();
         gameEventManager.start();

@@ -98,9 +98,6 @@ public class TeamShopGUI extends CustomGUI {
      */
     public TeamShopGUI(GamePlayer gamePlayer, GameManager gameManager) {
         super(gamePlayer, "§8团队升级", 45);
-        if (gamePlayer == null) {
-            return;
-        }
 
         GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
         
