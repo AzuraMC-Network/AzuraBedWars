@@ -80,7 +80,7 @@ public class GameManager {
 
     private List<AbstractSpecialItem> abstractSpecialItems;
 
-    private final int TEAM_BLOCK_SEARCH_RADIUS = settingsConfig.getSetupMap().getTeamBlockSearchRadius();
+    private int teamBlockSearchRadius;
 
     /**
      * 创建一个新的游戏实例
@@ -115,6 +115,7 @@ public class GameManager {
 
         this.arrowDisplayEnabled = settingsConfig.getDisplayDamage().isArrowDisplayEnabled();
         this.attackDisplayEnabled = settingsConfig.getDisplayDamage().isAttackDisplayEnabled();
+        this.teamBlockSearchRadius = settingsConfig.getSetupMap().getTeamBlockSearchRadius();
     }
 
     /**
@@ -200,7 +201,7 @@ public class GameManager {
      */
     private TeamColor detectTeamColorFromWool(Location location) {
         // 搜索范围，可以根据实际情况调整
-        int radius = TEAM_BLOCK_SEARCH_RADIUS;
+        int radius = teamBlockSearchRadius;
         World world = location.getWorld();
         
         // 遍历位置周围的方块
