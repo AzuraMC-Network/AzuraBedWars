@@ -19,6 +19,7 @@ import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
 import cc.azuramc.bedwars.util.LoadGameUtil;
+import cc.azuramc.bedwars.util.ServerMOTD;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import lombok.Getter;
@@ -122,9 +123,7 @@ public class GameManager {
      * 更新服务器MOTD
      */
     private void updateServerMOTD() {
-        if (AzuraBedWars.getInstance().getServerMOTD() != null) {
-            AzuraBedWars.getInstance().getServerMOTD().updateMOTD();
-        }
+        ServerMOTD.updateMOTD(this.gameState);
     }
 
     /**

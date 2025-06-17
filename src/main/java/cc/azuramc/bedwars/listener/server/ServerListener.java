@@ -1,11 +1,13 @@
 package cc.azuramc.bedwars.listener.server;
 
+import cc.azuramc.bedwars.util.ServerMOTD;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
 /**
@@ -34,5 +36,10 @@ public class ServerListener implements Listener {
         if (event.getRightClicked() instanceof ArmorStand) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onServerPing(ServerListPingEvent event) {
+        event.setMotd(ServerMOTD.getMOTD());
     }
 }

@@ -63,7 +63,7 @@ public class PlayerDataDao {
                 .column(PlayerDataTableKey.wins, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                 .column(PlayerDataTableKey.losses, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                 .column(PlayerDataTableKey.games, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
-                .column(PlayerDataTableKey.shopData, DataType.DEFAULT(dataToStore))
+                .column(PlayerDataTableKey.shopData, DataType.Type.TEXT.getSql(), DataType.DEFAULT(dataToStore))
                 .addTimestamps()
                 .engine("InnoDB")
                 .charset("utf8mb4")
