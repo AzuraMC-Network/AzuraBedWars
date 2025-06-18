@@ -59,13 +59,23 @@ public class PlayerDataService {
     public PlayerData selectPlayerData(GamePlayer gamePlayer) {
         try {
             PlayerData playerData = playerDataMap.get(gamePlayer);
-            int playerId = playerIdMap.get(gamePlayer);
-            if(playerData == null || playerId == 0) {
-                playerData = playerDataDao.selectPlayerDataById(playerId);
+            int playerId = playerIdMap.getOrDefault(gamePlayer, -1);
+            
+            if(playerData == null || playerId == -1) {
+                // 先通过UUID获取玩家ID
                 playerId = playerDataDao.selectPlayerDataIdByUuid(gamePlayer.getUuid());
-
-                playerIdMap.put(gamePlayer, playerId);
-                playerDataMap.put(gamePlayer, playerData);
+                
+                if (playerId > 0) {
+                    // 如果找到了ID，根据ID查询完整数据
+                    playerData = playerDataDao.selectPlayerDataById(playerId);
+                    
+                    // 缓存数据
+                    playerIdMap.put(gamePlayer, playerId);
+                    playerDataMap.put(gamePlayer, playerData);
+                } else {
+                    // 如果没有找到数据 说明是新玩家 这里不创建 让GamePlayer自己处理
+                    return null;
+                }
             }
 
             return playerData;
@@ -112,5 +122,17 @@ public class PlayerDataService {
 
     public int getPlayerId(GamePlayer gamePlayer) {
         return playerIdMap.get(gamePlayer);
+    }
+    
+    /**
+     * 缓存玩家数据
+     * @param gamePlayer 游戏玩家
+     * @param playerData 玩家数据
+     */
+    public void cachePlayerData(GamePlayer gamePlayer, PlayerData playerData) {
+        if (playerData != null && playerData.getId() > 0) {
+            playerDataMap.put(gamePlayer, playerData);
+            playerIdMap.put(gamePlayer, playerData.getId());
+        }
     }
 }

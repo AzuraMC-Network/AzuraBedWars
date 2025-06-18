@@ -444,9 +444,9 @@ public class PlayerDamageListener implements Listener {
             // 最终击杀给金币奖励
             showCoinsReward(gameKiller);
             AzuraBedWars.getInstance().getEcon().depositPlayer(gameKiller.getPlayer(), COINS_REWARD);
-            gameKiller.addFinalKills();
+            gameKiller.getPlayerData().addFinalKills();
         } else {
-            gameKiller.addKills();
+            gameKiller.getPlayerData().addKills();
         }
 
         gameKiller.getPlayerData().addKills();
@@ -514,7 +514,7 @@ public class PlayerDamageListener implements Listener {
         if (isFinalKill) {
             showCoinsReward(gameKiller);
             AzuraBedWars.getInstance().getEcon().depositPlayer(gamePlayer.getPlayer(), COINS_REWARD);
-            gameKiller.addFinalKills();
+            gameKiller.getPlayerData().addFinalKills();
 
             // 广播击杀消息
             gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + "♛)[最终击杀]§e被" +
