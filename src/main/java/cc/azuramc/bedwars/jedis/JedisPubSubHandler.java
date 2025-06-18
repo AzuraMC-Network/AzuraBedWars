@@ -40,7 +40,11 @@ public class JedisPubSubHandler extends JedisPubSub {
             }
 
             Bukkit.getLogger().info(LOG_PREFIX + "收到消息 - 频道: " + channel + ", 内容: " + message);
-            plugin.callEvent(new BukkitPubSubMessageEvent(channel, message));
+            
+            // 在高版本Bukkit Event要求必须主线程触发
+            plugin.mainThreadRunnable(() -> {
+                plugin.callEvent(new BukkitPubSubMessageEvent(channel, message));
+            });
         } catch (Exception e) {
             Bukkit.getLogger().log(Level.SEVERE, LOG_PREFIX + "处理消息时发生错误", e);
         }
