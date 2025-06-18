@@ -11,6 +11,10 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -28,7 +32,8 @@ public class PubSubListener implements Runnable {
     private JedisPubSubHandler jedisPubSubHandler;
     private final Set<String> addedChannels = new HashSet<>();
     private boolean isInitialized = false;
-    private Thread subscribeThread;
+    private ExecutorService executorService;
+    private Future<?> subscribeTask;
 
     /**
      * 运行监听器
@@ -47,6 +52,15 @@ public class PubSubListener implements Runnable {
      */
     private void initializePubSub() {
         try {
+            // 初始化线程池（单线程执行器，因为Redis订阅需要持续运行）
+            if (executorService == null || executorService.isShutdown()) {
+                executorService = Executors.newSingleThreadExecutor(r -> {
+                    Thread thread = new Thread(r, "Redis-Subscribe-Thread");
+                    thread.setDaemon(true);
+                    return thread;
+                });
+            }
+            
             jedisPubSubHandler = new JedisPubSubHandler(AzuraBedWars.getInstance());
             
             // 添加所有需要的频道
@@ -56,8 +70,8 @@ public class PubSubListener implements Runnable {
             // 记录订阅的频道
             Bukkit.getLogger().info("正在订阅以下频道: " + String.join(", ", addedChannels));
             
-            // 在单独的线程中执行订阅操作
-            subscribeThread = new Thread(() -> {
+            // 使用线程池执行订阅操作
+            subscribeTask = executorService.submit(() -> {
                 try (Jedis jedis = JedisUtil.getJedis()) {
                     jedis.subscribe(jedisPubSubHandler, addedChannels.toArray(new String[0]));
                 } catch (JedisConnectionException e) {
@@ -66,9 +80,7 @@ public class PubSubListener implements Runnable {
                 } catch (Exception e) {
                     Bukkit.getLogger().log(Level.SEVERE, "初始化PubSub订阅失败", e);
                 }
-            }, "Redis-Subscribe-Thread");
-            
-            subscribeThread.start();
+            });
         } catch (Exception e) {
             Bukkit.getLogger().log(Level.SEVERE, "初始化PubSub订阅失败", e);
         }
@@ -117,9 +129,26 @@ public class PubSubListener implements Runnable {
         if (jedisPubSubHandler != null) {
             jedisPubSubHandler.unsubscribe();
         }
-        if (subscribeThread != null && subscribeThread.isAlive()) {
-            subscribeThread.interrupt();
+        
+        // 取消订阅任务
+        if (subscribeTask != null && !subscribeTask.isDone()) {
+            subscribeTask.cancel(true);
         }
+        
+        // 关闭线程池
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdown();
+            try {
+                // 等待任务完成，如果超时则强制关闭
+                if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executorService.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
+        
         isInitialized = false;
     }
 }
