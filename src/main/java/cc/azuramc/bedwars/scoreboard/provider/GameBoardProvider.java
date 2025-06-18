@@ -7,19 +7,15 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
-import cc.azuramc.bedwars.scoreboard.base.FastBoard;
+import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.UUID;
 
 /**
  * 游戏计分板管理类
