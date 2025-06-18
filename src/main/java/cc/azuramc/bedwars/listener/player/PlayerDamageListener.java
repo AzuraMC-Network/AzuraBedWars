@@ -704,6 +704,7 @@ public class PlayerDamageListener implements Listener {
         
         // 给予击杀者经验
         gameKiller.getPlayer().giveExpLevels(totalExp);
+        gameKiller.sendMessage("&a击杀 &b" + gamePlayer.getName() + " &a掠夺了 " + totalExp + " 经验");
     }
     
     /**
