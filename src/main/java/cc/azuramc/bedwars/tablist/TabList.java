@@ -27,8 +27,7 @@ public class TabList {
         String displayName;
         
         if (gameTeam != null) {
-            // 如果玩家有队伍，显示格式为 "队伍颜色&l+队伍名 | 队伍颜色&l+玩家名"
-            displayName = gameTeam.getChatColor() + "§l" + gameTeam.getName() + " §7| " + gameTeam.getChatColor() +  "§l" + gamePlayer.getNickName();
+            displayName = gameTeam.getChatColor() + gameTeam.getName() + " | " + gamePlayer.getNickName();
         } else {
             // 如果玩家没有队伍，只显示玩家名
             displayName = "§7" + gamePlayer.getNickName();

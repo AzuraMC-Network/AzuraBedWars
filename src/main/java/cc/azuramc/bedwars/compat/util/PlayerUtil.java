@@ -8,9 +8,12 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Objects;
 
 public class PlayerUtil {
 
@@ -100,6 +103,19 @@ public class PlayerUtil {
         packet.getBooleans().write(1, true);
         packet.getBooleans().write(2, true);
         protocolManager.sendServerPacket(player, packet);
+    }
+
+    /**
+     * 获取玩家最大血量
+     * @param player 玩家
+     */
+    @SuppressWarnings("deprecation")
+    public static double getMaxHealth(Player player) {
+        if (VersionUtil.isLessThan113()) {
+            return player.getMaxHealth();
+        } else {
+            return Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        }
     }
 
 }
