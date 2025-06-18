@@ -118,7 +118,7 @@ public final class AzuraBedWars extends JavaPlugin {
                 .setLeakDetectionThreshold(30000L)
                 .setPoolName("AzuraBedWars-Pool")
                 .setRegisterMbeans(true)
-                .setAutoCommit(false);
+                .setAutoCommit(true);
 
         AzuraORM.initialize(config, true);
         ormClient = AzuraORM.getClient();

@@ -69,9 +69,6 @@ public class GamePlayer {
     @Getter @Setter private boolean isEggBridgeCooldown;
     @Getter @Setter private boolean isViewingArrowDamage;
     @Getter @Setter private boolean isViewingAttackDamage;
-
-    @Getter private int kills;
-    @Getter private int finalKills;
     
     // 装备状态
     @Getter @Setter private ArmorType armorType;
@@ -158,8 +155,8 @@ public class GamePlayer {
             if (playerId > 0) {
                 PlayerData playerData = plugin.getPlayerDataDao().selectPlayerDataById(playerId);
                 if (playerData != null) {
-                    // 存储ID映射关系
-                    playerDataService.playerIdMap.put(this, playerId);
+                    // 缓存数据
+                    playerDataService.cachePlayerData(this, playerData);
                     return playerData;
                 }
             }
@@ -185,11 +182,9 @@ public class GamePlayer {
             
             // 插入数据库
             PlayerData insertedData = playerDataService.insertPlayerData(newPlayerData);
-            if (insertedData != null) {
-                // 将新插入的数据映射关系存储到service中
-                // 注意：ID会在插入时自动生成，这里不需要手动设置
-                playerDataService.playerDataMap.put(this, insertedData);
-                
+            if (insertedData != null && insertedData.getId() > 0) {
+                // 将新插入的数据缓存到service中
+                playerDataService.cachePlayerData(this, insertedData);
                 return insertedData;
             }
             
@@ -387,7 +382,7 @@ public class GamePlayer {
      */
     public static List<GamePlayer> sortFinalKills() {
         List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> player2.getFinalKills() - player1.getFinalKills());
+        list.sort((player1, player2) -> player2.getPlayerData().getFinalKills() - player1.getPlayerData().getFinalKills());
         return list;
     }
 
@@ -542,20 +537,6 @@ public class GamePlayer {
         if (gameTeam != null && !gameTeam.getAlivePlayers().isEmpty()) {
             spectatorTarget.setTarget(gameTeam.getAlivePlayers().getFirst());
         }
-    }
-
-    /**
-     * 增加击杀数
-     */
-    public void addKills() {
-        kills++;
-    }
-
-    /**
-     * 增加最终击杀数
-     */
-    public void addFinalKills() {
-        finalKills++;
     }
 
     /**

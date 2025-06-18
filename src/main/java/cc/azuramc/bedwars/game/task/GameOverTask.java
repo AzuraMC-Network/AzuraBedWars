@@ -186,7 +186,7 @@ public class GameOverTask extends BukkitRunnable {
             if (i > 2) {
                 continue;
             }
-            messages.add(RANK_PREFIX + LEAD[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getFinalKills());
+            messages.add(RANK_PREFIX + LEAD[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getPlayerData().getFinalKills());
             i++;
         }
         
