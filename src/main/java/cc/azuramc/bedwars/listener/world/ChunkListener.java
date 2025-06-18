@@ -65,7 +65,8 @@ public class ChunkListener implements Listener {
                 if (!FORCE_LOADED_CHUNKS.contains(chunkKey)) {
                     SET_FORCE_LOADED_METHOD.invoke(chunk, true);
                     FORCE_LOADED_CHUNKS.add(chunkKey);
-                    Bukkit.getLogger().info("已强制加载区块: " + chunkKey);
+                    //TODO 或许需要一个全局的DEBUG了
+//                    Bukkit.getLogger().info("已强制加载区块: " + chunkKey);
                     return;
                 }
             } catch (Exception e) {
