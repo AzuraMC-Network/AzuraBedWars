@@ -26,8 +26,8 @@ public class FireballHandler implements Listener {
     private static final int FIREBALL_EXPLOSION_RADIUS_Z = CONFIG.getFireballExplosionRadiusZ();
     private static final int FIREBALL_DAMAGE = CONFIG.getFireballDamage();
     private static final double FIREBALL_KNOCK_BACK_MULTIPLIER = CONFIG.getFireballKnockbackMultiplier();
-    private static final String FIREBALL_METADATA = "GAME_FIREBALL";
-    private static final String NO_FALL_DAMAGE_METADATA = "FIREBALL_PLAYER_NO_FALL";
+    public static final String FIREBALL_METADATA = "GAME_FIREBALL";
+    public static final String NO_FALL_DAMAGE_METADATA = "FIREBALL_PLAYER_FALL_MODIFY";
 
 
     /**
