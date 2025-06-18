@@ -10,6 +10,7 @@ import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.listener.world.FireballHandler;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -45,7 +46,6 @@ public class PlayerDamageListener implements Listener {
     private final static PlayerConfig.PlayerDeath CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
 
     private static final String METADATA_VOID_PLAYER = "VOID_PLAYER";
-    private static final String METADATA_FIREBALL_FALL_MODIFY = "FIREBALL_PLAYER_FALL_MODIFY";
     private static final String METADATA_SHOP = "Shop";
     private static final String METADATA_SHOP2 = "Shop2";
     private static final String COINS_ACTION_BAR = MESSAGE_CONFIG.getCoinsActionBar();
@@ -375,9 +375,9 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 处理火球落地伤害修改
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL && gamePlayer.getPlayer().hasMetadata(METADATA_FIREBALL_FALL_MODIFY)) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL && gamePlayer.getPlayer().hasMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA)) {
             event.setDamage(event.getFinalDamage() * FIREBALL_FALLEN_DAMAGE_RATE);
-            gamePlayer.getPlayer().removeMetadata(METADATA_FIREBALL_FALL_MODIFY, plugin);
+            gamePlayer.getPlayer().removeMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA, plugin);
             return;
         }
 

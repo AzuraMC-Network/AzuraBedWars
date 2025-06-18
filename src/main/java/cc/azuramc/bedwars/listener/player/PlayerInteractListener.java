@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.gui.ModeSelectionGUI;
+import cc.azuramc.bedwars.listener.world.FireballHandler;
 import cc.azuramc.bedwars.shop.gui.ItemShopGUI;
 import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
@@ -159,7 +160,6 @@ public class PlayerInteractListener implements Listener {
      */
     private void handleRightClickAction(PlayerInteractEvent event, GamePlayer gamePlayer, GameTeam gameTeam) {
 
-        Player player = gamePlayer.getPlayer();
         Material material = event.getMaterial();
         
         if (material == XMaterial.COMPASS.get()) {
@@ -390,7 +390,7 @@ public class PlayerInteractListener implements Listener {
         fireball.setYield(3.0F);
         fireball.setBounce(false);
         fireball.setIsIncendiary(false);
-        fireball.setMetadata("Game FIREBALL", new FixedMetadataValue(AzuraBedWars.getInstance(), gamePlayer.getUuid()));
+        fireball.setMetadata(FireballHandler.FIREBALL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), gamePlayer.getUuid()));
     }
     
     /**
