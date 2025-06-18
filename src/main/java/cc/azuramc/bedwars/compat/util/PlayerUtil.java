@@ -29,9 +29,9 @@ public class PlayerUtil {
 
         if (VersionUtil.isLessThan113()) {
             return player.getItemInHand();
-        } else {
-            return player.getInventory().getItemInMainHand();
         }
+
+        return player.getInventory().getItemInMainHand();
     }
 
     /**
@@ -43,9 +43,10 @@ public class PlayerUtil {
     public static void setItemInHand(Player player, ItemStack item) {
         if (VersionUtil.isLessThan113()) {
             player.setItemInHand(item);
-        } else {
-            player.getInventory().setItemInMainHand(item);
+            return;
         }
+
+        player.getInventory().setItemInMainHand(item);
     }
 
     /**
@@ -57,9 +58,9 @@ public class PlayerUtil {
     public static void hidePlayer(Player player, Player target) {
         if (VersionUtil.isLessThan113()) {
             player.hidePlayer(target);
-        } else {
-            player.hidePlayer(PLUGIN, target);
+            return;
         }
+        player.hidePlayer(PLUGIN, target);
     }
 
     /**
@@ -71,9 +72,10 @@ public class PlayerUtil {
     public static void showPlayer(Player player, Player target) {
         if (VersionUtil.isLessThan113()) {
             player.showPlayer(target);
-        } else {
-            player.showPlayer(PLUGIN, target);
+            return;
         }
+
+        player.showPlayer(PLUGIN, target);
     }
 
     /**
@@ -113,9 +115,9 @@ public class PlayerUtil {
     public static double getMaxHealth(Player player) {
         if (VersionUtil.isLessThan113()) {
             return player.getMaxHealth();
-        } else {
-            return Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
         }
+
+        return Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
     }
 
 }
