@@ -605,8 +605,8 @@ public class PlayerDamageListener implements Listener {
         if (ATTACK_DISPLAY_ENABLED && attackPlayer.isViewingArrowDamage()) {
             attackPlayer.sendTitle(
                     "&r ",
-                    "&b伤害 &f- &e" + event.getFinalDamage() + "  &b血量 &f- &e" + gamePlayer.getPlayer().getHealth() +
-                            "&f/&e" + PlayerUtil.getMaxHealth(gamePlayer.getPlayer()),
+                    "&b伤害 &f- &e" + (int) event.getFinalDamage() + "  &b血量 &f- &e" + (int) gamePlayer.getPlayer().getHealth() +
+                            "&f/&e" + (int) PlayerUtil.getMaxHealth(gamePlayer.getPlayer()),
                     1, ATTACK_DISPLAY_TITLE_TICKS,
                     5);
         }
