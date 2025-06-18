@@ -193,11 +193,12 @@ public class LoadGameUtil {
                 continue;
             }
 
-//            gameTeam.getAlivePlayers().forEach(gamePlayer -> {
-//                Player player = gamePlayer.getPlayer();
-//                NametagEdit.getApi().clearNametag(player);
-//                NametagEdit.getApi().setNametag(player, gameTeam.getName() + " ", gamePlayer.getName().equals(gamePlayer.getNickName()) ? "" : gamePlayer.getNickName());
-//            });
+            // 更新队伍所有玩家的TabList显示名称
+            gameTeam.getAlivePlayers().forEach(gamePlayer -> {
+                if (gamePlayer != null) {
+                    cc.azuramc.bedwars.tablist.TabList.editTabListName(gamePlayer);
+                }
+            });
         }
     }
 }

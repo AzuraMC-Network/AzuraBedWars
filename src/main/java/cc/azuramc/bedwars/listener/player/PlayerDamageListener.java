@@ -603,7 +603,7 @@ public class PlayerDamageListener implements Listener {
 
         // 普通攻击伤害显示
         if (ATTACK_DISPLAY_ENABLED && attackPlayer.isViewingArrowDamage()) {
-            attackPlayer.sendTitle("&r ", "&e伤害 " + String.format("%.1f", event.getFinalDamage()), 1, ATTACK_DISPLAY_TITLE_TICKS, 5);
+            attackPlayer.sendTitle("&r ", "&e&l伤害: " + String.format("%.1f", event.getFinalDamage()), 1, ATTACK_DISPLAY_TITLE_TICKS, 5);
         }
     }
 

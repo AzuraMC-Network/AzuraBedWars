@@ -18,18 +18,17 @@ import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
+import cc.azuramc.bedwars.tablist.TabList;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import cc.azuramc.bedwars.util.ServerMOTD;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import lombok.Getter;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.Location;
 
 import java.util.*;
 
@@ -864,6 +863,9 @@ public class GameManager {
         preparePlayersForGame();
         teleportPlayersToTeamSpawn();
         markEmptyTeams();
+        
+        // 更新所有玩家的TabList显示名称
+        TabList.updateAllTabListNames();
 
         GamePlayer.getOnlinePlayers().forEach(GamePlayer::giveInventory);
 
