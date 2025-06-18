@@ -29,7 +29,6 @@ public class ChatListener implements Listener {
 
     private static final ChatConfig CONFIG = AzuraBedWars.getInstance().getChatConfig();
 
-    // 常量定义
     public static final String GLOBAL_CHAT_PREFIX = CONFIG.getGlobalChatPrefix();
     private static final String SPECTATOR_PREFIX = CONFIG.getSpectatorPrefix();
     private static final String GLOBAL_CHAT_TAG = CONFIG.getGlobalChatTag();
@@ -113,7 +112,7 @@ public class ChatListener implements Listener {
         int level = calculatePlayerLevel(gamePlayer.getPlayerData());
         String globalPrefix = ChatColor.translateAlternateColorCodes('&', plugin.getChat().getPlayerPrefix(gamePlayer.getPlayer()));
 
-        return "§6[" + PlayerLevelMap.getLevel(level) + "✫]" + globalPrefix + "§7" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
+        return "§6[" + PlayerLevelMap.getLevel(level) + "✫] " + globalPrefix + "§7" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
     }
 
     /**
