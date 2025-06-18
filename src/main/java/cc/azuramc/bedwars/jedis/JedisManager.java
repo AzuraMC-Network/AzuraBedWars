@@ -59,9 +59,6 @@ public class JedisManager {
     public JedisManager(AzuraBedWars plugin) {
         instance = this;
         
-        // 创建有界队列
-        BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
-        
         // 创建线程工厂
         ThreadFactory threadFactory = r -> {
             Thread thread = new Thread(r, "JedisManager-Thread");
@@ -71,18 +68,7 @@ public class JedisManager {
         
         // 创建拒绝策略处理器
         RejectedExecutionHandler handler = new ThreadPoolExecutor.CallerRunsPolicy();
-        
-        // 通过ThreadPoolExecutor创建线程池
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(
-            CORE_POOL_SIZE,
-            MAX_POOL_SIZE,
-            KEEP_ALIVE_TIME,
-            TimeUnit.MILLISECONDS,
-            workQueue,
-            threadFactory,
-            handler
-        );
-        
+
         // 将ThreadPoolExecutor包装为ScheduledExecutorService
         this.scheduler = new ScheduledThreadPoolExecutor(
             CORE_POOL_SIZE,
