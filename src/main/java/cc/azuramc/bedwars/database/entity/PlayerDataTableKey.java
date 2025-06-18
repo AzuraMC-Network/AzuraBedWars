@@ -20,7 +20,7 @@ public class PlayerDataTableKey {
     public static String losses = "losses";
     public static String games = "games";
     public static String shopData = "shopData";
-    public static String createdAt = "createdAt";
-    public static String updatedAt = "updatedAt";
+    public static String createdAt = "created_at";
+    public static String updatedAt = "updated_at";
 
 }
