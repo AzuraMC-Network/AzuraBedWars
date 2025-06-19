@@ -116,14 +116,6 @@ public class PlayerDataService {
         return null;
     }
 
-    public PlayerData getPlayerData(GamePlayer gamePlayer) {
-        return playerDataMap.get(gamePlayer);
-    }
-
-    public int getPlayerId(GamePlayer gamePlayer) {
-        return playerIdMap.get(gamePlayer);
-    }
-    
     /**
      * 缓存玩家数据
      * @param gamePlayer 游戏玩家
