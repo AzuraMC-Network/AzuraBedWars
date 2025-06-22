@@ -86,7 +86,10 @@ public final class AzuraBedWars extends JavaPlugin {
         
         // 初始化命令和通信系统
         initCommands();
-        intiChannelSystem();
+
+        if (settingsConfig.isEnabledJedisMapFeature()) {
+            intiChannelSystem();
+        }
         
         // 根据配置决定加载游戏模式还是编辑模式
         if (settingsConfig.isEditorMode()) {
@@ -149,9 +152,9 @@ public final class AzuraBedWars extends JavaPlugin {
         pubSubListener = new PubSubListener();
 
         pubSubListener.run();
-        
-        // 设置为异步任务
-        getServer().getScheduler().runTaskAsynchronously(this, pubSubListener);
+
+        // 主线程Task
+        getServer().getScheduler().runTask(this, pubSubListener);
         
         JedisManager.getInstance().getServerData().setGameType("AzuraBedWars");
         JedisManager.getInstance().getExpand().put("ver", getDescription().getVersion());
