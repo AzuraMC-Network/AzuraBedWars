@@ -16,6 +16,7 @@ public class SettingsConfig {
     private boolean editorMode = false;
     private String defaultMapName = "";
     private String mapStorage = "JSON";
+    private boolean enabledJedisMapFeature = false;
 
     private DatabaseConfig database = new DatabaseConfig();
 

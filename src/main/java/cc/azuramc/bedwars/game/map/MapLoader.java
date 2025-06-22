@@ -46,35 +46,37 @@ public class MapLoader {
      * 加载指定地图
      */
     public void loadMap() {
-        CompletableFuture<String> mapLoaderFuture = new CompletableFuture<>();
+        if (plugin.getSettingsConfig().isEnabledJedisMapFeature()) {
+            CompletableFuture<String> mapLoaderFuture = new CompletableFuture<>();
 
-        Bukkit.getPluginManager().registerEvents(new Listener() {
-            @EventHandler
-            public void onPubSubMessage(BukkitPubSubMessageEvent event) {
-                if (event.getChannel().equals(MAP_CHANNEL)) {
-                    mapLoaderFuture.complete(event.getMessage());
-                    Bukkit.getLogger().info(LOG_PREFIX + "开始加载地图: " + event.getMessage());
-                    HandlerList.unregisterAll(this);
+            Bukkit.getPluginManager().registerEvents(new Listener() {
+                @EventHandler
+                public void onPubSubMessage(BukkitPubSubMessageEvent event) {
+                    if (event.getChannel().equals(MAP_CHANNEL)) {
+                        mapLoaderFuture.complete(event.getMessage());
+                        Bukkit.getLogger().info(LOG_PREFIX + "开始加载地图: " + event.getMessage());
+                        HandlerList.unregisterAll(this);
+                    }
                 }
+            }, plugin);
+
+            Bukkit.getLogger().info("正在通过Jedis请求地图");
+            JedisUtil.publish(MAP_CHANNEL, "requestMap");
+
+            String mapName = null;
+            try {
+                mapName = mapLoaderFuture.get(DEFAULT_WAIT_TIME, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                Bukkit.getLogger().info("请求超时 加载备用方案");
             }
-        }, plugin);
 
-        Bukkit.getLogger().info("正在通过Jedis请求地图");
-        JedisUtil.publish(MAP_CHANNEL, "requestMap");
-
-        String mapName = null;
-        try {
-            mapName = mapLoaderFuture.get(DEFAULT_WAIT_TIME, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            Bukkit.getLogger().info("请求超时 加载备用方案");
-        }
-
-        if (mapName != null  && !mapName.isEmpty()) {
-            plugin.setMapData(mapManager.loadMapAndWorld(mapName));
-            if (plugin.getMapData() != null) {
-                return;
+            if (mapName != null && !mapName.isEmpty()) {
+                plugin.setMapData(mapManager.loadMapAndWorld(mapName));
+                if (plugin.getMapData() != null) {
+                    return;
+                }
+                Bukkit.getLogger().warning("Jedis地图加载失败 尝试加载默认地图");
             }
-            Bukkit.getLogger().warning("Jedis地图加载失败 尝试加载默认地图");
         }
 
         String defaultMapName = plugin.getSettingsConfig().getDefaultMapName();
@@ -91,7 +93,7 @@ public class MapLoader {
             String anyMapName = plugin.getMapManager().getLoadedMaps().keySet().iterator().next();
             plugin.setMapData(mapManager.loadMapAndWorld(anyMapName));
             if (plugin.getMapData() != null) {
-                Bukkit.getLogger().info(LOG_PREFIX + "默认地图加载成功");
+                Bukkit.getLogger().info(LOG_PREFIX + "由于未设置地图 自动选择已加载地图: " + anyMapName);
                 return;
             }
         }
