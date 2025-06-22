@@ -16,14 +16,14 @@ import org.bukkit.DyeColor;
 public enum TeamColor {
     // 主要队伍颜色 (传统颜色)
     RED(Color.fromRGB(255, 85, 85), ChatColor.RED, DyeColor.RED, "§c红"),
-    BLUE(Color.fromRGB(85, 85, 255), ChatColor.BLUE, DyeColor.LIGHT_BLUE, "§9蓝"),
+    BLUE(Color.fromRGB(85, 85, 255), ChatColor.BLUE, DyeColor.BLUE, "§9蓝"),
     GREEN(Color.fromRGB(85, 255, 85), ChatColor.GREEN, DyeColor.LIME, "§a绿"),
     YELLOW(Color.fromRGB(255, 255, 85), ChatColor.YELLOW, DyeColor.YELLOW, "§e黄"),
     AQUA(Color.fromRGB(85, 255, 255), ChatColor.AQUA, DyeColor.CYAN, "§b青"),
     WHITE(Color.WHITE, ChatColor.WHITE, DyeColor.WHITE, "§f白"),
     PINK(Color.fromRGB(255, 85, 255), ChatColor.LIGHT_PURPLE, DyeColor.PINK, "§d粉"),
     GRAY(Color.fromRGB(85, 85, 85), ChatColor.DARK_GRAY, DyeColor.GRAY, "§8灰"),
-    
+
     // 扩展颜色
     ORANGE(Color.fromRGB(255, 165, 0), ChatColor.GOLD, DyeColor.ORANGE, "§6橙"),
     MAGENTA(Color.fromRGB(255, 0, 255), ChatColor.LIGHT_PURPLE, DyeColor.MAGENTA, "§5品红"),

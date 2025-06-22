@@ -706,7 +706,7 @@ public class ItemShopGUI extends CustomGUI {
         Player player = gamePlayer.getPlayer();
         
         // 处理剑特殊情况
-        String itemTypeName = shopItemType.getItemStack().getType().toString();
+        String itemTypeName = shopItemType.getItemStack().getType().name();
         if (itemTypeName.endsWith("_SWORD") || itemTypeName.endsWith("SWORD")) {
             player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
             
@@ -722,7 +722,7 @@ public class ItemShopGUI extends CustomGUI {
         // 处理有颜色的方块
         if (shopItemType.getColorType() == ColorType.COLOR) {
             // 处理羊毛
-            if (shopItemType.getItemStack().getType().name().toUpperCase().equals("WOOL")) {
+            if (shopItemType.getItemStack().getType().name().contains("WOOL")) {
                 // 创建带颜色的羊毛
                 ItemBuilder woolBuilder = new ItemBuilder();
                 woolBuilder.setWoolColor(gamePlayer.getGameTeam().getDyeColor());
