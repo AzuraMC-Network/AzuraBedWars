@@ -120,7 +120,7 @@ public class PlacementListener implements Listener {
         Optional<XMaterial> xMaterialOptional = Optional.of(XMaterial.matchXMaterial(material));
 
         // 检查 XMaterial 的名称是否以 "_WOOL" 结尾
-        return xMaterialOptional.map(xMat -> xMat.name().endsWith("_WOOL"))
+        return xMaterialOptional.map(xMat -> xMat.name().contains("WOOL"))
                 .orElse(false);
     }
 
