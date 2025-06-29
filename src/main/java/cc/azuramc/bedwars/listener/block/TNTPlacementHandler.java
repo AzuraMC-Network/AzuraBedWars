@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 /**
  * @author an5w1r@163.com
@@ -28,7 +27,6 @@ public class TNTPlacementHandler {
 
         // 生成已激活的TNT实体
         TNTPrimed tnt = block.getWorld().spawn(block.getLocation().add(0.5D, 0.0D, 0.5D), TNTPrimed.class);
-        tnt.setVelocity(new Vector(0, 0, 0));
 
         // 减少玩家物品栏中的TNT数量
         consumeItem(player, XMaterial.TNT.get());

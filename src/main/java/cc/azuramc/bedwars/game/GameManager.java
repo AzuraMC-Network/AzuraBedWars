@@ -70,7 +70,7 @@ public class GameManager {
     private Location waitingLocation;
     private Location respawnLocation;
 
-    private List<Location> blocks;
+    private List<Location> blocksLocation;
     private GameStartTask gameStartTask = null;
     private List<GameTeam> gameTeams;
     private List<GameParty> gameParties;
@@ -136,7 +136,7 @@ public class GameManager {
         }
         
         this.mapData = mapData;
-        this.blocks = mapData.loadMap();
+        this.blocksLocation = mapData.loadMap();
         this.respawnLocation = mapData.getRespawnLocation().toLocation();
         this.waitingLocation = mapData.getWaitingLocation().toLocation();
 

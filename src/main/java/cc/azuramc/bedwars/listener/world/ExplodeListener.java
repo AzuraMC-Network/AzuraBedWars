@@ -68,7 +68,7 @@ public class ExplodeListener implements Listener {
             }
 
             // 只处理玩家放置的方块，保护地图方块
-            if (!MapUtil.isProtectedBlockType(block) && !GAME_MANAGER.getBlocks().contains(block.getLocation())) {
+            if (!MapUtil.isProtectedBlockType(block) && !GAME_MANAGER.getBlocksLocation().contains(block.getLocation())) {
                 blocksToExplode.add(block);
             }
         }
@@ -90,7 +90,7 @@ public class ExplodeListener implements Listener {
             }
 
             // 从游戏放置的方块列表中移除
-            GAME_MANAGER.getBlocks().remove(block.getLocation());
+            GAME_MANAGER.getBlocksLocation().remove(block.getLocation());
         }
     }
 }
