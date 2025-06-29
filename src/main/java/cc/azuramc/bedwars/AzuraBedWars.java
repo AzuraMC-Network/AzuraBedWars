@@ -92,8 +92,8 @@ public final class AzuraBedWars extends JavaPlugin {
         }
         
         // 根据配置决定加载游戏模式还是编辑模式
-        if (settingsConfig.isEditorMode()) {
-            getLogger().info("当前处于编辑模式(editorMode) 取消游戏相关特性加载");
+        if (settingsConfig.isEditorMode() || mapManager.getLoadedMaps().isEmpty()) {
+            getLogger().info("当前处于编辑模式(editorMode)或未发现可用地图 取消游戏相关特性加载");
             initEditorFeatures();
         } else {
             initGameFeatures();
