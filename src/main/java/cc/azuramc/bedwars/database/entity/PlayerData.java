@@ -30,6 +30,7 @@ public class PlayerData implements ChangeManager.DirtyTracker {
     private int losses;
     private int games;
     private String[] shopData;
+    private String shopDataJson;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -206,6 +207,12 @@ public class PlayerData implements ChangeManager.DirtyTracker {
             finalShopDataString = string.substring(0, string.length() - 2);
             this.shopData = finalShopDataString.split(",");
         }
+    }
+
+    public void setShopDataJson(String shopDataJson) {
+        this.isDirty = true;
+        playerDataService.changeManager.registerDirty(this);
+        this.shopDataJson = shopDataJson;
     }
 
     @Override

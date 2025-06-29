@@ -275,24 +275,40 @@ public class MapData {
     }
 
     public List<Location> loadMap() {
-        List<Location> blocks = new ArrayList<>();
         Location pos1 = region.getPos1().toLocation();
         Location pos2 = region.getPos2().toLocation();
-        for (int x = Math.min(pos1.getBlockX(), pos2.getBlockX()); x <= Math.max(pos1.getBlockX(), pos2.getBlockX()); x++) {
-            for (int y = Math.min(pos1.getBlockY(), pos2.getBlockY()); y <= Math.max(pos1.getBlockY(), pos2.getBlockY()); y++) {
-                for (int z = Math.min(pos1.getBlockZ(), pos2.getBlockZ()); z <= Math.max(pos1.getBlockZ(), pos2.getBlockZ()); z++) {
-                    Block block = new Location(pos1.getWorld(), x, y, z).getBlock();
-
+        
+        // 预先计算边界值，避免重复计算
+        int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
+        int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
+        int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
+        int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
+        int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
+        int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
+        
+        // 缓存World对象，避免重复获取
+        org.bukkit.World world = pos1.getWorld();
+        
+        // 预估容量，减少ArrayList扩容次数
+        int estimatedSize = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+        List<Location> blocksLocation = new ArrayList<>(estimatedSize);
+        
+        // 优化的三重循环
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    Location blockLocation = new Location(world, x, y, z);
+                    
                     // 使用版本兼容的方式检查方块类型
-                    if (canSkippedBlock(block)) {
+                    if (canSkippedBlock(blockLocation.getBlock())) {
                         continue;
                     }
-                    blocks.add(block.getLocation());
+                    blocksLocation.add(blockLocation);
                 }
             }
         }
 
-        return blocks;
+        return blocksLocation;
     }
 
     /**
@@ -366,6 +382,7 @@ public class MapData {
         // 检查 Z 坐标是否在 (minZ, maxZ) 开区间的外部或边界上
         // 这等同于原始的: !(location.getZ() > minZ) || !(location.getZ() < maxZ)
         // 意味着 Z <= minZ 或者 Z >= maxZ
+        // 提示: 这里是AI打上的注释 如果存在歧义请issue讨论
 
         // 只有当 X 和 Y 在范围内，并且 Z 在指定范围之外 (或边界上) 时，才返回 true
         return location.getZ() <= minZ || location.getZ() >= maxZ;

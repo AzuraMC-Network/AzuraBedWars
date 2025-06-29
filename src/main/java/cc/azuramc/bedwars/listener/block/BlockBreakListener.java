@@ -50,7 +50,7 @@ public class BlockBreakListener implements Listener {
             }
 
             // 检查区域保护和玩家放置的方块
-            if (GAME_MANAGER.getMapData().hasRegion(block.getLocation()) || GAME_MANAGER.getBlocks().contains(block.getLocation())) {
+            if (GAME_MANAGER.getMapData().hasRegion(block.getLocation()) || GAME_MANAGER.getBlocksLocation().contains(block.getLocation())) {
                 event.setCancelled(true);
             }
         }

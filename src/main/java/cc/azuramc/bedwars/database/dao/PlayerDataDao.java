@@ -59,6 +59,7 @@ public class PlayerDataDao {
                     .column(PlayerDataTableKey.losses, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.games, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.shopData, DataType.Type.TEXT.getSql(), DataType.DEFAULT(dataToStore))
+                    .column(PlayerDataTableKey.shopDataJson, DataType.Type.TEXT.getSql(), DataType.DEFAULT("{}"))
                     .addTimestamps()
                     .engine("InnoDB")
                     .charset("utf8mb4")
@@ -96,6 +97,7 @@ public class PlayerDataDao {
                     .values(PlayerDataTableKey.losses, playerData.getLosses())
                     .values(PlayerDataTableKey.games, playerData.getGames())
                     .values(PlayerDataTableKey.shopData, shopDataString)
+                    .values(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : "{}")
                     .values(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
                     .values(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .prepare();
@@ -142,6 +144,7 @@ public class PlayerDataDao {
                     .set(PlayerDataTableKey.losses, playerData.getLosses())
                     .set(PlayerDataTableKey.games, playerData.getGames())
                     .set(PlayerDataTableKey.shopData, shopDataString)
+                    .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : "{}")
                     .set(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
                     .set(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .whereEquals(PlayerDataTableKey.id, playerData.getId())
@@ -175,6 +178,7 @@ public class PlayerDataDao {
                             PlayerDataTableKey.losses,
                             PlayerDataTableKey.games,
                             PlayerDataTableKey.shopData,
+                            PlayerDataTableKey.shopDataJson,
                             PlayerDataTableKey.createdAt,
                             PlayerDataTableKey.updatedAt)
                     .whereEquals(PlayerDataTableKey.id, String.valueOf(id))
@@ -197,6 +201,7 @@ public class PlayerDataDao {
                 playerData.setLosses(resultSet.getInt(PlayerDataTableKey.losses));
                 playerData.setGames(resultSet.getInt(PlayerDataTableKey.games));
                 playerData.setShopData(resultSet.getString(PlayerDataTableKey.shopData).split(", "));
+                playerData.setShopDataJson(resultSet.getString(PlayerDataTableKey.shopDataJson));
                 playerData.setCreatedAt(resultSet.getTimestamp(PlayerDataTableKey.createdAt));
                 playerData.setUpdatedAt(resultSet.getTimestamp(PlayerDataTableKey.updatedAt));
             }
