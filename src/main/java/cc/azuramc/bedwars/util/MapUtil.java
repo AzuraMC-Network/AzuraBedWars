@@ -106,7 +106,7 @@ public class MapUtil {
      */
     public static boolean isBedBlock(Block block) {
         String typeName = block.getType().name();
-        return typeName.endsWith("_BED") || typeName.equals("BED_BLOCK");
+        return typeName.contains("BED");
     }
 
     /**

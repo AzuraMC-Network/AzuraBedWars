@@ -170,25 +170,32 @@ public class PlayerDamageListener implements Listener {
      * @param gameTeam 玩家所在队伍
      */
     private void processDeathGameLogic(GamePlayer gamePlayer, GameTeam gameTeam) {
+
+        if (gamePlayer == null) {
+            return;
+        }
+
         // 游戏未开始
         if (gameManager.getGameState() == GameState.WAITING) {
             return;
         }
         
         // 玩家是观察者
-        if (gamePlayer != null && gamePlayer.isSpectator()) {
+        if (gamePlayer.isSpectator()) {
             return;
         }
         
         // 处理非虚空死亡
-        if (gamePlayer != null && !gamePlayer.getPlayer().hasMetadata(METADATA_VOID_PLAYER)) {
+        if (!gamePlayer.getPlayer().hasMetadata(METADATA_VOID_PLAYER)) {
             handleNormalDeath(gamePlayer, gameTeam);
         }
 
         // 移除虚空标记并处理重生
-        if (gamePlayer != null) {
-            gamePlayer.getPlayer().removeMetadata(METADATA_VOID_PLAYER, plugin);
-        }
+        gamePlayer.getPlayer().removeMetadata(METADATA_VOID_PLAYER, plugin);
+
+        // 清除经验来源map
+        gamePlayer.getExperienceSources().clear();
+        MessageUtil.sendDebugMessage("PlayerDamageListener$convertExperienceSourcesToExp | expMapCleared");
         handlePlayerRespawn(gamePlayer);
     }
 
@@ -683,6 +690,7 @@ public class PlayerDamageListener implements Listener {
         for (Map.Entry<String, Integer> entry : expSources.entrySet()) {
             String resourceType = entry.getKey();
             int amount = entry.getValue();
+            MessageUtil.sendDebugMessage("PlayerDamageListener$convertExperienceSourcesToExp | in for amount: " + amount);
             
             // 不同资源类型的经验转换倍率
             switch (resourceType) {
@@ -710,8 +718,11 @@ public class PlayerDamageListener implements Listener {
         }
         
         // 加上被击杀者的经验等级
-        totalExp += gamePlayer.getPlayer().getLevel();
-        
+        int playerLevel = gamePlayer.getPlayer().getLevel();
+        MessageUtil.sendDebugMessage("PlayerDamageListener$convertExperienceSourcesToExp | playerLevel: " + playerLevel);
+        totalExp += playerLevel;
+        MessageUtil.sendDebugMessage("PlayerDamageListener$convertExperienceSourcesToExp | totalExp: " + totalExp);
+
         // 给予击杀者经验
         gameKiller.getPlayer().giveExpLevels(totalExp);
         gameKiller.sendMessage("&a击杀 &e" + gamePlayer.getName() + " &a掠夺了 &e" + totalExp + " &a经验");
