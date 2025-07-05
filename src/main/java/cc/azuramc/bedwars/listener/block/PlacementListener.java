@@ -82,7 +82,6 @@ public class PlacementListener implements Listener {
      * @param item 物品
      */
     private void handleSpeedWoolPlacement(BlockPlaceEvent event, Player player, ItemStack item) {
-        // 不对火速羊毛使用全局冷却，允许多个同时进行
 
         // 防止玩家卡在方块中
         Block block = event.getBlock();
@@ -119,7 +118,7 @@ public class PlacementListener implements Listener {
     private boolean isWoolMaterialByName(Material material) {
         Optional<XMaterial> xMaterialOptional = Optional.of(XMaterial.matchXMaterial(material));
 
-        // 检查 XMaterial 的名称是否以 "_WOOL" 结尾
+        // 检查 XMaterial 的名称是否包含 "WOOL"
         return xMaterialOptional.map(xMat -> xMat.name().contains("WOOL"))
                 .orElse(false);
     }

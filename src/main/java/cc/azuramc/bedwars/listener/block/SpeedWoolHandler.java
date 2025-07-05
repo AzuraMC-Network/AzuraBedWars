@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.util.MapUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -52,10 +53,11 @@ public class SpeedWoolHandler {
                     return;
                 }
 
+                MessageUtil.sendDebugMessage("SpeedWoolHandler -> startSpeedWoolTask$Method | itemType: " + item.getType() + " itemData: " + item.getData());
                 // 放置方块
                 if (relativeBlock.getType() == Material.AIR) {
                     relativeBlock.setType(item.getType());
-                    if (!VersionUtil.isLessThan113() && item.getData() != null) {
+                    if (VersionUtil.isLessThan113() && item.getData() != null) {
                         MapUtil.setBlockData(relativeBlock, item.getData().getData());
                     }
 
