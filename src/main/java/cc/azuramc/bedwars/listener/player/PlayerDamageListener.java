@@ -11,6 +11,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.listener.world.FireballHandler;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -108,6 +109,8 @@ public class PlayerDamageListener implements Listener {
 
         // 如果没有击杀者，直接清理掉落物并继续处理
         if (killer == null) {
+            Bukkit.broadcastMessage("onDeath$killer == null");
+            MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$onDeath | killer is null");
             cleanDeathDrops(event);
             
             GamePlayer gamePlayer = GamePlayer.get(player);
@@ -117,6 +120,7 @@ public class PlayerDamageListener implements Listener {
             processDeathGameLogic(gamePlayer, gameTeam);
             return;
         }
+        MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$onDeath | killer isn't null");
 
         GamePlayer gamePlayer = GamePlayer.get(player);
         GamePlayer gameKiller = GamePlayer.get(killer);
@@ -133,11 +137,13 @@ public class PlayerDamageListener implements Listener {
         if (gameKiller.getGameModeType() == GameModeType.EXPERIENCE) {
             // 1. 击杀者是经验模式
             if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+                MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$processKillReward | player and killer all the 'EXPERIENCE' mode'");
                 // 1.1 被击杀者也是经验模式，直接给经验，无需转换
                 // 从experienceSources直接给予经验
                 convertExperienceSourcesToExp(gamePlayer, gameKiller);
             } else {
                 // 1.2 被击杀者是default模式，需要将物品转换为经验
+                MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$processKillReward | player is 'EXPERIENCE' mode , killer is 'DEFAULT' mode");
                 gameKiller.getPlayer().giveExpLevels(getPlayerRewardExp(gamePlayer.getPlayer()));
             }
             // 清理死亡玩家物品
@@ -146,10 +152,13 @@ public class PlayerDamageListener implements Listener {
             // 2. 击杀者是default模式
             if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
                 // 2.1 被击杀者是经验模式，需要将经验转换为物品
+                MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$processKillReward | player is 'DEFAULT' mode , killer is 'EXPERIENCE' mode");
                 convertExperienceSourcesToItems(gamePlayer, gameKiller, event);
             } else {
                 // 2.2 被击杀者是default模式，直接转移物品
+                MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$processKillReward | player and killer all the 'DEFAULT' mode'");
                 transferItemsToKiller(gamePlayer.getPlayer(), gameKiller.getPlayer(), event);
+                cleanDeathDrops(event);
             }
         }
     }
@@ -485,6 +494,7 @@ public class PlayerDamageListener implements Listener {
         event.getDrops().clear();
         event.getEntity().getInventory().clear();
         event.setDroppedExp(0);
+        MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$cleanDeathDrops");
     }
 
     /**

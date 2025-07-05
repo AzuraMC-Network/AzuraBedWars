@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class SettingsConfig {
     private boolean editorMode = false;
+    private boolean debugMode = false;
     private String defaultMapName = "";
     private String mapStorage = "JSON";
     private boolean enabledJedisMapFeature = false;
