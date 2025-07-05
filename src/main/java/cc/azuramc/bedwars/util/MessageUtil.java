@@ -21,6 +21,7 @@ public final class MessageUtil {
 
     public static final String CHAT_BAR = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH
             + "------------------------------------------------";
+    public static final String ADMIN_PERMISSION = "azurabedwars.admin";
 
     public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         title = parse(player, title);
