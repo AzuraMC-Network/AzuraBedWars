@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
 
 /**
- * 
  * @author an5w1r@163.com
  */
 public class TabList {
