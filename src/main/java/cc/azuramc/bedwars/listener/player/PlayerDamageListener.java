@@ -494,7 +494,7 @@ public class PlayerDamageListener implements Listener {
         event.getDrops().clear();
         event.getEntity().getInventory().clear();
         event.setDroppedExp(0);
-        MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$cleanDeathDrops");
+        Bukkit.broadcastMessage("playerDeath -> cleanDeathDrops$Method");
     }
 
     /**
@@ -714,7 +714,7 @@ public class PlayerDamageListener implements Listener {
         
         // 给予击杀者经验
         gameKiller.getPlayer().giveExpLevels(totalExp);
-        gameKiller.sendMessage("&a击杀 &b" + gamePlayer.getName() + " &a掠夺了 " + totalExp + " 经验");
+        gameKiller.sendMessage("&a击杀 &e" + gamePlayer.getName() + " &a掠夺了 &e" + totalExp + " &a经验");
     }
     
     /**
