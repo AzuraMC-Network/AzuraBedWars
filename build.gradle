@@ -51,7 +51,7 @@ dependencies {
     implementation 'com.github.Revxrsal.Lamp:bukkit:3.2.1'
     // https://mvnrepository.com/artifact/redis.clients/jedis
     implementation 'redis.clients:jedis:5.1.5'
-    implementation 'com.github.cryptomorin:XSeries:13.3.1'
+    implementation 'com.github.cryptomorin:XSeries:13.3.3'
     implementation 'fr.mrmicky:fastboard:2.1.5'
     implementation files('libs/AzuraORM-1.0.0-all.jar')
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
@@ -106,5 +106,4 @@ processResources {
 }
 
 shadowJar {
-    relocate("com.cryptomorin.xseries", "cc.azuramc.bedwars.util.compat")
 }

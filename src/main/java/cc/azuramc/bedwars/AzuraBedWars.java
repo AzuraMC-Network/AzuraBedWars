@@ -135,6 +135,7 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initMapSystem() {
         mapManager = new MapManager();
+        mapManager.preloadAllMaps();
     }
 
     /**
