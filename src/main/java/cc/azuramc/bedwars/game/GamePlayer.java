@@ -441,7 +441,7 @@ public class GamePlayer {
         if (!isOnline()) {
             return;
         }
-        getPlayer().sendMessage(message);
+        getPlayer().sendMessage(MessageUtil.color(message));
     }
 
     /**

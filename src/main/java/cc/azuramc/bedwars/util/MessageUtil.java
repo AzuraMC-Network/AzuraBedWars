@@ -1,9 +1,11 @@
 package cc.azuramc.bedwars.util;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import com.cryptomorin.xseries.messages.ActionBar;
 import com.cryptomorin.xseries.messages.Titles;
 import lombok.Setter;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -34,6 +36,14 @@ public final class MessageUtil {
     public static void sendMessage(Player player, String message) {
         message = parse(player, message);
         player.sendMessage(color(message));
+    }
+
+    public static void sendDebugMessage(String message) {
+        if (!AzuraBedWars.getInstance().getSettingsConfig().isDebugMode()) {
+            return;
+        }
+        Bukkit.broadcast(message, ADMIN_PERMISSION);
+        Bukkit.getLogger().info("[AzuraBedWars Debugger] " +  message);
     }
 
     public static String color(String string) {

@@ -85,6 +85,18 @@ public class AdminCommand {
         plugin.getConfigManager().saveConfig("settings");
     }
 
+    @Subcommand("debugMode")
+    public void debugMode(BukkitCommandActor actor, boolean value) {
+        if (plugin.getSettingsConfig().isEditorMode() == value) {
+            CommandUtil.sendLayout(actor, "&cdebugMode值已经是 " + value + "了");
+            return;
+        }
+        plugin.getSettingsConfig().setEditorMode(value);
+        CommandUtil.sendLayout(actor, "&a成功设置值为 " + value);
+        plugin.getConfigManager().saveConfig("settings");
+    }
+
+
     @Subcommand("toWorld")
     public void toWorld(Player player, String worldName) {
         player.teleport(Objects.requireNonNull(Bukkit.getWorld(worldName)).getSpawnLocation());
