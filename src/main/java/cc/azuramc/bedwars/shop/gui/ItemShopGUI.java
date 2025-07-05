@@ -668,19 +668,19 @@ public class ItemShopGUI extends CustomGUI {
     private boolean handleArmorGiving(GamePlayer gamePlayer, int shopSlot, Material material, GameManager gameManager) {
         Player player = gamePlayer.getPlayer();
 
-        if (XMaterial.CHAINMAIL_BOOTS.get().name().equals(material)) {
+        if (XMaterial.CHAINMAIL_BOOTS.get() == material) {
             gamePlayer.setArmorType(ArmorType.CHAINMAIL);
             gamePlayer.giveArmor();
             player.updateInventory();
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
-        } else if (XMaterial.IRON_BOOTS.get().name().equals(material)) {
+        } else if (XMaterial.IRON_BOOTS.get() == material) {
             gamePlayer.setArmorType(ArmorType.IRON);
             gamePlayer.giveArmor();
             player.updateInventory();
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
-        } else if (XMaterial.DIAMOND_BOOTS.get().name().equals(material)) {
+        } else if (XMaterial.DIAMOND_BOOTS.get() == material) {
             gamePlayer.setArmorType(ArmorType.DIAMOND);
             gamePlayer.giveArmor();
             player.updateInventory();
@@ -697,22 +697,22 @@ public class ItemShopGUI extends CustomGUI {
         Player player = gamePlayer.getPlayer();
 
         // 镐
-        if (XMaterial.WOODEN_PICKAXE.get().equals(material)) {
+        if (XMaterial.WOODEN_PICKAXE.get() == material) {
             gamePlayer.setPickaxeType(ToolType.WOOD);
             gamePlayer.givePickaxe(false);
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
-        } else if (XMaterial.STONE_PICKAXE.get().equals(material)) {
+        } else if (XMaterial.STONE_PICKAXE.get() == material) {
             gamePlayer.setPickaxeType(ToolType.STONE);
             gamePlayer.givePickaxe(true);
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
-        } else if (XMaterial.IRON_PICKAXE.get().equals(material)) {
+        } else if (XMaterial.IRON_PICKAXE.get() == material) {
             gamePlayer.setPickaxeType(ToolType.IRON);
             gamePlayer.givePickaxe(true);
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
-        } else if (XMaterial.DIAMOND_PICKAXE.get().equals(material)) {
+        } else if (XMaterial.DIAMOND_PICKAXE.get() == material) {
             gamePlayer.setPickaxeType(ToolType.DIAMOND);
             gamePlayer.givePickaxe(true);
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
@@ -720,22 +720,22 @@ public class ItemShopGUI extends CustomGUI {
         }
         
         // 斧
-        else if (XMaterial.WOODEN_AXE.get().equals(material)) {
+        else if (XMaterial.WOODEN_AXE.get() == material) {
             gamePlayer.setAxeType(ToolType.WOOD);
             gamePlayer.giveAxe(false);
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
-        } else if (XMaterial.STONE_AXE.get().equals(material)) {
+        } else if (XMaterial.STONE_AXE.get() == material) {
             gamePlayer.setAxeType(ToolType.STONE);
             gamePlayer.giveAxe(true);
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
-        } else if (XMaterial.IRON_AXE.get().equals(material)) {
+        } else if (XMaterial.IRON_AXE.get() == material) {
             gamePlayer.setAxeType(ToolType.IRON);
             gamePlayer.giveAxe(true);
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
-        } else if (XMaterial.DIAMOND_AXE.get().equals(material)) {
+        } else if (XMaterial.DIAMOND_AXE.get() == material) {
             gamePlayer.setAxeType(ToolType.DIAMOND);
             gamePlayer.giveAxe(true);
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
@@ -743,7 +743,7 @@ public class ItemShopGUI extends CustomGUI {
         }
         
         // 剪刀
-        else if (XMaterial.SHEARS.get().equals(material)) {
+        else if (XMaterial.SHEARS.get() == material) {
             gamePlayer.setShear(true);
             gamePlayer.giveShear();
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
