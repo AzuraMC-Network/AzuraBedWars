@@ -494,7 +494,7 @@ public class PlayerDamageListener implements Listener {
         event.getDrops().clear();
         event.getEntity().getInventory().clear();
         event.setDroppedExp(0);
-        Bukkit.broadcastMessage("playerDeath -> cleanDeathDrops$Method");
+        MessageUtil.sendDebugMessage("playerDeath -> cleanDeathDrops$Method");
     }
 
     /**
