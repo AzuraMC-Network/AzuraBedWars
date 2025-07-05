@@ -330,11 +330,6 @@ public class MapData {
             return true;
         }
 
-        // 检查GRASS（草）
-        if (typeName.contains("GRASS")) {
-            return true;
-        }
-
         // 检查DEAD_BUSH（枯灌木）
         // 在1.13+版本中名称保持一致，但为了安全起见使用字符串比较
         return typeName.contains("DEAD_BUSH");
