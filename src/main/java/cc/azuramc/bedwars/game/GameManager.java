@@ -227,7 +227,7 @@ public class GameManager {
                     }
 
                     // 检查方块是否为羊毛
-                    if (block != null && "WOOL".equals(block.getType().name())) {
+                    if (block != null && "WOOL".contains(block.getType().name())) {
                         // 根据羊毛颜色确定队伍颜色
                         return getTeamColorFromWoolBlock(block);
                     }
@@ -245,7 +245,6 @@ public class GameManager {
      * @return 对应的队伍颜色
      */
     private TeamColor getTeamColorFromWoolBlock(Block block) {
-        // 获取方块数据值（旧版本）或方块材质（新版本）
         String blockType = block.getType().name();
 
         // 1.13+版本的羊毛命名格式为 COLOR_WOOL

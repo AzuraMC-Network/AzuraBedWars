@@ -105,7 +105,7 @@ public class MapUtil {
      * @return 如果是床方块返回true，否则返回false
      */
     public static boolean isBedBlock(Block block) {
-        String typeName = block.getType().name();
+        String typeName = block.getType().name().toUpperCase();
         return typeName.contains("BED");
     }
 

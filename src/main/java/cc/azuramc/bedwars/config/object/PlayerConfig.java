@@ -30,7 +30,7 @@ public class PlayerConfig {
     public static class PlayerDeath {
         private int coinsActionBarTimes = 5;
         private int actionBarPeriod = 10;
-        private int coinsReward = 1;
+        private double coinsReward = 1.0;
         private double fireballFallenDamageRate = 0.4;
         private double normalFallenDamageRate = 0.6;
         private double explosionDamageRate = 0.4;

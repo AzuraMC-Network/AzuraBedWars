@@ -12,6 +12,7 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.listener.world.FireballHandler;
 import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.util.VaultUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -55,7 +56,7 @@ public class PlayerDamageListener implements Listener {
     private static final int ACTIONBAR_PERIOD = CONFIG.getActionBarPeriod();
     private static final int RESPAWN_DELAY = 10;
     private static final double VOID_DAMAGE = 100.0D;
-    private static final int COINS_REWARD = CONFIG.getCoinsReward();
+    private static final double COINS_REWARD = CONFIG.getCoinsReward();
     private static final int ATTACK_DISPLAY_TITLE_TICKS = 10;
     private final boolean ARROW_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isArrowDisplayEnabled();
     private final boolean ATTACK_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isAttackDisplayEnabled();
@@ -458,8 +459,10 @@ public class PlayerDamageListener implements Listener {
 
         if (isFinalKill) {
             // 最终击杀给金币奖励
-            showCoinsReward(gameKiller);
-            AzuraBedWars.getInstance().getEcon().depositPlayer(gameKiller.getPlayer(), COINS_REWARD);
+            if (!VaultUtil.ecoIsNull) {
+                showCoinsReward(gameKiller);
+                VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
+            }
             gameKiller.getPlayerData().addFinalKills();
         } else {
             gameKiller.getPlayerData().addKills();
@@ -529,8 +532,10 @@ public class PlayerDamageListener implements Listener {
 
         // 处理最终击杀
         if (isFinalKill) {
-            showCoinsReward(gameKiller);
-            AzuraBedWars.getInstance().getEcon().depositPlayer(gamePlayer.getPlayer(), COINS_REWARD);
+            if (!VaultUtil.ecoIsNull) {
+                showCoinsReward(gameKiller);
+                VaultUtil.depositPlayer(gamePlayer, COINS_REWARD);
+            }
             gameKiller.getPlayerData().addFinalKills();
 
             // 广播击杀消息

@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.util.VaultUtil;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -111,11 +112,10 @@ public class BedBreakHandler {
             }
         }.runTaskTimerAsynchronously(PLUGIN, 0, 10);
 
-        // 聊天栏显示奖励
-        gamePlayer.sendMessage("§6+" + BED_DESTROY_REWARD + "个金币 (破坏床)");
-
-        // 实际奖励金币
-        PLUGIN.getEcon().depositPlayer(gamePlayer.getPlayer(), BED_DESTROY_REWARD);
+        if (!VaultUtil.ecoIsNull) {
+            gamePlayer.sendMessage("§6+" + BED_DESTROY_REWARD + "个金币 (破坏床)");
+            VaultUtil.depositPlayer(gamePlayer, BED_DESTROY_REWARD);
+        }
     }
 
     /**
