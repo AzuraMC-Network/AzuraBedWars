@@ -91,7 +91,7 @@ public class AdminCommand {
             CommandUtil.sendLayout(actor, "&cdebugMode值已经是 " + value + "了");
             return;
         }
-        plugin.getSettingsConfig().setEditorMode(value);
+        plugin.getSettingsConfig().setDebugMode(value);
         CommandUtil.sendLayout(actor, "&a成功设置值为 " + value);
         plugin.getConfigManager().saveConfig("settings");
     }
