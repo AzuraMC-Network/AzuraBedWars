@@ -108,7 +108,7 @@ public class EggBridgeHandler implements Runnable {
         getPlayer().playSound(player.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 10F, 1F);
     }
 
-    public void cancel(){
+    public void cancel() {
         task.cancel();
     }
 }
