@@ -25,6 +25,7 @@ public class ListenerRegistry {
         Bukkit.getPluginManager().registerEvents(new PlayerRespawnListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerMiscListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerDamageListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerDeathReasonListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerAFKListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new EggBridgeListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), plugin);
