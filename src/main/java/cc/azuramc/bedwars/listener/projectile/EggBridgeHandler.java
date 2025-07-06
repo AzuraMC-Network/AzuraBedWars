@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.projectile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.team.TeamColor;
 import cc.azuramc.bedwars.util.MapUtil;
@@ -11,8 +12,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
+import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Objects;
@@ -55,9 +58,6 @@ public class EggBridgeHandler implements Runnable {
         Block b5 = loc.clone().subtract(-1.0D, 2.0D, 0.0D).getBlock();
         Block b6 = loc.clone().subtract(0.0D, 2.0D, -1.0D).getBlock();
         Block b7 = loc.clone().subtract(1.0D, 2.0D, 1.0D).getBlock();
-        Block b8 = loc.clone().subtract(-1.0D, 2.0D, 1.0D).getBlock();
-        Block b9 = loc.clone().subtract(1.0D, 2.0D, -1.0D).getBlock();
-        Block b10 = loc.clone().subtract(-1.0D, 2.0D, -1.0D).getBlock();
 
         // 检查是否接触到保护区域
         if (MapUtil.isProtectedArea(b2.getLocation(b2.getLocation())) || MapUtil.isProtectedArea(b3.getLocation()) || MapUtil.isProtectedArea(b4.getLocation())) {
@@ -81,23 +81,31 @@ public class EggBridgeHandler implements Runnable {
             buildEggBridgeBlock(b5);
             buildEggBridgeBlock(b6);
             buildEggBridgeBlock(b7);
-            buildEggBridgeBlock(b8);
-            buildEggBridgeBlock(b9);
-            buildEggBridgeBlock(b10);
         }
     }
 
     private void buildEggBridgeBlock(Block block) {
-        // 检查为非地图方块
-        if (!gameManager.getMapData().hasRegion(block.getLocation())) {
-            // 检查是否为空气方块
-            if (block.getType() == Material.AIR) {
-                // 改变 AIR 为 指定颜色的羊毛
-                block.setType(Objects.requireNonNull(XMaterial.matchXMaterial(teamColor.getDyeColor().toString() + "_WOOL").orElse(XMaterial.WHITE_WOOL).get()));
-                // 播放超级无敌音效
-                getPlayer().playSound(player.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 10F, 1F);
-            }
+        // 检查为地图方块
+        if (gameManager.getMapData().hasRegion(block.getLocation())) {
+            return;
         }
+
+        // 检查是否为空气方块
+        if (block.getType() != Material.AIR) {
+            return;
+        }
+
+        // 改变 AIR 为 指定颜色的羊毛
+        if (VersionUtil.isLessThan113()) {
+            block.setType(Material.valueOf("WOOL"));
+            BlockState state = block.getState();
+            state.setData(new Wool(teamColor.getDyeColor()));
+            state.update();
+        } else {
+            block.setType(Objects.requireNonNull(XMaterial.matchXMaterial(teamColor.getDyeColor().toString() + "_WOOL").orElse(XMaterial.WHITE_WOOL).get()));
+        }
+
+        getPlayer().playSound(player.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 10F, 1F);
     }
 
     public void cancel(){

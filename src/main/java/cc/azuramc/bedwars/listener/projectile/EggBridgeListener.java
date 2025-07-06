@@ -1,11 +1,13 @@
 package cc.azuramc.bedwars.listener.projectile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.MessageUtil;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
@@ -57,6 +59,9 @@ public class EggBridgeListener implements Listener {
         if (gamePlayer.isEggBridgeCooldown()) {
             shooter.sendMessage(MessageUtil.color(EGG_COOLDOWN_MESSAGE));
             event.setCancelled(true);
+            if (VersionUtil.isLessThan113()) {
+                gamePlayer.getPlayer().getInventory().addItem(XMaterial.EGG.parseItem());
+            }
             return;
         }
 

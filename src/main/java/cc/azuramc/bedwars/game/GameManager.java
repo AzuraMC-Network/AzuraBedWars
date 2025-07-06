@@ -320,6 +320,35 @@ public class GameManager {
     }
 
     /**
+     * 低版本根据TeamColor获取BlockData
+     *
+     * @param teamColor 队伍颜色
+     * @return Block Data 的 byte数值
+     */
+    public byte getWoolDataFromTeamColor(TeamColor teamColor) {
+
+        // 根据羊毛的数据值映射到TeamColor
+        return switch (teamColor) {
+            case TeamColor.WHITE -> 0;
+            case TeamColor.ORANGE -> 1;
+            case TeamColor.MAGENTA -> 2;
+            case TeamColor.LIGHT_BLUE -> 3;
+            case TeamColor.YELLOW -> 4;
+            case TeamColor.LIME -> 5;
+            case TeamColor.PINK -> 6;
+            case TeamColor.GRAY -> 7;
+            case TeamColor.CYAN -> 9;
+            case TeamColor.PURPLE -> 10;
+            case TeamColor.BLUE -> 11;
+            case TeamColor.BROWN -> 12;
+            case TeamColor.GREEN -> 13;
+            case TeamColor.RED -> 14;
+            case TeamColor.BLACK -> 15;
+            default -> 0;
+        };
+    }
+
+    /**
      * 玩家加入游戏处理
      *
      * @param gamePlayer 游戏玩家
