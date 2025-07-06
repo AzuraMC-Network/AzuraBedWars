@@ -126,6 +126,13 @@ public class PlayerDamageListener implements Listener {
         GamePlayer gameKiller = GamePlayer.get(killer);
         GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
 
+        if (gamePlayer != null) {
+            gameKiller.sendMessage("&e你击杀了 " + gamePlayer.getGameTeam().getColor() + gamePlayer.getNickName());
+        }
+        if (gamePlayer != null) {
+            gamePlayer.sendMessage("&e你被 " + gameKiller.getGameTeam().getColor() + gameKiller.getNickName() + " &e击杀了");
+        }
+
         // 处理击杀奖励
         processKillReward(event, gamePlayer, gameKiller);
 
