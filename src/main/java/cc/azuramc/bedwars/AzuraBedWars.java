@@ -181,9 +181,8 @@ public final class AzuraBedWars extends JavaPlugin {
         // 注册GUI监听器
         new GUIListener(this);
 
-        // 设置经济和聊天系统
-        setupEconomy();
-        setupChat();
+        // Hook Vault Chat and Econ
+        hookVault();
 
         // 初始化地图存储
         initMapStorage();
@@ -262,6 +261,13 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     public void mainThreadRunnable(Runnable runnable) {
         Bukkit.getScheduler().runTask(this, runnable);
+    }
+
+    private void hookVault() {
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            setupEconomy();
+            setupChat();
+        }
     }
 
     /**
