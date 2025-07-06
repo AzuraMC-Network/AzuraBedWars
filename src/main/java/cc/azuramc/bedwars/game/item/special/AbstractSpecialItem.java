@@ -1,12 +1,8 @@
 package cc.azuramc.bedwars.game.item.special;
 
-import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.item.special.impl.RescuePlatform;
 import cc.azuramc.bedwars.game.item.special.impl.WarpPowder;
-import cc.azuramc.bedwars.listener.special.RescuePlatformListener;
-import cc.azuramc.bedwars.listener.special.WarpPowderListener;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -22,8 +18,6 @@ public abstract class AbstractSpecialItem {
     public static void loadSpecials() {
         AbstractSpecialItem.AVAILABLE_SPECIALS.add(RescuePlatform.class);
         AbstractSpecialItem.AVAILABLE_SPECIALS.add(WarpPowder.class);
-        Bukkit.getPluginManager().registerEvents(new RescuePlatformListener(), AzuraBedWars.getInstance());
-        Bukkit.getPluginManager().registerEvents(new WarpPowderListener(), AzuraBedWars.getInstance());
     }
 
     /**
