@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.item.special.impl.RescuePlatform;
-import org.bukkit.Sound;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -53,7 +53,7 @@ public class RescuePlatformListener implements Listener {
         
         // 如果创建成功，播放声音
         if (success) {
-            player.playSound(player.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1.0f, 1.0f);
+            player.playSound(player.getLocation(), XSound.ENTITY_CHICKEN_EGG.get(), 1.0f, 1.0f);
         }
     }
     

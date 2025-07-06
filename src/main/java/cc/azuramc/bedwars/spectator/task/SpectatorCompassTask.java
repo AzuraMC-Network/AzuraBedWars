@@ -48,6 +48,7 @@ public class SpectatorCompassTask {
                 } catch (Exception e) {
                     // 记录错误但不停止任务运行
                     AzuraBedWars.getInstance().getLogger().warning("指南针追踪任务发生错误: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }, 0L, UPDATE_FREQUENCY).getTaskId();
         }

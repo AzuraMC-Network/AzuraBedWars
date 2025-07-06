@@ -750,13 +750,11 @@ public class GamePlayer {
      * 玩家指南针内部类
      */
     @Getter
-    public static class PlayerCompass {
+    public class PlayerCompass {
         private final GamePlayer gamePlayer;
-        private final Player player;
 
         public PlayerCompass(GamePlayer gamePlayer) {
             this.gamePlayer = gamePlayer;
-            this.player = gamePlayer.getPlayer();
         }
 
         /**
@@ -766,12 +764,28 @@ public class GamePlayer {
             GamePlayer closestPlayer = AzuraBedWars.getInstance().getGameManager().findTargetPlayer(gamePlayer);
 
             if (closestPlayer != null) {
-                int distance = (int) closestPlayer.getPlayer().getLocation().distance(player.getLocation());
+                MessageUtil.sendDebugMessage("GamePlayer.PlayerCompass$sendClosestPlayer | closest player is " + closestPlayer);
+                
+                // 动态获取 Player 对象
+                Player player = gamePlayer.getPlayer();
+                if (player == null) {
+                    MessageUtil.sendDebugMessage("GamePlayer.PlayerCompass$sendClosestPlayer | player is null");
+                    return;
+                }
+                
+                // 获取目标玩家的 Player 对象
+                Player targetPlayer = closestPlayer.getPlayer();
+                if (targetPlayer == null) {
+                    MessageUtil.sendDebugMessage("GamePlayer.PlayerCompass$sendClosestPlayer | target player is null");
+                    return;
+                }
+                
+                int distance = (int) targetPlayer.getLocation().distance(player.getLocation());
                 gamePlayer.sendActionBar(String.format("§f玩家 %s%s §f距离您 %dm",
                     closestPlayer.getGameTeam().getChatColor(),
                     closestPlayer.getNickName(),
                     distance));
-                player.setCompassTarget(closestPlayer.getPlayer().getLocation());
+                player.setCompassTarget(targetPlayer.getLocation());
             } else {
                 gamePlayer.sendActionBar("§c没有目标");
             }
