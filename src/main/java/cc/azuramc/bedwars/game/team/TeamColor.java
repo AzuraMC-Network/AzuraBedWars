@@ -26,9 +26,9 @@ public enum TeamColor {
 
     // 扩展颜色
     ORANGE(Color.fromRGB(255, 165, 0), ChatColor.GOLD, DyeColor.ORANGE, "§6橙"),
-    MAGENTA(Color.fromRGB(255, 0, 255), ChatColor.LIGHT_PURPLE, DyeColor.MAGENTA, "§5品红"),
-    LIGHT_BLUE(Color.fromRGB(135, 206, 250), ChatColor.BLUE, DyeColor.LIGHT_BLUE, "§b淡蓝"),
-    LIME(Color.fromRGB(50, 205, 50), ChatColor.GREEN, DyeColor.LIME, "§a黄绿"),
+    MAGENTA(Color.fromRGB(255, 0, 255), ChatColor.LIGHT_PURPLE, DyeColor.MAGENTA, "§5粉"),
+    LIGHT_BLUE(Color.fromRGB(135, 206, 250), ChatColor.BLUE, DyeColor.LIGHT_BLUE, "§b青"),
+    LIME(Color.fromRGB(50, 205, 50), ChatColor.GREEN, DyeColor.LIME, "§a绿"),
     PURPLE(Color.fromRGB(128, 0, 128), ChatColor.DARK_PURPLE, DyeColor.PURPLE, "§5紫"),
     CYAN(Color.fromRGB(0, 255, 255), ChatColor.DARK_AQUA, DyeColor.CYAN, "§3青"),
     BLACK(Color.BLACK, ChatColor.BLACK, DyeColor.BLACK, "§0黑"),

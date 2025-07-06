@@ -42,6 +42,6 @@ public class SettingsConfig {
 
     @Data
     public static class SetupMap {
-        private final int teamBlockSearchRadius = 5;
+        private final int teamBlockSearchRadius = 15;
     }
 } 
