@@ -110,7 +110,6 @@ public class PlayerDamageListener implements Listener {
 
         // 如果没有击杀者，直接清理掉落物并继续处理
         if (killer == null) {
-            Bukkit.broadcastMessage("onDeath$killer == null");
             MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$onDeath | killer is null");
             cleanDeathDrops(event);
             
@@ -440,9 +439,9 @@ public class PlayerDamageListener implements Listener {
      */
     private void broadcastVoidKillMessage(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer gameKiller, GameTeam killerTeam, boolean isFinalKill) {
         if (isFinalKill) {
-            gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + ") [最终击杀]§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + ")§e狠狠滴丢下虚空");
+            gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + " [最终击杀]§e被" + killerTeam.getChatColor() + gameKiller.getName() + "§e狠狠滴丢下虚空");
         } else {
-            gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + ")§e被" + killerTeam.getChatColor() + "(" + killerTeam.getName() + ")§e狠狠滴丢下虚空");
+            gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "§e被" + killerTeam.getChatColor() + gameKiller.getName() + "§e狠狠滴丢下虚空");
         }
     }
 
