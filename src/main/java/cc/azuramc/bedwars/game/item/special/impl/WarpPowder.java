@@ -14,6 +14,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -232,7 +233,7 @@ public class WarpPowder extends AbstractSpecialItem {
         gamePlayer.sendMessage(String.format(TELEPORT_START_MESSAGE, this.fullTeleportingTime));
         
         // 播放开始传送音效
-        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+        player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0f, 1.0f);
 
         // 计算每个tick减少的时间
         final double perThrough = (Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((fullTeleportingTime * 20) / CIRCLE_COUNT)) / 20);

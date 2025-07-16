@@ -17,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -57,6 +58,7 @@ public class PlacementListener implements Listener {
 
         // 检查区域保护
         if (MapUtil.isProtectedArea(block.getLocation())) {
+            Objects.requireNonNull(gamePlayer).sendMessage("&c你不能在此处放置方块！");
             event.setCancelled(true);
             return;
         }

@@ -20,6 +20,7 @@ import cc.azuramc.bedwars.jedis.listener.PubSubListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
+import cc.azuramc.bedwars.util.InvisibleUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
@@ -86,6 +87,7 @@ public final class AzuraBedWars extends JavaPlugin {
         
         // 初始化命令和通信系统
         initCommands();
+        InvisibleUtil.initialize(this);
 
         if (settingsConfig.isEnabledJedisMapFeature()) {
             intiChannelSystem();

@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.listener.player;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.util.InvisibleUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -18,6 +19,10 @@ public class PlayerQuitListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         event.setQuitMessage(null);
         GamePlayer gamePlayer = GamePlayer.get(event.getPlayer());
+        
+        // 清理隐身盔甲记录
+        InvisibleUtil.removePlayer(event.getPlayer().getUniqueId());
+        
         gameManager.removePlayers(gamePlayer);
     }
 }
