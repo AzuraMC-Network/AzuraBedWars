@@ -96,6 +96,12 @@ public class PlayerDamageListener implements Listener {
         if (gameManager.getGameState() == GameState.RUNNING) {
             handleRunningStateDamage(event, gamePlayer);
         }
+
+        // 处理玩家复活保护
+        if (PlayerRespawnListener.RESPAWN_PROTECT.get(player) != null) {
+            PlayerRespawnListener.RESPAWN_PROTECT.remove(player);
+        }
+
     }
 
     /**
