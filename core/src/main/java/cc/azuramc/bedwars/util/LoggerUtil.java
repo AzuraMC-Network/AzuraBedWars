@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.util;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import org.bukkit.Bukkit;
 
 /**
@@ -8,6 +9,8 @@ import org.bukkit.Bukkit;
 public class LoggerUtil {
 
     private static final String LOGGER_PREFIX = "[AzuraBedWars] ";
+
+    public static final String ADMIN_PERMISSION = "azurabedwars.admin";
 
     public static void info(String message) {
         Bukkit.getLogger().info(LOGGER_PREFIX + message);
@@ -22,6 +25,10 @@ public class LoggerUtil {
     }
 
     public static void debug(String message) {
-        Bukkit.getLogger().info(LOGGER_PREFIX + "[DEBUG] " + message);
+        if (!AzuraBedWars.getInstance().getSettingsConfig().isDebugMode()) {
+            return;
+        }
+        Bukkit.broadcast(message, ADMIN_PERMISSION);
+        Bukkit.getLogger().info(LOGGER_PREFIX + "[Debugger] " + message);
     }
 }

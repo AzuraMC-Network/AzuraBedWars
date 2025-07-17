@@ -32,7 +32,7 @@ public class InvisibleUtil {
      */
     public static void hide(Player target) {
         sendArmorPacketToAll(target, true);
-        MessageUtil.sendDebugMessage("hide " + target.getName());
+        LoggerUtil.debug("hide " + target.getName());
     }
 
     /**
@@ -41,7 +41,7 @@ public class InvisibleUtil {
      */
     public static void show(Player target) {
         sendArmorPacketToAll(target, false);
-        MessageUtil.sendDebugMessage("show " + target.getName());
+        LoggerUtil.debug("show " + target.getName());
     }
 
     /**
@@ -61,14 +61,14 @@ public class InvisibleUtil {
             // 1.16+
 //            if (!VersionUtil.isLessThan116()) {
 //                modifyNew(packet, target, hide);
-//                MessageUtil.sendDebugMessage("invisible 1.16+");
+//                LoggerUtil.debug("invisible 1.16+");
 //            } else if (!VersionUtil.isVersion18()) {
 //                // 1.8 - 1.16
 //                modifyOld(packet, target, hide);
-//                MessageUtil.sendDebugMessage("invisible 1.8-1.16");
+//                LoggerUtil.debug("invisible 1.8-1.16");
 //            } else {
                 // 1.8
-                MessageUtil.sendDebugMessage("invisible 1.8");
+                LoggerUtil.debug("invisible 1.8");
                 modifyVeryOld(packet, target, hide);
 //            }
 
