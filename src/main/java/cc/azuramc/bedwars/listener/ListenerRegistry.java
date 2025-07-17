@@ -37,6 +37,7 @@ public class ListenerRegistry {
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerMiscListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerResourcePutListener(), plugin);
         if (VersionUtil.isLessThan113()) {
             Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerA(), plugin);
         } else {
