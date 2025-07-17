@@ -1,1 +1,6 @@
 rootProject.name = 'AzuraBedWars'
+
+include (
+        'core',
+        '1_8_R3'
+)
