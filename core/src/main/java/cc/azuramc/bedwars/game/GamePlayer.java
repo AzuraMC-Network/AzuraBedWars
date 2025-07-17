@@ -11,6 +11,7 @@ import cc.azuramc.bedwars.game.item.tool.ToolType;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
@@ -764,19 +765,19 @@ public class GamePlayer {
             GamePlayer closestPlayer = AzuraBedWars.getInstance().getGameManager().findTargetPlayer(gamePlayer);
 
             if (closestPlayer != null) {
-                MessageUtil.sendDebugMessage("GamePlayer.PlayerCompass$sendClosestPlayer | closest player is " + closestPlayer);
+                LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | closest player is " + closestPlayer);
                 
                 // 动态获取 Player 对象
                 Player player = gamePlayer.getPlayer();
                 if (player == null) {
-                    MessageUtil.sendDebugMessage("GamePlayer.PlayerCompass$sendClosestPlayer | player is null");
+                    LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | player is null");
                     return;
                 }
                 
                 // 获取目标玩家的 Player 对象
                 Player targetPlayer = closestPlayer.getPlayer();
                 if (targetPlayer == null) {
-                    MessageUtil.sendDebugMessage("GamePlayer.PlayerCompass$sendClosestPlayer | target player is null");
+                    LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | target player is null");
                     return;
                 }
                 

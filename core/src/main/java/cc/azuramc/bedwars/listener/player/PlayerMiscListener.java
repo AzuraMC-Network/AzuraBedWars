@@ -8,7 +8,7 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.util.InvisibleUtil;
-import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
@@ -97,7 +97,7 @@ public class PlayerMiscListener implements Listener {
         }
 
         if (event.getItem().getType().toString().contains("POTION")) {
-            MessageUtil.sendDebugMessage("是隐身药水，处理盔甲隐藏");
+            LoggerUtil.debug("是隐身药水，处理盔甲隐藏");
             // 延迟1tick检查玩家是否获得隐身效果
             Bukkit.getScheduler().runTaskLater(plugin, () -> checkPlayerInvisibility(player), 1L);
         }

@@ -11,7 +11,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.listener.world.FireballHandler;
-import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
@@ -116,7 +116,7 @@ public class PlayerDamageListener implements Listener {
 
         // 如果没有击杀者，直接清理掉落物并继续处理
         if (killer == null) {
-            MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$onDeath | killer is null");
+            LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer is null");
             cleanDeathDrops(event);
             
             GamePlayer gamePlayer = GamePlayer.get(player);
@@ -126,7 +126,7 @@ public class PlayerDamageListener implements Listener {
             processDeathGameLogic(gamePlayer, gameTeam);
             return;
         }
-        MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$onDeath | killer isn't null");
+        LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer isn't null");
 
         GamePlayer gamePlayer = GamePlayer.get(player);
         GamePlayer gameKiller = GamePlayer.get(killer);
@@ -143,13 +143,13 @@ public class PlayerDamageListener implements Listener {
         if (gameKiller.getGameModeType() == GameModeType.EXPERIENCE) {
             // 1. 击杀者是经验模式
             if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
-                MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$processKillReward | player and killer all the 'EXPERIENCE' mode'");
+                LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player and killer all the 'EXPERIENCE' mode'");
                 // 1.1 被击杀者也是经验模式，直接给经验，无需转换
                 // 从experienceSources直接给予经验
                 convertExperienceSourcesToExp(gamePlayer, gameKiller);
             } else {
                 // 1.2 被击杀者是default模式，需要将物品转换为经验
-                MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$processKillReward | player is 'EXPERIENCE' mode , killer is 'DEFAULT' mode");
+                LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player is 'EXPERIENCE' mode , killer is 'DEFAULT' mode");
                 gameKiller.getPlayer().giveExpLevels(getPlayerRewardExp(gamePlayer.getPlayer()));
             }
             // 清理死亡玩家物品
@@ -158,11 +158,11 @@ public class PlayerDamageListener implements Listener {
             // 2. 击杀者是default模式
             if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
                 // 2.1 被击杀者是经验模式，需要将经验转换为物品
-                MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$processKillReward | player is 'DEFAULT' mode , killer is 'EXPERIENCE' mode");
+                LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player is 'DEFAULT' mode , killer is 'EXPERIENCE' mode");
                 convertExperienceSourcesToItems(gamePlayer, gameKiller, event);
             } else {
                 // 2.2 被击杀者是default模式，直接转移物品
-                MessageUtil.sendDebugMessage("Triggered PlayerDamageListener$processKillReward | player and killer all the 'DEFAULT' mode'");
+                LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player and killer all the 'DEFAULT' mode'");
                 transferItemsToKiller(gamePlayer.getPlayer(), gameKiller.getPlayer(), event);
                 cleanDeathDrops(event);
             }
@@ -201,7 +201,7 @@ public class PlayerDamageListener implements Listener {
 
         // 清除经验来源map
         gamePlayer.getExperienceSources().clear();
-        MessageUtil.sendDebugMessage("PlayerDamageListener$convertExperienceSourcesToExp | expMapCleared");
+        LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | expMapCleared");
         handlePlayerRespawn(gamePlayer);
     }
 
@@ -509,7 +509,7 @@ public class PlayerDamageListener implements Listener {
         event.getDrops().clear();
         event.getEntity().getInventory().clear();
         event.setDroppedExp(0);
-        MessageUtil.sendDebugMessage("playerDeath -> cleanDeathDrops$Method");
+        LoggerUtil.debug("playerDeath -> cleanDeathDrops$Method");
     }
 
     /**
@@ -700,7 +700,7 @@ public class PlayerDamageListener implements Listener {
         for (Map.Entry<String, Integer> entry : expSources.entrySet()) {
             String resourceType = entry.getKey();
             int amount = entry.getValue();
-            MessageUtil.sendDebugMessage("PlayerDamageListener$convertExperienceSourcesToExp | in for amount: " + amount);
+            LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | in for amount: " + amount);
             
             // 不同资源类型的经验转换倍率
             switch (resourceType) {
@@ -729,9 +729,9 @@ public class PlayerDamageListener implements Listener {
         
         // 加上被击杀者的经验等级
         int playerLevel = gamePlayer.getPlayer().getLevel();
-        MessageUtil.sendDebugMessage("PlayerDamageListener$convertExperienceSourcesToExp | playerLevel: " + playerLevel);
+        LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | playerLevel: " + playerLevel);
         totalExp += playerLevel;
-        MessageUtil.sendDebugMessage("PlayerDamageListener$convertExperienceSourcesToExp | totalExp: " + totalExp);
+        LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | totalExp: " + totalExp);
 
         // 给予击杀者经验
         gameKiller.getPlayer().giveExpLevels(totalExp);

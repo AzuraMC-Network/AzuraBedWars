@@ -21,7 +21,7 @@ import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
 import cc.azuramc.bedwars.tablist.TabList;
 import cc.azuramc.bedwars.util.LoadGameUtil;
-import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.ServerMOTD;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
@@ -183,12 +183,12 @@ public class GameManager {
         for (int i = 0; i < mapData.getBases().size(); i++) {
             Location baseLocation = mapData.getBases().get(i).toLocation();
             TeamColor teamColor = detectTeamColorFromWool(baseLocation);
-            MessageUtil.sendDebugMessage("GameManager$initializeTeams | detectTeamColorFromWool is " + teamColor);
+            LoggerUtil.debug("GameManager$initializeTeams | detectTeamColorFromWool is " + teamColor);
             
             // 如果无法检测到羊毛颜色，则使用默认顺序
             if (teamColor == null) {
                 teamColor = TeamColor.values()[i % TeamColor.values().length];
-                MessageUtil.sendDebugMessage("GameManager$initializeTeams | team color is null so we used the order " + teamColor);
+                LoggerUtil.debug("GameManager$initializeTeams | team color is null so we used the order " + teamColor);
             }
             
             // 获取每个队伍的玩家数量，添加空值检查防止NPE
@@ -216,22 +216,22 @@ public class GameManager {
         // 搜索范围，可以根据实际情况调整
         int radius = teamBlockSearchRadius;
         World world = location.getWorld();
-        MessageUtil.sendDebugMessage("GameManager$detectTeamColorFromWool | world is " + world);
-        MessageUtil.sendDebugMessage("GameManager$detectTeamColorFromWool | location is " + location);
-        MessageUtil.sendDebugMessage("GameManager$detectTeamColorFromWool | radius is " + radius);
+        LoggerUtil.debug("GameManager$detectTeamColorFromWool | world is " + world);
+        LoggerUtil.debug("GameManager$detectTeamColorFromWool | location is " + location);
+        LoggerUtil.debug("GameManager$detectTeamColorFromWool | radius is " + radius);
         
         // 检查基础条件
         if (world == null) {
-            MessageUtil.sendDebugMessage("GameManager$detectTeamColorFromWool | world is null, returning null");
+            LoggerUtil.debug("GameManager$detectTeamColorFromWool | world is null, returning null");
             return null;
         }
         
         if (radius <= 0) {
-            MessageUtil.sendDebugMessage("GameManager$detectTeamColorFromWool | radius is <= 0, returning null");
+            LoggerUtil.debug("GameManager$detectTeamColorFromWool | radius is <= 0, returning null");
             return null;
         }
         
-        MessageUtil.sendDebugMessage("GameManager$detectTeamColorFromWool | starting search in radius " + radius);
+        LoggerUtil.debug("GameManager$detectTeamColorFromWool | starting search in radius " + radius);
         
         // 遍历位置周围的方块
         int checkedBlocks = 0;
@@ -248,14 +248,14 @@ public class GameManager {
                     // 检查方块是否为羊毛
                     if (block.getType().name().contains("WOOL")) {
                         // 根据羊毛颜色确定队伍颜色
-                        MessageUtil.sendDebugMessage("GameManager$detectTeamColorFromWool | Found WOOL block! Type: " + block.getType().name());
+                        LoggerUtil.debug("GameManager$detectTeamColorFromWool | Found WOOL block! Type: " + block.getType().name());
                         return getTeamColorFromWoolBlock(block);
                     }
                 }
             }
         }
         
-        MessageUtil.sendDebugMessage("GameManager$detectTeamColorFromWool | Checked " + checkedBlocks + " blocks, no wool found");
+        LoggerUtil.debug("GameManager$detectTeamColorFromWool | Checked " + checkedBlocks + " blocks, no wool found");
         return null;
     }
     

@@ -14,7 +14,7 @@ import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.gui.SpectatorCompassGUI;
 import cc.azuramc.bedwars.spectator.gui.SpectatorSettingGUI;
-import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
@@ -272,9 +272,9 @@ public class PlayerInteractListener implements Listener {
      */
     private void placeBedForTeam(GameTeam gameTeam) {
         BlockFace face = gameTeam.getBedFace();
-        MessageUtil.sendDebugMessage("PlayerInteractListener$placeBedForTeam | bed face: " + face);
+        LoggerUtil.debug("PlayerInteractListener$placeBedForTeam | bed face: " + face);
         Location bedHeadLocation = gameTeam.getBedHead().getLocation();
-        MessageUtil.sendDebugMessage("PlayerInteractListener$placeBedForTeam | bed head loc: " + bedHeadLocation);
+        LoggerUtil.debug("PlayerInteractListener$placeBedForTeam | bed head loc: " + bedHeadLocation);
         bedHeadLocation.getBlock().setType(Material.AIR);
         bedHeadLocation.getBlock().setType(XMaterial.RED_BED.get());
         Block block = gameTeam.getBedHead();

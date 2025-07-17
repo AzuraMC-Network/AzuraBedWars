@@ -1,12 +1,12 @@
 package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MapUtil;
-import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,7 +47,7 @@ public class BlockBreakListener implements Listener {
             // 处理床方块破坏
             if (MapUtil.isBedBlock(block)) {
                 BedBreakHandler.handleBedBreak(event, block, gamePlayer, gameTeam);
-                MessageUtil.sendDebugMessage("BlockBreakListener$onBreak | is bed block then handleBedBreak");
+                LoggerUtil.debug("BlockBreakListener$onBreak | is bed block then handleBedBreak");
                 return;
             }
 
