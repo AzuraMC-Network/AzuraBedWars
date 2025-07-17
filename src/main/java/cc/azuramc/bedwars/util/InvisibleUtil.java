@@ -1,244 +1,246 @@
 package cc.azuramc.bedwars.util;
 
-import cc.azuramc.bedwars.game.GamePlayer;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.reflect.StructureModifier;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.Pair;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author an5w1r@163.com
+ * @author An5w1r@163.com
  */
 public class InvisibleUtil {
-    private static final String VERSION;
-    private static final boolean NEW_VERSION;
 
-    private static Method asNMSCopyMethod;
-    private static Constructor<?> packetEquipmentConstructor;
-    private static Method getHandleMethod;
-    private static Field playerConnectionField;
-    private static Method sendPacketMethod;
+    // 槽位常量
+    public static final int SLOT_HAND = 0;
+    public static final int SLOT_HEAD = 1;
+    public static final int SLOT_CHEST = 2;
+    public static final int SLOT_LEGS = 3;
+    public static final int SLOT_FEET = 4;
+    public static final int SLOT_OFF_HAND = 5;
 
-    private static Method enumItemSlotValueOf;
-    
-    static {
-        String name = Bukkit.getServer().getClass().getPackage().getName();
-        VERSION = name.substring(name.lastIndexOf('.') + 1);
-        
-        // 检测是否为新版本 (1.16+)
-        boolean isNew = false;
+    /**
+     * 隐藏指定玩家的盔甲（发送给所有其他玩家）
+     * @param target 要被隐藏盔甲的玩家
+     */
+    public static void hide(Player target) {
+        sendArmorPacketToAll(target, true);
+        MessageUtil.sendDebugMessage("hide " + target.getName());
+    }
+
+    /**
+     * 显示指定玩家的盔甲（发送给所有其他玩家）
+     * @param target 要被显示盔甲的玩家
+     */
+    public static void show(Player target) {
+        sendArmorPacketToAll(target, false);
+        MessageUtil.sendDebugMessage("show " + target.getName());
+    }
+
+    /**
+     * 创建并发送装备数据包给所有其他玩家
+     * @param target 目标玩家
+     * @param hide 是否隐藏装备
+     */
+    private static void sendArmorPacketToAll(Player target, boolean hide) {
         try {
-            Class.forName("org.bukkit.Material").getField("PLAYER_HEAD");
-            isNew = true;
-        } catch (Exception ignored) {}
-        NEW_VERSION = isNew;
-        
-        try {
-            // 初始化反射缓存
-            // 反射缓存
-            Class<?> craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + VERSION + ".inventory.CraftItemStack");
-            asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
-            
-            // 装备包和构造器初始化
-            Class<?> packetEquipmentClass;
-            if (NEW_VERSION && Integer.parseInt(VERSION.split("_")[1]) >= 16) {
-                // 1.16+ 使用新API
-                packetEquipmentClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment");
-                // 新版本反射缓存
-                Class<?> enumItemSlotClass = Class.forName("net.minecraft.world.entity.EnumItemSlot");
-                enumItemSlotValueOf = enumItemSlotClass.getMethod("valueOf", String.class);
-                
-                try {
-                    // 1.16+ 构造器接受列表参数 (各版本略有不同)
-                    Class<?> pairClass = Class.forName("com.mojang.datafixers.util.Pair");
-                    packetEquipmentConstructor = packetEquipmentClass.getConstructor(int.class, java.util.List.class);
-                } catch (Exception e) {
-                    try {
-                        // 1.17+
-                        packetEquipmentConstructor = packetEquipmentClass.getConstructor(int.class, java.util.List.class);
-                    } catch (Exception ex) {
-                        Bukkit.getLogger().warning("无法找到匹配的PacketPlayOutEntityEquipment构造器");
-                    }
-                }
-            } else {
-                // 旧版本 (1.8-1.15)
-                packetEquipmentClass = Class.forName("net.minecraft.server." + VERSION + ".PacketPlayOutEntityEquipment");
-                
-                try {
-                    // 1.8-1.14
-                    packetEquipmentConstructor = packetEquipmentClass.getConstructor(int.class, int.class, Object.class);
-                } catch (Exception e) {
-                    try {
-                        // 1.15 使用不同构造器
-                        Class<?> enumItemSlotClass = Class.forName("net.minecraft.server." + VERSION + ".EnumItemSlot");
-                        packetEquipmentConstructor = packetEquipmentClass.getConstructor(int.class, enumItemSlotClass, Object.class);
-                        enumItemSlotValueOf = enumItemSlotClass.getMethod("valueOf", String.class);
-                    } catch (Exception ex) {
-                        Bukkit.getLogger().warning("无法找到匹配的PacketPlayOutEntityEquipment构造器");
-                    }
+            PacketContainer packet = ProtocolLibrary.getProtocolManager()
+                    .createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
+
+            // 设置目标玩家的实体ID
+            packet.getIntegers().write(0, target.getEntityId());
+
+            // 根据版本处理数据包
+            // 1.16+
+//            if (!VersionUtil.isLessThan116()) {
+//                modifyNew(packet, target, hide);
+//                MessageUtil.sendDebugMessage("invisible 1.16+");
+//            } else if (!VersionUtil.isVersion18()) {
+//                // 1.8 - 1.16
+//                modifyOld(packet, target, hide);
+//                MessageUtil.sendDebugMessage("invisible 1.8-1.16");
+//            } else {
+                // 1.8
+                MessageUtil.sendDebugMessage("invisible 1.8");
+                modifyVeryOld(packet, target, hide);
+//            }
+
+            // 发送数据包给所有其他在线玩家
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                if (!onlinePlayer.equals(target)) {
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(onlinePlayer, packet);
                 }
             }
-            
-            // 通用发包方法
-            Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + VERSION + ".entity.CraftPlayer");
-            getHandleMethod = craftPlayerClass.getMethod("getHandle");
-            
-            Class<?> entityPlayerClass;
-            Class<?> packetClass;
-            if (NEW_VERSION && Integer.parseInt(VERSION.split("_")[1]) >= 17) {
-                entityPlayerClass = Class.forName("net.minecraft.server.level.EntityPlayer");
-                packetClass = Class.forName("net.minecraft.network.protocol.Packet");
-            } else {
-                entityPlayerClass = Class.forName("net.minecraft.server." + VERSION + ".EntityPlayer");
-                packetClass = Class.forName("net.minecraft.server." + VERSION + ".Packet");
-            }
-            
-            playerConnectionField = getNMSConnectionField(entityPlayerClass);
-            Class<?> playerConnectionClass = playerConnectionField.getType();
-            sendPacketMethod = playerConnectionClass.getMethod("sendPacket", packetClass);
-            
+
         } catch (Exception e) {
-            Bukkit.getLogger().severe("初始化InvisibleUtil失败: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    
-    private static Field getNMSConnectionField(Class<?> entityPlayerClass) throws NoSuchFieldException {
-        try {
-            // 尝试1.17+命名
-            return entityPlayerClass.getField("b");
-        } catch (NoSuchFieldException e) {
-            try {
-                // 尝试1.8-1.16命名
-                return entityPlayerClass.getField("playerConnection");
-            } catch (NoSuchFieldException ex) {
-                // 遍历所有字段寻找PlayerConnection类型
-                for (Field field : entityPlayerClass.getFields()) {
-                    if (field.getType().getSimpleName().contains("PlayerConnection")) {
-                        return field;
-                    }
-                }
-                throw new NoSuchFieldException("找不到玩家连接字段");
-            }
-        }
+
+    /**
+     * 1.16+ 新版本处理
+     */
+    private static void modifyNew(PacketContainer packet, Player target, boolean hide) {
+        StructureModifier<List<Pair<EnumWrappers.ItemSlot, ItemStack>>> modifier = packet.getSlotStackPairLists();
+
+        List<Pair<EnumWrappers.ItemSlot, ItemStack>> equipmentList = new ArrayList<>();
+
+        // 添加所有装备槽位
+        addEquipmentPair(equipmentList, EnumWrappers.ItemSlot.MAINHAND,
+                hide ? null : target.getItemInHand());
+        addEquipmentPair(equipmentList, EnumWrappers.ItemSlot.HEAD,
+                hide ? null : target.getInventory().getHelmet());
+        addEquipmentPair(equipmentList, EnumWrappers.ItemSlot.CHEST,
+                hide ? null : target.getInventory().getChestplate());
+        addEquipmentPair(equipmentList, EnumWrappers.ItemSlot.LEGS,
+                hide ? null : target.getInventory().getLeggings());
+        addEquipmentPair(equipmentList, EnumWrappers.ItemSlot.FEET,
+                hide ? null : target.getInventory().getBoots());
+
+        // 如果版本支持副手
+//        if (VersionUtil.hasOffhand()) {
+//            addEquipmentPair(equipmentList, EnumWrappers.ItemSlot.OFFHAND,
+//                    hide ? null : getOffhandItem(target));
+//        }
+
+        modifier.write(0, equipmentList);
     }
-    
-    public void hideEquip(GamePlayer gamePlayer, boolean hide) {
+
+    /**
+     * 1.9 - 1.15.2 等旧版本处理
+     */
+    private static void modifyOld(PacketContainer packet, Player target, boolean hide) {
+        // 旧版本需要为每个装备槽位创建单独的数据包
+        sendMultiplePacketsOld(target, hide);
+    }
+
+    /**
+     * 1.8.X 版本处理
+     */
+    private static void modifyVeryOld(PacketContainer packet, Player target, boolean hide) {
+        // 1.8版本需要为每个装备槽位创建单独的数据包
+        sendMultiplePacketsVeryOld(target, hide);
+    }
+
+    /**
+     * 为旧版本发送多个单独的装备数据包 (1.9-1.15.2)
+     */
+    private static void sendMultiplePacketsOld(Player target, boolean hide) {
         try {
-            Player player = gamePlayer.getPlayer();
-            int entityId = player.getEntityId();
-            Object nmsAirItem = asNMSCopyMethod.invoke(null, new ItemStack(Material.AIR));
-            
-            if (NEW_VERSION && Integer.parseInt(VERSION.split("_")[1]) >= 16) {
-                // 使用新版本API (1.16+)
-                hideEquipNewVersion(gamePlayer, hide, entityId, nmsAirItem);
-            } else if (enumItemSlotValueOf != null) {
-                // 使用1.15版本API
-                hideEquip1_15Version(gamePlayer, hide, entityId, nmsAirItem);
-            } else {
-                // 使用旧版本API (1.8-1.14)
-                hideEquipOldVersion(gamePlayer, hide, entityId, nmsAirItem);
-            }
+            sendSingleSlotPacketOld(target, EnumWrappers.ItemSlot.MAINHAND,
+                    hide ? null : target.getItemInHand());
+            sendSingleSlotPacketOld(target, EnumWrappers.ItemSlot.HEAD,
+                    hide ? null : target.getInventory().getHelmet());
+            sendSingleSlotPacketOld(target, EnumWrappers.ItemSlot.CHEST,
+                    hide ? null : target.getInventory().getChestplate());
+            sendSingleSlotPacketOld(target, EnumWrappers.ItemSlot.LEGS,
+                    hide ? null : target.getInventory().getLeggings());
+            sendSingleSlotPacketOld(target, EnumWrappers.ItemSlot.FEET,
+                    hide ? null : target.getInventory().getBoots());
+
+//            if (VersionUtil.hasOffhand()) {
+//                sendSingleSlotPacketOld(target, EnumWrappers.ItemSlot.OFFHAND,
+//                        hide ? null : getOffhandItem(target));
+//            }
         } catch (Exception e) {
-            Bukkit.getLogger().severe("隐藏装备失败: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    
-    private void hideEquipNewVersion(GamePlayer gamePlayer, boolean hide, int entityId, Object nmsAirItem) throws Exception {
-        // 为1.16+版本创建装备包
-        Player player = gamePlayer.getPlayer();
-        
-        // 创建装备对列表
-        Class<?> pairClass = Class.forName("com.mojang.datafixers.util.Pair");
-        Method pairOf = pairClass.getMethod("of", Object.class, Object.class);
-        
-        Object helmetSlot = enumItemSlotValueOf.invoke(null, "HEAD");
-        Object chestSlot = enumItemSlotValueOf.invoke(null, "CHEST");
-        Object legsSlot = enumItemSlotValueOf.invoke(null, "LEGS");
-        Object feetSlot = enumItemSlotValueOf.invoke(null, "FEET");
-        
-        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, Objects.requireNonNull(player.getEquipment()).getHelmet());
-        Object chestItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getChestplate());
-        Object legsItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getLeggings());
-        Object feetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getBoots());
-        
-        // 创建Pair列表
-        java.util.List<Object> pairs = new java.util.ArrayList<>();
-        pairs.add(pairOf.invoke(null, helmetSlot, helmetItem));
-        pairs.add(pairOf.invoke(null, chestSlot, chestItem));
-        pairs.add(pairOf.invoke(null, legsSlot, legsItem));
-        pairs.add(pairOf.invoke(null, feetSlot, feetItem));
-        
-        // 创建并发送包
-        Object packet = packetEquipmentConstructor.newInstance(entityId, pairs);
-        sendPacketToOthers(gamePlayer, packet);
+
+    /**
+     * 为很旧版本发送多个单独的装备数据包 (1.8.x)
+     */
+    private static void sendMultiplePacketsVeryOld(Player target, boolean hide) {
+        try {
+            sendSingleSlotPacketVeryOld(target, SLOT_HAND,
+                    hide ? null : target.getItemInHand());
+            sendSingleSlotPacketVeryOld(target, SLOT_HEAD,
+                    hide ? null : target.getInventory().getHelmet());
+            sendSingleSlotPacketVeryOld(target, SLOT_CHEST,
+                    hide ? null : target.getInventory().getChestplate());
+            sendSingleSlotPacketVeryOld(target, SLOT_LEGS,
+                    hide ? null : target.getInventory().getLeggings());
+            sendSingleSlotPacketVeryOld(target, SLOT_FEET,
+                    hide ? null : target.getInventory().getBoots());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    
-    private void hideEquip1_15Version(GamePlayer gamePlayer, boolean hide, int entityId, Object nmsAirItem) throws Exception {
-        // 为1.15版本创建装备包
-        Player player = gamePlayer.getPlayer();
-        
-        Object helmetSlot = enumItemSlotValueOf.invoke(null, "HEAD");
-        Object chestSlot = enumItemSlotValueOf.invoke(null, "CHEST");
-        Object legsSlot = enumItemSlotValueOf.invoke(null, "LEGS");
-        Object feetSlot = enumItemSlotValueOf.invoke(null, "FEET");
-        
-        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, Objects.requireNonNull(player.getEquipment()).getHelmet());
-        Object chestItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getChestplate());
-        Object legsItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getLeggings());
-        Object feetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getBoots());
-        
-        Object packet1 = packetEquipmentConstructor.newInstance(entityId, helmetSlot, helmetItem);
-        Object packet2 = packetEquipmentConstructor.newInstance(entityId, chestSlot, chestItem);
-        Object packet3 = packetEquipmentConstructor.newInstance(entityId, legsSlot, legsItem);
-        Object packet4 = packetEquipmentConstructor.newInstance(entityId, feetSlot, feetItem);
-        
-        sendPacketToOthers(gamePlayer, packet1);
-        sendPacketToOthers(gamePlayer, packet2);
-        sendPacketToOthers(gamePlayer, packet3);
-        sendPacketToOthers(gamePlayer, packet4);
-    }
-    
-    private void hideEquipOldVersion(GamePlayer gamePlayer, boolean hide, int entityId, Object nmsAirItem) throws Exception {
-        // 为1.8-1.14版本创建装备包
-        Player player = gamePlayer.getPlayer();
-        
-        Object helmetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, Objects.requireNonNull(player.getEquipment()).getHelmet());
-        Object chestItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getChestplate());
-        Object legsItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getLeggings());
-        Object feetItem = hide ? nmsAirItem : asNMSCopyMethod.invoke(null, player.getEquipment().getBoots());
-        
-        Object packet1 = packetEquipmentConstructor.newInstance(entityId, 4, helmetItem);
-        Object packet2 = packetEquipmentConstructor.newInstance(entityId, 3, chestItem);
-        Object packet3 = packetEquipmentConstructor.newInstance(entityId, 2, legsItem);
-        Object packet4 = packetEquipmentConstructor.newInstance(entityId, 1, feetItem);
-        
-        sendPacketToOthers(gamePlayer, packet1);
-        sendPacketToOthers(gamePlayer, packet2);
-        sendPacketToOthers(gamePlayer, packet3);
-        sendPacketToOthers(gamePlayer, packet4);
-    }
-    
-    private void sendPacketToOthers(GamePlayer gamePlayer, Object packet) throws Exception {
-        for (GamePlayer otherPlayer : GamePlayer.getOnlinePlayers()) {
-            if (otherPlayer.equals(gamePlayer)) {
-                continue;
+
+    /**
+     * 发送单个装备槽位数据包 (1.9-1.15.2)
+     */
+    private static void sendSingleSlotPacketOld(Player target, EnumWrappers.ItemSlot slot, ItemStack item) {
+        PacketContainer packet = ProtocolLibrary.getProtocolManager()
+                .createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
+
+        packet.getIntegers().write(0, target.getEntityId());
+        packet.getItemSlots().write(0, slot);
+        packet.getItemModifier().write(0, item);
+
+        // 发送给所有其他玩家
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (!onlinePlayer.equals(target)) {
+                try {
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(onlinePlayer, packet);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            
-            Player bukkitPlayer = otherPlayer.getPlayer();
-            if (bukkitPlayer == null) {
-                continue;
+        }
+    }
+
+    /**
+     * 发送单个装备槽位数据包 (1.8.x)
+     */
+    private static void sendSingleSlotPacketVeryOld(Player target, int slotNum, ItemStack item) {
+        PacketContainer packet = ProtocolLibrary.getProtocolManager()
+                .createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
+
+        packet.getIntegers().write(0, target.getEntityId());
+        packet.getShorts().write(0, (short) slotNum);
+        packet.getItemModifier().write(0, item);
+
+        // 发送给所有其他玩家
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (!onlinePlayer.equals(target)) {
+                try {
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(onlinePlayer, packet);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            
-            Object entityPlayer = getHandleMethod.invoke(bukkitPlayer);
-            Object playerConnection = playerConnectionField.get(entityPlayer);
-            sendPacketMethod.invoke(playerConnection, packet);
+        }
+    }
+
+    /**
+     * 添加装备对到列表
+     */
+    private static void addEquipmentPair(List<Pair<EnumWrappers.ItemSlot, ItemStack>> list,
+                                         EnumWrappers.ItemSlot slot, ItemStack item) {
+        list.add(new Pair<>(slot, item));
+    }
+
+
+    /**
+     * 将ItemSlot转换为数字槽位
+     */
+    private static int convertSlot(EnumWrappers.ItemSlot slot) {
+        switch (slot) {
+            case MAINHAND: return SLOT_HAND;
+            case HEAD: return SLOT_HEAD;
+            case CHEST: return SLOT_CHEST;
+            case LEGS: return SLOT_LEGS;
+            case FEET: return SLOT_FEET;
+            case OFFHAND: return SLOT_OFF_HAND;
+            default: return -1;
         }
     }
 }

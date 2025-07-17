@@ -20,11 +20,12 @@ import cc.azuramc.bedwars.jedis.listener.PubSubListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
-import cc.azuramc.bedwars.util.InvisibleUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.config.DatabaseConfig;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.milkbowl.vault.chat.Chat;
@@ -70,6 +71,7 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private AzuraOrmClient ormClient;
     @Getter private PlayerDataDao playerDataDao;
     @Getter private PlayerDataService playerDataService;
+    @Getter private ProtocolManager protocolManager;
 
     public static final String MAP_TABLE_NAME = "bw_map";
 
@@ -87,7 +89,8 @@ public final class AzuraBedWars extends JavaPlugin {
         
         // 初始化命令和通信系统
         initCommands();
-        InvisibleUtil.initialize(this);
+
+        protocolManager = ProtocolLibrary.getProtocolManager();
 
         if (settingsConfig.isEnabledJedisMapFeature()) {
             intiChannelSystem();

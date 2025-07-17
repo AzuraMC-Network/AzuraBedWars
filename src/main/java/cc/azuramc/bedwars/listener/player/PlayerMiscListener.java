@@ -29,17 +29,25 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author an5w1r@163.com
  */
 public class PlayerMiscListener implements Listener {
+    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
+    private final Map<UUID, Boolean> playerInvisibleState = new HashMap<>();
+
+    public PlayerMiscListener() {
+        startInvisibilityChecker();
+    }
 
     @EventHandler
     public void onBucket(PlayerBucketEmptyEvent event) {
@@ -88,15 +96,10 @@ public class PlayerMiscListener implements Listener {
             return;
         }
 
-        // 检查是否是隐身药水
-        if (event.getItem().hasItemMeta() && event.getItem().getItemMeta() instanceof PotionMeta potionMeta) {
-            for (PotionEffect effect : potionMeta.getCustomEffects()) {
-                if (effect.getType() == PotionEffectType.INVISIBILITY) {
-                    // 是隐身药水，处理盔甲隐藏
-                    handleInvisibilityPotion(player, effect.getDuration());
-                    break;
-                }
-            }
+        if (event.getItem().getType().toString().contains("POTION")) {
+            MessageUtil.sendDebugMessage("是隐身药水，处理盔甲隐藏");
+            // 延迟1tick检查玩家是否获得隐身效果
+            Bukkit.getScheduler().runTaskLater(plugin, () -> checkPlayerInvisibility(player), 1L);
         }
 
         new BukkitRunnable() {
@@ -109,84 +112,42 @@ public class PlayerMiscListener implements Listener {
         }.runTaskLater(AzuraBedWars.getInstance(), 0);
     }
 
+    private void startInvisibilityChecker() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    checkPlayerInvisibility(player);
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 20L); // 每秒检查一次
+    }
+
     /**
      * 处理隐身药水效果
      * @param player 玩家
-     * @param duration 药水持续时间（tick）
      */
-    private void handleInvisibilityPotion(Player player, int duration) {
-        GamePlayer gamePlayer = GamePlayer.get(player);
-        if (gamePlayer == null || gamePlayer.isSpectator()) {
-            return;
-        }
+    private void checkPlayerInvisibility(Player player) {
+        UUID playerId = player.getUniqueId();
+        boolean hasInvisibility = player.hasPotionEffect(PotionEffectType.INVISIBILITY);
+        Boolean lastState = playerInvisibleState.get(playerId);
 
-        // 检查InvisibleUtil是否正确初始化
-        if (!InvisibleUtil.isInitialized()) {
-            player.sendMessage("§c隐身盔甲功能不可用，请联系管理员");
-            return;
-        }
+        // 状态发生变化
+        if (lastState == null || lastState != hasInvisibility) {
+            playerInvisibleState.put(playerId, hasInvisibility);
 
-        // 延迟3tick后隐藏盔甲（确保药水效果已经生效）
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (player.isOnline() && player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                    try {
-                        InvisibleUtil.hideArmor(player);
-                        // 给玩家发送确认消息（可选）
-                        MessageUtil.sendActionBar(player, "§7盔甲已隐藏");
-                    } catch (Exception e) {
-                        Bukkit.getLogger().warning("隐藏盔甲时发生错误: " + e.getMessage());
-                        player.sendMessage("§c隐藏盔甲失败，请联系管理员");
-                    }
-                }
+            if (hasInvisibility) {
+                // 玩家获得隐身效果
+                InvisibleUtil.hide(player);
+            } else {
+                // 玩家失去隐身效果
+                InvisibleUtil.show(player);
             }
-        }.runTaskLater(AzuraBedWars.getInstance(), 3);
+        }
+    }
 
-        // 定时检查隐身效果状态
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                // 检查玩家是否还在线
-                if (!player.isOnline()) {
-                    cancel();
-                    return;
-                }
-
-                // 检查玩家是否还存在游戏中
-                GamePlayer currentGamePlayer = GamePlayer.get(player);
-                if (currentGamePlayer == null) {
-                    cancel();
-                    return;
-                }
-
-                // 检查玩家是否已经成为观察者
-                if (currentGamePlayer.isSpectator()) {
-                    cancel();
-                    return;
-                }
-
-                // 检查游戏状态
-                if (gameManager.getGameState() != GameState.RUNNING) {
-                    cancel();
-                    return;
-                }
-
-                // 检查玩家是否还有隐身效果
-                if (!player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                    // 隐身效果结束，恢复盔甲显示
-                    try {
-                        InvisibleUtil.showArmor(player);
-                        // 给玩家发送确认消息（可选）
-                        MessageUtil.sendActionBar(player, "§7盔甲已恢复显示");
-                    } catch (Exception e) {
-                        Bukkit.getLogger().warning("恢复盔甲显示时发生错误: " + e.getMessage());
-                        player.sendMessage("§c恢复盔甲显示失败，请联系管理员");
-                    }
-                    cancel();
-                }
-            }
-        }.runTaskTimer(AzuraBedWars.getInstance(), 20L, 20L); // 1秒后开始检查，每1秒检查一次
+    public void cleanupPlayer(UUID playerId) {
+        playerInvisibleState.remove(playerId);
     }
 
     @EventHandler
