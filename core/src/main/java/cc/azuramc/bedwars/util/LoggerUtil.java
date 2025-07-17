@@ -1,0 +1,27 @@
+package cc.azuramc.bedwars.util;
+
+import org.bukkit.Bukkit;
+
+/**
+ * @author An5w1r
+ */
+public class LoggerUtil {
+
+    private static final String LOGGER_PREFIX = "[AzuraBedWars] ";
+
+    public static void info(String message) {
+        Bukkit.getLogger().info(LOGGER_PREFIX + message);
+    }
+
+    public static void warn(String message) {
+        Bukkit.getLogger().warning(LOGGER_PREFIX + message);
+    }
+
+    public static void error(String message) {
+        Bukkit.getLogger().severe(LOGGER_PREFIX + message);
+    }
+
+    public static void debug(String message) {
+        Bukkit.getLogger().info(LOGGER_PREFIX + "[DEBUG] " + message);
+    }
+}

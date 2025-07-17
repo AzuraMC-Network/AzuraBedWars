@@ -19,6 +19,8 @@ import cc.azuramc.bedwars.jedis.JedisManager;
 import cc.azuramc.bedwars.jedis.listener.PubSubListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
+import cc.azuramc.bedwars.nms.NMSAccess;
+import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
@@ -72,6 +74,8 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private PlayerDataDao playerDataDao;
     @Getter private PlayerDataService playerDataService;
     @Getter private ProtocolManager protocolManager;
+    @Getter private NMSProvider nmsProvider;
+    @Getter private NMSAccess nmsAccess;
 
     public static final String MAP_TABLE_NAME = "bw_map";
 
@@ -80,6 +84,7 @@ public final class AzuraBedWars extends JavaPlugin {
         long startTime = System.currentTimeMillis();
         instance = this;
 
+        setupNMSSupport();
         // 初始化配置系统
         initConfigSystem();
 
@@ -266,6 +271,11 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     public void mainThreadRunnable(Runnable runnable) {
         Bukkit.getScheduler().runTask(this, runnable);
+    }
+
+    private void setupNMSSupport() {
+        nmsProvider = new NMSProvider();
+        nmsAccess = nmsProvider.setup();
     }
 
     private void hookVault() {
