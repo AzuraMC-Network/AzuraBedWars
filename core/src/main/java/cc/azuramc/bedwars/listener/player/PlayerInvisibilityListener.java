@@ -20,7 +20,7 @@ import java.util.Objects;
  */
 public class PlayerInvisibilityListener implements Listener {
 
-    private AzuraBedWars plugin;
+    private final AzuraBedWars plugin;
     private static final Map<GamePlayer, Boolean> playerInvisibleState = new HashMap<>();
     private static final Map<GamePlayer, BukkitRunnable> invisibilityTasks = new HashMap<>();
 
@@ -68,7 +68,10 @@ public class PlayerInvisibilityListener implements Listener {
      * 结束玩家隐身状态
      */
     private static void endInvisibility(GamePlayer gamePlayer) {
-        if (gamePlayer != null && gamePlayer.isOnline()) {
+        if (gamePlayer == null) {
+            return;
+        }
+        if (gamePlayer.isOnline()) {
             AzuraBedWars.getInstance().getNmsAccess().showArmor(gamePlayer, GamePlayer.getGamePlayers());
             LoggerUtil.debug("PlayerInvisibilityListener$endInvisibility | player " + gamePlayer.getName() + " invisibility ended");
         }
