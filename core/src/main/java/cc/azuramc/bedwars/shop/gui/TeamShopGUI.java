@@ -506,7 +506,7 @@ public class TeamShopGUI extends CustomGUI {
             // 未升级状态
             int price = TIER_PRICES.get(ALARM_TRAP).get(0);
             
-            setItem(16, new ItemBuilder()
+            setItem(22, new ItemBuilder()
                     .setType(XMaterial.REDSTONE_TORCH.get())
                     .setDisplayName("§a" + ALARM_TRAP)
                     .setLores(
@@ -527,7 +527,7 @@ public class TeamShopGUI extends CustomGUI {
                     }, false));
         } else {
             // 已升级状态
-            setItem(16, new ItemBuilder()
+            setItem(22, new ItemBuilder()
                     .setType(XMaterial.REDSTONE_TORCH.get())
                     .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
                     .addItemFlag(ItemFlag.HIDE_ENCHANTS)
