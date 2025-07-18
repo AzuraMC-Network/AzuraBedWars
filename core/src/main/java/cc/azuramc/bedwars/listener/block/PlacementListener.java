@@ -51,7 +51,7 @@ public class PlacementListener implements Listener {
         }
 
         // 不允许放置床方块
-        if (block.getType().toString().startsWith("BED")) {
+        if (block.getType().toString().contains("BED")) {
             event.setCancelled(true);
             return;
         }
