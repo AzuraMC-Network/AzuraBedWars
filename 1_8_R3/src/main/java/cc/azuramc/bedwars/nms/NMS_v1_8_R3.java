@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author An5w1r@163.com
  */
-public final class NMS_v1_8_R3 implements NMSAccess {
+public class NMS_v1_8_R3 implements NMSAccess {
 
     @Override
     public void hideArmor(Player victim, Player receiver) {
