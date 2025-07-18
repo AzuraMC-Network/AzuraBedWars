@@ -46,6 +46,7 @@ public class ListenerRegistry {
         }
         Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerRespawnListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerTntDamageListener(), plugin);
 
         // projectile package
         Bukkit.getPluginManager().registerEvents(new EggBridgeListener(), plugin);
