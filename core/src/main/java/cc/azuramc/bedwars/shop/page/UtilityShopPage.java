@@ -26,9 +26,11 @@ public class UtilityShopPage implements ShopData {
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.TNT.get()).getItem(), "TNT", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 4, 40)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.ENDER_PEARL.get()).getItem(), "末影珍珠", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 4, 400)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WATER_BUCKET.get()).getItem(), "水桶", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.COMPASS.get()).setDisplayName("§e指南针").getItem(), "指南针", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
+//        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.COMPASS.get()).setDisplayName("§e指南针").getItem(), "指南针", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.BLAZE_ROD.get()).setDisplayName("§e援救平台").setLores(" ", "§f在空中使用该平台", "§f将在脚下生成一块临时史莱姆方块平台救生!").getItem(), "救援平台", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 80)));
 //        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.GUNPOWDER.get()).setDisplayName("§e回城卷轴").setLores(" ", "§f将在6秒后传送到出生点.", "§f注意:移动将会取消传送!").getItem(), "回城卷轴", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 10, 50)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.RED_BED.get()).setDisplayName("§e回春床").setLores(" ", "§f开局10分钟内可恢复一次床").getItem(), "回春床", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 80)));
+//        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.RED_BED.get()).setDisplayName("§e回春床").setLores(" ", "§f开局10分钟内可恢复一次床").getItem(), "回春床", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 80)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.GOLDEN_APPLE.get()).getItem(), "金苹果", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 3, 15)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.EGG.get()).getItem(), "搭桥蛋", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
     }
 }
