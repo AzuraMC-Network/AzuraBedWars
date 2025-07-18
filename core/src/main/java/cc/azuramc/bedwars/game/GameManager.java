@@ -329,21 +329,21 @@ public class GameManager {
 
         // 根据羊毛的数据值映射到TeamColor
         return switch (teamColor) {
-            case TeamColor.WHITE -> 0;
-            case TeamColor.ORANGE -> 1;
-            case TeamColor.MAGENTA -> 2;
-            case TeamColor.LIGHT_BLUE -> 3;
-            case TeamColor.YELLOW -> 4;
-            case TeamColor.LIME -> 5;
-            case TeamColor.PINK -> 6;
-            case TeamColor.GRAY -> 7;
-            case TeamColor.CYAN -> 9;
-            case TeamColor.PURPLE -> 10;
-            case TeamColor.BLUE -> 11;
-            case TeamColor.BROWN -> 12;
-            case TeamColor.GREEN -> 13;
-            case TeamColor.RED -> 14;
-            case TeamColor.BLACK -> 15;
+            case WHITE -> 0;
+            case ORANGE -> 1;
+            case MAGENTA -> 2;
+            case LIGHT_BLUE -> 3;
+            case YELLOW -> 4;
+            case LIME -> 5;
+            case PINK -> 6;
+            case GRAY -> 7;
+            case CYAN -> 9;
+            case PURPLE -> 10;
+            case BLUE -> 11;
+            case BROWN -> 12;
+            case GREEN -> 13;
+            case RED -> 14;
+            case BLACK -> 15;
             default -> 0;
         };
     }

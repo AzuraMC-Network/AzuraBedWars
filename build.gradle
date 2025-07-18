@@ -41,7 +41,7 @@ subprojects {
     group = 'cc.azuramc'
     version = '1.0.0'
 
-    def targetJavaVersion = 21
+    def targetJavaVersion = 17
     java {
         def javaVersion = JavaVersion.toVersion(targetJavaVersion)
         sourceCompatibility = javaVersion
