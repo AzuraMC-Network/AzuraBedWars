@@ -127,14 +127,12 @@ public class BedBreakHandler {
      */
     private static void broadcastBedDestructionMessages(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam) {
         // 播放全局音效
-        GAME_MANAGER.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
+        GAME_MANAGER.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 10, 10);
 
         // 发送全局消息
-        GAME_MANAGER.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
         GAME_MANAGER.broadcastMessage(" ");
-        GAME_MANAGER.broadcastMessage("§c§l" + targetTeam.getName() + " §a的床被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + "§a 挖爆!");
+        GAME_MANAGER.broadcastMessage("&f&l床被破坏 " + targetTeam.getChatColor() + targetTeam.getName() + " &f&l的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + "&f&l 破坏");
         GAME_MANAGER.broadcastMessage(" ");
-        GAME_MANAGER.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
 
         // 向受影响的团队发送标题提示
         GAME_MANAGER.broadcastTeamTitle(targetTeam, "§c§l床被摧毁", "§c死亡将无法复活", 1, 20, 1);
