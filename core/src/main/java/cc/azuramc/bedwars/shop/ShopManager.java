@@ -15,6 +15,7 @@ public class ShopManager {
     private static final List<ShopData> SHOPS = new ArrayList<>();
 
     public static void init(GameManager gameManager) {
+        registerShop(new DefaultShopPage());
         registerShop(new BlockShopPage());
         registerShop(new SwordShopPage());
         registerShop(new ArmorShopPage());
