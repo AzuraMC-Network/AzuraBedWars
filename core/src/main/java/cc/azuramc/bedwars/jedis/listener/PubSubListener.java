@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.jedis.JedisPubSubHandler;
 import cc.azuramc.bedwars.jedis.util.IPUtil;
 import cc.azuramc.bedwars.jedis.util.JedisUtil;
-import org.bukkit.Bukkit;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 /**
  * Redis PubSub监听器
@@ -68,21 +67,21 @@ public class PubSubListener implements Runnable {
             addedChannels.add(channel);
             
             // 记录订阅的频道
-            Bukkit.getLogger().info("正在订阅以下频道: " + String.join(", ", addedChannels));
+            LoggerUtil.info("正在订阅以下频道: " + String.join(", ", addedChannels));
             
             // 使用线程池执行订阅操作
             subscribeTask = executorService.submit(() -> {
                 try (Jedis jedis = JedisUtil.getJedis()) {
                     jedis.subscribe(jedisPubSubHandler, addedChannels.toArray(new String[0]));
                 } catch (JedisConnectionException e) {
-                    Bukkit.getLogger().log(Level.SEVERE, "Redis连接失败，将在" + RECONNECT_DELAY + "秒后重试", e);
+                    LoggerUtil.error("Redis连接失败，将在" + RECONNECT_DELAY + "秒后重试");
                     scheduleReconnect();
                 } catch (Exception e) {
-                    Bukkit.getLogger().log(Level.SEVERE, "初始化PubSub订阅失败", e);
+                    LoggerUtil.error("初始化PubSub订阅失败");
                 }
             });
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.SEVERE, "初始化PubSub订阅失败", e);
+            LoggerUtil.error("初始化PubSub订阅失败");
         }
     }
 
@@ -107,7 +106,7 @@ public class PubSubListener implements Runnable {
         if (jedisPubSubHandler != null) {
             jedisPubSubHandler.subscribe(channels);
         }
-        Bukkit.getLogger().info("频道注册成功: " + Arrays.toString(channels));
+        LoggerUtil.info("频道注册成功: " + Arrays.toString(channels));
     }
 
     /**

@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.compat.util;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -55,7 +56,8 @@ public class ItemBuilder {
                 reflectionInitialized = true;
             } catch (Exception e) {
                 // 记录初始化失败，稍后会回退到备用方法
-                Bukkit.getLogger().warning("无法初始化NMS反射: " + e.getMessage());
+                LoggerUtil.warn("无法初始化NMS反射: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -217,7 +219,7 @@ public class ItemBuilder {
                 }
             }
         } catch (Exception e) {
-            Bukkit.getLogger().warning("设置物品不可破坏失败: " + e.getMessage());
+            LoggerUtil.warn("设置物品不可破坏失败: " + e.getMessage());
         }
         
         return this;
@@ -251,7 +253,7 @@ public class ItemBuilder {
                 
                 reflectionInitialized = true;
             } catch (Exception e) {
-                Bukkit.getLogger().warning("无法初始化NMS反射: " + e.getMessage());
+                LoggerUtil.warn("无法初始化NMS反射: " + e.getMessage());
                 return item;
             }
         }
@@ -280,7 +282,7 @@ public class ItemBuilder {
             // 转换回Bukkit物品
             return (ItemStack) asBukkitCopyMethod.invoke(null, nmsItem);
         } catch (Exception e) {
-            Bukkit.getLogger().warning("使用NBT设置不可破坏失败: " + e.getMessage());
+            LoggerUtil.warn("使用NBT设置不可破坏失败: " + e.getMessage());
             return item;
         }
     }

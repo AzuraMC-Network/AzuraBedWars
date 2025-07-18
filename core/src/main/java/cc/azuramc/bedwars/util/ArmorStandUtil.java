@@ -160,7 +160,7 @@ public class ArmorStandUtil {
             }
         } catch (Exception e) {
             // 捕获并记录异常，但不要中断游戏流程
-            Bukkit.getLogger().warning("无法移动盔甲架: " + e.getMessage());
+            LoggerUtil.warn("无法移动盔甲架: " + e.getMessage());
         }
     }
 }

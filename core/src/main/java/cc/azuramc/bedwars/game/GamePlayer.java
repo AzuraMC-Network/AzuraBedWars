@@ -133,7 +133,7 @@ public class GamePlayer {
             return createNewPlayerData(uuid, name, playerDataService);
             
         } catch (Exception e) {
-            Bukkit.getLogger().warning("加载玩家数据时发生错误: " + e.getMessage());
+            LoggerUtil.warn("加载玩家数据时发生错误: " + e.getMessage());
             e.printStackTrace();
             // 如果数据库操作失败，返回默认的PlayerData
             return createDefaultPlayerData(uuid, name);
@@ -164,7 +164,7 @@ public class GamePlayer {
             
             return null;
         } catch (Exception e) {
-            Bukkit.getLogger().warning("查询玩家数据时发生错误: " + e.getMessage());
+            LoggerUtil.warn("查询玩家数据时发生错误: " + e.getMessage());
             return null;
         }
     }
@@ -192,7 +192,7 @@ public class GamePlayer {
             return newPlayerData;
             
         } catch (Exception e) {
-            Bukkit.getLogger().warning("创建新玩家数据时发生错误: " + e.getMessage());
+            LoggerUtil.warn("创建新玩家数据时发生错误: " + e.getMessage());
             e.printStackTrace();
             return createDefaultPlayerData(uuid, name);
         }
@@ -299,7 +299,7 @@ public class GamePlayer {
      */
     public void addExperience(String resourceType, int amount) {
         if (amount <= 0) {
-            Bukkit.getLogger().warning("addExperience 应该输入大于0的数值");
+            LoggerUtil.warn("addExperience 应该输入大于0的数值");
             return;
         }
 
@@ -315,7 +315,7 @@ public class GamePlayer {
      */
     public boolean spendExperience(String resourceType, int amount) {
         if (amount <= 0) {
-            Bukkit.getLogger().warning("spendExperience 应该输入大于0的数值");
+            LoggerUtil.warn("spendExperience 应该输入大于0的数值");
             return false;
         }
 

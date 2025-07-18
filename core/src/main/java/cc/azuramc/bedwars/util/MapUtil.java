@@ -137,14 +137,14 @@ public class MapUtil {
                 fallbackSetBlockData(block, data);
             }
         } catch (Exception e) {
-            Bukkit.getLogger().warning("无法设置方块数据: " + e.getMessage());
+            LoggerUtil.warn("无法设置方块数据: " + e.getMessage());
             if (Bukkit.getPluginManager().isPluginEnabled("AzuraBedWars")) {
-                Bukkit.getLogger().info("尝试使用替代方法设置方块数据...");
+                LoggerUtil.info("尝试使用替代方法设置方块数据...");
                 try {
                     // 尝试使用替代方法
                     fallbackSetBlockData(block, data);
                 } catch (Exception ex) {
-                    Bukkit.getLogger().warning("替代方法也失败: " + ex.getMessage());
+                    LoggerUtil.warn("替代方法也失败: " + ex.getMessage());
                 }
             }
         }
@@ -225,7 +225,7 @@ public class MapUtil {
             }
 
         } catch (Exception e) {
-            Bukkit.getLogger().warning("回退设置方块数据方法失败: " + e.getMessage());
+            LoggerUtil.warn("回退设置方块数据方法失败: " + e.getMessage());
         }
     }
 }

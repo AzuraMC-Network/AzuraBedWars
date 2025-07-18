@@ -2,8 +2,8 @@ package cc.azuramc.bedwars.compat.util;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -29,13 +29,13 @@ public class BedUtil {
                 gameTeam.getBedFeet().setType(XMaterial.AIR.get());
             }
         } catch (Exception e) {
-            Bukkit.getLogger().warning("销毁床时出现异常: " + e.getMessage());
+            LoggerUtil.warn("销毁床时出现异常: " + e.getMessage());
             try {
                 // 反射调用
                 setBlockTypeUsingReflection(gameTeam.getBedHead());
                 setBlockTypeUsingReflection(gameTeam.getBedFeet());
             } catch (Exception ex) {
-                Bukkit.getLogger().severe("无法销毁床: " + ex.getMessage());
+                LoggerUtil.error("无法销毁床: " + ex.getMessage());
             }
         }
     }
@@ -103,7 +103,7 @@ public class BedUtil {
                     bedFeet.setType(Material.AIR);
                 }
             } catch (Exception e) {
-                Bukkit.getLogger().warning("销毁床时出错: " + e.getMessage());
+                LoggerUtil.warn("销毁床时出错: " + e.getMessage());
                 // 兜底方案：直接设置目标方块为AIR
                 targetBlock.setType(Material.AIR);
             }

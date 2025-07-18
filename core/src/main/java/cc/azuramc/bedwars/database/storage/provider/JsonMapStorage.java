@@ -3,9 +3,9 @@ package cc.azuramc.bedwars.database.storage.provider;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.game.map.MapData;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.bukkit.Bukkit;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -53,7 +53,7 @@ public class JsonMapStorage implements IMapStorage {
             writer.write(json);
             return true;
         } catch (IOException e) {
-            Bukkit.getLogger().severe("保存地图数据到JSON文件时出错: " + e.getMessage());
+            LoggerUtil.error("保存地图数据到JSON文件时出错: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -73,7 +73,7 @@ public class JsonMapStorage implements IMapStorage {
             mapData.setName(mapName);
             return mapData;
         } catch (Exception e) {
-            Bukkit.getLogger().severe("从JSON文件加载地图数据时出错: " + e.getMessage());
+            LoggerUtil.error("从JSON文件加载地图数据时出错: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

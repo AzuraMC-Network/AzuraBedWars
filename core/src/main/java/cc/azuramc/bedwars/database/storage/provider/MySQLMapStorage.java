@@ -3,9 +3,9 @@ package cc.azuramc.bedwars.database.storage.provider;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.game.map.MapData;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.bukkit.Bukkit;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -44,7 +44,7 @@ public class MySQLMapStorage implements IMapStorage {
     private void setupDatabase() {
         try (Connection connection = AzuraBedWars.getInstance().getOrmHander().getConnection()) {
             if (connection == null) {
-                Bukkit.getLogger().severe("无法连接到数据库: " + databaseName);
+                LoggerUtil.error("无法连接到数据库: " + databaseName);
                 return;
             }
             
@@ -62,7 +62,7 @@ public class MySQLMapStorage implements IMapStorage {
                 statement.executeUpdate();
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("设置数据库表结构时出错: " + e.getMessage());
+            LoggerUtil.error("设置数据库表结构时出错: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -104,7 +104,7 @@ public class MySQLMapStorage implements IMapStorage {
                 return affected > 0;
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("保存地图数据到MySQL时出错: " + e.getMessage());
+            LoggerUtil.error("保存地图数据到MySQL时出错: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -139,7 +139,7 @@ public class MySQLMapStorage implements IMapStorage {
                 }
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("从MySQL加载地图数据时出错: " + e.getMessage());
+            LoggerUtil.error("从MySQL加载地图数据时出错: " + e.getMessage());
             e.printStackTrace();
         }
         
@@ -161,7 +161,7 @@ public class MySQLMapStorage implements IMapStorage {
                 return affected > 0;
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("从MySQL删除地图数据时出错: " + e.getMessage());
+            LoggerUtil.error("从MySQL删除地图数据时出错: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -184,7 +184,7 @@ public class MySQLMapStorage implements IMapStorage {
                 }
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("检查地图是否存在时出错: " + e.getMessage());
+            LoggerUtil.error("检查地图是否存在时出错: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -209,7 +209,7 @@ public class MySQLMapStorage implements IMapStorage {
                 }
             }
         } catch (SQLException e) {
-            Bukkit.getLogger().severe("获取所有地图名称时出错: " + e.getMessage());
+            LoggerUtil.error("获取所有地图名称时出错: " + e.getMessage());
             e.printStackTrace();
         }
         

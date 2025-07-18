@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.game.map;
 import cc.azuramc.bedwars.compat.util.WorldUtil;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -134,18 +135,18 @@ public class MapManager {
             // 如果世界已经存在，先卸载它
             World existingWorld = Bukkit.getWorld(mapName);
             if (existingWorld != null) {
-                Bukkit.getLogger().info("正在卸载已经存在的世界 " + mapName);
+                LoggerUtil.info("正在卸载已经存在的世界 " + mapName);
                 Bukkit.unloadWorld(existingWorld, false);
             }
             
             // 检查目标目录是否存在，存在则删除
             File targetDir = new File(Bukkit.getWorldContainer(), mapName);
             if (targetDir.exists()) {
-                Bukkit.getLogger().info("正在删除已经存在的世界 " + mapName);
+                LoggerUtil.info("正在删除已经存在的世界 " + mapName);
                 FileUtils.deleteDirectory(targetDir);
                 // 确保目录被完全删除
                 if (targetDir.exists()) {
-                    Bukkit.getLogger().warning("无法删除目标目录: " + targetDir.getAbsolutePath());
+                    LoggerUtil.warn("无法删除目标目录: " + targetDir.getAbsolutePath());
                     return null;
                 }
             }
@@ -153,7 +154,7 @@ public class MapManager {
             // 确保源目录存在
             File sourceDir = new File(mapUrl);
             if (!sourceDir.exists() || !sourceDir.isDirectory()) {
-                Bukkit.getLogger().warning("源地图目录不存在: " + mapUrl);
+                LoggerUtil.warn("源地图目录不存在: " + mapUrl);
                 return null;
             }
             
@@ -170,7 +171,7 @@ public class MapManager {
                 return WorldUtil.setWorldRules(mapWorld);
             }
         } catch (IOException e) {
-            Bukkit.getLogger().severe("加载地图世界时出错: " + e.getMessage());
+            LoggerUtil.error("加载地图世界时出错: " + e.getMessage());
             e.printStackTrace();
         }
         
@@ -193,14 +194,14 @@ public class MapManager {
         // 获取地图文件URL
         String mapUrl = mapData.getFileUrl();
         if (mapUrl == null || mapUrl.isEmpty()) {
-            Bukkit.getLogger().warning("地图 " + mapName + " 没有设置物理路径(URL)");
+            LoggerUtil.warn("地图 " + mapName + " 没有设置物理路径(URL)");
             return null;
         }
-        Bukkit.getLogger().info("正在从 " + mapUrl + "获取地图文件");
+        LoggerUtil.info("正在从 " + mapUrl + "获取地图文件");
 
         World world = loadMapWorld(mapName, mapUrl);
         if (world == null) {
-            Bukkit.getLogger().warning("world 加载失败");
+            LoggerUtil.warn("world 加载失败");
             return null;
         }
         

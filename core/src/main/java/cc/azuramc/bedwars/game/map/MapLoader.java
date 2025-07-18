@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.jedis.JedisManager;
 import cc.azuramc.bedwars.jedis.event.BukkitPubSubMessageEvent;
 import cc.azuramc.bedwars.jedis.util.IPUtil;
 import cc.azuramc.bedwars.jedis.util.JedisUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -54,20 +55,20 @@ public class MapLoader {
                 public void onPubSubMessage(BukkitPubSubMessageEvent event) {
                     if (event.getChannel().equals(MAP_CHANNEL)) {
                         mapLoaderFuture.complete(event.getMessage());
-                        Bukkit.getLogger().info(LOG_PREFIX + "开始加载地图: " + event.getMessage());
+                        LoggerUtil.info(LOG_PREFIX + "开始加载地图: " + event.getMessage());
                         HandlerList.unregisterAll(this);
                     }
                 }
             }, plugin);
 
-            Bukkit.getLogger().info("正在通过Jedis请求地图");
+            LoggerUtil.info("正在通过Jedis请求地图");
             JedisUtil.publish(MAP_CHANNEL, "requestMap");
 
             String mapName = null;
             try {
                 mapName = mapLoaderFuture.get(DEFAULT_WAIT_TIME, TimeUnit.SECONDS);
             } catch (Exception e) {
-                Bukkit.getLogger().info("请求超时 加载备用方案");
+                LoggerUtil.info("请求超时 加载备用方案");
             }
 
             if (mapName != null && !mapName.isEmpty()) {
@@ -75,7 +76,7 @@ public class MapLoader {
                 if (plugin.getMapData() != null) {
                     return;
                 }
-                Bukkit.getLogger().warning("Jedis地图加载失败 尝试加载默认地图");
+                LoggerUtil.warn("Jedis地图加载失败 尝试加载默认地图");
             }
         }
 
@@ -83,7 +84,7 @@ public class MapLoader {
         if (defaultMapName != null && !defaultMapName.isEmpty()) {
             plugin.setMapData(mapManager.loadMapAndWorld(defaultMapName));
             if (plugin.getMapData() != null) {
-                Bukkit.getLogger().info(LOG_PREFIX + "默认地图加载成功");
+                LoggerUtil.info(LOG_PREFIX + "默认地图加载成功");
                 return;
             }
         }
@@ -93,12 +94,12 @@ public class MapLoader {
             String anyMapName = plugin.getMapManager().getLoadedMaps().keySet().iterator().next();
             plugin.setMapData(mapManager.loadMapAndWorld(anyMapName));
             if (plugin.getMapData() != null) {
-                Bukkit.getLogger().info(LOG_PREFIX + "由于未设置地图 自动选择已加载地图: " + anyMapName);
+                LoggerUtil.info(LOG_PREFIX + "由于未设置地图 自动选择已加载地图: " + anyMapName);
                 return;
             }
         }
 
-        Bukkit.getLogger().info(LOG_PREFIX + "所有地图加载尝试均失败，请先打开editorMode为服务端设置地图");
+        LoggerUtil.info(LOG_PREFIX + "所有地图加载尝试均失败，请先打开editorMode为服务端设置地图");
     }
 
 

@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.config;
 
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import org.bukkit.Bukkit;
 
 import java.io.*;
 
@@ -64,7 +64,7 @@ public class ConfigHandler<T> {
             if (!file.getParentFile().exists()) {
                 boolean created = file.getParentFile().mkdirs();
                 if (!created) {
-                    Bukkit.getLogger().severe("无法创建配置文件目录：" + file.getParentFile().getAbsolutePath());
+                    LoggerUtil.error("无法创建配置文件目录：" + file.getParentFile().getAbsolutePath());
                     return;
                 }
             }
