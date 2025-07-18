@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.util.ArmorStandUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
@@ -18,12 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 资源生成计时器
@@ -210,13 +206,13 @@ public class GeneratorTask {
                         ArmorStandUtil.moveArmorStand(as, as.getLocation().getY());
                     } catch (Exception e) {
                         // 记录异常但继续处理其他盔甲架
-                        Bukkit.getLogger().warning("处理盔甲架时出错: " + e.getMessage());
+                        LoggerUtil.warn("处理盔甲架时出错: " + e.getMessage());
                         iterator.remove(); // 移除有问题的盔甲架
                     }
                 }
             } catch (Exception e) {
                 // 捕获总体异常，确保任务不会终止
-                Bukkit.getLogger().warning("盔甲架更新任务出错: " + e.getMessage());
+                LoggerUtil.warn("盔甲架更新任务出错: " + e.getMessage());
             }
         }, 0L, 1L).getTaskId();
     }
@@ -336,7 +332,7 @@ public class GeneratorTask {
                 registerResourceDisplay(DIAMOND_TIME_DISPLAY, DIAMOND_GENERATOR_NAME, 
                     gameManager.getArmorStand().keySet(), DIAMOND_NAME);
             } else {
-                Bukkit.getLogger().warning("无法注册钻石显示更新：盔甲架集合为空");
+                LoggerUtil.warn("无法注册钻石显示更新：盔甲架集合为空");
             }
             
             // 绿宝石显示更新
@@ -344,10 +340,10 @@ public class GeneratorTask {
                 registerResourceDisplay(EMERALD_TIME_DISPLAY, EMERALD_GENERATOR_NAME, 
                     gameManager.getArmorSande().keySet(), EMERALD_NAME);
             } else {
-                Bukkit.getLogger().warning("无法注册绿宝石显示更新：盔甲架集合为空");
+                LoggerUtil.warn("无法注册绿宝石显示更新：盔甲架集合为空");
             }
         } catch (Exception e) {
-            Bukkit.getLogger().warning("注册资源显示更新器时出错: " + e.getMessage());
+            LoggerUtil.warn("注册资源显示更新器时出错: " + e.getMessage());
         }
     }
     
@@ -425,7 +421,7 @@ public class GeneratorTask {
     private void registerResourceDisplay(String displayName, String generatorName, 
                                        java.util.Set<ArmorStand> armorStands, String resourceName) {
         if (armorStands == null || armorStands.isEmpty()) {
-            Bukkit.getLogger().warning("尝试注册资源显示，但盔甲架集合为空: " + displayName);
+            LoggerUtil.warn("尝试注册资源显示，但盔甲架集合为空: " + displayName);
             return;
         }
         
@@ -468,13 +464,13 @@ public class GeneratorTask {
                                 updateLevelDisplay(armorStand, currentEvent);
                             }
                         } catch (Exception e) {
-                            Bukkit.getLogger().warning("更新盔甲架显示时出错: " + e.getMessage());
+                            LoggerUtil.warn("更新盔甲架显示时出错: " + e.getMessage());
                             // 移除问题盔甲架
                             iterator.remove();
                         }
                     }
                 } catch (Exception e) {
-                    Bukkit.getLogger().warning("处理资源显示更新时出错: " + e.getMessage());
+                    LoggerUtil.warn("处理资源显示更新时出错: " + e.getMessage());
                 }
             })
         );
@@ -504,7 +500,7 @@ public class GeneratorTask {
                 armorStand.setCustomName(displayText);
             }
         } catch (Exception e) {
-            Bukkit.getLogger().warning("更新时间显示时出错: " + e.getMessage());
+            LoggerUtil.warn("更新时间显示时出错: " + e.getMessage());
         }
     }
     
@@ -531,7 +527,7 @@ public class GeneratorTask {
             
             armorStand.setCustomName(levelDisplay);
         } catch (Exception e) {
-            Bukkit.getLogger().warning("更新等级显示时出错: " + e.getMessage());
+            LoggerUtil.warn("更新等级显示时出错: " + e.getMessage());
         }
     }
 }

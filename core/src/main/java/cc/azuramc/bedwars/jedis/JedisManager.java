@@ -8,13 +8,12 @@ import cc.azuramc.bedwars.jedis.listener.ServerListener;
 import cc.azuramc.bedwars.jedis.util.IPUtil;
 import cc.azuramc.bedwars.jedis.util.JedisUtil;
 import cc.azuramc.bedwars.jedis.util.JsonUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.*;
-import java.util.logging.Level;
 
 /**
  * Jedis管理器
@@ -117,7 +116,7 @@ public class JedisManager {
                 handleServerManagerFile();
             } catch (Exception e) {
                 // 捕获异常但不中断任务执行
-                Bukkit.getLogger().log(Level.SEVERE, "服务器状态更新任务执行失败", e);
+                LoggerUtil.error("服务器状态更新任务执行失败");
             }
         }, 0, TASK_INTERVAL, TimeUnit.MILLISECONDS);
     }
@@ -148,7 +147,7 @@ public class JedisManager {
             if (serverManagerFile.exists()) {
                 boolean deleted = serverManagerFile.delete();
                 if (!deleted) {
-                    Bukkit.getLogger().severe("无法删除服务器管理文件：" + serverManagerFile.getAbsolutePath());
+                    LoggerUtil.error("无法删除服务器管理文件：" + serverManagerFile.getAbsolutePath());
                 }
                 serverData.setServerType(ServerType.END);
             }
@@ -166,7 +165,7 @@ public class JedisManager {
                 if (serverManagerFile.exists()) {
                     boolean deleted = serverManagerFile.delete();
                     if (!deleted) {
-                        Bukkit.getLogger().severe("无法删除服务器管理文件：" + serverManagerFile.getAbsolutePath());
+                        LoggerUtil.error("无法删除服务器管理文件：" + serverManagerFile.getAbsolutePath());
                     }
                     serverData.setServerType(ServerType.END);
                 }
@@ -181,7 +180,7 @@ public class JedisManager {
         try {
             JedisUtil.publish(GAME_SERVER_MANAGER_CHANNEL, JsonUtil.getDynamicString(serverData, expand));
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.SEVERE, "发布服务器状态失败", e);
+            LoggerUtil.error("发布服务器状态失败");
         }
     }
 
@@ -195,11 +194,11 @@ public class JedisManager {
                 && !serverManagerFile.exists()) {
                 boolean created = serverManagerFile.createNewFile();
                 if (!created) {
-                    Bukkit.getLogger().severe("无法创建服务器管理文件：" + serverManagerFile.getAbsolutePath());
+                    LoggerUtil.error("无法创建服务器管理文件：" + serverManagerFile.getAbsolutePath());
                 }
             }
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.SEVERE, "处理服务器管理文件失败", e);
+            LoggerUtil.error("处理服务器管理文件失败");
         }
     }
 

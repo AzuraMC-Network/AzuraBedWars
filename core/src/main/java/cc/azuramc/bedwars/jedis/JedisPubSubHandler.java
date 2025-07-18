@@ -2,10 +2,8 @@ package cc.azuramc.bedwars.jedis;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.jedis.event.BukkitPubSubMessageEvent;
-import org.bukkit.Bukkit;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import redis.clients.jedis.JedisPubSub;
-
-import java.util.logging.Level;
 
 /**
  * Redis PubSub消息处理器
@@ -39,14 +37,12 @@ public class JedisPubSubHandler extends JedisPubSub {
                 return;
             }
 
-            Bukkit.getLogger().info(LOG_PREFIX + "收到消息 - 频道: " + channel + ", 内容: " + message);
+            LoggerUtil.info(LOG_PREFIX + "收到消息 - 频道: " + channel + ", 内容: " + message);
             
             // 在高版本Bukkit Event要求必须主线程触发
-            plugin.mainThreadRunnable(() -> {
-                plugin.callEvent(new BukkitPubSubMessageEvent(channel, message));
-            });
+            plugin.mainThreadRunnable(() -> plugin.callEvent(new BukkitPubSubMessageEvent(channel, message)));
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.SEVERE, LOG_PREFIX + "处理消息时发生错误", e);
+            LoggerUtil.error(LOG_PREFIX + "处理消息时发生错误");
         }
     }
 }

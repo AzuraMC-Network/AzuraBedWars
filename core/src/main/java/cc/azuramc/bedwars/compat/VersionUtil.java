@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.compat;
 
+import cc.azuramc.bedwars.util.LoggerUtil;
 import org.bukkit.Bukkit;
 
 public class VersionUtil {
@@ -43,8 +44,9 @@ public class VersionUtil {
                 }
             }
         } catch (Exception e) {
-            Bukkit.getLogger().warning("无法解析服务器版本: " + e.getMessage());
-            Bukkit.getLogger().warning("使用默认版本: 1.13");
+            LoggerUtil.warn("无法解析服务器版本: " + e.getMessage());
+            LoggerUtil.warn("使用默认版本: 1.13");
+            e.printStackTrace();
         }
         
         VERSION = version;

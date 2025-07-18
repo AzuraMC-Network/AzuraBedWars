@@ -3,12 +3,13 @@ package cc.azuramc.bedwars.listener.world;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.util.LoggerUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.Chunk;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -66,11 +67,11 @@ public class ChunkListener implements Listener {
                     SET_FORCE_LOADED_METHOD.invoke(chunk, true);
                     FORCE_LOADED_CHUNKS.add(chunkKey);
                     //TODO 或许需要一个全局的DEBUG了
-//                    Bukkit.getLogger().info("已强制加载区块: " + chunkKey);
+//                    LoggerUtil.info("已强制加载区块: " + chunkKey);
                     return;
                 }
             } catch (Exception e) {
-                Bukkit.getLogger().warning("无法使用ForceLoadedChunk API: " + e.getMessage());
+                LoggerUtil.warn("无法使用ForceLoadedChunk API: " + e.getMessage());
             }
         }
 
@@ -87,7 +88,7 @@ public class ChunkListener implements Listener {
             try {
                 event.getClass().getMethod("setCancelled", boolean.class).invoke(event, true);
             } catch (Exception e) {
-                Bukkit.getLogger().warning("无法直接取消区块卸载事件: " + e.getMessage());
+                LoggerUtil.warn("无法直接取消区块卸载事件: " + e.getMessage());
             }
         }
     }
@@ -113,7 +114,7 @@ public class ChunkListener implements Listener {
                     SET_FORCE_LOADED_METHOD.invoke(chunk, false);
                 }
             } catch (Exception e) {
-                Bukkit.getLogger().warning("释放强制加载区块失败: " + e.getMessage());
+                LoggerUtil.warn("释放强制加载区块失败: " + e.getMessage());
             }
         }
         
