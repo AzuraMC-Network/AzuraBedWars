@@ -4,16 +4,17 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.LoggerUtil;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author An5w1r@163.com
@@ -38,7 +39,17 @@ public class PlayerInvisibilityListener implements Listener {
 
         GamePlayer gamePlayer = GamePlayer.get(player);
 
-        if (Objects.requireNonNull(event.getItem().getItemMeta()).getDisplayName().contains("隐身")) {
+        ItemStack itemStack = event.getItem();
+        if (itemStack.getType() == Material.AIR || itemStack.getItemMeta() == null ||  itemStack.getItemMeta() == null) {
+            return;
+        }
+
+        String itemName =  itemStack.getItemMeta().getDisplayName();
+        if (itemName == null || itemName.isEmpty()) {
+            return;
+        }
+
+        if (itemName.contains("隐身")) {
             LoggerUtil.debug("PlayerInvisibilityListener$onDrink | invisible player is " + player.getName());
 
             // 如果玩家已经隐身，取消之前的任务
