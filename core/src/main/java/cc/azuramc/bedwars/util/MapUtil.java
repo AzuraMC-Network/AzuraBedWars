@@ -18,8 +18,8 @@ import java.lang.reflect.Method;
  */
 public class MapUtil {
 
-    private static final int TEAM_SPAWN_PROTECTION_RADIUS = 5;
-    private static final int RESOURCE_SPAWN_PROTECTION_RADIUS = 3;
+    private static final int TEAM_SPAWN_PROTECTION_RADIUS = 8;
+    private static final int RESOURCE_SPAWN_PROTECTION_RADIUS = 5;
     private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
 
     /**
