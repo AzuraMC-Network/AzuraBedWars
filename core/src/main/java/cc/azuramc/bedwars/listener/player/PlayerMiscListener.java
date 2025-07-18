@@ -21,7 +21,6 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -33,20 +32,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  * @author an5w1r@163.com
  */
 public class PlayerMiscListener implements Listener {
-    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
-
-    @EventHandler
-    public void onBucket(PlayerBucketEmptyEvent event) {
-        Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player);
-
-        if (gamePlayer == null || gameManager.getGameState() != GameState.RUNNING) {
-            return;
-        }
-
-        PlayerUtil.setItemInHand(player, null);
-    }
 
     @EventHandler
     public void onFood(FoodLevelChangeEvent event) {
