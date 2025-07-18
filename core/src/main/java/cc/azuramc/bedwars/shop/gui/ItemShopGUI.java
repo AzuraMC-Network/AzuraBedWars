@@ -11,7 +11,6 @@ import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
 import cc.azuramc.bedwars.shop.*;
-import cc.azuramc.bedwars.shop.page.DefaultShopPage;
 import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
@@ -65,13 +64,6 @@ public class ItemShopGUI extends CustomGUI {
      */
     public ItemShopGUI(GamePlayer gamePlayer, int slot, GameManager gameManager) {
         super(gamePlayer, "§8道具商店 - " + ChatColor.stripColor(ShopManager.getSHOPS().get(slot).getMainShopItem().getDisplayName()), 54);
-        PlayerData playerData = gamePlayer.getPlayerData();
-
-        // 检查是否有DIYShop，如果没有则优先打开DefaultShop
-        if (slot == 0 && !hasDIYShop(playerData)) {
-            // 默认打开第一个非DIYShop的商店
-            slot = 1;
-        }
 
         // 初始化商店导航栏
         initializeShopNavbar(gamePlayer, slot, gameManager);
@@ -80,33 +72,7 @@ public class ItemShopGUI extends CustomGUI {
         initializeShopSeparator(slot);
 
         // 初始化商店内容
-        ShopData shopData = ShopManager.getSHOPS().get(slot);
-        if (shopData instanceof DefaultShopPage) {
-            initializeDefaultShop(gamePlayer, slot, gameManager);
-        } else {
-            initializeRegularShop(gamePlayer, shopData, slot, gameManager);
-        }
-    }
-
-    /**
-     * 检查玩家是否有DIYShop
-     *
-     * @param playerData 玩家档案
-     * @return 是否有DIYShop
-     */
-    private boolean hasDIYShop(PlayerData playerData) {
-        String[] shopSort = playerData.getShopData();
-        if (shopSort == null) {
-            return false;
-        }
-        
-        // 检查是否有非"AIR"的槽位
-        for (String shopItemCode : shopSort) {
-            if (!"AIR".equals(shopItemCode)) {
-                return true;
-            }
-        }
-        return false;
+        initializeCustomShop(gamePlayer, slot, gameManager);
     }
 
     /**
@@ -150,7 +116,7 @@ public class ItemShopGUI extends CustomGUI {
     /**
      * 初始化默认商店(快捷购买) - 使用JSON格式
      */
-    private void initializeDefaultShop(GamePlayer gamePlayer, int slot, GameManager gameManager) {
+    private void initializeCustomShop(GamePlayer gamePlayer, int slot, GameManager gameManager) {
         // 从数据库加载JSON格式的快捷商店配置
         Map<Integer, String> shopDataMap = loadShopDataFromJson(gamePlayer.getPlayerData());
         
@@ -234,17 +200,6 @@ public class ItemShopGUI extends CustomGUI {
         }
         
         return null;
-    }
-    
-    /**
-     * 初始化常规商店
-     */
-    private void initializeRegularShop(GamePlayer gamePlayer, ShopData shopData, int shopSlot, GameManager gameManager) {
-        int itemIndex = -1;
-        for (ShopItemType shopItemType : shopData.getShopItems()) {
-            itemIndex++;
-            setItem(gamePlayer, shopSlot, SHOP_SLOTS[itemIndex], gameManager, shopItemType, itemIndex, null);
-        }
     }
 
     /**

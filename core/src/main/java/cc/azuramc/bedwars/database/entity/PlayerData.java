@@ -29,7 +29,6 @@ public class PlayerData implements ChangeManager.DirtyTracker {
     private int wins;
     private int losses;
     private int games;
-    private String[] shopData;
     private String shopDataJson;
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -189,26 +188,6 @@ public class PlayerData implements ChangeManager.DirtyTracker {
         playerDataService.changeManager.registerDirty(this);
         this.updatedAt = updatedAt;
     }
-    public void setShopData(String[] shopData) {
-        this.isDirty = true;
-        playerDataService.changeManager.registerDirty(this);
-        StringBuilder string = null;
-        for (String s : shopData) {
-            if (string == null) {
-                string = new StringBuilder(s + ", ");
-                continue;
-            }
-
-            string.append(s).append(", ");
-        }
-
-        String finalShopDataString = null;
-        if (string != null) {
-            finalShopDataString = string.substring(0, string.length() - 2);
-            this.shopData = finalShopDataString.split(",");
-        }
-    }
-
     public void setShopDataJson(String shopDataJson) {
         this.isDirty = true;
         playerDataService.changeManager.registerDirty(this);
