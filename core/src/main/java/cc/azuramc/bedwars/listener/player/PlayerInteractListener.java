@@ -30,6 +30,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -415,6 +416,19 @@ public class PlayerInteractListener implements Listener {
                 return;
             }
         }
+    }
+
+    @EventHandler
+    public void onBucket(PlayerBucketEmptyEvent event) {
+        Player player = event.getPlayer();
+        GamePlayer gamePlayer = GamePlayer.get(player);
+
+        if (gamePlayer == null || gameManager.getGameState() != GameState.RUNNING) {
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(),
+                () -> player.getInventory().removeItem(XMaterial.BUCKET.parseItem()), 2L);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
