@@ -19,6 +19,13 @@ import java.util.UUID;
 public class PlayerDataDao {
     
     public AzuraOrmClient ormClient;
+
+    private final String defaultShopJson = "{\"0\":\"BlockShopPage#1\",\"1\":\"SwordShopPage#1\",\"8\":\"SwordShopPage#2\"," +
+            "\"15\":\"SwordShopPage#3\",\"7\":\"BlockShopPage#5\",\"14\":\"BlockShopPage#8\",\"2\":\"ArmorShopPage#1\"," +
+            "\"9\":\"ArmorShopPage#2\",\"16\":\"ArmorShopPage#3\",\"3\":\"ToolShopPage#3\",\"10\":\"ToolShopPage#1\"," +
+            "\"17\":\"ToolShopPage#2\",\"4\":\"BowShopPage#3\",\"11\":\"BowShopPage#1\",\"5\":\"PotionShopPage#1\"," +
+            "\"12\":\"PotionShopPage#2\",\"19\":\"PotionShopPage#3\",\"6\":\"UtilityShopPage#6\",\"13\":\"UtilityShopPage#2\"," +
+            "\"20\":\"UtilityShopPage#1\"}";
     
     public PlayerDataDao(AzuraBedWars plugin) {
         this.ormClient = plugin.getOrmClient();
@@ -78,7 +85,7 @@ public class PlayerDataDao {
                     .values(PlayerDataTableKey.wins, playerData.getWins())
                     .values(PlayerDataTableKey.losses, playerData.getLosses())
                     .values(PlayerDataTableKey.games, playerData.getGames())
-                    .values(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : "{}")
+                    .values(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : defaultShopJson)
                     .values(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
                     .values(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .prepare();
@@ -118,7 +125,7 @@ public class PlayerDataDao {
                     .set(PlayerDataTableKey.wins, playerData.getWins())
                     .set(PlayerDataTableKey.losses, playerData.getLosses())
                     .set(PlayerDataTableKey.games, playerData.getGames())
-                    .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : "{}")
+                    .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : defaultShopJson)
                     .set(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
                     .set(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .whereEquals(PlayerDataTableKey.id, playerData.getId())
