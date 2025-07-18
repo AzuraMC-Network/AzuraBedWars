@@ -218,13 +218,7 @@ public class GamePlayer {
         playerData.setWins(0);
         playerData.setLosses(0);
         playerData.setGames(0);
-        
-        // 设置默认商店数据
-        String[] defaultShopData = new String[]{"BlockShop#1", "SwordShop#1", "ArmorShop#1", "FoodShop#1", "BowShop#2", "PotionShop#1",
-                "UtilityShop#2", "BlockShop#8", "SwordShop#2", "ArmorShop#2", "UtilityShop#1", "BowShop#1", "PotionShop#2",
-                "UtilityShop#4", "AIR", "AIR", "AIR", "AIR", "AIR", "AIR", "AIR"};
-        playerData.setShopData(defaultShopData);
-        
+        playerData.setShopDataJson(null);
         java.sql.Timestamp now = new java.sql.Timestamp(System.currentTimeMillis());
         playerData.setCreatedAt(now);
         playerData.setUpdatedAt(now);
