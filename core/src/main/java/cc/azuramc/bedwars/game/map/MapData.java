@@ -316,23 +316,25 @@ public class MapData {
      * 此方法兼容1.8和1.21版本
      */
     private boolean canSkippedBlock(Block block) {
-        Material type = block.getType();
-        String typeName = type.name();
+        Material material = block.getType();
+        String materialName = material.name();
 
-        // 检查AIR（空气方块）- 两个版本都有
-        if (type == XMaterial.AIR.get()) {
+        // 检查AIR
+        if (material == XMaterial.AIR.get()) {
             return true;
         }
 
         // 检查BED_BLOCK（床方块）
         // 在1.13+版本中变为BED、RED_BED等
-        if (typeName.contains("BED")) {
+        if (materialName.contains("BED")) {
             return true;
         }
 
-        // 检查DEAD_BUSH（枯灌木）
-        // 在1.13+版本中名称保持一致，但为了安全起见使用字符串比较
-        return typeName.contains("DEAD_BUSH");
+        if (materialName.contains("DEAD_BUSH")) {
+            return true;
+        }
+
+        return materialName.contains("LONG_GRASS");
     }
 
     /**
