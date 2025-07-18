@@ -11,17 +11,14 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -124,46 +121,5 @@ public class PlayerMiscListener implements Listener {
                 i++;
             }
         }.runTaskTimer(AzuraBedWars.getInstance(), 0, 10L);
-    }
-
-    @EventHandler
-    public void onChestOpen(PlayerInteractEvent event) {
-
-        if (gameManager.getGameState() != GameState.RUNNING) {
-            return;
-        }
-
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
-            return;
-        }
-
-        Block block = event.getClickedBlock();
-        Material blockType = null;
-        if (block != null) {
-            blockType = block.getType();
-        }
-
-        // 只对木箱进行判断
-        if (blockType != XMaterial.CHEST.get()) {
-            return;
-        }
-
-        Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player);
-
-        if (gamePlayer.isSpectator()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        for (GameTeam team : gameManager.getGameTeams()) {
-            if (block != null && team.getSpawnLocation().distance(block.getLocation()) <= 18) {
-                if (!team.getAlivePlayers().isEmpty() && !team.isInTeam(gamePlayer)) {
-                    event.setCancelled(true);
-                    player.sendMessage("§c只有该队伍的玩家可以打开这个箱子");
-                }
-                break;
-            }
-        }
     }
 }
