@@ -131,7 +131,7 @@ public class BedBreakHandler {
 
         // 发送全局消息
         GAME_MANAGER.broadcastMessage(" ");
-        GAME_MANAGER.broadcastMessage("&f&l床被破坏 " + targetTeam.getChatColor() + targetTeam.getName() + " &f&l的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + "&f&l 破坏");
+        GAME_MANAGER.broadcastMessage("&f&l床被破坏 >>> " + targetTeam.getChatColor() + targetTeam.getName() + " 的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + " 破坏");
         GAME_MANAGER.broadcastMessage(" ");
 
         // 向受影响的团队发送标题提示
