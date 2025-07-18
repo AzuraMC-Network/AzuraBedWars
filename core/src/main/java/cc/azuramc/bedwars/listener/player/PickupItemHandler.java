@@ -268,15 +268,15 @@ public class PickupItemHandler {
      * 应用VIP经验加成
      */
     private static double applyVipBonus(Player player, double xp) {
-        if (player.hasPermission("azurabedwars.xp.vip1")) {
-            xp = xp + (xp * 1.1);
-        } else if (player.hasPermission("azurabedwars.xp.vip2")) {
-            xp = xp + (xp * 1.2);
-        } else if (player.hasPermission("azurabedwars.xp.vip3")) {
-            xp = xp + (xp * 1.4);
-        } else if (player.hasPermission("azurabedwars.xp.vip4")) {
-            xp = xp + (xp * 1.8);
-        }
+//        if (player.hasPermission("azurabedwars.xp.vip1")) {
+//            xp = xp + (xp * 1.1);
+//        } else if (player.hasPermission("azurabedwars.xp.vip2")) {
+//            xp = xp + (xp * 1.2);
+//        } else if (player.hasPermission("azurabedwars.xp.vip3")) {
+//            xp = xp + (xp * 1.4);
+//        } else if (player.hasPermission("azurabedwars.xp.vip4")) {
+//            xp = xp + (xp * 1.8);
+//        }
         return xp;
     }
 } 

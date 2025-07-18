@@ -22,8 +22,8 @@ public class ShopManager {
         registerShop(new ToolShopPage());
         registerShop(new BowShopPage());
         registerShop(new PotionShopPage());
-        registerShop(new FoodShopPage());
         registerShop(new UtilityShopPage());
+        registerShop(new ConvertShopPage());
     }
 
     public static void registerShop(ShopData shopData) {
