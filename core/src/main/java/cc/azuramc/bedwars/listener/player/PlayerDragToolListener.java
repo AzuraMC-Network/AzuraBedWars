@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -127,7 +128,7 @@ public class PlayerDragToolListener implements Listener {
             return;
         }
 
-        Inventory topInventory = event.getView().getTopInventory();
+        Inventory topInventory = XInventoryView.of(event.getView()).getTopInventory();
         if (!isForbiddenContainer(topInventory)) {
             return;
         }
