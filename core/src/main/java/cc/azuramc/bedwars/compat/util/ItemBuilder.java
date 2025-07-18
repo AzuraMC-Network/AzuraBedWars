@@ -331,6 +331,19 @@ public class ItemBuilder {
     }
 
     /**
+     * 设置玻璃颜色
+     * @param dyeColor 染料颜色
+     * @return 构建器实例
+     */
+    public ItemBuilder setGlassColor(DyeColor dyeColor) {
+        this.itemStack = XMaterial.matchXMaterial(dyeColor.toString() + "_STAINED_GLASS")
+                // 找不到颜色名则用白色
+                .orElse(XMaterial.GLASS)
+                .parseItem();
+        return this;
+    }
+
+    /**
      * 设置物品数量
      * @param amount 数量
      * @return 构建器实例

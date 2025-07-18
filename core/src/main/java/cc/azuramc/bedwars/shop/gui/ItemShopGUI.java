@@ -751,18 +751,17 @@ public class ItemShopGUI extends CustomGUI {
             // 处理羊毛
             if (shopItemType.getItemStack().getType().name().contains("WOOL")) {
                 // 创建带颜色的羊毛
-                ItemBuilder woolBuilder = new ItemBuilder();
-                woolBuilder.setWoolColor(gamePlayer.getGameTeam().getDyeColor());
-                woolBuilder.setAmount(shopItemType.getItemStack().getAmount());
+                itemBuilder.setWoolColor(gamePlayer.getGameTeam().getDyeColor());
+                itemBuilder.setAmount(shopItemType.getItemStack().getAmount());
                 
                 // 保留原始附魔（如果有）
                 for (Map.Entry<Enchantment, Integer> entry : shopItemType.getItemStack().getEnchantments().entrySet()) {
-                    woolBuilder.addEnchant(entry.getKey(), entry.getValue());
+                    itemBuilder.addEnchant(entry.getKey(), entry.getValue());
                 }
-                
-                // 添加到玩家物品栏
-                player.getInventory().addItem(woolBuilder.getItem());
-                return; // 已经添加到物品栏，直接返回
+
+            } else if (shopItemType.getItemStack().getType().name().contains("GLASS")) {
+                itemBuilder.setGlassColor(gamePlayer.getGameTeam().getDyeColor());
+                itemBuilder.setAmount(shopItemType.getItemStack().getAmount());
             } else {
                 // 对于非羊毛的颜色方块，使用旧方法
                 itemBuilder.setDurability(gamePlayer.getGameTeam().getDyeColor().getDyeData());
