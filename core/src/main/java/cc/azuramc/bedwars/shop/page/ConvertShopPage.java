@@ -23,9 +23,9 @@ public class ConvertShopPage implements ShopData {
         mainShopItem = new ShopItemType(new ItemBuilder().setType(XMaterial.EXPERIENCE_BOTTLE.get()).setLores("§e点击查看！").getItem(), "§a经验转换", ColorType.NONE, null);
 
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.IRON_INGOT.get()).setAmount(1).getItem(), "铁锭", ColorType.NONE, new PriceCost(XMaterial.OAK_BUTTON.get(), 1, 1)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.GOLD_INGOT.get()).setAmount(2).getItem(), "金锭", ColorType.NONE, new PriceCost(XMaterial.OAK_BUTTON.get(), 1, 4)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.DIAMOND.get()).setAmount(2).getItem(), "钻石", ColorType.NONE, new PriceCost(XMaterial.OAK_BUTTON.get(), 1, 40)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.EMERALD.get()).setAmount(2).getItem(), "绿宝石", ColorType.NONE, new PriceCost(XMaterial.OAK_BUTTON.get(), 1, 80)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.GOLD_INGOT.get()).setAmount(1).getItem(), "金锭", ColorType.NONE, new PriceCost(XMaterial.OAK_BUTTON.get(), 1, 5)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.DIAMOND.get()).setAmount(1).getItem(), "钻石", ColorType.NONE, new PriceCost(XMaterial.OAK_BUTTON.get(), 1, 50)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.EMERALD.get()).setAmount(1).getItem(), "绿宝石", ColorType.NONE, new PriceCost(XMaterial.OAK_BUTTON.get(), 1, 100)));
     }
 
 }
