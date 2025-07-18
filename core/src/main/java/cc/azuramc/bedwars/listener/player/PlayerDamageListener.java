@@ -165,6 +165,10 @@ public class PlayerDamageListener implements Listener {
         }
 
         cleanDeathDrops(event);
+        // 清除经验来源map
+        gamePlayer.getExperienceSources().clear();
+        LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | expMapCleared");
+        handlePlayerRespawn(gamePlayer);
     }
 
     /**
@@ -202,10 +206,6 @@ public class PlayerDamageListener implements Listener {
         // 移除虚空标记并处理重生
         gamePlayer.getPlayer().removeMetadata(METADATA_VOID_PLAYER, plugin);
 
-        // 清除经验来源map
-        gamePlayer.getExperienceSources().clear();
-        LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | expMapCleared");
-        handlePlayerRespawn(gamePlayer);
     }
 
     /**
