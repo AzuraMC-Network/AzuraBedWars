@@ -35,6 +35,7 @@ public class ListenerRegistry {
         Bukkit.getPluginManager().registerEvents(new PlayerDragToolListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerDropListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), plugin);
+        Bukkit.getPluginManager().registerEvents(new PlayerInvisibilityListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerMiscListener(), plugin);
         Bukkit.getPluginManager().registerEvents(new PlayerResourcePutListener(), plugin);

@@ -97,11 +97,6 @@ public class PlayerDamageListener implements Listener {
             handleRunningStateDamage(event, gamePlayer);
         }
 
-        // 处理玩家复活保护
-        if (PlayerRespawnListener.RESPAWN_PROTECT.get(player) != null) {
-            PlayerRespawnListener.RESPAWN_PROTECT.remove(player);
-        }
-
     }
 
     /**
@@ -194,6 +189,11 @@ public class PlayerDamageListener implements Listener {
         // 处理非虚空死亡
         if (!gamePlayer.getPlayer().hasMetadata(METADATA_VOID_PLAYER)) {
             handleNormalDeath(gamePlayer, gameTeam);
+        }
+
+        // 如果存在隐藏盔甲效果则移除
+        if (PlayerInvisibilityListener.isPlayerInvisible(gamePlayer)) {
+            PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
         }
 
         // 移除虚空标记并处理重生
@@ -412,6 +412,16 @@ public class PlayerDamageListener implements Listener {
         // 处理爆炸伤害修改
         if ((event.getCause() == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
             event.setDamage(event.getFinalDamage() * EXPLOSION_DAMAGE_RATE);
+        }
+
+        // 处理玩家复活保护
+        if (PlayerRespawnListener.RESPAWN_PROTECT.get(gamePlayer) != null) {
+            PlayerRespawnListener.RESPAWN_PROTECT.remove(gamePlayer);
+        }
+
+        // 玩家攻击移除隐身
+        if (PlayerInvisibilityListener.isPlayerInvisible(gamePlayer)) {
+            PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
         }
     }
 

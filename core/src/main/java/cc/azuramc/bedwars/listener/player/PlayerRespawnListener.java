@@ -58,7 +58,7 @@ public class PlayerRespawnListener implements Listener {
     private static final String REJOIN_BUTTON = MESSAGE_CONFIG.getRejoinButton();
     private static final String REJOIN_COMMAND = MESSAGE_CONFIG.getRejoinCommand();
     
-    public static final Map<Player, Boolean> RESPAWN_PROTECT = new HashMap<>();
+    public static final Map<GamePlayer, Boolean> RESPAWN_PROTECT = new HashMap<>();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
     /**
@@ -102,11 +102,11 @@ public class PlayerRespawnListener implements Listener {
      */
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
+        if (!(event.getEntity() instanceof Player player)) {
             return;
         }
 
-        if (!RESPAWN_PROTECT.containsKey((Player) event.getEntity())) {
+        if (!RESPAWN_PROTECT.containsKey(GamePlayer.get(player))) {
             return;
         }
 
@@ -288,10 +288,10 @@ public class PlayerRespawnListener implements Listener {
      * @param gamePlayer 游戏玩家玩家
      */
     private void applyDamageProtection(GamePlayer gamePlayer) {
-        RESPAWN_PROTECT.put(gamePlayer.getPlayer(), false);
+        RESPAWN_PROTECT.put(gamePlayer, false);
         Bukkit.getScheduler().runTaskLater(
             AzuraBedWars.getInstance(), 
-            () -> RESPAWN_PROTECT.remove(gamePlayer.getUuid()),
+            () -> RESPAWN_PROTECT.remove(gamePlayer),
             RESPAWN_PROTECTION_TICKS
         );
     }

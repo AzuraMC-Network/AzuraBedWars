@@ -7,11 +7,8 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
-import cc.azuramc.bedwars.util.InvisibleUtil;
-import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,12 +27,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author an5w1r@163.com
@@ -43,11 +35,6 @@ import java.util.UUID;
 public class PlayerMiscListener implements Listener {
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
-    private final Map<UUID, Boolean> playerInvisibleState = new HashMap<>();
-
-    public PlayerMiscListener() {
-        startInvisibilityChecker();
-    }
 
     @EventHandler
     public void onBucket(PlayerBucketEmptyEvent event) {
@@ -58,8 +45,7 @@ public class PlayerMiscListener implements Listener {
             return;
         }
 
-        gamePlayer.getPlayer().setItemInHand(null);
-        gamePlayer.getPlayer().getInventory().setItemInMainHand(null);
+        PlayerUtil.setItemInHand(player, null);
     }
 
     @EventHandler
@@ -96,12 +82,6 @@ public class PlayerMiscListener implements Listener {
             return;
         }
 
-        if (event.getItem().getType().toString().contains("POTION")) {
-            LoggerUtil.debug("是隐身药水，处理盔甲隐藏");
-            // 延迟1tick检查玩家是否获得隐身效果
-            Bukkit.getScheduler().runTaskLater(plugin, () -> checkPlayerInvisibility(player), 1L);
-        }
-
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -112,43 +92,6 @@ public class PlayerMiscListener implements Listener {
         }.runTaskLater(AzuraBedWars.getInstance(), 0);
     }
 
-    private void startInvisibilityChecker() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    checkPlayerInvisibility(player);
-                }
-            }
-        }.runTaskTimer(plugin, 0L, 20L); // 每秒检查一次
-    }
-
-    /**
-     * 处理隐身药水效果
-     * @param player 玩家
-     */
-    private void checkPlayerInvisibility(Player player) {
-        UUID playerId = player.getUniqueId();
-        boolean hasInvisibility = player.hasPotionEffect(PotionEffectType.INVISIBILITY);
-        Boolean lastState = playerInvisibleState.get(playerId);
-
-        // 状态发生变化
-        if (lastState == null || lastState != hasInvisibility) {
-            playerInvisibleState.put(playerId, hasInvisibility);
-
-            if (hasInvisibility) {
-                // 玩家获得隐身效果
-                InvisibleUtil.hide(player);
-            } else {
-                // 玩家失去隐身效果
-                InvisibleUtil.show(player);
-            }
-        }
-    }
-
-    public void cleanupPlayer(UUID playerId) {
-        playerInvisibleState.remove(playerId);
-    }
 
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
@@ -228,7 +171,7 @@ public class PlayerMiscListener implements Listener {
         }
 
         for (GameTeam team : gameManager.getGameTeams()) {
-            if (team.getSpawnLocation().distance(block.getLocation()) <= 18) {
+            if (block != null && team.getSpawnLocation().distance(block.getLocation()) <= 18) {
                 if (!team.getAlivePlayers().isEmpty() && !team.isInTeam(gamePlayer)) {
                     event.setCancelled(true);
                     player.sendMessage("§c只有该队伍的玩家可以打开这个箱子");

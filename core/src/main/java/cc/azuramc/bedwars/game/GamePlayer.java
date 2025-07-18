@@ -45,7 +45,7 @@ public class GamePlayer {
 
     private static final PlayerConfig.GamePlayer CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getGamePlayer();
 
-    private static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
     private static final int MAX_HEALTH = CONFIG.getMaxHealth();
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
@@ -250,7 +250,7 @@ public class GamePlayer {
      * @return 游戏玩家实例
      */
     public static GamePlayer get(UUID uuid) {
-        return GAME_PLAYERS.get(uuid);
+        return GAME_PLAYERS.getOrDefault(uuid, null);
     }
 
     /**
