@@ -135,9 +135,13 @@ public class PlayerDamageListener implements Listener {
     }
 
     private void processKillReward(PlayerDeathEvent event, GamePlayer gamePlayer, GamePlayer gameKiller) {
+        if (gamePlayer == null) {
+            return;
+        }
+
         if (gameKiller.getGameModeType() == GameModeType.EXPERIENCE) {
             // 1. 击杀者是经验模式
-            if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+            if (gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player and killer all the 'EXPERIENCE' mode'");
                 // 1.1 被击杀者也是经验模式，直接给经验，无需转换
                 // 从experienceSources直接给予经验
@@ -147,11 +151,9 @@ public class PlayerDamageListener implements Listener {
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player is 'EXPERIENCE' mode , killer is 'DEFAULT' mode");
                 gameKiller.getPlayer().giveExpLevels(getPlayerRewardExp(gamePlayer.getPlayer()));
             }
-            // 清理死亡玩家物品
-            cleanDeathDrops(event);
         } else {
             // 2. 击杀者是default模式
-            if (gamePlayer != null && gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+            if (gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
                 // 2.1 被击杀者是经验模式，需要将经验转换为物品
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player is 'DEFAULT' mode , killer is 'EXPERIENCE' mode");
                 convertExperienceSourcesToItems(gamePlayer, gameKiller, event);
@@ -159,9 +161,10 @@ public class PlayerDamageListener implements Listener {
                 // 2.2 被击杀者是default模式，直接转移物品
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player and killer all the 'DEFAULT' mode'");
                 transferItemsToKiller(gamePlayer.getPlayer(), gameKiller.getPlayer(), event);
-                cleanDeathDrops(event);
             }
         }
+
+        cleanDeathDrops(event);
     }
 
     /**
