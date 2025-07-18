@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.team.GameTeam;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -58,6 +59,10 @@ public class PlayerResourcePutListener implements Listener {
                 return;
         }
 
+        if (!isOtherTeamChest(gamePlayer, block)) {
+            return;
+        }
+
         if (targetInventory == null) return;
 
         ItemStack item = event.getItem();
@@ -108,5 +113,19 @@ public class PlayerResourcePutListener implements Listener {
         } else if (transferredCount > 0) {
             gamePlayer.sendMessage("&a成功转移了 " + transferredCount + " 个物品！");
         }
+    }
+
+    private boolean isOtherTeamChest(GamePlayer gamePlayer, Block block) {
+        for (GameTeam team : AzuraBedWars.getInstance().getGameManager().getGameTeams()) {
+            if (team.getSpawnLocation().distance(block.getLocation()) <= 18) {
+                if (!team.getAlivePlayers().isEmpty() && !team.isInTeam(gamePlayer)) {
+                    gamePlayer.sendMessage("&c只有该队伍的玩家才可以使用这个箱子");
+                    return false;
+                }
+                break;
+            }
+        }
+
+        return true;
     }
 }

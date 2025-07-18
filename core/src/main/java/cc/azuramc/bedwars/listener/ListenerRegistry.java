@@ -35,6 +35,7 @@ public class ListenerRegistry {
 
         // player package
         register(new PlayerAFKListener());
+        register(new PlayerChestOpenListener());
         register(new PlayerDamageListener());
         register(new PlayerDeathReasonListener());
         register(new PlayerDragToolListener());
