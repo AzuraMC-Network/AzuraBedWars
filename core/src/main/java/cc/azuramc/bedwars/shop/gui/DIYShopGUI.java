@@ -55,16 +55,15 @@ public class DIYShopGUI extends CustomGUI {
      */
     public DIYShopGUI(GamePlayer gamePlayer, GameManager gameManager, ItemStack itemStack, String className) {
         super(gamePlayer, "§8添加物品到快捷购买", 54);
-        PlayerData playerData = gamePlayer.getPlayerData();
 
         // 初始化界面
-        initializeUI(gameManager, gamePlayer, itemStack, className, playerData);
+        initializeUI(gameManager, gamePlayer, itemStack, className);
     }
     
     /**
      * 初始化用户界面
      */
-    private void initializeUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className, PlayerData playerData) {
+    private void initializeUI(GameManager gameManager, GamePlayer gamePlayer, ItemStack itemStack, String className) {
         
         // 设置顶部展示物品
         setItem(4, new ItemBuilder()
@@ -77,7 +76,7 @@ public class DIYShopGUI extends CustomGUI {
         setupBorders();
         
         // 设置快捷购买槽位
-        setupShopSlots(gameManager, gamePlayer, className, playerData);
+        setupShopSlots(gameManager, gamePlayer, className);
     }
     
     /**
@@ -109,7 +108,8 @@ public class DIYShopGUI extends CustomGUI {
     /**
      * 设置商店槽位 - 新的JSON方式
      */
-    private void setupShopSlots(GameManager gameManager, GamePlayer gamePlayer, String className, PlayerData playerData) {
+    private void setupShopSlots(GameManager gameManager, GamePlayer gamePlayer, String className) {
+        PlayerData playerData = gamePlayer.getPlayerData();
         // 从数据库加载JSON格式的快捷商店配置
         Map<Integer, String> shopDataMap = loadShopDataFromJson(playerData);
         
