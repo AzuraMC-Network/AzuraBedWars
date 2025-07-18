@@ -14,45 +14,50 @@ import cc.azuramc.bedwars.listener.special.WarpPowderListener;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
 import cc.azuramc.bedwars.listener.world.ExplodeListener;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 
 /**
  * @author an5w1r@163.com
  */
 public class ListenerRegistry {
+    private final AzuraBedWars plugin;
 
     public ListenerRegistry(AzuraBedWars plugin) {
+        this.plugin = plugin;
+
         // block package
-        Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlacementListener(), plugin);
+        register(new BlockBreakListener());
+        register(new BlockBreakListener());
+        register(new PlacementListener());
 
         // chat package
-        Bukkit.getPluginManager().registerEvents(new ChatListener(), plugin);
+        register(new ChatListener());
 
         // player package
-        Bukkit.getPluginManager().registerEvents(new PlayerAFKListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerDamageListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerDeathReasonListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerDragToolListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerDropListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerInvisibilityListener(plugin), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerMiscListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerResourcePutListener(), plugin);
+        register(new PlayerAFKListener());
+        register(new PlayerDamageListener());
+        register(new PlayerDeathReasonListener());
+        register(new PlayerDragToolListener());
+        register(new PlayerDropListener());
+        register(new PlayerInteractListener());
+        register(new PlayerInvisibilityListener(plugin));
+        register(new PlayerJoinListener());
+        register(new PlayerMiscListener());
+        register(new PlayerResourcePutListener());
         if (VersionUtil.isLessThan113()) {
-            Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerA(), plugin);
+            register(new PlayerPickUpListenerA());
         } else {
-            Bukkit.getPluginManager().registerEvents(new PlayerPickUpListenerB(), plugin);
+            register(new PlayerPickUpListenerB());
         }
-        Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerRespawnListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new PlayerTntDamageListener(), plugin);
+        register(new PlayerQuitListener());
+        register(new PlayerRespawnListener());
+        register(new PlayerTntDamageListener());
 
         // projectile package
-        Bukkit.getPluginManager().registerEvents(new EggBridgeListener(), plugin);
+        register(new EggBridgeListener());
 
         // server package
-        Bukkit.getPluginManager().registerEvents(new ServerListener(), plugin);
+        register(new ServerListener());
 
         // setup package
         if (plugin.getSettingsConfig().isEditorMode()) {
@@ -60,11 +65,15 @@ public class ListenerRegistry {
         }
 
         // special package
-        Bukkit.getPluginManager().registerEvents(new RescuePlatformListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new WarpPowderListener(), plugin);
+        register(new RescuePlatformListener());
+        register(new WarpPowderListener());
 
         // world
-        Bukkit.getPluginManager().registerEvents(new ChunkListener(), plugin);
-        Bukkit.getPluginManager().registerEvents(new ExplodeListener(), plugin);
+        register(new ChunkListener());
+        register(new ExplodeListener());
+    }
+
+    private void register(Listener listener) {
+        Bukkit.getPluginManager().registerEvents(listener, plugin);
     }
 }
