@@ -38,21 +38,26 @@ public class PlayerResourcePutListener implements Listener {
         }
 
         Block block = event.getClickedBlock();
-        if (block == null) {
-            return;
-        }
+        if (block == null) return;
 
-        Inventory targetInventory;
+        Inventory targetInventory = null;
+        Material blockType = block.getType();
 
-        if (block.getType() == Material.ENDER_CHEST) {
-            targetInventory = player.getEnderChest();
-        } else {
-            BlockState state = block.getState();
-            if (!(state instanceof Container container)) {
+        switch (blockType) {
+            case CHEST:
+            case TRAPPED_CHEST:
+                if (block.getState() instanceof Chest) {
+                    targetInventory = ((Chest) block.getState()).getInventory();
+                }
+                break;
+            case ENDER_CHEST:
+                targetInventory = player.getEnderChest();
+                break;
+            default:
                 return;
-            }
-            targetInventory = container.getInventory();
         }
+
+        if (targetInventory == null) return;
 
         ItemStack item = event.getItem();
         ItemStack resource;
@@ -80,5 +85,4 @@ public class PlayerResourcePutListener implements Listener {
             }
         }
     }
-
 }
