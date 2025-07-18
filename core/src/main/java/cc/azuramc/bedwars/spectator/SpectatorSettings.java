@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
 
 /**
  * 旁观者设置管理类
@@ -15,25 +14,6 @@ import java.util.concurrent.*;
  */
 public class SpectatorSettings {
 
-    private static final int THREAD_POOL_SIZE = 5;
-
-    private static final int CORE_POOL_SIZE = THREAD_POOL_SIZE;
-    private static final int MAX_POOL_SIZE = THREAD_POOL_SIZE;
-    private static final long KEEP_ALIVE_TIME = 60L;
-    private static final int QUEUE_CAPACITY = 100;
-
-    /**
-     * 线程池和缓存
-     */
-    private static final ExecutorService FIXED_THREAD_POOL = new ThreadPoolExecutor(
-        CORE_POOL_SIZE,
-        MAX_POOL_SIZE,
-        KEEP_ALIVE_TIME,
-        TimeUnit.SECONDS,
-        new LinkedBlockingQueue<>(QUEUE_CAPACITY),
-        Executors.defaultThreadFactory(),
-        new ThreadPoolExecutor.CallerRunsPolicy()
-    );
     private static final Map<GamePlayer, SpectatorSettings> SPECTATOR_SETTINGS_HASH_MAP = new HashMap<>();
 
     private final GamePlayer gamePlayer;
