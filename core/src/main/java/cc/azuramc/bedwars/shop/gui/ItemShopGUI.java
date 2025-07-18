@@ -11,6 +11,7 @@ import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
 import cc.azuramc.bedwars.shop.*;
+import cc.azuramc.bedwars.shop.page.DefaultShopPage;
 import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
@@ -72,7 +73,12 @@ public class ItemShopGUI extends CustomGUI {
         initializeShopSeparator(slot);
 
         // 初始化商店内容
-        initializeCustomShop(gamePlayer, slot, gameManager);
+        ShopData shopData = ShopManager.getSHOPS().get(slot);
+        if (shopData instanceof DefaultShopPage) {
+            initializeCustomShop(gamePlayer, slot, gameManager);
+        } else {
+            initializeRegularShop(gamePlayer, shopData, slot, gameManager);
+        }
     }
 
     /**
@@ -166,7 +172,18 @@ public class ItemShopGUI extends CustomGUI {
         // 返回默认空配置
         return new HashMap<>();
     }
-    
+
+    /**
+     * 初始化常规商店
+     */
+    private void initializeRegularShop(GamePlayer gamePlayer, ShopData shopData, int shopSlot, GameManager gameManager) {
+        int itemIndex = -1;
+        for (ShopItemType shopItemType : shopData.getShopItems()) {
+            itemIndex++;
+            setItem(gamePlayer, shopSlot, SHOP_SLOTS[itemIndex], gameManager, shopItemType, itemIndex, null);
+        }
+    }
+
     /**
      * 设置空槽位
      */
