@@ -35,19 +35,19 @@ public class PlayerDeathReasonListener implements Listener {
 
         switch (Objects.requireNonNull(player.getLastDamageCause()).getCause()) {
             case ENTITY_ATTACK -> {
-                gameKiller.sendMessage("&e你击杀了 " + gamePlayer.getGameTeam().getColor() + gamePlayer.getNickName());
-                gamePlayer.sendMessage("&e你被 " + gameKiller.getGameTeam().getColor() + gameKiller.getNickName() + " &e击杀了");
+                gameKiller.sendMessage("&e你击杀了 " + gamePlayer.getGameTeam().getChatColor() + gamePlayer.getNickName());
+                gamePlayer.sendMessage("&e你被 " + gameKiller.getGameTeam().getChatColor() + gameKiller.getNickName() + " &e击杀了");
             }
 
-            case FALL -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getColor() + gamePlayer.getNickName() + " &e落地过猛");
+            case FALL -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getChatColor() + gamePlayer.getNickName() + " &e落地过猛");
 
-            case VOID -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getColor() + gamePlayer.getNickName() + " &e跌入虚空");
+            case VOID -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getChatColor() + gamePlayer.getNickName() + " &e跌入虚空");
 
-            case FIRE -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getColor() + gamePlayer.getNickName() + " &e欲火焚身");
+            case FIRE -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getChatColor() + gamePlayer.getNickName() + " &e欲火焚身");
 
-            case ENTITY_EXPLOSION -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getColor() + gamePlayer.getNickName() + " &e被炸死了");
+            case ENTITY_EXPLOSION -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getChatColor() + gamePlayer.getNickName() + " &e被炸死了");
 
-            default -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getColor() + gamePlayer.getNickName() + "死亡");
+            default -> gameManager.broadcastMessage(gamePlayer.getGameTeam().getChatColor() + gamePlayer.getNickName() + "死亡");
         }
 
     }
