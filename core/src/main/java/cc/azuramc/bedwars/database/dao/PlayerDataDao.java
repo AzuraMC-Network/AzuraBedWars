@@ -28,19 +28,6 @@ public class PlayerDataDao {
      * 建表
      */
     public void createPlayerDataTable() throws SQLException {
-        String[] defaultShopData = new String[]{"BlockShop#1", "SwordShop#1", "ArmorShop#1", "FoodShop#1", "BowShop#2", "PotionShop#1",
-                "UtilityShop#2", "BlockShop#8", "SwordShop#2", "ArmorShop#2", "UtilityShop#1", "BowShop#1", "PotionShop#2",
-                "UtilityShop#4", "AIR", "AIR", "AIR", "AIR", "AIR", "AIR", "AIR"};
-        StringBuilder string = null;
-        for (String s : defaultShopData) {
-            if (string == null) {
-                string = new StringBuilder(s + ", ");
-                continue;
-            }
-
-            string.append(s).append(", ");
-        }
-        String dataToStore = string.toString();
 
         try (Connection conn = ormClient.getConnection()) {
             PreparedStatement createUsersStmt = ormClient.createTable(conn)
@@ -58,7 +45,6 @@ public class PlayerDataDao {
                     .column(PlayerDataTableKey.wins, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.losses, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.games, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
-                    .column(PlayerDataTableKey.shopData, DataType.Type.TEXT.getSql(), DataType.DEFAULT(dataToStore))
                     .column(PlayerDataTableKey.shopDataJson, DataType.Type.TEXT.getSql(), DataType.DEFAULT("{}"))
                     .addTimestamps()
                     .engine("InnoDB")
@@ -77,10 +63,6 @@ public class PlayerDataDao {
      * @return 插入成功后，带有生成ID的用户对象
      */
     public PlayerData insertPlayerData(PlayerData playerData) throws SQLException {
-        String shopDataString = "";
-        if (playerData.getShopData() != null) {
-            shopDataString = String.join(", ", playerData.getShopData());
-        }
 
         try (Connection conn = ormClient.getConnection()) {
             PreparedStatement insertUsersStmt = ormClient.insert(conn)
@@ -96,7 +78,6 @@ public class PlayerDataDao {
                     .values(PlayerDataTableKey.wins, playerData.getWins())
                     .values(PlayerDataTableKey.losses, playerData.getLosses())
                     .values(PlayerDataTableKey.games, playerData.getGames())
-                    .values(PlayerDataTableKey.shopData, shopDataString)
                     .values(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : "{}")
                     .values(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
                     .values(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
@@ -123,12 +104,6 @@ public class PlayerDataDao {
      * @return 更新成功后，带有生成ID的用户对象
      */
     public PlayerData updatePlayerData(PlayerData playerData) throws SQLException {
-        // 将shopData数组转换为字符串
-        String shopDataString = "";
-        if (playerData.getShopData() != null) {
-            shopDataString = String.join(", ", playerData.getShopData());
-        }
-
         try (Connection conn = ormClient.getConnection()) {
             PreparedStatement updateUsersStmt = ormClient.update(conn)
                     .update(PlayerDataTableKey.tableName)
@@ -143,7 +118,6 @@ public class PlayerDataDao {
                     .set(PlayerDataTableKey.wins, playerData.getWins())
                     .set(PlayerDataTableKey.losses, playerData.getLosses())
                     .set(PlayerDataTableKey.games, playerData.getGames())
-                    .set(PlayerDataTableKey.shopData, shopDataString)
                     .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : "{}")
                     .set(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
                     .set(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
@@ -177,7 +151,6 @@ public class PlayerDataDao {
                             PlayerDataTableKey.wins,
                             PlayerDataTableKey.losses,
                             PlayerDataTableKey.games,
-                            PlayerDataTableKey.shopData,
                             PlayerDataTableKey.shopDataJson,
                             PlayerDataTableKey.createdAt,
                             PlayerDataTableKey.updatedAt)
@@ -200,7 +173,6 @@ public class PlayerDataDao {
                 playerData.setWins(resultSet.getInt(PlayerDataTableKey.wins));
                 playerData.setLosses(resultSet.getInt(PlayerDataTableKey.losses));
                 playerData.setGames(resultSet.getInt(PlayerDataTableKey.games));
-                playerData.setShopData(resultSet.getString(PlayerDataTableKey.shopData).split(", "));
                 playerData.setShopDataJson(resultSet.getString(PlayerDataTableKey.shopDataJson));
                 playerData.setCreatedAt(resultSet.getTimestamp(PlayerDataTableKey.createdAt));
                 playerData.setUpdatedAt(resultSet.getTimestamp(PlayerDataTableKey.updatedAt));
