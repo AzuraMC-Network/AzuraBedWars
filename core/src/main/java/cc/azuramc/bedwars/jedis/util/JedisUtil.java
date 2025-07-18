@@ -1,10 +1,9 @@
 package cc.azuramc.bedwars.jedis.util;
 
+import cc.azuramc.bedwars.util.LoggerUtil;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import org.bukkit.Bukkit;
-import java.util.logging.Level;
 
 /**
  * Redis工具类
@@ -44,10 +43,10 @@ public class JedisUtil {
         try {
             return pool.getResource();
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.SEVERE, "获取Redis连接失败: " + e.getMessage());
+            LoggerUtil.error("获取Redis连接失败: " + e.getMessage());
             if (retryCount < MAX_RETRIES) {
                 retryCount++;
-                Bukkit.getLogger().info("将在" + (RETRY_DELAY/1000) + "秒后重试连接... (尝试 " + retryCount + "/" + MAX_RETRIES + ")");
+                LoggerUtil.info("将在" + (RETRY_DELAY/1000) + "秒后重试连接... (尝试 " + retryCount + "/" + MAX_RETRIES + ")");
                 try {
                     Thread.sleep(RETRY_DELAY);
                 } catch (InterruptedException ie) {
@@ -75,10 +74,10 @@ public class JedisUtil {
                 // 测试连接
                 try (Jedis jedis = pool.getResource()) {
                     jedis.ping();
-                    Bukkit.getLogger().info("Redis连接成功: " + REDIS_HOST + ":" + REDIS_PORT);
+                    LoggerUtil.info("Redis连接成功: " + REDIS_HOST + ":" + REDIS_PORT);
                 }
             } catch (Exception e) {
-                Bukkit.getLogger().log(Level.SEVERE, "初始化Redis连接池失败: " + e.getMessage());
+                LoggerUtil.error("初始化Redis连接池失败: " + e.getMessage());
                 pool = null;
                 throw e;
             }
@@ -94,7 +93,7 @@ public class JedisUtil {
         try (Jedis jedis = getJedis()) {
             jedis.publish(channel, message);
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.SEVERE, "发布消息到Redis失败: " + e.getMessage());
+            LoggerUtil.error("发布消息到Redis失败: " + e.getMessage());
             throw e;
         }
     }

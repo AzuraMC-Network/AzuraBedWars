@@ -3,9 +3,9 @@ package cc.azuramc.bedwars.listener.world;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XSound;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -86,7 +86,8 @@ public class ExplodeListener implements Listener {
                 block.getWorld().playSound(block.getLocation(), XSound.ENTITY_GENERIC_EXPLODE.get(), 0.5F, 1.0F);
             } catch (Exception e) {
                 // 如果声音效果失败，记录日志但不中断游戏
-                Bukkit.getLogger().warning("无法播放爆炸音效: " + e.getMessage());
+                LoggerUtil.warn("无法播放爆炸音效: " + e.getMessage());
+                e.printStackTrace();
             }
 
             // 从游戏放置的方块列表中移除

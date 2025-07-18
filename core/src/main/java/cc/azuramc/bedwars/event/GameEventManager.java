@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.event.impl.*;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
@@ -134,7 +135,7 @@ public class GameEventManager implements Runnable {
             ++this.seconds;
         } catch (Exception e) {
             // 捕获并记录异常，但不中断定时任务的执行
-            Bukkit.getLogger().severe("游戏事件管理器执行错误: " + e.getMessage());
+            LoggerUtil.error("游戏事件管理器执行错误: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -168,7 +169,8 @@ public class GameEventManager implements Runnable {
                 });
             }
         } catch (Exception e) {
-            Bukkit.getLogger().warning("玩家追踪更新错误: " + e.getMessage());
+            LoggerUtil.warn("玩家追踪更新错误: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
@@ -190,7 +192,7 @@ public class GameEventManager implements Runnable {
                     task.getEvent().run(seconds, currentEvent);
                 }
             } catch (Exception e) {
-                Bukkit.getLogger().warning("任务 '" + name + "' 执行错误: " + e.getMessage());
+                LoggerUtil.warn("任务 '" + name + "' 执行错误: " + e.getMessage());
             }
         });
     }

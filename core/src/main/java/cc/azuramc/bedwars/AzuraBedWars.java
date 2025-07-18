@@ -22,6 +22,7 @@ import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
@@ -187,7 +188,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 初始化游戏相关功能
      */
     private void initGameFeatures() {
-        Bukkit.getLogger().info("开始加载游戏相关特性...");
+        LoggerUtil.info("开始加载游戏相关特性...");
         // 注册GUI监听器
         new GUIListener(this);
 
@@ -216,7 +217,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 配置世界设置
         configureWorlds();
-        Bukkit.getLogger().info("游戏相关特性加载完成");
+        LoggerUtil.info("游戏相关特性加载完成");
     }
 
     /**
