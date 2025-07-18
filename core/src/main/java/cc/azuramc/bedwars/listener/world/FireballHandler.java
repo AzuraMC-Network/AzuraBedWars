@@ -102,7 +102,7 @@ public class FireballHandler implements Listener {
         player.setMetadata(NO_FALL_DAMAGE_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), ownerPlayer.getUuid()));
 
         // 应用击退效果
-        Vector knockbackVector = getPosition(player.getLocation(), fireball.getLocation(), 1.5D);
+        Vector knockbackVector = getPosition(player.getLocation(), fireball.getLocation(), 2.1D);
         player.setVelocity(knockbackVector.multiply(FIREBALL_KNOCK_BACK_MULTIPLIER));
     }
 
