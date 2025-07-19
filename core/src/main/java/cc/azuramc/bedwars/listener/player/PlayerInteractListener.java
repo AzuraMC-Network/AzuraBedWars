@@ -14,6 +14,7 @@ import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.gui.SpectatorCompassGUI;
 import cc.azuramc.bedwars.spectator.gui.SpectatorSettingGUI;
+import cc.azuramc.bedwars.util.BungeeUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -73,7 +74,7 @@ public class PlayerInteractListener implements Listener {
                     new ModeSelectionGUI(gamePlayer).open();
                     break;
                 case SLIME_BALL:
-                    //TODO 回大厅
+                    BungeeUtil.connectToLobby(gamePlayer);
                     break;
                 default:
                     break;

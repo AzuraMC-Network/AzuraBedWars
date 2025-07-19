@@ -4,7 +4,9 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
+import cc.azuramc.bedwars.util.BungeeUtil;
 import org.bukkit.Bukkit;
 
 /**
@@ -50,6 +52,11 @@ public class GameShutdownEvent extends AbstractGameEvent {
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
+        }
+
+        // 所有游戏玩家传送到大厅
+        for (GameTeam gameTeam : gameManager.getGameTeams()) {
+            gameTeam.getGamePlayers().forEach(BungeeUtil::connectToLobby);
         }
 
         performCleanup();
