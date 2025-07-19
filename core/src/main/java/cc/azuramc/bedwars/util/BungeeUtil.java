@@ -30,7 +30,7 @@ public class BungeeUtil {
             out.writeUTF("Connect");
             out.writeUTF(server);
 
-            player.sendPluginMessage(AzuraBedWars.getInstance(), "AzuraBedWars", byteArray.toByteArray());
+            player.sendPluginMessage(AzuraBedWars.getInstance(), "BungeeCord", byteArray.toByteArray());
 
         } catch (Exception e) {
             LoggerUtil.warn("Failed to connect player " + player.getName() + " to server " + server);

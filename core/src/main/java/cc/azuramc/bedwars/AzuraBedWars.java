@@ -236,7 +236,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 注册BungeeCord通信频道
      */
     private void registerBungeeChannel() {
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "AzuraBedWars");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
     }
 
     /**
