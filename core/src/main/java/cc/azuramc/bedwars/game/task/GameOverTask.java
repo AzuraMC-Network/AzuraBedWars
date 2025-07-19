@@ -230,9 +230,6 @@ public class GameOverTask extends BukkitRunnable {
     private void performShutdown() {
         // 释放强制加载的区块
         ChunkListener.releaseForceLoadedChunks();
-
-        // 关闭时将ChangeManager内的所有脏数据提交
-        AzuraBedWars.getInstance().getPlayerDataService().changeManager.shutdown();
         
         // 取消当前任务
         cancel();
