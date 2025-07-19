@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.level.PlayerLevelMap;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
 import org.bukkit.Bukkit;
@@ -111,10 +112,14 @@ public class ChatListener implements Listener {
     public static String buildChatMessage(GamePlayer gamePlayer, String message) {
         int level = calculatePlayerLevel(gamePlayer.getPlayerData());
         String globalPrefix = "";
-        if (!VaultUtil.chatIsNull) {
+
+        if (LuckPermsUtil.isLoaded) {
+            globalPrefix = LuckPermsUtil.getPrefix(gamePlayer);
+        } else if (!VaultUtil.chatIsNull) {
             globalPrefix = VaultUtil.getPlayerPrefix(gamePlayer);
         }
-        return "§6[" + PlayerLevelMap.getLevel(level) + "✫] " + globalPrefix + "§7" + gamePlayer.getNickName() + " " + CHAT_SEPARATOR + " " + message;
+
+        return globalPrefix + "§6[" + PlayerLevelMap.getLevel(level) + "✫] " + "§7" + gamePlayer.getNickName() + " " + CHAT_SEPARATOR + " " + message;
     }
 
     /**
