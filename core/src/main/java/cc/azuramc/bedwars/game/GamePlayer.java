@@ -530,7 +530,7 @@ public class GamePlayer {
      */
     private void setupSpectatorTarget() {
         if (gameTeam != null && !gameTeam.getAlivePlayers().isEmpty()) {
-            spectatorTarget.setTarget(gameTeam.getAlivePlayers().getFirst());
+            spectatorTarget.setTarget(gameTeam.getAlivePlayers().get(0));
         }
     }
 
