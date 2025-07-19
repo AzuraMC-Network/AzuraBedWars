@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.dao.PlayerDataDao;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.orm.manager.ChangeManager;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -25,20 +24,6 @@ public class PlayerDataService {
 
     /** 存储GamePlayer与对应PlayerData的关系 */
     public HashMap<GamePlayer, PlayerData> playerDataMap = new HashMap<>();
-
-    public ChangeManager<PlayerData> changeManager = new ChangeManager<>(playerDataList -> {
-        playerDataList.forEach(playerData -> {
-            try {
-                playerDataDao.updatePlayerData(playerData);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-    },
-    // 每8个进行一次更新
-    8,
-    // 3分钟
-    180000);
 
     /**
      * 建表
