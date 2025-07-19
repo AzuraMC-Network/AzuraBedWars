@@ -11,7 +11,6 @@ import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -113,9 +112,9 @@ public class ChatListener implements Listener {
         int level = calculatePlayerLevel(gamePlayer.getPlayerData());
         String globalPrefix = "";
         if (!VaultUtil.chatIsNull) {
-            globalPrefix = ChatColor.translateAlternateColorCodes('&', plugin.getChat().getPlayerPrefix(gamePlayer.getPlayer()));
+            globalPrefix = VaultUtil.getPlayerPrefix(gamePlayer);
         }
-        return "§6[" + PlayerLevelMap.getLevel(level) + "✫] " + globalPrefix + "§7" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
+        return "§6[" + PlayerLevelMap.getLevel(level) + "✫] " + globalPrefix + "§7" + gamePlayer.getNickName() + " " + CHAT_SEPARATOR + " " + message;
     }
 
     /**

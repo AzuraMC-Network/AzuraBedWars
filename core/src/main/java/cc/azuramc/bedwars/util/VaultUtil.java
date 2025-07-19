@@ -15,4 +15,8 @@ public class VaultUtil {
     public static void depositPlayer(GamePlayer gamePlayer, double amount) {
         AzuraBedWars.getInstance().getEcon().depositPlayer(gamePlayer.getPlayer(), amount);
     }
+
+    public static String getPlayerPrefix(GamePlayer gamePlayer) {
+        return MessageUtil.color(AzuraBedWars.getInstance().getChat().getPlayerPrefix(gamePlayer.getPlayer()));
+    }
 }
