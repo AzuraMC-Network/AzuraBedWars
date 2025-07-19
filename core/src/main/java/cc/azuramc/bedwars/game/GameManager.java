@@ -606,7 +606,7 @@ public class GameManager {
         return gameTeams.stream()
                 .filter(team -> !team.isFull())
                 .min(Comparator.comparingInt(team -> team.getGamePlayers().size()))
-                .orElse(gameTeams.getFirst());
+                .orElse(gameTeams.get(0));
     }
 
     /**

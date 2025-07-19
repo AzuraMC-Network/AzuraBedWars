@@ -47,7 +47,7 @@ public class GUIListener implements Listener {
         if (list == null || list.isEmpty()) {
             return null;
         }
-        return list.getFirst();
+        return list.get(0);
     }
 
     @EventHandler

@@ -155,7 +155,7 @@ public class PlayerRespawnListener implements Listener {
     private void sendRejoinMessage(GamePlayer gamePlayer) {
         TextComponent textComponent = new TextComponent(REJOIN_MESSAGE);
         textComponent.addExtra(REJOIN_BUTTON);
-        textComponent.getExtra().getFirst().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, REJOIN_COMMAND));
+        textComponent.getExtra().get(0).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, REJOIN_COMMAND));
         gamePlayer.getPlayer().spigot().sendMessage(textComponent);
     }
 
