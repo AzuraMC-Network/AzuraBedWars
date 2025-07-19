@@ -31,6 +31,8 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
 import lombok.Setter;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -77,6 +79,7 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private ProtocolManager protocolManager;
     @Getter private NMSProvider nmsProvider;
     @Getter private NMSAccess nmsAccess;
+    @Getter private LuckPerms luckPermsApi;
 
     public static final String MAP_TABLE_NAME = "bw_map";
 
@@ -194,6 +197,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // Hook Vault Chat and Econ
         hookVault();
+        hookLuckPerms();
 
         // 初始化地图存储
         initMapStorage();
@@ -285,6 +289,12 @@ public final class AzuraBedWars extends JavaPlugin {
     private void setupNMSSupport() {
         nmsProvider = new NMSProvider();
         nmsAccess = nmsProvider.setup();
+    }
+
+    private void hookLuckPerms() {
+        if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
+            luckPermsApi = LuckPermsProvider.get();
+        }
     }
 
     private void hookVault() {

@@ -70,6 +70,7 @@ subprojects {
         implementation 'fr.mrmicky:fastboard:2.1.5'
         implementation files('libs/AzuraORM-1.0.0-all.jar')
         annotationProcessor 'org.projectlombok:lombok:1.18.34'
+        compileOnly("net.luckperms:api:5.4")
     }
 }
 
