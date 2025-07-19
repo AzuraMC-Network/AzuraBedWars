@@ -33,7 +33,6 @@ public class PlayerResourcePutListener implements Listener {
 
         if (gamePlayer == null
                 || gameManager.getGameState() != GameState.RUNNING
-                || !player.isSneaking()
                 || event.getItem() == null
                 || action != Action.LEFT_CLICK_BLOCK) {
             return;
