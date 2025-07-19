@@ -35,7 +35,14 @@ public class IronGolemSpawnListener implements Listener {
         Action action = event.getAction();
         Block block = event.getClickedBlock();
         ItemStack item = PlayerUtil.getItemInHand(player);
-        Location loc = block.getLocation();
+        Location loc = null;
+        if (block != null) {
+            loc = block.getLocation();
+        }
+
+        if (loc == null) {
+            return;
+        }
 
         if (action != Action.RIGHT_CLICK_BLOCK
                 || item == null || item.getType() != XMaterial.WOLF_SPAWN_EGG.get()
