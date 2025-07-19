@@ -210,6 +210,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 注册各种事件监听器
         registerEventListeners();
+        registerBungeeChannel();
 
         // 加载特殊物品和玩家等级
         AbstractSpecialItem.loadSpecials();
@@ -229,6 +230,13 @@ public final class AzuraBedWars extends JavaPlugin {
         // 创建并初始化计分板管理器
         scoreboardManager = new ScoreboardManager(gameManager);
         scoreboardManager.initialize(this);
+    }
+
+    /**
+     * 注册BungeeCord通信频道
+     */
+    private void registerBungeeChannel() {
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "AzuraBedWars");
     }
 
     /**
