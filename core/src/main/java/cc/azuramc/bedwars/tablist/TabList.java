@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.tablist;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
 
 /**
@@ -43,9 +44,15 @@ public class TabList {
             return;
         }
 
-        if (!VaultUtil.chatIsNull) {
-            gamePlayer.getPlayer().setPlayerListName(VaultUtil.getPlayerPrefix(gamePlayer) + " " + gamePlayer.getNickName());
+        String prefix = "";
+
+        if (LuckPermsUtil.isLoaded) {
+            prefix = LuckPermsUtil.getPrefix(gamePlayer);
+        } else if (!VaultUtil.chatIsNull) {
+            prefix = VaultUtil.getPlayerPrefix(gamePlayer);
         }
+
+        gamePlayer.getPlayer().setPlayerListName(prefix + gamePlayer.getNickName());
     }
     
     /**
