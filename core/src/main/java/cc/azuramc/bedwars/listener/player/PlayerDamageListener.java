@@ -584,7 +584,7 @@ public class PlayerDamageListener implements Listener {
         if (killer == null) {
             List<GamePlayer> killers = gamePlayer.getAssistsManager().getAssists(System.currentTimeMillis());
             if (killers != null && !killers.isEmpty()) {
-                return killers.getFirst();
+                return killers.get(0);
             }
         }
 
