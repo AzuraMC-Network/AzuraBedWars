@@ -477,7 +477,7 @@ public class GameTeam {
         
         // 更新玩家的TabList显示名称
         if (gamePlayer.getPlayer() != null) {
-            cc.azuramc.bedwars.tablist.TabList.editTabListName(gamePlayer);
+            cc.azuramc.bedwars.tablist.TabList.changeTabListNameInGame(gamePlayer);
         }
         
         return true;

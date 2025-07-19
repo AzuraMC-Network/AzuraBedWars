@@ -196,7 +196,7 @@ public class LoadGameUtil {
             // 更新队伍所有玩家的TabList显示名称
             gameTeam.getAlivePlayers().forEach(gamePlayer -> {
                 if (gamePlayer != null) {
-                    cc.azuramc.bedwars.tablist.TabList.editTabListName(gamePlayer);
+                    cc.azuramc.bedwars.tablist.TabList.changeTabListNameInGame(gamePlayer);
                 }
             });
         }

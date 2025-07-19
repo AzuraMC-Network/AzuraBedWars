@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.tablist;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.util.VaultUtil;
 
 /**
  * @author an5w1r@163.com
@@ -15,7 +16,7 @@ public class TabList {
      *
      * @param gamePlayer 目标玩家
      */
-    public static void editTabListName(GamePlayer gamePlayer) {
+    public static void changeTabListNameInGame(GamePlayer gamePlayer) {
         if (gamePlayer == null) {
             // 如果GamePlayer为空，使用默认显示名
             gamePlayer.getPlayer().setPlayerListName(gamePlayer.getName());
@@ -34,6 +35,18 @@ public class TabList {
         
         gamePlayer.getPlayer().setPlayerListName(displayName);
     }
+
+    public static void changeTabListNameWhenWaiting(GamePlayer gamePlayer) {
+        if (gamePlayer == null) {
+            // 如果GamePlayer为空，使用默认显示名
+            gamePlayer.getPlayer().setPlayerListName(gamePlayer.getName());
+            return;
+        }
+
+        if (!VaultUtil.chatIsNull) {
+            gamePlayer.getPlayer().setPlayerListName(VaultUtil.getPlayerPrefix(gamePlayer) + " " + gamePlayer.getNickName());
+        }
+    }
     
     /**
      * 为所有在线玩家更新TabList显示名称
@@ -41,7 +54,7 @@ public class TabList {
     public static void updateAllTabListNames() {
         for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
             if (gamePlayer.getPlayer() != null) {
-                editTabListName(gamePlayer);
+                changeTabListNameInGame(gamePlayer);
             }
         }
     }
@@ -58,7 +71,7 @@ public class TabList {
         
         for (GamePlayer gamePlayer : gameTeam.getGamePlayers()) {
             if (gamePlayer.getPlayer() != null) {
-                editTabListName(gamePlayer);
+                changeTabListNameInGame(gamePlayer);
             }
         }
     }

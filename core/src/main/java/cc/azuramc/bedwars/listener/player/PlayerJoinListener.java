@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.tablist.TabList;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,5 +74,7 @@ public class PlayerJoinListener implements Listener {
         board.updateLines("Test");
         gamePlayer.setBoard(board);
         gameManager.addPlayer(gamePlayer);
+
+        TabList.changeTabListNameWhenWaiting(gamePlayer);
     }
 }
