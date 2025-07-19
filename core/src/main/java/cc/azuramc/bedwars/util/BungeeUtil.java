@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.ByteArrayOutputStream;
@@ -35,5 +36,14 @@ public class BungeeUtil {
             LoggerUtil.warn("Failed to connect player " + player.getName() + " to server " + server);
             e.printStackTrace();
         }
+    }
+
+    public static void connect(GamePlayer gamePlayer, String server) {
+        Player player = gamePlayer.getPlayer();
+        connect(player, server);
+    }
+
+    public static void connectToLobby(GamePlayer gamePlayer) {
+        connect(gamePlayer, "G_BedwarsLobby#1");
     }
 }
