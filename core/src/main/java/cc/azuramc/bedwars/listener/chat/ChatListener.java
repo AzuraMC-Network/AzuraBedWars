@@ -192,11 +192,11 @@ public class ChatListener implements Listener {
      */
     public static String buildTeamChatMessage(GamePlayer gamePlayer, GameTeam gameTeam, String message, boolean isGlobalChat) {
 
-        return (isGlobalChat ? GLOBAL_CHAT_TAG : TEAM_CHAT_TAG) +
+        return (isGlobalChat ? GLOBAL_CHAT_TAG : TEAM_CHAT_TAG) + " " +
                 gameTeam.getChatColor() +
                 "[" +
                 gameTeam.getName() +
-                "]" +
+                "] " +
                 gamePlayer.getNickName() +
                 CHAT_SEPARATOR +
                 (isGlobalChat ? message.substring(1) : message);
