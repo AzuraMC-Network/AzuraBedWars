@@ -37,6 +37,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 /**
  * @author an5w1r@163.com
@@ -391,6 +392,8 @@ public class PlayerInteractListener implements Listener {
      */
     private void launchFireball(GamePlayer gamePlayer) {
         Fireball fireball = gamePlayer.getPlayer().launchProjectile(Fireball.class);
+        Vector direction = gamePlayer.getPlayer().getEyeLocation().getDirection();
+        fireball = AzuraBedWars.getInstance().getNmsAccess().setFireballDirection(fireball, direction);
         fireball.setVelocity(fireball.getVelocity().multiply(2));
         fireball.setYield(3.0F);
         fireball.setBounce(false);
