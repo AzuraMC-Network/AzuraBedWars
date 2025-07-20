@@ -2,10 +2,6 @@ package cc.azuramc.bedwars.compat.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -91,20 +87,6 @@ public class PlayerUtil {
             Bukkit.getPluginManager().callEvent(new PlayerRespawnEvent(player, respawnLocation, false,
                     false, PlayerRespawnEvent.RespawnReason.PLUGIN));
         }
-    }
-
-    /**
-     * 设置玩家为飞行状态
-     * @param player 玩家
-     */
-    public static void setFlying(Player player) {
-        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ABILITIES);
-        packet.getModifier().writeDefaults();
-        packet.getFloat().write(0, 0.05F);
-        packet.getBooleans().write(1, true);
-        packet.getBooleans().write(2, true);
-        protocolManager.sendServerPacket(player, packet);
     }
 
     /**
