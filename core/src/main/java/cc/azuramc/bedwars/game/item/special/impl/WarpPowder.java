@@ -8,11 +8,6 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.team.GameTeam;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
@@ -350,19 +345,19 @@ public class WarpPowder extends AbstractSpecialItem {
     }
 
     public void spawnParticle(List<GamePlayer> gamePlayers, Location loc) {
-        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.WORLD_PARTICLES);
-        packet.getModifier().writeDefaults();
-        packet.getParticles().write(0, EnumWrappers.Particle.FIREWORKS_SPARK);
-        packet.getBooleans().write(0, false);
-        packet.getFloat().write(0, (float) loc.getX());
-        packet.getFloat().write(1, (float) loc.getY());
-        packet.getFloat().write(2, (float) loc.getZ());
-        packet.getFloat().write(3, 0.0F);
-        packet.getFloat().write(4, 0.0F);
-        packet.getFloat().write(5, 0.0F);
-        packet.getFloat().write(6, 0.0F);
-        packet.getIntegers().write(0, 1);
-        gamePlayers.forEach(gamePlayer -> protocolManager.sendServerPacket(gamePlayer.getPlayer(), packet));
+//        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+//        PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.WORLD_PARTICLES);
+//        packet.getModifier().writeDefaults();
+//        packet.getParticles().write(0, EnumWrappers.Particle.FIREWORKS_SPARK);
+//        packet.getBooleans().write(0, false);
+//        packet.getFloat().write(0, (float) loc.getX());
+//        packet.getFloat().write(1, (float) loc.getY());
+//        packet.getFloat().write(2, (float) loc.getZ());
+//        packet.getFloat().write(3, 0.0F);
+//        packet.getFloat().write(4, 0.0F);
+//        packet.getFloat().write(5, 0.0F);
+//        packet.getFloat().write(6, 0.0F);
+//        packet.getIntegers().write(0, 1);
+//        gamePlayers.forEach(gamePlayer -> protocolManager.sendServerPacket(gamePlayer.getPlayer(), packet));
     }
 }
