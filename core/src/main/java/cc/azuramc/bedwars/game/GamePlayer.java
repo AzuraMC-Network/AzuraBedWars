@@ -487,7 +487,7 @@ public class GamePlayer {
         }
         player.setGameMode(GameMode.ADVENTURE);
         player.setAllowFlight(true);
-        PlayerUtil.setFlying(player);
+        player.setFlying(true);
         player.teleport(AzuraBedWars.getInstance().getGameManager().getMapData().getRespawnLocation().toLocation());
     }
 
