@@ -372,7 +372,7 @@ public class GeneratorTask {
             location, 
             new ItemBuilder()
                 .setType(material)
-                .setDisplayName(ITEM_DISPLAY_NAME)
+//                .setDisplayName(ITEM_DISPLAY_NAME)
                 .getItem()
         ).setVelocity(ITEM_VELOCITY);
     }
