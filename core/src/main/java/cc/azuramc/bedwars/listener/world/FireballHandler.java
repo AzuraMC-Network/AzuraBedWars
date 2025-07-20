@@ -60,7 +60,7 @@ public class FireballHandler implements Listener {
             GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
 
             // 检查是否是队友
-            if (isFireballTeammate(ownerPlayer, gamePlayer)) {
+            if (isTeammateFireball(ownerPlayer, gamePlayer)) {
                 continue;
             }
 
@@ -78,7 +78,7 @@ public class FireballHandler implements Listener {
      * @param targetPlayer 目标玩家
      * @return 如果是队友返回true，否则返回false
      */
-    private static boolean isFireballTeammate(GamePlayer ownerPlayer, GamePlayer targetPlayer) {
+    private static boolean isTeammateFireball(GamePlayer ownerPlayer, GamePlayer targetPlayer) {
         GameTeam ownerTeam = ownerPlayer.getGameTeam();
         return ownerTeam != null && ownerTeam.isInTeam(ownerPlayer, targetPlayer);
     }

@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MapUtil;
+import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -43,7 +44,7 @@ public class ExplodeListener implements Listener {
         processExplodedBlocks(event);
 
         // 处理火球爆炸
-        if (entity instanceof Fireball) {
+        if (isFireballExplosion(event)) {
             FireballHandler.handleFireballExplosion((Fireball) entity);
         }
 
@@ -64,6 +65,11 @@ public class ExplodeListener implements Listener {
 
             // 检查受保护区域
             if (GAME_MANAGER.getMapData().hasRegion(block.getLocation())) {
+                continue;
+            }
+
+            // 火球无法破坏末地石
+            if (isFireballExplosion(event) && block.getType() == XMaterial.END_STONE.get()) {
                 continue;
             }
 
@@ -93,5 +99,9 @@ public class ExplodeListener implements Listener {
             // 从游戏放置的方块列表中移除
             GAME_MANAGER.getBlocksLocation().remove(block.getLocation());
         }
+    }
+
+    private boolean isFireballExplosion(EntityExplodeEvent event) {
+        return (event.getEntity() instanceof Fireball);
     }
 }
