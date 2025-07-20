@@ -8,7 +8,6 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.gui.ModeSelectionGUI;
-import cc.azuramc.bedwars.listener.world.FireballHandler;
 import cc.azuramc.bedwars.shop.gui.ItemShopGUI;
 import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
@@ -25,7 +24,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,8 +34,6 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.util.Vector;
 
 /**
  * @author an5w1r@163.com
@@ -45,8 +41,6 @@ import org.bukkit.util.Vector;
 public class PlayerInteractListener implements Listener {
 
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
-
-    private final String fireballCooldownMetadata = "GAME_FIREBALL_TIMER";
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
@@ -176,8 +170,6 @@ public class PlayerInteractListener implements Listener {
             handleSlimeBallInteraction(event);
         } else if (material.name().toUpperCase().contains("BED")) {
             handleBedInteraction(event, gamePlayer, gameTeam);
-        } else if (material == XMaterial.FIRE_CHARGE.get()) {
-            handleFireballInteraction(event, gamePlayer);
         } else if (material.name().toUpperCase().contains("WATER_BUCKIT")) {
             handleWaterBucketInteraction(event, gamePlayer);
         }
@@ -347,59 +339,7 @@ public class PlayerInteractListener implements Listener {
         gameManager.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
     }
     
-    /**
-     * 处理火球交互
-     */
-    private void handleFireballInteraction(PlayerInteractEvent event, GamePlayer gamePlayer) {
-        event.setCancelled(true);
-        if (gamePlayer.isSpectator()) {
-            return;
-        }
 
-        // 检查冷却时间
-        long lastFireballTime = getLastFireballTime(gamePlayer);
-        long currentTime = System.currentTimeMillis();
-        long cooldownTime = 1000;
-        
-        if (currentTime - lastFireballTime < cooldownTime) {
-            return;
-        }
-
-        // 减少物品
-        reduceItemInHand(gamePlayer);
-
-        // 设置冷却时间
-        gamePlayer.getPlayer().setMetadata(fireballCooldownMetadata, new FixedMetadataValue(AzuraBedWars.getInstance(), currentTime));
-
-        // 发射火球
-        launchFireball(gamePlayer);
-    }
-    
-    /**
-     * 获取玩家上次使用火球的时间
-     * @return 返回上次使用时间的时间戳，如果没有使用过返回0
-     */
-    private long getLastFireballTime(GamePlayer gamePlayer) {
-        Player player  = gamePlayer.getPlayer();
-        if (player.hasMetadata(fireballCooldownMetadata)) {
-            return player.getMetadata(fireballCooldownMetadata).get(0).asLong();
-        }
-        return 0L;
-    }
-    
-    /**
-     * 发射火球
-     */
-    private void launchFireball(GamePlayer gamePlayer) {
-        Fireball fireball = gamePlayer.getPlayer().launchProjectile(Fireball.class);
-        Vector direction = gamePlayer.getPlayer().getEyeLocation().getDirection();
-        fireball = AzuraBedWars.getInstance().getNmsAccess().setFireballDirection(fireball, direction);
-        fireball.setVelocity(fireball.getVelocity().multiply(2));
-        fireball.setYield(3.0F);
-        fireball.setBounce(false);
-        fireball.setIsIncendiary(false);
-        fireball.setMetadata(FireballHandler.FIREBALL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), gamePlayer.getUuid()));
-    }
     
     /**
      * 处理水桶交互

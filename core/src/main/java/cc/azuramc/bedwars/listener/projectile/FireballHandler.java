@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.listener.world;
+package cc.azuramc.bedwars.listener.projectile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.ItemConfig;
