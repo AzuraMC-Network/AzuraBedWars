@@ -27,8 +27,6 @@ import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.config.DatabaseConfig;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
@@ -76,7 +74,6 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private AzuraOrmClient ormClient;
     @Getter private PlayerDataDao playerDataDao;
     @Getter private PlayerDataService playerDataService;
-    @Getter private ProtocolManager protocolManager;
     @Getter private NMSProvider nmsProvider;
     @Getter private NMSAccess nmsAccess;
     @Getter private LuckPerms luckPermsApi;
@@ -98,8 +95,6 @@ public final class AzuraBedWars extends JavaPlugin {
         
         // 初始化命令和通信系统
         initCommands();
-
-        protocolManager = ProtocolLibrary.getProtocolManager();
 
         if (settingsConfig.isEnabledJedisMapFeature()) {
             intiChannelSystem();
