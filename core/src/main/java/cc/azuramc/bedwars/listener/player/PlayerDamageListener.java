@@ -806,7 +806,10 @@ public class PlayerDamageListener implements Listener {
                 // 创建物品 - 每个物品栈最多64个
                 while (itemAmount > 0) {
                     int stackSize = Math.min(itemAmount, 64);
-                    ItemStack item = new ItemStack(material, stackSize);
+                    ItemStack item = null;
+                    if (material != null) {
+                        item = new ItemStack(material, stackSize);
+                    }
                     drops.add(item);
                     itemAmount -= stackSize;
                 }
