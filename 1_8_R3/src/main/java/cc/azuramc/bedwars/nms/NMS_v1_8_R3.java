@@ -2,13 +2,18 @@ package cc.azuramc.bedwars.nms;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.util.LoggerUtil;
+import net.minecraft.server.v1_8_R3.EntityFireball;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEquipment;
 import net.minecraft.server.v1_8_R3.PlayerConnection;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFireball;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -60,5 +65,14 @@ public class NMS_v1_8_R3 implements NMSAccess {
         for (GamePlayer receiver : receiverList) {
             showArmor(gamePlayer.getPlayer(), receiver.getPlayer());
         }
+    }
+
+    @Override
+    public Fireball setFireballDirection(Fireball fireball, @NotNull Vector vector) {
+        EntityFireball fb = ((CraftFireball) fireball).getHandle();
+        fb.dirX = vector.getX() * 0.1D;
+        fb.dirY = vector.getY() * 0.1D;
+        fb.dirZ = vector.getZ() * 0.1D;
+        return (Fireball) fb.getBukkitEntity();
     }
 }
