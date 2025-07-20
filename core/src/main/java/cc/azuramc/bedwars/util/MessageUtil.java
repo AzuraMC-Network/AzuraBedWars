@@ -38,6 +38,9 @@ public final class MessageUtil {
     }
 
     public static String color(String string) {
+        if (string == null) {
+            return "";
+        }
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 

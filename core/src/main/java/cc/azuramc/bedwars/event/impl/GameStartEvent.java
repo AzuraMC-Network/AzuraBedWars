@@ -9,6 +9,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XPotion;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.potion.PotionEffect;
@@ -147,15 +148,17 @@ public class GameStartEvent extends AbstractGameEvent {
      */
     private void handleEnemyInTeamTerritory(GamePlayer player, GameTeam gameTeam) {
         double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
-        
+
         if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
             // 触发普通陷阱
             if (gameTeam.isHasTrap()) {
+                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger normal trap, player: " + player.getName());
                 triggerTrap(player, gameTeam);
             }
             
             // 触发挖掘疲劳陷阱
             if (gameTeam.isHasMiner()) {
+                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger mining fatigue trap, player: " + player.getName());
                 triggerMiningFatigueTrap(player, gameTeam);
             }
         }
@@ -191,10 +194,7 @@ public class GameStartEvent extends AbstractGameEvent {
         });
 
         // 通知团队成员陷阱被触发
-        AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
-            player1.sendTitle("§c§l陷阱触发！", null, 0, 20, 0);
-            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
-        })));
+        announceTrapTrigger(gameTeam);
     }
     
     /**
@@ -213,6 +213,21 @@ public class GameStartEvent extends AbstractGameEvent {
             }
         });
         gameTeam.setHasMiner(false);
+
+        // 通知团队成员陷阱被触发
+        announceTrapTrigger(gameTeam);
+    }
+
+    /**
+     * 通知团队成员陷阱被触发
+     *
+     * @param gameTeam 游戏团队
+     */
+    private void announceTrapTrigger(GameTeam gameTeam) {
+        AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
+            player1.sendTitle("§c§l陷阱触发！", null, 0, 40, 0);
+            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+        })));
     }
     
     /**
