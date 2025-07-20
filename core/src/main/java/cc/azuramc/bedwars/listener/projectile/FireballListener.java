@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XPotion;
 import org.bukkit.Material;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -14,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 /**
@@ -35,36 +37,44 @@ public class FireballListener implements Listener {
             return;
         }
 
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getAction() != Action.RIGHT_CLICK_AIR) {
+        if (event.getAction() == Action.PHYSICAL) {
+            event.setCancelled(true);
             return;
         }
 
-        if (material != XMaterial.FIRE_CHARGE.get()) {
-            return;
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
+
+            if (material != XMaterial.FIRE_CHARGE.get()) {
+                return;
+            }
+
+            event.setCancelled(true);
+            if (gamePlayer.isSpectator()) {
+                return;
+            }
+
+            // 检查冷却时间
+            long lastFireballTime = getLastFireballTime(gamePlayer);
+            long currentTime = System.currentTimeMillis();
+            long cooldownTime = 1000;
+
+            if (currentTime - lastFireballTime < cooldownTime) {
+                return;
+            }
+
+            // 减少物品
+            reduceItemInHand(gamePlayer);
+
+            // 缓慢
+            PotionEffect slowness = new PotionEffect(XPotion.parseEffect("SLOWNESS").getXPotion().getPotionEffectType(), 20, 1, false, false);
+            player.addPotionEffect(slowness);
+
+            // 设置冷却时间
+            gamePlayer.getPlayer().setMetadata(fireballCooldownMetadata, new FixedMetadataValue(AzuraBedWars.getInstance(), currentTime));
+
+            // 发射火球
+            launchFireball(gamePlayer);
         }
-
-        event.setCancelled(true);
-        if (gamePlayer.isSpectator()) {
-            return;
-        }
-
-        // 检查冷却时间
-        long lastFireballTime = getLastFireballTime(gamePlayer);
-        long currentTime = System.currentTimeMillis();
-        long cooldownTime = 1000;
-
-        if (currentTime - lastFireballTime < cooldownTime) {
-            return;
-        }
-
-        // 减少物品
-        reduceItemInHand(gamePlayer);
-
-        // 设置冷却时间
-        gamePlayer.getPlayer().setMetadata(fireballCooldownMetadata, new FixedMetadataValue(AzuraBedWars.getInstance(), currentTime));
-
-        // 发射火球
-        launchFireball(gamePlayer);
     }
 
 
