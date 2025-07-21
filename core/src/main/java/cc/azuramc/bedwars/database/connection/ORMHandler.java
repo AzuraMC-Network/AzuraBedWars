@@ -11,11 +11,11 @@ import java.sql.SQLException;
 /**
  * @author an5w1r@163.com
  */
-public class ORMHander {
+public class ORMHandler {
 
     @Getter private AzuraOrmClient ormClient;
 
-    public ORMHander(AzuraBedWars plugin) {
+    public ORMHandler(AzuraBedWars plugin) {
         ormClient = plugin.getOrmClient();
         AzuraBedWars.getInstance().getPlayerDataService().createTable();
     }
