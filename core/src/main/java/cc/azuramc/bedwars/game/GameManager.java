@@ -511,6 +511,10 @@ public class GameManager {
      * @param gamePlayer 游戏玩家
      */
     public void removePlayers(GamePlayer gamePlayer) {
+        if (gamePlayer == null) {
+            return;
+        }
+
         if (gameState == GameState.WAITING) {
             broadcastMessage(String.format(msgPlayerLeave, gamePlayer.getNickName()));
         }
