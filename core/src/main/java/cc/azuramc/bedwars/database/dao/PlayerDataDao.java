@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.entity.PlayerDataTableKey;
 import cc.azuramc.bedwars.game.GameModeType;
+import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.builder.DataType;
 
@@ -20,13 +21,6 @@ public class PlayerDataDao {
     
     public AzuraOrmClient ormClient;
 
-    private final String defaultShopJson = "{\"0\":\"BlockShopPage#1\",\"1\":\"SwordShopPage#1\",\"8\":\"SwordShopPage#2\"," +
-            "\"15\":\"SwordShopPage#3\",\"7\":\"BlockShopPage#5\",\"14\":\"BlockShopPage#8\",\"2\":\"ArmorShopPage#1\"," +
-            "\"9\":\"ArmorShopPage#2\",\"16\":\"ArmorShopPage#3\",\"3\":\"ToolShopPage#3\",\"10\":\"ToolShopPage#1\"," +
-            "\"17\":\"ToolShopPage#2\",\"4\":\"BowShopPage#3\",\"11\":\"BowShopPage#1\",\"5\":\"PotionShopPage#1\"," +
-            "\"12\":\"PotionShopPage#2\",\"19\":\"PotionShopPage#3\",\"6\":\"UtilityShopPage#6\",\"13\":\"UtilityShopPage#2\"," +
-            "\"20\":\"UtilityShopPage#1\"}";
-    
     public PlayerDataDao(AzuraBedWars plugin) {
         this.ormClient = plugin.getOrmClient();
     }
@@ -53,11 +47,12 @@ public class PlayerDataDao {
                     .column(PlayerDataTableKey.wins, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.losses, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.games, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
-                    .column(PlayerDataTableKey.shopDataJson, DataType.Type.TEXT.getSql(), DataType.DEFAULT(defaultShopJson))
+                    .column(PlayerDataTableKey.shopDataJson, DataType.Type.TEXT.getSql(), DataType.DEFAULT("{}"))
                     .addTimestamps()
                     .engine("InnoDB")
                     .charset("utf8mb4")
                     .collate("utf8mb4_unicode_ci")
+                    .index(PlayerDataTableKey.uuid)
                     .prepare();
 
             createUsersStmt.executeUpdate();
@@ -87,7 +82,7 @@ public class PlayerDataDao {
                     .values(PlayerDataTableKey.wins, playerData.getWins())
                     .values(PlayerDataTableKey.losses, playerData.getLosses())
                     .values(PlayerDataTableKey.games, playerData.getGames())
-                    .values(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : defaultShopJson)
+                    .values(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
                     .values(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
                     .values(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .prepare();
@@ -128,7 +123,7 @@ public class PlayerDataDao {
                     .set(PlayerDataTableKey.wins, playerData.getWins())
                     .set(PlayerDataTableKey.losses, playerData.getLosses())
                     .set(PlayerDataTableKey.games, playerData.getGames())
-                    .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson() != null ? playerData.getShopDataJson() : defaultShopJson)
+                    .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
                     .set(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
                     .set(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .whereEquals(PlayerDataTableKey.id, playerData.getId())
@@ -146,7 +141,7 @@ public class PlayerDataDao {
      * @param id 用户 ID
      * @return 对应的 PlayerData 对象，如果不存在则返回 null
      */
-    public PlayerData selectPlayerDataById(int id) throws SQLException {
+    public PlayerData selectPlayerDataById(int id, GamePlayer gamePlayer) throws SQLException {
         try (Connection conn = ormClient.getConnection()) {
             PreparedStatement selectUsersStmt = ormClient.select(conn)
                     .from(PlayerDataTableKey.tableName)
@@ -169,7 +164,7 @@ public class PlayerDataDao {
                     .prepare();
 
             ResultSet resultSet = selectUsersStmt.executeQuery();
-            PlayerData playerData = new PlayerData();
+            PlayerData playerData = new PlayerData(gamePlayer);
             playerData.setId(id);
 
             while (resultSet.next()) {

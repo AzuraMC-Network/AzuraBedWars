@@ -111,6 +111,34 @@ public final class AzuraBedWars extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "加载完成耗时 " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
+    @Override
+    public void onDisable() {
+        if (ormHander != null) {
+            ormHander.shutdown();
+        }
+
+        if (gameManager != null && gameManager.getGameEventManager() != null) {
+            gameManager.getGameEventManager().stop();
+        }
+
+        // 保存配置
+        if (configManager != null) {
+            configManager.saveAll();
+        }
+
+        if (pubSubListener != null) {
+            pubSubListener.poison();
+        }
+
+        if (jedisManager != null) {
+            jedisManager.shutdown();
+        }
+
+        if (playerDataService != null) {
+            playerDataService.shutdown();
+        }
+    }
+
     /**
      * 初始化数据库连接
      */
@@ -246,30 +274,6 @@ public final class AzuraBedWars extends JavaPlugin {
             world.setAutoSave(false);
             world.setDifficulty(Difficulty.NORMAL);
         });
-    }
-
-    @Override
-    public void onDisable() {
-        if (ormHander != null) {
-            ormHander.shutdown();
-        }
-        
-        if (gameManager != null && gameManager.getGameEventManager() != null) {
-            gameManager.getGameEventManager().stop();
-        }
-        
-        // 保存配置
-        if (configManager != null) {
-            configManager.saveAll();
-        }
-
-        if (pubSubListener != null) {
-            pubSubListener.poison();
-        }
-
-        if (jedisManager != null) {
-            jedisManager.shutdown();
-        }
     }
 
     /**
