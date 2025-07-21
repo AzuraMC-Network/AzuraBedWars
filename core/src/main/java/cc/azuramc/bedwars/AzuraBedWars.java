@@ -124,9 +124,6 @@ public final class AzuraBedWars extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (ormHandler != null) {
-            ormHandler.shutdown();
-        }
 
         if (gameManager != null && gameManager.getGameEventManager() != null) {
             gameManager.getGameEventManager().stop();
@@ -147,6 +144,10 @@ public final class AzuraBedWars extends JavaPlugin {
 
         if (playerDataService != null) {
             playerDataService.shutdown();
+        }
+
+        if (ormHandler != null) {
+            ormHandler.shutdown();
         }
     }
 
