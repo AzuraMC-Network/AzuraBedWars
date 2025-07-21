@@ -60,7 +60,10 @@ public class PlayerAFKListener implements Listener {
 
     private void clearAfk(UUID uuid) {
         AFK_LAST_MOVEMENT.remove(uuid);
-        GamePlayer.get(uuid).setAfk(false);
+        GamePlayer gamePlayer = GamePlayer.get(uuid);
+        if (gamePlayer != null) {
+            gamePlayer.setAfk(false);
+        }
     }
 
     public static void stop() {
