@@ -11,6 +11,7 @@ public class PlayerDataTableKey {
     public static String name = "name";
     public static String uuid = "uuid";
     public static String mode = "mode";
+    public static String level = "level";
     public static String kills = "kills";
     public static String deaths = "deaths";
     public static String assists = "assists";

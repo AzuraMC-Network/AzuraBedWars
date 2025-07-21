@@ -44,6 +44,7 @@ public class PlayerDataDao {
                     .column(PlayerDataTableKey.name, DataType.VARCHAR_NOT_NULL(36))
                     .column(PlayerDataTableKey.uuid, DataType.VARCHAR_NOT_NULL(36))
                     .column(PlayerDataTableKey.mode, DataType.VARCHAR_NOT_NULL(20))
+                    .column(PlayerDataTableKey.level, DataType.Type.DOUBLE.getSql(), DataType.DEFAULT(0.0))
                     .column(PlayerDataTableKey.kills, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.assists, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.deaths, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
@@ -77,6 +78,7 @@ public class PlayerDataDao {
                     .values(PlayerDataTableKey.name, playerData.getName())
                     .values(PlayerDataTableKey.uuid, playerData.getUuid().toString())
                     .values(PlayerDataTableKey.mode, playerData.getMode().toString())
+                    .values(PlayerDataTableKey.level, playerData.getLevel())
                     .values(PlayerDataTableKey.kills, playerData.getKills())
                     .values(PlayerDataTableKey.deaths, playerData.getDeaths())
                     .values(PlayerDataTableKey.assists, playerData.getAssists())
@@ -117,6 +119,7 @@ public class PlayerDataDao {
                     .set(PlayerDataTableKey.name, playerData.getName())
                     .set(PlayerDataTableKey.uuid, playerData.getUuid().toString())
                     .set(PlayerDataTableKey.mode, playerData.getMode().toString())
+                    .set(PlayerDataTableKey.level, playerData.getLevel())
                     .set(PlayerDataTableKey.kills, playerData.getKills())
                     .set(PlayerDataTableKey.deaths, playerData.getDeaths())
                     .set(PlayerDataTableKey.assists, playerData.getAssists())
@@ -150,6 +153,7 @@ public class PlayerDataDao {
                     .select(PlayerDataTableKey.name,
                             PlayerDataTableKey.uuid,
                             PlayerDataTableKey.mode,
+                            PlayerDataTableKey.level,
                             PlayerDataTableKey.kills,
                             PlayerDataTableKey.deaths,
                             PlayerDataTableKey.assists,
@@ -172,6 +176,7 @@ public class PlayerDataDao {
                 playerData.setName(resultSet.getString(PlayerDataTableKey.name));
                 playerData.setUuid(UUID.fromString(resultSet.getString(PlayerDataTableKey.uuid)));
                 playerData.setMode(GameModeType.valueOf(resultSet.getString(PlayerDataTableKey.mode).toUpperCase()));
+                playerData.setLevel(resultSet.getDouble(PlayerDataTableKey.level));
                 playerData.setKills(resultSet.getInt(PlayerDataTableKey.kills));
                 playerData.setDeaths(resultSet.getInt(PlayerDataTableKey.deaths));
                 playerData.setAssists(resultSet.getInt(PlayerDataTableKey.assists));

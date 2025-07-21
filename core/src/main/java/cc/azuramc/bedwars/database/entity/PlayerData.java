@@ -16,6 +16,7 @@ public class PlayerData {
     private String name;
     private UUID uuid;
     private GameModeType mode;
+    private double level;
     private int kills;
     private int deaths;
     private int assists;
@@ -28,6 +29,9 @@ public class PlayerData {
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
+    public void addLevel(double level) {
+        this.level = this.level + level;
+    }
     public void addKills(int kills) {
         this.kills = this.kills + kills;
     }
