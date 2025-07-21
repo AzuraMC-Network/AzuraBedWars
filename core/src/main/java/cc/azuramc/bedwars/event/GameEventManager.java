@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.event;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.event.impl.*;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;

@@ -1,6 +1,5 @@
 package cc.azuramc.bedwars.listener.special;
 
-
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GameManager;
@@ -10,15 +9,12 @@ import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Objects;
 
 /**
  * @author ant1aura@qq.com
@@ -59,7 +55,8 @@ public class IronGolemSpawnListener implements Listener {
             }
         }
 
-        Objects.requireNonNull(loc.getWorld()).spawnEntity(new Location(block.getWorld(), loc.getX(), loc.getY() + 1, loc.getZ()), Objects.requireNonNull(EntityType.IRON_GOLEM));
+        AzuraBedWars.getInstance().getNmsAccess().spawnIronGolem(loc.add(0, 1, 0), gamePlayer.getGameTeam(),
+                0.25, 100, 240);
         event.setCancelled(true);
     }
 }

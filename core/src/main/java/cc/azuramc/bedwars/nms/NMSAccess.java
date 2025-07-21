@@ -1,6 +1,8 @@
 package cc.azuramc.bedwars.nms;
 
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
+import org.bukkit.Location;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -16,4 +18,6 @@ public interface NMSAccess {
     void hideArmor(GamePlayer gamePlayer, List<GamePlayer> receiverList);
     void showArmor(GamePlayer gamePlayer, List<GamePlayer> receiverList);
     Fireball setFireballDirection(Fireball fireball, Vector vector);
+    void spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn);
+    void spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage);
 }

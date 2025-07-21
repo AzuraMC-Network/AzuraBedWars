@@ -8,7 +8,6 @@ import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
-import cc.azuramc.bedwars.game.team.GameTeam;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
 import cc.azuramc.bedwars.util.LoggerUtil;
@@ -255,9 +254,9 @@ public class GamePlayer {
      */
     public static List<GamePlayer> getSpectators() {
         List<GamePlayer> spectators = new ArrayList<>();
-        for (GamePlayer player : GAME_PLAYERS.values()) {
-            if (player.isSpectator()) {
-                spectators.add(player);
+        for (GamePlayer gamePlayer : GAME_PLAYERS.values()) {
+            if (gamePlayer.isSpectator()) {
+                spectators.add(gamePlayer);
             }
         }
         return spectators;
