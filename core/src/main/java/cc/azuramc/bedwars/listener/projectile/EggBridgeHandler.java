@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.listener.projectile;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.team.TeamColor;
+import cc.azuramc.bedwars.game.TeamColor;
 import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;

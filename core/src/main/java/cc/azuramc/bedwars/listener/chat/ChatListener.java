@@ -7,7 +7,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.level.PlayerLevelMap;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.VaultUtil;

@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.event.impl;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.compat.util.BedUtil;
 import cc.azuramc.bedwars.config.object.EventConfig;
