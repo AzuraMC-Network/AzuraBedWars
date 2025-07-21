@@ -8,11 +8,11 @@ import cc.azuramc.bedwars.listener.chat.ChatListener;
 import cc.azuramc.bedwars.listener.player.*;
 import cc.azuramc.bedwars.listener.projectile.EggBridgeListener;
 import cc.azuramc.bedwars.listener.projectile.FireballListener;
-import cc.azuramc.bedwars.listener.special.SilverFishListener;
 import cc.azuramc.bedwars.listener.server.ServerListener;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.listener.special.IronGolemSpawnListener;
 import cc.azuramc.bedwars.listener.special.RescuePlatformListener;
+import cc.azuramc.bedwars.listener.special.SilverFishListener;
 import cc.azuramc.bedwars.listener.special.WarpPowderListener;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
 import cc.azuramc.bedwars.listener.world.ExplodeListener;
@@ -62,7 +62,6 @@ public class ListenerRegistry {
         // projectile package
         register(new EggBridgeListener());
         register(new FireballListener());
-        register(new SilverFishListener());
 
         // server package
         register(new ServerListener());
@@ -73,9 +72,10 @@ public class ListenerRegistry {
         }
 
         // special package
+        register(new IronGolemSpawnListener());
         register(new RescuePlatformListener());
         register(new WarpPowderListener());
-        register(new IronGolemSpawnListener());
+        register(new SilverFishListener());
 
         // world
         register(new ChunkListener());

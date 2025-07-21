@@ -22,7 +22,7 @@ import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
-import cc.azuramc.bedwars.util.EntityUtil;
+import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
@@ -97,15 +97,6 @@ public final class AzuraBedWars extends JavaPlugin {
         
         // 初始化命令和通信系统
         initCommands();
-
-        Bukkit.getScheduler().runTaskTimer(this, new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (EntityUtil entityUtil : EntityUtil.getDespawnables().values()){
-                    entityUtil.refresh();
-                }
-            }
-        }, 20L, 20L);
 
         if (settingsConfig.isEnabledJedisMapFeature()) {
             intiChannelSystem();
@@ -300,6 +291,22 @@ public final class AzuraBedWars extends JavaPlugin {
     private void setupNMSSupport() {
         nmsProvider = new NMSProvider();
         nmsAccess = nmsProvider.setup();
+        initCustomEntities();
+    }
+
+    /**
+     * 初始化自定义实体 (蠹虫 铁傀儡等)
+     */
+    private void initCustomEntities() {
+        nmsAccess.registerCustomEntities();
+        Bukkit.getScheduler().runTaskTimer(this, new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (CustomEntityRemoverUtil customEntityRemoverUtil : CustomEntityRemoverUtil.getDespawnables().values()){
+                    customEntityRemoverUtil.refresh();
+                }
+            }
+        }, 20L, 20L);
     }
 
     private void hookLuckPerms() {
