@@ -89,7 +89,7 @@ public class GamePlayer {
 
         // 初始化管理器
         this.assistsManager = new AssistsManager(this);
-        this.playerData = loadPlayerData(uuid, name);
+        this.playerData = loadPlayerData(this);
         this.playerCompass = new PlayerCompass(this);
 
         // 初始化游戏状态
@@ -111,119 +111,12 @@ public class GamePlayer {
 
     /**
      * 从数据库加载玩家数据
-     * 
-     * @param uuid 玩家UUID
-     * @param name 玩家名称
+     *
      * @return PlayerData实例
      */
-    private PlayerData loadPlayerData(UUID uuid, String name) {
+    private PlayerData loadPlayerData(GamePlayer gamePlayer) {
         PlayerDataService playerDataService = AzuraBedWars.getInstance().getPlayerDataService();
-        
-        try {
-            // 尝试直接通过UUID从数据库查询玩家数据
-            PlayerData existingData = queryPlayerDataByUuid(uuid, playerDataService);
-            
-            if (existingData != null && existingData.getUuid() != null) {
-                // 如果找到了有效的玩家数据，将映射关系存储到service中后返回
-                playerDataService.playerDataMap.put(this, existingData);
-                return existingData;
-            }
-            
-            // 如果玩家不存在，创建新的PlayerData并插入数据库
-            return createNewPlayerData(uuid, name, playerDataService);
-            
-        } catch (Exception e) {
-            LoggerUtil.warn("加载玩家数据时发生错误: " + e.getMessage());
-            e.printStackTrace();
-            // 如果数据库操作失败，返回默认的PlayerData
-            return createDefaultPlayerData(uuid, name);
-        }
-    }
-
-    /**
-     * 通过UUID直接查询玩家数据
-     * 
-     * @param uuid 玩家UUID
-     * @param playerDataService 玩家数据服务
-     * @return PlayerData实例，如果不存在则返回null
-     */
-    private PlayerData queryPlayerDataByUuid(UUID uuid, PlayerDataService playerDataService) {
-        try {
-            // 直接访问DAO层查询（因为Service层方法需要GamePlayer参数会造成循环依赖）
-            AzuraBedWars plugin = AzuraBedWars.getInstance();
-            int playerId = plugin.getPlayerDataDao().selectPlayerDataIdByUuid(uuid);
-            
-            if (playerId > 0) {
-                PlayerData playerData = plugin.getPlayerDataDao().selectPlayerDataById(playerId);
-                if (playerData != null) {
-                    // 缓存数据
-                    playerDataService.cachePlayerData(this, playerData);
-                    return playerData;
-                }
-            }
-            
-            return null;
-        } catch (Exception e) {
-            LoggerUtil.warn("查询玩家数据时发生错误: " + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * 创建新的玩家数据并插入数据库
-     * 
-     * @param uuid 玩家UUID
-     * @param name 玩家名称
-     * @param playerDataService 玩家数据服务
-     * @return 新创建的PlayerData
-     */
-    private PlayerData createNewPlayerData(UUID uuid, String name, PlayerDataService playerDataService) {
-        try {
-            PlayerData newPlayerData = createDefaultPlayerData(uuid, name);
-            
-            // 插入数据库
-            PlayerData insertedData = playerDataService.insertPlayerData(newPlayerData);
-            if (insertedData != null && insertedData.getId() > 0) {
-                // 将新插入的数据缓存到service中
-                playerDataService.cachePlayerData(this, insertedData);
-                return insertedData;
-            }
-            
-            return newPlayerData;
-            
-        } catch (Exception e) {
-            LoggerUtil.warn("创建新玩家数据时发生错误: " + e.getMessage());
-            e.printStackTrace();
-            return createDefaultPlayerData(uuid, name);
-        }
-    }
-
-    /**
-     * 创建默认的玩家数据
-     * 
-     * @param uuid 玩家UUID
-     * @param name 玩家名称
-     * @return 默认的PlayerData
-     */
-    private PlayerData createDefaultPlayerData(UUID uuid, String name) {
-        PlayerData playerData = new PlayerData();
-        playerData.setUuid(uuid);
-        playerData.setName(name);
-        playerData.setMode(GameModeType.DEFAULT);
-        playerData.setKills(0);
-        playerData.setDeaths(0);
-        playerData.setAssists(0);
-        playerData.setFinalKills(0);
-        playerData.setDestroyedBeds(0);
-        playerData.setWins(0);
-        playerData.setLosses(0);
-        playerData.setGames(0);
-        playerData.setShopDataJson(null);
-        java.sql.Timestamp now = new java.sql.Timestamp(System.currentTimeMillis());
-        playerData.setCreatedAt(now);
-        playerData.setUpdatedAt(now);
-        
-        return playerData;
+        return playerDataService.selectPlayerData(gamePlayer);
     }
 
     /**

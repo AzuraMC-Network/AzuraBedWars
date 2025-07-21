@@ -521,7 +521,7 @@ public class GameManager {
             return;
         }
 
-        AzuraBedWars.getInstance().getPlayerDataService().updatePlayerData(gamePlayer.getPlayerData());
+        AzuraBedWars.getInstance().getPlayerDataService().updatePlayerData(gamePlayer);
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam == null) {

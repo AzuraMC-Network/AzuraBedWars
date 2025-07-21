@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.database.entity;
 
 import cc.azuramc.bedwars.game.GameModeType;
+import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -28,6 +29,22 @@ public class PlayerData {
     private String shopDataJson;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+    public PlayerData(GamePlayer gamePlayer) {
+        this.setName(gamePlayer.getName());
+        this.setUuid(gamePlayer.getUuid());
+        this.setMode(GameModeType.DEFAULT);
+        this.setLevel(0.0);
+        this.setKills(0);
+        this.setDeaths(0);
+        this.setAssists(0);
+        this.setFinalKills(0);
+        this.setDestroyedBeds(0);
+        this.setWins(0);
+        this.setLosses(0);
+        this.setGames(0);
+        this.setShopDataJson("{}");
+    }
 
     public void addLevel(double level) {
         this.level = this.level + level;

@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public class PlayerDataService {
 
-    private PlayerDataDao playerDataDao;
+    private final PlayerDataDao playerDataDao;
 
     public PlayerDataService(AzuraBedWars plugin) {
         this.playerDataDao = plugin.getPlayerDataDao();
@@ -43,23 +43,30 @@ public class PlayerDataService {
      */
     public PlayerData selectPlayerData(GamePlayer gamePlayer) {
         try {
-            PlayerData playerData = playerDataMap.get(gamePlayer);
+            PlayerData playerData = playerDataMap.getOrDefault(gamePlayer, null);
             int playerId = playerIdMap.getOrDefault(gamePlayer, -1);
-            
+
+            // 如果缓存中没有数据，尝试从数据库查询
             if(playerData == null || playerId == -1) {
                 // 先通过UUID获取玩家ID
                 playerId = playerDataDao.selectPlayerDataIdByUuid(gamePlayer.getUuid());
-                
+
                 if (playerId > 0) {
                     // 如果找到了ID，根据ID查询完整数据
-                    playerData = playerDataDao.selectPlayerDataById(playerId);
-                    
+                    playerData = playerDataDao.selectPlayerDataById(playerId, gamePlayer);
+
                     // 缓存数据
                     playerIdMap.put(gamePlayer, playerId);
                     playerDataMap.put(gamePlayer, playerData);
                 } else {
-                    // 如果没有找到数据 说明是新玩家 这里不创建 让GamePlayer自己处理
-                    return null;
+                    // 数据库中也没有数据，创建新的玩家数据
+                    playerData = insertPlayerData(gamePlayer);
+
+                    // 缓存新创建的数据
+                    if (playerData != null) {
+                        playerIdMap.put(gamePlayer, playerData.getId());
+                        playerDataMap.put(gamePlayer, playerData);
+                    }
                 }
             }
 
@@ -71,14 +78,15 @@ public class PlayerDataService {
         return null;
     }
 
+
     /**
      * 插入新的用户记录
-     * @param playerData 要插入的用户对象 (id 会在数据库中生成)
+     * @param gamePlayer 玩家对象
      * @return 插入成功后，带有生成ID的用户对象
      */
-    public PlayerData insertPlayerData(PlayerData playerData) {
+    public PlayerData insertPlayerData(GamePlayer gamePlayer) {
         try {
-            return playerDataDao.insertPlayerData(playerData);
+            return playerDataDao.insertPlayerData(new PlayerData(gamePlayer));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -88,28 +96,19 @@ public class PlayerDataService {
 
     /**
      * 更新用户数据
-     * @param playerData 要更新的用户对象
-     * @return 更新成功后，带有生成ID的用户对象
+     * @param gamePlayer 玩家对象
      */
-    public PlayerData updatePlayerData(PlayerData playerData) {
+    public void updatePlayerData(GamePlayer gamePlayer) {
         try {
-            return playerDataDao.updatePlayerData(playerData);
+            PlayerData playerData = selectPlayerData(gamePlayer);
+            playerDataDao.updatePlayerData(playerData);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return null;
     }
 
-    /**
-     * 缓存玩家数据
-     * @param gamePlayer 游戏玩家
-     * @param playerData 玩家数据
-     */
-    public void cachePlayerData(GamePlayer gamePlayer, PlayerData playerData) {
-        if (playerData != null && playerData.getId() > 0) {
-            playerDataMap.put(gamePlayer, playerData);
-            playerIdMap.put(gamePlayer, playerData.getId());
-        }
+    public void shutdown() {
+        playerDataMap.keySet().forEach(this::updatePlayerData);
+        playerDataMap.clear();
     }
 }
