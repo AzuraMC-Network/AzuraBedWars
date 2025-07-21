@@ -5,15 +5,13 @@ import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.gui.ModeSelectionGUI;
+import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.shop.gui.ItemShopGUI;
 import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.gui.SpectatorCompassGUI;
 import cc.azuramc.bedwars.spectator.gui.SpectatorSettingGUI;
-import cc.azuramc.bedwars.util.BungeeUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -48,39 +46,10 @@ public class PlayerInteractListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player);
         Material interactingMaterial = event.getMaterial();
 
-        if (gameManager.getGameState() == GameState.WAITING) {
-            handleWaitingState(event, gamePlayer, interactingMaterial);
+        if (gameManager.getGameState() != GameState.RUNNING) {
             return;
         }
 
-        if (gameManager.getGameState() == GameState.RUNNING) {
-            handleRunningState(event, gamePlayer, interactingMaterial);
-        }
-    }
-    
-    /**
-     * 处理等待状态下的交互事件
-     */
-    private void handleWaitingState(PlayerInteractEvent event, GamePlayer gamePlayer, Material interactingMaterial) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
-            event.setCancelled(true);
-            switch (interactingMaterial) {
-                case PAPER:
-                    new ModeSelectionGUI(gamePlayer).open();
-                    break;
-                case SLIME_BALL:
-                    BungeeUtil.connectToLobby(gamePlayer);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    
-    /**
-     * 处理游戏运行状态下的交互事件
-     */
-    private void handleRunningState(PlayerInteractEvent event, GamePlayer gamePlayer, Material interactingMaterial) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
 
         if (event.getAction() == Action.PHYSICAL) {
