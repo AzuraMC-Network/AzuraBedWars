@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.compat.util;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;

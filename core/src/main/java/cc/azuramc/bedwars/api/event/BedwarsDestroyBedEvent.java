@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.api.event;
 
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

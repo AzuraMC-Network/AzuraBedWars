@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.compat.util.BedUtil;
 import cc.azuramc.bedwars.config.object.EventConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.VaultUtil;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;

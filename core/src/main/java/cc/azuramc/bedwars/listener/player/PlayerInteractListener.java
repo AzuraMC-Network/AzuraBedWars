@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.map.MapData;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.gui.ModeSelectionGUI;
 import cc.azuramc.bedwars.shop.gui.ItemShopGUI;
 import cc.azuramc.bedwars.shop.gui.TeamShopGUI;

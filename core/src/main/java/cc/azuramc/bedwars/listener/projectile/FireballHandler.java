@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.listener.projectile;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;

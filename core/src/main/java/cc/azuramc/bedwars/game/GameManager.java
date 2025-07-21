@@ -12,8 +12,6 @@ import cc.azuramc.bedwars.event.GameEventManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.task.GameStartTask;
-import cc.azuramc.bedwars.game.team.GameTeam;
-import cc.azuramc.bedwars.game.team.TeamColor;
 import cc.azuramc.bedwars.jedis.JedisManager;
 import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;

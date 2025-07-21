@@ -1,7 +1,6 @@
-package cc.azuramc.bedwars.game.team;
+package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Data;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;

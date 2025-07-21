@@ -1,17 +1,15 @@
-package cc.azuramc.bedwars.listener.projectile;
+package cc.azuramc.bedwars.listener.special;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import com.cryptomorin.xseries.XEntityType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
-
-import java.util.Objects;
 
 /**
  * @author ant1aura@qq.com
@@ -24,6 +22,7 @@ public class SilverFishListener implements Listener {
     public void onThrown(ProjectileHitEvent event) {
         Location location = event.getEntity().getLocation();
 
+
         if (gameManager.getGameState() != GameState.RUNNING) {
             return;
         }
@@ -32,6 +31,9 @@ public class SilverFishListener implements Listener {
             return;
         }
 
-        Objects.requireNonNull(location.getWorld()).spawnEntity(location, Objects.requireNonNull(XEntityType.SILVERFISH.get()));
+        GamePlayer gamePlayer = GamePlayer.get(shooter);
+
+        AzuraBedWars.getInstance().getNmsAccess().spawnSilverfish(location.add(0, 1, 0), gamePlayer.getGameTeam(),
+                0.25, 8, 15, 4);
     }
 }

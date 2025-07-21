@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.game.team;
+package cc.azuramc.bedwars.game;
 
 import lombok.Getter;
 import org.bukkit.ChatColor;

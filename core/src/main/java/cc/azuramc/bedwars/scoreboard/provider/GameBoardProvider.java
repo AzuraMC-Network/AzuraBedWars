@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.config.object.ScoreboardConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.team.GameTeam;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;

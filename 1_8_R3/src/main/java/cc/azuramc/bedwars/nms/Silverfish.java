@@ -1,0 +1,97 @@
+package cc.azuramc.bedwars.nms;
+
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
+import lombok.Getter;
+import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+
+import java.lang.reflect.Field;
+
+@Getter
+public class Silverfish extends EntitySilverfish {
+
+    private GameTeam gameTeam;
+
+    public Silverfish(World world, GameTeam gameTeam) {
+        super(world);
+        if (gameTeam == null) return;
+        this.gameTeam = gameTeam;
+
+        clearGoals();
+        setupGoals();
+        setupTargets();
+    }
+
+    private void clearGoals() {
+        try {
+            Field b = PathfinderGoalSelector.class.getDeclaredField("b");
+            Field c = PathfinderGoalSelector.class.getDeclaredField("c");
+            b.setAccessible(true);
+            c.setAccessible(true);
+            b.set(this.goalSelector, new UnsafeList<>());
+            c.set(this.goalSelector, new UnsafeList<>());
+            b.set(this.targetSelector, new UnsafeList<>());
+            c.set(this.targetSelector, new UnsafeList<>());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setupGoals() {
+        this.goalSelector.a(1, new PathfinderGoalFloat(this));
+        this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.9D, false));
+        this.goalSelector.a(3, new PathfinderGoalRandomStroll(this, 2D));
+    }
+
+    private void setupTargets() {
+        this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, true));
+        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, 20, true, false,
+                human -> human != null && human.isAlive()
+                        && !gameTeam.isInTeam(GamePlayer.get(human.getUniqueID()))
+                        && !GamePlayer.get(human.getUniqueID()).isSpectator()));
+        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, IronGolem.class, 20, true, false,
+                golem -> golem != null && golem.getGameTeam() != gameTeam));
+        this.targetSelector.a(4, new PathfinderGoalNearestAttackableTarget<>(this, Silverfish.class, 20, true, false,
+                fish -> fish != null && fish.getGameTeam() != gameTeam));
+    }
+
+    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
+        WorldServer world = ((CraftWorld) loc.getWorld()).getHandle();
+        Silverfish entity = new Silverfish(world, gameTeam);
+
+        entity.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        entity.getAttributeInstance(GenericAttributes.maxHealth).setValue(health);
+        entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(speed);
+        entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(damage);
+
+        CraftLivingEntity craft = (CraftLivingEntity) entity.getBukkitEntity();
+        craft.setRemoveWhenFarAway(false);
+
+        String name = "{TeamColor}&l{TeamName} &r{TeamColor}Silverfish"
+                .replace("{TeamColor}", gameTeam.getChatColor().toString())
+                .replace("{TeamName}", gameTeam.getName());
+        entity.setCustomName(name);
+        entity.setCustomNameVisible(true);
+
+        world.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+        return craft;
+    }
+
+    @Override
+    public void die() {
+        super.die();
+        gameTeam = null;
+    }
+
+    @Override
+    public void die(DamageSource source) {
+        super.die(source);
+        gameTeam = null;
+    }
+}

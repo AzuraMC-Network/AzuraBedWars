@@ -8,7 +8,7 @@ import cc.azuramc.bedwars.listener.chat.ChatListener;
 import cc.azuramc.bedwars.listener.player.*;
 import cc.azuramc.bedwars.listener.projectile.EggBridgeListener;
 import cc.azuramc.bedwars.listener.projectile.FireballListener;
-import cc.azuramc.bedwars.listener.projectile.SilverFishListener;
+import cc.azuramc.bedwars.listener.special.SilverFishListener;
 import cc.azuramc.bedwars.listener.server.ServerListener;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.listener.special.IronGolemSpawnListener;
