@@ -46,12 +46,13 @@ public class ListenerRegistry {
         register(new PlayerInteractListener());
         register(new PlayerInvisibilityListener(plugin));
         register(new PlayerJoinListener());
+        register(new PlayerLobbyInteractListener());
         register(new PlayerMiscListener());
         register(new PlayerResourcePutListener());
         if (VersionUtil.isLessThan113()) {
-            register(new PlayerPickUpListenerA());
+            register(new PlayerPickUpListenerLowVersion());
         } else {
-            register(new PlayerPickUpListenerB());
+            register(new PlayerPickUpListenerHighVersion());
         }
         register(new PlayerQuitListener());
         register(new PlayerRespawnListener());

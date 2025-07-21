@@ -4,20 +4,23 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * 处理老版本Minecraft的物品拾取事件
+ * 处理新版本Minecraft的物品拾取事件
  *
  * @author an5w1r@163.com
  */
-public class PlayerPickUpListenerA implements Listener {
+public class PlayerPickUpListenerHighVersion implements Listener {
 
-    @SuppressWarnings("deprecation")
     @EventHandler
-    public void onPickup(PlayerPickupItemEvent event) {
-        Player player = event.getPlayer();
+    public void onPickup(EntityPickupItemEvent event) {
+        // 检查拾取实体是否为玩家
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
         ItemStack itemStack = event.getItem().getItemStack();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         
