@@ -56,6 +56,7 @@ public class ListenerRegistry {
         }
         register(new PlayerQuitListener());
         register(new PlayerRespawnListener());
+        register(new PlayerRightClickListener());
         register(new PlayerTntDamageListener());
 
         // projectile package
