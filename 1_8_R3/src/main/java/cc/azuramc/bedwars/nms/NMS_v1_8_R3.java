@@ -3,10 +3,7 @@ package cc.azuramc.bedwars.nms;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import net.minecraft.server.v1_8_R3.EntityFireball;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEquipment;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFireball;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -18,7 +15,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author An5w1r@163.com
@@ -80,12 +81,41 @@ public class NMS_v1_8_R3 implements NMSAccess {
     }
 
     @Override
+    public void registerCustomEntities() {
+        registerCustomEntity("CustomSilverfish", 60, CustomSilverfish.class);
+        registerCustomEntity("CustomIronGolem", 99, CustomIronGolem.class);
+    }
+
+    @Override
     public LivingEntity spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn) {
-        return IronGolem.spawn(loc, gameTeam, speed, health, despawn);
+        LoggerUtil.debug("NMS_v1_8_R3$spawnIronGolem | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn);
+        return CustomIronGolem.spawn(loc, gameTeam, speed, health, despawn);
     }
 
     @Override
     public LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
-        return Silverfish.spawn(loc, gameTeam, speed, health, despawn, damage);
+        LoggerUtil.debug("NMS_v1_8_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn + ", damage: " + damage);
+        return CustomSilverfish.spawn(loc, gameTeam, speed, health, despawn, damage);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private void registerCustomEntity(String name, int id, Class customClass) {
+        try {
+            ArrayList<Map> dataMap = new ArrayList<>();
+            for (Field field : EntityTypes.class.getDeclaredFields()) {
+                if (!field.getType().getSimpleName().equals(Map.class.getSimpleName())) continue;
+                field.setAccessible(true);
+                dataMap.add((Map) field.get(null));
+            }
+            if (dataMap.get(2).containsKey(id)) {
+                dataMap.get(0).remove(name);
+                dataMap.get(2).remove(id);
+            }
+            Method method = EntityTypes.class.getDeclaredMethod("a", Class.class, String.class, Integer.TYPE);
+            method.setAccessible(true);
+            method.invoke(null, customClass, name, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
