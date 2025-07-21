@@ -44,6 +44,8 @@ public class PlayerData {
         this.setLosses(0);
         this.setGames(0);
         this.setShopDataJson("{}");
+        this.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        this.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
     }
 
     public void addLevel(double level) {
