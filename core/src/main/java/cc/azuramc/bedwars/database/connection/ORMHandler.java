@@ -17,7 +17,6 @@ public class ORMHandler {
 
     public ORMHandler(AzuraBedWars plugin) {
         ormClient = plugin.getOrmClient();
-        AzuraBedWars.getInstance().getPlayerDataService().createTable();
     }
 
     public Connection getConnection() throws SQLException {
