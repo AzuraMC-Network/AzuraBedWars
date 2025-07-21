@@ -105,9 +105,8 @@ public class PlayerDataDao {
     /**
      * 更新用户数据
      * @param playerData 要更新的用户对象
-     * @return 更新成功后，带有生成ID的用户对象
      */
-    public PlayerData updatePlayerData(PlayerData playerData) throws SQLException {
+    public void updatePlayerData(PlayerData playerData) throws SQLException {
         try (Connection conn = ormClient.getConnection()) {
             PreparedStatement updateUsersStmt = ormClient.update(conn)
                     .update(PlayerDataTableKey.tableName)
@@ -132,7 +131,6 @@ public class PlayerDataDao {
             updateUsersStmt.executeUpdate();
             updateUsersStmt.close();
         }
-        return playerData;
     }
 
 
