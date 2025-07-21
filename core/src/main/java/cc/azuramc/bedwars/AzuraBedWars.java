@@ -22,6 +22,7 @@ import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
+import cc.azuramc.bedwars.util.EntityUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
@@ -38,6 +39,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * AzuraBedWars插件主类
@@ -95,6 +97,15 @@ public final class AzuraBedWars extends JavaPlugin {
         
         // 初始化命令和通信系统
         initCommands();
+
+        Bukkit.getScheduler().runTaskTimer(this, new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (EntityUtil entityUtil : EntityUtil.getDespawnables().values()){
+                    entityUtil.refresh();
+                }
+            }
+        }, 20L, 20L);
 
         if (settingsConfig.isEnabledJedisMapFeature()) {
             intiChannelSystem();

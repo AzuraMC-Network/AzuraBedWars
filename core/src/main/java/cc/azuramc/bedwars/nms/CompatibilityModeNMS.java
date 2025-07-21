@@ -14,6 +14,7 @@ import org.bukkit.craftbukkit.v1_20_R3.entity.CraftFireball;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import com.mojang.datafixers.util.Pair;
 import org.bukkit.util.Vector;
@@ -75,13 +76,13 @@ public class CompatibilityModeNMS implements NMSAccess {
     }
 
     @Override
-    public void spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn) {
-
+    public LivingEntity spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn) {
+        return null;
     }
 
     @Override
-    public void spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
-
+    public LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
+        return null;
     }
 
     private void sendPacket(Player player, Packet<?> packet) {

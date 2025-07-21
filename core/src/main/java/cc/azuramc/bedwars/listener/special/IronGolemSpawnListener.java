@@ -5,6 +5,8 @@ import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.util.EntityUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -55,8 +57,11 @@ public class IronGolemSpawnListener implements Listener {
             }
         }
 
-        AzuraBedWars.getInstance().getNmsAccess().spawnIronGolem(loc.add(0, 1, 0), gamePlayer.getGameTeam(),
-                0.25, 100, 240);
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        int despawn = 240;
+
+        new EntityUtil(AzuraBedWars.getInstance().getNmsAccess().spawnIronGolem(loc.add(0, 1, 0), gameTeam,
+                0.25, 100, despawn), gameTeam, despawn);
         event.setCancelled(true);
     }
 }
