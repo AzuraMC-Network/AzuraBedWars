@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.nms;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.util.EntityUtil;
+import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
@@ -15,15 +15,16 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import java.lang.reflect.Field;
 
 @Getter
-public class IronGolem extends EntityIronGolem {
+public class CustomSilverfish extends EntitySilverfish {
 
     private GameTeam gameTeam;
 
-    private IronGolem(World world, GameTeam gameTeam) {
+    public CustomSilverfish(World world, GameTeam gameTeam) {
         super(world);
+        if (gameTeam == null) return;
         this.gameTeam = gameTeam;
+
         clearGoals();
-        setupAttributes();
         setupGoals();
         setupTargets();
     }
@@ -43,16 +44,10 @@ public class IronGolem extends EntityIronGolem {
         }
     }
 
-    private void setupAttributes() {
-        this.setSize(1.4F, 2.9F);
-        ((Navigation) this.getNavigation()).a(true);
-    }
-
     private void setupGoals() {
         this.goalSelector.a(1, new PathfinderGoalFloat(this));
-        this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.5D, false));
-        this.goalSelector.a(3, new PathfinderGoalRandomStroll(this, 1D));
-        this.goalSelector.a(4, new PathfinderGoalRandomLookaround(this));
+        this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.9D, false));
+        this.goalSelector.a(3, new PathfinderGoalRandomStroll(this, 2D));
     }
 
     private void setupTargets() {
@@ -61,27 +56,27 @@ public class IronGolem extends EntityIronGolem {
                 human -> human != null && human.isAlive()
                         && !gameTeam.isInTeam(GamePlayer.get(human.getUniqueID()))
                         && !GamePlayer.get(human.getUniqueID()).isSpectator()));
-        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, IronGolem.class, 20, true, false,
+        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, CustomIronGolem.class, 20, true, false,
                 golem -> golem != null && golem.getGameTeam() != gameTeam));
-        this.targetSelector.a(4, new PathfinderGoalNearestAttackableTarget<>(this, Silverfish.class, 20, true, false,
-                silverfish -> silverfish != null && silverfish.getGameTeam() != gameTeam));
+        this.targetSelector.a(4, new PathfinderGoalNearestAttackableTarget<>(this, CustomSilverfish.class, 20, true, false,
+                fish -> fish != null && fish.getGameTeam() != gameTeam));
     }
 
-    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, int despawn) {
+    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
         WorldServer world = ((CraftWorld) loc.getWorld()).getHandle();
-        IronGolem entity = new IronGolem(world, gameTeam);
+        CustomSilverfish entity = new CustomSilverfish(world, gameTeam);
 
+        entity.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         entity.getAttributeInstance(GenericAttributes.maxHealth).setValue(health);
         entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(speed);
-        entity.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+        entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(damage);
 
         CraftLivingEntity craft = (CraftLivingEntity) entity.getBukkitEntity();
         craft.setRemoveWhenFarAway(false);
 
-        String name = "{TeamColor}{despawn}s &8[ {TeamColor}{health}&8]"
+        String name = "{TeamColor}&l{TeamName} &r{TeamColor}Silverfish"
                 .replace("{TeamColor}", gameTeam.getChatColor().toString())
-                .replace("{despawn}", String.valueOf(despawn))
-                .replace("{health}", String.valueOf((int) health));
+                .replace("{TeamName}", gameTeam.getName());
         entity.setCustomName(name);
         entity.setCustomNameVisible(true);
 
@@ -90,19 +85,16 @@ public class IronGolem extends EntityIronGolem {
     }
 
     @Override
-    protected void dropDeathLoot(boolean flag, int i) {}
-
-    @Override
     public void die() {
         super.die();
         gameTeam = null;
-        EntityUtil.getDespawnables().remove(this.getUniqueID());
+        CustomEntityRemoverUtil.getDespawnables().remove(this.getUniqueID());
     }
 
     @Override
     public void die(DamageSource source) {
         super.die(source);
         gameTeam = null;
-        EntityUtil.getDespawnables().remove(this.getUniqueID());
+        CustomEntityRemoverUtil.getDespawnables().remove(this.getUniqueID());
     }
 }

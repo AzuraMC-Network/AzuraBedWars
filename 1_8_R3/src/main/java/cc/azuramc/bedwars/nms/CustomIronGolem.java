@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.nms;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.util.EntityUtil;
+import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
@@ -15,16 +15,15 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import java.lang.reflect.Field;
 
 @Getter
-public class Silverfish extends EntitySilverfish {
+public class CustomIronGolem extends EntityIronGolem {
 
     private GameTeam gameTeam;
 
-    public Silverfish(World world, GameTeam gameTeam) {
+    private CustomIronGolem(World world, GameTeam gameTeam) {
         super(world);
-        if (gameTeam == null) return;
         this.gameTeam = gameTeam;
-
         clearGoals();
+        setupAttributes();
         setupGoals();
         setupTargets();
     }
@@ -44,10 +43,16 @@ public class Silverfish extends EntitySilverfish {
         }
     }
 
+    private void setupAttributes() {
+        this.setSize(1.4F, 2.9F);
+        ((Navigation) this.getNavigation()).a(true);
+    }
+
     private void setupGoals() {
         this.goalSelector.a(1, new PathfinderGoalFloat(this));
-        this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.9D, false));
-        this.goalSelector.a(3, new PathfinderGoalRandomStroll(this, 2D));
+        this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.5D, false));
+        this.goalSelector.a(3, new PathfinderGoalRandomStroll(this, 1D));
+        this.goalSelector.a(4, new PathfinderGoalRandomLookaround(this));
     }
 
     private void setupTargets() {
@@ -56,27 +61,27 @@ public class Silverfish extends EntitySilverfish {
                 human -> human != null && human.isAlive()
                         && !gameTeam.isInTeam(GamePlayer.get(human.getUniqueID()))
                         && !GamePlayer.get(human.getUniqueID()).isSpectator()));
-        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, IronGolem.class, 20, true, false,
+        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, CustomIronGolem.class, 20, true, false,
                 golem -> golem != null && golem.getGameTeam() != gameTeam));
-        this.targetSelector.a(4, new PathfinderGoalNearestAttackableTarget<>(this, Silverfish.class, 20, true, false,
-                fish -> fish != null && fish.getGameTeam() != gameTeam));
+        this.targetSelector.a(4, new PathfinderGoalNearestAttackableTarget<>(this, CustomSilverfish.class, 20, true, false,
+                customSilverfish -> customSilverfish != null && customSilverfish.getGameTeam() != gameTeam));
     }
 
-    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
+    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, int despawn) {
         WorldServer world = ((CraftWorld) loc.getWorld()).getHandle();
-        Silverfish entity = new Silverfish(world, gameTeam);
+        CustomIronGolem entity = new CustomIronGolem(world, gameTeam);
 
-        entity.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         entity.getAttributeInstance(GenericAttributes.maxHealth).setValue(health);
         entity.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(speed);
-        entity.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(damage);
+        entity.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
 
         CraftLivingEntity craft = (CraftLivingEntity) entity.getBukkitEntity();
         craft.setRemoveWhenFarAway(false);
 
-        String name = "{TeamColor}&l{TeamName} &r{TeamColor}Silverfish"
+        String name = "{TeamColor}{despawn}s &8[ {TeamColor}{health}&8]"
                 .replace("{TeamColor}", gameTeam.getChatColor().toString())
-                .replace("{TeamName}", gameTeam.getName());
+                .replace("{despawn}", String.valueOf(despawn))
+                .replace("{health}", String.valueOf((int) health));
         entity.setCustomName(name);
         entity.setCustomNameVisible(true);
 
@@ -85,16 +90,19 @@ public class Silverfish extends EntitySilverfish {
     }
 
     @Override
+    protected void dropDeathLoot(boolean flag, int i) {}
+
+    @Override
     public void die() {
         super.die();
         gameTeam = null;
-        EntityUtil.getDespawnables().remove(this.getUniqueID());
+        CustomEntityRemoverUtil.getDespawnables().remove(this.getUniqueID());
     }
 
     @Override
     public void die(DamageSource source) {
         super.die(source);
         gameTeam = null;
-        EntityUtil.getDespawnables().remove(this.getUniqueID());
+        CustomEntityRemoverUtil.getDespawnables().remove(this.getUniqueID());
     }
 }

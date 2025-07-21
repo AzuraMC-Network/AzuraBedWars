@@ -7,9 +7,9 @@ import org.bukkit.entity.LivingEntity;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityUtil {
+public class CustomEntityRemoverUtil {
 
-    @Getter private static final ConcurrentHashMap<UUID, EntityUtil> despawnables = new ConcurrentHashMap<>();
+    @Getter private static final ConcurrentHashMap<UUID, CustomEntityRemoverUtil> despawnables = new ConcurrentHashMap<>();
 
     @Getter
     private LivingEntity livingEntity;
@@ -19,7 +19,7 @@ public class EntityUtil {
     private int despawn = 250;
     private UUID uuid;
 
-    public EntityUtil(LivingEntity livingEntity, GameTeam gameTeam, int despawn) {
+    public CustomEntityRemoverUtil(LivingEntity livingEntity, GameTeam gameTeam, int despawn) {
         this.livingEntity = livingEntity;
         if (livingEntity == null) return;
         this.uuid = livingEntity.getUniqueId();

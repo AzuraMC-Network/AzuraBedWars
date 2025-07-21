@@ -19,6 +19,7 @@ public interface NMSAccess {
     void hideArmor(GamePlayer gamePlayer, List<GamePlayer> receiverList);
     void showArmor(GamePlayer gamePlayer, List<GamePlayer> receiverList);
     Fireball setFireballDirection(Fireball fireball, Vector vector);
+    void registerCustomEntities();
     LivingEntity spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn);
     LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage);
 }
