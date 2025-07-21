@@ -16,8 +16,8 @@ public class PlayerDataService {
     private final PlayerDataDao playerDataDao;
 
     public PlayerDataService(AzuraBedWars plugin) {
-        AzuraBedWars.getInstance().getPlayerDataService().createTable();
         this.playerDataDao = plugin.getPlayerDataDao();
+        this.createTable();
     }
 
     /** 存储GamePlayer与对应ID(主键)关系 */
