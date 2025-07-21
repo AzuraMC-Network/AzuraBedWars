@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.server;
 
 import cc.azuramc.bedwars.util.ServerMOTD;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -17,11 +16,11 @@ public class ServerListener implements Listener {
 
     @EventHandler
     public void onSpawnMobHub(CreatureSpawnEvent event) {
-        if (event.getEntityType() != EntityType.ARMOR_STAND && event.getEntityType() != EntityType.VILLAGER) {
-            if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM) {
-                event.setCancelled(true);
-            }
-        }
+//        if (event.getEntityType() != EntityType.ARMOR_STAND && event.getEntityType() != EntityType.VILLAGER) {
+//            if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.CUSTOM) {
+//                event.setCancelled(true);
+//            }
+//        }
     }
 
     @EventHandler
