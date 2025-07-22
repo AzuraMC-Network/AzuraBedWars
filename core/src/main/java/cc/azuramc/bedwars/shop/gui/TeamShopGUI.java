@@ -34,9 +34,9 @@ public class TeamShopGUI extends CustomGUI {
     private static final String SHARPENED_SWORDS = "磨刀石";
     private static final String REINFORCED_ARMOR = "精制护甲";
     private static final String MANIC_MINER = "疯狂矿工";
-    private static final String RESOURCE_FURNACE = "资源炉";
+    private static final String RESOURCE_FURNACE = "铁锻炉";
     private static final String HEALING_POOL = "治愈池";
-    private static final String FALLING_PROTECTION = "坠落保护";
+    private static final String FALLING_PROTECTION = "缓冲靴子";
 
     private static final String BLINDNESS_TRAP = "致盲陷阱";
     private static final String FIGHT_BACK_TRAP = "反击陷阱";
@@ -56,44 +56,44 @@ public class TeamShopGUI extends CustomGUI {
 
         // 锋利
         Map<Integer, Integer> swordPrices = new HashMap<>();
-        swordPrices.put(0, 4);
+        swordPrices.put(0, 8);
         TIER_PRICES.put(SHARPENED_SWORDS, swordPrices);
         
         // 初始化保护价格
         Map<Integer, Integer> armorPrices = new HashMap<>();
         // 护甲保护 I
-        armorPrices.put(0, 2);
+        armorPrices.put(0, 5);
         // 护甲保护 II
-        armorPrices.put(1, 4);
+        armorPrices.put(1, 10);
         // 护甲保护 III
-        armorPrices.put(2, 6);
+        armorPrices.put(2, 20);
         // 护甲保护 IV
-        armorPrices.put(3, 8);
+        armorPrices.put(3, 30);
         TIER_PRICES.put(REINFORCED_ARMOR, armorPrices);
 
         // 初始化资源炉价格
         Map<Integer, Integer> resourceFurnacePrices = new HashMap<>();
         // I
-        resourceFurnacePrices.put(0, 2);
+        resourceFurnacePrices.put(0, 4);
         // II
-        resourceFurnacePrices.put(1, 4);
+        resourceFurnacePrices.put(1, 8);
         // III
-        resourceFurnacePrices.put(2, 6);
+        resourceFurnacePrices.put(2, 12);
         // IV
-        resourceFurnacePrices.put(3, 8);
+        resourceFurnacePrices.put(3, 16);
         TIER_PRICES.put(RESOURCE_FURNACE, resourceFurnacePrices);
 
         // 治愈池
         Map<Integer, Integer> healingPrices = new HashMap<>();
-        healingPrices.put(0, 4);
+        healingPrices.put(0, 3);
         TIER_PRICES.put(HEALING_POOL, healingPrices);
 
         // 初始化疯狂矿工价格
         Map<Integer, Integer> minerPrices = new HashMap<>();
         // 急迫 I
-        minerPrices.put(0, 2);
+        minerPrices.put(0, 4);
         // 急迫 II
-        minerPrices.put(1, 4);
+        minerPrices.put(1, 6);
         TIER_PRICES.put(MANIC_MINER, minerPrices);
 
         // 初始化摔落保护价格
@@ -322,8 +322,8 @@ public class TeamShopGUI extends CustomGUI {
             setItem(19, new ItemBuilder()
                             .setType(XMaterial.FURNACE.get())
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                            .setDisplayName("§a" + REINFORCED_ARMOR)
-                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .setDisplayName("§a" + RESOURCE_FURNACE)
+                            .setLores(getResourceFurnaceUpgradeLore(currentLevel, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
@@ -340,7 +340,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addEnchant(XEnchantment.PROTECTION.get(), 4)
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                            .setDisplayName("§a" + REINFORCED_ARMOR)
+                            .setDisplayName("§a" + RESOURCE_NAMES)
                             .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
@@ -361,8 +361,7 @@ public class TeamShopGUI extends CustomGUI {
                             .setType(XMaterial.BEACON.get())
                             .setDisplayName("§a" + HEALING_POOL)
                             .setLores(
-                                    "§7基地附近的队伍成员获得",
-                                    "§7生命恢复效果",
+                                    "§7基地附近的队伍成员将获得生命恢复效果！",
                                     "",
                                     "§7价格: §b" + formatPrice(price, gameModeType),
                                     "§e点击购买"
@@ -409,7 +408,7 @@ public class TeamShopGUI extends CustomGUI {
             setItem(21, new ItemBuilder()
                             .setType(XMaterial.DIAMOND_BOOTS.get())
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                            .setDisplayName("§a" + REINFORCED_ARMOR)
+                            .setDisplayName("§a" + FALLING_PROTECTION)
                             .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
@@ -427,8 +426,8 @@ public class TeamShopGUI extends CustomGUI {
                             .addEnchant(XEnchantment.PROTECTION.get(), 4)
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                            .setDisplayName("§a" + REINFORCED_ARMOR)
-                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .setDisplayName("§a" + FALLING_PROTECTION)
+                            .setLores(getFallingProtectionUpgradeLore(currentLevel, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         }
@@ -450,8 +449,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + BLINDNESS_TRAP)
                             .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "§7造成失明与缓慢效果，持续8秒。",
                                     "",
                                     "§7价格: §b" + formatPrice(price, gameModeType),
                                     "§e点击购买"
@@ -499,8 +497,8 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + FIGHT_BACK_TRAP)
                             .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "§7赋予基地附近的队友速度 II 与跳跃提升 II",
+                                    "§7效果，持续15秒。",
                                     "",
                                     "§7价格: §b" + formatPrice(price, gameModeType),
                                     "§e点击购买"
@@ -595,8 +593,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + MINING_FATIGUE_TRAP)
                             .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "§7造成挖掘疲劳效果，持续8秒。",
                                     "",
                                     "§7价格: §b" + formatPrice(price, gameModeType),
                                     "§e点击购买"
@@ -630,29 +627,11 @@ public class TeamShopGUI extends CustomGUI {
     }
 
     /**
-     * 获取通用升级说明
-     */
-    private List<String> getUpgradeLore(String description, int price, GameModeType gameModeType, boolean isUnlocked) {
-        List<String> lore = new ArrayList<>();
-        lore.add("§7" + description);
-        lore.add("");
-        
-        if (isUnlocked) {
-            lore.add("§a已购买");
-        } else {
-            lore.add("§7价格: §b" + formatPrice(price, gameModeType));
-            lore.add("§e点击购买");
-        }
-        
-        return lore;
-    }
-
-    /**
      * 获取分级升级说明 - 锋利专用
      */
     private List<String> getSwordUpgradeLore(boolean isUnlocked, GameModeType gameModeType) {
         List<String> lore = new ArrayList<>();
-        lore.add("§7队伍的所有剑获得锋利I附魔！");
+        lore.add("§7你方所有成员的剑将永久获得锋利I附魔！");
         lore.add("");
 
         // 显示等级和价格
@@ -676,7 +655,7 @@ public class TeamShopGUI extends CustomGUI {
      */
     private List<String> getArmorUpgradeLore(int currentTier, GameModeType gameModeType) {
         List<String> lore = new ArrayList<>();
-        lore.add("§7队伍的所有护甲获得保护附魔！");
+        lore.add("§7己方所有成员的盔甲将获得永久保护附魔！");
         lore.add("");
         
         // 添加4个等级的描述和价格
@@ -716,7 +695,7 @@ public class TeamShopGUI extends CustomGUI {
      */
     private List<String> getMinerUpgradeLore(int currentTier, GameModeType gameModeType) {
         List<String> lore = new ArrayList<>();
-        lore.add("§7队伍的所有成员获得急迫效果！");
+        lore.add("§7己方所有成员获得急迫效果。");
         lore.add("");
         
         // 添加2个等级的描述和价格
@@ -748,6 +727,86 @@ public class TeamShopGUI extends CustomGUI {
             lore.add("§a已达到最高等级");
         }
         
+        return lore;
+    }
+
+    /**
+     * 获取分级升级说明 - 资源炉专用
+     */
+    private List<String> getResourceFurnaceUpgradeLore(int currentTier, GameModeType gameModeType) {
+        List<String> lore = new ArrayList<>();
+        lore.add("§7升级你岛屿资源池的生成速度和和最大容量.");
+        lore.add("");
+
+        // 添加2个等级的描述和价格
+        for (int tier = 0; tier < 2; tier++) {
+            String tierColor;
+            if (tier < currentTier) {
+                // 已购买的等级
+                tierColor = "§a";
+            } else if (tier == currentTier) {
+                // 当前可购买的等级
+                tierColor = "§e";
+            } else {
+                // 未解锁的等级
+                tierColor = "§7";
+            }
+
+            int displayTier = tier + 1;
+            int price = TIER_PRICES.get(RESOURCE_FURNACE).get(tier);
+
+            lore.add(tierColor + "等级 " + displayTier + "：铁锻炉 " + getRomanNumeral(displayTier) +
+                    "，§b" + formatPrice(price, gameModeType));
+        }
+
+        lore.add("");
+
+        if (currentTier < 2) {
+            lore.add("§e点击升级到铁锻炉 " + getRomanNumeral(currentTier + 1));
+        } else {
+            lore.add("§a已达到最高等级");
+        }
+
+        return lore;
+    }
+
+    /**
+     * 获取分级升级说明 - 资源炉专用
+     */
+    private List<String> getFallingProtectionUpgradeLore(int currentTier, GameModeType gameModeType) {
+        List<String> lore = new ArrayList<>();
+        lore.add("§7你队伍的靴子获得了永久摔落保护！");
+        lore.add("");
+
+        // 添加2个等级的描述和价格
+        for (int tier = 0; tier < 2; tier++) {
+            String tierColor;
+            if (tier < currentTier) {
+                // 已购买的等级
+                tierColor = "§a";
+            } else if (tier == currentTier) {
+                // 当前可购买的等级
+                tierColor = "§e";
+            } else {
+                // 未解锁的等级
+                tierColor = "§7";
+            }
+
+            int displayTier = tier + 1;
+            int price = TIER_PRICES.get(RESOURCE_FURNACE).get(tier);
+
+            lore.add(tierColor + "等级 " + displayTier + "：缓冲靴子 " + getRomanNumeral(displayTier) +
+                    "，§b" + formatPrice(price, gameModeType));
+        }
+
+        lore.add("");
+
+        if (currentTier < 2) {
+            lore.add("§e点击升级到缓冲靴子 " + getRomanNumeral(currentTier + 1));
+        } else {
+            lore.add("§a已达到最高等级");
+        }
+
         return lore;
     }
     
