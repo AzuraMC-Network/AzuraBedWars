@@ -62,7 +62,7 @@ public abstract class AbstractTower {
 
                     for (int i = 0; i < BLOCKS_PER_TICK && currentIndex[0] < totalBlocks; i++) {
                         String coordinate = coordinates.get(currentIndex[0]);
-                        placeBlock(coordinate, chest, color, player);
+                        placeBlock(coordinate, chest, color);
                         currentIndex[0]++;
                     }
 
@@ -78,13 +78,13 @@ public abstract class AbstractTower {
     /**
      * 放置单个方块
      */
-    private void placeBlock(String coordinate, Block chest, TeamColor color, Player player) {
+    private void placeBlock(String coordinate, Block chest, TeamColor color) {
         if (coordinate.contains("ladder")) {
             String[] parts = coordinate.split("ladder");
             int ladderData = Integer.parseInt(parts[1]);
-            new NewPlaceBlock(chest, coordinate, color, player, true, ladderData);
+            new NewPlaceBlock(chest, coordinate, color, true, ladderData);
         } else {
-            new NewPlaceBlock(chest, coordinate, color, player, false, 0);
+            new NewPlaceBlock(chest, coordinate, color, false, 0);
         }
     }
 
