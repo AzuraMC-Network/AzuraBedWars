@@ -43,14 +43,17 @@ public class GameTeam {
     private boolean isDestroyed;
     private GamePlayer destroyPlayer;
 
-    private int forge;
-    private int manicMiner;
-    private boolean hasSharpenedEnchant;
-    private int reinforcedArmor;
-    private boolean hasHealPool;
-    private boolean hasTrap;
-    private boolean hasMiner;
+    private boolean hasSharpnessUpgrade;
+    private int protectionUpgrade;
+    private int magicMinerUpgrade;
+    private int resourceFurnaceUpgrade;
+    private boolean hasHealPoolUpgrade;
+    private int fallingProtectionUpgrade;
+
+    private boolean hasBlindnessTrap;
+    private boolean hasFightBackTrap;
     private boolean hasAlarmTrap;
+    private boolean hasMinerTrap;
 
     /**
      * 创建一个游戏团队
@@ -80,14 +83,17 @@ public class GameTeam {
         this.isDestroyed = false;
         
         // 团队升级初始化
-        this.hasSharpenedEnchant = false;
-        this.reinforcedArmor = 0;
-        this.manicMiner = 0;
-        this.forge = 0;
-        this.hasMiner = false;
-        this.hasHealPool = false;
-        this.hasTrap = false;
+        this.hasSharpnessUpgrade = false;
+        this.protectionUpgrade = 0;
+        this.magicMinerUpgrade = 0;
+        this.resourceFurnaceUpgrade = 0;
+        this.hasHealPoolUpgrade = false;
+        this.fallingProtectionUpgrade = 0;
+
+        this.hasBlindnessTrap = false;
+        this.hasFightBackTrap = false;
         this.hasAlarmTrap = false;
+        this.hasMinerTrap = false;
     }
     
     /**

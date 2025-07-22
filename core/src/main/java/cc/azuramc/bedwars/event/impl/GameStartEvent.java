@@ -105,7 +105,7 @@ public class GameStartEvent extends AbstractGameEvent {
      * @param gameTeam 游戏团队
      */
     private void applyManicMinerEffect(GameTeam gameTeam) {
-        if (gameTeam.getManicMiner() <= 0) {
+        if (gameTeam.getMagicMinerUpgrade() <= 0) {
             return;
         }
         
@@ -114,7 +114,7 @@ public class GameStartEvent extends AbstractGameEvent {
             if (fastDigging != null) {
                 player.getPlayer().addPotionEffect(new PotionEffect(fastDigging, 
                     CONFIG.getUpgrade().getHasteEffectDuration(),
-                    gameTeam.getManicMiner()));
+                    gameTeam.getMagicMinerUpgrade()));
             }
         })));
     }
@@ -128,7 +128,7 @@ public class GameStartEvent extends AbstractGameEvent {
     private void applyHealingPoolEffect(GamePlayer player, GameTeam gameTeam) {
         double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
         
-        if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPool()) {
+        if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPoolUpgrade()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType regeneration = XPotion.REGENERATION.get();
                 if (regeneration != null) {
@@ -151,13 +151,13 @@ public class GameStartEvent extends AbstractGameEvent {
 
         if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
             // 触发普通陷阱
-            if (gameTeam.isHasTrap()) {
+            if (gameTeam.isHasBlindnessTrap()) {
                 LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger normal trap, player: " + player.getName());
                 triggerTrap(player, gameTeam);
             }
             
             // 触发挖掘疲劳陷阱
-            if (gameTeam.isHasMiner()) {
+            if (gameTeam.isHasMinerTrap()) {
                 LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger mining fatigue trap, player: " + player.getName());
                 triggerMiningFatigueTrap(player, gameTeam);
             }
@@ -171,7 +171,7 @@ public class GameStartEvent extends AbstractGameEvent {
      * @param gameTeam 拥有陷阱的团队
      */
     private void triggerTrap(GamePlayer player, GameTeam gameTeam) {
-        gameTeam.setHasTrap(false);
+        gameTeam.setHasBlindnessTrap(false);
 
         // 给敌方玩家添加失明效果
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
@@ -212,7 +212,7 @@ public class GameStartEvent extends AbstractGameEvent {
                     CONFIG.getUpgrade().getMiningFatigueEffectAmplifier()));
             }
         });
-        gameTeam.setHasMiner(false);
+        gameTeam.setHasMinerTrap(false);
 
         // 通知团队成员陷阱被触发
         announceTrapTrigger(gameTeam);
