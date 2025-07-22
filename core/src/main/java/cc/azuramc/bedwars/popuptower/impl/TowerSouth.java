@@ -1,5 +1,6 @@
-package cc.azuramc.bedwars.popuptower;
+package cc.azuramc.bedwars.popuptower.impl;
 
+import cc.azuramc.bedwars.popuptower.AbstractTower;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -9,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 南向塔建造器
+ * @author An5w1r@163.com
  */
 public class TowerSouth extends AbstractTower {
 
