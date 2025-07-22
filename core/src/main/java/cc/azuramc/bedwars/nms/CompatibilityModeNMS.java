@@ -10,6 +10,7 @@ import net.minecraft.world.entity.projectile.EntityFireball;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.*;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftFireball;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
@@ -88,6 +89,11 @@ public class CompatibilityModeNMS implements NMSAccess {
     @Override
     public LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
         return null;
+    }
+
+    @Override
+    public void placeLadder(Block block, int x, int y, int z, int data) {
+
     }
 
     private void sendPacket(Player player, Packet<?> packet) {
