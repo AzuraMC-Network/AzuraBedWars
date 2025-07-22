@@ -1,5 +1,6 @@
-package cc.azuramc.bedwars.popuptower;
+package cc.azuramc.bedwars.popuptower.impl;
 
+import cc.azuramc.bedwars.popuptower.AbstractTower;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
