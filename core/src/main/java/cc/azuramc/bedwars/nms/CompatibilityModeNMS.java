@@ -91,11 +91,6 @@ public class CompatibilityModeNMS implements NMSAccess {
         return null;
     }
 
-    @Override
-    public void placeLadder(Block block, int x, int y, int z, int data) {
-
-    }
-
     private void sendPacket(Player player, Packet<?> packet) {
         ((CraftPlayer) player).getHandle().c.a(packet);
     }

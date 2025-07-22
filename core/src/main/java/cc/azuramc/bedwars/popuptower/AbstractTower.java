@@ -87,13 +87,4 @@ public abstract class AbstractTower {
             new NewPlaceBlock(chest, coordinate, color, false, 0);
         }
     }
-
-    /**
-     * 取消建造任务
-     */
-    public void cancelBuilding() {
-        if (buildTask != null && !buildTask.isCancelled()) {
-            buildTask.cancel();
-        }
-    }
 }
