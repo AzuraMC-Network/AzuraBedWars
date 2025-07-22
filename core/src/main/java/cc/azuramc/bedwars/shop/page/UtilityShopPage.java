@@ -32,7 +32,8 @@ public class UtilityShopPage implements ShopData {
 //        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.RED_BED.get()).setDisplayName("§e回春床").setLores(" ", "§f开局10分钟内可恢复一次床").getItem(), "回春床", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 80)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.GOLDEN_APPLE.get()).getItem(), "金苹果", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 3, 15)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.EGG.get()).getItem(), "搭桥蛋", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
-//        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.SNOWBALL.get()).getItem(), "蠹虫", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 40, 40)));
-//        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WOLF_SPAWN_EGG.get()).getItem(), "梦幻守护者", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 128, 128)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.SNOWBALL.get()).getItem(), "蠹虫", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 40, 40)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WOLF_SPAWN_EGG.get()).getItem(), "梦幻守护者", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 128, 128)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.CHEST.get()).getItem(), "速建防御塔", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 64, 64)));
     }
 }
