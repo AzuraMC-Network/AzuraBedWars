@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.nms;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,5 +22,4 @@ public interface NMSAccess {
     void registerCustomEntities();
     LivingEntity spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn);
     LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage);
-    void placeLadder(Block block, int x, int y, int z, int data);
 }

@@ -5,8 +5,6 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFireball;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
@@ -98,13 +96,6 @@ public class NMS_v1_8_R3 implements NMSAccess {
     public LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
         LoggerUtil.debug("NMS_v1_8_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn + ", damage: " + damage);
         return CustomSilverfish.spawn(loc, gameTeam, speed, health, despawn, damage);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void placeLadder(Block block, int x, int y, int z, int data) {
-        block.getRelative(x, y, z).setType(Material.LADDER);
-        block.getRelative(x, y, z).setData((byte)data);
     }
 
     @SuppressWarnings("rawtypes")
