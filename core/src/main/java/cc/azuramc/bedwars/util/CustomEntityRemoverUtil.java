@@ -55,13 +55,18 @@ public class CustomEntityRemoverUtil {
     private void setName() {
         String name = "";
         if (livingEntity instanceof IronGolem) {
-            name = "{TeamColor}{TeamName}队的守卫";
+            name = "§c{Health}❤ {TeamColor}{TeamName}队守卫 §e{Countdown}s";
         } else if (livingEntity instanceof Silverfish) {
-            name = "{TeamColor}{TeamName}队的蠹虫";
+            name = "{TeamColor}{TeamName}队蠹虫 §e{Countdown}s";
         }
+
         if (gameTeam != null) {
-            name = name.replace("{TeamColor}", gameTeam.getChatColor().toString()).replace("{TeamName}", gameTeam.getName());
+            name = name.replace("{TeamColor}", gameTeam.getChatColor().toString())
+                    .replace("{TeamName}", gameTeam.getName())
+                    .replace("{Countdown}", "" + despawn)
+                    .replace("{Health}", "" + (int) livingEntity.getHealth());
         }
+
         livingEntity.setCustomName(name);
     }
 
