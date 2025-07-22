@@ -5,8 +5,14 @@ import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.TeamColor;
+import cc.azuramc.bedwars.popuptower.TowerEast;
+import cc.azuramc.bedwars.popuptower.TowerNorth;
+import cc.azuramc.bedwars.popuptower.TowerSouth;
+import cc.azuramc.bedwars.popuptower.TowerWest;
 import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -74,6 +80,11 @@ public class PlacementListener implements Listener {
         if (isSpeedWool(item)) {
             handleSpeedWoolPlacement(event, player, item);
         }
+
+        // Pop-Up Tower
+        if (event.getBlock().getType() == XMaterial.CHEST.get()) {
+            handlePopUpTowerPlacement(event, player);
+        }
     }
 
     /**
@@ -99,6 +110,32 @@ public class PlacementListener implements Listener {
 
         // 开始火速羊毛搭桥任务
         SpeedWoolHandler.startSpeedWoolTask(block, blockFace, item);
+    }
+
+    /**
+     * 处理PopUpTower放置
+     * @param event BlockPlaceEvent
+     * @param player 玩家
+     */
+    private void handlePopUpTowerPlacement(BlockPlaceEvent event, Player player) {
+        event.setCancelled(true);
+        Location loc = event.getBlock().getLocation();
+        TeamColor color = GamePlayer.get(player).getGameTeam().getTeamColor();
+        double rotation = (player.getLocation().getYaw() - 90.0F) % 360.0F;
+        if (rotation < 0.0D) {
+            rotation += 360.0D;
+        }
+        if (45.0D <= rotation && rotation < 135.0D) {
+            new TowerSouth(loc, event.getBlockPlaced(), color, player);
+        } else if (225.0D <= rotation && rotation < 315.0D) {
+            new TowerNorth(loc, event.getBlockPlaced(), color, player);
+        } else if (135.0D <= rotation && rotation < 225.0D) {
+            new TowerWest(loc, event.getBlockPlaced(), color, player);
+        } else if (0.0D <= rotation && rotation < 45.0D) {
+            new TowerEast(loc, event.getBlockPlaced(), color, player);
+        } else if (315.0D <= rotation && rotation < 360.0D) {
+            new TowerEast(loc, event.getBlockPlaced(), color, player);
+        }
     }
 
     /**
