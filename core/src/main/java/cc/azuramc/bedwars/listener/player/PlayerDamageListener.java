@@ -11,15 +11,13 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
+import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -40,6 +38,7 @@ import java.util.Map;
  * <p>
  * 负责处理玩家伤害和死亡事件，包括虚空伤害、玩家击杀、团队伤害检测等
  * </p>
+ *
  * @author an5w1r@163.com
  */
 public class PlayerDamageListener implements Listener {
@@ -113,10 +112,10 @@ public class PlayerDamageListener implements Listener {
         if (killer == null) {
             LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer is null");
             cleanDeathDrops(event);
-            
+
             GamePlayer gamePlayer = GamePlayer.get(player);
             GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
-            
+
             // 处理死亡后的游戏逻辑
             processDeathGameLogic(gamePlayer, gameTeam);
             return;
@@ -175,7 +174,7 @@ public class PlayerDamageListener implements Listener {
      * 处理玩家死亡后的游戏逻辑
      *
      * @param gamePlayer 游戏玩家
-     * @param gameTeam 玩家所在队伍
+     * @param gameTeam   玩家所在队伍
      */
     private void processDeathGameLogic(GamePlayer gamePlayer, GameTeam gameTeam) {
 
@@ -187,12 +186,12 @@ public class PlayerDamageListener implements Listener {
         if (gameManager.getGameState() == GameState.WAITING) {
             return;
         }
-        
+
         // 玩家是观察者
         if (gamePlayer.isSpectator()) {
             return;
         }
-        
+
         // 处理非虚空死亡
         if (!gamePlayer.getPlayer().hasMetadata(METADATA_VOID_PLAYER)) {
             handleNormalDeath(gamePlayer, gameTeam);
@@ -213,7 +212,7 @@ public class PlayerDamageListener implements Listener {
      *
      * @param player 死亡玩家
      * @param killer 击杀者
-     * @param event 死亡事件
+     * @param event  死亡事件
      */
     private void transferItemsToKiller(Player player, Player killer, PlayerDeathEvent event) {
         Inventory playerInventory = player.getInventory();
@@ -221,10 +220,10 @@ public class PlayerDamageListener implements Listener {
 
         // 定义需要转移的资源类型
         Material[] resourceTypes = {
-            XMaterial.IRON_INGOT.get(),
-            XMaterial.GOLD_INGOT.get(),
-            XMaterial.DIAMOND.get(),
-            XMaterial.EMERALD.get()
+                XMaterial.IRON_INGOT.get(),
+                XMaterial.GOLD_INGOT.get(),
+                XMaterial.DIAMOND.get(),
+                XMaterial.EMERALD.get()
         };
 
         // 清除死亡消息和经验掉落
@@ -332,6 +331,9 @@ public class PlayerDamageListener implements Listener {
 
         GamePlayer gamePlayer = entity instanceof Player ? GamePlayer.get(entity.getUniqueId()) : null;
 
+        // 处理玩家和召唤物间的攻击
+        handlePlayerVsCreature(event, entity, attacker);
+
         // 检查受击者是否为玩家
         if (gamePlayer == null) {
             return;
@@ -348,6 +350,26 @@ public class PlayerDamageListener implements Listener {
             // 投掷物攻击玩家处理
             handleProjectileDamage(event, gamePlayer, (Projectile) attacker);
         }
+    }
+
+    private void handlePlayerVsCreature(EntityDamageByEntityEvent event, Entity entity, Entity attacker) {
+
+        GameTeam entityTeam = CustomEntityRemoverUtil.getDespawnables().get(entity.getUniqueId()).getGameTeam();
+        if (entityTeam == null) {
+            return;
+        }
+
+        GamePlayer attackerPlayer = GamePlayer.get(attacker.getUniqueId());
+        GameTeam attackerTeam = attackerPlayer.getGameTeam();
+        if (attackerTeam == null) {
+            return;
+        }
+
+        if (attackerTeam != entityTeam) {
+            return;
+        }
+
+        event.setCancelled(true);
     }
 
     /**
@@ -701,20 +723,20 @@ public class PlayerDamageListener implements Listener {
 
     /**
      * 将被击杀者的经验来源转换为经验值给予击杀者
-     * 
+     *
      * @param gamePlayer 被击杀的游戏玩家
      * @param gameKiller 击杀者
      */
     private void convertExperienceSourcesToExp(GamePlayer gamePlayer, GamePlayer gameKiller) {
         int totalExp = 0;
         Map<String, Integer> expSources = gamePlayer.getExperienceSources();
-        
+
         // 按照不同资源类型计算总经验值
         for (Map.Entry<String, Integer> entry : expSources.entrySet()) {
             String resourceType = entry.getKey();
             int amount = entry.getValue();
             LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | in for amount: " + amount);
-            
+
             // 不同资源类型的经验转换倍率
             switch (resourceType) {
                 case "IRON":
@@ -739,7 +761,7 @@ public class PlayerDamageListener implements Listener {
                     break;
             }
         }
-        
+
         // 加上被击杀者的经验等级
         int playerLevel = gamePlayer.getPlayer().getLevel();
         LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | playerLevel: " + playerLevel);
@@ -750,31 +772,31 @@ public class PlayerDamageListener implements Listener {
         gameKiller.getPlayer().giveExpLevels(totalExp);
         gameKiller.sendMessage("&a击杀 &e" + gamePlayer.getName() + " &a掠夺了 &e" + totalExp + " &a经验");
     }
-    
+
     /**
      * 将被击杀者的经验来源转换为物品给予击杀者
-     * 
+     *
      * @param gamePlayer 被击杀的游戏玩家
      * @param gameKiller 击杀者
-     * @param event 死亡事件
+     * @param event      死亡事件
      */
     private void convertExperienceSourcesToItems(GamePlayer gamePlayer, GamePlayer gameKiller, PlayerDeathEvent event) {
         Player killer = gameKiller.getPlayer();
         Inventory killerInventory = killer.getInventory();
         Map<String, Integer> expSources = gamePlayer.getExperienceSources();
         List<ItemStack> drops = new ArrayList<>();
-        
+
         // 清除死亡消息和经验掉落
         event.setDeathMessage(null);
         event.setDroppedExp(0);
-        
+
         // 从经验源转换为相应的物品数量
         for (Map.Entry<String, Integer> entry : expSources.entrySet()) {
             String resourceType = entry.getKey();
             int expAmount = entry.getValue();
             int itemAmount;
             Material material;
-            
+
             // 根据资源类型进行转换
             switch (resourceType) {
                 case "IRON":
@@ -800,7 +822,7 @@ public class PlayerDamageListener implements Listener {
                 default:
                     continue;
             }
-            
+
             // 如果转换后数量大于0，创建物品堆并添加到掉落列表
             if (itemAmount > 0) {
                 // 创建物品 - 每个物品栈最多64个
@@ -815,12 +837,12 @@ public class PlayerDamageListener implements Listener {
                 }
             }
         }
-        
+
         // 给予击杀者物品或掉落在地上
         for (ItemStack item : drops) {
             // 尝试添加到击杀者背包
             HashMap<Integer, ItemStack> leftover = killerInventory.addItem(item);
-            
+
             // 如果有剩余，掉落在死亡玩家位置
             if (!leftover.isEmpty()) {
                 for (ItemStack leftItem : leftover.values()) {
@@ -828,10 +850,10 @@ public class PlayerDamageListener implements Listener {
                 }
             }
         }
-        
+
         // 清空死亡玩家的物品栏
         gamePlayer.getPlayer().getInventory().clear();
-        
+
         // 更新两个玩家的背包显示
         gamePlayer.getPlayer().updateInventory();
         killer.updateInventory();
