@@ -738,7 +738,7 @@ public class ItemShopGUI extends CustomGUI {
             player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
             
             // 添加锋利附魔
-            if (gamePlayer.getGameTeam().isHasSharpenedEnchant()) {
+            if (gamePlayer.getGameTeam().isHasSharpnessUpgrade()) {
                 Enchantment sharpness = XEnchantment.SHARPNESS.get();
                 if (sharpness != null) {
                     itemBuilder.addEnchant(sharpness, 1);
