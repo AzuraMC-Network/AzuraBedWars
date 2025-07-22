@@ -34,9 +34,14 @@ public class TeamShopGUI extends CustomGUI {
     private static final String SHARPENED_SWORDS = "磨刀石";
     private static final String REINFORCED_ARMOR = "精制护甲";
     private static final String MANIC_MINER = "疯狂矿工";
-    private static final String MINING_FATIGUE_TRAP = "挖掘疲劳陷阱";
+    private static final String RESOURCE_FURNACE = "资源炉";
     private static final String HEALING_POOL = "治愈池";
+    private static final String FALLING_PROTECTION = "坠落保护";
+
+    private static final String BLINDNESS_TRAP = "致盲陷阱";
+    private static final String FIGHT_BACK_TRAP = "反击陷阱";
     private static final String ALARM_TRAP = "警报陷阱";
+    private static final String MINING_FATIGUE_TRAP = "挖掘疲劳陷阱";
 
     /** 资源类型名称缓存 */
     private static final Map<Material, String> RESOURCE_NAMES = new HashMap<>();
@@ -48,6 +53,11 @@ public class TeamShopGUI extends CustomGUI {
     static {
         // 初始化资源名称
         RESOURCE_NAMES.put(XMaterial.DIAMOND.get(), "钻石");
+
+        // 锋利
+        Map<Integer, Integer> swordPrices = new HashMap<>();
+        swordPrices.put(0, 4);
+        TIER_PRICES.put(SHARPENED_SWORDS, swordPrices);
         
         // 初始化保护价格
         Map<Integer, Integer> armorPrices = new HashMap<>();
@@ -60,7 +70,24 @@ public class TeamShopGUI extends CustomGUI {
         // 护甲保护 IV
         armorPrices.put(3, 8);
         TIER_PRICES.put(REINFORCED_ARMOR, armorPrices);
-        
+
+        // 初始化资源炉价格
+        Map<Integer, Integer> resourceFurnacePrices = new HashMap<>();
+        // I
+        resourceFurnacePrices.put(0, 2);
+        // II
+        resourceFurnacePrices.put(1, 4);
+        // III
+        resourceFurnacePrices.put(2, 6);
+        // IV
+        resourceFurnacePrices.put(3, 8);
+        TIER_PRICES.put(RESOURCE_FURNACE, resourceFurnacePrices);
+
+        // 治愈池
+        Map<Integer, Integer> healingPrices = new HashMap<>();
+        healingPrices.put(0, 4);
+        TIER_PRICES.put(HEALING_POOL, healingPrices);
+
         // 初始化疯狂矿工价格
         Map<Integer, Integer> minerPrices = new HashMap<>();
         // 急迫 I
@@ -68,27 +95,36 @@ public class TeamShopGUI extends CustomGUI {
         // 急迫 II
         minerPrices.put(1, 4);
         TIER_PRICES.put(MANIC_MINER, minerPrices);
-        
+
+        // 初始化摔落保护价格
+        Map<Integer, Integer> fallingProtectionPrices = new HashMap<>();
+        // 摔落保护 I
+        fallingProtectionPrices.put(0, 2);
+        // 摔落保护 II
+        fallingProtectionPrices.put(1, 4);
+        TIER_PRICES.put(FALLING_PROTECTION, fallingProtectionPrices);
+
+
         // 初始化陷阱和其他升级价格
-        Map<Integer, Integer> trapPrices = new HashMap<>();
-        // 挖掘疲劳陷阱
-        trapPrices.put(0, 2);
-        TIER_PRICES.put(MINING_FATIGUE_TRAP, trapPrices);
-        
-        Map<Integer, Integer> alarmPrices = new HashMap<>();
+        // 失明陷阱
+        Map<Integer, Integer> blindnessTrapPrices = new HashMap<>();
+        blindnessTrapPrices.put(0, 2);
+        TIER_PRICES.put(BLINDNESS_TRAP, blindnessTrapPrices);
+
+        // 反击陷阱
+        Map<Integer, Integer> fightBackTrapPrices = new HashMap<>();
+        fightBackTrapPrices.put(0, 2);
+        TIER_PRICES.put(FIGHT_BACK_TRAP, fightBackTrapPrices);
+
         // 警报陷阱
+        Map<Integer, Integer> alarmPrices = new HashMap<>();
         alarmPrices.put(0, 2);
         TIER_PRICES.put(ALARM_TRAP, alarmPrices);
-        
-        Map<Integer, Integer> healingPrices = new HashMap<>();
-        // 治愈池
-        healingPrices.put(0, 4);
-        TIER_PRICES.put(HEALING_POOL, healingPrices);
-        
-        Map<Integer, Integer> swordPrices = new HashMap<>();
-        // 锋利
-        swordPrices.put(0, 4);
-        TIER_PRICES.put(SHARPENED_SWORDS, swordPrices);
+
+        // 挖掘疲劳陷阱
+        Map<Integer, Integer> trapPrices = new HashMap<>();
+        trapPrices.put(0, 2);
+        TIER_PRICES.put(MINING_FATIGUE_TRAP, trapPrices);
     }
 
     /**
@@ -97,7 +133,7 @@ public class TeamShopGUI extends CustomGUI {
      * @param gameManager 游戏实例
      */
     public TeamShopGUI(GamePlayer gamePlayer, GameManager gameManager) {
-        super(gamePlayer, "§8团队升级", 45);
+        super(gamePlayer, "§8团队升级", 54);
 
         GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
         
@@ -108,9 +144,15 @@ public class TeamShopGUI extends CustomGUI {
         addSharpenedSwordsUpgrade(gamePlayer, gameManager, gameModeType);
         addReinforcedArmorUpgrade(gamePlayer, gameManager, gameModeType);
         addManicMinerUpgrade(gamePlayer, gameManager, gameModeType);
-        addMiningFatigueTrap(gamePlayer, gameManager, gameModeType);
+        addResourceFurnaceUpgrade(gamePlayer, gameManager, gameModeType);
         addHealingPoolUpgrade(gamePlayer, gameManager, gameModeType);
+        addFallingProtectionUpgrade(gamePlayer, gameManager, gameModeType);
+
+        // 陷阱选项
+        addBlindnessTrap(gamePlayer, gameManager, gameModeType);
+        addFightBackTrap(gamePlayer, gameManager, gameModeType);
         addAlarmTrap(gamePlayer, gameManager, gameModeType);
+        addMiningFatigueTrap(gamePlayer, gameManager, gameModeType);
     }
     
     /**
@@ -118,21 +160,472 @@ public class TeamShopGUI extends CustomGUI {
      */
     private void setupBorders() {
         // 设置顶部边框
-        for (int i = 0; i < 9; i++) {
+        for (int i = 27; i < 36; i++) {
             setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
         }
-        
-        // 设置左右边框
-        for (int row = 1; row < 5; row++) {
-            int leftBorder = row * 9;
-            int rightBorder = row * 9 + 8;
-            setItem(leftBorder, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
-            setItem(rightBorder, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+    }
+
+    /**
+     * 添加锋利升级选项
+     */
+    private void addSharpenedSwordsUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+
+        if (!gameTeam.isHasSharpnessUpgrade()) {
+            // 未升级状态
+            int price = TIER_PRICES.get(SHARPENED_SWORDS).get(0);
+
+            setItem(10, new ItemBuilder()
+                            .setType(XMaterial.IRON_SWORD.get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + SHARPENED_SWORDS)
+                            .setLores(getSwordUpgradeLore(false, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setHasSharpnessUpgrade(true);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+
+                        // 为团队所有玩家的剑添加锋利附魔
+                        for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
+                            Player p = teamPlayer.getPlayer();
+
+                            for (int i = 0; i < p.getInventory().getContents().length; i++) {
+                                ItemStack item = p.getInventory().getContents()[i];
+                                if (item != null && item.getType().toString().endsWith("_SWORD")) {
+                                    item.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
+                                }
+                            }
+                        }
+                    }, false));
+        } else {
+            // 已升级状态
+            setItem(10, new ItemBuilder()
+                            .setType(XMaterial.IRON_SWORD.get())
+                            .addEnchant(XEnchantment.SHARPNESS.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + SHARPENED_SWORDS)
+                            .setLores(getSwordUpgradeLore(true, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
         }
-        
-        // 设置底部边框
-        for (int i = 36; i < 45; i++) {
-            setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+    }
+
+    /**
+     * 添加保护升级选项
+     */
+    private void addReinforcedArmorUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        int currentLevel = gameTeam.getProtectionUpgrade();
+
+        if (currentLevel < 4) {
+            // 未达到最高级
+            int price = TIER_PRICES.get(REINFORCED_ARMOR).get(currentLevel);
+            int nextLevel = currentLevel + 1;
+
+            setItem(11, new ItemBuilder()
+                            .setType(XMaterial.IRON_CHESTPLATE.get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + REINFORCED_ARMOR)
+                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setProtectionUpgrade(nextLevel);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+
+                        // 为团队所有玩家的护甲添加保护附魔
+                        for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
+                            Player p = teamPlayer.getPlayer();
+
+                            for (int i = 0; i < p.getInventory().getArmorContents().length; i++) {
+                                ItemStack armor = p.getInventory().getArmorContents()[i];
+                                if (armor != null) {
+                                    armor.addEnchantment(XEnchantment.PROTECTION.get(), nextLevel);
+                                }
+                            }
+                        }
+                    }, false));
+        } else {
+            // 已达到最高级
+            setItem(11, new ItemBuilder()
+                            .setType(XMaterial.IRON_CHESTPLATE.get())
+                            .addEnchant(XEnchantment.PROTECTION.get(), 4)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + REINFORCED_ARMOR)
+                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+    /**
+     * 添加疯狂矿工升级选项
+     */
+    private void addManicMinerUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        int currentLevel = gameTeam.getMagicMinerUpgrade();
+
+        if (currentLevel < 2) {
+            // 未达到最高级
+            int price = TIER_PRICES.get(MANIC_MINER).get(currentLevel);
+            int nextLevel = currentLevel + 1;
+
+            setItem(12, new ItemBuilder()
+                            .setType(XMaterial.GOLDEN_PICKAXE.get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + MANIC_MINER)
+                            .setLores(getMinerUpgradeLore(currentLevel, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setMagicMinerUpgrade(nextLevel);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }, false));
+        } else {
+            // 已达到最高级
+            setItem(12, new ItemBuilder()
+                            .setType(XMaterial.GOLDEN_PICKAXE.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 2)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + MANIC_MINER)
+                            .setLores(getMinerUpgradeLore(currentLevel, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+    /**
+     * 添加资源炉升级选项
+     */
+    private void addResourceFurnaceUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        int currentLevel = gameTeam.getResourceFurnaceUpgrade();
+
+        if (currentLevel < 4) {
+            // 未达到最高级
+            int price = TIER_PRICES.get(RESOURCE_FURNACE).get(currentLevel);
+            int nextLevel = currentLevel + 1;
+
+            setItem(19, new ItemBuilder()
+                            .setType(XMaterial.FURNACE.get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + REINFORCED_ARMOR)
+                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setResourceFurnaceUpgrade(nextLevel);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }, false));
+        } else {
+            // 已达到最高级
+            setItem(19, new ItemBuilder()
+                            .setType(XMaterial.FURNACE.get())
+                            .addEnchant(XEnchantment.PROTECTION.get(), 4)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + REINFORCED_ARMOR)
+                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+    /**
+     * 添加治愈池升级选项
+     */
+    private void addHealingPoolUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+
+        if (!gameTeam.isHasHealPoolUpgrade()) {
+            // 未升级状态
+            int price = TIER_PRICES.get(HEALING_POOL).get(0);
+
+            setItem(20, new ItemBuilder()
+                            .setType(XMaterial.BEACON.get())
+                            .setDisplayName("§a" + HEALING_POOL)
+                            .setLores(
+                                    "§7基地附近的队伍成员获得",
+                                    "§7生命恢复效果",
+                                    "",
+                                    "§7价格: §b" + formatPrice(price, gameModeType),
+                                    "§e点击购买"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setHasHealPoolUpgrade(true);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }, false));
+        } else {
+            // 已升级状态
+            setItem(20, new ItemBuilder()
+                            .setType(XMaterial.BEACON.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .setDisplayName("§a" + HEALING_POOL)
+                            .setLores(
+                                    "§7基地附近的队伍成员获得",
+                                    "§7生命恢复效果",
+                                    "",
+                                    "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+    /**
+     * 添加摔落保护升级选项
+     */
+    private void addFallingProtectionUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        int currentLevel = gameTeam.getFallingProtectionUpgrade();
+
+        if (currentLevel < 2) {
+            // 未达到最高级
+            int price = TIER_PRICES.get(FALLING_PROTECTION).get(currentLevel);
+            int nextLevel = currentLevel + 1;
+
+            setItem(21, new ItemBuilder()
+                            .setType(XMaterial.DIAMOND_BOOTS.get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + REINFORCED_ARMOR)
+                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setFallingProtectionUpgrade(nextLevel);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }, false));
+        } else {
+            // 已达到最高级
+            setItem(21, new ItemBuilder()
+                            .setType(XMaterial.DIAMOND_BOOTS.get())
+                            .addEnchant(XEnchantment.PROTECTION.get(), 4)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + REINFORCED_ARMOR)
+                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+
+    /**
+     * 添加失明陷阱升级选项
+     */
+    private void addBlindnessTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+
+        if (!gameTeam.isHasBlindnessTrap()) {
+            // 未升级状态
+            int price = TIER_PRICES.get(BLINDNESS_TRAP).get(0);
+
+            setItem(14, new ItemBuilder()
+                            .setType(XMaterial.TRIPWIRE_HOOK.get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + BLINDNESS_TRAP)
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§7价格: §b" + formatPrice(price, gameModeType),
+                                    "§e点击购买"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setHasBlindnessTrap(true);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }, false));
+        } else {
+            // 已升级状态
+            setItem(14, new ItemBuilder()
+                            .setType(XMaterial.TRIPWIRE_HOOK.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + BLINDNESS_TRAP)
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+    /**
+     * 添加挖掘疲劳陷阱升级选项
+     */
+    private void addFightBackTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+
+        if (!gameTeam.isHasFightBackTrap()) {
+            // 未升级状态
+            int price = TIER_PRICES.get(FIGHT_BACK_TRAP).get(0);
+
+            setItem(15, new ItemBuilder()
+                            .setType(XMaterial.FEATHER.get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + FIGHT_BACK_TRAP)
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§7价格: §b" + formatPrice(price, gameModeType),
+                                    "§e点击购买"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setHasFightBackTrap(true);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }, false));
+        } else {
+            // 已升级状态
+            setItem(15, new ItemBuilder()
+                            .setType(XMaterial.FEATHER.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + FIGHT_BACK_TRAP)
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+    /**
+     * 添加警报陷阱升级选项
+     */
+    private void addAlarmTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+
+        if (!gameTeam.isHasAlarmTrap()) {
+            // 未升级状态
+            int price = TIER_PRICES.get(ALARM_TRAP).get(0);
+
+            setItem(16, new ItemBuilder()
+                            .setType(XMaterial.REDSTONE_TORCH.get())
+                            .setDisplayName("§a" + ALARM_TRAP)
+                            .setLores(
+                                    "§7显示隐身的玩家，",
+                                    "§7及其名称与队伍名。",
+                                    "",
+                                    "§7价格: §b" + formatPrice(price, gameModeType),
+                                    "§e点击购买"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setHasAlarmTrap(true);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }, false));
+        } else {
+            // 已升级状态
+            setItem(16, new ItemBuilder()
+                            .setType(XMaterial.REDSTONE_TORCH.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .setDisplayName("§a" + ALARM_TRAP)
+                            .setLores(
+                                    "§7显示隐身的玩家，",
+                                    "§7及其名称与队伍名。",
+                                    "",
+                                    "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+    /**
+     * 添加挖掘疲劳陷阱升级选项
+     */
+    private void addMiningFatigueTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+
+        if (!gameTeam.isHasMinerTrap()) {
+            // 未升级状态
+            int price = TIER_PRICES.get(MINING_FATIGUE_TRAP).get(0);
+
+            setItem(23, new ItemBuilder()
+                            .setType(XMaterial.IRON_PICKAXE.get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + MINING_FATIGUE_TRAP)
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§7价格: §b" + formatPrice(price, gameModeType),
+                                    "§e点击购买"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {
+                        if (!processPayment(gamePlayer, price, gameModeType)) {
+                            return;
+                        }
+
+                        gameTeam.setHasMinerTrap(true);
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }, false));
+        } else {
+            // 已升级状态
+            setItem(23, new ItemBuilder()
+                            .setType(XMaterial.IRON_PICKAXE.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + MINING_FATIGUE_TRAP)
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
         }
     }
 
@@ -153,7 +646,31 @@ public class TeamShopGUI extends CustomGUI {
         
         return lore;
     }
-    
+
+    /**
+     * 获取分级升级说明 - 锋利专用
+     */
+    private List<String> getSwordUpgradeLore(boolean isUnlocked, GameModeType gameModeType) {
+        List<String> lore = new ArrayList<>();
+        lore.add("§7队伍的所有剑获得锋利I附魔！");
+        lore.add("");
+
+        // 显示等级和价格
+        String tierColor = isUnlocked ? "§a" : "§e";
+        int price = TIER_PRICES.get(SHARPENED_SWORDS).get(0);
+
+        lore.add(tierColor + "等级 1：锋利 I，§b" + formatPrice(price, gameModeType));
+        lore.add("");
+
+        if (isUnlocked) {
+            lore.add("§a已购买");
+        } else {
+            lore.add("§e点击购买");
+        }
+
+        return lore;
+    }
+
     /**
      * 获取分级升级说明 - 护甲专用
      */
@@ -232,315 +749,6 @@ public class TeamShopGUI extends CustomGUI {
         }
         
         return lore;
-    }
-
-    /**
-     * 获取分级升级说明 - 锋利专用
-     */
-    private List<String> getSwordUpgradeLore(boolean isUnlocked, GameModeType gameModeType) {
-        List<String> lore = new ArrayList<>();
-        lore.add("§7队伍的所有剑获得锋利I附魔！");
-        lore.add("");
-        
-        // 显示等级和价格
-        String tierColor = isUnlocked ? "§a" : "§e";
-        int price = TIER_PRICES.get(SHARPENED_SWORDS).get(0);
-        
-        lore.add(tierColor + "等级 1：锋利 I，§b" + formatPrice(price, gameModeType));
-        lore.add("");
-        
-        if (isUnlocked) {
-            lore.add("§a已购买");
-        } else {
-            lore.add("§e点击购买");
-        }
-        
-        return lore;
-    }
-
-    /**
-     * 添加锋利升级选项
-     */
-    private void addSharpenedSwordsUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        
-        if (!gameTeam.isHasSharpenedEnchant()) {
-            // 未升级状态
-            int price = TIER_PRICES.get(SHARPENED_SWORDS).get(0);
-            
-            setItem(11, new ItemBuilder()
-                    .setType(XMaterial.IRON_SWORD.get())
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .setDisplayName("§a" + SHARPENED_SWORDS)
-                    .setLores(getSwordUpgradeLore(false, gameModeType))
-                    .getItem(), 
-                    new GUIAction(0, () -> {
-                        if (!processPayment(gamePlayer, price, gameModeType)) {
-                            return;
-                        }
-                        
-                        gameTeam.setHasSharpenedEnchant(true);
-                        new TeamShopGUI(gamePlayer, gameManager).open();
-                        
-                        // 为团队所有玩家的剑添加锋利附魔
-                        for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
-                            Player p = teamPlayer.getPlayer();
-                            
-                            for (int i = 0; i < p.getInventory().getContents().length; i++) {
-                                ItemStack item = p.getInventory().getContents()[i];
-                                if (item != null && item.getType().toString().endsWith("_SWORD")) {
-                                    item.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
-                                }
-                            }
-                        }
-                    }, false));
-        } else {
-            // 已升级状态
-            setItem(11, new ItemBuilder()
-                    .setType(XMaterial.IRON_SWORD.get())
-                    .addEnchant(XEnchantment.SHARPNESS.get(), 1)
-                    .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .setDisplayName("§a" + SHARPENED_SWORDS)
-                    .setLores(getSwordUpgradeLore(true, gameModeType))
-                    .getItem(), 
-                    new GUIAction(0, () -> {}, false));
-        }
-    }
-    
-    /**
-     * 添加保护升级选项
-     */
-    private void addReinforcedArmorUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        int currentLevel = gameTeam.getReinforcedArmor();
-        
-        if (currentLevel < 4) {
-            // 未达到最高级
-            int price = TIER_PRICES.get(REINFORCED_ARMOR).get(currentLevel);
-            int nextLevel = currentLevel + 1;
-            
-            setItem(12, new ItemBuilder()
-                    .setType(XMaterial.IRON_CHESTPLATE.get())
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .setDisplayName("§a" + REINFORCED_ARMOR)
-                    .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
-                    .getItem(), 
-                    new GUIAction(0, () -> {
-                        if (!processPayment(gamePlayer, price, gameModeType)) {
-                            return;
-                        }
-                        
-                        gameTeam.setReinforcedArmor(nextLevel);
-                        new TeamShopGUI(gamePlayer, gameManager).open();
-                        
-                        // 为团队所有玩家的护甲添加保护附魔
-                        for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
-                            Player p = teamPlayer.getPlayer();
-                            
-                            for (int i = 0; i < p.getInventory().getArmorContents().length; i++) {
-                                ItemStack armor = p.getInventory().getArmorContents()[i];
-                                if (armor != null) {
-                                    armor.addEnchantment(XEnchantment.PROTECTION.get(), nextLevel);
-                                }
-                            }
-                        }
-                    }, false));
-        } else {
-            // 已达到最高级
-            setItem(12, new ItemBuilder()
-                    .setType(XMaterial.IRON_CHESTPLATE.get())
-                    .addEnchant(XEnchantment.PROTECTION.get(), 4)
-                    .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .setDisplayName("§a" + REINFORCED_ARMOR)
-                    .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
-                    .getItem(), 
-                    new GUIAction(0, () -> {}, false));
-        }
-    }
-    
-    /**
-     * 添加疯狂矿工升级选项
-     */
-    private void addManicMinerUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        int currentLevel = gameTeam.getManicMiner();
-        
-        if (currentLevel < 2) {
-            // 未达到最高级
-            int price = TIER_PRICES.get(MANIC_MINER).get(currentLevel);
-            int nextLevel = currentLevel + 1;
-            
-            setItem(13, new ItemBuilder()
-                    .setType(XMaterial.GOLDEN_PICKAXE.get())
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .setDisplayName("§a" + MANIC_MINER)
-                    .setLores(getMinerUpgradeLore(currentLevel, gameModeType))
-                    .getItem(), 
-                    new GUIAction(0, () -> {
-                        if (!processPayment(gamePlayer, price, gameModeType)) {
-                            return;
-                        }
-                        
-                        gameTeam.setManicMiner(nextLevel);
-                        new TeamShopGUI(gamePlayer, gameManager).open();
-                    }, false));
-        } else {
-            // 已达到最高级
-            setItem(13, new ItemBuilder()
-                    .setType(XMaterial.GOLDEN_PICKAXE.get())
-                    .addEnchant(XEnchantment.EFFICIENCY.get(), 2)
-                    .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .setDisplayName("§a" + MANIC_MINER)
-                    .setLores(getMinerUpgradeLore(currentLevel, gameModeType))
-                    .getItem(), 
-                    new GUIAction(0, () -> {}, false));
-        }
-    }
-    
-    /**
-     * 添加挖掘疲劳陷阱升级选项
-     */
-    private void addMiningFatigueTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        
-        if (!gameTeam.isHasMiner()) {
-            // 未升级状态
-            int price = TIER_PRICES.get(MINING_FATIGUE_TRAP).get(0);
-            
-            setItem(14, new ItemBuilder()
-                    .setType(XMaterial.IRON_PICKAXE.get())
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .setDisplayName("§a" + MINING_FATIGUE_TRAP)
-                    .setLores(
-                        "§7下一个进入基地的敌人将获得",
-                        "§7持续10秒的挖掘疲劳效果！",
-                        "",
-                        "§7价格: §b" + formatPrice(price, gameModeType),
-                        "§e点击购买"
-                    )
-                    .getItem(), 
-                    new GUIAction(0, () -> {
-                        if (!processPayment(gamePlayer, price, gameModeType)) {
-                            return;
-                        }
-                        
-                        gameTeam.setHasMiner(true);
-                        new TeamShopGUI(gamePlayer, gameManager).open();
-                    }, false));
-        } else {
-            // 已升级状态
-            setItem(14, new ItemBuilder()
-                    .setType(XMaterial.IRON_PICKAXE.get())
-                    .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
-                    .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-                    .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                    .setDisplayName("§a" + MINING_FATIGUE_TRAP)
-                    .setLores(
-                        "§7下一个进入基地的敌人将获得",
-                        "§7持续10秒的挖掘疲劳效果！",
-                        "",
-                        "§a已激活"
-                    )
-                    .getItem(), 
-                    new GUIAction(0, () -> {}, false));
-        }
-    }
-    
-    /**
-     * 添加治愈池升级选项
-     */
-    private void addHealingPoolUpgrade(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        
-        if (!gameTeam.isHasHealPool()) {
-            // 未升级状态
-            int price = TIER_PRICES.get(HEALING_POOL).get(0);
-            
-            setItem(15, new ItemBuilder()
-                    .setType(XMaterial.BEACON.get())
-                    .setDisplayName("§a" + HEALING_POOL)
-                    .setLores(
-                        "§7基地附近的队伍成员获得",
-                        "§7生命恢复效果",
-                        "",
-                        "§7价格: §b" + formatPrice(price, gameModeType),
-                        "§e点击购买"
-                    )
-                    .getItem(), 
-                    new GUIAction(0, () -> {
-                        if (!processPayment(gamePlayer, price, gameModeType)) {
-                            return;
-                        }
-                        
-                        gameTeam.setHasHealPool(true);
-                        new TeamShopGUI(gamePlayer, gameManager).open();
-                    }, false));
-        } else {
-            // 已升级状态
-            setItem(15, new ItemBuilder()
-                    .setType(XMaterial.BEACON.get())
-                    .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
-                    .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-                    .setDisplayName("§a" + HEALING_POOL)
-                    .setLores(
-                        "§7基地附近的队伍成员获得",
-                        "§7生命恢复效果",
-                        "",
-                        "§a已激活"
-                    )
-                    .getItem(), 
-                    new GUIAction(0, () -> {}, false));
-        }
-    }
-    
-    /**
-     * 添加警报陷阱升级选项
-     */
-    private void addAlarmTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        
-        if (!gameTeam.isHasAlarmTrap()) {
-            // 未升级状态
-            int price = TIER_PRICES.get(ALARM_TRAP).get(0);
-            
-            setItem(22, new ItemBuilder()
-                    .setType(XMaterial.REDSTONE_TORCH.get())
-                    .setDisplayName("§a" + ALARM_TRAP)
-                    .setLores(
-                        "§7下一个进入基地的敌人会触发警报",
-                        "§7提醒并被标记10秒，显示准确位置",
-                        "",
-                        "§7价格: §b" + formatPrice(price, gameModeType),
-                        "§e点击购买"
-                    )
-                    .getItem(), 
-                    new GUIAction(0, () -> {
-                        if (!processPayment(gamePlayer, price, gameModeType)) {
-                            return;
-                        }
-                        
-                        gameTeam.setHasAlarmTrap(true);
-                        new TeamShopGUI(gamePlayer, gameManager).open();
-                    }, false));
-        } else {
-            // 已升级状态
-            setItem(22, new ItemBuilder()
-                    .setType(XMaterial.REDSTONE_TORCH.get())
-                    .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
-                    .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-                    .setDisplayName("§a" + ALARM_TRAP)
-                    .setLores(
-                        "§7下一个进入基地的敌人会触发警报",
-                        "§7提醒并被标记10秒，显示准确位置",
-                        "",
-                        "§a已激活"
-                    )
-                    .getItem(), 
-                    new GUIAction(0, () -> {}, false));
-        }
     }
     
     /**
