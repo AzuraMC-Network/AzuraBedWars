@@ -108,29 +108,23 @@ public class PlayerDamageListener implements Listener {
         Player player = event.getEntity();
         Player killer = player.getKiller();
 
+        GamePlayer gamePlayer = GamePlayer.get(player);
+        GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
+
         // 如果没有击杀者，直接清理掉落物并继续处理
         if (killer == null) {
             LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer is null");
             cleanDeathDrops(event);
-
-            GamePlayer gamePlayer = GamePlayer.get(player);
-            GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
-
-            // 处理死亡后的游戏逻辑
-            processDeathGameLogic(gamePlayer, gameTeam);
-            return;
         }
-        LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer isn't null");
-
-        GamePlayer gamePlayer = GamePlayer.get(player);
-        GamePlayer gameKiller = GamePlayer.get(killer);
-        GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
-
-        // 处理击杀奖励
-        processKillReward(event, gamePlayer, gameKiller);
+        else {
+            LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer isn't null");
+            // 处理击杀奖励
+            processKillReward(event, gamePlayer, GamePlayer.get(killer));
+        }
 
         // 处理死亡后的游戏逻辑
         processDeathGameLogic(gamePlayer, gameTeam);
+        handlePlayerRespawn(gamePlayer);
     }
 
     private void processKillReward(PlayerDeathEvent event, GamePlayer gamePlayer, GamePlayer gameKiller) {
@@ -167,7 +161,6 @@ public class PlayerDamageListener implements Listener {
         // 清除经验来源map
         gamePlayer.getExperienceSources().clear();
         LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | expMapCleared");
-        handlePlayerRespawn(gamePlayer);
     }
 
     /**
@@ -621,6 +614,7 @@ public class PlayerDamageListener implements Listener {
      * @param gamePlayer 重生玩家
      */
     private void handlePlayerRespawn(GamePlayer gamePlayer) {
+        if (gamePlayer == null) return;
         Player player = gamePlayer.getPlayer();
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             gamePlayer.getPlayer().spigot().respawn();
