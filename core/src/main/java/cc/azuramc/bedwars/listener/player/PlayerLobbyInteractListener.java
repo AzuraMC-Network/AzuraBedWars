@@ -47,6 +47,7 @@ public class PlayerLobbyInteractListener implements Listener {
                     break;
                 case RED_WOOL, YELLOW_WOOL, BLUE_WOOL, GREEN_WOOL, WHITE_WOOL:
                     new TeamSelectionGUI(gamePlayer).open();
+                    break;
                 default:
                     break;
             }
