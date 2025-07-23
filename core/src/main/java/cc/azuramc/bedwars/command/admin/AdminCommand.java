@@ -53,7 +53,7 @@ public class AdminCommand {
     @Subcommand("editorMode")
     public void editorMode(BukkitCommandActor actor, boolean value) {
         if (plugin.getSettingsConfig().isEditorMode() == value) {
-            CommandUtil.sendLayout(actor, "&ceditorMode值已经是 " + value + "了");
+            CommandUtil.sendLayout(actor, "&ceditorMode值已经是 " + value);
             return;
         }
         plugin.getSettingsConfig().setEditorMode(value);
@@ -65,7 +65,7 @@ public class AdminCommand {
     @Subcommand("debugMode")
     public void debugMode(BukkitCommandActor actor, boolean value) {
         if (plugin.getSettingsConfig().isEditorMode() == value) {
-            CommandUtil.sendLayout(actor, "&cdebugMode值已经是 " + value + "了");
+            CommandUtil.sendLayout(actor, "&cdebugMode值已经是 " + value);
             return;
         }
         plugin.getSettingsConfig().setDebugMode(value);
