@@ -1,88 +1,57 @@
 package cc.azuramc.bedwars.compat;
 
-import cc.azuramc.bedwars.util.LoggerUtil;
-import org.bukkit.Bukkit;
+import com.cryptomorin.xseries.reflection.XReflection;
 
 public class VersionUtil {
-    private static final String VERSION;
-    private static final int MAJOR_VERSION;
-    private static final int MINOR_VERSION;
-    
-    static {
-        String version = "1_13"; // 默认版本
-        int majorVersion = 1;
-        int minorVersion = 13;
-        
-        try {
-            version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-            
-            // 尝试解析版本号，格式一般为v1_XX_RX
-            String[] versionParts = version.split("_");
-            if (versionParts.length >= 3) {
-                // 确保版本号是数字
-                if (versionParts[1].matches("\\d+")) {
-                    majorVersion = Integer.parseInt(versionParts[1]);
-                }
-                
-                // 处理特殊情况：有些服务器版本格式为v1_XX_RX，我们需要确保只获取数字部分
-                String minorStr = versionParts[2];
-                if (minorStr.matches("\\d+")) {
-                    minorVersion = Integer.parseInt(minorStr);
-                } else {
-                    // 如果包含非数字，则尝试提取数字部分
-                    StringBuilder digits = new StringBuilder();
-                    for (char c : minorStr.toCharArray()) {
-                        if (Character.isDigit(c)) {
-                            digits.append(c);
-                        } else {
-                            break;
-                        }
-                    }
-                    if (!digits.isEmpty()) {
-                        minorVersion = Integer.parseInt(digits.toString());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtil.warn("无法解析服务器版本: " + e.getMessage());
-            LoggerUtil.warn("使用默认版本: 1.13");
-            e.printStackTrace();
-        }
-        
-        VERSION = version;
-        MAJOR_VERSION = majorVersion;
-        MINOR_VERSION = minorVersion;
+    private static final int MAJOR_NUMBER = XReflection.MAJOR_NUMBER;
+    private static final int MINOR_NUMBER = XReflection.MINOR_NUMBER;
+    private static final int  PATCH_NUMBER = XReflection.PATCH_NUMBER;
+    private static final String PARSED_VERSION = MAJOR_NUMBER + "." + MINOR_NUMBER + "." + PATCH_NUMBER;
+    private static final String NMS_VERSION = XReflection.NMS_VERSION;
+
+    /**
+     * 获取主版本号 (返回格式e.g. 1.12.2 返回 1)
+     */
+    public static int getMajorNumber() {
+        return MAJOR_NUMBER;
     }
 
     /**
-     * 获取服务器版本
+     * 获取次版本号 (返回格式e.g. 1.12.2 返回 12)
      */
-    public static String getVersion() {
-        return VERSION;
+    public static int getMinorNumber() {
+        return MINOR_NUMBER;
     }
 
     /**
-     * 获取主版本号
+     * 获取次版本号 (返回格式e.g. 1.12.2 返回 2)
      */
-    public static int getMajorVersion() {
-        return MAJOR_VERSION;
+    public static int getPatchNumber() {
+        return PATCH_NUMBER;
     }
 
     /**
-     * 获取次版本号
+     * 获取服务器版本 (返回格式e.g. 1.8.8)
      */
-    public static int getMinorVersion() {
-        return MINOR_VERSION;
+    public static String getParsedVersion() {
+        return PARSED_VERSION;
+    }
+
+    /**
+     * 获取NMS版本号 (返回格式e.g. v1_8_R3)
+     */
+    public static String getNmsVersion() {
+        return NMS_VERSION;
     }
 
     /**
      * 判断是否大于等于指定版本
      */
     public static boolean isGreaterOrEqual(int major, int minor) {
-        if (MAJOR_VERSION > major) {
+        if (MAJOR_NUMBER > major) {
             return true;
-        } else if (MAJOR_VERSION == major) {
-            return MINOR_VERSION >= minor;
+        } else if (MAJOR_NUMBER == major) {
+            return MINOR_NUMBER >= minor;
         }
         return false;
     }
@@ -98,16 +67,6 @@ public class VersionUtil {
      * 判断是否是1.13及以下版本
      */
     public static boolean isLessThan113() {
-        // 首先直接检查版本字符串，如果包含1_8, 1_9, 1_10, 1_11, 1_12，则确定是1.13以下版本
-        if (VERSION.contains("1_8") || 
-            VERSION.contains("1_9") || 
-            VERSION.contains("1_10") || 
-            VERSION.contains("1_11") || 
-            VERSION.contains("1_12")) {
-            return true;
-        }
-        
-        // 如果字符串检查未能确定，再使用数字版本比较
         return isLessThan(1, 13);
     }
 
@@ -123,12 +82,6 @@ public class VersionUtil {
      * @return 是否是1.8.x版本
      */
     public static boolean isVersion18() {
-        // 检查版本字符串，因为服务器版本字符串一般是 v1_8_Rx 格式
-        if (VERSION.contains("1_8")) {
-            return true;
-        }
-        
-        // 同时检查主版本号和次版本号
-        return MAJOR_VERSION == 1 && MINOR_VERSION == 8;
+        return MINOR_NUMBER == 8;
     }
 }
