@@ -45,6 +45,7 @@ public class ItemConfig {
     @Data
     public static class GameManager {
         private String resourceSelectorName = MessageUtil.color("&a资源类型选择 &7(右键选择)");
+        private String teamSelectorName = MessageUtil.color("&e队伍选择 &7(右键选择)");
         private String leaveGameName = MessageUtil.color("&c离开游戏 &7(右键离开)");
     }
 
