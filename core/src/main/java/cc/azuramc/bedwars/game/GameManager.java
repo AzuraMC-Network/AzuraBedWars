@@ -23,7 +23,6 @@ import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.ServerMOTD;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
-import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
@@ -61,8 +60,8 @@ public class GameManager {
     private Material leaveGameMaterial;
     private String leaveGameName;
 
-    @Getter private boolean arrowDisplayEnabled;
-    @Getter private boolean attackDisplayEnabled;
+    private boolean arrowDisplayEnabled;
+    private boolean attackDisplayEnabled;
 
     private AzuraBedWars plugin;
     private GameEventManager gameEventManager;
