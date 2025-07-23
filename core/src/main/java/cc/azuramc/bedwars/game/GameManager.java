@@ -38,6 +38,7 @@ import java.util.*;
  * 负责管理整个起床战争游戏的生命周期、玩家、团队以及游戏状态。
  * 包含游戏开始、运行和结束的逻辑，以及玩家加入、离开和重新连接的处理。
  * </p>
+ *
  * @author an5w1r@163.com
  */
 @Data
@@ -55,6 +56,8 @@ public class GameManager {
 
     private Material resourceSelectorMaterial;
     private String resourceSelectorName;
+    private Material teamSelectorMaterial;
+    private String teamSelectorName;
     private Material leaveGameMaterial;
     private String leaveGameName;
 
@@ -110,6 +113,8 @@ public class GameManager {
 
         this.resourceSelectorMaterial = XMaterial.PAPER.get();
         this.resourceSelectorName = itemConfig.getResourceSelectorName();
+        this.teamSelectorMaterial = XMaterial.WHITE_WOOL.get();
+        this.teamSelectorName = itemConfig.getTeamSelectorName();
         this.leaveGameMaterial = XMaterial.SLIME_BALL.get();
         this.leaveGameName = itemConfig.getLeaveGameName();
 
@@ -134,7 +139,7 @@ public class GameManager {
         if (mapData == null) {
             return;
         }
-        
+
         this.mapData = mapData;
         this.blocksLocation = mapData.loadMap();
         this.respawnLocation = mapData.getRespawnLocation().toLocation();
@@ -152,7 +157,7 @@ public class GameManager {
         this.gameState = GameState.WAITING;
         // 更新MOTD
         updateServerMOTD();
-        
+
         // 添加JedisManager的空值检查
         if (JedisManager.getInstance() != null) {
             JedisManager.getInstance().getExpand().put("map", mapData.getName());
@@ -176,37 +181,37 @@ public class GameManager {
         //         mapData.getPlayers().getTeam()
         //     ));
         // }
-        
+
         // 新 检测基地附近的羊毛颜色来确定队伍颜色
         for (int i = 0; i < mapData.getBases().size(); i++) {
             Location baseLocation = mapData.getBases().get(i).toLocation();
             TeamColor teamColor = detectTeamColorFromWool(baseLocation);
             LoggerUtil.debug("GameManager$initializeTeams | detectTeamColorFromWool is " + teamColor);
-            
+
             // 如果无法检测到羊毛颜色，则使用默认顺序
             if (teamColor == null) {
                 teamColor = TeamColor.values()[i % TeamColor.values().length];
                 LoggerUtil.debug("GameManager$initializeTeams | team color is null so we used the order " + teamColor);
             }
-            
+
             // 获取每个队伍的玩家数量，添加空值检查防止NPE
             Integer teamSize = mapData.getPlayers().getTeam();
             if (teamSize == null) {
                 // 设置默认值为1
                 teamSize = 1;
             }
-            
+
             gameTeams.add(new GameTeam(
-                teamColor,
-                baseLocation,
-                teamSize
+                    teamColor,
+                    baseLocation,
+                    teamSize
             ));
         }
     }
-    
+
     /**
      * 从基地位置附近检测羊毛颜色来确定队伍颜色
-     * 
+     *
      * @param location 基地位置
      * @return 检测到的队伍颜色，如果没有检测到则返回null
      */
@@ -217,20 +222,20 @@ public class GameManager {
         LoggerUtil.debug("GameManager$detectTeamColorFromWool | world is " + world);
         LoggerUtil.debug("GameManager$detectTeamColorFromWool | location is " + location);
         LoggerUtil.debug("GameManager$detectTeamColorFromWool | radius is " + radius);
-        
+
         // 检查基础条件
         if (world == null) {
             LoggerUtil.debug("GameManager$detectTeamColorFromWool | world is null, returning null");
             return null;
         }
-        
+
         if (radius <= 0) {
             LoggerUtil.debug("GameManager$detectTeamColorFromWool | radius is <= 0, returning null");
             return null;
         }
-        
+
         LoggerUtil.debug("GameManager$detectTeamColorFromWool | starting search in radius " + radius);
-        
+
         // 遍历位置周围的方块
         int checkedBlocks = 0;
         for (int x = -radius; x <= radius; x++) {
@@ -238,9 +243,9 @@ public class GameManager {
                 for (int z = -radius; z <= radius; z++) {
                     checkedBlocks++;
                     Block block = world.getBlockAt(
-                        location.getBlockX() + x,
-                        location.getBlockY() + y,
-                        location.getBlockZ() + z
+                            location.getBlockX() + x,
+                            location.getBlockY() + y,
+                            location.getBlockZ() + z
                     );
 
                     // 检查方块是否为羊毛
@@ -252,14 +257,14 @@ public class GameManager {
                 }
             }
         }
-        
+
         LoggerUtil.debug("GameManager$detectTeamColorFromWool | Checked " + checkedBlocks + " blocks, no wool found");
         return null;
     }
-    
+
     /**
      * 从羊毛方块确定对应的队伍颜色
-     * 
+     *
      * @param block 羊毛方块
      * @return 对应的队伍颜色
      */
@@ -292,7 +297,7 @@ public class GameManager {
             // 1.12-版本需要检查数据值
             @SuppressWarnings("deprecation")
             byte data = block.getData();
-            
+
             // 根据羊毛的数据值映射到TeamColor
             return switch (data) {
                 case 0 -> TeamColor.WHITE;
@@ -313,7 +318,7 @@ public class GameManager {
                 default -> null;
             };
         }
-        
+
         return null;
     }
 
@@ -393,7 +398,7 @@ public class GameManager {
 
     /**
      * 更新玩家可见性设置
-     * 
+     *
      * @param gamePlayer 游戏玩家
      */
     private void updatePlayerVisibility(GamePlayer gamePlayer) {
@@ -401,13 +406,13 @@ public class GameManager {
         // 使当前玩家可见
         for (GamePlayer otherPlayer : GamePlayer.getOnlinePlayers()) {
             Player otherPlayerObj = otherPlayer.getPlayer();
-            
+
             // 跳过已经是观察者的玩家
             if (otherPlayer.isSpectator()) {
                 PlayerUtil.hidePlayer(player, otherPlayerObj);
                 continue;
             }
-            
+
             // 让所有玩家看到新玩家
             PlayerUtil.showPlayer(otherPlayerObj, player);
             // 让新玩家看到所有玩家
@@ -421,18 +426,18 @@ public class GameManager {
      */
     public void resetAllPlayersVisibility() {
         List<GamePlayer> onlinePlayers = GamePlayer.getOnlinePlayers();
-        
+
         for (GamePlayer player1 : onlinePlayers) {
             Player p1 = player1.getPlayer();
-            
+
             for (GamePlayer player2 : onlinePlayers) {
                 Player p2 = player2.getPlayer();
-                
+
                 // 跳过自己
                 if (player1.equals(player2)) {
                     continue;
                 }
-                
+
                 // 如果是观察者，对其他玩家不可见
                 if (player1.isSpectator()) {
                     PlayerUtil.hidePlayer(p2, p1);
@@ -456,17 +461,24 @@ public class GameManager {
         Player player = gamePlayer.getPlayer();
 
         player.getInventory().addItem(
-            new ItemBuilder()
-                .setType(resourceSelectorMaterial)
-                .setDisplayName(resourceSelectorName)
-                .getItem()
+                new ItemBuilder()
+                        .setType(resourceSelectorMaterial)
+                        .setDisplayName(resourceSelectorName)
+                        .getItem()
         );
-        
-        player.getInventory().setItem(8, 
-            new ItemBuilder()
-                .setType(leaveGameMaterial)
-                .setDisplayName(leaveGameName)
-                .getItem()
+
+        player.getInventory().setItem(8,
+                new ItemBuilder()
+                        .setType(leaveGameMaterial)
+                        .setDisplayName(leaveGameName)
+                        .getItem()
+        );
+
+        player.getInventory().setItem(2,
+                new ItemBuilder()
+                        .setType(teamSelectorMaterial)
+                        .setDisplayName(teamSelectorName)
+                        .getItem()
         );
     }
 
@@ -538,7 +550,7 @@ public class GameManager {
      * 处理玩家离开对团队的影响
      *
      * @param gamePlayer 游戏玩家
-     * @param gameTeam 玩家所在团队
+     * @param gameTeam   玩家所在团队
      */
     private void handleTeamPlayerLeave(GamePlayer gamePlayer, GameTeam gameTeam) {
         if (gameTeam.isDestroyed()) {
@@ -617,7 +629,7 @@ public class GameManager {
     public void moveFreePlayersToTeam() {
         // 先处理队伍内的玩家
         assignPartyPlayersToTeams();
-        
+
         // 再处理独立玩家
         assignIndividualPlayersToTeams();
     }
@@ -628,12 +640,12 @@ public class GameManager {
     private void assignPartyPlayersToTeams() {
         for (GameParty gameParty : gameParties) {
             GameTeam lowest = getLowestTeam();
-            
+
             // 尝试将整个队伍放入同一游戏团队
             List<GamePlayer> unassignedPlayers = gameParty.getPlayers().stream()
                     .filter(player -> player.getGameTeam() == null)
                     .toList();
-                    
+
             for (GamePlayer gamePlayer : unassignedPlayers) {
                 if (!lowest.addPlayer(gamePlayer)) {
                     lowest = getLowestTeam();
@@ -650,7 +662,7 @@ public class GameManager {
         List<GamePlayer> freePlayers = GamePlayer.getOnlinePlayers().stream()
                 .filter(player -> player.getGameTeam() == null)
                 .toList();
-                
+
         for (GamePlayer gamePlayer : freePlayers) {
             GameTeam lowest = getLowestTeam();
             lowest.addPlayer(gamePlayer);
@@ -672,7 +684,7 @@ public class GameManager {
     /**
      * 安全地传送玩家到指定位置
      *
-     * @param player 玩家
+     * @param player   玩家
      * @param location 目标位置
      */
     private void teleportPlayerSafely(Player player, Location location) {
@@ -722,8 +734,8 @@ public class GameManager {
      * @param fadeOut  淡出时间
      */
     public void broadcastTitleToAll(String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
-        GamePlayer.getOnlinePlayers().forEach(gamePlayer -> 
-            gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
+        GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
+                gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
 
     /**
@@ -737,19 +749,19 @@ public class GameManager {
      * @param fadeOut  淡出时间
      */
     public void broadcastTeamTitle(GameTeam gameTeam, String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
-        gameTeam.getAlivePlayers().forEach(gamePlayer -> 
-            gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
+        gameTeam.getAlivePlayers().forEach(gamePlayer ->
+                gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
 
     /**
      * 向特定团队广播消息
      *
      * @param gameTeam 目标团队
-     * @param texts 消息文本
+     * @param texts    消息文本
      */
     public void broadcastTeamMessage(GameTeam gameTeam, String... texts) {
-        gameTeam.getAlivePlayers().forEach(player -> 
-            Arrays.asList(texts).forEach(player::sendMessage));
+        gameTeam.getAlivePlayers().forEach(player ->
+                Arrays.asList(texts).forEach(player::sendMessage));
     }
 
     /**
@@ -758,7 +770,7 @@ public class GameManager {
      * @param gameTeam 目标团队
      * @param textList 消息文本
      */
-    public void broadcastTeamMessage(GameTeam gameTeam,List<String> textList) {
+    public void broadcastTeamMessage(GameTeam gameTeam, List<String> textList) {
         gameTeam.getAlivePlayers().forEach(player ->
                 textList.forEach(player::sendMessage));
     }
@@ -767,13 +779,13 @@ public class GameManager {
      * 向特定团队播放声音
      *
      * @param gameTeam 目标团队
-     * @param sound 声音类型
-     * @param volume 音量
-     * @param pitch 音调
+     * @param sound    声音类型
+     * @param volume   音量
+     * @param pitch    音调
      */
     public void broadcastTeamSound(GameTeam gameTeam, Sound sound, float volume, float pitch) {
-        gameTeam.getAlivePlayers().forEach(gamePlayer -> 
-            gamePlayer.playSound(sound, volume, pitch));
+        gameTeam.getAlivePlayers().forEach(gamePlayer ->
+                gamePlayer.playSound(sound, volume, pitch));
     }
 
     /**
@@ -782,8 +794,8 @@ public class GameManager {
      * @param texts 消息文本
      */
     public void broadcastSpectatorMessage(String... texts) {
-        GamePlayer.getSpectators().forEach(gamePlayer -> 
-            Arrays.asList(texts).forEach(gamePlayer::sendMessage));
+        GamePlayer.getSpectators().forEach(gamePlayer ->
+                Arrays.asList(texts).forEach(gamePlayer::sendMessage));
     }
 
     /**
@@ -802,8 +814,8 @@ public class GameManager {
      * @param texts 消息文本
      */
     public void broadcastMessage(String... texts) {
-        GamePlayer.getOnlinePlayers().forEach(gamePlayer -> 
-            Arrays.asList(texts).forEach(gamePlayer::sendMessage));
+        GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
+                Arrays.asList(texts).forEach(gamePlayer::sendMessage));
     }
 
     /**
@@ -819,13 +831,13 @@ public class GameManager {
     /**
      * 向所有玩家播放声音
      *
-     * @param sound 声音类型
+     * @param sound  声音类型
      * @param volume 音量
-     * @param pitch 音调
+     * @param pitch  音调
      */
     public void broadcastSound(Sound sound, float volume, float pitch) {
-        GamePlayer.getOnlinePlayers().forEach(gamePlayer -> 
-            gamePlayer.playSound(sound, volume, pitch));
+        GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
+                gamePlayer.playSound(sound, volume, pitch));
     }
 
     /**
@@ -846,8 +858,8 @@ public class GameManager {
         int teamsWithPlayers = countTeamsWithPlayers();
         List<GamePlayer> freePlayers = getFreePlayers();
 
-        return (teamsWithPlayers > 1 || 
-                (teamsWithPlayers == 1 && !freePlayers.isEmpty()) || 
+        return (teamsWithPlayers > 1 ||
+                (teamsWithPlayers == 1 && !freePlayers.isEmpty()) ||
                 (teamsWithPlayers == 0 && freePlayers.size() >= 2));
     }
 
@@ -882,10 +894,10 @@ public class GameManager {
     public String getFormattedTime(int seconds) {
         int minutes = seconds / 60;
         int remainingSeconds = seconds % 60;
-        
+
         String minutesStr = (minutes < 10 ? "0" : "") + minutes;
         String secondsStr = (remainingSeconds < 10 ? "0" : "") + remainingSeconds;
-        
+
         return minutesStr + ":" + secondsStr;
     }
 
@@ -912,7 +924,7 @@ public class GameManager {
         preparePlayersForGame();
         teleportPlayersToTeamSpawn();
         markEmptyTeams();
-        
+
         // 更新所有玩家的TabList显示名称
         TabList.updateAllTabListNames();
 
@@ -985,7 +997,7 @@ public class GameManager {
      */
     public GamePlayer findTargetPlayer(GamePlayer gamePlayer) {
         List<GamePlayer> possibleTargets = getPossibleTargets(gamePlayer);
-        
+
         GamePlayer closestPlayer = null;
         double closestDistance = Double.MAX_VALUE;
 
@@ -1012,15 +1024,15 @@ public class GameManager {
      */
     private List<GamePlayer> getPossibleTargets(GamePlayer gamePlayer) {
         List<GamePlayer> targets = new ArrayList<>(GamePlayer.getOnlinePlayers());
-        
+
         // 移除同队玩家
         if (gamePlayer.getGameTeam() != null) {
             targets.removeAll(gamePlayer.getGameTeam().getGamePlayers());
         }
-        
+
         // 移除观察者
         targets.removeIf(GamePlayer::isSpectator);
-        
+
         return targets;
     }
 }
