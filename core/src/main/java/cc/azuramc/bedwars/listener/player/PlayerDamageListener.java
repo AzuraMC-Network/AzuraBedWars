@@ -435,54 +435,6 @@ public class PlayerDamageListener implements Listener {
         }
     }
 
-//    /**
-//     * 处理虚空伤害
-//     *
-//     * @param event      伤害事件
-//     * @param gamePlayer 游戏玩家
-//     */
-//    private void handleVoidDamage(EntityDamageEvent event, GamePlayer gamePlayer) {
-//        event.setDamage(VOID_DAMAGE);
-//        GamePlayer gameKiller = GamePlayer.get(gamePlayer.getPlayer().getKiller());
-//        GameTeam gameTeam = gamePlayer.getGameTeam();
-//
-//        if (gameKiller != null) {
-//
-//            GameTeam killerTeam = gameKiller.getGameTeam();
-//            processKill(gamePlayer, gameTeam, gameKiller, killerTeam, gameTeam.isDestroyed());
-//        } else {
-//            // 自杀消息
-//            gamePlayer.getPlayerData().addDeaths();
-//        }
-//
-//        gamePlayer.getPlayer().setMetadata(METADATA_VOID_PLAYER, new FixedMetadataValue(plugin, ""));
-//    }
-
-//    /**
-//     * 处理普通击杀奖励和消息
-//     */
-//    private void processKill(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer gameKiller, GameTeam killerTeam, boolean isFinalKill) {
-//
-//        BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
-//        Bukkit.getPluginManager().callEvent(event);
-//        if (event.isCancelled()) {
-//            return;
-//        }
-//
-//        if (isFinalKill) {
-//            // 最终击杀给金币奖励
-//            if (!VaultUtil.ecoIsNull) {
-//                showCoinsReward(gameKiller);
-//                VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
-//            }
-//            gameKiller.getPlayerData().addFinalKills();
-//        } else {
-//            gameKiller.getPlayerData().addKills();
-//        }
-//
-//        gameKiller.getPlayerData().addKills();
-//    }
-
     /**
      * 显示金币奖励
      *
