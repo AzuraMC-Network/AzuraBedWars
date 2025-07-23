@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.gui.ModeSelectionGUI;
+import cc.azuramc.bedwars.gui.TeamSelectionGUI;
 import cc.azuramc.bedwars.util.BungeeUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -44,6 +45,8 @@ public class PlayerLobbyInteractListener implements Listener {
                 case SLIME_BALL:
                     BungeeUtil.connectToLobby(gamePlayer);
                     break;
+                case RED_WOOL, YELLOW_WOOL, BLUE_WOOL, GREEN_WOOL, WHITE_WOOL:
+                    new TeamSelectionGUI(gamePlayer).open();
                 default:
                     break;
             }
