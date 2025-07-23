@@ -14,6 +14,8 @@ import cc.azuramc.bedwars.listener.special.IronGolemSpawnListener;
 import cc.azuramc.bedwars.listener.special.RescuePlatformListener;
 import cc.azuramc.bedwars.listener.special.SilverFishListener;
 import cc.azuramc.bedwars.listener.special.WarpPowderListener;
+import cc.azuramc.bedwars.listener.spectator.SpectatorCompassListener;
+import cc.azuramc.bedwars.listener.spectator.SpectatorInteractAtEntityListener;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
 import cc.azuramc.bedwars.listener.world.ExplodeListener;
 import org.bukkit.Bukkit;
@@ -43,7 +45,7 @@ public class ListenerRegistry {
         register(new PlayerDeathReasonListener());
         register(new PlayerDragToolListener());
         register(new PlayerDropListener());
-        register(new PlayerInteractListener());
+        register(new PlayerInteractShopListener());
         register(new PlayerInvisibilityListener(plugin));
         register(new PlayerJoinListener());
         register(new PlayerLobbyInteractListener());
@@ -58,6 +60,7 @@ public class ListenerRegistry {
         register(new PlayerRespawnListener());
         register(new PlayerRightClickListener());
         register(new PlayerTntDamageListener());
+        register(new PlayerUseBucketListener());
 
         // projectile package
         register(new EggBridgeListener());
@@ -76,6 +79,10 @@ public class ListenerRegistry {
         register(new RescuePlatformListener());
         register(new WarpPowderListener());
         register(new SilverFishListener());
+
+        // spectator package
+        register(new SpectatorCompassListener());
+        register(new SpectatorInteractAtEntityListener());
 
         // world
         register(new ChunkListener());
