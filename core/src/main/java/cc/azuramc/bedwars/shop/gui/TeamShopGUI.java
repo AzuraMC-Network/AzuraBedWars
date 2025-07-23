@@ -793,7 +793,7 @@ public class TeamShopGUI extends CustomGUI {
             }
 
             int displayTier = tier + 1;
-            int price = TIER_PRICES.get(RESOURCE_FURNACE).get(tier);
+            int price = TIER_PRICES.get(FALLING_PROTECTION).get(tier);
 
             lore.add(tierColor + "等级 " + displayTier + "：缓冲靴子 " + getRomanNumeral(displayTier) +
                     "，§b" + formatPrice(price, gameModeType));
