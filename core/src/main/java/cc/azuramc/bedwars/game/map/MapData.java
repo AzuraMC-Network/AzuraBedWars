@@ -17,21 +17,19 @@ import java.util.stream.Collectors;
 /**
  * @author an5w1r@163.com
  */
-@Getter
+@Data
 public class MapData {
     private final Players players;
     private final Region region;
     private final List<RawLocation> bases;
     private final List<DropRawLocation> drops;
     private final List<ShopRawLocation> shops;
-    @Setter
     private String name;
-    @Setter
     private String author;
     private RawLocation waitingLocation;
     private RawLocation respawnLocation;
 
-    @Getter @Setter private String fileUrl;
+    private String fileUrl;
 
     public MapData(String mapName) {
         this.name = mapName;
