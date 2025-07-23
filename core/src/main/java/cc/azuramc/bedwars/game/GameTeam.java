@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
+import cc.azuramc.bedwars.game.trap.TrapManager;
 import lombok.Data;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -44,10 +45,7 @@ public class GameTeam {
     private boolean hasHealPoolUpgrade;
     private int fallingProtectionUpgrade;
 
-    private boolean hasBlindnessTrap;
-    private boolean hasFightBackTrap;
-    private boolean hasAlarmTrap;
-    private boolean hasMinerTrap;
+    private TrapManager trapManager;
 
     /**
      * 创建一个游戏团队
@@ -84,10 +82,7 @@ public class GameTeam {
         this.hasHealPoolUpgrade = false;
         this.fallingProtectionUpgrade = 0;
 
-        this.hasBlindnessTrap = false;
-        this.hasFightBackTrap = false;
-        this.hasAlarmTrap = false;
-        this.hasMinerTrap = false;
+        this.trapManager = new TrapManager();
     }
 
     /**
