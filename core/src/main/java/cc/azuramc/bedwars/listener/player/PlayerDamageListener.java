@@ -354,10 +354,12 @@ public class PlayerDamageListener implements Listener {
 
     private void handlePlayerVsCreature(EntityDamageByEntityEvent event, Entity entity, Entity attacker) {
 
-        GameTeam entityTeam = CustomEntityRemoverUtil.getDespawnables().get(entity.getUniqueId()).getGameTeam();
-        if (entityTeam == null) {
+        CustomEntityRemoverUtil entityo = CustomEntityRemoverUtil.getDespawnables().get(entity.getUniqueId());
+        if (entityo == null) {
             return;
         }
+
+        GameTeam entityTeam = entityo.getGameTeam();
 
         GamePlayer attackerPlayer = GamePlayer.get(attacker.getUniqueId());
         GameTeam attackerTeam = attackerPlayer.getGameTeam();
