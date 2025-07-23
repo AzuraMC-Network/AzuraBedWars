@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsPlayerKilleEvent;
+import cc.azuramc.bedwars.api.event.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
@@ -25,7 +25,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ public class PlayerDamageListener implements Listener {
     private final static MessageConfig.PlayerDeath MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getPlayerDeath();
     private final static PlayerConfig.PlayerDeath CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
 
-    private static final String METADATA_VOID_PLAYER = "VOID_PLAYER";
     private static final String METADATA_SHOP = "Shop";
     private static final String METADATA_SHOP2 = "Shop2";
     private static final String COINS_ACTION_BAR = MESSAGE_CONFIG.getCoinsActionBar();
@@ -114,13 +112,15 @@ public class PlayerDamageListener implements Listener {
         // 如果没有击杀者，直接清理掉落物并继续处理
         if (killer == null) {
             LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer is null");
-            cleanDeathDrops(event);
         }
         else {
             LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer isn't null");
             // 处理击杀奖励
             processKillReward(event, gamePlayer, GamePlayer.get(killer));
         }
+
+        // 清理掉落物
+        cleanDeathDrops(event);
 
         // 处理死亡后的游戏逻辑
         processDeathGameLogic(gamePlayer, gameTeam);
@@ -157,7 +157,6 @@ public class PlayerDamageListener implements Listener {
             }
         }
 
-        cleanDeathDrops(event);
         // 清除经验来源map
         gamePlayer.getExperienceSources().clear();
         LoggerUtil.debug("PlayerDamageListener$convertExperienceSourcesToExp | expMapCleared");
@@ -185,18 +184,13 @@ public class PlayerDamageListener implements Listener {
             return;
         }
 
-        // 处理非虚空死亡
-        if (!gamePlayer.getPlayer().hasMetadata(METADATA_VOID_PLAYER)) {
-            handleNormalDeath(gamePlayer, gameTeam);
-        }
+        // 处理死亡
+        handleDeath(gamePlayer, gameTeam);
 
         // 如果存在隐藏盔甲效果则移除
         if (PlayerInvisibilityListener.isPlayerInvisible(gamePlayer)) {
             PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
         }
-
-        // 移除虚空标记并处理重生
-        gamePlayer.getPlayer().removeMetadata(METADATA_VOID_PLAYER, plugin);
 
     }
 
@@ -218,10 +212,6 @@ public class PlayerDamageListener implements Listener {
                 XMaterial.DIAMOND.get(),
                 XMaterial.EMERALD.get()
         };
-
-        // 清除死亡消息和经验掉落
-        event.setDeathMessage(null);
-        event.setDroppedExp(0);
 
         // 先把所有物品添加到掉落列表中
         List<ItemStack> drops = new ArrayList<>();
@@ -412,7 +402,7 @@ public class PlayerDamageListener implements Listener {
 
         // 处理虚空伤害
         if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-            handleVoidDamage(event, gamePlayer);
+            event.setDamage(VOID_DAMAGE);
             return;
         }
 
@@ -445,66 +435,53 @@ public class PlayerDamageListener implements Listener {
         }
     }
 
-    /**
-     * 处理虚空伤害
-     *
-     * @param event      伤害事件
-     * @param gamePlayer 游戏玩家
-     */
-    private void handleVoidDamage(EntityDamageEvent event, GamePlayer gamePlayer) {
-        event.setDamage(VOID_DAMAGE);
-        GamePlayer gameKiller = GamePlayer.get(gamePlayer.getPlayer().getKiller());
-        GameTeam gameTeam = gamePlayer.getGameTeam();
+//    /**
+//     * 处理虚空伤害
+//     *
+//     * @param event      伤害事件
+//     * @param gamePlayer 游戏玩家
+//     */
+//    private void handleVoidDamage(EntityDamageEvent event, GamePlayer gamePlayer) {
+//        event.setDamage(VOID_DAMAGE);
+//        GamePlayer gameKiller = GamePlayer.get(gamePlayer.getPlayer().getKiller());
+//        GameTeam gameTeam = gamePlayer.getGameTeam();
+//
+//        if (gameKiller != null) {
+//
+//            GameTeam killerTeam = gameKiller.getGameTeam();
+//            processKill(gamePlayer, gameTeam, gameKiller, killerTeam, gameTeam.isDestroyed());
+//        } else {
+//            // 自杀消息
+//            gamePlayer.getPlayerData().addDeaths();
+//        }
+//
+//        gamePlayer.getPlayer().setMetadata(METADATA_VOID_PLAYER, new FixedMetadataValue(plugin, ""));
+//    }
 
-        if (gameKiller != null) {
-
-            GameTeam killerTeam = gameKiller.getGameTeam();
-            processKill(gamePlayer, gameTeam, gameKiller, killerTeam, gameTeam.isDestroyed());
-            broadcastVoidKillMessage(gamePlayer, gameTeam, gameKiller, killerTeam, gameTeam.isDestroyed());
-        } else {
-            // 自杀消息
-            gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + ")§e掉下了虚空");
-            gamePlayer.getPlayerData().addDeaths();
-        }
-
-        gamePlayer.getPlayer().setMetadata(METADATA_VOID_PLAYER, new FixedMetadataValue(plugin, ""));
-    }
-
-    /**
-     * 发送虚空击杀消息
-     */
-    private void broadcastVoidKillMessage(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer gameKiller, GameTeam killerTeam, boolean isFinalKill) {
-        if (isFinalKill) {
-            gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + " [最终击杀]§e被" + killerTeam.getChatColor() + gameKiller.getName() + "§e狠狠滴丢下虚空");
-        } else {
-            gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "§e被" + killerTeam.getChatColor() + gameKiller.getName() + "§e狠狠滴丢下虚空");
-        }
-    }
-
-    /**
-     * 处理普通击杀奖励和消息
-     */
-    private void processKill(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer gameKiller, GameTeam killerTeam, boolean isFinalKill) {
-
-        BedwarsPlayerKilleEvent event = new BedwarsPlayerKilleEvent(gamePlayer, gameKiller, isFinalKill);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
-
-        if (isFinalKill) {
-            // 最终击杀给金币奖励
-            if (!VaultUtil.ecoIsNull) {
-                showCoinsReward(gameKiller);
-                VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
-            }
-            gameKiller.getPlayerData().addFinalKills();
-        } else {
-            gameKiller.getPlayerData().addKills();
-        }
-
-        gameKiller.getPlayerData().addKills();
-    }
+//    /**
+//     * 处理普通击杀奖励和消息
+//     */
+//    private void processKill(GamePlayer gamePlayer, GameTeam gameTeam, GamePlayer gameKiller, GameTeam killerTeam, boolean isFinalKill) {
+//
+//        BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
+//        Bukkit.getPluginManager().callEvent(event);
+//        if (event.isCancelled()) {
+//            return;
+//        }
+//
+//        if (isFinalKill) {
+//            // 最终击杀给金币奖励
+//            if (!VaultUtil.ecoIsNull) {
+//                showCoinsReward(gameKiller);
+//                VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
+//            }
+//            gameKiller.getPlayerData().addFinalKills();
+//        } else {
+//            gameKiller.getPlayerData().addKills();
+//        }
+//
+//        gameKiller.getPlayerData().addKills();
+//    }
 
     /**
      * 显示金币奖励
@@ -534,7 +511,6 @@ public class PlayerDamageListener implements Listener {
      * @param event 死亡事件
      */
     private void cleanDeathDrops(PlayerDeathEvent event) {
-        event.setDeathMessage(null);
         event.setKeepInventory(true);
         event.getDrops().clear();
         event.getEntity().getInventory().clear();
@@ -543,48 +519,39 @@ public class PlayerDamageListener implements Listener {
     }
 
     /**
-     * 处理普通（非虚空）死亡
+     * 修正：处理所有死亡
      *
      * @param gamePlayer 游戏玩家
      * @param gameTeam   玩家队伍
+     *
+     * @author ImCur_
      */
-    private void handleNormalDeath(GamePlayer gamePlayer, GameTeam gameTeam) {
+    private void handleDeath(GamePlayer gamePlayer, GameTeam gameTeam) {
 
         // 获取击杀者
         GamePlayer gameKiller = findKiller(gamePlayer);
-        if (gameKiller == null) {
-            return;
-        }
 
-        GameTeam killerTeam = gameKiller.getGameTeam();
+        GameTeam killerTeam = gameKiller == null ? null : gameKiller.getGameTeam();
         boolean isFinalKill = gameTeam != null && gameTeam.isDestroyed();
 
-        BedwarsPlayerKilleEvent event = new BedwarsPlayerKilleEvent(gamePlayer, gameKiller, isFinalKill);
+        BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
 
         // 处理最终击杀
         if (isFinalKill) {
-            if (!VaultUtil.ecoIsNull) {
-                showCoinsReward(gameKiller);
-                VaultUtil.depositPlayer(gamePlayer, COINS_REWARD);
+            PlayerDeathReasonListener.setFinalKill(true);
+            if (gameKiller != null) {
+                if (!VaultUtil.ecoIsNull) {
+                    showCoinsReward(gameKiller);
+                    VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
+                }
+                gameKiller.getPlayerData().addFinalKills();
             }
-            gameKiller.getPlayerData().addFinalKills();
-
-            // 广播击杀消息
-            gameManager.broadcastMessage(gameTeam.getChatColor() + gamePlayer.getNickName() + "(" + gameTeam.getName() + "♛)[最终击杀]§e被" +
-                    killerTeam.getChatColor() + gameKiller.getNickName() + "(" + killerTeam.getName() + "♛)§e狠狠滴推倒");
-        }
-
-        // 触发击杀事件
-        if (gameTeam != null) {
-            Bukkit.getPluginManager().callEvent(new BedwarsPlayerKilleEvent(gamePlayer, gameKiller, isFinalKill));
         }
 
         // 更新玩家数据
-        gameKiller.getPlayerData().addKills();
+        if (gameKiller != null)
+            gameKiller.getPlayerData().addKills();
         gamePlayer.getPlayerData().addDeaths();
     }
 
@@ -782,10 +749,6 @@ public class PlayerDamageListener implements Listener {
         Inventory killerInventory = killer.getInventory();
         Map<String, Integer> expSources = gamePlayer.getExperienceSources();
         List<ItemStack> drops = new ArrayList<>();
-
-        // 清除死亡消息和经验掉落
-        event.setDeathMessage(null);
-        event.setDroppedExp(0);
 
         // 从经验源转换为相应的物品数量
         for (Map.Entry<String, Integer> entry : expSources.entrySet()) {

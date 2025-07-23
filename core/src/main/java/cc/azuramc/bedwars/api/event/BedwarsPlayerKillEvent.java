@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.api.event;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Getter;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * @author an5w1r@163.com
  */
 @Getter
-public class BedwarsPlayerKilleEvent extends Event implements Cancellable {
+public class BedwarsPlayerKillEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
@@ -23,7 +22,7 @@ public class BedwarsPlayerKilleEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
-    public BedwarsPlayerKilleEvent(GamePlayer gamePlayer, GamePlayer gameKiller, boolean last) {
+    public BedwarsPlayerKillEvent(GamePlayer gamePlayer, GamePlayer gameKiller, boolean last) {
         this.gamePlayer = gamePlayer;
         this.gameKiller = gameKiller;
         this.last = last;
@@ -34,13 +33,4 @@ public class BedwarsPlayerKilleEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return false;
-    }
-
-    @Override
-    public void setCancelled(boolean cancel) {
-
-    }
 }
