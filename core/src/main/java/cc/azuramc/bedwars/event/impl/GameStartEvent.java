@@ -8,6 +8,8 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.trap.TrapManager;
+import cc.azuramc.bedwars.game.trap.TrapType;
 import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XPotion;
@@ -148,16 +150,17 @@ public class GameStartEvent extends AbstractGameEvent {
      */
     private void handleEnemyInTeamTerritory(GamePlayer player, GameTeam gameTeam) {
         double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
+        TrapManager trapManager = gameTeam.getTrapManager();
 
         if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
             // 触发普通陷阱
-            if (gameTeam.isHasBlindnessTrap()) {
+            if (trapManager.isTrapActive(TrapType.BLINDNESS)) {
                 LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger normal trap, player: " + player.getName());
                 triggerTrap(player, gameTeam);
             }
             
             // 触发挖掘疲劳陷阱
-            if (gameTeam.isHasMinerTrap()) {
+            if (trapManager.isTrapActive(TrapType.MINER)) {
                 LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger mining fatigue trap, player: " + player.getName());
                 triggerMiningFatigueTrap(player, gameTeam);
             }
@@ -171,7 +174,8 @@ public class GameStartEvent extends AbstractGameEvent {
      * @param gameTeam 拥有陷阱的团队
      */
     private void triggerTrap(GamePlayer player, GameTeam gameTeam) {
-        gameTeam.setHasBlindnessTrap(false);
+        TrapManager trapManager = gameTeam.getTrapManager();
+        trapManager.deactivateTrap(TrapType.BLINDNESS);
 
         // 给敌方玩家添加失明效果
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
@@ -212,7 +216,9 @@ public class GameStartEvent extends AbstractGameEvent {
                     CONFIG.getUpgrade().getMiningFatigueEffectAmplifier()));
             }
         });
-        gameTeam.setHasMinerTrap(false);
+
+        TrapManager trapManager = gameTeam.getTrapManager();
+        trapManager.deactivateTrap(TrapType.MINER);
 
         // 通知团队成员陷阱被触发
         announceTrapTrigger(gameTeam);
