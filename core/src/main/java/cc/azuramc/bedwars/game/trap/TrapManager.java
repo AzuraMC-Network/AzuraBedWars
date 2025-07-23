@@ -14,6 +14,8 @@ public class TrapManager {
     /** 资源类型名称缓存 */
     private final Map<Material, String> resourceNames = new HashMap<>();
 
+    private final int maxTrapCount = 3;
+
     /**
      * 获取激活的陷阱数量
      */
@@ -55,6 +57,14 @@ public class TrapManager {
     public boolean isTrapActive(TrapType trapType) {
         return activeTraps.contains(trapType);
     }
+
+    /**
+     * 检查是否达到最大陷阱数量限制
+     */
+    public boolean isReachedActiveLimit() {
+        return activeTraps.size() >= maxTrapCount;
+    }
+
 
     /**
      * 激活指定陷阱
