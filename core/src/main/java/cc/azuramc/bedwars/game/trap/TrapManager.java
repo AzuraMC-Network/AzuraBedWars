@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class TrapManager {
 
-    private final Set<TrapType> activeTraps = new HashSet<>();
+    private final Set<TrapType> activeTraps = new LinkedHashSet<>();
 
     /** 资源类型名称缓存 */
     private final Map<Material, String> resourceNames = new HashMap<>();

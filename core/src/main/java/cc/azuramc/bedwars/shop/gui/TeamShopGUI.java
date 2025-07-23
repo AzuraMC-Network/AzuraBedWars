@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.trap.TrapManager;
+import cc.azuramc.bedwars.game.trap.TrapState;
 import cc.azuramc.bedwars.game.trap.TrapType;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
@@ -127,7 +128,10 @@ public class TeamShopGUI extends CustomGUI {
         addBlindnessTrap(gamePlayer, gameManager, gameModeType);
         addFightBackTrap(gamePlayer, gameManager, gameModeType);
         addAlarmTrap(gamePlayer, gameManager, gameModeType);
-        addMiningFatigueTrap(gamePlayer, gameManager, gameModeType);
+        addMinerTrap(gamePlayer, gameManager, gameModeType);
+
+        // 陷阱列表
+        setupTrapList(gamePlayer);
     }
     
     /**
@@ -415,21 +419,15 @@ public class TeamShopGUI extends CustomGUI {
     private void addBlindnessTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         TrapManager trapManager = gameTeam.getTrapManager();
+        int price = trapManager.getCurrentTrapPrice();
 
         if (!trapManager.isTrapActive(TrapType.BLINDNESS)) {
             // 未升级状态
-            int price = trapManager.getCurrentTrapPrice();
-
             setItem(14, new ItemBuilder()
-                            .setType(XMaterial.TRIPWIRE_HOOK.get())
+                            .setType(getBlindnessTrapMaterial())
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.BLINDNESS.getDisplayName())
-                            .setLores(
-                                    "§7造成失明与缓慢效果，持续8秒。",
-                                    "",
-                                    "§7价格: §b" + formatPrice(price, gameModeType),
-                                    "§e点击购买"
-                            )
+                            .setLores(getTrapItemLore(TrapState.INACTIVE, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
@@ -447,12 +445,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.BLINDNESS.getDisplayName())
-                            .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
-                                    "",
-                                    "§a已激活"
-                            )
+                            .setLores(getTrapItemLore(TrapState.ACTIVE, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         } else {
@@ -462,12 +455,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.BLINDNESS.getDisplayName())
-                            .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
-                                    "",
-                                    "§c陷阱已满"
-                            )
+                            .setLores(getTrapItemLore(TrapState.FULLED, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         }
@@ -479,22 +467,16 @@ public class TeamShopGUI extends CustomGUI {
     private void addFightBackTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         TrapManager trapManager = gameTeam.getTrapManager();
+        int price = trapManager.getCurrentTrapPrice();
 
         if (!trapManager.isTrapActive(TrapType.FIGHT_BACK)) {
             // 未升级状态
-            int price = trapManager.getCurrentTrapPrice();
 
             setItem(15, new ItemBuilder()
-                            .setType(XMaterial.FEATHER.get())
+                            .setType(getFightbackTrapMaterial())
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.FIGHT_BACK.getDisplayName())
-                            .setLores(
-                                    "§7赋予基地附近的队友速度 II 与跳跃提升 II",
-                                    "§7效果，持续15秒。",
-                                    "",
-                                    "§7价格: §b" + formatPrice(price, gameModeType),
-                                    "§e点击购买"
-                            )
+                            .setLores(getTrapItemLore(TrapState.INACTIVE, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
@@ -512,12 +494,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.FIGHT_BACK.getDisplayName())
-                            .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
-                                    "",
-                                    "§a已激活"
-                            )
+                            .setLores(getTrapItemLore(TrapState.ACTIVE, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         } else {
@@ -527,12 +504,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.FIGHT_BACK.getDisplayName())
-                            .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
-                                    "",
-                                    "§c陷阱已满"
-                            )
+                            .setLores(getTrapItemLore(TrapState.FULLED, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         }
@@ -544,21 +516,15 @@ public class TeamShopGUI extends CustomGUI {
     private void addAlarmTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         TrapManager trapManager = gameTeam.getTrapManager();
+        int price = trapManager.getCurrentTrapPrice();
 
         if (!trapManager.isTrapActive(TrapType.ALARM)) {
             // 未升级状态
-            int price = trapManager.getCurrentTrapPrice();
 
             setItem(16, new ItemBuilder()
-                            .setType(XMaterial.REDSTONE_TORCH.get())
+                            .setType(getAlarmTrapMaterial())
                             .setDisplayName("§a" + TrapType.ALARM.getDisplayName())
-                            .setLores(
-                                    "§7显示隐身的玩家，",
-                                    "§7及其名称与队伍名。",
-                                    "",
-                                    "§7价格: §b" + formatPrice(price, gameModeType),
-                                    "§e点击购买"
-                            )
+                            .setLores(getTrapItemLore(TrapState.INACTIVE, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
@@ -575,12 +541,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .setDisplayName("§a" + TrapType.ALARM.getDisplayName())
-                            .setLores(
-                                    "§7显示隐身的玩家，",
-                                    "§7及其名称与队伍名。",
-                                    "",
-                                    "§a已激活"
-                            )
+                            .setLores(getTrapItemLore(TrapState.ACTIVE, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         } else {
@@ -589,12 +550,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .setDisplayName("§a" + TrapType.ALARM.getDisplayName())
-                            .setLores(
-                                    "§7显示隐身的玩家，",
-                                    "§7及其名称与队伍名。",
-                                    "",
-                                    "§c陷阱已满"
-                            )
+                            .setLores(getTrapItemLore(TrapState.FULLED, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         }
@@ -603,24 +559,19 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 添加挖掘疲劳陷阱升级选项
      */
-    private void addMiningFatigueTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void addMinerTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         TrapManager trapManager = gameTeam.getTrapManager();
+        int price = trapManager.getCurrentTrapPrice();
+
 
         if (!trapManager.isTrapActive(TrapType.MINER)) {
             // 未升级状态
-            int price = trapManager.getCurrentTrapPrice();
-
             setItem(23, new ItemBuilder()
-                            .setType(XMaterial.IRON_PICKAXE.get())
+                            .setType(getMinerTrapMaterial())
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.MINER.getDisplayName())
-                            .setLores(
-                                    "§7造成挖掘疲劳效果，持续8秒。",
-                                    "",
-                                    "§7价格: §b" + formatPrice(price, gameModeType),
-                                    "§e点击购买"
-                            )
+                            .setLores(getTrapItemLore(TrapState.INACTIVE, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
@@ -638,12 +589,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.MINER.getDisplayName())
-                            .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
-                                    "",
-                                    "§a已激活"
-                            )
+                            .setLores(getTrapItemLore(TrapState.ACTIVE, getBlindnessTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         } else {
@@ -653,14 +599,53 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.MINER.getDisplayName())
+                            .setLores(getTrapItemLore(TrapState.FULLED, getBlindnessTrapLore(), price, gameModeType))
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        }
+    }
+
+    /**
+     * 设置陷阱列表
+     */
+    private void setupTrapList(GamePlayer gamePlayer) {
+        TrapManager trapManager = gamePlayer.getGameTeam().getTrapManager();
+        for (int i = 39 + trapManager.getActiveTrapCount(); i < 42; i++) {
+            setItem(i, new ItemBuilder()
+                            .setType(XMaterial.matchXMaterial("STAINED_GLASS:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS).get())
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§c陷阱#" + (i - 38) + ": 没有陷阱！")
                             .setLores(
-                                    "§7下一个进入基地的敌人将获得",
-                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "§7第" + getChineseNumber(i - 38) + "个敌人进入己方基地后",
+                                    "§7会触发该陷阱！",
                                     "",
-                                    "§c陷阱已满"
+                                    "§7购买的陷阱会再次排列，具体",
+                                    "§7费用取决已排列的陷阱数量。",
+                                    "",
+                                    "§7下一个陷阱: §b" + formatPrice(trapManager.getCurrentTrapPrice(), gamePlayer.getGameModeType())
                             )
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
+        }
+
+        if (trapManager.getActiveTrapCount() >= 1) {
+            for (int j = 39; j < trapManager.getActiveTrapCount() + 39; j++) {
+                setItem(j, new ItemBuilder()
+                                .setType(getTrapMaterialByTrapType(trapManager.getActiveTraps().get(j - 39)))
+                                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                                .setDisplayName("§a陷阱#" + (j - 38) + ": " + trapManager.getActiveTraps().get(j - 39).getDisplayName())
+                                .setLores(
+                                        "§7第" + getChineseNumber(j - 38) + "个敌人进入己方基地后",
+                                        "§7会触发该陷阱！",
+                                        "",
+                                        "§7购买的陷阱会再次排列，具体",
+                                        "§7费用取决已排列的陷阱数量。",
+                                        "",
+                                        "§7下一个陷阱: §b" + formatPrice(trapManager.getCurrentTrapPrice(), gamePlayer.getGameModeType())
+                                )
+                                .getItem(),
+                        new GUIAction(0, () -> {}, false));
+            }
         }
     }
 
@@ -847,6 +832,133 @@ public class TeamShopGUI extends CustomGUI {
 
         return lore;
     }
+
+    /**
+     * 获取陷阱物品Lore
+     * @param trapLore 指定陷阱的lore
+     * @param price 价格
+     * @param gameModeType 游戏模式
+     * @return 完整拼接好的lore
+     */
+    private List<String> getTrapItemLore(TrapState trapState, List<String> trapLore, int price, GameModeType gameModeType) {
+        List<String> lores = new ArrayList<>(trapLore);
+        switch (trapState) {
+            case INACTIVE:
+                lores.add("");
+                lores.add("§7价格: §b" + formatPrice(price, gameModeType));
+                lores.add("");
+                lores.add("§e点击购买");
+                return lores;
+            case ACTIVE:
+                lores.add("");
+                lores.add("§7价格: §b" + formatPrice(price, gameModeType));
+                lores.add("");
+                lores.add("§a已激活");
+                return lores;
+            case FULLED:
+                lores.add("");
+                lores.add("§7价格: §b" + formatPrice(price, gameModeType));
+                lores.add("");
+                lores.add("§c陷阱已满");
+                return lores;
+            default:
+                return lores;
+        }
+    }
+
+    /**
+     * 获取陷阱图标材质 - 失明陷阱专用
+     */
+    private Material getBlindnessTrapMaterial() {
+        return XMaterial.TRIPWIRE_HOOK.get();
+    }
+
+    /**
+     * 获取陷阱图标材质 - 反击陷阱专用
+     */
+    private Material getFightbackTrapMaterial() {
+        return XMaterial.FEATHER.get();
+    }
+
+    /**
+     * 获取陷阱图标材质 - 警报陷阱专用
+     */
+    private Material getAlarmTrapMaterial() {
+        return XMaterial.REDSTONE_TORCH.get();
+    }
+
+    /**
+     * 获取陷阱图标材质 - 挖掘疲劳陷阱专用
+     */
+    private Material getMinerTrapMaterial() {
+        return XMaterial.IRON_PICKAXE.get();
+    }
+
+    /**
+     * 获取陷阱说明 - 失明陷阱专用
+     */
+    private List<String> getBlindnessTrapLore() {
+        return List.of(
+                "§7造成失明与缓慢效果，持续8秒。"
+        );
+    }
+
+    /**
+     * 获取陷阱说明 - 反击陷阱专用
+     */
+    private List<String> getFightbackTrapLore() {
+        return List.of(
+                "§7赋予基地附近的队友速度 II 与跳跃提升 II",
+                "§7效果，持续15秒。"
+        );
+    }
+
+    /**
+     * 获取陷阱说明 - 警报陷阱专用
+     */
+    private List<String> getAlarmTrapLore() {
+        return List.of(
+                "§7显示隐身的玩家，",
+                "§7及其名称与队伍名。"
+        );
+    }
+
+    /**
+     * 获取陷阱说明 - 挖掘疲劳陷阱专用
+     */
+    private List<String> getMinerTrapLore() {
+        return List.of(
+                "§7造成挖掘疲劳效果，持续8秒。"
+        );
+    }
+
+    /**
+     * 根据陷阱类型获取对应的图标材质
+     * @param trapType 陷阱类型
+     * @return 对应的陷阱图标材质
+     */
+    private Material getTrapMaterialByTrapType(TrapType trapType) {
+        return switch (trapType) {
+            case BLINDNESS -> getBlindnessTrapMaterial();
+            case FIGHT_BACK -> getFightbackTrapMaterial();
+            case ALARM -> getAlarmTrapMaterial();
+            case MINER -> getMinerTrapMaterial();
+        };
+    }
+
+    /**
+     * 根据陷阱类型获取对应的Lore
+     * @param trapType 陷阱类型
+     * @return 对应的陷阱Lore
+     */
+    private List<String> getTrapLoreByTrapType(TrapType trapType) {
+        return switch (trapType) {
+            case BLINDNESS -> getBlindnessTrapLore();
+            case FIGHT_BACK -> getFightbackTrapLore();
+            case ALARM -> getAlarmTrapLore();
+            case MINER -> getMinerTrapLore();
+        };
+    }
     
     /**
      * 处理支付
@@ -957,6 +1069,22 @@ public class TeamShopGUI extends CustomGUI {
             case 3 -> "III";
             case 4 -> "IV";
             case 5 -> "V";
+            default -> String.valueOf(number);
+        };
+    }
+
+    /**
+     * 获取数字对应的中文
+     * @param number 数字
+     * @return 中文汉字数字
+     */
+    private String getChineseNumber(int number) {
+        return switch (number) {
+            case 1 -> "一";
+            case 2 -> "二";
+            case 3 -> "三";
+            case 4 -> "四";
+            case 5 -> "五";
             default -> String.valueOf(number);
         };
     }
