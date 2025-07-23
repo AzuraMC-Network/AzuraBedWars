@@ -439,7 +439,7 @@ public class TeamShopGUI extends CustomGUI {
                         trapManager.activateTrap(TrapType.BLINDNESS);
                         new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
-        } else {
+        } else if (!trapManager.isReachedActiveLimit()) {
             // 已升级状态
             setItem(14, new ItemBuilder()
                             .setType(XMaterial.TRIPWIRE_HOOK.get())
@@ -452,6 +452,21 @@ public class TeamShopGUI extends CustomGUI {
                                     "§7持续10秒的挖掘疲劳效果！",
                                     "",
                                     "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        } else {
+            setItem(14, new ItemBuilder()
+                            .setType(XMaterial.TRIPWIRE_HOOK.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + TrapType.BLINDNESS.getDisplayName())
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§c陷阱已满"
                             )
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
@@ -489,7 +504,7 @@ public class TeamShopGUI extends CustomGUI {
                         trapManager.activateTrap(TrapType.FIGHT_BACK);
                         new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
-        } else {
+        } else if (trapManager.isReachedActiveLimit()) {
             // 已升级状态
             setItem(15, new ItemBuilder()
                             .setType(XMaterial.FEATHER.get())
@@ -502,6 +517,21 @@ public class TeamShopGUI extends CustomGUI {
                                     "§7持续10秒的挖掘疲劳效果！",
                                     "",
                                     "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        } else {
+            setItem(15, new ItemBuilder()
+                            .setType(XMaterial.FEATHER.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + TrapType.FIGHT_BACK.getDisplayName())
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§c陷阱已满"
                             )
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
@@ -538,7 +568,7 @@ public class TeamShopGUI extends CustomGUI {
                         trapManager.activateTrap(TrapType.ALARM);
                         new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
-        } else {
+        } else if (trapManager.isReachedActiveLimit()) {
             // 已升级状态
             setItem(16, new ItemBuilder()
                             .setType(XMaterial.REDSTONE_TORCH.get())
@@ -550,6 +580,20 @@ public class TeamShopGUI extends CustomGUI {
                                     "§7及其名称与队伍名。",
                                     "",
                                     "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        } else {
+            setItem(16, new ItemBuilder()
+                            .setType(XMaterial.REDSTONE_TORCH.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .setDisplayName("§a" + TrapType.ALARM.getDisplayName())
+                            .setLores(
+                                    "§7显示隐身的玩家，",
+                                    "§7及其名称与队伍名。",
+                                    "",
+                                    "§c陷阱已满"
                             )
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
@@ -586,7 +630,7 @@ public class TeamShopGUI extends CustomGUI {
                         trapManager.activateTrap(TrapType.MINER);
                         new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
-        } else {
+        } else if (trapManager.isReachedActiveLimit()) {
             // 已升级状态
             setItem(23, new ItemBuilder()
                             .setType(XMaterial.IRON_PICKAXE.get())
@@ -599,6 +643,21 @@ public class TeamShopGUI extends CustomGUI {
                                     "§7持续10秒的挖掘疲劳效果！",
                                     "",
                                     "§a已激活"
+                            )
+                            .getItem(),
+                    new GUIAction(0, () -> {}, false));
+        } else {
+            setItem(23, new ItemBuilder()
+                            .setType(XMaterial.IRON_PICKAXE.get())
+                            .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                            .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                            .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                            .setDisplayName("§a" + TrapType.MINER.getDisplayName())
+                            .setLores(
+                                    "§7下一个进入基地的敌人将获得",
+                                    "§7持续10秒的挖掘疲劳效果！",
+                                    "",
+                                    "§c陷阱已满"
                             )
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
