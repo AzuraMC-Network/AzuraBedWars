@@ -1,24 +1,19 @@
 package cc.azuramc.bedwars.listener.projectile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.compat.util.WoolUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.TeamColor;
 import cc.azuramc.bedwars.util.MapUtil;
-import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
-import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.util.Objects;
 
 /**
  * @author an5w1r@163.com
@@ -96,14 +91,7 @@ public class EggBridgeHandler implements Runnable {
         }
 
         // 改变 AIR 为 指定颜色的羊毛
-        if (VersionUtil.isLessThan113()) {
-            block.setType(Material.valueOf("WOOL"));
-            BlockState state = block.getState();
-            state.setData(new Wool(teamColor.getDyeColor()));
-            state.update();
-        } else {
-            block.setType(Objects.requireNonNull(XMaterial.matchXMaterial(teamColor.getDyeColor().toString() + "_WOOL").orElse(XMaterial.WHITE_WOOL).get()));
-        }
+        WoolUtil.setWoolBlockColor(block, teamColor);
 
         getPlayer().playSound(player.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 10F, 1F);
     }
