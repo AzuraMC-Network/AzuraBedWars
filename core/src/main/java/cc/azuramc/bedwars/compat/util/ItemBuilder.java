@@ -270,7 +270,7 @@ public class ItemBuilder {
             
             // 如果没有标签就创建一个
             if (tag == null) {
-                tag = nbtTagCompoundClass.newInstance();
+                tag = nbtTagCompoundClass.getDeclaredConstructor().newInstance();
             }
             
             // 设置Unbreakable标签

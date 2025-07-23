@@ -28,7 +28,7 @@ public class NMSProvider {
 
     private NMSAccess createNMSAccess(String version) {
         try {
-            return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + ".NMS_" + version).newInstance();
+            return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + ".NMS_" + version).getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             LoggerUtil.warn("未受支持的版本: " + e.getMessage());
         } catch (InstantiationException | IllegalAccessException e) {
