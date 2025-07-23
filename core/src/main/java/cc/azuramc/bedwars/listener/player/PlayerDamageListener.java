@@ -318,7 +318,7 @@ public class PlayerDamageListener implements Listener {
      *
      * @param event 实体间伤害事件
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
 
         // 检查是否游戏中
@@ -667,9 +667,10 @@ public class PlayerDamageListener implements Listener {
 
         // 普通攻击伤害显示
         if (ATTACK_DISPLAY_ENABLED && attackPlayer.isViewingArrowDamage()) {
+            int finalDamage = (int) (event.getFinalDamage() + 0.5);
             attackPlayer.sendTitle(
                     "&r ",
-                    "&b伤害 &f- &e" + (int) event.getFinalDamage() + "  &b血量 &f- &e" + (int) gamePlayer.getPlayer().getHealth() +
+                    "&b伤害 &f- &e" + finalDamage + "  &b血量 &f- &e" + ((int) gamePlayer.getPlayer().getHealth() - finalDamage) +
                             "&f/&e" + (int) PlayerUtil.getMaxHealth(gamePlayer.getPlayer()),
                     1, ATTACK_DISPLAY_TITLE_TICKS,
                     5);
