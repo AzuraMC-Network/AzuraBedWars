@@ -169,7 +169,7 @@ public class MapCommand {
         }
         MapData mapData = mapManager.getLoadedMaps().get(mapName);
         mapData.getPlayers().setMin(value);
-        player.sendMessage(MessageUtil.color("&a地图最小人数置成功!"));
+        player.sendMessage(MessageUtil.color("&a地图最小人数设置成功!"));
     }
 
     @Subcommand("addDrop")
