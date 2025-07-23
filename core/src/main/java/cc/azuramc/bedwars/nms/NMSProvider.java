@@ -9,19 +9,18 @@ import lombok.Getter;
  */
 @Getter
 public class NMSProvider {
-    public final boolean laterThan1_8 = !VersionUtil.isVersion18();
     private NMSAccess access;
-    private String version;
+    private String nmsVersion;
 
     public NMSAccess setup() {
-        this.version = VersionUtil.getVersion();
-        this.access = createNMSAccess(version);
+        this.nmsVersion = VersionUtil.getNmsVersion();
+        this.access = createNMSAccess(nmsVersion);
 
         if (this.access == null) {
-            LoggerUtil.warn("NMS支持未找到 (" + this.version + ")! 启用兼容模式 可能存在意外问题!");
+            LoggerUtil.warn("NMS支持未找到 (" + this.nmsVersion + ")! 启用兼容模式 可能存在意外问题!");
             access = new CompatibilityModeNMS();
         } else {
-            LoggerUtil.info("正在使用受支持的版本! (" + this.version + ")");
+            LoggerUtil.info("正在使用受支持的版本! (" + this.nmsVersion + ")");
         }
 
         return access;
