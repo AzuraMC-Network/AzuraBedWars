@@ -15,8 +15,8 @@ import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import fr.mrmicky.fastboard.FastBoard;
+import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  * @author an5w1r@163.com
  */
+@Data
 public class GamePlayer {
 
     private static final PlayerConfig.GamePlayer CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getGamePlayer();
@@ -49,32 +50,33 @@ public class GamePlayer {
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
 
-    @Getter private final UUID uuid;
-    @Getter private final String name;
-    @Getter private final AssistsManager assistsManager;
-    @Getter private final PlayerData playerData;
-    @Getter private final PlayerCompass playerCompass;
+    private final UUID uuid;
+    private final String name;
+    private final AssistsManager assistsManager;
+    private final PlayerData playerData;
+    private final PlayerCompass playerCompass;
 
-    @Getter @Setter GameModeType gameModeType;
+    GameModeType gameModeType;
     /** 使用 HashMap 存储经验来源，键是资源名(String)，值是经验数量(Integer) */
-    @Getter Map<String, Integer> experienceSources;
+    Map<String, Integer> experienceSources;
 
-    @Setter private String nickName;
-    @Getter @Setter private FastBoard board;
-    @Getter private boolean spectator;
-    @Getter @Setter private SpectatorTarget spectatorTarget;
-    @Getter @Setter private GameTeam gameTeam;
-    @Setter @Getter private boolean isAfk;
-    @Setter @Getter private boolean isShoutCooldown;
-    @Getter @Setter private boolean isEggBridgeCooldown;
-    @Getter @Setter private boolean isViewingArrowDamage;
-    @Getter @Setter private boolean isViewingAttackDamage;
+    private String nickName;
+    private FastBoard board;
+    private boolean spectator;
+    private SpectatorTarget spectatorTarget;
+    private GameTeam gameTeam;
+    private boolean isAfk;
+    private boolean isShoutCooldown;
+    private boolean isEggBridgeCooldown;
+    private boolean isViewingArrowDamage;
+    private boolean isViewingAttackDamage;
+    private boolean isInvisible;
     
     // 装备状态
-    @Getter @Setter private ArmorType armorType;
-    @Getter @Setter private ToolType pickaxeType;
-    @Getter @Setter private ToolType axeType;
-    @Getter @Setter private boolean shear;
+    private ArmorType armorType;
+    private ToolType pickaxeType;
+    private ToolType axeType;
+    private boolean shear;
 
     /**
      * 构造方法
@@ -97,6 +99,7 @@ public class GamePlayer {
         this.isEggBridgeCooldown = false;
         this.isViewingArrowDamage = true;
         this.isViewingAttackDamage = true;
+        this.isInvisible = false;
 
         // 初始化装备状态
         this.armorType = ArmorType.DEFAULT;
