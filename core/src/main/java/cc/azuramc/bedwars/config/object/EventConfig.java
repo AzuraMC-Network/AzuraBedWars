@@ -86,9 +86,9 @@ public class EventConfig {
             private int hasteEffectDuration = 40;
             private int regenerationEffectDuration = 60;
             private int regenerationEffectAmplifier = 1;
-            private int trapEffectDuration = 200;
+            private int trapEffectDuration = 160;
             private int trapEffectAmplifier = 1;
-            private int miningFatigueEffectDuration = 200;
+            private int miningFatigueEffectDuration = 160;
             private int miningFatigueEffectAmplifier = 0;
         }
     }
