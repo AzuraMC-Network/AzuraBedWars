@@ -13,7 +13,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -72,7 +71,7 @@ public class NMS_v1_8_R3 implements NMSAccess {
     }
 
     @Override
-    public Fireball setFireballDirection(Fireball fireball, @NotNull Vector vector) {
+    public Fireball setFireballDirection(Fireball fireball, Vector vector) {
         EntityFireball fb = ((CraftFireball) fireball).getHandle();
         fb.dirX = vector.getX() * 0.1D;
         fb.dirY = vector.getY() * 0.1D;
