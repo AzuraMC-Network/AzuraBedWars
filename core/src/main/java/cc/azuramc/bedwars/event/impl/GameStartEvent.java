@@ -7,7 +7,7 @@ import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.game.task.GeneratorTask;
+import cc.azuramc.bedwars.game.task.resource.GeneratorTask;
 import cc.azuramc.bedwars.game.trap.TrapManager;
 import cc.azuramc.bedwars.game.trap.TrapType;
 import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
