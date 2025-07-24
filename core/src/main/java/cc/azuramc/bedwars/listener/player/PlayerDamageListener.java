@@ -188,7 +188,7 @@ public class PlayerDamageListener implements Listener {
 
         // 如果存在隐藏盔甲效果则移除
         if (gamePlayer.isInvisible()) {
-            PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
+            gamePlayer.endInvisibility();
         }
 
     }
@@ -425,7 +425,7 @@ public class PlayerDamageListener implements Listener {
 
         // 玩家攻击移除隐身
         if (gamePlayer.isInvisible()) {
-            PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
+            gamePlayer.endInvisibility();
         }
     }
 
