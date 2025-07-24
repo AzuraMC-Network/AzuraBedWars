@@ -6,10 +6,11 @@ import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.trap.TrapManager;
 import cc.azuramc.bedwars.game.trap.TrapType;
+import cc.azuramc.bedwars.listener.player.PlayerInvisibilityListener;
 import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XPotion;
@@ -124,17 +125,17 @@ public class GameStartEvent extends AbstractGameEvent {
     /**
      * 为团队基地内的玩家应用治愈池效果
      *
-     * @param player 游戏玩家
+     * @param gamePlayer 游戏玩家
      * @param gameTeam 游戏团队
      */
-    private void applyHealingPoolEffect(GamePlayer player, GameTeam gameTeam) {
-        double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
+    private void applyHealingPoolEffect(GamePlayer gamePlayer, GameTeam gameTeam) {
+        double distance = gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
         
         if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPoolUpgrade()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType regeneration = XPotion.REGENERATION.get();
                 if (regeneration != null) {
-                    player.getPlayer().addPotionEffect(new PotionEffect(regeneration, 
+                    gamePlayer.getPlayer().addPotionEffect(new PotionEffect(regeneration,
                         CONFIG.getUpgrade().getRegenerationEffectDuration(),
                         CONFIG.getUpgrade().getRegenerationEffectAmplifier()));
                 }
@@ -145,60 +146,115 @@ public class GameStartEvent extends AbstractGameEvent {
     /**
      * 处理敌方玩家进入团队领地触发的陷阱
      *
-     * @param player 游戏玩家
+     * @param gamePlayer 游戏玩家
      * @param gameTeam 游戏团队
      */
-    private void handleEnemyInTeamTerritory(GamePlayer player, GameTeam gameTeam) {
-        double distance = player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
+    private void handleEnemyInTeamTerritory(GamePlayer gamePlayer, GameTeam gameTeam) {
+        double distance = gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
         TrapManager trapManager = gameTeam.getTrapManager();
 
         if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
-            // 触发普通陷阱
+            // 触发致盲陷阱
             if (trapManager.isTrapActive(TrapType.BLINDNESS)) {
-                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger normal trap, player: " + player.getName());
-                triggerTrap(player, gameTeam);
+                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger blindness trap, gamePlayer: " + gamePlayer.getName());
+                triggerBlindnessTrap(gamePlayer, gameTeam);
+            }
+
+            // 触发反击陷阱
+            if (trapManager.isTrapActive(TrapType.FIGHT_BACK)) {
+                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger fightback trap, gamePlayer: " + gamePlayer.getName());
+                triggerFightbackTrap(gamePlayer, gameTeam);
+            }
+
+            // 触发反击陷阱
+            if (trapManager.isTrapActive(TrapType.ALARM)) {
+                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger alarm trap, gamePlayer: " + gamePlayer.getName());
+                triggerAlarmTrap(gamePlayer, gameTeam);
             }
             
             // 触发挖掘疲劳陷阱
             if (trapManager.isTrapActive(TrapType.MINER)) {
-                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger mining fatigue trap, player: " + player.getName());
-                triggerMiningFatigueTrap(player, gameTeam);
+                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger mining fatigue trap, gamePlayer: " + gamePlayer.getName());
+                triggerMinerTrap(gamePlayer, gameTeam);
             }
         }
     }
     
     /**
-     * 触发团队陷阱效果
+     * 触发失明陷阱
      *
-     * @param player 触发陷阱的玩家
+     * @param gamePlayer 触发陷阱的玩家
      * @param gameTeam 拥有陷阱的团队
      */
-    private void triggerTrap(GamePlayer player, GameTeam gameTeam) {
+    private void triggerBlindnessTrap(GamePlayer gamePlayer, GameTeam gameTeam) {
         TrapManager trapManager = gameTeam.getTrapManager();
         trapManager.deactivateTrap(TrapType.BLINDNESS);
 
-        // 给敌方玩家添加失明效果
+        // 给敌方玩家添加 失明 缓慢 效果
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
             PotionEffectType blindness = XPotion.BLINDNESS.get();
-            if (blindness != null) {
-                player.getPlayer().addPotionEffect(new PotionEffect(blindness, 
+            gamePlayer.getPlayer().addPotionEffect(new PotionEffect(blindness,
                     CONFIG.getUpgrade().getTrapEffectDuration(),
                     CONFIG.getUpgrade().getTrapEffectAmplifier()));
-            }
-        });
 
-        // 给敌方玩家添加缓慢效果
-        AzuraBedWars.getInstance().mainThreadRunnable(() -> {
             PotionEffectType slowness = XPotion.SLOWNESS.get();
-            if (slowness != null) {
-                player.getPlayer().addPotionEffect(new PotionEffect(slowness, 
+            gamePlayer.getPlayer().addPotionEffect(new PotionEffect(slowness,
                     CONFIG.getUpgrade().getTrapEffectDuration(),
                     CONFIG.getUpgrade().getTrapEffectAmplifier()));
-            }
         });
 
         // 通知团队成员陷阱被触发
         announceTrapTrigger(gameTeam);
+    }
+
+    /**
+     * 触发反击陷阱
+     *
+     * @param gamePlayer 触发陷阱的玩家
+     * @param gameTeam 拥有陷阱的团队
+     */
+    private void triggerFightbackTrap(GamePlayer gamePlayer, GameTeam gameTeam) {
+        TrapManager trapManager = gameTeam.getTrapManager();
+        trapManager.deactivateTrap(TrapType.FIGHT_BACK);
+
+        // 给己方玩家添加速度和跳跃提升效果
+        AzuraBedWars.getInstance().mainThreadRunnable(() -> {
+            PotionEffectType blindness = XPotion.SPEED.get();
+            PotionEffectType jumpBoost = XPotion.JUMP_BOOST.get();
+            gameTeam.getAlivePlayers().forEach(player -> {
+                player.getPlayer().addPotionEffect(new PotionEffect(blindness,
+                        15,
+                        1));
+
+                player.getPlayer().addPotionEffect(new PotionEffect(jumpBoost,
+                        15,
+                        1));
+            });
+        });
+
+        // 通知团队成员陷阱被触发
+        announceTrapTrigger(gameTeam);
+    }
+
+    /**
+     * 触发警报陷阱
+     *
+     * @param gamePlayer 触发陷阱的玩家
+     * @param gameTeam 拥有陷阱的团队
+     */
+    private void triggerAlarmTrap(GamePlayer gamePlayer, GameTeam gameTeam) {
+        TrapManager trapManager = gameTeam.getTrapManager();
+        trapManager.deactivateTrap(TrapType.ALARM);
+
+        if (PlayerInvisibilityListener.isPlayerInvisible(gamePlayer)) {
+            PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
+        }
+
+        // 通知团队成员陷阱被触发
+        AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
+            player1.sendTitle("§c§l陷阱触发！", "&e触发者 " + gamePlayer.getGameTeam().getName() + gamePlayer.getName(), 0, 40, 0);
+            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+        })));
     }
     
     /**
@@ -207,7 +263,10 @@ public class GameStartEvent extends AbstractGameEvent {
      * @param player 触发陷阱的玩家
      * @param gameTeam 拥有陷阱的团队
      */
-    private void triggerMiningFatigueTrap(GamePlayer player, GameTeam gameTeam) {
+    private void triggerMinerTrap(GamePlayer player, GameTeam gameTeam) {
+        TrapManager trapManager = gameTeam.getTrapManager();
+        trapManager.deactivateTrap(TrapType.MINER);
+
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
             PotionEffectType miningFatigue = XPotion.MINING_FATIGUE.get();
             if (miningFatigue != null) {
@@ -216,9 +275,6 @@ public class GameStartEvent extends AbstractGameEvent {
                     CONFIG.getUpgrade().getMiningFatigueEffectAmplifier()));
             }
         });
-
-        TrapManager trapManager = gameTeam.getTrapManager();
-        trapManager.deactivateTrap(TrapType.MINER);
 
         // 通知团队成员陷阱被触发
         announceTrapTrigger(gameTeam);
