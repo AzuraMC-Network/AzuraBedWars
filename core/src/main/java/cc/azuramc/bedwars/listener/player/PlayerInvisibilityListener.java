@@ -22,7 +22,6 @@ import java.util.Map;
 public class PlayerInvisibilityListener implements Listener {
 
     private final AzuraBedWars plugin;
-    private static final Map<GamePlayer, Boolean> playerInvisibleState = new HashMap<>();
     private static final Map<GamePlayer, BukkitRunnable> invisibilityTasks = new HashMap<>();
 
     public PlayerInvisibilityListener(AzuraBedWars plugin) {
@@ -53,14 +52,13 @@ public class PlayerInvisibilityListener implements Listener {
             LoggerUtil.debug("PlayerInvisibilityListener$onDrink | invisible player is " + player.getName());
 
             // 如果玩家已经隐身，取消之前的任务
-            if (playerInvisibleState.containsKey(gamePlayer) &&
-                    playerInvisibleState.get(gamePlayer)) {
+            if (gamePlayer.isInvisible()) {
                 cancelInvisibilityTask(gamePlayer);
             }
 
             // 隐藏装备
             plugin.getNmsAccess().hideArmor(gamePlayer, GamePlayer.getGamePlayers());
-            playerInvisibleState.put(gamePlayer, true);
+            gamePlayer.setInvisible(true);
 
             BukkitRunnable invisibilityTask = new BukkitRunnable() {
                 @Override
@@ -90,7 +88,8 @@ public class PlayerInvisibilityListener implements Listener {
         if (gamePlayer.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
             gamePlayer.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
         }
-        playerInvisibleState.remove(gamePlayer);
+
+        gamePlayer.setInvisible(false);
         invisibilityTasks.remove(gamePlayer);
     }
 
@@ -110,21 +109,14 @@ public class PlayerInvisibilityListener implements Listener {
      */
     public static void cleanupPlayer(GamePlayer gamePlayer) {
         cancelInvisibilityTask(gamePlayer);
-        playerInvisibleState.remove(gamePlayer);
-    }
-
-    /**
-     * 检查玩家是否处于隐身状态
-     */
-    public static boolean isPlayerInvisible(GamePlayer gamePlayer) {
-        return playerInvisibleState.getOrDefault(gamePlayer, false);
+        gamePlayer.setInvisible(false);
     }
 
     /**
      * 强制结束玩家隐身（例如玩家死亡时）
      */
     public static void forceEndInvisibility(GamePlayer gamePlayer) {
-        if (isPlayerInvisible(gamePlayer)) {
+        if (gamePlayer.isInvisible()) {
             cancelInvisibilityTask(gamePlayer);
             endInvisibility(gamePlayer);
         }
