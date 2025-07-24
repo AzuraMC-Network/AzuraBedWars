@@ -5,11 +5,7 @@ import cc.azuramc.bedwars.api.event.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.*;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
 import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
@@ -17,7 +13,10 @@ import cc.azuramc.bedwars.util.VaultUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -424,11 +423,6 @@ public class PlayerDamageListener implements Listener {
             event.setDamage(event.getFinalDamage() * EXPLOSION_DAMAGE_RATE);
         }
 
-        // 处理玩家复活保护
-        if (PlayerRespawnListener.RESPAWN_PROTECT.get(gamePlayer) != null) {
-            PlayerRespawnListener.RESPAWN_PROTECT.remove(gamePlayer);
-        }
-
         // 玩家攻击移除隐身
         if (PlayerInvisibilityListener.isPlayerInvisible(gamePlayer)) {
             PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
@@ -576,6 +570,11 @@ public class PlayerDamageListener implements Listener {
         if (gamePlayer.getGameTeam().isInTeam(attackPlayer)) {
             event.setCancelled(true);
             return;
+        }
+
+        // 处理玩家复活保护
+        if (PlayerRespawnListener.RESPAWN_PROTECT.contains(attackPlayer)) {
+            PlayerRespawnListener.RESPAWN_PROTECT.remove(gamePlayer);
         }
 
         // 普通攻击伤害显示

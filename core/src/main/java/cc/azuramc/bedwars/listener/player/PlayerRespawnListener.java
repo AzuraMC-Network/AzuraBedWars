@@ -7,8 +7,8 @@ import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.item.tool.ToolType;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.item.tool.ToolType;
 import com.cryptomorin.xseries.XSound;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -23,7 +23,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 玩家重生事件监听器
@@ -58,7 +59,7 @@ public class PlayerRespawnListener implements Listener {
     private static final String REJOIN_BUTTON = MESSAGE_CONFIG.getRejoinButton();
     private static final String REJOIN_COMMAND = MESSAGE_CONFIG.getRejoinCommand();
     
-    public static final Map<GamePlayer, Boolean> RESPAWN_PROTECT = new HashMap<>();
+    public static final List<GamePlayer> RESPAWN_PROTECT = new ArrayList<>();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
     /**
@@ -106,7 +107,7 @@ public class PlayerRespawnListener implements Listener {
             return;
         }
 
-        if (!RESPAWN_PROTECT.containsKey(GamePlayer.get(player))) {
+        if (!RESPAWN_PROTECT.contains(GamePlayer.get(player))) {
             return;
         }
 
@@ -288,7 +289,7 @@ public class PlayerRespawnListener implements Listener {
      * @param gamePlayer 游戏玩家玩家
      */
     private void applyDamageProtection(GamePlayer gamePlayer) {
-        RESPAWN_PROTECT.put(gamePlayer, false);
+        RESPAWN_PROTECT.add(gamePlayer);
         Bukkit.getScheduler().runTaskLater(
             AzuraBedWars.getInstance(), 
             () -> RESPAWN_PROTECT.remove(gamePlayer),
