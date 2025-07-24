@@ -27,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,7 +71,10 @@ public class GamePlayer {
     private boolean isEggBridgeCooldown;
     private boolean isViewingArrowDamage;
     private boolean isViewingAttackDamage;
+
+    // 隐身相关
     private boolean isInvisible;
+    private BukkitRunnable invisibilityTask;
     
     // 装备状态
     private ArmorType armorType;
@@ -185,6 +189,36 @@ public class GamePlayer {
             }
         }
         return teamPlayers;
+    }
+
+    /**
+     * 开始隐身任务
+     */
+    public void startInvisibilityTask() {
+        AzuraBedWars.getInstance().getNmsAccess().hideArmor(this, GamePlayer.getGamePlayers());
+        this.setInvisible(true);
+        invisibilityTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                endInvisibility();
+            }
+        };
+        invisibilityTask.runTaskLater(AzuraBedWars.getInstance(), 30 * 20);
+    }
+
+    /**
+     * 取消隐身任务
+     */
+    public void endInvisibility() {
+        AzuraBedWars.getInstance().getNmsAccess().showArmor(this, GamePlayer.getGamePlayers());
+        if (this.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+            this.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
+        }
+
+        this.setInvisible(false);
+        if (invisibilityTask != null) {
+            invisibilityTask.cancel();
+        }
     }
 
     /**

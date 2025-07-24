@@ -10,7 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -53,72 +52,9 @@ public class PlayerInvisibilityListener implements Listener {
 
             // 如果玩家已经隐身，取消之前的任务
             if (gamePlayer.isInvisible()) {
-                cancelInvisibilityTask(gamePlayer);
+                gamePlayer.endInvisibility();
             }
-
-            // 隐藏装备
-            plugin.getNmsAccess().hideArmor(gamePlayer, GamePlayer.getGamePlayers());
-            gamePlayer.setInvisible(true);
-
-            BukkitRunnable invisibilityTask = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    endInvisibility(gamePlayer);
-                }
-            };
-
-            // 30秒 = 30 * 20 ticks
-            invisibilityTask.runTaskLater(plugin, 30 * 20);
-            invisibilityTasks.put(gamePlayer, invisibilityTask);
         }
     }
 
-    /**
-     * 结束玩家隐身状态
-     */
-    private static void endInvisibility(GamePlayer gamePlayer) {
-        if (gamePlayer == null) {
-            return;
-        }
-        if (gamePlayer.isOnline()) {
-            AzuraBedWars.getInstance().getNmsAccess().showArmor(gamePlayer, GamePlayer.getGamePlayers());
-            LoggerUtil.debug("PlayerInvisibilityListener$endInvisibility | player " + gamePlayer.getName() + " invisibility ended");
-        }
-
-        if (gamePlayer.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-            gamePlayer.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
-        }
-
-        gamePlayer.setInvisible(false);
-        invisibilityTasks.remove(gamePlayer);
-    }
-
-    /**
-     * 取消隐身任务
-     */
-    private static void cancelInvisibilityTask(GamePlayer gamePlayer) {
-        BukkitRunnable task = invisibilityTasks.get(gamePlayer);
-        if (task != null) {
-            task.cancel();
-            invisibilityTasks.remove(gamePlayer);
-        }
-    }
-
-    /**
-     * 清理玩家数据（玩家离开时调用）
-     */
-    public static void cleanupPlayer(GamePlayer gamePlayer) {
-        cancelInvisibilityTask(gamePlayer);
-        gamePlayer.setInvisible(false);
-    }
-
-    /**
-     * 强制结束玩家隐身（例如玩家死亡时）
-     */
-    public static void forceEndInvisibility(GamePlayer gamePlayer) {
-        if (gamePlayer.isInvisible()) {
-            cancelInvisibilityTask(gamePlayer);
-            endInvisibility(gamePlayer);
-        }
-    }
 }

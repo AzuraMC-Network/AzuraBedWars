@@ -18,7 +18,7 @@ public class PlayerQuitListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         event.setQuitMessage(null);
         GamePlayer gamePlayer = GamePlayer.get(event.getPlayer());
-        PlayerInvisibilityListener.cleanupPlayer(gamePlayer);
+        gamePlayer.endInvisibility();
         gameManager.removePlayers(gamePlayer);
     }
 }
