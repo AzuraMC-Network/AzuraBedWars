@@ -1027,10 +1027,6 @@ public class TeamShopGUI extends CustomGUI {
         player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
     }
-
-    private void applyResourceFurnaceUpgrade(GameManager gameManager, int level) {
-
-    }
     
     /**
      * 处理经验支付
