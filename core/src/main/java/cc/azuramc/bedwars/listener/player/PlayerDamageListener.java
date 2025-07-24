@@ -577,6 +577,11 @@ public class PlayerDamageListener implements Listener {
             PlayerRespawnListener.RESPAWN_PROTECT.remove(gamePlayer);
         }
 
+        // 如果玩家在保护状态下 不显示攻击伤害信息
+        if (PlayerRespawnListener.RESPAWN_PROTECT.contains(gamePlayer)) {
+            return;
+        }
+
         // 普通攻击伤害显示
         if (ATTACK_DISPLAY_ENABLED && attackPlayer.isViewingArrowDamage()) {
             int finalDamage = (int) (event.getFinalDamage() + 0.5);
