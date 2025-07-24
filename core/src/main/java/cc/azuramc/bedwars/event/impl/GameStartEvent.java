@@ -10,7 +10,6 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.trap.TrapManager;
 import cc.azuramc.bedwars.game.trap.TrapType;
-import cc.azuramc.bedwars.listener.player.PlayerInvisibilityListener;
 import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XPotion;
@@ -247,7 +246,7 @@ public class GameStartEvent extends AbstractGameEvent {
         trapManager.deactivateTrap(TrapType.ALARM);
 
         if (gamePlayer.isInvisible()) {
-            PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
+            gamePlayer.endInvisibility();
         }
 
         // 通知团队成员陷阱被触发
