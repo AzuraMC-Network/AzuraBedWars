@@ -516,6 +516,10 @@ public class GamePlayer {
                 player.getInventory().getArmorContents()[i].addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getProtectionUpgrade());
             }
         }
+
+        if (gameTeam.getFallingProtectionUpgrade() > 0) {
+            player.getInventory().getArmorContents()[3].addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getFallingProtectionUpgrade());
+        }
     }
 
     public void giveSword(boolean remove) {
