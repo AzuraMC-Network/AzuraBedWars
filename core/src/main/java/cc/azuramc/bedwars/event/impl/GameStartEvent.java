@@ -246,7 +246,7 @@ public class GameStartEvent extends AbstractGameEvent {
         TrapManager trapManager = gameTeam.getTrapManager();
         trapManager.deactivateTrap(TrapType.ALARM);
 
-        if (PlayerInvisibilityListener.isPlayerInvisible(gamePlayer)) {
+        if (gamePlayer.isInvisible()) {
             PlayerInvisibilityListener.forceEndInvisibility(gamePlayer);
         }
 
