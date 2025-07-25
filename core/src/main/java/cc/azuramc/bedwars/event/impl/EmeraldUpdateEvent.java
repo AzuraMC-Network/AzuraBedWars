@@ -1,9 +1,11 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.task.GeneratorManager;
+import cc.azuramc.bedwars.game.task.generator.ResourceGenerator;
 
 /**
  * 绿宝石资源点升级事件
@@ -51,17 +53,16 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
      */
     @Override
     public void execute(GameManager gameManager) {
-        // 获取绿宝石刷新任务
-        GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().get(EVENT_NAME);
-        if (gameEventRunnable == null) {
-            return; // 防止NPE
+        GeneratorManager genManager = gameManager.getGeneratorManager();
+        ResourceGenerator emeraldGen = genManager.getGenerator("绿宝石");
+        if (emeraldGen == null) {
+            return;
         }
-
-        // 根据等级设置新的刷新时间
         int newRefreshSeconds = getRefreshSecondsForLevel();
-        
-        // 调整当前周期和未来周期的刷新时间
-        updateRefreshTime(gameEventRunnable, newRefreshSeconds);
+        emeraldGen.setInterval(newRefreshSeconds * 20L);
+        emeraldGen.setLevel(level);
+        int newMaxStack = genManager.getMaxStackForResource("绿宝石", level);
+        emeraldGen.setMaxStack(newMaxStack);
     }
     
     /**
