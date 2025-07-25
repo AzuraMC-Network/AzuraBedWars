@@ -185,6 +185,49 @@ public class GeneratorManager {
         initResourceDisplayUpdater("钻石", DIAMOND_GENERATOR_NAME, gameManager.getArmorStand().keySet(), DIAMOND_NAME);
         initResourceDisplayUpdater("绿宝石", EMERALD_GENERATOR_NAME, gameManager.getArmorSande().keySet(), EMERALD_NAME);
     }
+    private void updateResourceDisplay(Set<ArmorStand> armorStands, ResourceGenerator generator, String resourceDisplayName) {
+        Iterator<ArmorStand> iterator = armorStands.iterator();
+        while (iterator.hasNext()) {
+            ArmorStand armorStand = iterator.next();
+            if (armorStand == null || !armorStand.isValid()) {
+                iterator.remove();
+                continue;
+            }
+            Location location = armorStand.getLocation();
+            if (location.getWorld() == null || !location.getChunk().isLoaded()) {
+                continue;
+            }
+            if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
+                int timeRemaining = generator.getSecondsToNextDrop();
+                String displayText = String.format(TIME_REMAINING_FORMAT, timeRemaining);
+                armorStand.setCustomName(displayText);
+            }
+            if (armorStand.getFallDistance() == RESOURCE_TYPE_HEIGHT) {
+                armorStand.setCustomName(resourceDisplayName);
+            }
+            if (armorStand.getFallDistance() == LEVEL_DISPLAY_HEIGHT) {
+                int level = generator.getLevel();
+                String levelDisplay = level <= 1 ? LEVEL_I : (level == 2 ? LEVEL_II : LEVEL_III);
+                armorStand.setCustomName(levelDisplay);
+            }
+        }
+    }
+    public void immediateUpdateDisplay(String generatorName) {
+        ResourceGenerator generator = getGenerator(generatorName);
+        if (generator == null) return;
+        Set<ArmorStand> armorStands;
+        String resourceDisplayName;
+        if (generatorName.equals(DIAMOND_GENERATOR_NAME)) {
+            armorStands = new HashSet<>(gameManager.getArmorStand().keySet());
+            resourceDisplayName = DIAMOND_NAME;
+        } else if (generatorName.equals(EMERALD_GENERATOR_NAME)) {
+            armorStands = new HashSet<>(gameManager.getArmorSande().keySet());
+            resourceDisplayName = EMERALD_NAME;
+        } else {
+            return;
+        }
+        updateResourceDisplay(armorStands, generator, resourceDisplayName);
+    }
     private void initResourceDisplayUpdater(String resourceName, String generatorName, Set<ArmorStand> armorStands, String resourceDisplayName) {
         if (armorStands == null || armorStands.isEmpty()) {
             LoggerUtil.warn("尝试初始化资源显示更新，但盔甲架集合为空: " + generatorName);
@@ -196,32 +239,6 @@ public class GeneratorManager {
             LoggerUtil.warn("无法找到生成器: " + resourceName);
             return;
         }
-        Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> {
-            Iterator<ArmorStand> iterator = safeArmorStands.iterator();
-            while (iterator.hasNext()) {
-                ArmorStand armorStand = iterator.next();
-                if (armorStand == null || !armorStand.isValid()) {
-                    iterator.remove();
-                    continue;
-                }
-                Location location = armorStand.getLocation();
-                if (location.getWorld() == null || !location.getChunk().isLoaded()) {
-                    continue;
-                }
-                if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
-                    int timeRemaining = generator.getSecondsToNextDrop();
-                    String displayText = String.format(TIME_REMAINING_FORMAT, timeRemaining);
-                    armorStand.setCustomName(displayText);
-                }
-                if (armorStand.getFallDistance() == RESOURCE_TYPE_HEIGHT) {
-                    armorStand.setCustomName(resourceDisplayName);
-                }
-                if (armorStand.getFallDistance() == LEVEL_DISPLAY_HEIGHT) {
-                    int level = generator.getLevel();
-                    String levelDisplay = level <= 1 ? LEVEL_I : (level == 2 ? LEVEL_II : LEVEL_III);
-                    armorStand.setCustomName(levelDisplay);
-                }
-            }
-        }, 0L, 20L);
+        Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> updateResourceDisplay(safeArmorStands, generator, resourceDisplayName), 0L, 20L);
     }
 }
