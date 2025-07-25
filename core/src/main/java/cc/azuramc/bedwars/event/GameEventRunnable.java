@@ -18,9 +18,9 @@ public class GameEventRunnable {
          * 游戏自定义用EventRunnable
          *
          * @param seconds 时间
-         * @param currentEvent 当前事件
+         * @param currentEventLevel 当前事件等级
          */
-        void run(int seconds, int currentEvent);
+        void run(int seconds, int currentEventLevel);
     }
 }
 

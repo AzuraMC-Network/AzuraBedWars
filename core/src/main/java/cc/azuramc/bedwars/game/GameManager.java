@@ -12,6 +12,7 @@ import cc.azuramc.bedwars.event.GameEventManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.task.GameStartTask;
+import cc.azuramc.bedwars.game.task.GeneratorManager;
 import cc.azuramc.bedwars.jedis.JedisManager;
 import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
@@ -64,6 +65,7 @@ public class GameManager {
     private boolean attackDisplayEnabled;
 
     private AzuraBedWars plugin;
+    private GeneratorManager generatorManager;
     private GameEventManager gameEventManager;
     private MapData mapData;
     private GameState gameState;
@@ -98,6 +100,7 @@ public class GameManager {
         this.armorStand = new HashMap<>();
         this.abstractSpecialItems = new ArrayList<>();
         ShopManager.init(this);
+        this.generatorManager = new GeneratorManager(this);
         this.gameEventManager = new GameEventManager(this);
         initializeConfigs();
     }
