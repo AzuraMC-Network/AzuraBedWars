@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.event;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.event.impl.*;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.event.impl.*;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -183,13 +183,13 @@ public class GameEventManager implements Runnable {
                 if (task.getSeconds() != 0) {
                     // 周期性任务
                     if (task.getNextSeconds() == task.getSeconds()) {
-                        task.getEvent().run(0, currentEvent);
+                        task.getEvent().run(0, this.currentEvent);
                         task.setNextSeconds(0);
                     }
                     task.setNextSeconds(task.getNextSeconds() + 1);
                 } else {
                     // 持续性任务
-                    task.getEvent().run(seconds, currentEvent);
+                    task.getEvent().run(seconds, this.currentEvent);
                 }
             } catch (Exception e) {
                 LoggerUtil.warn("任务 '" + name + "' 执行错误: " + e.getMessage());
