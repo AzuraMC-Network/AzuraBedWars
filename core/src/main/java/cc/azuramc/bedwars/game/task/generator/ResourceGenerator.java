@@ -30,6 +30,8 @@ public class ResourceGenerator extends BukkitRunnable {
     private final MapData.DropType dropType;
     private int maxStack;
     private long interval = 20L;
+     private int level = 1;
+    private long lastDropTime = 0;
     private BukkitRunnable currentTask;
     private final GameManager gameManager;
 
@@ -47,11 +49,13 @@ public class ResourceGenerator extends BukkitRunnable {
         this.material = material;
         this.dropType = dropType;
         this.maxStack = maxStack;
+        this.lastDropTime = System.currentTimeMillis();
     }
 
     @Override
     public void run() {
         gameManager.getMapData().getDropLocations(dropType).forEach(location -> dropItem(location, material, getMaxStack()));
+        lastDropTime = System.currentTimeMillis();
     }
 
     /**
@@ -132,4 +136,21 @@ public class ResourceGenerator extends BukkitRunnable {
         return count;
     }
 
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getSecondsToNextDrop() {
+        long now = System.currentTimeMillis();
+        long intervalMs = interval * 50;
+        if (intervalMs <= 0) return 0;
+        long timeSinceLast = now - lastDropTime;
+        long timeInCurrent = timeSinceLast % intervalMs;
+        long timeToNext = intervalMs - timeInCurrent;
+        return (int) Math.ceil((double) timeToNext / 1000);
+    }
 }
