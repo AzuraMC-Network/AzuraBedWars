@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
+import cc.azuramc.bedwars.game.GameManager;
 
 /**
  * 钻石资源点升级事件
@@ -21,7 +21,7 @@ public class DiamondUpdateEvent extends AbstractGameEvent {
     private static final String EVENT_NAME = PLUGIN.getMessageConfig().getDiamondUpdate().getEventName();
 
     /**
-     *     定义各等级的钻石刷新时间（秒）
+     * 定义各等级的钻石刷新时间（秒）
      */
     private static final int LEVEL_2_REFRESH_SECONDS = PLUGIN.getEventConfig().getDiamondUpdateEvent().getLevel2RefreshSecond();
     private static final int LEVEL_3_REFRESH_SECONDS = PLUGIN.getEventConfig().getDiamondUpdateEvent().getLevel3RefreshSecond();

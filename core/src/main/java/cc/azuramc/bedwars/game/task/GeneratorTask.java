@@ -5,11 +5,9 @@ import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.util.ArmorStandUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
-import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -217,57 +215,7 @@ public class GeneratorTask {
      * 注册所有资源生成器
      */
     private void registerResourceGenerators() {
-        // 获取GeneratorManager实例
-        GeneratorManager generatorManager = gameManager.getGeneratorManager();
-        int currentEventLevel = gameManager.getGameEventManager().currentEvent().getPriority();
-
-        // 铁锭生成器
-        ResourceGenerator ironGenerator = null;
-        if (XMaterial.IRON_INGOT.get() != null) {
-            ironGenerator = new ResourceGenerator(
-                    gameManager,
-                    XMaterial.IRON_INGOT.get(),
-                    MapData.DropType.BASE,
-                    currentEventLevel
-            );
-        }
-        generatorManager.addTask(IRON_GENERATOR_NAME, ironGenerator);
-
-        // 金锭生成器
-        ResourceGenerator goldGenerator = null;
-        if (XMaterial.GOLD_INGOT.get() != null) {
-            goldGenerator = new ResourceGenerator(
-                    gameManager,
-                    XMaterial.GOLD_INGOT.get(),
-                    MapData.DropType.BASE,
-                    currentEventLevel
-            );
-        }
-        generatorManager.addTask(GOLD_GENERATOR_NAME, goldGenerator);
-
-        // 钻石生成器
-        ResourceGenerator diamondGenerator = null;
-        if (XMaterial.DIAMOND.get() != null) {
-            diamondGenerator = new ResourceGenerator(
-                    gameManager,
-                    XMaterial.DIAMOND.get(),
-                    MapData.DropType.DIAMOND,
-                    currentEventLevel
-            );
-        }
-        generatorManager.addTask(DIAMOND_GENERATOR_NAME, diamondGenerator);
-
-        // 绿宝石生成器
-        ResourceGenerator emeraldGenerator = null;
-        if (XMaterial.EMERALD.get() != null) {
-            emeraldGenerator = new ResourceGenerator(
-                    gameManager,
-                    XMaterial.EMERALD.get(),
-                    MapData.DropType.EMERALD,
-                    currentEventLevel
-            );
-        }
-        generatorManager.addTask(EMERALD_GENERATOR_NAME, emeraldGenerator);
+        gameManager.getGeneratorManager().initGeneratorTasks();
     }
     
     /**
@@ -303,8 +251,7 @@ public class GeneratorTask {
      * @param armorStands 盔甲架集合
      * @param resourceName 资源名称
      */
-    private void registerResourceDisplay(String displayName, String generatorName, 
-                                       java.util.Set<ArmorStand> armorStands, String resourceName) {
+    private void registerResourceDisplay(String displayName, String generatorName, Set<ArmorStand> armorStands, String resourceName) {
         if (armorStands == null || armorStands.isEmpty()) {
             LoggerUtil.warn("尝试注册资源显示，但盔甲架集合为空: " + displayName);
             return;
