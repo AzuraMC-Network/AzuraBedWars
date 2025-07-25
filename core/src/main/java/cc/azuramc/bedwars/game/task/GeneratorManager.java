@@ -2,6 +2,9 @@ package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.map.MapData;
+import cc.azuramc.bedwars.game.task.generator.ResourceGenerator;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -13,31 +16,75 @@ import java.util.Map;
 public class GeneratorManager {
 
     private final GameManager gameManager;
-    private Map<String, BukkitRunnable> tasks;
+    private final Map<String, BukkitRunnable> tasks;
 
     public GeneratorManager(GameManager gameManager) {
         this.gameManager = gameManager;
         this.tasks = new HashMap<>();
     }
 
-    /**
-     * 添加任务，使用默认间隔（每秒一次）
-     * 
-     * @param taskName 任务名称
-     * @param task 任务实例
-     */
-    public void addTask(String taskName, BukkitRunnable task) {
-        addTask(taskName, task, 20L); // 默认每秒执行一次
+    public void initGeneratorTasks() {
+        ResourceGenerator iron = null;
+        if (XMaterial.IRON_INGOT.get() != null) {
+            iron = new ResourceGenerator(
+                    gameManager,
+                    "铁锭",
+                    XMaterial.IRON_INGOT.get(),
+                    MapData.DropType.BASE,
+                    48
+            );
+        }
+        addTask(iron, 20L);
+
+        ResourceGenerator gold = null;
+        if (XMaterial.GOLD_INGOT.get() != null) {
+            gold = new ResourceGenerator(
+                    gameManager,
+                    "金锭",
+                    XMaterial.GOLD_INGOT.get(),
+                    MapData.DropType.BASE,
+                    8
+            );
+        }
+        addTask(gold, 20L * 3L);
+
+        ResourceGenerator diamond = null;
+        if (XMaterial.DIAMOND.get() != null) {
+            diamond = new ResourceGenerator(
+                    gameManager,
+                    "钻石",
+                    XMaterial.DIAMOND.get(),
+                    MapData.DropType.DIAMOND,
+                    4
+            );
+        }
+        addTask(diamond, 20L * 35L);
+
+        ResourceGenerator emerald = null;
+        if (XMaterial.EMERALD.get() != null) {
+            emerald = new ResourceGenerator(
+                    gameManager,
+                    "绿宝石",
+                    XMaterial.EMERALD.get(),
+                    MapData.DropType.EMERALD,
+                    2
+            );
+        }
+        addTask(emerald, 20L * 60L);
     }
     
     /**
      * 添加任务，指定执行间隔
-     * 
-     * @param taskName 任务名称
+     *
      * @param task 任务实例
      * @param interval 执行间隔（刻）
      */
-    public void addTask(String taskName, BukkitRunnable task, long interval) {
+    public void addTask(ResourceGenerator task, long interval) {
+        if (task == null) {
+            return;
+        }
+
+        String taskName = task.getTaskName();
         // 如果已存在同名任务，取消旧任务
         if (tasks.containsKey(taskName)) {
             tasks.get(taskName).cancel();
@@ -45,11 +92,7 @@ public class GeneratorManager {
 
         // 添加新任务
         tasks.put(taskName, task);
-        
-        // 如果任务是ResourceGenerator类型，设置当前任务实例
-        if (task instanceof ResourceGenerator) {
-            ((ResourceGenerator) task).setCurrentTask(task);
-        }
+        task.setCurrentTask(task);
         
         // 启动任务
         task.runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
