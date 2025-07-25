@@ -4,6 +4,8 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.task.GeneratorManager;
+import cc.azuramc.bedwars.game.task.generator.ResourceGenerator;
 
 /**
  * 钻石资源点升级事件
@@ -51,17 +53,16 @@ public class DiamondUpdateEvent extends AbstractGameEvent {
      */
     @Override
     public void execute(GameManager gameManager) {
-        // 获取钻石刷新任务
-        GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().get(EVENT_NAME);
-        if (gameEventRunnable == null) {
-            return; // 防止NPE
+        GeneratorManager genManager = gameManager.getGeneratorManager();
+        ResourceGenerator diamondGen = genManager.getGenerator("钻石");
+        if (diamondGen == null) {
+            return;
         }
-
-        // 根据等级设置新的刷新时间
         int newRefreshSeconds = getRefreshSecondsForLevel();
-        
-        // 调整当前周期和未来周期的刷新时间
-        updateRefreshTime(gameEventRunnable, newRefreshSeconds);
+        diamondGen.setInterval(newRefreshSeconds * 20L);
+        diamondGen.setLevel(level);
+        int newMaxStack = genManager.getMaxStackForResource("钻石", level);
+        diamondGen.setMaxStack(newMaxStack);
     }
     
     /**

@@ -136,15 +136,9 @@ public class GeneratorTask {
     public void start() {
         if (!this.timer) {
             timer = true;
-
-            // 启动盔甲架位置更新任务
             startArmorStandUpdateTask();
-            
-            // 注册资源生成事件
-            registerResourceGenerators();
-            
-            // 注册资源显示更新事件
-            registerDisplayUpdaters();
+            gameManager.getGeneratorManager().initGeneratorTasks();
+            gameManager.getGeneratorManager().initDisplayUpdaters();
         }
     }
     
