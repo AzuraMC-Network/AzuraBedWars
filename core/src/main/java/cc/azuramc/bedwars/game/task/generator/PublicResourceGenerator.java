@@ -56,9 +56,7 @@ public class PublicResourceGenerator extends BukkitRunnable {
     public void run() {
         gameManager.getMapData().getDropLocations(dropType).forEach(location -> dropItem(location, material, getMaxStack()));
         lastDropTime = System.currentTimeMillis();
-        if (dropType == MapData.DropType.DIAMOND || dropType == MapData.DropType.EMERALD) {
-            gameManager.getGeneratorManager().immediateUpdateDisplay(taskName);
-        }
+        gameManager.getGeneratorManager().immediateUpdateDisplay(taskName);
     }
 
     /**
