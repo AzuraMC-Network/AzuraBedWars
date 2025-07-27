@@ -22,16 +22,10 @@ public class GeneratorManager {
     private final Map<String, PublicResourceGenerator> publicResourceGeneratorMap;
     private final Map<String, PrivateResourceGenerator> privateResourceGeneratorMap;
 
-    private final int MAX_IRON_STACK_LEVEL_1;
-    private final int MAX_GOLD_STACK_LEVEL_1;
     private final int MAX_DIAMOND_STACK_LEVEL_1;
     private final int MAX_EMERALD_STACK_LEVEL_1;
-    private final int MAX_IRON_STACK_LEVEL_2;
-    private final int MAX_GOLD_STACK_LEVEL_2;
     private final int MAX_DIAMOND_STACK_LEVEL_2;
     private final int MAX_EMERALD_STACK_LEVEL_2;
-    private final int MAX_IRON_STACK_LEVEL_3;
-    private final int MAX_GOLD_STACK_LEVEL_3;
     private final int MAX_DIAMOND_STACK_LEVEL_3;
     private final int MAX_EMERALD_STACK_LEVEL_3;
     private final float NAME_DISPLAY_HEIGHT;
@@ -52,16 +46,10 @@ public class GeneratorManager {
         this.privateResourceGeneratorMap = new HashMap<>();
 
         TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
-        MAX_IRON_STACK_LEVEL_1 = config.getMaxIronStackLevel1();
-        MAX_GOLD_STACK_LEVEL_1 = config.getMaxGoldStackLevel1();
         MAX_DIAMOND_STACK_LEVEL_1 = config.getMaxDiamondStackLevel1();
         MAX_EMERALD_STACK_LEVEL_1 = config.getMaxEmeraldStackLevel1();
-        MAX_IRON_STACK_LEVEL_2 = config.getMaxIronStackLevel2();
-        MAX_GOLD_STACK_LEVEL_2 = config.getMaxGoldStackLevel2();
         MAX_DIAMOND_STACK_LEVEL_2 = config.getMaxDiamondStackLevel2();
         MAX_EMERALD_STACK_LEVEL_2 = config.getMaxEmeraldStackLevel2();
-        MAX_IRON_STACK_LEVEL_3 = config.getMaxIronStackLevel3();
-        MAX_GOLD_STACK_LEVEL_3 = config.getMaxGoldStackLevel3();
         MAX_DIAMOND_STACK_LEVEL_3 = config.getMaxDiamondStackLevel3();
         MAX_EMERALD_STACK_LEVEL_3 = config.getMaxEmeraldStackLevel3();
         MessageConfig.Generator messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGenerator();
@@ -182,16 +170,6 @@ public class GeneratorManager {
 
     public int getMaxStackForResource(String resource, int level) {
         switch (resource) {
-            case "铁锭":
-                if (level == 1) return MAX_IRON_STACK_LEVEL_1;
-                if (level == 2) return MAX_IRON_STACK_LEVEL_2;
-                if (level == 3) return MAX_IRON_STACK_LEVEL_3;
-                break;
-            case "金锭":
-                if (level == 1) return MAX_GOLD_STACK_LEVEL_1;
-                if (level == 2) return MAX_GOLD_STACK_LEVEL_2;
-                if (level == 3) return MAX_GOLD_STACK_LEVEL_3;
-                break;
             case "钻石":
                 if (level == 1) return MAX_DIAMOND_STACK_LEVEL_1;
                 if (level == 2) return MAX_DIAMOND_STACK_LEVEL_2;
