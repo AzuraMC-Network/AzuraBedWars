@@ -187,6 +187,7 @@ public class GameManager {
         // 新 检测基地附近的羊毛颜色来确定队伍颜色
         for (int i = 0; i < mapData.getBases().size(); i++) {
             Location baseLocation = mapData.getBases().get(i).toLocation();
+            Location resourceDropLocation = mapData.getDropLocations(MapData.DropType.BASE).get(i);
             TeamColor teamColor = detectTeamColorFromWool(baseLocation);
             LoggerUtil.debug("GameManager$initializeTeams | detectTeamColorFromWool is " + teamColor);
 
@@ -206,6 +207,7 @@ public class GameManager {
             gameTeams.add(new GameTeam(
                     teamColor,
                     baseLocation,
+                    resourceDropLocation,
                     teamSize
             ));
         }
