@@ -1,11 +1,10 @@
-package cc.azuramc.bedwars.game.task;
+package cc.azuramc.bedwars.game.task.generator;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.map.MapData;
-import cc.azuramc.bedwars.game.task.generator.ResourceGenerator;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
@@ -125,7 +124,7 @@ public class GeneratorManager {
         }
         addTask(emerald, 20L * 60L);
     }
-    
+
     /**
      * 添加任务，指定执行间隔
      *

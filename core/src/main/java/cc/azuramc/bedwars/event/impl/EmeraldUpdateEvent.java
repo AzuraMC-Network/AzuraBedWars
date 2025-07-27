@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.task.GeneratorManager;
+import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.game.task.generator.ResourceGenerator;
 
 /**
@@ -64,10 +64,10 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
         int newMaxStack = genManager.getMaxStackForResource("绿宝石", level);
         emeraldGen.setMaxStack(newMaxStack);
     }
-    
+
     /**
      * 获取指定等级的刷新时间
-     * 
+     *
      * @return 刷新间隔（秒）
      */
     private int getRefreshSecondsForLevel() {
@@ -78,10 +78,10 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
             default -> LEVEL_2_REFRESH_SECONDS;
         };
     }
-    
+
     /**
      * 更新资源刷新时间
-     * 
+     *
      * @param gameEventRunnable 刷新任务
      * @param newRefreshSeconds 新的刷新时间（秒）
      */
@@ -90,7 +90,7 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
         if (gameEventRunnable.getNextSeconds() > newRefreshSeconds) {
             gameEventRunnable.setNextSeconds(newRefreshSeconds);
         }
-        
+
         // 设置未来周期的刷新间隔
         gameEventRunnable.setSeconds(newRefreshSeconds);
     }
