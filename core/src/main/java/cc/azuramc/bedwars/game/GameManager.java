@@ -12,7 +12,7 @@ import cc.azuramc.bedwars.event.GameEventManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.task.GameStartTask;
-import cc.azuramc.bedwars.game.task.GeneratorManager;
+import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.jedis.JedisManager;
 import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
@@ -179,7 +179,7 @@ public class GameManager {
         // for (int i = 0; i < mapData.getBases().size(); i++) {
         //     gameTeams.add(new GameTeam(
         //         TeamColor.values()[i],
-        //         mapData.getBases().get(i).toLocation(), 
+        //         mapData.getBases().get(i).toLocation(),
         //         mapData.getPlayers().getTeam()
         //     ));
         // }
