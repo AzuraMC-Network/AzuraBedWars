@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
@@ -67,13 +68,13 @@ public class GeneratorManager {
     }
 
     public void initGeneratorTasks() {
-        for (Location dropLocation : gameManager.getMapData().getDropLocations(MapData.DropType.BASE)) {
+        for (GameTeam gameTeam : gameManager.getGameTeams()) {
             PrivateResourceGenerator iron = null;
             if (XMaterial.IRON_INGOT.get() != null) {
                 iron = new PrivateResourceGenerator(
                         gameManager,
-                        "铁锭" + dropLocation.toString(),
-                        dropLocation,
+                        "铁锭" + gameTeam.getName(),
+                        gameTeam.getResourceDropLocation(),
                         XMaterial.IRON_INGOT.get(),
                         48
                 );
@@ -84,8 +85,8 @@ public class GeneratorManager {
             if (XMaterial.GOLD_INGOT.get() != null) {
                 gold = new PrivateResourceGenerator(
                         gameManager,
-                        "金锭" + dropLocation.toString(),
-                        dropLocation,
+                        "金锭" + gameTeam.getName(),
+                        gameTeam.getResourceDropLocation(),
                         XMaterial.GOLD_INGOT.get(),
                         8
                 );
