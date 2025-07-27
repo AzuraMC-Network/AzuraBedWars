@@ -7,11 +7,9 @@ import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.util.ArmorStandUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -27,38 +25,14 @@ public class GeneratorTask {
     private final GameManager gameManager;
     private boolean timer;
     private int taskId = -1;
-
-    private final int IRON_SPAWN_INTERVAL;
-    private final int GOLD_SPAWN_INTERVAL;
-    private final int DIAMOND_SPAWN_INTERVAL;
-    private final int EMERALD_SPAWN_INTERVAL;
-
-    private final int MAX_IRON_STACK_LEVEL_1;
-    private final int MAX_GOLD_STACK_LEVEL_1;
-    private final int MAX_DIAMOND_STACK_LEVEL_1;
-    private final int MAX_EMERALD_STACK_LEVEL_1;
-
-    private final int MAX_IRON_STACK_LEVEL_2;
-    private final int MAX_GOLD_STACK_LEVEL_2;
-    private final int MAX_DIAMOND_STACK_LEVEL_2;
-    private final int MAX_EMERALD_STACK_LEVEL_2;
-
-    private final int MAX_IRON_STACK_LEVEL_3;
-    private final int MAX_GOLD_STACK_LEVEL_3;
-    private final int MAX_DIAMOND_STACK_LEVEL_3;
-    private final int MAX_EMERALD_STACK_LEVEL_3;
-
     /**
      * 检测资源周围范围（方块）
      */
-    private final double RESOURCE_CHECK_RADIUS;
 
     private final float NAME_DISPLAY_HEIGHT;
     private final float RESOURCE_TYPE_HEIGHT;
     private final float LEVEL_DISPLAY_HEIGHT;
 
-    private final String IRON_GENERATOR_NAME;
-    private final String GOLD_GENERATOR_NAME;
     private final String DIAMOND_GENERATOR_NAME;
     private final String DIAMOND_TIME_DISPLAY;
     private final String EMERALD_GENERATOR_NAME;
@@ -71,9 +45,6 @@ public class GeneratorTask {
     private final String LEVEL_II;
     private final String LEVEL_III;
 
-    private final String ITEM_DISPLAY_NAME;
-    private final Vector ITEM_VELOCITY;
-
     /**
      * 创建资源生成计时器
      *
@@ -84,35 +55,10 @@ public class GeneratorTask {
         TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
         MessageConfig.Generator messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGenerator();
 
-        // 初始化所有配置值
-        IRON_SPAWN_INTERVAL = config.getIronSpawnInterval();
-        GOLD_SPAWN_INTERVAL = config.getGoldSpawnInterval();
-        DIAMOND_SPAWN_INTERVAL = config.getDiamondSpawnInterval();
-        EMERALD_SPAWN_INTERVAL = config.getEmeraldSpawnInterval();
-
-        MAX_IRON_STACK_LEVEL_1 = config.getMaxIronStackLevel1();
-        MAX_GOLD_STACK_LEVEL_1 = config.getMaxGoldStackLevel1();
-        MAX_DIAMOND_STACK_LEVEL_1 = config.getMaxDiamondStackLevel1();
-        MAX_EMERALD_STACK_LEVEL_1 = config.getMaxEmeraldStackLevel1();
-
-        MAX_IRON_STACK_LEVEL_2 = config.getMaxIronStackLevel2();
-        MAX_GOLD_STACK_LEVEL_2 = config.getMaxGoldStackLevel2();
-        MAX_DIAMOND_STACK_LEVEL_2 = config.getMaxDiamondStackLevel2();
-        MAX_EMERALD_STACK_LEVEL_2 = config.getMaxEmeraldStackLevel2();
-
-        MAX_IRON_STACK_LEVEL_3 = config.getMaxIronStackLevel3();
-        MAX_GOLD_STACK_LEVEL_3 = config.getMaxGoldStackLevel3();
-        MAX_DIAMOND_STACK_LEVEL_3 = config.getMaxDiamondStackLevel3();
-        MAX_EMERALD_STACK_LEVEL_3 = config.getMaxEmeraldStackLevel3();
-
-        RESOURCE_CHECK_RADIUS = config.getResourceCheckRadius();
-
         NAME_DISPLAY_HEIGHT = config.getNameDisplayHeight();
         RESOURCE_TYPE_HEIGHT = config.getResourceTypeHeight();
         LEVEL_DISPLAY_HEIGHT = config.getLevelDisplayHeight();
 
-        IRON_GENERATOR_NAME = messageConfig.getIronGeneratorName();
-        GOLD_GENERATOR_NAME = messageConfig.getGoldGeneratorName();
         DIAMOND_GENERATOR_NAME = messageConfig.getDiamondGeneratorName();
         DIAMOND_TIME_DISPLAY = messageConfig.getDiamondTimeDisplay();
         EMERALD_GENERATOR_NAME = messageConfig.getEmeraldGeneratorName();
@@ -124,9 +70,6 @@ public class GeneratorTask {
         LEVEL_I = messageConfig.getLevelI();
         LEVEL_II = messageConfig.getLevelII();
         LEVEL_III = messageConfig.getLevelIII();
-
-        ITEM_DISPLAY_NAME = MessageUtil.color("&a&a&a&a&a&a");
-        ITEM_VELOCITY = new Vector(config.getItemVelocityX(), config.getItemVelocityY(), config.getItemVelocityZ());
     }
 
     /**
@@ -141,7 +84,7 @@ public class GeneratorTask {
             gameManager.getGeneratorManager().initDisplayUpdaters();
         }
     }
-    
+
     /**
      * 停止所有计时器任务
      */
@@ -154,7 +97,7 @@ public class GeneratorTask {
             }
         }
     }
-    
+
     /**
      * 启动盔甲架位置更新任务
      */
@@ -162,13 +105,13 @@ public class GeneratorTask {
         taskId = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> {
             try {
                 List<ArmorStand> allArmor = new ArrayList<>();
-                
+
                 // 安全地添加盔甲架到列表中
                 if (gameManager.getArmorSande() != null) {
                     Set<ArmorStand> armorSandeSet = gameManager.getArmorSande().keySet();
                     allArmor.addAll(armorSandeSet);
                 }
-                
+
                 if (gameManager.getArmorStand() != null) {
                     Set<ArmorStand> armorStandSet = gameManager.getArmorStand().keySet();
                     allArmor.addAll(armorStandSet);
@@ -182,7 +125,7 @@ public class GeneratorTask {
                         iterator.remove();
                         continue;
                     }
-                    
+
                     try {
                         Location loc = as.getLocation();
                         if (loc.getWorld() != null) {
@@ -204,14 +147,14 @@ public class GeneratorTask {
             }
         }, 0L, 1L).getTaskId();
     }
-    
+
     /**
      * 注册所有资源生成器
      */
     private void registerResourceGenerators() {
         gameManager.getGeneratorManager().initGeneratorTasks();
     }
-    
+
     /**
      * 注册资源显示更新器
      */
@@ -219,15 +162,15 @@ public class GeneratorTask {
         try {
             // 钻石显示更新
             if (gameManager.getArmorStand() != null && !gameManager.getArmorStand().isEmpty()) {
-                registerResourceDisplay(DIAMOND_TIME_DISPLAY, DIAMOND_GENERATOR_NAME, 
+                registerResourceDisplay(DIAMOND_TIME_DISPLAY, DIAMOND_GENERATOR_NAME,
                     gameManager.getArmorStand().keySet(), DIAMOND_NAME);
             } else {
                 LoggerUtil.warn("无法注册钻石显示更新：盔甲架集合为空");
             }
-            
+
             // 绿宝石显示更新
             if (gameManager.getArmorSande() != null && !gameManager.getArmorSande().isEmpty()) {
-                registerResourceDisplay(EMERALD_TIME_DISPLAY, EMERALD_GENERATOR_NAME, 
+                registerResourceDisplay(EMERALD_TIME_DISPLAY, EMERALD_GENERATOR_NAME,
                     gameManager.getArmorSande().keySet(), EMERALD_NAME);
             } else {
                 LoggerUtil.warn("无法注册绿宝石显示更新：盔甲架集合为空");
@@ -236,7 +179,7 @@ public class GeneratorTask {
             LoggerUtil.warn("注册资源显示更新器时出错: " + e.getMessage());
         }
     }
-    
+
     /**
      * 注册资源显示更新器
      *
@@ -250,10 +193,10 @@ public class GeneratorTask {
             LoggerUtil.warn("尝试注册资源显示，但盔甲架集合为空: " + displayName);
             return;
         }
-        
+
         // 创建盔甲架的安全副本，避免并发修改异常
         final Set<ArmorStand> safeArmorStands = new HashSet<>(armorStands);
-        
+
         gameManager.getGameEventManager().registerRunnable(displayName, (seconds, currentEventLevel) ->
             Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> {
                 try {
@@ -264,7 +207,7 @@ public class GeneratorTask {
                             iterator.remove();
                             continue;
                         }
-                        
+
                         try {
                             // 确保区块已加载
                             Location location = armorStand.getLocation();
@@ -272,19 +215,19 @@ public class GeneratorTask {
                                 iterator.remove();
                                 continue;
                             }
-                            
+
                             if (!location.getChunk().isLoaded()) {
                                 location.getChunk().load();
                             }
-                            
+
                             // 更新倒计时显示
                             updateTimeDisplay(armorStand, generatorName);
-                            
+
                             // 更新资源名称显示
                             if (armorStand.getFallDistance() == RESOURCE_TYPE_HEIGHT) {
                                 armorStand.setCustomName(resourceName);
                             }
-                            
+
                             // 更新等级显示
                             if (armorStand.getFallDistance() == LEVEL_DISPLAY_HEIGHT) {
                                 updateLevelDisplay(armorStand, currentEventLevel);
@@ -301,7 +244,7 @@ public class GeneratorTask {
             })
         );
     }
-    
+
     /**
      * 更新倒计时显示
      *
@@ -313,15 +256,15 @@ public class GeneratorTask {
             if (armorStand == null || !armorStand.isValid()) {
                 return;
             }
-            
+
             if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
                 int timeRemaining = 0;
                 GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().getOrDefault(generatorName, null);
-                
+
                 if (gameEventRunnable != null) {
                     timeRemaining = gameEventRunnable.getSeconds() - gameEventRunnable.getNextSeconds();
                 }
-                
+
                 String displayText = String.format(TIME_REMAINING_FORMAT, timeRemaining);
                 armorStand.setCustomName(displayText);
             }
@@ -329,7 +272,7 @@ public class GeneratorTask {
             LoggerUtil.warn("更新时间显示时出错: " + e.getMessage());
         }
     }
-    
+
     /**
      * 更新等级显示
      *
@@ -341,7 +284,7 @@ public class GeneratorTask {
             if (armorStand == null || !armorStand.isValid()) {
                 return;
             }
-            
+
             String levelDisplay;
             if (currentEvent <= 1) {
                 levelDisplay = LEVEL_I;
@@ -350,7 +293,7 @@ public class GeneratorTask {
             } else {
                 levelDisplay = LEVEL_III;
             }
-            
+
             armorStand.setCustomName(levelDisplay);
         } catch (Exception e) {
             LoggerUtil.warn("更新等级显示时出错: " + e.getMessage());
