@@ -271,10 +271,10 @@ public class GameTeam {
 
     /**
      * 设置资源熔炉升级等级
-     * @param level 升级等级，必须在0到3之间
+     * @param level 升级等级，必须在0到4之间
      */
     public void setResourceFurnaceUpgrade(int level) {
-        if (level < 0 || level > 3) {
+        if (level < 0 || level > 5) {
             return;
         }
 
@@ -284,24 +284,24 @@ public class GameTeam {
         PrivateResourceGenerator goldGenerator = generatorManager.getPrivateResourceGenerator("金锭" + this.getName());
 
         switch (level) {
-            case 0:
-                this.resourceFurnaceUpgrade = 0;
+            case 1:
+                this.resourceFurnaceUpgrade = 1;
                 ironGenerator.setInterval(20L * 1);
                 ironGenerator.setMaxStack(48);
 
                 goldGenerator.setInterval(20L * 3);
                 goldGenerator.setMaxStack(8);
                 break;
-            case 1:
-                this.resourceFurnaceUpgrade = 1;
+            case 2:
+                this.resourceFurnaceUpgrade = 2;
                 ironGenerator.setInterval((long) (20L * 0.8));
                 ironGenerator.setMaxStack(72);
 
                 goldGenerator.setInterval((long) (20L * 2.4));
                 goldGenerator.setMaxStack(12);
                 break;
-            case 2:
-                this.resourceFurnaceUpgrade = 2;
+            case 3:
+                this.resourceFurnaceUpgrade = 3;
                 ironGenerator.setInterval((long) (20L * 0.6));
                 ironGenerator.setMaxStack(96);
                 goldGenerator.setInterval(20L * 2);
@@ -319,8 +319,8 @@ public class GameTeam {
                 }
                 generatorManager.addPrivateResourceTask(emerald, 20L * 60);
                 break;
-            case 3:
-                this.resourceFurnaceUpgrade = 3;
+            case 4:
+                this.resourceFurnaceUpgrade = 4;
                 ironGenerator.setInterval((long) (20L * 0.4));
                 ironGenerator.setMaxStack(128);
                 goldGenerator.setInterval((long) (20L * 1.6));

@@ -10,6 +10,7 @@ import cc.azuramc.bedwars.game.trap.TrapState;
 import cc.azuramc.bedwars.game.trap.TrapType;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -26,7 +27,7 @@ import java.util.Map;
 /**
  * 团队商店GUI
  * 用于展示和处理各种团队升级选项
- * 
+ *
  * @author an5w1r@163.com
  */
 public class TeamShopGUI extends CustomGUI {
@@ -43,10 +44,10 @@ public class TeamShopGUI extends CustomGUI {
 
     /** 资源类型名称缓存 */
     private static final Map<Material, String> RESOURCE_NAMES = new HashMap<>();
-    
+
     /** 升级价格缓存（二维：升级类型 -> 等级 -> 价格） */
     private static final Map<String, Map<Integer, Integer>> TIER_PRICES = new HashMap<>();
-    
+
     // 静态初始化资源名称和价格
     static {
         // 初始化资源名称
@@ -56,7 +57,7 @@ public class TeamShopGUI extends CustomGUI {
         Map<Integer, Integer> swordPrices = new HashMap<>();
         swordPrices.put(0, 8);
         TIER_PRICES.put(SHARPENED_SWORDS, swordPrices);
-        
+
         // 初始化保护价格
         Map<Integer, Integer> armorPrices = new HashMap<>();
         // 护甲保护 I
@@ -112,10 +113,10 @@ public class TeamShopGUI extends CustomGUI {
         super(gamePlayer, "§8团队升级", 54);
 
         GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
-        
+
         // 设置界面边框
         setupBorders();
-        
+
         // 设置升级选项
         addSharpenedSwordsUpgrade(gamePlayer, gameManager, gameModeType);
         addReinforcedArmorUpgrade(gamePlayer, gameManager, gameModeType);
@@ -133,7 +134,7 @@ public class TeamShopGUI extends CustomGUI {
         // 陷阱列表
         setupTrapList(gamePlayer);
     }
-    
+
     /**
      * 设置界面边框
      */
@@ -310,6 +311,7 @@ public class TeamShopGUI extends CustomGUI {
                         }
 
                         gameTeam.setResourceFurnaceUpgrade(nextLevel);
+                        LoggerUtil.debug("资源炉升级到等级 " + nextLevel + "，当前价格: " + price);
                         new TeamShopGUI(gamePlayer, gameManager).open();
                     }, false));
         } else {
@@ -319,7 +321,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addEnchant(XEnchantment.PROTECTION.get(), 4)
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                            .setDisplayName("§a" + RESOURCE_NAMES)
+                            .setDisplayName("§a" + RESOURCE_FURNACE)
                             .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
@@ -684,7 +686,7 @@ public class TeamShopGUI extends CustomGUI {
         List<String> lore = new ArrayList<>();
         lore.add("§7己方所有成员的盔甲将获得永久保护附魔！");
         lore.add("");
-        
+
         // 添加4个等级的描述和价格
         for (int tier = 0; tier < 4; tier++) {
             String tierColor;
@@ -698,25 +700,25 @@ public class TeamShopGUI extends CustomGUI {
                 // 未解锁的等级
                 tierColor = "§7";
             }
-            
+
             int displayTier = tier + 1;
             int price = TIER_PRICES.get(REINFORCED_ARMOR).get(tier);
-            
-            lore.add(tierColor + "等级 " + displayTier + "：保护 " + getRomanNumeral(displayTier) + 
+
+            lore.add(tierColor + "等级 " + displayTier + "：保护 " + getRomanNumeral(displayTier) +
                     "，§b" + formatPrice(price, gameModeType));
         }
-        
+
         lore.add("");
-        
+
         if (currentTier < 4) {
             lore.add("§e点击升级到保护 " + getRomanNumeral(currentTier + 1));
         } else {
             lore.add("§a已达到最高等级");
         }
-        
+
         return lore;
     }
-    
+
     /**
      * 获取分级升级说明 - 疯狂矿工专用
      */
@@ -724,7 +726,7 @@ public class TeamShopGUI extends CustomGUI {
         List<String> lore = new ArrayList<>();
         lore.add("§7己方所有成员获得急迫效果。");
         lore.add("");
-        
+
         // 添加2个等级的描述和价格
         for (int tier = 0; tier < 2; tier++) {
             String tierColor;
@@ -741,19 +743,19 @@ public class TeamShopGUI extends CustomGUI {
 
             int displayTier = tier + 1;
             int price = TIER_PRICES.get(MANIC_MINER).get(tier);
-            
-            lore.add(tierColor + "等级 " + displayTier + "：急迫 " + getRomanNumeral(displayTier) + 
+
+            lore.add(tierColor + "等级 " + displayTier + "：急迫 " + getRomanNumeral(displayTier) +
                     "，§b" + formatPrice(price, gameModeType));
         }
-        
+
         lore.add("");
-        
+
         if (currentTier < 2) {
             lore.add("§e点击升级到急迫 " + getRomanNumeral(currentTier + 1));
         } else {
             lore.add("§a已达到最高等级");
         }
-        
+
         return lore;
     }
 
@@ -765,8 +767,8 @@ public class TeamShopGUI extends CustomGUI {
         lore.add("§7升级你岛屿资源池的生成速度和和最大容量.");
         lore.add("");
 
-        // 添加2个等级的描述和价格
-        for (int tier = 0; tier < 2; tier++) {
+        // 添加4个等级的描述和价格
+        for (int tier = 0; tier < 4; tier++) {
             String tierColor;
             if (tier < currentTier) {
                 // 已购买的等级
@@ -782,14 +784,22 @@ public class TeamShopGUI extends CustomGUI {
             int displayTier = tier + 1;
             int price = TIER_PRICES.get(RESOURCE_FURNACE).get(tier);
 
-            lore.add(tierColor + "等级 " + displayTier + "：铁锻炉 " + getRomanNumeral(displayTier) +
+            String effectDescription = switch (displayTier) {
+                case 1 -> "+50%资源";
+                case 2 -> "+100%资源";
+                case 3 -> "生成绿宝石";
+                case 4 -> "+200%资源";
+                default -> "";
+            };
+
+            lore.add(tierColor + "等级 " + displayTier + "： " + effectDescription +
                     "，§b" + formatPrice(price, gameModeType));
         }
 
         lore.add("");
 
-        if (currentTier < 2) {
-            lore.add("§e点击升级到铁锻炉 " + getRomanNumeral(currentTier + 1));
+        if (currentTier < 4) {
+            lore.add("§e点击升级到等级 " + getRomanNumeral(currentTier + 1));
         } else {
             lore.add("§a已达到最高等级");
         }
@@ -963,7 +973,7 @@ public class TeamShopGUI extends CustomGUI {
             case MINER -> getMinerTrapLore();
         };
     }
-    
+
     /**
      * 处理支付
      * @param gamePlayer 游戏玩家
@@ -980,7 +990,7 @@ public class TeamShopGUI extends CustomGUI {
             return processExperiencePayment(gamePlayer, price * 100);
         }
     }
-    
+
     /**
      * 处理物品支付
      * @param gamePlayer 玩家
@@ -994,20 +1004,20 @@ public class TeamShopGUI extends CustomGUI {
         // 计算玩家拥有的资源总数
         int playerTotal = 0;
         ItemStack[] inventory = player.getInventory().getContents();
-        
+
         for (ItemStack item : inventory) {
             if (item != null && item.getType().equals(material)) {
                 playerTotal += item.getAmount();
             }
         }
-        
+
         // 检查是否有足够资源
         if (playerTotal < amount) {
             player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
-        
+
         // 扣除资源
         int remainingToDeduct = amount;
         for (int i = 0; i < inventory.length; i++) {
@@ -1023,11 +1033,11 @@ public class TeamShopGUI extends CustomGUI {
                 player.getInventory().setItem(i, item);
             }
         }
-        
+
         player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
     }
-    
+
     /**
      * 处理经验支付
      * @param gamePlayer 游戏玩家
@@ -1041,12 +1051,12 @@ public class TeamShopGUI extends CustomGUI {
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
-        
+
         player.setLevel(player.getLevel() - xpLevel);
         player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
     }
-    
+
     /**
      * 格式化价格显示
      * @param price 价格
@@ -1060,7 +1070,7 @@ public class TeamShopGUI extends CustomGUI {
             return (price * 100) + "级";
         }
     }
-    
+
     /**
      * 获取罗马数字
      * @param number 数字
