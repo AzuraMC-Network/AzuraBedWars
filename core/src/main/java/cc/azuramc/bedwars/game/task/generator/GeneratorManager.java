@@ -10,7 +10,6 @@ import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -20,7 +19,9 @@ import java.util.*;
 public class GeneratorManager {
 
     private final GameManager gameManager;
-    private final Map<String, BukkitRunnable> tasks;
+    private final Map<String, PublicResourceGenerator> publicResourceGeneratorMap;
+    private final Map<String, PrivateResourceGenerator> privateResourceGeneratorMap;
+
     private final int MAX_IRON_STACK_LEVEL_1;
     private final int MAX_GOLD_STACK_LEVEL_1;
     private final int MAX_DIAMOND_STACK_LEVEL_1;
@@ -47,7 +48,9 @@ public class GeneratorManager {
 
     public GeneratorManager(GameManager gameManager) {
         this.gameManager = gameManager;
-        this.tasks = new HashMap<>();
+        this.publicResourceGeneratorMap = new HashMap<>();
+        this.privateResourceGeneratorMap = new HashMap<>();
+
         TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
         MAX_IRON_STACK_LEVEL_1 = config.getMaxIronStackLevel1();
         MAX_GOLD_STACK_LEVEL_1 = config.getMaxGoldStackLevel1();
@@ -76,33 +79,35 @@ public class GeneratorManager {
     }
 
     public void initGeneratorTasks() {
-        ResourceGenerator iron = null;
-        if (XMaterial.IRON_INGOT.get() != null) {
-            iron = new ResourceGenerator(
-                    gameManager,
-                    "铁锭",
-                    XMaterial.IRON_INGOT.get(),
-                    MapData.DropType.BASE,
-                    48
-            );
-        }
-        addTask(iron, 20L);
+        for (Location dropLocation : gameManager.getMapData().getDropLocations(MapData.DropType.BASE)) {
+            PrivateResourceGenerator iron = null;
+            if (XMaterial.IRON_INGOT.get() != null) {
+                iron = new PrivateResourceGenerator(
+                        gameManager,
+                        "铁锭",
+                        dropLocation,
+                        XMaterial.IRON_INGOT.get(),
+                        48
+                );
+            }
+            addPrivateResourceTask(iron, 20L);
 
-        ResourceGenerator gold = null;
-        if (XMaterial.GOLD_INGOT.get() != null) {
-            gold = new ResourceGenerator(
-                    gameManager,
-                    "金锭",
-                    XMaterial.GOLD_INGOT.get(),
-                    MapData.DropType.BASE,
-                    8
-            );
+            PrivateResourceGenerator gold = null;
+            if (XMaterial.GOLD_INGOT.get() != null) {
+                gold = new PrivateResourceGenerator(
+                        gameManager,
+                        "金锭",
+                        dropLocation,
+                        XMaterial.GOLD_INGOT.get(),
+                        8
+                );
+            }
+            addPrivateResourceTask(gold, 20L * 3L);
         }
-        addTask(gold, 20L * 3L);
 
-        ResourceGenerator diamond = null;
+        PublicResourceGenerator diamond = null;
         if (XMaterial.DIAMOND.get() != null) {
-            diamond = new ResourceGenerator(
+            diamond = new PublicResourceGenerator(
                     gameManager,
                     "钻石",
                     XMaterial.DIAMOND.get(),
@@ -110,11 +115,11 @@ public class GeneratorManager {
                     4
             );
         }
-        addTask(diamond, 20L * 35L);
+        addPublicResourceTask(diamond, 20L * 35L);
 
-        ResourceGenerator emerald = null;
+        PublicResourceGenerator emerald = null;
         if (XMaterial.EMERALD.get() != null) {
-            emerald = new ResourceGenerator(
+            emerald = new PublicResourceGenerator(
                     gameManager,
                     "绿宝石",
                     XMaterial.EMERALD.get(),
@@ -122,39 +127,59 @@ public class GeneratorManager {
                     2
             );
         }
-        addTask(emerald, 20L * 60L);
+        addPublicResourceTask(emerald, 20L * 60L);
     }
 
     /**
-     * 添加任务，指定执行间隔
+     * 添加私有资源任务，指定执行间隔
      *
      * @param task 任务实例
      * @param interval 执行间隔（刻）
      */
-    public void addTask(ResourceGenerator task, long interval) {
+    public void addPrivateResourceTask(PrivateResourceGenerator task, long interval) {
         if (task == null) {
             return;
         }
         task.setInterval(interval);
         String taskName = task.getTaskName();
         // 如果已存在同名任务，取消旧任务
-        if (tasks.containsKey(taskName)) {
-            tasks.get(taskName).cancel();
+        if (privateResourceGeneratorMap.containsKey(taskName)) {
+            privateResourceGeneratorMap.get(taskName).cancel();
         }
         // 添加新任务
-        tasks.put(taskName, task);
+        privateResourceGeneratorMap.put(taskName, task);
         task.setCurrentTask(task);
         // 启动任务
         task.runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
     }
 
-    public ResourceGenerator getGenerator(String name) {
-        BukkitRunnable task = tasks.get(name);
-        if (task instanceof ResourceGenerator) {
-            return (ResourceGenerator) task;
+    /**
+     * 添加公开资源任务，指定执行间隔
+     *
+     * @param task 任务实例
+     * @param interval 执行间隔（刻）
+     */
+    public void addPublicResourceTask(PublicResourceGenerator task, long interval) {
+        if (task == null) {
+            return;
         }
-        return null;
+        task.setInterval(interval);
+        String taskName = task.getTaskName();
+        // 如果已存在同名任务，取消旧任务
+        if (publicResourceGeneratorMap.containsKey(taskName)) {
+            publicResourceGeneratorMap.get(taskName).cancel();
+        }
+        // 添加新任务
+        publicResourceGeneratorMap.put(taskName, task);
+        task.setCurrentTask(task);
+        // 启动任务
+        task.runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
     }
+
+    public PublicResourceGenerator getPublicResourceGenerator(String name) {
+        return publicResourceGeneratorMap.get(name);
+    }
+
     public int getMaxStackForResource(String resource, int level) {
         switch (resource) {
             case "铁锭":
@@ -184,7 +209,7 @@ public class GeneratorManager {
         initResourceDisplayUpdater("钻石", DIAMOND_GENERATOR_NAME, gameManager.getArmorStand().keySet(), DIAMOND_NAME);
         initResourceDisplayUpdater("绿宝石", EMERALD_GENERATOR_NAME, gameManager.getArmorSande().keySet(), EMERALD_NAME);
     }
-    private void updateResourceDisplay(Set<ArmorStand> armorStands, ResourceGenerator generator, String resourceDisplayName) {
+    private void updateResourceDisplay(Set<ArmorStand> armorStands, PublicResourceGenerator generator, String resourceDisplayName) {
         Iterator<ArmorStand> iterator = armorStands.iterator();
         while (iterator.hasNext()) {
             ArmorStand armorStand = iterator.next();
@@ -211,8 +236,9 @@ public class GeneratorManager {
             }
         }
     }
+
     public void immediateUpdateDisplay(String generatorName) {
-        ResourceGenerator generator = getGenerator(generatorName);
+        PublicResourceGenerator generator = getPublicResourceGenerator(generatorName);
         if (generator == null) return;
         Set<ArmorStand> armorStands;
         String resourceDisplayName;
@@ -227,13 +253,14 @@ public class GeneratorManager {
         }
         updateResourceDisplay(armorStands, generator, resourceDisplayName);
     }
+
     private void initResourceDisplayUpdater(String resourceName, String generatorName, Set<ArmorStand> armorStands, String resourceDisplayName) {
         if (armorStands == null || armorStands.isEmpty()) {
             LoggerUtil.warn("尝试初始化资源显示更新，但盔甲架集合为空: " + generatorName);
             return;
         }
         final Set<ArmorStand> safeArmorStands = new HashSet<>(armorStands);
-        final ResourceGenerator generator = getGenerator(resourceName);
+        final PublicResourceGenerator generator = getPublicResourceGenerator(resourceName);
         if (generator == null) {
             LoggerUtil.warn("无法找到生成器: " + resourceName);
             return;

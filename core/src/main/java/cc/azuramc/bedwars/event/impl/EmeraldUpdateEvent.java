@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
-import cc.azuramc.bedwars.game.task.generator.ResourceGenerator;
+import cc.azuramc.bedwars.game.task.generator.PublicResourceGenerator;
 
 /**
  * 绿宝石资源点升级事件
@@ -54,7 +54,7 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
     @Override
     public void execute(GameManager gameManager) {
         GeneratorManager genManager = gameManager.getGeneratorManager();
-        ResourceGenerator emeraldGen = genManager.getGenerator("绿宝石");
+        PublicResourceGenerator emeraldGen = genManager.getPublicResourceGenerator("绿宝石");
         if (emeraldGen == null) {
             return;
         }

@@ -24,13 +24,13 @@ import java.util.Collection;
  */
 @Getter
 @Setter
-public class ResourceGenerator extends BukkitRunnable {
+public class PublicResourceGenerator extends BukkitRunnable {
     private String taskName;
     private final Material material;
     private final MapData.DropType dropType;
     private int maxStack;
     private long interval = 20L;
-     private int level = 1;
+    private int level = 1;
     private long lastDropTime = 0;
     private BukkitRunnable currentTask;
     private final GameManager gameManager;
@@ -43,7 +43,7 @@ public class ResourceGenerator extends BukkitRunnable {
      * @param dropType 资源生成点类型
      * @param maxStack 最大堆叠数量
      */
-    public ResourceGenerator(GameManager gameManager, String taskName, Material material, MapData.DropType dropType, int maxStack) {
+    public PublicResourceGenerator(GameManager gameManager, String taskName, Material material, MapData.DropType dropType, int maxStack) {
         this.gameManager = gameManager;
         this.taskName = taskName;
         this.material = material;
@@ -72,7 +72,7 @@ public class ResourceGenerator extends BukkitRunnable {
         // 如果当前任务正在运行，需要取消并重新调度
         if (currentTask != null) {
             currentTask.cancel();
-            gameManager.getGeneratorManager().addTask(this, interval);
+            gameManager.getGeneratorManager().addPublicResourceTask(this, interval);
         }
     }
 
@@ -137,14 +137,6 @@ public class ResourceGenerator extends BukkitRunnable {
         }
 
         return count;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
     }
 
     public int getSecondsToNextDrop() {
