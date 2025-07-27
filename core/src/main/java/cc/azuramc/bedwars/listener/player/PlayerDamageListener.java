@@ -137,22 +137,23 @@ public class PlayerDamageListener implements Listener {
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player and killer all the 'EXPERIENCE' mode'");
                 // 1.1 被击杀者也是经验模式，直接给经验，无需转换
                 // 从experienceSources直接给予经验
-                convertExperienceSourcesToExp(gamePlayer, gameKiller);
+                // FIXME: 转换未考虑消费问题
+//                convertExperienceSourcesToExp(gamePlayer, gameKiller);
             } else {
                 // 1.2 被击杀者是default模式，需要将物品转换为经验
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player is 'EXPERIENCE' mode , killer is 'DEFAULT' mode");
-                gameKiller.getPlayer().giveExpLevels(getPlayerRewardExp(gamePlayer.getPlayer()));
+//                gameKiller.getPlayer().giveExpLevels(getPlayerRewardExp(gamePlayer.getPlayer()));
             }
         } else {
             // 2. 击杀者是default模式
             if (gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
                 // 2.1 被击杀者是经验模式，需要将经验转换为物品
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player is 'DEFAULT' mode , killer is 'EXPERIENCE' mode");
-                convertExperienceSourcesToItems(gamePlayer, gameKiller, event);
+//                convertExperienceSourcesToItems(gamePlayer, gameKiller, event);
             } else {
                 // 2.2 被击杀者是default模式，直接转移物品
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player and killer all the 'DEFAULT' mode'");
-                transferItemsToKiller(gamePlayer.getPlayer(), gameKiller.getPlayer(), event);
+//                transferItemsToKiller(gamePlayer.getPlayer(), gameKiller.getPlayer(), event);
             }
         }
 
