@@ -79,7 +79,7 @@ public class GeneratorManager {
                         48
                 );
             }
-            addPrivateResourceTask(iron, 20L);
+            addPrivateResourceTask(iron, 20L * 1);
 
             PrivateResourceGenerator gold = null;
             if (XMaterial.GOLD_INGOT.get() != null) {
@@ -91,7 +91,7 @@ public class GeneratorManager {
                         8
                 );
             }
-            addPrivateResourceTask(gold, 20L * 3L);
+            addPrivateResourceTask(gold, 20L * 3);
         }
 
         PublicResourceGenerator diamond = null;
@@ -104,7 +104,7 @@ public class GeneratorManager {
                     4
             );
         }
-        addPublicResourceTask(diamond, 20L * 35L);
+        addPublicResourceTask(diamond, 20L * 35);
 
         PublicResourceGenerator emerald = null;
         if (XMaterial.EMERALD.get() != null) {
@@ -116,7 +116,7 @@ public class GeneratorManager {
                     2
             );
         }
-        addPublicResourceTask(emerald, 20L * 60L);
+        addPublicResourceTask(emerald, 20L * 60);
     }
 
     /**
@@ -169,6 +169,10 @@ public class GeneratorManager {
         return publicResourceGeneratorMap.get(name);
     }
 
+    public PrivateResourceGenerator getPrivateResourceGenerator(String name) {
+        return privateResourceGeneratorMap.get(name);
+    }
+
     public int getMaxStackForResource(String resource, int level) {
         switch (resource) {
             case "钻石":
@@ -184,10 +188,12 @@ public class GeneratorManager {
         }
         return 0;
     }
+
     public void initDisplayUpdaters() {
         initResourceDisplayUpdater("钻石", DIAMOND_GENERATOR_NAME, gameManager.getArmorStand().keySet(), DIAMOND_NAME);
         initResourceDisplayUpdater("绿宝石", EMERALD_GENERATOR_NAME, gameManager.getArmorSande().keySet(), EMERALD_NAME);
     }
+
     private void updateResourceDisplay(Set<ArmorStand> armorStands, PublicResourceGenerator generator, String resourceDisplayName) {
         Iterator<ArmorStand> iterator = armorStands.iterator();
         while (iterator.hasNext()) {

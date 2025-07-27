@@ -207,6 +207,7 @@ public class GameManager {
             }
 
             gameTeams.add(new GameTeam(
+                    this,
                     teamColor,
                     baseLocation,
                     resourceDropLocation,
