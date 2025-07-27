@@ -84,7 +84,7 @@ public class GeneratorManager {
             if (XMaterial.IRON_INGOT.get() != null) {
                 iron = new PrivateResourceGenerator(
                         gameManager,
-                        "铁锭",
+                        "铁锭" + dropLocation.toString(),
                         dropLocation,
                         XMaterial.IRON_INGOT.get(),
                         48
@@ -96,7 +96,7 @@ public class GeneratorManager {
             if (XMaterial.GOLD_INGOT.get() != null) {
                 gold = new PrivateResourceGenerator(
                         gameManager,
-                        "金锭",
+                        "金锭" + dropLocation.toString(),
                         dropLocation,
                         XMaterial.GOLD_INGOT.get(),
                         8
