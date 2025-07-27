@@ -187,7 +187,9 @@ public class GameManager {
         // 新 检测基地附近的羊毛颜色来确定队伍颜色
         for (int i = 0; i < mapData.getBases().size(); i++) {
             Location baseLocation = mapData.getBases().get(i).toLocation();
-            Location resourceDropLocation = mapData.getDropLocations(MapData.DropType.BASE).get(i);
+            Location resourceDropLocation = getClosestBaseLocationDropLocation(baseLocation);
+            LoggerUtil.debug("GameManager$initializeTeams | baseLocation is " + baseLocation +
+                    ", resourceDropLocation is " + resourceDropLocation);
             TeamColor teamColor = detectTeamColorFromWool(baseLocation);
             LoggerUtil.debug("GameManager$initializeTeams | detectTeamColorFromWool is " + teamColor);
 
@@ -211,6 +213,32 @@ public class GameManager {
                     teamSize
             ));
         }
+    }
+
+    /**
+     * 根据BaseLocation获得最近的BaseType DropLocation
+     * @param baseLocation base location
+     * @return 最近的BaseType DropLocation
+     */
+    private Location getClosestBaseLocationDropLocation(Location baseLocation) {
+        List<Location> baseDropLocations = mapData.getDropLocations(MapData.DropType.BASE);
+
+        Location resourceDropLocation = null;
+        double minDistanceSquared = Double.MAX_VALUE;
+
+        for (Location dropLocation : baseDropLocations) {
+            double distanceSquared = baseLocation.distanceSquared(dropLocation);
+            if (distanceSquared < minDistanceSquared) {
+                minDistanceSquared = distanceSquared;
+                resourceDropLocation = dropLocation;
+            }
+        }
+
+        if (resourceDropLocation == null) {
+            LoggerUtil.debug("No BASE drop location found for base at " + baseLocation);
+        }
+
+        return resourceDropLocation;
     }
 
     /**
