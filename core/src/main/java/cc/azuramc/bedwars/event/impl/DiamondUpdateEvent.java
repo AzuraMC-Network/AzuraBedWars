@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
-import cc.azuramc.bedwars.game.task.generator.ResourceGenerator;
+import cc.azuramc.bedwars.game.task.generator.PublicResourceGenerator;
 
 /**
  * 钻石资源点升级事件
@@ -54,7 +54,7 @@ public class DiamondUpdateEvent extends AbstractGameEvent {
     @Override
     public void execute(GameManager gameManager) {
         GeneratorManager genManager = gameManager.getGeneratorManager();
-        ResourceGenerator diamondGen = genManager.getGenerator("钻石");
+        PublicResourceGenerator diamondGen = genManager.getPublicResourceGenerator("钻石");
         if (diamondGen == null) {
             return;
         }
