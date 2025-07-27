@@ -60,21 +60,6 @@ public class PublicResourceGenerator extends BukkitRunnable {
     }
 
     /**
-     * 设置掉落间隔并重新调度任务
-     *
-     * @param interval 新的掉落间隔（刻）
-     */
-    public void setInterval(long interval) {
-        this.interval = interval;
-
-        // 如果当前任务正在运行，需要取消并重新调度
-        if (currentTask != null) {
-            currentTask.cancel();
-            gameManager.getGeneratorManager().addPublicResourceTask(this, interval);
-        }
-    }
-
-    /**
      * 在指定位置生成物品，但不超过最大堆叠数量
      *
      * @param location 生成位置
