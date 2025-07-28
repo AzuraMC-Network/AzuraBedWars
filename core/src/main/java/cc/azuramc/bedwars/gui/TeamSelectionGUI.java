@@ -192,9 +192,6 @@ public class TeamSelectionGUI extends CustomGUI {
             player.sendMessage(MessageUtil.color("&a你选择了 " + teamChatColor + teamDisplayName));
             player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0F, 1.0F);
 
-            // 更新记分板
-            AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
-
             // TODO: 刷新GUI显示
         } else {
             player.sendMessage(MessageUtil.color("&c加入队伍失败，请稍后重试！"));
