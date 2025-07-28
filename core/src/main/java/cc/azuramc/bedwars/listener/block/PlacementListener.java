@@ -23,7 +23,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -31,7 +30,7 @@ import java.util.Optional;
  */
 public class PlacementListener implements Listener {
 
-    private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
+    private static final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
     /**
      * 处理方块放置事件
@@ -45,7 +44,7 @@ public class PlacementListener implements Listener {
         Block block = event.getBlock();
 
         // 游戏未开始时不允许放置方块
-        if (GAME_MANAGER.getGameState() == GameState.WAITING) {
+        if (gameManager.getGameState() == GameState.WAITING) {
             event.setCancelled(true);
             return;
         }
@@ -64,7 +63,18 @@ public class PlacementListener implements Listener {
 
         // 检查区域保护
         if (MapUtil.isProtectedArea(block.getLocation())) {
-            Objects.requireNonNull(gamePlayer).sendMessage("&c你不能在此处放置方块！");
+            if (gamePlayer != null) {
+                gamePlayer.sendMessage("&c你不能在此处放置方块！");
+            }
+            event.setCancelled(true);
+            return;
+        }
+
+        // 建筑限高
+        if (block.getLocation().getY() > gameManager.getMapData().getHigherY()) {
+            if (gamePlayer != null) {
+                gamePlayer.sendMessage("&c你不能在此处放置方块！");
+            }
             event.setCancelled(true);
             return;
         }

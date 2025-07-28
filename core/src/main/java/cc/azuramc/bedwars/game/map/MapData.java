@@ -153,6 +153,19 @@ public class MapData {
     }
 
     /**
+     * 获取两个pos中较高的Y坐标 (当作建筑限高值)
+     *
+     * @return higher pos y
+     */
+    public double getHigherY() {
+        // 如果其中一个位置为null，返回另一个位置的Y坐标或默认值80
+        if (getPos1Location() == null) return getPos2Location() != null ? getPos2Location().getY() : 80;
+        if (getPos2Location() == null) return getPos1Location().getY();
+        return Math.max(getPos1Location().getY(), getPos2Location().getY());
+    }
+
+
+    /**
      * 获取地图区域的第一个点
      * @return 区域第一个点的Bukkit Location对象
      */
@@ -193,7 +206,7 @@ public class MapData {
         if (location == null) {
             return false;
         }
-        
+
         for (int i = 0; i < bases.size(); i++) {
             RawLocation base = bases.get(i);
             Location baseLoc = base.toLocation();
@@ -216,7 +229,7 @@ public class MapData {
         if (location == null) {
             return false;
         }
-        
+
         for (int i = 0; i < drops.size(); i++) {
             RawLocation drop = drops.get(i);
             Location dropLoc = drop.toLocation();
@@ -239,7 +252,7 @@ public class MapData {
         if (location == null) {
             return false;
         }
-        
+
         for (int i = 0; i < shops.size(); i++) {
             RawLocation shop = shops.get(i);
             Location shopLoc = shop.toLocation();
@@ -258,14 +271,14 @@ public class MapData {
         if (players.getTeam() == null) {
             players.setTeam(1);
         }
-        
+
         // 如果min为null，默认设置为2
         if (players.getMin() == null) {
             players.setMin(2);
         }
-        
-        return region.getPos1() != null && 
-               region.getPos2() != null && 
+
+        return region.getPos1() != null &&
+                region.getPos2() != null &&
                respawnLocation != null &&
                !bases.isEmpty() &&
                players.getTeam() != null &&
@@ -275,7 +288,7 @@ public class MapData {
     public List<Location> loadMap() {
         Location pos1 = region.getPos1().toLocation();
         Location pos2 = region.getPos2().toLocation();
-        
+
         // 预先计算边界值，避免重复计算
         int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
@@ -283,20 +296,20 @@ public class MapData {
         int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
         int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
         int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-        
+
         // 缓存World对象，避免重复获取
         org.bukkit.World world = pos1.getWorld();
-        
+
         // 预估容量，减少ArrayList扩容次数
         int estimatedSize = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
         List<Location> blocksLocation = new ArrayList<>(estimatedSize);
-        
+
         // 优化的三重循环
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     Location blockLocation = new Location(world, x, y, z);
-                    
+
                     // 使用版本兼容的方式检查方块类型
                     if (canSkippedBlock(blockLocation.getBlock())) {
                         continue;
@@ -401,28 +414,18 @@ public class MapData {
     }
 
     public enum DropType {
-        /**
-         * 基地资源点
-         */
+        /** 基地资源点 */
         BASE,
-        /**
-         * 钻石资源点
-         */
+        /** 钻石资源点 */
         DIAMOND,
-        /**
-         * 绿宝石资源点
-         */
+        /** 绿宝石资源点 */
         EMERALD
     }
 
     public enum ShopType {
-        /**
-         * 物品商店
-         */
+        /** 物品商店 */
         ITEM,
-        /**
-         * 升级商店
-         */
+        /** 升级商店 */
         UPGRADE
     }
 
