@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.api.event.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
@@ -142,6 +143,13 @@ public class GameManager {
      */
     public void loadGame(MapData mapData) {
         if (mapData == null) {
+            return;
+        }
+
+        // call event
+        BedwarsGameLoadEvent event = new BedwarsGameLoadEvent(mapData.getMaxPlayers());
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
             return;
         }
 
@@ -550,7 +558,7 @@ public class GameManager {
      * @return 最大玩家数量
      */
     public int getMaxPlayers() {
-        return mapData.getBases().size() * mapData.getPlayers().getTeam();
+        return this.mapData.getMaxPlayers();
     }
 
     /**

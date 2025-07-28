@@ -198,6 +198,15 @@ public class MapData {
     }
 
     /**
+     * 获取地图的最大玩家数量
+     *
+     * @return 地图的最大玩家数量
+     */
+    public int getMaxPlayers() {
+        return this.getBases().size() * this.getPlayers().getTeam();
+    }
+
+    /**
      * 删除指定位置的基地
      * @param location 要删除的基地位置
      * @return 是否成功删除
