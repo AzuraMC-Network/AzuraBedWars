@@ -8,5 +8,9 @@ public enum GameState {
     /** 游戏实例运行中 */
     RUNNING,
     /** 游戏实例等待中 */
-    WAITING
+    WAITING,
+    /**
+     * 游戏实例已结束
+     */
+    ENDING;
 }

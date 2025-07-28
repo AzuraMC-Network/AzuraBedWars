@@ -1,8 +1,10 @@
 package cc.azuramc.bedwars.event;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.api.event.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.event.impl.*;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
@@ -72,25 +74,25 @@ public class GameEventManager implements Runnable {
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> scheduledFuture;
     private int currentEvent = 0;
-    
+
     @Getter
     private int seconds = 0;
-    
+
     @Getter
     private boolean over = false;
 
     /**
      * 创建事件管理器
-     * 
+     *
      * @param gameManager 游戏实例
      */
     public GameEventManager(GameManager gameManager) {
         this.gameManager = gameManager;
-        
+
         // 注册所有游戏事件
         registerGameEvents();
     }
-    
+
     /**
      * 注册游戏中的所有事件
      */
@@ -118,7 +120,7 @@ public class GameEventManager implements Runnable {
             // 执行事件倒计时回调
             int remainingSeconds = event.getExecuteSeconds() - seconds;
             event.executeRunnable(this.gameManager, remainingSeconds);
-            
+
             // 检查事件是否应该执行
             if (this.seconds >= event.getExecuteSeconds()) {
                 this.seconds = 0;
@@ -139,12 +141,23 @@ public class GameEventManager implements Runnable {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * 处理游戏结束逻辑
      */
     private void handleGameOver() {
         if (gameManager.isOver() && !over) {
+
+            // 调用游戏结束事件
+            BedwarsGameEndEvent event = new BedwarsGameEndEvent();
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                return;
+            }
+
+            // 设置GameState
+            gameManager.setGameState(GameState.ENDING);
+
             Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> {
                 setCurrentEvent(OVER_EVENT_PRIORITY);
                 currentEvent().execute(gameManager);
@@ -152,7 +165,7 @@ public class GameEventManager implements Runnable {
             over = true;
         }
     }
-    
+
     /**
      * 更新玩家位置追踪信息
      */
@@ -162,7 +175,7 @@ public class GameEventManager implements Runnable {
                 gameTeam.getAlivePlayers().forEach(player -> {
                     if (Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawnLocation().getWorld())) {
                         int distance = (int) player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
-                        String trackingMessage = "§f队伍: " + gameTeam.getChatColor() + gameTeam.getName() + 
+                        String trackingMessage = "§f队伍: " + gameTeam.getChatColor() + gameTeam.getName() +
                                                "§f 追踪: " + gameTeam.getChatColor() + distance + "m";
                         player.sendActionBar(trackingMessage);
                     }
@@ -173,7 +186,7 @@ public class GameEventManager implements Runnable {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * 处理周期性任务
      */
@@ -199,7 +212,7 @@ public class GameEventManager implements Runnable {
 
     /**
      * 获取当前事件
-     * 
+     *
      * @return 当前事件
      */
     public AbstractGameEvent currentEvent() {
@@ -208,7 +221,7 @@ public class GameEventManager implements Runnable {
 
     /**
      * 设置当前事件
-     * 
+     *
      * @param priority 事件优先级
      */
     public void setCurrentEvent(int priority) {
@@ -218,7 +231,7 @@ public class GameEventManager implements Runnable {
 
     /**
      * 获取当前事件剩余时间
-     * 
+     *
      * @return 剩余时间（秒）
      */
     public int getLeftTime() {
@@ -227,7 +240,7 @@ public class GameEventManager implements Runnable {
 
     /**
      * 获取下一个事件的格式化名称
-     * 
+     *
      * @return 事件名称
      */
     public String formattedNextEvent() {
@@ -237,7 +250,7 @@ public class GameEventManager implements Runnable {
 
     /**
      * 注册无延迟执行的任务
-     * 
+     *
      * @param name 任务名称
      * @param runnable 任务执行逻辑
      */
@@ -247,7 +260,7 @@ public class GameEventManager implements Runnable {
 
     /**
      * 注册周期性执行的任务
-     * 
+     *
      * @param name 任务名称
      * @param runnable 任务执行逻辑
      * @param seconds 执行周期（秒）
@@ -258,7 +271,7 @@ public class GameEventManager implements Runnable {
 
     /**
      * 注册游戏事件
-     * 
+     *
      * @param event 事件实例
      */
     private void registerEvent(AbstractGameEvent event) {
@@ -276,20 +289,20 @@ public class GameEventManager implements Runnable {
                 thread.setDaemon(true); // 设置为守护线程，便于JVM退出
                 return thread;
             };
-            
+
             // 创建拒绝策略处理器
             RejectedExecutionHandler handler = new ThreadPoolExecutor.CallerRunsPolicy();
-            
+
             // 创建ScheduledThreadPoolExecutor
             this.scheduler = new ScheduledThreadPoolExecutor(
                 CORE_POOL_SIZE,
                 threadFactory,
                 handler
             );
-            
+
             // 设置队列大小限制
             ((ScheduledThreadPoolExecutor) scheduler).setMaximumPoolSize(CORE_POOL_SIZE);
-            
+
             // 调度执行任务
             this.scheduledFuture = scheduler.scheduleAtFixedRate(
                 this, 0, TIMER_PERIOD_MS, TimeUnit.MILLISECONDS
@@ -306,7 +319,7 @@ public class GameEventManager implements Runnable {
             if (this.scheduledFuture != null) {
                 this.scheduledFuture.cancel(false);
             }
-            
+
             // 关闭调度器
             this.scheduler.shutdown();
             try {
@@ -318,7 +331,7 @@ public class GameEventManager implements Runnable {
                 this.scheduler.shutdownNow();
                 Thread.currentThread().interrupt();
             }
-            
+
             this.scheduler = null;
             this.currentEvent = 0;
             this.seconds = 0;
