@@ -28,6 +28,9 @@ public class NMS_v1_8_R3 implements NMSAccess {
     @Override
     public void hideArmor(Player victim, Player receiver) {
         LoggerUtil.debug("NMS_v1_8_R3$hideArmor | victim: " + victim + ", receiver: " + receiver);
+        if (receiver == null) {
+            return;
+        }
         if (victim.equals(receiver)) return;
         PacketPlayOutEntityEquipment helmet = new PacketPlayOutEntityEquipment(victim.getEntityId(), 1, CraftItemStack.asNMSCopy(new ItemStack(org.bukkit.Material.AIR)));
         PacketPlayOutEntityEquipment chest = new PacketPlayOutEntityEquipment(victim.getEntityId(), 2, CraftItemStack.asNMSCopy(new ItemStack(org.bukkit.Material.AIR)));
@@ -43,6 +46,9 @@ public class NMS_v1_8_R3 implements NMSAccess {
     @Override
     public void showArmor(Player victim, Player receiver) {
         LoggerUtil.debug("NMS_v1_8_R3$showArmor | victim: " + victim + ", receiver: " + receiver);
+        if (receiver == null) {
+            return;
+        }
         if (victim.equals(receiver)) return;
         EntityPlayer entityPlayer = ((CraftPlayer) victim).getHandle();
         PacketPlayOutEntityEquipment helmet = new PacketPlayOutEntityEquipment(entityPlayer.getId(), 4, entityPlayer.inventory.getArmorContents()[3]);
