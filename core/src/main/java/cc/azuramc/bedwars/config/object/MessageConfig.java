@@ -160,9 +160,9 @@ public class MessageConfig {
         private String deathPermanentSubTitle = MessageUtil.color("&7你没床了");
         private String teamEliminatedFormat = MessageUtil.color("&7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
         private String teamEliminatedMessage = MessageUtil.color("%s &c凉了! &e挖床者: %s");
-        private String rejoinMessage = MessageUtil.color("&c你凉了!想再来一局吗? ");
-        private String rejoinButton = MessageUtil.color("&b&l点击这里!");
-        private String rejoinCommand = MessageUtil.color("/queue join qc x");
+        private String playAgainMessage = MessageUtil.color("&c你凉了!想再来一局吗? ");
+        private String playAgainButton = MessageUtil.color("&b&l点击这里!");
+        private String playAgainCommand = MessageUtil.color("/not impl now");
     }
 
     @Data
@@ -197,7 +197,7 @@ public class MessageConfig {
             private String flyEnabled = MessageUtil.color("&a你现在不能停止飞行！");
             private String flyDisabled = MessageUtil.color("&a你现在能停止飞行！");
         }
-        
+
         @Data
         public static class Target {
             private String targetLostMessage = MessageUtil.color("&c&l目标已丢失或不在同一个世界");

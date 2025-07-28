@@ -55,9 +55,9 @@ public class PlayerRespawnListener implements Listener {
     private static final String DEATH_PERMANENT_SUBTITLE = MESSAGE_CONFIG.getDeathPermanentSubTitle();
     private static final String TEAM_ELIMINATED_FORMAT = MESSAGE_CONFIG.getTeamEliminatedFormat();
     private static final String TEAM_ELIMINATED_MSG = MESSAGE_CONFIG.getTeamEliminatedMessage();
-    private static final String REJOIN_MESSAGE = MESSAGE_CONFIG.getRejoinMessage();
-    private static final String REJOIN_BUTTON = MESSAGE_CONFIG.getRejoinButton();
-    private static final String REJOIN_COMMAND = MESSAGE_CONFIG.getRejoinCommand();
+    private static final String PLAY_AGAIN_MESSAGE = MESSAGE_CONFIG.getPlayAgainMessage();
+    private static final String PLAY_AGAIN_BUTTON = MESSAGE_CONFIG.getPlayAgainButton();
+    private static final String PLAY_AGAIN_COMMAND = MESSAGE_CONFIG.getPlayAgainCommand();
 
     public static final List<GamePlayer> RESPAWN_PROTECT = new ArrayList<>();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
@@ -154,9 +154,9 @@ public class PlayerRespawnListener implements Listener {
      * @param gamePlayer 游戏玩家
      */
     private void sendPlayAgainMessage(GamePlayer gamePlayer) {
-        TextComponent textComponent = new TextComponent(REJOIN_MESSAGE);
-        textComponent.addExtra(REJOIN_BUTTON);
-        textComponent.getExtra().get(0).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, REJOIN_COMMAND));
+        TextComponent textComponent = new TextComponent(PLAY_AGAIN_MESSAGE);
+        textComponent.addExtra(PLAY_AGAIN_BUTTON);
+        textComponent.getExtra().get(0).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PLAY_AGAIN_COMMAND));
         gamePlayer.getPlayer().spigot().sendMessage(textComponent);
     }
 
