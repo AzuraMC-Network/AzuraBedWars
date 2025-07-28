@@ -71,7 +71,7 @@ public class PlacementListener implements Listener {
         }
 
         // 建筑限高
-        if (block.getLocation().getY() > gameManager.getMapData().getHigherY()) {
+        if (block.getLocation().getY() > gameManager.getBuildLimitHeight()) {
             if (gamePlayer != null) {
                 gamePlayer.sendMessage("&c你不能在此处放置方块！");
             }
