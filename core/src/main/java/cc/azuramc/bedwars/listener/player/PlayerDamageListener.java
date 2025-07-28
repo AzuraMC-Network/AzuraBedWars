@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.game.*;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
 import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
+import cc.azuramc.bedwars.util.DamageUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
 import com.cryptomorin.xseries.XMaterial;
@@ -100,7 +101,7 @@ public class PlayerDamageListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        Player killer = player.getKiller();
+        Player killer = DamageUtil.findKiller(player);
 
         GamePlayer gamePlayer = GamePlayer.get(player);
         GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
@@ -477,7 +478,7 @@ public class PlayerDamageListener implements Listener {
     private void handleDeath(GamePlayer gamePlayer, GameTeam gameTeam) {
 
         // 获取击杀者
-        GamePlayer gameKiller = findKiller(gamePlayer);
+        GamePlayer gameKiller = DamageUtil.findKiller(gamePlayer);
 
         GameTeam killerTeam = gameKiller == null ? null : gameKiller.getGameTeam();
         boolean isFinalKill = gameTeam != null && gameTeam.isDestroyed();
@@ -501,26 +502,6 @@ public class PlayerDamageListener implements Listener {
         if (gameKiller != null)
             gameKiller.getPlayerData().addKills();
         gamePlayer.getPlayerData().addDeaths();
-    }
-
-    /**
-     * 寻找真正的击杀者（包括辅助击杀）
-     *
-     * @param gamePlayer 游戏玩家
-     * @return 击杀者
-     */
-    private GamePlayer findKiller(GamePlayer gamePlayer) {
-        Player killer = gamePlayer.getPlayer().getKiller();
-
-        // 如果没有直接击杀者，尝试从辅助中获取
-        if (killer == null) {
-            GamePlayer gameKiller = gamePlayer.getLastDamager();
-            if (gameKiller != null) {
-                return gameKiller;
-            }
-        }
-
-        return GamePlayer.get(killer);
     }
 
     /**
