@@ -404,6 +404,7 @@ public class GameManager {
     private void giveWaitingItems(GamePlayer gamePlayer) {
         Player player = gamePlayer.getPlayer();
 
+        // Game Mode Selection
         player.getInventory().addItem(
                 new ItemBuilder()
                         .setType(resourceSelectorMaterial)
@@ -411,17 +412,19 @@ public class GameManager {
                         .getItem()
         );
 
-        player.getInventory().setItem(8,
-                new ItemBuilder()
-                        .setType(leaveGameMaterial)
-                        .setDisplayName(leaveGameName)
-                        .getItem()
-        );
-
+        // Team Selection
         player.getInventory().setItem(2,
                 new ItemBuilder()
                         .setType(teamSelectorMaterial)
                         .setDisplayName(teamSelectorName)
+                        .getItem()
+        );
+
+        // Leave Game
+        player.getInventory().setItem(8,
+                new ItemBuilder()
+                        .setType(leaveGameMaterial)
+                        .setDisplayName(leaveGameName)
                         .getItem()
         );
     }
