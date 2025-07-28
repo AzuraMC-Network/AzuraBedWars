@@ -75,16 +75,18 @@ public class GamePlayer {
     // 隐身相关
     private boolean isInvisible;
     private BukkitRunnable invisibilityTask;
-    
+
     // 装备状态
     private ArmorType armorType;
     private ToolType pickaxeType;
     private ToolType axeType;
     private boolean shear;
 
+    private boolean reconnect;
+
     /**
      * 构造方法
-     * 
+     *
      * @param uuid 玩家UUID
      * @param name 玩家名称
      */
@@ -110,6 +112,8 @@ public class GamePlayer {
         this.pickaxeType = ToolType.NONE;
         this.axeType = ToolType.NONE;
 
+        this.reconnect = false;
+
         // 游戏模式
         this.gameModeType = playerData.getMode();
         this.experienceSources = new HashMap<>();
@@ -127,7 +131,7 @@ public class GamePlayer {
 
     /**
      * 创建或获取游戏玩家实例
-     * 
+     *
      * @param uuid 玩家UUID
      * @param name 玩家名称
      * @return 游戏玩家实例
@@ -138,7 +142,7 @@ public class GamePlayer {
 
     /**
      * 获取游戏玩家实例
-     * 
+     *
      * @param uuid 玩家UUID
      * @return 游戏玩家实例
      */
@@ -159,17 +163,8 @@ public class GamePlayer {
     }
 
     /**
-     * 获取玩家显示名称
-     * 
-     * @return 玩家显示名称
-     */
-    public String getNickName() {
-        return this.nickName != null ? this.nickName : this.name;
-    }
-
-    /**
      * 获取所有游戏玩家
-     * 
+     *
      * @return 游戏玩家列表
      */
     public static List<GamePlayer> getGamePlayers() {
@@ -178,7 +173,7 @@ public class GamePlayer {
 
     /**
      * 获取所有团队玩家
-     * 
+     *
      * @return 团队玩家列表
      */
     public static List<GamePlayer> getTeamPlayers() {
@@ -189,6 +184,21 @@ public class GamePlayer {
             }
         }
         return teamPlayers;
+    }
+
+    /**
+     * 获取所有在线玩家
+     *
+     * @return 在线玩家列表
+     */
+    public static List<GamePlayer> getOnlinePlayers() {
+        List<GamePlayer> onlinePlayers = new ArrayList<>();
+        for (GamePlayer player : GAME_PLAYERS.values()) {
+            if (player.isOnline()) {
+                onlinePlayers.add(player);
+            }
+        }
+        return onlinePlayers;
     }
 
     /**
@@ -268,25 +278,9 @@ public class GamePlayer {
         return this.experienceSources.getOrDefault(resourceType, -1);
     }
 
-
-    /**
-     * 获取所有在线玩家
-     * 
-     * @return 在线玩家列表
-     */
-    public static List<GamePlayer> getOnlinePlayers() {
-        List<GamePlayer> onlinePlayers = new ArrayList<>();
-        for (GamePlayer player : GAME_PLAYERS.values()) {
-            if (player.isOnline()) {
-                onlinePlayers.add(player);
-            }
-        }
-        return onlinePlayers;
-    }
-
     /**
      * 获取所有观察者
-     * 
+     *
      * @return 观察者列表
      */
     public static List<GamePlayer> getSpectators() {
@@ -301,7 +295,7 @@ public class GamePlayer {
 
     /**
      * 按最终击杀数排序玩家
-     * 
+     *
      * @return 排序后的玩家列表
      */
     public static List<GamePlayer> sortFinalKills() {
@@ -311,8 +305,17 @@ public class GamePlayer {
     }
 
     /**
+     * 获取玩家显示名称
+     *
+     * @return 玩家显示名称
+     */
+    public String getNickName() {
+        return this.nickName != null ? this.nickName : this.name;
+    }
+
+    /**
      * 获取Bukkit玩家实例
-     * 
+     *
      * @return Bukkit玩家实例
      */
     public Player getPlayer() {
@@ -321,7 +324,7 @@ public class GamePlayer {
 
     /**
      * 检查玩家是否在线
-     * 
+     *
      * @return 是否在线
      */
     public boolean isOnline() {
@@ -330,7 +333,7 @@ public class GamePlayer {
 
     /**
      * 发送动作栏消息
-     * 
+     *
      * @param message 消息内容
      */
     public void sendActionBar(String message) {
@@ -358,7 +361,7 @@ public class GamePlayer {
 
     /**
      * 发送聊天消息
-     * 
+     *
      * @param message 消息内容
      */
     public void sendMessage(String message) {
@@ -370,7 +373,7 @@ public class GamePlayer {
 
     /**
      * 播放音效
-     * 
+     *
      * @param sound 音效类型
      * @param volume 音量
      * @param pitch 音调
@@ -391,7 +394,7 @@ public class GamePlayer {
 
     /**
      * 将玩家转换为观察者
-     * 
+     *
      * @param title 主标题
      * @param subTitle 副标题
      */
@@ -465,7 +468,7 @@ public class GamePlayer {
 
     /**
      * 设置最后伤害来源
-     * 
+     *
      * @param damager 伤害来源玩家
      * @param time 时间戳
      */
@@ -693,21 +696,21 @@ public class GamePlayer {
 
             if (closestPlayer != null) {
                 LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | closest player is " + closestPlayer);
-                
+
                 // 动态获取 Player 对象
                 Player player = gamePlayer.getPlayer();
                 if (player == null) {
                     LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | player is null");
                     return;
                 }
-                
+
                 // 获取目标玩家的 Player 对象
                 Player targetPlayer = closestPlayer.getPlayer();
                 if (targetPlayer == null) {
                     LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | target player is null");
                     return;
                 }
-                
+
                 int distance = (int) targetPlayer.getLocation().distance(player.getLocation());
                 gamePlayer.sendActionBar(String.format("§f玩家 %s%s §f距离您 %dm",
                     closestPlayer.getGameTeam().getChatColor(),
