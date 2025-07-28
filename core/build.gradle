@@ -9,7 +9,6 @@ processResources {
 dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly "org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT"
-    compileOnly 'com.comphenix.protocol:ProtocolLib:5.1.0'
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly 'net.luckperms:api:5.4'
 
