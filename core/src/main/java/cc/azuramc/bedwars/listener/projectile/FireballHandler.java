@@ -96,7 +96,7 @@ public class FireballHandler implements Listener {
         player.damage(FIREBALL_DAMAGE);
 
         // 记录伤害来源（用于助攻系统）
-        gamePlayer.getAssistsManager().setLastDamage(ownerPlayer, System.currentTimeMillis());
+        gamePlayer.setLastDamage(ownerPlayer);
 
         // 设置元数据以防止掉落伤害
         player.setMetadata(NO_FALL_DAMAGE_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), ownerPlayer.getUuid()));

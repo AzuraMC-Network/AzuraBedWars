@@ -513,9 +513,9 @@ public class PlayerDamageListener implements Listener {
 
         // 如果没有直接击杀者，尝试从辅助中获取
         if (killer == null) {
-            List<GamePlayer> killers = gamePlayer.getAssistsManager().getAssists(System.currentTimeMillis());
-            if (killers != null && !killers.isEmpty()) {
-                return killers.get(0);
+            GamePlayer gameKiller = gamePlayer.getLastDamager();
+            if (gameKiller != null) {
+                return gameKiller;
             }
         }
 

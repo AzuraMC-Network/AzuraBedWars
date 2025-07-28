@@ -467,13 +467,45 @@ public class GamePlayer {
     }
 
     /**
-     * 设置最后伤害来源
+     * 设置最后伤害来源玩家
+     *
+     * @param damager 伤害来源玩家
+     */
+    public void setLastDamage(GamePlayer damager) {
+        assistsManager.setLastDamage(damager, System.currentTimeMillis());
+    }
+
+
+    /**
+     * 设置最后伤害来源玩家
      *
      * @param damager 伤害来源玩家
      * @param time 时间戳
      */
     public void setLastDamage(GamePlayer damager, long time) {
         assistsManager.setLastDamage(damager, time);
+    }
+
+    /**
+     * 获取最后伤害来源玩家
+     *
+     * @return 伤害来源玩家
+     */
+    public GamePlayer getLastDamager() {
+        List<GamePlayer> gamePlayers = assistsManager.getAssists();
+        if (gamePlayers.isEmpty()) {
+            return null;
+        }
+        return gamePlayers.get(gamePlayers.size() - 1);
+    }
+
+    /**
+     * 获取最后伤害来源玩家列表
+     *
+     * @return 伤害来源玩家列表
+     */
+    public List<GamePlayer> getLastDamagerList() {
+        return assistsManager.getAssists();
     }
 
     /**
