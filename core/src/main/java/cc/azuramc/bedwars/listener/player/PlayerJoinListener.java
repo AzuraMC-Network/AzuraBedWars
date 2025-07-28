@@ -96,14 +96,16 @@ public class PlayerJoinListener implements Listener {
         boolean hasAdminPermission = player.hasPermission("azurabedwars.admin");
         boolean playerHasTeam = gamePlayer.getGameTeam() != null;
 
-        // 如果是有权限的玩家且游戏正在运行且玩家没有团队，则不添加到gameManager
-        if (hasAdminPermission && !playerHasTeam) {
-            // 有权限的玩家强行加入但不添加到gameManager，直接设为观察者并且使用bukkit hide
-            gamePlayer.setSpectator();
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                PlayerUtil.hidePlayer(player, onlinePlayer);
+        if (gameManager.getGameState() == GameState.RUNNING) {
+            // 如果是有权限的玩家且游戏正在运行且玩家没有团队，则不添加到gameManager
+            if (hasAdminPermission && !playerHasTeam) {
+                // 有权限的玩家强行加入但不添加到gameManager，直接设为观察者并且使用bukkit hide
+                gamePlayer.setSpectator();
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    PlayerUtil.hidePlayer(player, onlinePlayer);
+                }
+                return;
             }
-            return;
         }
 
         // 正常情况下添加玩家到gameManager
