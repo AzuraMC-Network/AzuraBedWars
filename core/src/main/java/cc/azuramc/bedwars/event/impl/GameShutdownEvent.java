@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -30,7 +29,7 @@ public class GameShutdownEvent extends AbstractGameEvent {
      * 事件优先级（在所有事件结束后触发）
      */
     private static final int END_EVENT_PRIORITY = 7;
-    
+
     /**
      * 创建游戏结束事件
      */
@@ -47,13 +46,6 @@ public class GameShutdownEvent extends AbstractGameEvent {
     @Override
     public void execute(GameManager gameManager) {
 
-        // 调用游戏结束事件
-        BedwarsGameEndEvent event = new BedwarsGameEndEvent();
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
-
         // 所有游戏玩家传送到大厅
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
             gameTeam.getGamePlayers().forEach(BungeeUtil::connectToLobby);
@@ -63,7 +55,7 @@ public class GameShutdownEvent extends AbstractGameEvent {
 
         shutdownServer();
     }
-    
+
     /**
      * 执行游戏结束前的清理工作
      */
@@ -71,7 +63,7 @@ public class GameShutdownEvent extends AbstractGameEvent {
         // 释放强制加载的区块
         ChunkListener.releaseForceLoadedChunks();
     }
-    
+
     /**
      * 关闭服务器
      */
