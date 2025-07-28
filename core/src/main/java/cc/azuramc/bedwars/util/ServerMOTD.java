@@ -15,16 +15,17 @@ public class ServerMOTD {
     public static void updateMOTD(GameState gameState) {
         currentGameState = gameState;
     }
-    
+
     /**
      * 获取当前游戏状态对应的MOTD
-     * 
+     *
      * @return 当前游戏状态的MOTD字符串
      */
     public static String getMOTD() {
         return switch (currentGameState) {
             case RUNNING -> "abw-running";
             case WAITING -> "abw-waiting";
+            case ENDING -> "abw-ending";
         };
     }
 }
