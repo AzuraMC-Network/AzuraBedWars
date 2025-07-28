@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.listener.player;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import lombok.Getter;
+import cc.azuramc.bedwars.util.DamageUtil;
 import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -109,7 +109,7 @@ public class PlayerDeathReasonListener implements Listener {
         event.setDeathMessage(null);
 
         Player player = event.getEntity();
-        Player killer = player.getKiller();
+        Player killer = DamageUtil.findKiller(player);
 
         GamePlayer gamePlayer = GamePlayer.get(player);
         GamePlayer gameKiller = GamePlayer.get(killer);
