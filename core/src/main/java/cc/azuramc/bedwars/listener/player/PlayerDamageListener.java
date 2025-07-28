@@ -13,10 +13,7 @@ import cc.azuramc.bedwars.util.VaultUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -314,9 +311,6 @@ public class PlayerDamageListener implements Listener {
 
         GamePlayer gamePlayer = entity instanceof Player ? GamePlayer.get(entity.getUniqueId()) : null;
 
-        // 处理玩家和召唤物间的攻击
-        handlePlayerVsCreature(event, entity, attacker);
-
         // 检查受击者是否为玩家
         if (gamePlayer == null) {
             return;
@@ -333,16 +327,23 @@ public class PlayerDamageListener implements Listener {
             // 投掷物攻击玩家处理
             handleProjectileDamage(event, gamePlayer, (Projectile) attacker);
         }
+
+        if (attacker instanceof IronGolem || attacker instanceof Silverfish) {
+            // 团队生物处理
+            handlePlayerVsCreature(event, entity, attacker);
+        }
     }
 
     private void handlePlayerVsCreature(EntityDamageByEntityEvent event, Entity entity, Entity attacker) {
 
-        CustomEntityRemoverUtil entityo = CustomEntityRemoverUtil.getDespawnables().get(entity.getUniqueId());
-        if (entityo == null) {
+        //TODO: 处理铁傀儡/蠹虫伤害进入lastDamage (需要可以获取到放出生物的人)
+
+        CustomEntityRemoverUtil customEntityRemoverUtil = CustomEntityRemoverUtil.getDespawnables().get(entity.getUniqueId());
+        if (customEntityRemoverUtil == null) {
             return;
         }
 
-        GameTeam entityTeam = entityo.getGameTeam();
+        GameTeam entityTeam = customEntityRemoverUtil.getGameTeam();
 
         GamePlayer attackerPlayer = GamePlayer.get(attacker.getUniqueId());
         GameTeam attackerTeam = attackerPlayer.getGameTeam();
@@ -583,6 +584,8 @@ public class PlayerDamageListener implements Listener {
             return;
         }
 
+        gamePlayer.setLastDamage(attackPlayer);
+
         // 普通攻击伤害显示
         if (ATTACK_DISPLAY_ENABLED && attackPlayer.isViewingArrowDamage()) {
             int finalDamage = (int) (event.getFinalDamage() + 0.5);
@@ -613,7 +616,7 @@ public class PlayerDamageListener implements Listener {
 
         GamePlayer attackerPlayer = GamePlayer.get(((Player) projectile.getShooter()).getUniqueId());
 
-        // 火球伤害特殊处理
+        // 火球伤害特殊处理 (注意 火球伤害是在其他的类有处理 所以这里取消掉不管即可)
         if (projectile.getType() == EntityType.FIREBALL) {
             event.setCancelled(true);
             return;
@@ -627,6 +630,8 @@ public class PlayerDamageListener implements Listener {
 
         // 检查投掷物是否为箭矢
         if (projectile.getType() == EntityType.ARROW) {
+
+            gamePlayer.setLastDamage(attackerPlayer);
 
             if (!ARROW_DISPLAY_ENABLED) {
                 return;
