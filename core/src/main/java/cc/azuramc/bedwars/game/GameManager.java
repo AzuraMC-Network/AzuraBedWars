@@ -67,7 +67,10 @@ public class GameManager {
     private AzuraBedWars plugin;
     private GeneratorManager generatorManager;
     private GameEventManager gameEventManager;
+
     private MapData mapData;
+    private double buildLimitHeight;
+
     private GameState gameState;
     private boolean isForceStarted;
 
@@ -143,6 +146,7 @@ public class GameManager {
         }
 
         this.mapData = mapData;
+        this.buildLimitHeight = mapData.getHigherY();
         this.blocksLocation = mapData.loadMap();
         this.respawnLocation = mapData.getRespawnLocation().toLocation();
         this.waitingLocation = mapData.getWaitingLocation().toLocation();
