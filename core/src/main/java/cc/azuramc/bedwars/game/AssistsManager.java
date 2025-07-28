@@ -21,14 +21,14 @@ public class AssistsManager {
      * 玩家造成伤害后在此时间内仍然计为助攻
      */
     private static final long ASSIST_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(10);
-    
+
     /**
      * 存储玩家最后伤害时间的映射
      * 键: 造成伤害的玩家
      * 值: 最后一次造成伤害的时间戳（毫秒）
      */
     private final Map<GamePlayer, Long> lastDamage = new HashMap<>();
-    
+
     /**
      * 被跟踪助攻的玩家
      */
@@ -53,12 +53,15 @@ public class AssistsManager {
         if (attacker == null) {
             return; // 忽略空玩家
         }
-        
+
         // 不记录自己对自己的伤害
         if (attacker.equals(targetPlayer)) {
             return;
         }
-        
+
+        // 在添加新记录前清理过期记录
+        cleanupExpiredAssists(time);
+
         lastDamage.put(attacker, time);
     }
 
@@ -69,6 +72,9 @@ public class AssistsManager {
      * @return 有效的助攻玩家列表
      */
     public List<GamePlayer> getAssists(long currentTime) {
+        // 在获取助攻列表前清理过期记录
+        cleanupExpiredAssists(currentTime);
+
         List<GamePlayer> players = new ArrayList<>();
         for (Map.Entry<GamePlayer, Long> entry : lastDamage.entrySet()) {
             if (currentTime - entry.getValue() <= ASSIST_TIMEOUT_MS) {
@@ -77,7 +83,7 @@ public class AssistsManager {
         }
         return players;
     }
-    
+
     /**
      * 获取当前有效的助攻玩家列表（使用系统当前时间）
      *
@@ -86,7 +92,7 @@ public class AssistsManager {
     public List<GamePlayer> getAssists() {
         return getAssists(System.currentTimeMillis());
     }
-    
+
     /**
      * 使用Stream API获取助攻列表（替代实现）
      *
@@ -94,12 +100,15 @@ public class AssistsManager {
      * @return 有效的助攻玩家列表
      */
     public List<GamePlayer> getAssistsStream(long currentTime) {
+        // 在获取助攻列表前清理过期记录
+        cleanupExpiredAssists(currentTime);
+
         return lastDamage.entrySet().stream()
                 .filter(entry -> currentTime - entry.getValue() <= ASSIST_TIMEOUT_MS)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * 清理过期的助攻记录
      *
@@ -111,7 +120,7 @@ public class AssistsManager {
         lastDamage.entrySet().removeIf(entry -> currentTime - entry.getValue() > ASSIST_TIMEOUT_MS);
         return initialSize - lastDamage.size();
     }
-    
+
     /**
      * 清理过期的助攻记录（使用系统当前时间）
      *
@@ -120,7 +129,7 @@ public class AssistsManager {
     public int cleanupExpiredAssists() {
         return cleanupExpiredAssists(System.currentTimeMillis());
     }
-    
+
     /**
      * 获取跟踪的助攻数量
      *
@@ -129,7 +138,7 @@ public class AssistsManager {
     public int size() {
         return lastDamage.size();
     }
-    
+
     /**
      * 清空所有助攻记录
      */
