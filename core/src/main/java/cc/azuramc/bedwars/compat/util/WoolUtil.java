@@ -6,6 +6,7 @@ import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
 import java.util.Objects;
@@ -137,5 +138,21 @@ public class WoolUtil {
             case BLACK -> 15;
             default -> 0;
         };
+    }
+
+    /**
+     * 获取指定颜色的羊毛物品
+     *
+     * @param teamColor 队伍颜色
+     * @return 对应颜色的羊毛物品
+     */
+    public static ItemStack getColoredWool(TeamColor teamColor) {
+        if (VersionUtil.isLessThan113()) {
+            return new ItemStack(Material.valueOf("WOOL"), 1, getWoolDataFromTeamColor(teamColor));
+        } else {
+            return XMaterial.matchXMaterial(teamColor.getDyeColor().toString() + "_WOOL")
+                    .orElse(XMaterial.WHITE_WOOL)
+                    .parseItem();
+        }
     }
 }

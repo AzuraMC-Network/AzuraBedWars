@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.gui;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
+import cc.azuramc.bedwars.compat.util.WoolUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -13,6 +14,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,9 +57,12 @@ public class TeamSelectionGUI extends CustomGUI {
         }
 
         // 设置选择区域装饰
-        setItem(11, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + HIGHLIGHT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
-        setItem(13, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + HIGHLIGHT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
-        setItem(15, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + HIGHLIGHT_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {}, false));
+        setItem(11, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {
+        }, false));
+        setItem(13, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {
+        }, false));
+        setItem(15, XMaterial.matchXMaterial("STAINED_GLASS_PANE:" + BORDER_GLASS_COLOR).orElse(XMaterial.GLASS_PANE).parseItem(), new GUIAction(0, () -> {
+        }, false));
     }
 
     /**
@@ -121,9 +126,9 @@ public class TeamSelectionGUI extends CustomGUI {
         int maxPlayers = team.getMaxPlayers();
 
         // 获取队伍信息
-        XMaterial woolMaterial = getTeamWoolMaterial(teamColor);
-        ChatColor chatColor = getTeamChatColor(teamColor);
-        String teamName = getTeamDisplayName(teamColor);
+        ItemStack coloredWoolItem = WoolUtil.getColoredWool(teamColor);
+        ChatColor chatColor = teamColor.getChatColor();
+        String teamName = teamColor.getName();
 
         // 构建物品描述
         String statusLine;
@@ -135,8 +140,7 @@ public class TeamSelectionGUI extends CustomGUI {
             statusLine = "§7点击选择此队伍";
         }
 
-        setItem(slot, new ItemBuilder()
-                        .setType(woolMaterial.get())
+        setItem(slot, new ItemBuilder(coloredWoolItem)
                         .setDisplayName(chatColor + teamName)
                         .setLores(
                                 "§7队伍人数: §f" + currentPlayers + "§7/§f" + maxPlayers,
@@ -182,8 +186,8 @@ public class TeamSelectionGUI extends CustomGUI {
 
         // 尝试加入新队伍
         if (targetTeam.addPlayer(gamePlayer)) {
-            String teamDisplayName = getTeamDisplayName(teamColor);
-            ChatColor teamChatColor = getTeamChatColor(teamColor);
+            String teamDisplayName = teamColor.getName();
+            ChatColor teamChatColor = teamColor.getChatColor();
 
             player.sendMessage(MessageUtil.color("&a你选择了 " + teamChatColor + teamDisplayName));
             player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0F, 1.0F);
@@ -195,28 +199,5 @@ public class TeamSelectionGUI extends CustomGUI {
         } else {
             player.sendMessage(MessageUtil.color("&c加入队伍失败，请稍后重试！"));
         }
-    }
-
-    /**
-     * 获取队伍对应的羊毛材料
-     */
-    private XMaterial getTeamWoolMaterial(TeamColor teamColor) {
-        // 根据DyeColor获取对应的羊毛材料
-        String woolName = teamColor.getDyeColor().name() + "_WOOL";
-        return XMaterial.matchXMaterial(woolName).orElse(XMaterial.WHITE_WOOL);
-    }
-
-    /**
-     * 获取队伍对应的聊天颜色
-     */
-    private ChatColor getTeamChatColor(TeamColor teamColor) {
-        return teamColor.getChatColor();
-    }
-
-    /**
-     * 获取队伍显示名称
-     */
-    private String getTeamDisplayName(TeamColor teamColor) {
-        return teamColor.getName();
     }
 }
