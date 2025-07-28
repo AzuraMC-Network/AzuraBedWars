@@ -25,6 +25,7 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 玩家重生事件监听器
@@ -82,6 +83,7 @@ public class PlayerRespawnListener implements Listener {
             return;
         }
 
+        // 清理玩家状态
         if (gamePlayer != null) {
             gamePlayer.cleanState();
         }
@@ -191,9 +193,16 @@ public class PlayerRespawnListener implements Listener {
         player.setGameMode(GameMode.SPECTATOR);
         player.setFlying(true);
 
+        // 使用AtomicInteger以便可以重新赋值在Runnable里使用
+        AtomicInteger delay = new AtomicInteger(RESPAWN_COUNTDOWN_SECONDS);
+
+        // 如果是重连的 复活时间为10s
+        if (gamePlayer.isReconnect()) {
+            delay.set(10);
+        }
+
         // 启动重生倒计时
         new BukkitRunnable() {
-            int delay = RESPAWN_COUNTDOWN_SECONDS;
 
             @Override
             public void run() {
@@ -201,12 +210,11 @@ public class PlayerRespawnListener implements Listener {
                     cancel();
                     return;
                 }
-
-                if (this.delay > 0) {
+                if (delay.get() > 0) {
                     // 显示倒计时
-                    gamePlayer.sendTitle(String.format(RESPAWN_COUNTDOWN_TITLE, delay), RESPAWN_COUNTDOWN_SUBTITLE,
+                    gamePlayer.sendTitle(String.format(RESPAWN_COUNTDOWN_TITLE, delay.get()), RESPAWN_COUNTDOWN_SUBTITLE,
                             TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
-                    this.delay -= 1;
+                    delay.decrementAndGet();
                     return;
                 }
 

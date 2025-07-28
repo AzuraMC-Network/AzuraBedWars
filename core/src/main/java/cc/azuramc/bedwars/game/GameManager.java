@@ -455,6 +455,7 @@ public class GameManager {
         if (gamePlayer.getGameTeam() != null) {
             if (!gamePlayer.getGameTeam().isDead()) {
                 LoadGameUtil.setPlayerTeamTab();
+                gamePlayer.setReconnect(true);
                 PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
                 broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
                 return;
