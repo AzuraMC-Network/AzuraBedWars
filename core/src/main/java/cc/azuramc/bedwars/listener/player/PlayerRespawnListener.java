@@ -58,7 +58,7 @@ public class PlayerRespawnListener implements Listener {
     private static final String REJOIN_MESSAGE = MESSAGE_CONFIG.getRejoinMessage();
     private static final String REJOIN_BUTTON = MESSAGE_CONFIG.getRejoinButton();
     private static final String REJOIN_COMMAND = MESSAGE_CONFIG.getRejoinCommand();
-    
+
     public static final List<GamePlayer> RESPAWN_PROTECT = new ArrayList<>();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
@@ -126,20 +126,20 @@ public class PlayerRespawnListener implements Listener {
             @Override
             public void run() {
                 // 显示重新加入游戏的提示
-                sendRejoinMessage(gamePlayer);
+                sendPlayAgainMessage(gamePlayer);
 
                 // 设置重生位置和移动状态
                 teleportToRespawnLocation(event);
-                
+
                 // 隐藏死亡玩家
-                GamePlayer.getOnlinePlayers().forEach(otherPlayer -> 
+                GamePlayer.getOnlinePlayers().forEach(otherPlayer ->
                     PlayerUtil.hidePlayer(otherPlayer.getPlayer(), gamePlayer.getPlayer()));
 
                 // 设置为观察者
                 gamePlayer.toSpectator(DEATH_PERMANENT_TITLE, DEATH_PERMANENT_SUBTITLE);
             }
         }.runTaskLater(AzuraBedWars.getInstance(), RESPAWN_DELAY_TICKS);
-        
+
         gamePlayer.getPlayerData().addLosses();
 
         // 如果整个队伍都被消灭，广播消息
@@ -149,11 +149,11 @@ public class PlayerRespawnListener implements Listener {
     }
 
     /**
-     * 发送重新加入游戏的消息
+     * 发送再来一局信息
      *
      * @param gamePlayer 游戏玩家
      */
-    private void sendRejoinMessage(GamePlayer gamePlayer) {
+    private void sendPlayAgainMessage(GamePlayer gamePlayer) {
         TextComponent textComponent = new TextComponent(REJOIN_MESSAGE);
         textComponent.addExtra(REJOIN_BUTTON);
         textComponent.getExtra().get(0).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, REJOIN_COMMAND));
@@ -167,7 +167,7 @@ public class PlayerRespawnListener implements Listener {
      */
     private void announceTeamElimination(GameTeam gameTeam) {
         String destroyerName = gameTeam.getDestroyPlayer() != null ? gameTeam.getDestroyPlayer().getNickName() : "null";
-        
+
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
         gameManager.broadcastMessage(TEAM_ELIMINATED_FORMAT);
         gameManager.broadcastMessage(" ");
@@ -187,7 +187,7 @@ public class PlayerRespawnListener implements Listener {
         Player player = event.getPlayer();
         // 设置重生位置和玩家状态
         teleportToRespawnLocation(event);
-        
+
         player.setGameMode(GameMode.SPECTATOR);
         player.setFlying(true);
 
@@ -201,7 +201,7 @@ public class PlayerRespawnListener implements Listener {
                     cancel();
                     return;
                 }
-                
+
                 if (this.delay > 0) {
                     // 显示倒计时
                     gamePlayer.sendTitle(String.format(RESPAWN_COUNTDOWN_TITLE, delay), RESPAWN_COUNTDOWN_SUBTITLE,
@@ -234,16 +234,16 @@ public class PlayerRespawnListener implements Listener {
 
         // 恢复玩家物品栏
         gamePlayer.giveInventory();
-        
+
         // 使玩家对所有人可见
         PlayerUtil.showPlayer(player, player);
-        GamePlayer.getOnlinePlayers().forEach(otherPlayer -> 
+        GamePlayer.getOnlinePlayers().forEach(otherPlayer ->
             PlayerUtil.showPlayer(otherPlayer.getPlayer(), player));
-        
+
         // 传送到队伍出生点
         player.teleport(gameTeam.getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
-        
+
         // 添加临时伤害保护
         applyDamageProtection(gamePlayer);
 
@@ -291,7 +291,7 @@ public class PlayerRespawnListener implements Listener {
     private void applyDamageProtection(GamePlayer gamePlayer) {
         RESPAWN_PROTECT.add(gamePlayer);
         Bukkit.getScheduler().runTaskLater(
-            AzuraBedWars.getInstance(), 
+                AzuraBedWars.getInstance(),
             () -> RESPAWN_PROTECT.remove(gamePlayer),
             RESPAWN_PROTECTION_TICKS
         );
