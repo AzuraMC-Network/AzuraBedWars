@@ -5,14 +5,29 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+
+import java.util.Objects;
 
 /**
  * @author an5w1r@163.com
  */
 public class TabList {
+
+    /**
+     * 清除所有注册的team
+     */
+    public static void cleanUpScoreBoard() {
+        Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager(), "ScoreboardManager未空").getMainScoreboard();
+        for (Team team : scoreboard.getTeams()) {
+            if (team.getName().startsWith("tag#")) {
+                team.unregister();
+            }
+        }
+    }
 
     /**
      * 编辑玩家的TabList显示名称
