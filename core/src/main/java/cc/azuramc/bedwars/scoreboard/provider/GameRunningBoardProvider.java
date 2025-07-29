@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.config.object.ScoreboardConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;
@@ -132,13 +133,58 @@ public class GameRunningBoardProvider implements Listener {
         lines.add("§7团队 " + DATE_FORMAT.format(Calendar.getInstance().getTime()));
         lines.add(EMPTY_LINE);
         // 添加事件信息
-        lines.add("&c游戏结束");
+        lines.add(gameManager.getGameEventManager().formattedNextEvent());
+        lines.add("§a" + gameManager.getFormattedTime(gameManager.getGameEventManager().getLeftTime()));
+        lines.add(EMPTY_LINE);
+        // 添加队伍信息
+        for (GameTeam gameTeam : gameManager.getGameTeams()) {
+            StringBuilder teamLine = new StringBuilder()
+                    .append(gameTeam.getName())
+                    .append(" ")
+                    .append(gameTeam.isDestroyed() ? BED_DESTROYED : BED_ALIVE)
+                    .append(SEPARATOR)
+                    .append(gameTeam.getAlivePlayers().size());
+
+            if (gameTeam.isInTeam(gamePlayer)) {
+                teamLine.append(MY_TEAM_MARK);
+            }
+
+            lines.add(teamLine.toString());
+        }
         lines.add(EMPTY_LINE);
         // 添加服务器信息
         lines.add(SERVER_INFO);
 
         // 更新计分板
         board.updateLines(lines.toArray(new String[0]));
+    }
+
+    /**
+     * 游戏开始事件处理
+     *
+     * @param event 游戏开始事件
+     */
+    @EventHandler
+    public void onStart(BedwarsGameStartEvent event) {
+        if (scoreboardManager != null) {
+            // 使用计分板管理器切换到游戏模式
+            scoreboardManager.switchBoardMode();
+
+            // 注册计分板更新任务
+            gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> {
+                if (scoreboardManager != null) {
+                    scoreboardManager.updateAllBoards();
+                } else {
+                    updateBoard();
+                }
+            });
+        } else {
+            // 为所有在线玩家显示计分板
+            Bukkit.getOnlinePlayers().forEach(GameRunningBoardProvider::show);
+
+            // 注册计分板更新任务
+            gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> updateBoard());
+        }
     }
 
     /**
@@ -180,34 +226,6 @@ public class GameRunningBoardProvider implements Listener {
             } catch (Exception e) {
                 // 忽略错误
             }
-        }
-    }
-
-    /**
-     * 游戏开始事件处理
-     *
-     * @param event 游戏开始事件
-     */
-    @EventHandler
-    public void onStart(BedwarsGameStartEvent event) {
-        if (scoreboardManager != null) {
-            // 使用计分板管理器切换到游戏模式
-            scoreboardManager.switchBoardMode();
-
-            // 注册计分板更新任务
-            gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> {
-                if (scoreboardManager != null) {
-                    scoreboardManager.updateAllBoards();
-                } else {
-                    updateBoard();
-                }
-            });
-        } else {
-            // 为所有在线玩家显示计分板
-            Bukkit.getOnlinePlayers().forEach(GameRunningBoardProvider::show);
-
-            // 注册计分板更新任务
-            gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> updateBoard());
         }
     }
 
