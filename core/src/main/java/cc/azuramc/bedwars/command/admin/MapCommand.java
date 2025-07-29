@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.command.admin;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
+import cc.azuramc.bedwars.database.storage.MapStorageType;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.util.MessageUtil;
@@ -47,7 +48,7 @@ public class MapCommand {
         if (checkEditorMode(player)) {
             return;
         }
-        
+
         player.sendMessage(MessageUtil.CHAT_BAR);
         player.sendMessage(MessageUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置"));
         player.sendMessage("");
@@ -232,10 +233,10 @@ public class MapCommand {
         if (checkEditorMode(player)) {
             return;
         }
-        MapStorageFactory.StorageType storageType = MapStorageFactory.StorageType.JSON;
+        MapStorageType storageType = MapStorageType.JSON;
 
         try {
-            storageType = MapStorageFactory.StorageType.valueOf(type.toUpperCase());
+            storageType = MapStorageType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
             player.sendMessage(MessageUtil.color("&c无效的存储类型: " + type));
         }
@@ -260,18 +261,18 @@ public class MapCommand {
             return;
         }
 
-        MapStorageFactory.StorageType sourceTypeEnum;
-        MapStorageFactory.StorageType targetTypeEnum;
+        MapStorageType sourceTypeEnum;
+        MapStorageType targetTypeEnum;
 
         try {
-            sourceTypeEnum = MapStorageFactory.StorageType.valueOf(sourceTypeString.toUpperCase());
+            sourceTypeEnum = MapStorageType.valueOf(sourceTypeString.toUpperCase());
         } catch (IllegalArgumentException e) {
             player.sendMessage(ChatColor.RED + "无效的源存储类型: " + sourceTypeString);
             return;
         }
 
         try {
-            targetTypeEnum = MapStorageFactory.StorageType.valueOf(targetTypeString.toUpperCase());
+            targetTypeEnum = MapStorageType.valueOf(targetTypeString.toUpperCase());
         } catch (IllegalArgumentException e) {
             player.sendMessage(ChatColor.RED + "无效的目标存储类型: " + targetTypeString);
             return;
@@ -359,22 +360,22 @@ public class MapCommand {
         }
         // 获取当前位置
         Location loc = player.getLocation();
-        
+
         // 对齐到最近的整数位置
         double x = Math.round(loc.getX());
         double y = Math.round(loc.getY());
         double z = Math.round(loc.getZ());
-        
+
         // 对齐视角为90度的倍数 (0, 90, 180, 270)
         float yaw = Math.round(loc.getYaw() / 90) * 90;
         float pitch = Math.round(loc.getPitch() / 90) * 90;
-        
+
         // 创建新位置
         Location newLoc = new Location(loc.getWorld(), x, y, z, yaw, pitch);
-        
+
         // 传送玩家
         player.teleport(newLoc);
-        
+
         player.sendMessage(MessageUtil.color("&a位置已对齐到整数坐标! &7X: " + x + ", Y: " + y + ", Z: " + z));
         player.sendMessage(MessageUtil.color("&a视角已对齐到90度! &7Yaw: " + yaw + ", Pitch: " + pitch));
     }
