@@ -125,9 +125,6 @@ public class PlayerLevelManager {
             // 升级
             currentLevel++;
             levelsGained++;
-
-            // 处理单次升级事件
-            handleSingleLevelUp(gamePlayer, currentLevel - 1, currentLevel);
         }
 
         // 更新玩家等级和剩余经验
