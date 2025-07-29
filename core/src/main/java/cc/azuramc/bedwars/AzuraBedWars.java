@@ -23,6 +23,7 @@ import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
+import cc.azuramc.bedwars.tablist.TabList;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
@@ -87,6 +88,8 @@ public final class AzuraBedWars extends JavaPlugin {
         long startTime = System.currentTimeMillis();
         instance = this;
 
+        TabList.cleanUpScoreBoard();
+
         setupNMSSupport();
         // 初始化配置系统
         initConfigSystem();
@@ -140,6 +143,8 @@ public final class AzuraBedWars extends JavaPlugin {
         if (ormHandler != null) {
             ormHandler.shutdown();
         }
+
+        TabList.cleanUpScoreBoard();
     }
 
     /**
