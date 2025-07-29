@@ -13,7 +13,7 @@ import org.bukkit.scoreboard.Team;
  * @author an5w1r@163.com
  */
 public class TabList {
-    
+
     /**
      * 编辑玩家的TabList显示名称
      * 如果玩家有队伍，显示格式为 "队伍颜色队伍名 | 玩家名"
@@ -27,10 +27,10 @@ public class TabList {
             gamePlayer.getPlayer().setPlayerListName(gamePlayer.getName());
             return;
         }
-        
+
         GameTeam gameTeam = gamePlayer.getGameTeam();
         String displayName;
-        
+
         if (gameTeam != null) {
             displayName = gameTeam.getChatColor() + gameTeam.getName() + " | " + gamePlayer.getNickName();
 
@@ -39,7 +39,7 @@ public class TabList {
             // 如果玩家没有队伍，只显示玩家名
             displayName = "§7" + gamePlayer.getNickName();
         }
-        
+
         gamePlayer.getPlayer().setPlayerListName(displayName);
     }
 
@@ -60,7 +60,7 @@ public class TabList {
 
         gamePlayer.getPlayer().setPlayerListName(prefix + gamePlayer.getNickName());
     }
-    
+
     /**
      * 为所有在线玩家更新TabList显示名称
      */
@@ -71,24 +71,24 @@ public class TabList {
             }
         }
     }
-    
+
     /**
      * 为指定队伍的所有玩家更新TabList显示名称
-     * 
+     *
      * @param gameTeam 目标队伍
      */
     public static void updateTeamTabListNames(GameTeam gameTeam) {
         if (gameTeam == null) {
             return;
         }
-        
+
         for (GamePlayer gamePlayer : gameTeam.getGamePlayers()) {
             if (gamePlayer.getPlayer() != null) {
                 changeTabListNameInGame(gamePlayer);
             }
         }
     }
-    
+
     /**
      * 重置玩家的TabList显示名称为默认名称
      *
@@ -111,7 +111,7 @@ public class TabList {
         Scoreboard scoreboard = player.getScoreboard();
 
         // 检查是否已有队伍
-        String teamName = "tag_" + player.getName();
+        String teamName = "tag#" + random6Digits();
         Team team = scoreboard.getTeam(teamName);
         if (team == null) {
             team = scoreboard.registerNewTeam(teamName);
@@ -126,4 +126,10 @@ public class TabList {
 
         player.setScoreboard(scoreboard);
     }
+
+    private static String random6Digits() {
+        int number = (int) (Math.random() * 1_000_000); // 0 ~ 999999
+        return String.format("%06d", number); // 补足前导0
+    }
+
 }
