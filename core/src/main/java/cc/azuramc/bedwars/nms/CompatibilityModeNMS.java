@@ -1,23 +1,21 @@
 package cc.azuramc.bedwars.nms;
 
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LoggerUtil;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.*;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment;
 import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.entity.projectile.EntityFireball;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftFireball;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import com.mojang.datafixers.util.Pair;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,12 +80,12 @@ public class CompatibilityModeNMS implements NMSAccess {
     }
 
     @Override
-    public LivingEntity spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn) {
+    public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn) {
         return null;
     }
 
     @Override
-    public LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
+    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn, double damage) {
         return null;
     }
 
