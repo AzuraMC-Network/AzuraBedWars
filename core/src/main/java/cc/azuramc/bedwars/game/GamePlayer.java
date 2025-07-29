@@ -548,12 +548,18 @@ public class GamePlayer {
 
         if (gameTeam.getProtectionUpgrade() > 0) {
             for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
-                player.getInventory().getArmorContents()[i].addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getProtectionUpgrade());
+                ItemStack armor = player.getInventory().getArmorContents()[i];
+                if (armor != null) {
+                    armor.addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getProtectionUpgrade());
+                }
             }
         }
 
         if (gameTeam.getFallingProtectionUpgrade() > 0) {
-            player.getInventory().getArmorContents()[3].addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getFallingProtectionUpgrade());
+            ItemStack boots = player.getInventory().getArmorContents()[3];
+            if (boots != null) {
+                boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getFallingProtectionUpgrade());
+            }
         }
     }
 
