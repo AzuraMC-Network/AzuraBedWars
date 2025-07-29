@@ -28,29 +28,24 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author an5w1r@163.com
  */
-public class LobbyBoardProvider implements Listener {
+public class GameEndBoardProvider implements Listener {
 
     private static final ScoreboardConfig.LobbyScoreboard CONFIG = AzuraBedWars.getInstance().getScoreboardConfig().getLobbyScoreboard();
-
-    private static GameManager gameManager;
-
     private static final String TITLE = CONFIG.getTitle();
     private static final String SERVER_INFO = CONFIG.getServerInfo();
     private static final String WAITING_MESSAGE = CONFIG.getWaitingMessage();
     private static final String EMPTY_LINE = CONFIG.getEmptyLine();
     private static final String DEFAULT_MODE = CONFIG.getDefaultMode();
     private static final String EXP_MODE = CONFIG.getExpMode();
-
     /**
      * 玩家计分板更新状态缓存
      */
     private static final ConcurrentHashMap<UUID, Long> LAST_UPDATE_TIME = new ConcurrentHashMap<>();
-
     /**
      * 更新间隔（毫秒）
      */
     private static final long UPDATE_INTERVAL = CONFIG.getUpdateInterval();
-
+    private static GameManager gameManager;
     /**
      * 插件实例缓存
      */
@@ -66,8 +61,8 @@ public class LobbyBoardProvider implements Listener {
      *
      * @param gameManager 游戏实例
      */
-    public LobbyBoardProvider(GameManager gameManager) {
-        LobbyBoardProvider.gameManager = gameManager;
+    public GameEndBoardProvider(GameManager gameManager) {
+        GameEndBoardProvider.gameManager = gameManager;
         plugin = AzuraBedWars.getInstance();
     }
 
@@ -77,7 +72,7 @@ public class LobbyBoardProvider implements Listener {
      * @param manager 计分板管理器
      */
     public static void setScoreboardManager(ScoreboardManager manager) {
-        LobbyBoardProvider.scoreboardManager = manager;
+        GameEndBoardProvider.scoreboardManager = manager;
     }
 
     /**
@@ -227,7 +222,7 @@ public class LobbyBoardProvider implements Listener {
         if (interval > 0) {
             // 通过反射修改常量值
             try {
-                java.lang.reflect.Field field = LobbyBoardProvider.class.getDeclaredField("UPDATE_INTERVAL");
+                java.lang.reflect.Field field = GameEndBoardProvider.class.getDeclaredField("UPDATE_INTERVAL");
                 field.setAccessible(true);
                 java.lang.reflect.Field modifiersField = java.lang.reflect.Field.class.getDeclaredField("modifiers");
                 modifiersField.setAccessible(true);
@@ -237,6 +232,19 @@ public class LobbyBoardProvider implements Listener {
                 // 忽略错误
             }
         }
+    }
+
+    /**
+     * 清理所有计分板
+     */
+    public static void removeAllBoards() {
+        for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
+            Player player = gamePlayer.getPlayer();
+            if (player != null) {
+                removeBoard(player);
+            }
+        }
+        LAST_UPDATE_TIME.clear();
     }
 
     /**
@@ -275,18 +283,5 @@ public class LobbyBoardProvider implements Listener {
             // 更新所有玩家的计分板
             updateBoard();
         }
-    }
-
-    /**
-     * 清理所有计分板
-     */
-    public static void removeAllBoards() {
-        for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
-            Player player = gamePlayer.getPlayer();
-            if (player != null) {
-                removeBoard(player);
-            }
-        }
-        LAST_UPDATE_TIME.clear();
     }
 }
