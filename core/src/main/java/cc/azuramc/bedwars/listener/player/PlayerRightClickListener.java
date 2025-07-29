@@ -9,6 +9,7 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.spectator.gui.SpectatorCompassGUI;
 import cc.azuramc.bedwars.spectator.gui.SpectatorSettingGUI;
+import cc.azuramc.bedwars.util.BungeeUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -134,7 +135,7 @@ public class PlayerRightClickListener implements Listener {
      */
     private void handleSlimeBallInteraction(PlayerInteractEvent event) {
         event.setCancelled(true);
-        // back to lobby
+        BungeeUtil.connectToLobby(GamePlayer.get(event.getPlayer()));
     }
 
     /**
