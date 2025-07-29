@@ -551,6 +551,7 @@ public class GamePlayer {
                 ItemStack armor = player.getInventory().getArmorContents()[i];
                 if (armor != null) {
                     armor.addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getProtectionUpgrade());
+                    player.updateInventory();
                 }
             }
         }
@@ -559,6 +560,7 @@ public class GamePlayer {
             ItemStack boots = player.getInventory().getArmorContents()[3];
             if (boots != null) {
                 boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getFallingProtectionUpgrade());
+                player.updateInventory();
             }
         }
     }
@@ -691,6 +693,13 @@ public class GamePlayer {
         PlayerInventory inv = player.getInventory();
         inv.setArmorContents(new ItemStack[4]);
         inv.setContents(new ItemStack[]{});
+    }
+
+    /**
+     * 刷新背包
+     */
+    public void updateInventory() {
+        this.getPlayer().updateInventory();
     }
 
     /**
