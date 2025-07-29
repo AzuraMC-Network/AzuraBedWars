@@ -182,29 +182,21 @@ public class PlayerDamageListener implements Listener {
         }
 
         if (attacker instanceof IronGolem || attacker instanceof Silverfish) {
-            // 团队生物处理
-            handlePlayerVsCreature(event, entity, attacker);
+            // 处理自定义生物
+            handlePlayerVsCustomEntity(event, entity, gamePlayer);
         }
     }
 
-    private void handlePlayerVsCreature(EntityDamageByEntityEvent event, Entity entity, Entity attacker) {
-
-        //TODO: 处理铁傀儡/蠹虫伤害进入lastDamage (需要可以获取到放出生物的人)
+    private void handlePlayerVsCustomEntity(EntityDamageByEntityEvent event, Entity entity, GamePlayer gamePlayer) {
 
         CustomEntityManager customEntityManager = CustomEntityManager.getCustomEntityMap().get(entity.getUniqueId());
-        if (customEntityManager == null) {
-            return;
-        }
+        GamePlayer summoner = customEntityManager.getSummoner();
 
         GameTeam entityTeam = customEntityManager.getGameTeam();
 
-        GamePlayer attackerPlayer = GamePlayer.get(attacker.getUniqueId());
-        GameTeam attackerTeam = attackerPlayer.getGameTeam();
-        if (attackerTeam == null) {
-            return;
-        }
-
-        if (attackerTeam != entityTeam) {
+        // 如果自定义生物的队伍和被攻击者不同
+        if (summoner.getGameTeam() != entityTeam) {
+            gamePlayer.setLastDamage(summoner);
             return;
         }
 
