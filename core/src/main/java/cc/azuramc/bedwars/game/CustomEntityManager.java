@@ -28,13 +28,13 @@ public class CustomEntityManager {
     private final LivingEntity livingEntity;
 
     @Getter
-    private GamePlayer gamePlayer;
+    private GamePlayer summoner;
 
     @Getter
     private GameTeam gameTeam;
 
     @Getter
-    private int despawn;
+    private int liveLeftTime;
 
     @Getter
     private UUID uuid;
@@ -43,10 +43,10 @@ public class CustomEntityManager {
      * 构造函数
      *
      * @param livingEntity 生物实体
-     * @param gamePlayer   玩家
-     * @param despawn      消失倒计时（0表示使用默认值）
+     * @param summoner   召唤玩家 (GamePlayer)
+     * @param liveLeftTime      消失倒计时（0表示使用默认值）
      */
-    public CustomEntityManager(LivingEntity livingEntity, GamePlayer gamePlayer, int despawn) {
+    public CustomEntityManager(LivingEntity livingEntity, GamePlayer summoner, int liveLeftTime) {
         this.livingEntity = livingEntity;
 
         if (livingEntity == null) {
@@ -54,9 +54,9 @@ public class CustomEntityManager {
         }
 
         this.uuid = livingEntity.getUniqueId();
-        this.gamePlayer = gamePlayer;
-        this.gameTeam = gamePlayer.getGameTeam();
-        this.despawn = (despawn > 0) ? despawn : DEFAULT_DESPAWN_TIME;
+        this.summoner = summoner;
+        this.gameTeam = summoner.getGameTeam();
+        this.liveLeftTime = (liveLeftTime > 0) ? liveLeftTime : DEFAULT_DESPAWN_TIME;
 
         // 注册到管理器
         customEntityMap.put(uuid, this);
@@ -103,10 +103,10 @@ public class CustomEntityManager {
 
         // 更新实体状态
         updateEntityName();
-        despawn--;
+        liveLeftTime--;
 
         // 检查是否到达消失时间
-        if (despawn <= 0) {
+        if (liveLeftTime <= 0) {
             destroyEntity();
         }
     }
@@ -146,7 +146,7 @@ public class CustomEntityManager {
         String displayName = nameTemplate
                 .replace("{TeamColor}", gameTeam.getChatColor().toString())
                 .replace("{TeamName}", gameTeam.getName())
-                .replace("{Countdown}", String.valueOf(despawn))
+                .replace("{Countdown}", String.valueOf(liveLeftTime))
                 .replace("{Health}", String.valueOf((int) livingEntity.getHealth()));
 
         livingEntity.setCustomName(displayName);
@@ -204,7 +204,7 @@ public class CustomEntityManager {
      * 获取剩余生存时间
      */
     public int getRemainingTime() {
-        return despawn;
+        return liveLeftTime;
     }
 
     /**
@@ -241,6 +241,6 @@ public class CustomEntityManager {
                 uuid,
                 livingEntity != null ? livingEntity.getClass().getSimpleName() : "null",
                 gameTeam != null ? gameTeam.getName() : "null",
-                despawn);
+                liveLeftTime);
     }
 }
