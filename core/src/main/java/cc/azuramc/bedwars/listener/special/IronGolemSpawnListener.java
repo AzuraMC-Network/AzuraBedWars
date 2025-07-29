@@ -2,11 +2,7 @@ package cc.azuramc.bedwars.listener.special;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
+import cc.azuramc.bedwars.game.*;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -60,7 +56,7 @@ public class IronGolemSpawnListener implements Listener {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         int despawn = 240;
 
-        new CustomEntityRemoverUtil(AzuraBedWars.getInstance().getNmsAccess().spawnIronGolem(loc.add(0, 1, 0), gameTeam,
+        new CustomEntityManager(AzuraBedWars.getInstance().getNmsAccess().spawnIronGolem(loc.add(0, 1, 0), gameTeam,
                 0.25, 100, despawn), gameTeam, despawn);
         event.setCancelled(true);
     }

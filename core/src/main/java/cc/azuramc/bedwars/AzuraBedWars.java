@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.database.connection.ORMHandler;
 import cc.azuramc.bedwars.database.dao.PlayerDataDao;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
+import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
@@ -22,7 +23,6 @@ import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
-import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
@@ -302,8 +302,8 @@ public final class AzuraBedWars extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimer(this, new BukkitRunnable() {
             @Override
             public void run() {
-                for (CustomEntityRemoverUtil customEntityRemoverUtil : CustomEntityRemoverUtil.getDespawnables().values()){
-                    customEntityRemoverUtil.refresh();
+                for (CustomEntityManager customEntityManager : CustomEntityManager.getCustomEntityMap().values()) {
+                    customEntityManager.refresh();
                 }
             }
         }, 20L, 20L);

@@ -5,12 +5,8 @@ import cc.azuramc.bedwars.api.event.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.*;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
-import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
 import cc.azuramc.bedwars.util.DamageUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
@@ -195,12 +191,12 @@ public class PlayerDamageListener implements Listener {
 
         //TODO: 处理铁傀儡/蠹虫伤害进入lastDamage (需要可以获取到放出生物的人)
 
-        CustomEntityRemoverUtil customEntityRemoverUtil = CustomEntityRemoverUtil.getDespawnables().get(entity.getUniqueId());
-        if (customEntityRemoverUtil == null) {
+        CustomEntityManager customEntityManager = CustomEntityManager.getCustomEntityMap().get(entity.getUniqueId());
+        if (customEntityManager == null) {
             return;
         }
 
-        GameTeam entityTeam = customEntityRemoverUtil.getGameTeam();
+        GameTeam entityTeam = customEntityManager.getGameTeam();
 
         GamePlayer attackerPlayer = GamePlayer.get(attacker.getUniqueId());
         GameTeam attackerTeam = attackerPlayer.getGameTeam();
