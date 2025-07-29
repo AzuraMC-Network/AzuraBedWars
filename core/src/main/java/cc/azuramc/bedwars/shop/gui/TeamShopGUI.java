@@ -223,12 +223,13 @@ public class TeamShopGUI extends CustomGUI {
 
                         // 为团队所有玩家的护甲添加保护附魔
                         for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
-                            Player p = teamPlayer.getPlayer();
+                            Player player = teamPlayer.getPlayer();
 
-                            for (int i = 0; i < p.getInventory().getArmorContents().length; i++) {
-                                ItemStack armor = p.getInventory().getArmorContents()[i];
+                            for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
+                                ItemStack armor = player.getInventory().getArmorContents()[i];
                                 if (armor != null) {
                                     armor.addEnchantment(XEnchantment.PROTECTION.get(), nextLevel);
+                                    teamPlayer.updateInventory();
                                 }
                             }
                         }
@@ -401,10 +402,11 @@ public class TeamShopGUI extends CustomGUI {
                         new TeamShopGUI(gamePlayer, gameManager).open();
 
                         // 为团队所有玩家的护甲添加摔落保护附魔
-                        gameTeam.getAlivePlayers().forEach(player -> {
-                            ItemStack boots = player.getPlayer().getInventory().getArmorContents()[3];
+                        gameTeam.getAlivePlayers().forEach(gamePlayers -> {
+                            ItemStack boots = gamePlayers.getPlayer().getInventory().getArmorContents()[0];
                             if (boots != null) {
                                 boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getFallingProtectionUpgrade());
+                                gamePlayers.updateInventory();
                             }
                         });
                     }, false));
