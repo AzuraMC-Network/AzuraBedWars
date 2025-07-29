@@ -17,9 +17,7 @@ public class PlayerLevelManager {
     @Getter
     private static final HashMap<Integer, Integer> LEVEL_TOTAL_EXP = new HashMap<>();
 
-    /**
-     * 最大等级
-     */
+    /** 最大等级 */
     private static final int MAX_LEVEL = 50;
 
     /**
@@ -43,10 +41,51 @@ public class PlayerLevelManager {
     }
 
     /**
+     * 根据当前等级内的经验值获取升级进度
+     *
+     * @param currentLevel    当前等级
+     * @param currentLevelExp 当前等级内的经验值
+     * @return 升级进度百分比（0.0 - 1.0）
+     */
+    public static double getLevelProgressByLevelExp(int currentLevel, double currentLevelExp) {
+        if (currentLevel >= MAX_LEVEL) {
+            return 1.0;
+        }
+
+        int expNeededForNextLevel = getExpRequiredForLevelUp(currentLevel);
+        if (expNeededForNextLevel <= 0) {
+            return 1.0;
+        }
+
+        return Math.min(1.0, Math.max(0.0, currentLevelExp / expNeededForNextLevel));
+    }
+
+    /**
+     * 获取从当前等级升级到下一级需要的经验值
+     *
+     * @param currentLevel 当前等级
+     * @return 升级所需经验值，如果已是最高等级返回-1
+     */
+    public static int getExpRequiredForLevelUp(int currentLevel) {
+        if (currentLevel >= MAX_LEVEL) {
+            return -1;
+        }
+
+        int currentLevelTotalExp = LEVEL_TOTAL_EXP.getOrDefault(currentLevel, 0);
+        int nextLevelTotalExp = LEVEL_TOTAL_EXP.getOrDefault(currentLevel + 1, -1);
+
+        if (nextLevelTotalExp == -1) {
+            return -1;
+        }
+
+        return nextLevelTotalExp - currentLevelTotalExp;
+    }
+
+    /**
      * 为玩家增加经验值并自动处理升级
      *
      * @param gamePlayer 玩家
-     * @param expToAdd   要增加的经验值
+     * @param expToAdd 要增加的经验值
      * @return 升级的等级数（0表示没有升级，1表示升了1级，以此类推）
      */
     public static int addExperience(GamePlayer gamePlayer, double expToAdd) {
@@ -70,31 +109,38 @@ public class PlayerLevelManager {
         int currentLevel = oldLevel;
         int levelsGained = 0;
 
-        // 循环检查是否可以升级
-        while (currentLevel < MAX_LEVEL) {
-            int nextLevel = currentLevel + 1;
-            Integer nextLevelRequiredExp = LEVEL_TOTAL_EXP.get(nextLevel);
+        // 循环检查是否可以升级（支持连续升级）
+        while (currentLevel < MAX_LEVEL && currentExp > 0) {
+            // 获取当前等级升级所需经验
+            int expNeededForNextLevel = getExpRequiredForLevelUp(currentLevel);
 
-            // 如果下一级的经验要求不存在，或者当前经验不足，则停止升级
-            if (nextLevelRequiredExp == null || currentExp < nextLevelRequiredExp) {
+            // 如果无法获取升级经验要求，或者当前经验不足，则停止升级
+            if (expNeededForNextLevel == -1 || currentExp < expNeededForNextLevel) {
                 break;
             }
 
+            // 扣除升级消耗的经验
+            currentExp -= expNeededForNextLevel;
+
             // 升级
-            currentLevel = nextLevel;
+            currentLevel++;
             levelsGained++;
 
             // 处理单次升级事件
             handleSingleLevelUp(gamePlayer, currentLevel - 1, currentLevel);
         }
 
-        // 更新玩家等级
+        // 更新玩家等级和剩余经验
         if (levelsGained > 0) {
             playerData.setLevel(currentLevel);
+            // 设置升级后剩余的经验
+            playerData.setExperience(currentExp);
 
             // 处理总体升级事件（如果升了多级）
             if (levelsGained > 1) {
                 handleMultipleLevelUp(gamePlayer, oldLevel, currentLevel, levelsGained);
+            } else {
+                handleSingleLevelUp(gamePlayer, oldLevel, currentLevel);
             }
         }
 
@@ -105,8 +151,8 @@ public class PlayerLevelManager {
      * 处理单次升级事件
      *
      * @param gamePlayer 玩家
-     * @param oldLevel   旧等级
-     * @param newLevel   新等级
+     * @param oldLevel 旧等级
+     * @param newLevel 新等级
      */
     private static void handleSingleLevelUp(GamePlayer gamePlayer, int oldLevel, int newLevel) {
         gamePlayer.getPlayer().sendMessage("§6恭喜！你从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
@@ -115,20 +161,18 @@ public class PlayerLevelManager {
     /**
      * 处理多级升级事件
      *
-     * @param gamePlayer   玩家
-     * @param oldLevel     起始等级
-     * @param newLevel     最终等级
+     * @param gamePlayer 玩家
+     * @param oldLevel 起始等级
+     * @param newLevel 最终等级
      * @param levelsGained 升级的等级数
      */
     private static void handleMultipleLevelUp(GamePlayer gamePlayer, int oldLevel, int newLevel, int levelsGained) {
-        // 处理连续升级的特殊逻辑
-        if (gamePlayer.getPlayer() != null) {
-            gamePlayer.getPlayer().sendMessage("§6恭喜！你连续升级了 " + levelsGained + " 级！从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
-        }
+        gamePlayer.getPlayer().sendMessage("§6恭喜！你连续升级了 " + levelsGained + " 级！从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
     }
 
     /**
      * 获取当前等级的进度百分比
+     * 注意：由于改为每级独立经验系统，playerData.getExperience() 应该存储的是当前等级内的经验
      *
      * @param playerData 玩家数据
      * @return 当前等级进度百分比（0.0 - 1.0）
@@ -137,30 +181,9 @@ public class PlayerLevelManager {
         if (playerData == null) return 0.0;
 
         int currentLevel = playerData.getLevel();
-        double currentExp = playerData.getExperience();
+        double currentLevelExp = playerData.getExperience();
 
-        // 如果已达最高等级
-        if (currentLevel >= MAX_LEVEL) {
-            return 1.0;
-        }
-
-        int currentLevelRequiredExp = LEVEL_TOTAL_EXP.getOrDefault(currentLevel, 0);
-        int nextLevelRequiredExp = LEVEL_TOTAL_EXP.getOrDefault(currentLevel + 1, -1);
-
-        // 如果下一级不存在，说明已达最高等级
-        if (nextLevelRequiredExp == -1) {
-            return 1.0;
-        }
-
-        // 计算当前等级内的进度
-        double expInCurrentLevel = currentExp - currentLevelRequiredExp;
-        double expNeededForNextLevel = nextLevelRequiredExp - currentLevelRequiredExp;
-
-        if (expNeededForNextLevel <= 0) {
-            return 1.0;
-        }
-
-        return Math.min(1.0, Math.max(0.0, expInCurrentLevel / expNeededForNextLevel));
+        return getLevelProgressByLevelExp(currentLevel, currentLevelExp);
     }
 
     /**
@@ -173,20 +196,18 @@ public class PlayerLevelManager {
         if (playerData == null) return 0.0;
 
         int currentLevel = playerData.getLevel();
-        double currentExp = playerData.getExperience();
+        double currentLevelExp = playerData.getExperience();
 
-        // 如果已达最高等级
         if (currentLevel >= MAX_LEVEL) {
             return 0.0;
         }
 
-        int nextLevelRequiredExp = LEVEL_TOTAL_EXP.getOrDefault(currentLevel + 1, -1);
-
-        if (nextLevelRequiredExp == -1) {
+        int expNeededForNextLevel = getExpRequiredForLevelUp(currentLevel);
+        if (expNeededForNextLevel <= 0) {
             return 0.0;
         }
 
-        return Math.max(0.0, nextLevelRequiredExp - currentExp);
+        return Math.max(0.0, expNeededForNextLevel - currentLevelExp);
     }
 
     /**

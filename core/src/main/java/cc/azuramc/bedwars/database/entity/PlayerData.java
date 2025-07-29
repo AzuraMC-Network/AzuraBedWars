@@ -52,13 +52,12 @@ public class PlayerData {
         this.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         this.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-        this.gamePlayer = GamePlayer.get(uuid);
+        this.gamePlayer = gamePlayer;
     }
 
     public void addLevel(int level) {
         this.level = this.level + level;
     }
-
     public void addExperience(double experience) {
         this.experience = this.experience + experience;
     }
@@ -87,6 +86,9 @@ public class PlayerData {
         this.games = this.games + games;
     }
 
+    public void addLevel() {
+        this.level++;
+    }
     public void addKills() {
         PlayerLevelManager.addExperience(this.gamePlayer, 1);
         this.kills++;
