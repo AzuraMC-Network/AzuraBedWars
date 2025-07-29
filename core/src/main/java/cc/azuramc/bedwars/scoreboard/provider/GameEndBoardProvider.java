@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.ScoreboardConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
@@ -17,9 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -37,6 +35,12 @@ public class GameEndBoardProvider implements Listener {
     private static final String EMPTY_LINE = CONFIG.getEmptyLine();
     private static final String DEFAULT_MODE = CONFIG.getDefaultMode();
     private static final String EXP_MODE = CONFIG.getExpMode();
+
+    /**
+     * 日期格式化器缓存
+     */
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yy", Locale.CHINESE);
+
     /**
      * 玩家计分板更新状态缓存
      */
@@ -130,30 +134,15 @@ public class GameEndBoardProvider implements Listener {
 
         List<String> lines = new ArrayList<>();
 
-        // 添加地图信息
+        // 添加日期行
+        lines.add("§7团队 " + DATE_FORMAT.format(Calendar.getInstance().getTime()));
         lines.add(EMPTY_LINE);
-        lines.add("§f地图: §a" + gameManager.getMapData().getName());
-        lines.add("§f队伍: §a" + gameManager.getMapData().getPlayers().getTeam() + "人 " + gameManager.getGameTeams().size() + "队");
-        lines.add("§f作者: §a" + gameManager.getMapData().getAuthor());
-        lines.add(EMPTY_LINE);
-        // 添加玩家信息
-        lines.add("§f玩家: §a" + GamePlayer.getOnlinePlayers().size() + "/" + gameManager.getMaxPlayers());
-        lines.add(EMPTY_LINE);
-        // 添加倒计时信息
-        String countdown = getCountdown();
-        if (countdown != null) {
-            lines.add(countdown);
-        }
-        lines.add(EMPTY_LINE);
-        // 添加模式信息
-        String modeText = gamePlayer.getPlayerData().getMode() == GameModeType.DEFAULT ? DEFAULT_MODE : EXP_MODE;
-        lines.add("§f你的模式: §a" + modeText);
-        lines.add(EMPTY_LINE);
-        // 添加版本信息
-        lines.add("§f版本: §a" + plugin.getDescription().getVersion());
+        // 添加事件信息
+        lines.add("&c游戏结束");
         lines.add(EMPTY_LINE);
         // 添加服务器信息
         lines.add(SERVER_INFO);
+
 
         // 更新计分板
         board.updateLines(lines.toArray(new String[0]));
