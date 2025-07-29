@@ -7,7 +7,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.level.PlayerLevelMap;
+import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import cc.azuramc.bedwars.game.task.GameStartTask;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import fr.mrmicky.fastboard.FastBoard;
@@ -63,17 +63,17 @@ public class LobbyBoardProvider implements Listener {
 
     /**
      * 构造函数
-     * 
+     *
      * @param gameManager 游戏实例
      */
     public LobbyBoardProvider(GameManager gameManager) {
         LobbyBoardProvider.gameManager = gameManager;
         plugin = AzuraBedWars.getInstance();
     }
-    
+
     /**
      * 设置计分板管理器
-     * 
+     *
      * @param manager 计分板管理器
      */
     public static void setScoreboardManager(ScoreboardManager manager) {
@@ -82,14 +82,14 @@ public class LobbyBoardProvider implements Listener {
 
     /**
      * 为玩家创建计分板
-     * 
+     *
      * @param player 玩家
      */
     public static void show(Player player) {
         if (player == null) {
             return;
         }
-        
+
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         if (gamePlayer != null && gamePlayer.getBoard() == null) {
             FastBoard board = new FastBoard(player);
@@ -104,59 +104,59 @@ public class LobbyBoardProvider implements Listener {
      */
     public static void updateBoard() {
         long currentTime = System.currentTimeMillis();
-        
+
         for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
             // 检查更新间隔
             UUID playerId = gamePlayer.getUuid();
             long lastUpdate = LAST_UPDATE_TIME.getOrDefault(playerId, 0L);
-            
+
             if (currentTime - lastUpdate >= UPDATE_INTERVAL) {
                 updatePlayerBoard(gamePlayer);
                 LAST_UPDATE_TIME.put(playerId, currentTime);
             }
         }
     }
-    
+
     /**
      * 更新单个玩家的计分板
-     * 
+     *
      * @param gamePlayer 游戏玩家
      */
     private static void updatePlayerBoard(GamePlayer gamePlayer) {
         FastBoard board = gamePlayer.getBoard();
         Player player = gamePlayer.getPlayer();
-        
+
         if (player == null || board == null || !player.isOnline()) {
             return;
         }
-        
+
         // 更新玩家等级
         updatePlayerLevel(player, gamePlayer.getPlayerData());
-        
+
         List<String> lines = new ArrayList<>();
-        
+
         // 添加地图信息
         addMapInfo(lines);
-        
+
         // 添加玩家信息
         addPlayerInfo(lines);
-        
+
         // 添加倒计时信息
         addCountdownInfo(lines);
-        
+
         // 添加模式信息
         addModeInfo(lines, gamePlayer.getPlayerData());
-        
+
         // 添加版本信息
         addVersionInfo(lines);
-        
+
         // 添加服务器信息
         addServerInfo(lines);
-        
+
         // 更新计分板
         board.updateLines(lines.toArray(new String[0]));
     }
-    
+
     /**
      * 更新玩家等级
      *
@@ -164,16 +164,17 @@ public class LobbyBoardProvider implements Listener {
      * @param playerData 玩家数据
      */
     private static void updatePlayerLevel(Player player, PlayerData playerData) {
-        int expPoints = (playerData.getKills() * 2) +
-                       (playerData.getDestroyedBeds() * 10) +
-                       (playerData.getWins() * 15);
-        int level = PlayerLevelMap.getLevel(expPoints);
-        player.setLevel(level);
+        // 设置玩家的显示等级
+        player.setLevel(playerData.getLevel());
+
+        // 设置经验条显示当前等级的进度
+        float progress = (float) PlayerLevelManager.getLevelProgress(playerData);
+        player.setExp(progress);
     }
-    
+
     /**
      * 添加地图信息到计分板
-     * 
+     *
      * @param lines 计分板行列表
      */
     private static void addMapInfo(List<String> lines) {
@@ -183,20 +184,20 @@ public class LobbyBoardProvider implements Listener {
         lines.add("§f作者: §a" + gameManager.getMapData().getAuthor());
         lines.add(EMPTY_LINE);
     }
-    
+
     /**
      * 添加玩家信息到计分板
-     * 
+     *
      * @param lines 计分板行列表
      */
     private static void addPlayerInfo(List<String> lines) {
         lines.add("§f玩家: §a" + GamePlayer.getOnlinePlayers().size() + "/" + gameManager.getMaxPlayers());
         lines.add(EMPTY_LINE);
     }
-    
+
     /**
      * 添加倒计时信息到计分板
-     * 
+     *
      * @param lines 计分板行列表
      */
     private static void addCountdownInfo(List<String> lines) {
@@ -206,10 +207,10 @@ public class LobbyBoardProvider implements Listener {
         }
         lines.add(EMPTY_LINE);
     }
-    
+
     /**
      * 添加模式信息到计分板
-     * 
+     *
      * @param lines 计分板行列表
      * @param playerData 玩家数据
      */
@@ -218,29 +219,29 @@ public class LobbyBoardProvider implements Listener {
         lines.add("§f你的模式: §a" + modeText);
         lines.add(EMPTY_LINE);
     }
-    
+
     /**
      * 添加版本信息到计分板
-     * 
+     *
      * @param lines 计分板行列表
      */
     private static void addVersionInfo(List<String> lines) {
         lines.add("§f版本: §a" + plugin.getDescription().getVersion());
         lines.add(EMPTY_LINE);
     }
-    
+
     /**
      * 添加服务器信息到计分板
-     * 
+     *
      * @param lines 计分板行列表
      */
     private static void addServerInfo(List<String> lines) {
         lines.add(SERVER_INFO);
     }
-    
+
     /**
      * 获取倒计时信息
-     * 
+     *
      * @return 倒计时文本
      */
     private static String getCountdown() {
@@ -257,67 +258,29 @@ public class LobbyBoardProvider implements Listener {
     }
 
     /**
-     * 玩家加入事件处理
-     * 
-     * @param e 玩家加入事件
-     */
-    @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
-        if (scoreboardManager != null) {
-            // 使用计分板管理器显示对应计分板
-            scoreboardManager.showBoard(GamePlayer.get(e.getPlayer()));
-            scoreboardManager.updateAllBoards();
-        } else {
-            // 为新加入的玩家创建计分板
-            show(e.getPlayer());
-            // 更新所有玩家的计分板
-            updateBoard();
-        }
-    }
-    
-    /**
-     * 玩家退出事件处理
-     * 
-     * @param e 玩家退出事件
-     */
-    @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        if (scoreboardManager != null) {
-            // 使用计分板管理器移除计分板
-            scoreboardManager.removeBoard(GamePlayer.get(e.getPlayer()));
-            scoreboardManager.updateAllBoards();
-        } else {
-            // 清理玩家的计分板
-            removeBoard(e.getPlayer());
-            // 更新所有玩家的计分板
-            updateBoard();
-        }
-    }
-
-    /**
      * 清理玩家的计分板
-     * 
+     *
      * @param player 玩家
      */
     public static void removeBoard(Player player) {
         if (player == null) {
             return;
         }
-        
+
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         if (gamePlayer != null && gamePlayer.getBoard() != null) {
             FastBoard board = gamePlayer.getBoard();
             board.delete();
             gamePlayer.setBoard(null);
-            
+
             // 移除缓存
             LAST_UPDATE_TIME.remove(player.getUniqueId());
         }
     }
-    
+
     /**
      * 设置更新间隔
-     * 
+     *
      * @param interval 更新间隔（毫秒）
      */
     public static void setUpdateInterval(long interval) {
@@ -335,7 +298,45 @@ public class LobbyBoardProvider implements Listener {
             }
         }
     }
-    
+
+    /**
+     * 玩家加入事件处理
+     *
+     * @param e 玩家加入事件
+     */
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        if (scoreboardManager != null) {
+            // 使用计分板管理器显示对应计分板
+            scoreboardManager.showBoard(GamePlayer.get(e.getPlayer()));
+            scoreboardManager.updateAllBoards();
+        } else {
+            // 为新加入的玩家创建计分板
+            show(e.getPlayer());
+            // 更新所有玩家的计分板
+            updateBoard();
+        }
+    }
+
+    /**
+     * 玩家退出事件处理
+     *
+     * @param e 玩家退出事件
+     */
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        if (scoreboardManager != null) {
+            // 使用计分板管理器移除计分板
+            scoreboardManager.removeBoard(GamePlayer.get(e.getPlayer()));
+            scoreboardManager.updateAllBoards();
+        } else {
+            // 清理玩家的计分板
+            removeBoard(e.getPlayer());
+            // 更新所有玩家的计分板
+            updateBoard();
+        }
+    }
+
     /**
      * 清理所有计分板
      */

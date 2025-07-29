@@ -18,7 +18,7 @@ import java.util.UUID;
  * @author an5w1r@163.com
  */
 public class PlayerDataDao {
-    
+
     public AzuraOrmClient ormClient;
 
     public PlayerDataDao(AzuraBedWars plugin) {
@@ -38,7 +38,8 @@ public class PlayerDataDao {
                     .column(PlayerDataTableKey.name, DataType.VARCHAR_NOT_NULL(36))
                     .column(PlayerDataTableKey.uuid, DataType.VARCHAR_NOT_NULL(36))
                     .column(PlayerDataTableKey.mode, DataType.VARCHAR_NOT_NULL(20))
-                    .column(PlayerDataTableKey.level, DataType.Type.DOUBLE.getSql(), DataType.DEFAULT(0.0))
+                    .column(PlayerDataTableKey.level, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
+                    .column(PlayerDataTableKey.experience, DataType.Type.DOUBLE.getSql(), DataType.DEFAULT(0.0))
                     .column(PlayerDataTableKey.kills, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.assists, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.deaths, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
@@ -74,6 +75,7 @@ public class PlayerDataDao {
                     .values(PlayerDataTableKey.uuid, playerData.getUuid().toString())
                     .values(PlayerDataTableKey.mode, playerData.getMode().toString())
                     .values(PlayerDataTableKey.level, playerData.getLevel())
+                    .values(PlayerDataTableKey.experience, playerData.getExperience())
                     .values(PlayerDataTableKey.kills, playerData.getKills())
                     .values(PlayerDataTableKey.deaths, playerData.getDeaths())
                     .values(PlayerDataTableKey.assists, playerData.getAssists())
@@ -89,7 +91,7 @@ public class PlayerDataDao {
 
             int affectedRows = insertUsersStmt.executeUpdate();
             insertUsersStmt.close();
-            
+
             if (affectedRows > 0) {
                 // 插入成功后，通过UUID查询获取生成的ID
                 int generatedId = selectPlayerDataIdByUuid(playerData.getUuid());
@@ -98,7 +100,7 @@ public class PlayerDataDao {
                 }
             }
         }
-        
+
         return playerData;
     }
 
@@ -114,6 +116,7 @@ public class PlayerDataDao {
                     .set(PlayerDataTableKey.uuid, playerData.getUuid().toString())
                     .set(PlayerDataTableKey.mode, playerData.getMode().toString())
                     .set(PlayerDataTableKey.level, playerData.getLevel())
+                    .set(PlayerDataTableKey.experience, playerData.getExperience())
                     .set(PlayerDataTableKey.kills, playerData.getKills())
                     .set(PlayerDataTableKey.deaths, playerData.getDeaths())
                     .set(PlayerDataTableKey.assists, playerData.getAssists())
@@ -148,6 +151,7 @@ public class PlayerDataDao {
                             PlayerDataTableKey.mode,
                             PlayerDataTableKey.level,
                             PlayerDataTableKey.kills,
+                            PlayerDataTableKey.experience,
                             PlayerDataTableKey.deaths,
                             PlayerDataTableKey.assists,
                             PlayerDataTableKey.finalKills,
@@ -169,7 +173,8 @@ public class PlayerDataDao {
                 playerData.setName(resultSet.getString(PlayerDataTableKey.name));
                 playerData.setUuid(UUID.fromString(resultSet.getString(PlayerDataTableKey.uuid)));
                 playerData.setMode(GameModeType.valueOf(resultSet.getString(PlayerDataTableKey.mode).toUpperCase()));
-                playerData.setLevel(resultSet.getDouble(PlayerDataTableKey.level));
+                playerData.setLevel(resultSet.getInt(PlayerDataTableKey.level));
+                playerData.setExperience(resultSet.getInt(PlayerDataTableKey.experience));
                 playerData.setKills(resultSet.getInt(PlayerDataTableKey.kills));
                 playerData.setDeaths(resultSet.getInt(PlayerDataTableKey.deaths));
                 playerData.setAssists(resultSet.getInt(PlayerDataTableKey.assists));
@@ -205,11 +210,11 @@ public class PlayerDataDao {
 
             ResultSet resultSet = selectUsersStmt.executeQuery();
             int userId = -1;
-            
+
             if (resultSet.next()) {
                 userId = resultSet.getInt(PlayerDataTableKey.id);
             }
-            
+
             resultSet.close();
             selectUsersStmt.close();
 
