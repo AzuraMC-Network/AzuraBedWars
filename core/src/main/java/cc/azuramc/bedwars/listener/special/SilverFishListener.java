@@ -1,7 +1,10 @@
 package cc.azuramc.bedwars.listener.special;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.*;
+import cc.azuramc.bedwars.game.CustomEntityManager;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameState;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -31,9 +34,8 @@ public class SilverFishListener implements Listener {
 
         GamePlayer gamePlayer = GamePlayer.get(shooter);
 
-        GameTeam gameTeam = gamePlayer.getGameTeam();
         int despawn = 15;
-        new CustomEntityManager(AzuraBedWars.getInstance().getNmsAccess().spawnSilverfish(location.add(0, 1, 0), gamePlayer.getGameTeam(),
-                0.25, 8, despawn, 4), gameTeam, despawn);
+        new CustomEntityManager(AzuraBedWars.getInstance().getNmsAccess().spawnSilverfish(location.add(0, 1, 0), gamePlayer,
+                0.25, 8, despawn, 4), gamePlayer, despawn);
     }
 }

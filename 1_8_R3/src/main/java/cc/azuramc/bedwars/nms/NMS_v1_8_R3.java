@@ -92,13 +92,15 @@ public class NMS_v1_8_R3 implements NMSAccess {
     }
 
     @Override
-    public LivingEntity spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn) {
-        LoggerUtil.debug("NMS_v1_8_R3$spawnIronGolem | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn);
+    public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        LoggerUtil.debug("NMS_v1_8_R3$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn);
         return CustomIronGolem.spawn(loc, gameTeam, speed, health, despawn);
     }
 
     @Override
-    public LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
+    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn, double damage) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
         LoggerUtil.debug("NMS_v1_8_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn + ", damage: " + damage);
         return CustomSilverfish.spawn(loc, gameTeam, speed, health, despawn, damage);
     }

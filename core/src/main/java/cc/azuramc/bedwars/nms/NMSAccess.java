@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.nms;
 
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.Location;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -20,6 +19,8 @@ public interface NMSAccess {
     void showArmor(GamePlayer gamePlayer, List<GamePlayer> receiverList);
     Fireball setFireballDirection(Fireball fireball, Vector vector);
     void registerCustomEntities();
-    LivingEntity spawnIronGolem(Location loc, GameTeam gameTeam, double speed, double health, int despawn);
-    LivingEntity spawnSilverfish(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage);
+
+    LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn);
+
+    LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn, double damage);
 }
