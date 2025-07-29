@@ -342,22 +342,22 @@ public class PlayerDamageListener implements Listener {
         BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
         Bukkit.getPluginManager().callEvent(event);
 
+        if (gameKiller == null) {
+            return;
+        }
+
         // 处理最终击杀
         if (isFinalKill) {
             PlayerDeathReasonListener.setFinalKill(true);
-            if (gameKiller != null) {
-                if (!VaultUtil.ecoIsNull) {
-                    showCoinsReward(gameKiller);
-                    VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
-                }
-                gameKiller.getPlayerData().addFinalKills();
+            if (!VaultUtil.ecoIsNull) {
+                showCoinsReward(gameKiller);
+                VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
             }
-        }
-
-        // 更新玩家数据
-        if (gameKiller != null) {
+            gameKiller.getPlayerData().addFinalKills();
+        } else {
             gameKiller.getPlayerData().addKills();
         }
+
         gamePlayer.getPlayerData().addDeaths();
     }
 
