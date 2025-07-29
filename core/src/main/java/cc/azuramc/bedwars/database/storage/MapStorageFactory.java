@@ -42,9 +42,8 @@ public class MapStorageFactory {
      */
     public static MySQLMapStorage getMysqlStorage() {
         if (mysqlMapStorage == null) {
-            String database = AzuraBedWars.getInstance().getDatabaseName();
             String table = AzuraBedWars.MAP_TABLE_NAME;
-            mysqlMapStorage = new MySQLMapStorage(database, table);
+            mysqlMapStorage = new MySQLMapStorage(AzuraBedWars.getInstance(), table);
         }
         return mysqlMapStorage;
     }
@@ -95,4 +94,4 @@ public class MapStorageFactory {
         
         return source.migrateTo(target, mapName);
     }
-} 
+}
