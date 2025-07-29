@@ -97,7 +97,7 @@ public class ScoreboardManager implements Listener {
             return;
         }
 
-        // 同时移除两种计分板，确保清理完全
+        GameEndBoardProvider.removeBoard(gamePlayer.getPlayer());
         GameRunningBoardProvider.removeBoard(gamePlayer.getPlayer());
         LobbyBoardProvider.removeBoard(gamePlayer.getPlayer());
     }
@@ -106,6 +106,7 @@ public class ScoreboardManager implements Listener {
      * 移除所有玩家的计分板
      */
     public void removeAllBoards() {
+        GameEndBoardProvider.removeAllBoards();
         GameRunningBoardProvider.removeAllBoards();
         LobbyBoardProvider.removeAllBoards();
     }
