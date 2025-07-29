@@ -28,6 +28,9 @@ public class CustomEntityManager {
     private final LivingEntity livingEntity;
 
     @Getter
+    private GamePlayer gamePlayer;
+
+    @Getter
     private GameTeam gameTeam;
 
     @Getter
@@ -40,10 +43,10 @@ public class CustomEntityManager {
      * 构造函数
      *
      * @param livingEntity 生物实体
-     * @param gameTeam     游戏队伍
+     * @param gamePlayer   玩家
      * @param despawn      消失倒计时（0表示使用默认值）
      */
-    public CustomEntityManager(LivingEntity livingEntity, GameTeam gameTeam, int despawn) {
+    public CustomEntityManager(LivingEntity livingEntity, GamePlayer gamePlayer, int despawn) {
         this.livingEntity = livingEntity;
 
         if (livingEntity == null) {
@@ -51,7 +54,8 @@ public class CustomEntityManager {
         }
 
         this.uuid = livingEntity.getUniqueId();
-        this.gameTeam = gameTeam;
+        this.gamePlayer = gamePlayer;
+        this.gameTeam = gamePlayer.getGameTeam();
         this.despawn = (despawn > 0) ? despawn : DEFAULT_DESPAWN_TIME;
 
         // 注册到管理器
