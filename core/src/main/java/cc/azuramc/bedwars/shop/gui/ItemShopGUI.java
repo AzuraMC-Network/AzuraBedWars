@@ -37,18 +37,18 @@ import java.util.*;
 public class ItemShopGUI extends CustomGUI {
     /** 商店展示槽位 */
     private static final Integer[] SHOP_SLOTS = new Integer[]{
-            19, 20, 21, 22, 23, 24, 25, 
-            28, 29, 30, 31, 32, 33, 34, 
+            19, 20, 21, 22, 23, 24, 25,
+            28, 29, 30, 31, 32, 33, 34,
             37, 38, 39, 40, 41, 42, 43
     };
-    
+
     /** 资源名称缓存 */
     private static final Map<Material, String> RESOURCE_NAMES = new HashMap<>();
-    
+
     /** JSON处理器 */
     private static final Gson GSON = new Gson();
     private static final Type SHOP_DATA_TYPE = new TypeToken<Map<Integer, String>>(){}.getType();
-    
+
     /* 静态初始化资源名称 */
     static {
         RESOURCE_NAMES.put(XMaterial.IRON_INGOT.get(), "铁");
@@ -68,7 +68,7 @@ public class ItemShopGUI extends CustomGUI {
 
         // 初始化商店导航栏
         initializeShopNavbar(gamePlayer, slot, gameManager);
-        
+
         // 初始化商店分隔条
         initializeShopSeparator(slot);
 
@@ -95,7 +95,7 @@ public class ItemShopGUI extends CustomGUI {
             setItem(i, new ItemBuilder()
                     .setItemStack(shopData.getMainShopItem().getItemStack().clone())
                     .setDisplayName(shopData.getMainShopItem().getDisplayName())
-                    .getItem(), 
+                            .getItem(),
                     new GUIAction(0, () -> {
                         if (finalI != slot) {
                             new ItemShopGUI(gamePlayer, finalI, gameManager).open();
@@ -104,7 +104,7 @@ public class ItemShopGUI extends CustomGUI {
             ++i;
         }
     }
-    
+
     /**
      * 初始化商店分隔条
      */
@@ -118,21 +118,21 @@ public class ItemShopGUI extends CustomGUI {
             }
         }
     }
-    
+
     /**
      * 初始化默认商店(快捷购买) - 使用JSON格式
      */
     private void initializeCustomShop(GamePlayer gamePlayer, int slot, GameManager gameManager) {
         // 从数据库加载JSON格式的快捷商店配置
         Map<Integer, String> shopDataMap = loadShopDataFromJson(gamePlayer.getPlayerData());
-        
-        // 遍历所有可用槽位 
+
+        // 遍历所有可用槽位
         for (int slotIndex = 0; slotIndex < SHOP_SLOTS.length; slotIndex++) {
             int actualSlotPosition = SHOP_SLOTS[slotIndex];
-            
+
             // 检查该槽位是否有配置的物品
             String itemData = shopDataMap.get(slotIndex);
-            
+
             if (itemData == null || "AIR".equals(itemData)) {
                 // 设置空槽位
                 setEmptySlot(gamePlayer.getPlayer(), actualSlotPosition, slot, gameManager);
@@ -140,7 +140,7 @@ public class ItemShopGUI extends CustomGUI {
                 // 已有物品的槽位
                 String[] itemInfo = itemData.split("#");
                 ShopItemType shopItemType = findItemType(itemInfo);
-                
+
                 if (shopItemType != null) {
                     // 设置有物品的槽位
                     setItem(gamePlayer, slot, actualSlotPosition, gameManager, shopItemType, -1,
@@ -152,7 +152,7 @@ public class ItemShopGUI extends CustomGUI {
             }
         }
     }
-    
+
     /**
      * 从数据库加载JSON格式的快捷商店配置
      * 解析JSON为Map<Integer, String>
@@ -168,7 +168,7 @@ public class ItemShopGUI extends CustomGUI {
             // JSON解析失败，返回空Map
             e.printStackTrace();
         }
-        
+
         // 返回默认空配置
         return new HashMap<>();
     }
@@ -188,12 +188,12 @@ public class ItemShopGUI extends CustomGUI {
      * 设置空槽位
      */
     private void setEmptySlot(Player player, int slotPosition, int shopSlot, GameManager gameManager) {
-        setItem(slotPosition, 
+        setItem(slotPosition,
                 new ItemBuilder()
                     .setItemStack(XMaterial.matchXMaterial("STAINED_GLASS_PANE:14").orElse(XMaterial.GLASS_PANE).parseItem())
                     .setDisplayName("§c空闲的槽位")
                     .setLores("§7这是一个快捷购买槽位!§bShift+左键", "§7将任意物品放到这里~")
-                    .getItem(), 
+                        .getItem(),
                 new NewGUIAction(0, event -> {
                     if (!event.getClick().isShiftClick()) {
                         return;
@@ -201,7 +201,7 @@ public class ItemShopGUI extends CustomGUI {
                     player.sendMessage("§c这是个空的槽位!请使用Shift+左键添加物品到这里~");
                 }, false));
     }
-    
+
     /**
      * 查找物品类型
      */
@@ -209,13 +209,13 @@ public class ItemShopGUI extends CustomGUI {
         if (itemInfo == null || itemInfo.length != 2) {
             return null;
         }
-        
+
         for (ShopData shopData : ShopManager.getSHOPS()) {
             if (shopData.getClass().getSimpleName().equals(itemInfo[0])) {
                 return shopData.getShopItems().get(Integer.parseInt(itemInfo[1]) - 1);
             }
         }
-        
+
         return null;
     }
 
@@ -228,36 +228,36 @@ public class ItemShopGUI extends CustomGUI {
 
         // 准备物品显示
         ItemBuilder itemBuilder = prepareItemDisplay(gamePlayer, shopItemType);
-        
+
         // 创建物品说明
         List<String> lore = createItemLore(shopItemType, gamePlayer.getGameModeType(), moreLore);
 
         // 设置商店项
-        super.setItem(displaySlot, 
+        super.setItem(displaySlot,
             itemBuilder.setDisplayName("§c" + shopItemType.getDisplayName())
                       .setLores(lore)
-                      .getItem(), 
+                    .getItem(),
             new NewGUIAction(0, event -> handleItemClick(event, gamePlayer, shopSlot, displaySlot,
                     shopItemType, itemBuilder, itemSlot, playerData, gameManager), false));
     }
-    
+
     /**
      * 准备物品显示
      */
     private ItemBuilder prepareItemDisplay(GamePlayer gamePlayer, ShopItemType shopItemType) {
         ItemBuilder itemBuilder = new ItemBuilder();
         itemBuilder.setItemStack(shopItemType.getItemStack().clone());
-        
+
         // 根据物品颜色类型进行特殊处理
         if (shopItemType.getColorType() == ColorType.PICKAXE) {
             updatePickaxeDisplay(gamePlayer, itemBuilder, shopItemType);
         } else if (shopItemType.getColorType() == ColorType.AXE) {
             updateAxeDisplay(gamePlayer, itemBuilder, shopItemType);
         }
-        
+
         return itemBuilder;
     }
-    
+
     /**
      * 更新稿子显示
      */
@@ -282,7 +282,7 @@ public class ItemShopGUI extends CustomGUI {
                 break;
         }
     }
-    
+
     /**
      * 更新斧头显示
      */
@@ -307,7 +307,7 @@ public class ItemShopGUI extends CustomGUI {
                 break;
         }
     }
-    
+
     /**
      * 创建物品说明
      */
@@ -316,25 +316,25 @@ public class ItemShopGUI extends CustomGUI {
         lore.add("§7物品:");
         lore.add("§8•" + shopItemType.getDisplayName());
         lore.add(" ");
-        
+
         // 添加额外说明
         if (moreLore != null && !moreLore.isEmpty()) {
             lore.addAll(moreLore);
         }
-        
+
         // 添加价格说明
         Material priceMaterial = shopItemType.getPriceCost().material();
         String resourceName = RESOURCE_NAMES.getOrDefault(priceMaterial, "资源");
-        
+
         if (gameModeType == GameModeType.EXPERIENCE) {
             lore.add("§7花费: §3§l" + shopItemType.getPriceCost().xp() + "级");
         } else {
             lore.add("§7花费: §3§l" + shopItemType.getPriceCost().amount() + " " + resourceName);
         }
-        
+
         return lore;
     }
-    
+
     /**
      * 处理物品点击
      */
@@ -346,21 +346,21 @@ public class ItemShopGUI extends CustomGUI {
             handleShiftClick(gamePlayer, shopSlot, displaySlot, itemBuilder, itemSlot, playerData, gameManager);
             return;
         }
-        
+
         // 检查是否可以购买（工具已达最高级或已拥有）
         if (!canPurchaseItem(gamePlayer, shopItemType, itemBuilder.getItem().getType())) {
             return;
         }
-        
+
         // 处理支付
         if (!processPayment(gamePlayer, shopItemType, playerData.getMode())) {
             return;
         }
-        
+
         // 处理物品给予
         handleItemGiving(gamePlayer, shopSlot, shopItemType, itemBuilder, gameManager);
     }
-    
+
     /**
      * 处理Shift+点击 - 使用JSON格式
      */
@@ -375,13 +375,13 @@ public class ItemShopGUI extends CustomGUI {
 
             // 加载当前快捷商店配置
             Map<Integer, String> shopDataMap = loadShopDataFromJson(playerData);
-            
+
             // 移除指定槽位的物品
             shopDataMap.remove(slotIndex);
-            
+
             // 保存回数据库
             saveShopDataToJson(playerData, shopDataMap);
-            
+
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
         } else {
             // 添加到快捷购买
@@ -390,7 +390,7 @@ public class ItemShopGUI extends CustomGUI {
                           + "#" + (itemSlot + 1)).open();
         }
     }
-    
+
     /**
      * 将Map<Integer, String>保存为JSON格式到数据库
      */
@@ -402,7 +402,7 @@ public class ItemShopGUI extends CustomGUI {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * 检查是否可以购买物品
      */
@@ -472,31 +472,31 @@ public class ItemShopGUI extends CustomGUI {
             return processExperiencePayment(gamePlayer, shopItemType);
         }
     }
-    
+
     /**
      * 处理物品支付
      */
     private boolean processItemPayment(GamePlayer gamePlayer, ShopItemType shopItemType) {
         Material paymentMaterial = shopItemType.getPriceCost().material();
         int requiredAmount = shopItemType.getPriceCost().amount();
-        
+
         // 计算玩家拥有的资源总数
         int playerTotal = 0;
         ItemStack[] inventory = gamePlayer.getPlayer().getInventory().getContents();
-        
+
         for (ItemStack item : inventory) {
             if (item != null && item.getType().equals(paymentMaterial)) {
                 playerTotal += item.getAmount();
             }
         }
-        
+
         // 检查是否有足够资源
         if (playerTotal < requiredAmount) {
             gamePlayer.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             gamePlayer.sendMessage("§c没有足够资源购买！");
             return false;
         }
-        
+
         // 扣除资源
         int remainingToDeduct = requiredAmount;
         for (int i = 0; i < inventory.length; i++) {
@@ -516,7 +516,7 @@ public class ItemShopGUI extends CustomGUI {
         gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
     }
-    
+
     /**
      * 处理经验支付
      * 优先从当前资源扣除，不足时：
@@ -524,77 +524,88 @@ public class ItemShopGUI extends CustomGUI {
      * - 如果是EMERALD不足，向下递减(EMERALD→DIAMOND→GOLD→IRON)
      */
     private boolean processExperiencePayment(GamePlayer gamePlayer, ShopItemType shopItemType) {
-        Player player = gamePlayer.getPlayer();
-
         int requiredXp = shopItemType.getPriceCost().xp();
-        String requiredResourceType = shopItemType.getPriceCost().material().toString().toUpperCase();
 
-
-        // 检查玩家是否有足够的经验等级
-        if (player.getLevel() < requiredXp) {
+        if (gamePlayer.getPlayer().getLevel() < requiredXp) {
             gamePlayer.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             gamePlayer.sendMessage("§c没有足够资源购买！");
             return false;
         }
-        
-        // 定义资源类型顺序（按价值递增）
-        final String[] resources = {"IRON", "GOLD", "DIAMOND", "EMERALD"};
-        
-        // 查找当前资源类型在列表中的位置
-        int resourceIndex = -1;
-        for (int i = 0; i < resources.length; i++) {
-            if (resources[i].equals(requiredResourceType)) {
-                resourceIndex = i;
-                break;
-            }
-        }
-        
-        // 如果不是标准资源类型，直接从经验中扣除
-        if (resourceIndex == -1) {
-            player.setLevel(player.getLevel() - requiredXp);
-            gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
-            return true;
-        }
-        
-        // 首先尝试从指定资源类型中扣除
-        int remainingXp = requiredXp;
-        int available = gamePlayer.getExperience(requiredResourceType);
-        
-        if (available > 0) {
-            int toDeduct = Math.min(available, remainingXp);
-            gamePlayer.spendExperience(requiredResourceType, toDeduct);
-            remainingXp -= toDeduct;
-        }
-        
-        // 如果仍需扣除，根据资源类型选择向上递增或向下递减
-        if (remainingXp > 0) {
-            if (requiredResourceType.equals("EMERALD")) {
-                // 创建向下递减的资源列表 (DIAMOND → GOLD → IRON)
-                String[] lowerResources = {"DIAMOND", "GOLD", "IRON"};
-                
-                // 用forEach遍历低价值资源进行扣除
-                remainingXp = getRemainingXp(gamePlayer, remainingXp, lowerResources);
-            } else {
-                // 确定需要向上递增的资源列表
-                String[] higherResources = switch (requiredResourceType) {
-                    case "IRON" -> new String[]{"GOLD", "DIAMOND", "EMERALD"};
-                    case "GOLD" -> new String[]{"DIAMOND", "EMERALD"};
-                    case "DIAMOND" -> new String[]{"EMERALD"};
-                    default -> new String[0];
-                };
 
-                // 用forEach遍历高价值资源进行扣除
-                remainingXp = getRemainingXp(gamePlayer, remainingXp, higherResources);
-            }
-        }
-        
-        // 如果所有资源尝试后仍需扣除，从玩家经验等级中扣除
-        if (remainingXp > 0) {
-            player.setLevel(player.getLevel() - remainingXp);
-        }
-        
+        gamePlayer.getPlayer().setLevel(gamePlayer.getPlayer().getLevel() - requiredXp);
         gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
+//        Player player = gamePlayer.getPlayer();
+//
+//        int requiredXp = shopItemType.getPriceCost().xp();
+//        String requiredResourceType = shopItemType.getPriceCost().material().toString().toUpperCase();
+//
+//
+//        // 检查玩家是否有足够的经验等级
+//        if (player.getLevel() < requiredXp) {
+//            gamePlayer.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+//            gamePlayer.sendMessage("§c没有足够资源购买！");
+//            return false;
+//        }
+//
+//        // 定义资源类型顺序（按价值递增）
+//        final String[] resources = {"IRON", "GOLD", "DIAMOND", "EMERALD"};
+//
+//        // 查找当前资源类型在列表中的位置
+//        int resourceIndex = -1;
+//        for (int i = 0; i < resources.length; i++) {
+//            if (resources[i].equals(requiredResourceType)) {
+//                resourceIndex = i;
+//                break;
+//            }
+//        }
+//
+//        // 如果不是标准资源类型，直接从经验中扣除
+//        if (resourceIndex == -1) {
+//            player.setLevel(player.getLevel() - requiredXp);
+//            gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+//            return true;
+//        }
+//
+//        // 首先尝试从指定资源类型中扣除
+//        int remainingXp = requiredXp;
+//        int available = gamePlayer.getExperience(requiredResourceType);
+//
+//        if (available > 0) {
+//            int toDeduct = Math.min(available, remainingXp);
+//            gamePlayer.spendExperience(requiredResourceType, toDeduct);
+//            remainingXp -= toDeduct;
+//        }
+//
+//        // 如果仍需扣除，根据资源类型选择向上递增或向下递减
+//        if (remainingXp > 0) {
+//            if (requiredResourceType.equals("EMERALD")) {
+//                // 创建向下递减的资源列表 (DIAMOND → GOLD → IRON)
+//                String[] lowerResources = {"DIAMOND", "GOLD", "IRON"};
+//
+//                // 用forEach遍历低价值资源进行扣除
+//                remainingXp = getRemainingXp(gamePlayer, remainingXp, lowerResources);
+//            } else {
+//                // 确定需要向上递增的资源列表
+//                String[] higherResources = switch (requiredResourceType) {
+//                    case "IRON" -> new String[]{"GOLD", "DIAMOND", "EMERALD"};
+//                    case "GOLD" -> new String[]{"DIAMOND", "EMERALD"};
+//                    case "DIAMOND" -> new String[]{"EMERALD"};
+//                    default -> new String[0];
+//                };
+//
+//                // 用forEach遍历高价值资源进行扣除
+//                remainingXp = getRemainingXp(gamePlayer, remainingXp, higherResources);
+//            }
+//        }
+//
+//        // 如果所有资源尝试后仍需扣除，从玩家经验等级中扣除
+//        if (remainingXp > 0) {
+//            player.setLevel(player.getLevel() - remainingXp);
+//        }
+//
+//        gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+//        return true;
     }
 
     private int getRemainingXp(GamePlayer gamePlayer, int remainingXp, String[] lowerResources) {
@@ -619,21 +630,21 @@ public class ItemShopGUI extends CustomGUI {
      */
     private void handleItemGiving(GamePlayer gamePlayer, int shopSlot, ShopItemType shopItemType, ItemBuilder itemBuilder, GameManager gameManager) {
         Material material = itemBuilder.getItem().getType();
-        
+
         // 处理护甲
         if (handleArmorGiving(gamePlayer, shopSlot, material, gameManager)) {
             return;
         }
-        
+
         // 处理工具
         if (handleToolGiving(gamePlayer, shopSlot, material, gameManager)) {
             return;
         }
-        
+
         // 处理普通物品
         handleRegularItemGiving(gamePlayer, shopItemType);
     }
-    
+
     /**
      * 处理护甲给予
      */
@@ -661,7 +672,7 @@ public class ItemShopGUI extends CustomGUI {
         }
         return false;
     }
-    
+
     /**
      * 处理工具给予
      */
@@ -690,7 +701,7 @@ public class ItemShopGUI extends CustomGUI {
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
         }
-        
+
         // 斧
         else if (XMaterial.WOODEN_AXE.get() == material) {
             gamePlayer.setAxeType(ToolType.WOOD);
@@ -713,7 +724,7 @@ public class ItemShopGUI extends CustomGUI {
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
         }
-        
+
         // 剪刀
         else if (XMaterial.SHEARS.get() == material) {
             gamePlayer.setShear(true);
@@ -721,22 +732,22 @@ public class ItemShopGUI extends CustomGUI {
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * 处理普通物品给予
      */
     private void handleRegularItemGiving(GamePlayer gamePlayer, ShopItemType shopItemType) {
         ItemBuilder itemBuilder = new ItemBuilder().setItemStack(shopItemType.getItemStack().clone());
         Player player = gamePlayer.getPlayer();
-        
+
         // 处理剑特殊情况
         String itemTypeName = shopItemType.getItemStack().getType().name();
         if (itemTypeName.endsWith("_SWORD") || itemTypeName.endsWith("SWORD")) {
             player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
-            
+
             // 添加锋利附魔
             if (gamePlayer.getGameTeam().isHasSharpnessUpgrade()) {
                 Enchantment sharpness = XEnchantment.SHARPNESS.get();
@@ -745,7 +756,7 @@ public class ItemShopGUI extends CustomGUI {
                 }
             }
         }
-        
+
         // 处理有颜色的方块
         if (shopItemType.getColorType() == ColorType.COLOR) {
             // 处理羊毛
@@ -753,7 +764,7 @@ public class ItemShopGUI extends CustomGUI {
                 // 创建带颜色的羊毛
                 itemBuilder.setWoolColor(gamePlayer.getGameTeam().getDyeColor());
                 itemBuilder.setAmount(shopItemType.getItemStack().getAmount());
-                
+
                 // 保留原始附魔（如果有）
                 for (Map.Entry<Enchantment, Integer> entry : shopItemType.getItemStack().getEnchantments().entrySet()) {
                     itemBuilder.addEnchant(entry.getKey(), entry.getValue());
@@ -767,7 +778,7 @@ public class ItemShopGUI extends CustomGUI {
                 itemBuilder.setDurability(gamePlayer.getGameTeam().getDyeColor().getDyeData());
             }
         }
-        
+
         // 将物品添加到玩家库存
         player.getInventory().addItem(itemBuilder.getItem());
     }
