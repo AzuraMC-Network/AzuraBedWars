@@ -355,8 +355,9 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 更新玩家数据
-        if (gameKiller != null)
+        if (gameKiller != null) {
             gameKiller.getPlayerData().addKills();
+        }
         gamePlayer.getPlayerData().addDeaths();
     }
 

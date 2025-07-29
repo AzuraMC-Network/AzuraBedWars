@@ -10,7 +10,7 @@ import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
-import cc.azuramc.bedwars.game.level.PlayerLevelMap;
+import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapLoader;
 import cc.azuramc.bedwars.game.map.MapManager;
@@ -94,14 +94,14 @@ public final class AzuraBedWars extends JavaPlugin {
         // 初始化基础服务
         initDatabases();
         initMapSystem();
-        
+
         // 初始化命令和通信系统
         initCommands();
 
         if (settingsConfig.isEnabledJedisMapFeature()) {
             intiChannelSystem();
         }
-        
+
         // 根据配置决定加载游戏模式还是编辑模式
         if (settingsConfig.isEditorMode() || mapManager.getLoadedMaps().isEmpty()) {
             getLogger().info("当前处于编辑模式(editorMode)或未发现可用地图 取消游戏相关特性加载");
@@ -196,7 +196,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 主线程Task
         getServer().getScheduler().runTask(this, pubSubListener);
-        
+
         JedisManager.getInstance().getServerData().setGameType("AzuraBedWars");
         JedisManager.getInstance().getExpand().put("ver", getDescription().getVersion());
     }
@@ -227,7 +227,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 初始化地图存储
         initMapStorage();
-        
+
         // 初始化地图加载管理器
         mapLoader = new MapLoader(this);
 
@@ -244,7 +244,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 加载特殊物品和玩家等级
         AbstractSpecialItem.loadSpecials();
-        PlayerLevelMap.loadLevelData();
+        PlayerLevelManager.loadLevelData();
 
         // 配置世界设置
         configureWorlds();
@@ -256,7 +256,7 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void registerEventListeners() {
         new ListenerRegistry(this);
-        
+
         // 创建并初始化计分板管理器
         scoreboardManager = new ScoreboardManager(gameManager);
         scoreboardManager.initialize(this);
@@ -281,7 +281,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
     /**
      * 在主线程上执行任务
-     * 
+     *
      * @param runnable 要执行的任务
      */
     public void mainThreadRunnable(Runnable runnable) {
@@ -344,7 +344,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
     /**
      * 调用Bukkit事件
-     * 
+     *
      * @param event 要调用的事件
      */
     public void callEvent(Event event) {
@@ -358,21 +358,21 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 初始化默认存储
         MapStorageFactory.getDefaultStorage();
-        
+
         String storageType = settingsConfig.getMapStorage();
         getLogger().info("地图存储系统已初始化，使用 " + storageType + " 作为默认存储方式");
     }
-    
+
     /**
      * 初始化配置系统
      */
     private void initConfigSystem() {
         // 创建配置管理器
         configManager = new ConfigManager(this);
-        
+
         // 创建配置工厂
         ConfigFactory configFactory = new ConfigFactory();
-        
+
         // 注册配置对象供应商
         configFactory.registerSupplier("settings", SettingsConfig::new);
         configFactory.registerSupplier("events", EventConfig::new);
@@ -385,7 +385,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 初始化默认配置
         configFactory.initializeDefaults(configManager);
-        
+
         // 获取配置对象
         settingsConfig = configManager.getConfig("settings", SettingsConfig.class);
         eventConfig = configManager.getConfig("events", EventConfig.class);

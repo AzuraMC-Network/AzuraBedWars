@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.level.PlayerLevelMap;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
@@ -119,7 +118,7 @@ public class ChatListener implements Listener {
             globalPrefix = VaultUtil.getPlayerPrefix(gamePlayer);
         }
 
-        return globalPrefix + "§6[" + PlayerLevelMap.getLevel(level) + "✫] " + "§7" + gamePlayer.getNickName() + " " + CHAT_SEPARATOR + " " + message;
+        return globalPrefix + "§6[" + gamePlayer.getPlayerData().getLevel() + "✫] " + "§7" + gamePlayer.getNickName() + " " + CHAT_SEPARATOR + " " + message;
     }
 
     /**
