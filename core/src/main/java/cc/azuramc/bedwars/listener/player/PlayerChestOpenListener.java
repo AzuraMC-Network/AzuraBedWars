@@ -53,7 +53,6 @@ public class PlayerChestOpenListener implements Listener {
                     event.setCancelled(true);
                     gamePlayer.sendMessage("&c只有该队伍的玩家可以打开这个箱子");
                 }
-                break;
             }
         }
     }
