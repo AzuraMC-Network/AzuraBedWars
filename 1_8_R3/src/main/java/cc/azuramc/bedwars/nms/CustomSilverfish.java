@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.nms;
 
+import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.util.CustomEntityRemoverUtil;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
@@ -88,13 +88,13 @@ public class CustomSilverfish extends EntitySilverfish {
     public void die() {
         super.die();
         gameTeam = null;
-        CustomEntityRemoverUtil.getDespawnables().remove(this.getUniqueID());
+        CustomEntityManager.getCustomEntityMap().remove(this.getUniqueID());
     }
 
     @Override
     public void die(DamageSource source) {
         super.die(source);
         gameTeam = null;
-        CustomEntityRemoverUtil.getDespawnables().remove(this.getUniqueID());
+        CustomEntityManager.getCustomEntityMap().remove(this.getUniqueID());
     }
 }
