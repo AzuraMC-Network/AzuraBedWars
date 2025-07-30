@@ -167,9 +167,12 @@ public class PickupItemHandler {
 
         if (itemStack.getType() == XMaterial.IRON_INGOT.get()) {
             gamePlayer.addResourceExperience("IRON", xp);
-        } else {
-            xp = xp * 3;
+            return xp;
+        }
+
+        if (itemStack.getType() == XMaterial.GOLD_INGOT.get()) {
             gamePlayer.addResourceExperience("GOLD", xp);
+            return xp * 3;
         }
 
         return xp;
@@ -179,7 +182,6 @@ public class PickupItemHandler {
      * 处理团队锭拾取
      */
     private static void handleTeamIngotPickup(GamePlayer gamePlayer, ItemStack itemStack, int xp) {
-        Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName();
         Player player = gamePlayer.getPlayer();
         for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
             if (entity instanceof Player players) {
