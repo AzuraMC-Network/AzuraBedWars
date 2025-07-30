@@ -236,9 +236,9 @@ public class GamePlayer {
      * @param resourceType 资源类型 (e.g., "iron")
      * @param amount       增加的数量
      */
-    public void addExperience(String resourceType, int amount) {
+    public void addResourceExperience(String resourceType, int amount) {
         if (amount <= 0) {
-            LoggerUtil.warn("addExperience 应该输入大于0的数值");
+            LoggerUtil.warn("addResourceExperience 应该输入大于0的数值");
             return;
         }
 
