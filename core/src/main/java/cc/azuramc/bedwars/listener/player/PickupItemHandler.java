@@ -139,25 +139,22 @@ public class PickupItemHandler {
             return false;
         }
 
-        PlayerData playerData = gamePlayer.getPlayerData();
         Player player = gamePlayer.getPlayer();
         int xp = calculateIngotXp(itemStack, gamePlayer);
 
         // 根据游戏模式处理拾取效果
-        if (playerData.getMode() == GameModeType.DEFAULT) {
+        if (gamePlayer.getGameModeType() == GameModeType.DEFAULT) {
             item.remove();
             gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
-        } else if (playerData.getMode() == GameModeType.EXPERIENCE) {
+        } else if (gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
             item.remove();
             gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.setLevel(player.getLevel() + xp);
         }
 
         // 处理团队拾取效果
-        if (itemStack.hasItemMeta()) {
-            handleTeamIngotPickup(gamePlayer, itemStack, xp);
-        }
+        handleTeamIngotPickup(gamePlayer, itemStack, xp);
 
         return true;
     }
@@ -189,7 +186,7 @@ public class PickupItemHandler {
                 gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
 
                 GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
-                if (nearbyPlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
+                if (nearbyPlayer.getGameModeType() == GameModeType.DEFAULT) {
                     players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
                 } else {
                     players.setLevel(players.getLevel() + xp);
