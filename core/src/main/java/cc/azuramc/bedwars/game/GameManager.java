@@ -425,12 +425,12 @@ public class GameManager {
         );
 
         // Team Selection
-        player.getInventory().setItem(2,
-                new ItemBuilder()
-                        .setType(teamSelectorMaterial)
-                        .setDisplayName(teamSelectorName)
-                        .getItem()
-        );
+//        player.getInventory().setItem(2,
+//                new ItemBuilder()
+//                        .setType(teamSelectorMaterial)
+//                        .setDisplayName(teamSelectorName)
+//                        .getItem()
+//        );
 
         // Leave Game
         player.getInventory().setItem(8,
