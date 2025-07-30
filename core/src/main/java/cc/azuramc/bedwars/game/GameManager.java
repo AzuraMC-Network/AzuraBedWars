@@ -363,12 +363,6 @@ public class GameManager {
         for (GamePlayer otherPlayer : GamePlayer.getOnlinePlayers()) {
             Player otherPlayerObj = otherPlayer.getPlayer();
 
-            // 跳过已经是观察者的玩家
-            if (otherPlayer.isSpectator()) {
-                PlayerUtil.hidePlayer(player, otherPlayerObj);
-                continue;
-            }
-
             // 让所有玩家看到新玩家
             PlayerUtil.showPlayer(otherPlayerObj, player);
             // 让新玩家看到所有玩家

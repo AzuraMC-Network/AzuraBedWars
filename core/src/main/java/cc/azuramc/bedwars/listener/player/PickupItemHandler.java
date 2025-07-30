@@ -24,12 +24,12 @@ import java.util.Objects;
  * @author an5w1r@163.com
  */
 public class PickupItemHandler {
-    
+
     private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
-    
+
     /**
      * 检查玩家是否能够拾取物品的基本条件
-     * 
+     *
      * @param gamePlayer 游戏玩家
      * @return 如果玩家不能拾取返回true
      */
@@ -38,14 +38,14 @@ public class PickupItemHandler {
         if (gamePlayer.isSpectator()) {
             return true;
         }
-        
+
         // 游戏未在运行状态不能拾取物品
         return GAME_MANAGER.getGameState() != GameState.RUNNING;
     }
-    
+
     /**
      * 处理床的拾取
-     * 
+     *
      * @param itemStack 物品堆
      * @param item 物品实体
      * @return 如果已处理返回true
@@ -54,18 +54,18 @@ public class PickupItemHandler {
         if (!itemStack.getType().name().toUpperCase().contains("BED")) {
             return false;
         }
-        
+
         // 如果床有自定义元数据，允许拾取
         if (itemStack.hasItemMeta()) {
             Objects.requireNonNull(itemStack.getItemMeta()).getDisplayName();
             return false;
         }
-        
+
         // 删除床并取消拾取
         item.remove();
         return true;
     }
-    
+
     /**
      * 处理剑的拾取
      *
@@ -79,20 +79,20 @@ public class PickupItemHandler {
                           itemStack.getType() == XMaterial.STONE_SWORD.get() ||
                           itemStack.getType() == XMaterial.IRON_SWORD.get() ||
                           itemStack.getType() == XMaterial.DIAMOND_SWORD.get();
-        
+
         if (!isSword) {
             return;
         }
-        
+
         // 添加锋利附魔
         if (gamePlayer.getGameTeam().isHasSharpnessUpgrade()) {
             itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
         }
-        
+
         // 移除木剑
         removeWoodenSwordFromInventory(player);
     }
-    
+
     /**
      * 从玩家背包中移除木剑
      */
@@ -106,10 +106,10 @@ public class PickupItemHandler {
             }
         }
     }
-    
+
     /**
      * 检查AFK玩家的资源拾取
-     * 
+     *
      * @param itemStack 物品堆
      * @param gamePlayer 游戏玩家对象
      * @return 如果玩家挂机且尝试拾取资源返回true
@@ -119,14 +119,14 @@ public class PickupItemHandler {
                             itemStack.getType() == XMaterial.GOLD_INGOT.get() ||
                             itemStack.getType() == XMaterial.DIAMOND.get() ||
                             itemStack.getType() == XMaterial.EMERALD.get();
-        
+
         // 玩家挂机状态不能拾取资源
         return isResource && gamePlayer.isAfk();
     }
-    
+
     /**
      * 处理金铁锭的拾取
-     * 
+     *
      * @param itemStack 物品堆
      * @param gamePlayer 游戏玩家对象
      * @param item 物品实体
@@ -134,7 +134,7 @@ public class PickupItemHandler {
      */
     public static boolean handleIngotPickup(ItemStack itemStack, GamePlayer gamePlayer, Item item) {
         boolean isIngot = itemStack.getType() == XMaterial.IRON_INGOT.get() || itemStack.getType() == XMaterial.GOLD_INGOT.get();
-        
+
         if (!isIngot) {
             return false;
         }
@@ -142,7 +142,7 @@ public class PickupItemHandler {
         PlayerData playerData = gamePlayer.getPlayerData();
         Player player = gamePlayer.getPlayer();
         int xp = calculateIngotXp(itemStack, gamePlayer);
-        
+
         // 根据游戏模式处理拾取效果
         if (playerData.getMode() == GameModeType.DEFAULT) {
             item.remove();
@@ -153,15 +153,15 @@ public class PickupItemHandler {
             gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
             player.setLevel(player.getLevel() + xp);
         }
-        
+
         // 处理团队拾取效果
         if (itemStack.hasItemMeta()) {
             handleTeamIngotPickup(gamePlayer, itemStack, xp);
         }
-        
+
         return true;
     }
-    
+
     /**
      * 计算锭的经验值
      */
@@ -169,15 +169,15 @@ public class PickupItemHandler {
         int xp = itemStack.getAmount();
 
         if (itemStack.getType() == XMaterial.IRON_INGOT.get()) {
-            gamePlayer.addExperience("IRON", xp);
+            gamePlayer.addResourceExperience("IRON", xp);
         } else {
             xp = xp * 3;
-            gamePlayer.addExperience("GOLD", xp);
+            gamePlayer.addResourceExperience("GOLD", xp);
         }
-        
+
         return xp;
     }
-    
+
     /**
      * 处理团队锭拾取
      */
@@ -187,7 +187,7 @@ public class PickupItemHandler {
         for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
             if (entity instanceof Player players) {
                 gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
-                
+
                 GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
                 if (nearbyPlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
                     players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
@@ -197,10 +197,10 @@ public class PickupItemHandler {
             }
         }
     }
-    
+
     /**
      * 处理钻石的拾取
-     * 
+     *
      * @param itemStack 物品堆
      * @param gamePlayer 游戏玩家对象
      * @param item 物品实体
@@ -213,27 +213,27 @@ public class PickupItemHandler {
 
         Player player = gamePlayer.getPlayer();
         PlayerData playerData = gamePlayer.getPlayerData();
-        
+
         // 默认模式下不做特殊处理
         if (playerData.getMode() == GameModeType.DEFAULT) {
             return false;
         }
-        
+
         // 经验模式下处理成经验值
         double xp = itemStack.getAmount() * 40;
         xp = applyVipBonus(player, xp);
-        
+
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
-        gamePlayer.addExperience("DIAMOND", (int) xp);
+        gamePlayer.addResourceExperience("DIAMOND", (int) xp);
         gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
-        
+
         return true;
     }
-    
+
     /**
      * 处理绿宝石的拾取
-     * 
+     *
      * @param itemStack 物品堆
      * @param gamePlayer 游戏玩家对象
      * @param item 物品实体
@@ -246,24 +246,24 @@ public class PickupItemHandler {
 
         Player player = gamePlayer.getPlayer();
         PlayerData playerData = gamePlayer.getPlayerData();
-        
+
         // 默认模式下不做特殊处理
         if (playerData.getMode() == GameModeType.DEFAULT) {
             return false;
         }
-        
+
         // 经验模式下处理成经验值
         double xp = itemStack.getAmount() * 80;
         xp = applyVipBonus(player, xp);
-        
+
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
-        gamePlayer.addExperience("EMERALD", (int) xp);
+        gamePlayer.addResourceExperience("EMERALD", (int) xp);
         gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
-        
+
         return true;
     }
-    
+
     /**
      * 应用VIP经验加成
      */
@@ -279,4 +279,4 @@ public class PickupItemHandler {
 //        }
         return xp;
     }
-} 
+}
