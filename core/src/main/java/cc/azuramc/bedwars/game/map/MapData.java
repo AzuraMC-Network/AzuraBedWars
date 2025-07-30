@@ -444,11 +444,11 @@ public class MapData {
         private double x;
         private double y;
         private double z;
-        private float pitch;
         private float yaw;
+        private float pitch;
 
         public Location toLocation() {
-            return new Location(Bukkit.getWorld(world), x, y, z, pitch, yaw);
+            return new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
         }
     }
 
