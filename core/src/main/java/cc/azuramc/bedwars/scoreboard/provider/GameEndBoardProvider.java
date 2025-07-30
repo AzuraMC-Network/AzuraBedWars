@@ -138,7 +138,7 @@ public class GameEndBoardProvider implements Listener {
         lines.add("§7团队 " + DATE_FORMAT.format(Calendar.getInstance().getTime()));
         lines.add(EMPTY_LINE);
         // 添加事件信息
-        lines.add("&c游戏结束");
+        lines.add("§c游戏结束");
         lines.add(EMPTY_LINE);
         // 添加服务器信息
         lines.add(SERVER_INFO);
