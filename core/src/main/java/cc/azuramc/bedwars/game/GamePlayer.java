@@ -252,9 +252,9 @@ public class GamePlayer {
      * @param amount       消耗的数量
      * @return true 如果消耗成功，否则返回 false
      */
-    public boolean spendExperience(String resourceType, int amount) {
+    public boolean spendResourceExperience(String resourceType, int amount) {
         if (amount <= 0) {
-            LoggerUtil.warn("spendExperience 应该输入大于0的数值");
+            LoggerUtil.warn("spendResourceExperience 应该输入大于0的数值");
             return false;
         }
 
