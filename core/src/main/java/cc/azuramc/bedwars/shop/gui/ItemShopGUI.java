@@ -573,7 +573,7 @@ public class ItemShopGUI extends CustomGUI {
 //
 //        if (available > 0) {
 //            int toDeduct = Math.min(available, remainingXp);
-//            gamePlayer.spendExperience(requiredResourceType, toDeduct);
+//            gamePlayer.spendResourceExperience(requiredResourceType, toDeduct);
 //            remainingXp -= toDeduct;
 //        }
 //
@@ -618,7 +618,7 @@ public class ItemShopGUI extends CustomGUI {
             available = gamePlayer.getExperience(resource);
             if (available > 0) {
                 int toDeduct = Math.min(available, remainingXp);
-                gamePlayer.spendExperience(resource, toDeduct);
+                gamePlayer.spendResourceExperience(resource, toDeduct);
                 remainingXp -= toDeduct;
             }
         }
