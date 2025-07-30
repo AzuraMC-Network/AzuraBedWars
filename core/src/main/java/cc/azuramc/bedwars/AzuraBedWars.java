@@ -98,9 +98,6 @@ public final class AzuraBedWars extends JavaPlugin {
         initDatabases();
         initMapSystem();
 
-        // 初始化命令和通信系统
-        initCommands();
-
         if (settingsConfig.isEnabledJedisMapFeature()) {
             intiChannelSystem();
         }
@@ -112,6 +109,9 @@ public final class AzuraBedWars extends JavaPlugin {
         } else {
             initGameFeatures();
         }
+
+        // 初始化命令和通信系统
+        initCommands();
 
         Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "加载完成耗时 " + (System.currentTimeMillis() - startTime) + " ms");
     }
