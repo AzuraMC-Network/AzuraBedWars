@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.listener.block.BlockBreakListener;
 import cc.azuramc.bedwars.listener.block.PlacementListener;
 import cc.azuramc.bedwars.listener.chat.ChatListener;
+import cc.azuramc.bedwars.listener.game.GamePlayerKillListener;
 import cc.azuramc.bedwars.listener.player.*;
 import cc.azuramc.bedwars.listener.projectile.EggBridgeListener;
 import cc.azuramc.bedwars.listener.projectile.FireballListener;
@@ -37,6 +38,9 @@ public class ListenerRegistry {
 
         // chat package
         register(new ChatListener());
+
+        // game
+        register(new GamePlayerKillListener());
 
         // player package
         register(new PlayerAFKListener());
