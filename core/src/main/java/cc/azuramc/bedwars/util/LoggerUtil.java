@@ -29,6 +29,10 @@ public class LoggerUtil {
             return;
         }
         Bukkit.broadcast(message, ADMIN_PERMISSION);
-        Bukkit.getLogger().info(LOGGER_PREFIX + "[Debugger] " + message);
+        info(LOGGER_PREFIX + "[Debugger] " + message);
+    }
+
+    public static void printChat(String message) {
+        info("[Chat] " + message);
     }
 }

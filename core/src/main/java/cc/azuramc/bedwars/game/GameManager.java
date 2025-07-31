@@ -714,8 +714,12 @@ public class GameManager {
      * @param texts    消息文本
      */
     public void broadcastTeamMessage(GameTeam gameTeam, String... texts) {
-        gameTeam.getAlivePlayers().forEach(player ->
-                Arrays.asList(texts).forEach(player::sendMessage));
+        gameTeam.getAlivePlayers().forEach(gamePlayer ->
+                Arrays.stream(texts).forEach(text -> {
+                    gamePlayer.sendMessage(text);
+                    LoggerUtil.printChat(text);
+                })
+        );
     }
 
     /**
@@ -749,7 +753,11 @@ public class GameManager {
      */
     public void broadcastSpectatorMessage(String... texts) {
         GamePlayer.getSpectators().forEach(gamePlayer ->
-                Arrays.asList(texts).forEach(gamePlayer::sendMessage));
+                Arrays.stream(texts).forEach(text -> {
+                    gamePlayer.sendMessage(text);
+                    LoggerUtil.printChat(text);
+                })
+        );
     }
 
     /**
@@ -759,7 +767,11 @@ public class GameManager {
      */
     public void broadcastSpectatorMessage(List<String> textList) {
         GamePlayer.getSpectators().forEach(gamePlayer ->
-                textList.forEach(gamePlayer::sendMessage));
+                textList.forEach(text -> {
+                    gamePlayer.sendMessage(text);
+                    LoggerUtil.printChat(text);
+                })
+        );
     }
 
     /**
@@ -769,7 +781,11 @@ public class GameManager {
      */
     public void broadcastMessage(String... texts) {
         GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
-                Arrays.asList(texts).forEach(gamePlayer::sendMessage));
+                Arrays.stream(texts).forEach(text -> {
+                    gamePlayer.sendMessage(text);
+                    LoggerUtil.printChat(text);
+                })
+        );
     }
 
     /**
@@ -779,7 +795,11 @@ public class GameManager {
      */
     public void broadcastMessage(List<String> textList) {
         GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
-                textList.forEach(gamePlayer::sendMessage));
+                textList.forEach(text -> {
+                    gamePlayer.sendMessage(text);
+                    LoggerUtil.printChat(text);
+                })
+        );
     }
 
     /**
