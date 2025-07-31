@@ -49,9 +49,9 @@ public class FireballHandler implements Listener {
 
         // 处理火球爆炸范围内的玩家
         for (Entity entity : fireball.getNearbyEntities(
-                FIREBALL_EXPLOSION_RADIUS_X,
-                FIREBALL_EXPLOSION_RADIUS_Y,
-                FIREBALL_EXPLOSION_RADIUS_Z)) {
+                3,
+                3,
+                3)) {
 
             if (!(entity instanceof Player player)) {
                 continue;
@@ -92,6 +92,7 @@ public class FireballHandler implements Listener {
      */
     private static void applyFireballDamage(GamePlayer gamePlayer, GamePlayer ownerPlayer, Fireball fireball) {
         Player player = gamePlayer.getPlayer();
+
         // 造成伤害
         player.damage(FIREBALL_DAMAGE);
 
@@ -102,13 +103,57 @@ public class FireballHandler implements Listener {
         player.setMetadata(NO_FALL_DAMAGE_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), ownerPlayer.getUuid()));
 
         // 应用击退效果
-        Vector knockbackVector = getPosition(player.getLocation(), fireball.getLocation(), 2.1D);
-        player.setVelocity(knockbackVector.multiply(FIREBALL_KNOCK_BACK_MULTIPLIER));
+        Vector knockbackVector = calculateKnockback(
+                fireball.getLocation(),
+                player.getLocation(),
+                1.3,  // 水平击退力度
+                1.1,  // 垂直抬升力度
+                6.0   // 最大有效距离
+        );
+
+        if (knockbackVector.lengthSquared() > 0) {
+            player.setVelocity(knockbackVector);
+        }
     }
+
 
     public static Vector getPosition(Location location1, Location location2, double y) {
         double x = location1.getX() - location2.getX();
         double z = location1.getZ() - location2.getZ();
         return new Vector(x, y, z);
     }
+
+    /**
+     * 根据爆炸位置计算击退向量
+     *
+     * @param source          火球爆炸位置
+     * @param target          玩家位置
+     * @param horizontalPower 最大水平击退力度
+     * @param verticalBoost   最大垂直抬升
+     * @param maxDistance     最大生效距离（超过此距离无击退）
+     * @return 击退向量
+     */
+    private static Vector calculateKnockback(Location source, Location target, double horizontalPower, double verticalBoost, double maxDistance) {
+        double distance = source.distance(target);
+        if (distance >= maxDistance) {
+            return new Vector(0, 0, 0);
+        }
+
+        double scale = 1.0 - (distance / maxDistance);
+
+        // 计算水平向量（不含Y轴）
+        Vector horizontalDirection = target.toVector().subtract(source.toVector()).setY(0);
+        double horizontalLength = horizontalDirection.length();
+
+        if (horizontalLength < 0.5) {  // 水平距离极小，判定为垂直弹起
+            // 只给垂直方向速度
+            return new Vector(0, verticalBoost * scale, 0);
+        } else {
+            // 水平向量归一化并乘力度
+            horizontalDirection.normalize().multiply(horizontalPower * scale);
+            horizontalDirection.setY(verticalBoost * scale);
+            return horizontalDirection;
+        }
+    }
+
 }
