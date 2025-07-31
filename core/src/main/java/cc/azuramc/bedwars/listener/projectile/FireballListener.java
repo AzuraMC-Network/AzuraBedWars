@@ -59,6 +59,7 @@ public class FireballListener implements Listener {
             long cooldownTime = 1000;
 
             if (currentTime - lastFireballTime < cooldownTime) {
+                gamePlayer.sendMessage("&c火焰弹发射冷却中");
                 return;
             }
 
@@ -97,8 +98,8 @@ public class FireballListener implements Listener {
         Fireball fireball = gamePlayer.getPlayer().launchProjectile(Fireball.class);
         Vector direction = gamePlayer.getPlayer().getEyeLocation().getDirection();
         fireball = AzuraBedWars.getInstance().getNmsAccess().setFireballDirection(fireball, direction);
-        fireball.setVelocity(fireball.getVelocity().multiply(2));
-        fireball.setYield(3.0F);
+        fireball.setVelocity(gamePlayer.getPlayer().getLocation().getDirection().normalize().multiply(0.8));
+        fireball.setYield(2.5F);
         fireball.setBounce(false);
         fireball.setIsIncendiary(false);
         fireball.setMetadata(FireballHandler.FIREBALL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), gamePlayer.getUuid()));
@@ -114,5 +115,6 @@ public class FireballListener implements Listener {
         } else {
             PlayerUtil.getItemInHand(player).setAmount(PlayerUtil.getItemInHand(player).getAmount() - 1);
         }
+        gamePlayer.updateInventory();
     }
 }
