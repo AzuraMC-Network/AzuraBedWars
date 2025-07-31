@@ -304,14 +304,14 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initCustomEntities() {
         nmsAccess.registerCustomEntities();
-        Bukkit.getScheduler().runTaskTimer(this, new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 for (CustomEntityManager customEntityManager : CustomEntityManager.getCustomEntityMap().values()) {
                     customEntityManager.refresh();
                 }
             }
-        }, 20L, 20L);
+        }.runTaskTimer(this, 20L, 20L);
     }
 
     private void hookLuckPerms() {
