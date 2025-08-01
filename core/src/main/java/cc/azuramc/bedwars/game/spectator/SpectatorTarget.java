@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.spectator;
+package cc.azuramc.bedwars.game.spectator;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.MessageConfig;
@@ -39,7 +39,7 @@ public class SpectatorTarget {
 
     /**
      * 构造函数
-     * 
+     *
      * @param gamePlayer 旁观者
      * @param gameTarget 目标玩家
      */
@@ -52,7 +52,7 @@ public class SpectatorTarget {
 
     /**
      * 获取旁观者
-     * 
+     *
      * @return 旁观者
      */
     public GamePlayer getPlayer() {
@@ -61,7 +61,7 @@ public class SpectatorTarget {
 
     /**
      * 获取目标玩家
-     * 
+     *
      * @return 目标玩家
      */
     public GamePlayer getTarget() {
@@ -70,7 +70,7 @@ public class SpectatorTarget {
 
     /**
      * 设置目标玩家
-     * 
+     *
      * @param gameTarget 新的目标玩家
      */
     public void setTarget(GamePlayer gameTarget) {
@@ -88,7 +88,7 @@ public class SpectatorTarget {
 
         // 第一人称旁观模式
         if (isFirstPersonViewActive()) {
-            String actionBarText = String.format(FIRST_PERSON_ACTION_BAR, 
+            String actionBarText = String.format(FIRST_PERSON_ACTION_BAR,
                 target.getName(), (int)target.getHealth()) + MENU_HINT;
             gamePlayer.sendActionBar(actionBarText);
             return;
@@ -101,7 +101,7 @@ public class SpectatorTarget {
         }
 
         // 第三人称旁观模式
-        String actionBarText = String.format(THIRD_PERSON_ACTION_BAR, 
+        String actionBarText = String.format(THIRD_PERSON_ACTION_BAR,
             target.getName(), (int)target.getHealth(), df.format(getDistance()));
         gamePlayer.sendActionBar(actionBarText);
     }
@@ -145,7 +145,7 @@ public class SpectatorTarget {
 
     /**
      * 检查目标是否有效
-     * 
+     *
      * @return 目标是否无效
      */
     public boolean isTargetInvalid() {
@@ -171,7 +171,7 @@ public class SpectatorTarget {
 
     /**
      * 检查是否在同一世界
-     * 
+     *
      * @return 是否在同一世界
      */
     private boolean isSameWorld() {
@@ -180,7 +180,7 @@ public class SpectatorTarget {
 
     /**
      * 获取与目标的距离
-     * 
+     *
      * @return 距离
      */
     private double getDistance() {
@@ -205,7 +205,7 @@ public class SpectatorTarget {
     private void activateFirstPersonView() {
         gamePlayer.sendTitle(
                 String.format(FIRST_PERSON_TITLE, target.getName()), FIRST_PERSON_SUBTITLE, TITLE_FADE_IN,
-            TITLE_DURATION, 
+                TITLE_DURATION,
             TITLE_FADE_OUT
         );
         player.setGameMode(GameMode.SPECTATOR);
@@ -214,7 +214,7 @@ public class SpectatorTarget {
 
     /**
      * 检查是否处于第一人称视角
-     * 
+     *
      * @return 是否处于第一人称视角
      */
     private boolean isFirstPersonViewActive() {

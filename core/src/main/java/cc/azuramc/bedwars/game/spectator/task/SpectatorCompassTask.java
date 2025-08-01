@@ -1,9 +1,9 @@
-package cc.azuramc.bedwars.spectator.task;
+package cc.azuramc.bedwars.game.spectator.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.spectator.SpectatorTarget;
+import cc.azuramc.bedwars.game.spectator.SpectatorTarget;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,13 +21,13 @@ import org.bukkit.inventory.ItemStack;
 public class SpectatorCompassTask {
     /** 任务运行状态标志 */
     private boolean isRunning;
-    
+
     /** 任务ID，用于在需要时取消任务 */
     private int taskId = -1;
-    
+
     /** 更新频率（单位：tick） */
     private static final long UPDATE_FREQUENCY = 1L;
-    
+
     /** 指南针材质 */
     private static final Material COMPASS_MATERIAL = XMaterial.COMPASS.get();
 
@@ -53,7 +53,7 @@ public class SpectatorCompassTask {
             }, 0L, UPDATE_FREQUENCY).getTaskId();
         }
     }
-    
+
     /**
      * 停止指南针追踪任务
      * <p>
@@ -67,7 +67,7 @@ public class SpectatorCompassTask {
             this.taskId = -1;
         }
     }
-    
+
     /**
      * 更新所有玩家的指南针和观战目标
      * <p>
@@ -80,18 +80,18 @@ public class SpectatorCompassTask {
             if (gamePlayer == null) {
                 continue;
             }
-            
+
             // 处理观战者
             if (gamePlayer.isSpectator()) {
                 updateSpectator(gamePlayer);
                 continue;
             }
-            
+
             // 处理普通玩家的指南针
             updatePlayerCompass(gamePlayer);
         }
     }
-    
+
     /**
      * 更新观战者的目标信息
      * @param spectator 观战玩家
@@ -103,7 +103,7 @@ public class SpectatorCompassTask {
             target.autoTp();
         }
     }
-    
+
     /**
      * 更新玩家手持指南针的目标信息
      * @param gamePlayer 游戏玩家
@@ -119,7 +119,7 @@ public class SpectatorCompassTask {
             gamePlayer.getPlayerCompass().sendClosestPlayer();
         }
     }
-    
+
     /**
      * 检查物品是否为指南针
      * @param item 要检查的物品
@@ -128,7 +128,7 @@ public class SpectatorCompassTask {
     private boolean isCompass(ItemStack item) {
         return item != null && item.getType() == COMPASS_MATERIAL;
     }
-    
+
     /**
      * 检查任务是否正在运行
      * @return 如果任务正在运行返回true，否则返回false

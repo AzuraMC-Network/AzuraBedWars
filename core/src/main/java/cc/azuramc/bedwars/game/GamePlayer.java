@@ -2,14 +2,13 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
-import cc.azuramc.bedwars.spectator.SpectatorSettings;
-import cc.azuramc.bedwars.spectator.SpectatorTarget;
+import cc.azuramc.bedwars.game.spectator.SpectatorManager;
+import cc.azuramc.bedwars.game.spectator.SpectatorTarget;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.packet.ArmorHider;
@@ -19,8 +18,6 @@ import fr.mrmicky.fastboard.FastBoard;
 import lombok.Data;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -64,7 +61,7 @@ public class GamePlayer {
 
     private String nickName;
     private FastBoard board;
-    private boolean spectator;
+    private boolean isSpectator;
     private SpectatorTarget spectatorTarget;
     private GameTeam gameTeam;
     private boolean isAfk;
@@ -391,81 +388,7 @@ public class GamePlayer {
      * 设置玩家为观察者
      */
     public void setSpectator() {
-        spectator = true;
-    }
-
-    /**
-     * 将玩家转换为观察者
-     *
-     * @param title 主标题
-     * @param subTitle 副标题
-     */
-    public void toSpectator(String title, String subTitle) {
-        spectator = true;
-        spectatorTarget = new SpectatorTarget(this, null);
-
-        Player player = getPlayer();
-        setupSpectatorPlayer(player, title, subTitle);
-        setupSpectatorInventory(player);
-        setupSpectatorEffects(player);
-        setupSpectatorTarget();
-    }
-
-    /**
-     * 设置观察者玩家状态
-     */
-    private void setupSpectatorPlayer(Player player, String title, String subTitle) {
-        sendTitle(title, subTitle, 10, 20, 10);
-        for (GamePlayer gamePlayer1 : getOnlinePlayers()) {
-            PlayerUtil.hidePlayer(gamePlayer1.getPlayer(), player);
-        }
-        player.setGameMode(GameMode.ADVENTURE);
-        player.setAllowFlight(true);
-        player.setFlying(true);
-        player.teleport(AzuraBedWars.getInstance().getGameManager().getMapData().getRespawnLocation().toLocation());
-    }
-
-    /**
-     * 设置观察者物品栏
-     */
-    private void setupSpectatorInventory(Player player) {
-        player.getInventory().setItem(0, createSpectatorItem(XMaterial.COMPASS.get(), "§a§l传送器 §7(右键打开)"));
-        player.getInventory().setItem(4, createSpectatorItem(XMaterial.COMPARATOR.get(), "§c§l旁观者设置 §7(右键打开)"));
-        player.getInventory().setItem(7, createSpectatorItem(XMaterial.PAPER.get(), "§b§l快速加入 §7(右键加入)"));
-        player.getInventory().setItem(8, createSpectatorItem(XMaterial.SLIME_BALL.get(), "§c§l离开游戏 §7(右键离开)"));
-    }
-
-    /**
-     * 创建观察者物品
-     */
-    private ItemStack createSpectatorItem(Material material, String name) {
-        return new ItemBuilder()
-                .setType(material)
-                .setDisplayName(name)
-                .getItem();
-    }
-
-    /**
-     * 设置观察者效果
-     */
-    private void setupSpectatorEffects(Player player) {
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
-        SpectatorSettings spectatorSettings = SpectatorSettings.get(this);
-        if (spectatorSettings.getOption(SpectatorSettings.Option.NIGHT_VISION)) {
-            if (player.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
-                player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-            }
-            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1));
-        }
-    }
-
-    /**
-     * 设置观察者目标
-     */
-    private void setupSpectatorTarget() {
-        if (gameTeam != null && !gameTeam.getAlivePlayers().isEmpty()) {
-            spectatorTarget.setTarget(gameTeam.getAlivePlayers().get(0));
-        }
+        SpectatorManager.add(this);
     }
 
     /**
