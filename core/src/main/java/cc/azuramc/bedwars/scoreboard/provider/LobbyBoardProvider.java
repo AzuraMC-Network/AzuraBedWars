@@ -17,9 +17,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -50,6 +49,11 @@ public class LobbyBoardProvider implements Listener {
      * 更新间隔（毫秒）
      */
     private static final long UPDATE_INTERVAL = CONFIG.getUpdateInterval();
+
+    /**
+     * 日期格式化器缓存
+     */
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yy", Locale.CHINESE);
 
     /**
      * 插件实例缓存
@@ -136,6 +140,7 @@ public class LobbyBoardProvider implements Listener {
         List<String> lines = new ArrayList<>();
 
         // 添加地图信息
+        lines.add(DATE_FORMAT.format(Calendar.getInstance().getTime()));
         lines.add(EMPTY_LINE);
         lines.add("§f地图: §a" + gameManager.getMapData().getName());
         lines.add("§f队伍: §a" + gameManager.getMapData().getPlayers().getTeam() + "人 " + gameManager.getGameTeams().size() + "队");
