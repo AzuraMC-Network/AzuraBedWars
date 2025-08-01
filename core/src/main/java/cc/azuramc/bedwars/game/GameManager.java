@@ -317,6 +317,7 @@ public class GameManager {
 
         if (gameState == GameState.RUNNING) {
             handlePlayerJoinRunningGame(gamePlayer);
+            TabList.addToTab(gamePlayer);
             return;
         }
 
