@@ -221,13 +221,13 @@ public class TabList {
     private static String generateSortedTeamName(GamePlayer gamePlayer) {
         StringBuilder teamName = new StringBuilder("sort#");
 
-        // 添加队伍优先级 (00-99)
-        int teamPriority = getTeamPriority(gamePlayer.getGameTeam());
-        teamName.append(String.format("%02d", teamPriority));
-
         // 添加玩家状态优先级 (0-9)
         int playerPriority = getPlayerPriority(gamePlayer);
         teamName.append(playerPriority);
+
+        // 添加队伍优先级 (00-99)
+        int teamPriority = getTeamPriority(gamePlayer.getGameTeam());
+        teamName.append(String.format("%02d", teamPriority));
 
         // 添加固定随机数避免冲突 每个玩家只生成一次
         int randomNumber = playerRandomNumbers.computeIfAbsent(gamePlayer,
