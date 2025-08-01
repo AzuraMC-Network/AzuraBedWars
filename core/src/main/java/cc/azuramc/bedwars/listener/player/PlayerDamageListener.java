@@ -195,7 +195,7 @@ public class PlayerDamageListener implements Listener {
         GameTeam entityTeam = customEntityManager.getGameTeam();
 
         // 如果自定义生物的队伍和被攻击者不同
-        if (summoner.getGameTeam() != entityTeam) {
+        if (gamePlayer.getGameTeam() != entityTeam) {
             gamePlayer.setLastDamage(summoner);
             return;
         }
