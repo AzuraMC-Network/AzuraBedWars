@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.util;
+package cc.azuramc.bedwars.util.packet;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
