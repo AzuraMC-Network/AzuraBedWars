@@ -185,6 +185,11 @@ public class PickupItemHandler {
         Player player = gamePlayer.getPlayer();
         for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
             if (entity instanceof Player players) {
+                // 只有队员可以捡起
+                if (!gamePlayer.getGameTeam().getGamePlayers().contains(GamePlayer.get(players))) {
+                    return;
+                }
+
                 gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
 
                 GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
