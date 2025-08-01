@@ -200,7 +200,7 @@ public class TabList {
         } else if (gamePlayer.isRespawning()) {
             prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
         } else if (gamePlayer.isSpectator()) {
-            prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
+            prefix = "&7[旁观者] | ";
         } else {
             prefix = gameTeam.getName() + " | ";
         }
