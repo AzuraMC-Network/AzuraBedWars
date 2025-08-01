@@ -1,13 +1,13 @@
-package cc.azuramc.bedwars.spectator.gui;
+package cc.azuramc.bedwars.game.spectator.gui;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
-import cc.azuramc.bedwars.spectator.SpectatorSettings;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
-import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.game.GamePlayer;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -58,20 +58,20 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 构造函数
-     * 
+     *
      * @param gamePlayer 打开GUI的玩家
      */
     public SpectatorSettingGUI(GamePlayer gamePlayer) {
         super(gamePlayer, GUI_TITLE, INVENTORY_SIZE);
         SpectatorSettings spectatorSettings = SpectatorSettings.get(gamePlayer);
-        
+
         initializeSpeedItems(gamePlayer, spectatorSettings);
         initializeOptionItems(gamePlayer, spectatorSettings);
     }
 
     /**
      * 初始化速度效果选项
-     * 
+     *
      * @param gamePlayer 游戏玩家
      * @param settings 旁观者设置
      */
@@ -83,15 +83,15 @@ public class SpectatorSettingGUI extends CustomGUI {
         // 速度 I
         setItem(SPEED_I_SLOT, createSpeedItem(XMaterial.CHAINMAIL_BOOTS.get(), "§a速度 I"),
             createSpeedAction(gamePlayer, settings, 1));
-        
+
         // 速度 II
         setItem(SPEED_II_SLOT, createSpeedItem(XMaterial.IRON_BOOTS.get(), "§a速度 II"),
             createSpeedAction(gamePlayer, settings, 2));
-        
+
         // 速度 III
         setItem(SPEED_III_SLOT, createSpeedItem(XMaterial.GOLDEN_BOOTS.get(), "§a速度 III"),
             createSpeedAction(gamePlayer, settings, 3));
-        
+
         // 速度 IV
         setItem(SPEED_IV_SLOT, createSpeedItem(XMaterial.DIAMOND_BOOTS.get(), "§a速度 IV"),
             createSpeedAction(gamePlayer, settings, 4));
@@ -99,7 +99,7 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 创建速度效果物品
-     * 
+     *
      * @param material 材质
      * @param name 显示名称
      * @return 物品栈
@@ -113,7 +113,7 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 创建速度效果动作
-     * 
+     *
      * @param gamePlayer 游戏玩家
      * @param settings 旁观者设置
      * @param level 速度等级
@@ -127,7 +127,7 @@ public class SpectatorSettingGUI extends CustomGUI {
                 removeSpeedEffect(gamePlayer);
                 return;
             }
-            
+
             removeSpeedEffect(gamePlayer);
             if (level > 0) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, MAX_POTION_DURATION, level - 1));
@@ -141,7 +141,7 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 移除速度效果
-     * 
+     *
      * @param gamePlayer 游戏玩家
      */
     private void removeSpeedEffect(GamePlayer gamePlayer) {
@@ -179,7 +179,7 @@ public class SpectatorSettingGUI extends CustomGUI {
             XMaterial.CLOCK.get(),
             settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ? "§c停用第一人称旁观" : "§a启动第一人称旁观",
             settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ?
-                "§7点击停用第一人称旁观" : 
+                    "§7点击停用第一人称旁观" :
                 "§7点击确认使用指南针时\n§7自动沿用第一人称旁观！\n§7你也可以右键点击一位玩家\n§7来启用第一人称旁观"
         ), createFirstPersonAction(gamePlayer, settings));
 
@@ -203,7 +203,7 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 创建选项物品
-     * 
+     *
      * @param material 材质
      * @param name 显示名称
      * @param lore 描述
@@ -233,7 +233,7 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 创建夜视动作
-     * 
+     *
      * @param player 玩家
      * @param settings 旁观者设置
      * @return GUI动作
@@ -266,7 +266,7 @@ public class SpectatorSettingGUI extends CustomGUI {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.FIRST_PERSON);
             settings.setOption(SpectatorSettings.Option.FIRST_PERSON, newValue);
             gamePlayer.sendMessage(newValue ? FIRST_PERSON_ENABLED : FIRST_PERSON_DISABLED);
-            
+
             if (!newValue && gamePlayer.isSpectator() && player.getGameMode() == GameMode.SPECTATOR) {
                 gamePlayer.sendTitle("§e退出旁观模式", null, 0, 20, 0);
                 player.setGameMode(GameMode.ADVENTURE);
@@ -292,7 +292,7 @@ public class SpectatorSettingGUI extends CustomGUI {
 
     /**
      * 创建飞行动作
-     * 
+     *
      * @param gamePlayer 游戏玩家
      * @param settings 旁观者设置
      * @return GUI动作
@@ -304,7 +304,7 @@ public class SpectatorSettingGUI extends CustomGUI {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.FLY);
             settings.setOption(SpectatorSettings.Option.FLY, newValue);
             gamePlayer.sendMessage(newValue ? FLY_ENABLED : FLY_DISABLED);
-            
+
             if (newValue) {
                 if (player.isOnGround()) {
                     player.getLocation().setY(player.getLocation().getY() + 0.1D);

@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.spectator.SpectatorSettings;
+import cc.azuramc.bedwars.game.spectator.SpectatorSettings;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
