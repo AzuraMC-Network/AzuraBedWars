@@ -6,3 +6,5 @@ authors:
   - Ant1Aura
   - ImCur_
 api-version: 1.13
+depend:
+  - packetevents
