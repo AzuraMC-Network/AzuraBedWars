@@ -68,6 +68,7 @@ public class GamePlayer {
     private SpectatorTarget spectatorTarget;
     private GameTeam gameTeam;
     private boolean isAfk;
+    private boolean isRespawning;
     private boolean isShoutCooldown;
     private boolean isEggBridgeCooldown;
     private boolean isViewingArrowDamage;
@@ -83,7 +84,7 @@ public class GamePlayer {
     private ToolType axeType;
     private boolean shear;
 
-    private boolean reconnect;
+    private boolean isReconnect;
 
     /**
      * 构造方法
@@ -113,7 +114,7 @@ public class GamePlayer {
         this.pickaxeType = ToolType.NONE;
         this.axeType = ToolType.NONE;
 
-        this.reconnect = false;
+        this.isReconnect = false;
 
         // 游戏模式
         this.gameModeType = playerData.getMode();

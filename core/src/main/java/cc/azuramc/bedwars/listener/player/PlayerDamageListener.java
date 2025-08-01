@@ -357,6 +357,7 @@ public class PlayerDamageListener implements Listener {
     private void handlePlayerRespawn(GamePlayer gamePlayer) {
         if (gamePlayer == null) return;
         Player player = gamePlayer.getPlayer();
+        // PlayerRespawnListener处理复活后的相关事宜 (清除不可见等等)
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             gamePlayer.getPlayer().spigot().respawn();
 

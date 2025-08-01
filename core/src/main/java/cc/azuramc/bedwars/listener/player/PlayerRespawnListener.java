@@ -193,6 +193,8 @@ public class PlayerRespawnListener implements Listener {
         player.setGameMode(GameMode.SPECTATOR);
         player.setFlying(true);
 
+        gamePlayer.setRespawning(true);
+
         // 使用AtomicInteger以便可以重新赋值在Runnable里使用
         AtomicInteger delay = new AtomicInteger(RESPAWN_COUNTDOWN_SECONDS);
 
@@ -236,6 +238,8 @@ public class PlayerRespawnListener implements Listener {
         // 重置经验和等级
         player.setExp(0f);
         player.setLevel(0);
+
+        gamePlayer.setRespawning(false);
 
         // 降级工具等级
         degradeTools(gamePlayer);
