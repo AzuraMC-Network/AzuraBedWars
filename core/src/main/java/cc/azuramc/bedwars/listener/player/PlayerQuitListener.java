@@ -18,8 +18,10 @@ public class PlayerQuitListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         event.setQuitMessage(null);
         GamePlayer gamePlayer = GamePlayer.get(event.getPlayer());
-        gamePlayer.endInvisibility();
-        gameManager.removePlayers(gamePlayer);
+        if (gamePlayer != null) {
+            gamePlayer.endInvisibility();
+            gameManager.removePlayers(gamePlayer);
+        }
         AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
     }
 }
