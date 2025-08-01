@@ -391,7 +391,7 @@ public class TeamShopGUI extends CustomGUI {
                             .setType(XMaterial.DIAMOND_BOOTS.get())
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + FALLING_PROTECTION)
-                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .setLores(getFallingProtectionUpgradeLore(currentLevel, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
