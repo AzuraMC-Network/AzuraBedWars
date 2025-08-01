@@ -72,9 +72,7 @@ public class SpectatorManager {
      */
     private static void setupSpectatorPlayer(GamePlayer gamePlayer, String title, String subTitle) {
         gamePlayer.sendTitle(title, subTitle, 10, 20, 10);
-        for (GamePlayer gamePlayer1 : GamePlayer.getOnlinePlayers()) {
-            PlayerUtil.hidePlayer(gamePlayer1.getPlayer(), gamePlayer.getPlayer());
-        }
+        PlayerUtil.hidePlayer(gamePlayer, GamePlayer.getGamePlayers());
 
         Player player = gamePlayer.getPlayer();
         player.setGameMode(GameMode.ADVENTURE);
