@@ -12,6 +12,7 @@ import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.event.GameEventManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.map.MapData;
+import cc.azuramc.bedwars.game.spectator.SpectatorManager;
 import cc.azuramc.bedwars.game.task.GameStartTask;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.jedis.JedisManager;
@@ -458,7 +459,7 @@ public class GameManager {
         }
 
         // 如果没有有效团队，设为观察者
-        gamePlayer.toSpectator(null, null);
+        SpectatorManager.toSpectator(gamePlayer);
     }
 
     /**

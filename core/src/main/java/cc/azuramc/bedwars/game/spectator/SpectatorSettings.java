@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.spectator;
+package cc.azuramc.bedwars.game.spectator;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class SpectatorSettings {
 
     /**
      * 构造函数
-     * 
+     *
      * @param gamePlayer 游戏玩家
      */
     public SpectatorSettings(GamePlayer gamePlayer) {
@@ -41,7 +41,7 @@ public class SpectatorSettings {
 
     /**
      * 获取玩家的旁观者设置
-     * 
+     *
      * @param player 游戏玩家
      * @return 旁观者设置
      */
@@ -51,7 +51,7 @@ public class SpectatorSettings {
 
     /**
      * 设置速度等级
-     * 
+     *
      * @param level 速度等级
      */
     public void setSpeed(int level) {
@@ -63,7 +63,7 @@ public class SpectatorSettings {
 
     /**
      * 获取选项状态
-     * 
+     *
      * @param option 选项
      * @return 是否启用
      */
@@ -111,7 +111,7 @@ public class SpectatorSettings {
 
     /**
      * 获取游戏玩家
-     * 
+     *
      * @return 游戏玩家
      */
     public GamePlayer getPlayer() {

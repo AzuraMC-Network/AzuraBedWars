@@ -9,6 +9,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
+import cc.azuramc.bedwars.game.spectator.SpectatorManager;
 import com.cryptomorin.xseries.XSound;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -138,7 +139,7 @@ public class PlayerRespawnListener implements Listener {
                     PlayerUtil.hidePlayer(otherPlayer.getPlayer(), gamePlayer.getPlayer()));
 
                 // 设置为观察者
-                gamePlayer.toSpectator(DEATH_PERMANENT_TITLE, DEATH_PERMANENT_SUBTITLE);
+                SpectatorManager.toSpectator(gamePlayer, DEATH_PERMANENT_TITLE, DEATH_PERMANENT_SUBTITLE);
             }
         }.runTaskLater(AzuraBedWars.getInstance(), RESPAWN_DELAY_TICKS);
 

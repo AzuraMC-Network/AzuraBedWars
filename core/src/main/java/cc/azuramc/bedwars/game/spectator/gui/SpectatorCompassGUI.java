@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.spectator.gui;
+package cc.azuramc.bedwars.game.spectator.gui;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
@@ -30,7 +30,7 @@ public class SpectatorCompassGUI extends CustomGUI {
 
     /**
      * 构造函数
-     * 
+     *
      * @param gamePlayer 打开GUI的玩家
      */
     public SpectatorCompassGUI(GamePlayer gamePlayer) {
@@ -40,11 +40,11 @@ public class SpectatorCompassGUI extends CustomGUI {
 
     /**
      * 计算库存大小
-     * 
+     *
      * @return 适当的库存大小
      */
     private static int calculateInventorySize() {
-        return GamePlayer.getOnlinePlayers().size() <= SMALL_INVENTORY_SIZE ? 
+        return GamePlayer.getOnlinePlayers().size() <= SMALL_INVENTORY_SIZE ?
                SMALL_INVENTORY_SIZE : LARGE_INVENTORY_SIZE;
     }
 
@@ -65,7 +65,7 @@ public class SpectatorCompassGUI extends CustomGUI {
 
     /**
      * 检查玩家是否可以作为观察目标
-     * 
+     *
      * @param gamePlayer 要检查的玩家
      * @return 是否有效
      */
@@ -75,7 +75,7 @@ public class SpectatorCompassGUI extends CustomGUI {
 
     /**
      * 创建玩家物品
-     * 
+     *
      * @param gamePlayer 目标玩家
      * @return 物品栈
      */
@@ -98,7 +98,7 @@ public class SpectatorCompassGUI extends CustomGUI {
 
     /**
      * 创建传送动作
-     * 
+     *
      * @param gamePlayer 目标玩家
      * @return GUI动作
      */

@@ -7,10 +7,10 @@ import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.trap.TrapManager;
 import cc.azuramc.bedwars.game.trap.TrapType;
-import cc.azuramc.bedwars.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XPotion;
 import com.cryptomorin.xseries.XSound;
@@ -66,7 +66,7 @@ public class GameStartEvent extends AbstractGameEvent {
         startResourceGenerators(gameManager);
         startCompassTracking();
     }
-    
+
     /**
      * 注册团队升级任务，处理团队效果和陷阱
      *
@@ -78,29 +78,29 @@ public class GameStartEvent extends AbstractGameEvent {
                 if (player.isSpectator()) {
                     return;
                 }
-                
+
                 for (GameTeam gameTeam : gameManager.getGameTeams()) {
                     // 跳过不同世界的团队
                     if (!Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawnLocation().getWorld())) {
                         continue;
                     }
-                    
+
                     // 处理疯狂矿工效果
                     applyManicMinerEffect(gameTeam);
-                    
+
                     // 如果是团队成员，检查治愈池效果
                     if (gameTeam.isInTeam(player)) {
                         applyHealingPoolEffect(player, gameTeam);
                         continue;
                     }
-                    
+
                     // 处理敌方玩家进入团队领地的陷阱触发
                     handleEnemyInTeamTerritory(player, gameTeam);
                 }
             })
         );
     }
-    
+
     /**
      * 应用疯狂矿工效果给团队成员
      *
@@ -110,17 +110,17 @@ public class GameStartEvent extends AbstractGameEvent {
         if (gameTeam.getMagicMinerUpgrade() <= 0) {
             return;
         }
-        
+
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player -> {
             PotionEffectType fastDigging = XPotion.HASTE.get();
             if (fastDigging != null) {
-                player.getPlayer().addPotionEffect(new PotionEffect(fastDigging, 
+                player.getPlayer().addPotionEffect(new PotionEffect(fastDigging,
                     CONFIG.getUpgrade().getHasteEffectDuration(),
                     gameTeam.getMagicMinerUpgrade()));
             }
         })));
     }
-    
+
     /**
      * 为团队基地内的玩家应用治愈池效果
      *
@@ -129,7 +129,7 @@ public class GameStartEvent extends AbstractGameEvent {
      */
     private void applyHealingPoolEffect(GamePlayer gamePlayer, GameTeam gameTeam) {
         double distance = gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
-        
+
         if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPoolUpgrade()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType regeneration = XPotion.REGENERATION.get();
@@ -141,7 +141,7 @@ public class GameStartEvent extends AbstractGameEvent {
             });
         }
     }
-    
+
     /**
      * 处理敌方玩家进入团队领地触发的陷阱
      *
@@ -170,7 +170,7 @@ public class GameStartEvent extends AbstractGameEvent {
                 LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger alarm trap, gamePlayer: " + gamePlayer.getName());
                 triggerAlarmTrap(gamePlayer, gameTeam);
             }
-            
+
             // 触发挖掘疲劳陷阱
             if (trapManager.isTrapActive(TrapType.MINER)) {
                 LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger mining fatigue trap, gamePlayer: " + gamePlayer.getName());
@@ -178,7 +178,7 @@ public class GameStartEvent extends AbstractGameEvent {
             }
         }
     }
-    
+
     /**
      * 触发失明陷阱
      *
@@ -255,7 +255,7 @@ public class GameStartEvent extends AbstractGameEvent {
             player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
         })));
     }
-    
+
     /**
      * 触发挖掘疲劳陷阱
      *
@@ -269,7 +269,7 @@ public class GameStartEvent extends AbstractGameEvent {
         AzuraBedWars.getInstance().mainThreadRunnable(() -> {
             PotionEffectType miningFatigue = XPotion.MINING_FATIGUE.get();
             if (miningFatigue != null) {
-                player.getPlayer().addPotionEffect(new PotionEffect(miningFatigue, 
+                player.getPlayer().addPotionEffect(new PotionEffect(miningFatigue,
                     CONFIG.getUpgrade().getMiningFatigueEffectDuration(),
                     CONFIG.getUpgrade().getMiningFatigueEffectAmplifier()));
             }
@@ -290,7 +290,7 @@ public class GameStartEvent extends AbstractGameEvent {
             player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
         })));
     }
-    
+
     /**
      * 启动资源生成器
      *
@@ -299,7 +299,7 @@ public class GameStartEvent extends AbstractGameEvent {
     private void startResourceGenerators(GameManager gameManager) {
         new GeneratorTask(gameManager).start();
     }
-    
+
     /**
      * 启动指南针追踪系统
      */

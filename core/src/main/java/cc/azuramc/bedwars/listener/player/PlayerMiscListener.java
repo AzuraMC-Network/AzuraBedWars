@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.spectator.SpectatorSettings;
+import cc.azuramc.bedwars.game.spectator.SpectatorSettings;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.GameMode;
