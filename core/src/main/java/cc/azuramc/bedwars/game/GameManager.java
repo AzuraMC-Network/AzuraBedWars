@@ -333,7 +333,7 @@ public class GameManager {
     private void handlePlayerJoinWaitingGame(GamePlayer gamePlayer) {
         Player player = gamePlayer.getPlayer();
         // 处理玩家可见性
-        updatePlayerVisibility(gamePlayer);
+        showAllPlayers(gamePlayer);
 
         // 设置玩家基本状态
         player.spigot().respawn();
@@ -360,48 +360,9 @@ public class GameManager {
      *
      * @param gamePlayer 游戏玩家
      */
-    private void updatePlayerVisibility(GamePlayer gamePlayer) {
-        Player player = gamePlayer.getPlayer();
-        // 使当前玩家可见
-        for (GamePlayer otherPlayer : GamePlayer.getOnlinePlayers()) {
-            Player otherPlayerObj = otherPlayer.getPlayer();
-
-            // 让所有玩家看到新玩家
-            PlayerUtil.showPlayer(otherPlayerObj, player);
-            // 让新玩家看到所有玩家
-            PlayerUtil.showPlayer(player, otherPlayerObj);
-        }
-    }
-
-    /**
-     * 重置所有玩家可见性
-     * 在游戏状态变化时调用此方法
-     */
-    public void resetAllPlayersVisibility() {
-        List<GamePlayer> onlinePlayers = GamePlayer.getOnlinePlayers();
-
-        for (GamePlayer player1 : onlinePlayers) {
-            Player p1 = player1.getPlayer();
-
-            for (GamePlayer player2 : onlinePlayers) {
-                Player p2 = player2.getPlayer();
-
-                // 跳过自己
-                if (player1.equals(player2)) {
-                    continue;
-                }
-
-                // 如果是观察者，对其他玩家不可见
-                if (player1.isSpectator()) {
-                    PlayerUtil.hidePlayer(p2, p1);
-                } else if (player2.isSpectator()) {
-                    PlayerUtil.hidePlayer(p1, p2);
-                } else {
-                    // 正常玩家互相可见
-                    PlayerUtil.showPlayer(p1, p2);
-                    PlayerUtil.showPlayer(p2, p1);
-                }
-            }
+    private void showAllPlayers(GamePlayer gamePlayer) {
+        for (GamePlayer onlinePlayer : GamePlayer.getOnlinePlayers()) {
+            PlayerUtil.showPlayer(onlinePlayer, GamePlayer.getOnlinePlayers());
         }
     }
 

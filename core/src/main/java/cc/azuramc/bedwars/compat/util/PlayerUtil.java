@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.compat.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Objects;
 
 public class PlayerUtil {
@@ -43,6 +45,58 @@ public class PlayerUtil {
         }
 
         player.getInventory().setItemInMainHand(item);
+    }
+
+    public static void hidePlayer(GamePlayer gamePlayer, List<GamePlayer> targetList) {
+        if (targetList.isEmpty()) {
+            return;
+        }
+
+        for (GamePlayer targetPlayer : targetList) {
+            if (targetList == gamePlayer) {
+                continue;
+            }
+            hidePlayer(gamePlayer.getPlayer(), targetPlayer.getPlayer());
+        }
+    }
+
+    public static void showPlayer(GamePlayer gamePlayer, List<GamePlayer> targetList) {
+        if (targetList.isEmpty()) {
+            return;
+        }
+
+        for (GamePlayer targetPlayer : targetList) {
+            if (targetList == gamePlayer) {
+                continue;
+            }
+            showPlayer(gamePlayer.getPlayer(), targetPlayer.getPlayer());
+        }
+    }
+
+    public static void hidePlayer(List<GamePlayer> playerList, GamePlayer target) {
+        if (playerList.isEmpty()) {
+            return;
+        }
+
+        for (GamePlayer player : playerList) {
+            if (player == target) {
+                continue;
+            }
+            hidePlayer(player.getPlayer(), target.getPlayer());
+        }
+    }
+
+    public static void showPlayer(List<GamePlayer> playerList, GamePlayer target) {
+        if (playerList.isEmpty()) {
+            return;
+        }
+
+        for (GamePlayer player : playerList) {
+            if (player == target) {
+                continue;
+            }
+            showPlayer(player.getPlayer(), target.getPlayer());
+        }
     }
 
     /**

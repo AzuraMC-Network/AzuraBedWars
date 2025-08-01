@@ -362,12 +362,8 @@ public class PlayerDamageListener implements Listener {
             gamePlayer.getPlayer().spigot().respawn();
 
             // 使用PlayerUtil隐藏玩家
-            for (GamePlayer otherPlayer : GamePlayer.getOnlinePlayers()) {
-                PlayerUtil.hidePlayer(otherPlayer.getPlayer(), player);
-            }
+            PlayerUtil.hidePlayer(GamePlayer.getOnlinePlayers(), gamePlayer);
 
-            // 玩家自己也看不到自己
-            PlayerUtil.hidePlayer(player, player);
         }, RESPAWN_DELAY);
     }
 

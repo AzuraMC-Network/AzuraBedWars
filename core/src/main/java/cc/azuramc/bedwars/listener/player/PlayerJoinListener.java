@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameLoadEvent;
-import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -98,11 +97,8 @@ public class PlayerJoinListener implements Listener {
         if (gameManager.getGameState() == GameState.RUNNING) {
             // 如果是有权限的玩家且游戏正在运行且玩家没有团队，则不添加到gameManager
             if (hasAdminPermission && !playerHasTeam) {
-                // 有权限的玩家强行加入但不添加到gameManager，直接设为观察者并且使用bukkit hide
+                // 有权限的玩家强行加入但不添加到gameManager，直接设为观察者
                 gamePlayer.setSpectator();
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    PlayerUtil.hidePlayer(player, onlinePlayer);
-                }
                 return;
             }
         }

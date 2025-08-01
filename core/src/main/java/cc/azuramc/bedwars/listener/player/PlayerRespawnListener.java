@@ -134,10 +134,6 @@ public class PlayerRespawnListener implements Listener {
                 // 设置重生位置和移动状态
                 teleportToRespawnLocation(event);
 
-                // 隐藏死亡玩家
-                GamePlayer.getOnlinePlayers().forEach(otherPlayer ->
-                    PlayerUtil.hidePlayer(otherPlayer.getPlayer(), gamePlayer.getPlayer()));
-
                 // 设置为观察者
                 SpectatorManager.toSpectator(gamePlayer, DEATH_PERMANENT_TITLE, DEATH_PERMANENT_SUBTITLE);
             }
@@ -249,9 +245,7 @@ public class PlayerRespawnListener implements Listener {
         gamePlayer.giveInventory();
 
         // 使玩家对所有人可见
-        PlayerUtil.showPlayer(player, player);
-        GamePlayer.getOnlinePlayers().forEach(otherPlayer ->
-            PlayerUtil.showPlayer(otherPlayer.getPlayer(), player));
+        PlayerUtil.showPlayer(GamePlayer.getOnlinePlayers(), gamePlayer);
 
         // 传送到队伍出生点
         player.teleport(gameTeam.getSpawnLocation());
