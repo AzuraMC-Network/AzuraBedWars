@@ -229,18 +229,4 @@ public class CustomEntityManager {
 
         return false;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(uuid);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("CustomEntityManager{uuid=%s, entityType=%s, team=%s, despawn=%d}",
-                uuid,
-                livingEntity != null ? livingEntity.getClass().getSimpleName() : "null",
-                gameTeam != null ? gameTeam.getName() : "null",
-                liveLeftTime);
-    }
 }

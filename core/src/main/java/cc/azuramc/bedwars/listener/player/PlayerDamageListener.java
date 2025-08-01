@@ -183,7 +183,7 @@ public class PlayerDamageListener implements Listener {
 
         if (attacker instanceof IronGolem || attacker instanceof Silverfish) {
             // 处理自定义生物
-            handlePlayerVsCustomEntity(event, entity, gamePlayer);
+            handlePlayerVsCustomEntity(event, attacker, gamePlayer);
         }
     }
 
