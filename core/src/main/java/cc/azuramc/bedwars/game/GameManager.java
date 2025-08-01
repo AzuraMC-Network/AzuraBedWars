@@ -320,6 +320,8 @@ public class GameManager {
         }
 
         handlePlayerJoinWaitingGame(gamePlayer);
+
+        TabList.addToTab(gamePlayer);
     }
 
     /**
@@ -448,7 +450,6 @@ public class GameManager {
         // 检查玩家团队状态
         if (gamePlayer.getGameTeam() != null) {
             if (!gamePlayer.getGameTeam().isDead()) {
-                LoadGameUtil.setPlayerTeamTab();
                 gamePlayer.setReconnect(true);
                 PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
                 broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
