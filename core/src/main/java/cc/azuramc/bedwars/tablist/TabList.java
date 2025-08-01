@@ -143,7 +143,7 @@ public class TabList {
     }
 
     private static void handleEndingTabList() {
-
+        handleGamingTabList();
     }
 
     /**
@@ -160,8 +160,9 @@ public class TabList {
         if (gameTeam == null) {
             return;
         }
-
-        if (gamePlayer.isSpectator()) {
+        if (gamePlayer.isRespawning()) {
+            displayName = "&7" + gameTeam.getName() + " | " + gamePlayer.getNickName();
+        } else if (gamePlayer.isSpectator()) {
             displayName = "&7[旁观者] | " + gamePlayer.getNickName();
         } else {
             displayName = gameTeam.getChatColor() + gameTeam.getName() + " | " + gamePlayer.getNickName();
@@ -186,7 +187,9 @@ public class TabList {
 
         String prefix;
 
-        if (gamePlayer.isSpectator()) {
+        if (gamePlayer.isRespawning()) {
+            prefix = "&7" + gameTeam.getName() + " | ";
+        } else if (gamePlayer.isSpectator()) {
             prefix = "&7" + gameTeam.getName() + " | ";
         } else {
             prefix = gameTeam.getChatColor() + gameTeam.getName() + " | ";
@@ -255,6 +258,11 @@ public class TabList {
         // 旁观者
         if (gamePlayer.isSpectator()) {
             return 8;
+        }
+
+        // 复活中
+        if (gamePlayer.isRespawning()) {
+            return 7;
         }
 
         // 普通存活玩家
