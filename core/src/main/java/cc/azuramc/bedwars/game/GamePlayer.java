@@ -12,6 +12,7 @@ import cc.azuramc.bedwars.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.spectator.SpectatorTarget;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.util.packet.ArmorHider;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import fr.mrmicky.fastboard.FastBoard;
@@ -205,7 +206,7 @@ public class GamePlayer {
      * 开始隐身任务
      */
     public void startInvisibilityTask() {
-        AzuraBedWars.getInstance().getNmsAccess().hideArmor(this, GamePlayer.getGamePlayers());
+        ArmorHider.hideArmor(this, GamePlayer.getGamePlayers());
         this.setInvisible(true);
         invisibilityTask = new BukkitRunnable() {
             @Override
@@ -220,7 +221,7 @@ public class GamePlayer {
      * 取消隐身任务
      */
     public void endInvisibility() {
-        AzuraBedWars.getInstance().getNmsAccess().showArmor(this, GamePlayer.getGamePlayers());
+        ArmorHider.showArmor(this, GamePlayer.getGamePlayers());
         if (this.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
             this.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
         }
