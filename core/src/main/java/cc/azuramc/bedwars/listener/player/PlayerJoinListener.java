@@ -23,6 +23,15 @@ public class PlayerJoinListener implements Listener {
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     private static int serverMaxPlayers = 16;
 
+    @EventHandler(priority = EventPriority.LOW)
+    public void onAsyncJoin(AsyncPlayerPreLoginEvent event) {
+        if (GamePlayer.get(event.getUniqueId()) != null) {
+            return;
+        }
+
+        GamePlayer.create(event.getUniqueId(), event.getName());
+    }
+
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
@@ -37,7 +46,6 @@ public class PlayerJoinListener implements Listener {
         boolean hasAdminPermission = player.hasPermission("azurabedwars.admin");
 
         if (hasAdminPermission) {
-            // 有权限的玩家可以强行加入但不会被添加到gameManager
             event.allow();
         }
 
@@ -59,18 +67,6 @@ public class PlayerJoinListener implements Listener {
         // 如果游戏正在运行且玩家没有权限
         if (gameManager.getGameState() == GameState.RUNNING && !hasAdminPermission) {
             event.disallow(PlayerLoginEvent.Result.KICK_FULL, "游戏已开始");
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onAsyncJoin(AsyncPlayerPreLoginEvent event) {
-        if (GamePlayer.get(event.getUniqueId()) != null) {
-            return;
-        }
-
-        GamePlayer gamePlayer = GamePlayer.create(event.getUniqueId(), event.getName());
-        if (gameManager.getGameState() == GameState.RUNNING) {
-            gamePlayer.setSpectator();
         }
     }
 
@@ -103,8 +99,6 @@ public class PlayerJoinListener implements Listener {
                 return;
             }
         }
-
-        // 正常情况下添加玩家到gameManager
         gameManager.addPlayer(gamePlayer);
     }
 
