@@ -131,6 +131,21 @@ public class GameTeam {
     }
 
     /**
+     * 获取团队名称 (移除前边的颜色符号)
+     *
+     * @return 团队名称
+     */
+    public String getNameWithoutColor() {
+        String teamName = teamColor.getName();
+
+        if (teamName == null || teamName.length() < 2) {
+            return "error";
+        }
+
+        return teamName.substring(2);
+    }
+
+    /**
      * 获取团队中所有玩家
      *
      * @return 团队玩家列表
