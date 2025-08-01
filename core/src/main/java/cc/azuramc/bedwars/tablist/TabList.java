@@ -1,7 +1,9 @@
 package cc.azuramc.bedwars.tablist;
 
 import cc.azuramc.bedwars.game.*;
+import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.util.VaultUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -81,11 +83,13 @@ public class TabList {
         Team team = scoreboard.getTeam(teamName);
         if (team == null) {
             team = scoreboard.registerNewTeam(teamName);
-            team.addEntry(gamePlayer.getName());
         }
+
+        team.addEntry(gamePlayer.getName());
 
         teamMap.put(gamePlayer, team);
 
+        updateTabList(gamePlayer);
         updateTag(gamePlayer, team);
     }
 
@@ -107,27 +111,6 @@ public class TabList {
      * 为所有在线玩家更新TabList显示名称
      */
     public static void updateAllTabListNames() {
-
-        if (gameManager.getGameState() == GameState.WAITING) {
-            handleWaitingTabList();
-            return;
-        }
-
-        if (gameManager.getGameState() == GameState.RUNNING) {
-            handleGamingTabList();
-            return;
-        }
-
-        if (gameManager.getGameState() == GameState.ENDING) {
-            handleEndingTabList();
-            return;
-        }
-    }
-
-    private static void handleWaitingTabList() {
-    }
-
-    private static void handleGamingTabList() {
         for (GamePlayer gamePlayer : teamMap.keySet()) {
             Team team = teamMap.get(gamePlayer);
             String newTeamName = generateSortedTeamName(gamePlayer);
@@ -148,9 +131,6 @@ public class TabList {
         }
     }
 
-    private static void handleEndingTabList() {
-        handleGamingTabList();
-    }
 
     /**
      * 使用ScoreboardAPI设置玩家tabList显示
@@ -163,19 +143,28 @@ public class TabList {
 
         String displayName;
 
-        if (gameTeam == null) {
+        if (gameManager.getGameState() == GameState.WAITING) {
+            String prefix = "";
+            if (LuckPermsUtil.isLoaded) {
+                prefix = LuckPermsUtil.getPrefix(gamePlayer);
+            } else if (!VaultUtil.chatIsNull) {
+                prefix = VaultUtil.getPlayerPrefix(gamePlayer);
+            }
+
+            player.setPlayerListName(prefix + gamePlayer.getNickName());
             return;
         }
 
-        if (gamePlayer.isRespawning()) {
-            displayName = "&7" + gameTeam.getNameWithoutColor() + " | " + gamePlayer.getNickName();
-        } else if (gamePlayer.isSpectator()) {
-            displayName = "&7[旁观者] | " + gamePlayer.getNickName();
-        } else {
-            displayName = gameTeam.getName() + " | " + gamePlayer.getNickName();
+        if (gameManager.getGameState() == GameState.RUNNING || gameManager.getGameState() == GameState.ENDING) {
+            if (gamePlayer.isRespawning()) {
+                displayName = "&7" + gameTeam.getNameWithoutColor() + " | " + gamePlayer.getNickName();
+            } else if (gamePlayer.isSpectator()) {
+                displayName = "&7[旁观者] | " + gamePlayer.getNickName();
+            } else {
+                displayName = gameTeam.getName() + " | " + gamePlayer.getNickName();
+            }
+            player.setPlayerListName(MessageUtil.color(displayName));
         }
-
-        player.setPlayerListName(MessageUtil.color(displayName));
     }
 
     /**
@@ -188,30 +177,45 @@ public class TabList {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         Scoreboard scoreboard = player.getScoreboard();
 
-        if (gameTeam == null) {
+        String prefix = "";
+
+        if (gameManager.getGameState() == GameState.WAITING) {
+            if (LuckPermsUtil.isLoaded) {
+                prefix = LuckPermsUtil.getPrefix(gamePlayer);
+            } else if (!VaultUtil.chatIsNull) {
+                prefix = VaultUtil.getPlayerPrefix(gamePlayer);
+            }
+
+            // 设置前缀和后缀
+            team.setPrefix(MessageUtil.color(prefix));
+
+            // 添加玩家到这个队伍
+            team.addEntry(player.getName());
+
+            player.setScoreboard(scoreboard);
             return;
         }
 
-        String prefix;
+        if (gameManager.getGameState() == GameState.RUNNING || gameManager.getGameState() == GameState.ENDING) {
+            if (gamePlayer.isInvisible()) {
+                team.removeEntry(gamePlayer.getName());
+                return;
+            } else if (gamePlayer.isRespawning()) {
+                prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
+            } else if (gamePlayer.isSpectator()) {
+                prefix = "&7[旁观者] | ";
+            } else {
+                prefix = gameTeam.getName() + " | ";
+            }
 
-        if (gamePlayer.isInvisible()) {
-            team.removeEntry(gamePlayer.getName());
-            return;
-        } else if (gamePlayer.isRespawning()) {
-            prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
-        } else if (gamePlayer.isSpectator()) {
-            prefix = "&7[旁观者] | ";
-        } else {
-            prefix = gameTeam.getName() + " | ";
+            // 设置前缀和后缀
+            team.setPrefix(MessageUtil.color(prefix));
+
+            // 添加玩家到这个队伍
+            team.addEntry(player.getName());
+
+            player.setScoreboard(scoreboard);
         }
-
-        // 设置前缀和后缀
-        team.setPrefix(MessageUtil.color(prefix));
-
-        // 添加玩家到这个队伍
-        team.addEntry(player.getName());
-
-        player.setScoreboard(scoreboard);
     }
 
     /**
