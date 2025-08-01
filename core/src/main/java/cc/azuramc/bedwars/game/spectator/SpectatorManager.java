@@ -26,6 +26,12 @@ public class SpectatorManager {
     public static void add(GamePlayer gamePlayer) {
         gamePlayer.setSpectator(true);
         spectators.add(gamePlayer);
+        // 对所有玩家隐藏新的旁观者
+        PlayerUtil.hidePlayer(GamePlayer.getOnlinePlayers(), gamePlayer);
+        // 对所有旁观者显示所有玩家
+        for (GamePlayer spectator : spectators) {
+            PlayerUtil.showPlayer(spectator, GamePlayer.getOnlinePlayers());
+        }
     }
 
     public static void remove(GamePlayer gamePlayer) {
@@ -72,7 +78,6 @@ public class SpectatorManager {
      */
     private static void setupSpectatorPlayer(GamePlayer gamePlayer, String title, String subTitle) {
         gamePlayer.sendTitle(title, subTitle, 10, 20, 10);
-        PlayerUtil.hidePlayer(gamePlayer, GamePlayer.getGamePlayers());
 
         Player player = gamePlayer.getPlayer();
         player.setGameMode(GameMode.ADVENTURE);
