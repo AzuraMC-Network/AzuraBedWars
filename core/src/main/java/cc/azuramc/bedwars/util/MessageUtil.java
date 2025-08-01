@@ -22,6 +22,9 @@ public final class MessageUtil {
 
 
     public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        if (title == null && subtitle == null) {
+            return;
+        }
         title = parse(player, title);
         subtitle = parse(player, subtitle);
         Titles.sendTitle(player, fadeIn, stay, fadeOut, color(title), color(subtitle));

@@ -236,6 +236,7 @@ public class PlayerRespawnListener implements Listener {
         player.setExp(0f);
         player.setLevel(0);
 
+        gamePlayer.setReconnect(false);
         gamePlayer.setRespawning(false);
 
         // 降级工具等级

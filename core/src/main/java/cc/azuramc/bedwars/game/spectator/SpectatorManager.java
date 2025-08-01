@@ -50,13 +50,7 @@ public class SpectatorManager {
      * 将玩家转换为观察者
      */
     public static void toSpectator(GamePlayer gamePlayer) {
-        SpectatorManager.add(gamePlayer);
-        gamePlayer.setSpectatorTarget(new SpectatorTarget(gamePlayer, null));
-
-        Player player = gamePlayer.getPlayer();
-        setupSpectatorInventory(player);
-        setupSpectatorEffects(player);
-        setupSpectatorTarget(gamePlayer);
+        toSpectator(gamePlayer, null, null);
     }
 
     /**
