@@ -160,12 +160,13 @@ public class TabList {
         if (gameTeam == null) {
             return;
         }
+
         if (gamePlayer.isRespawning()) {
-            displayName = "&7" + gameTeam.getName() + " | " + gamePlayer.getNickName();
+            displayName = "&7" + gameTeam.getNameWithoutColor() + " | " + gamePlayer.getNickName();
         } else if (gamePlayer.isSpectator()) {
             displayName = "&7[旁观者] | " + gamePlayer.getNickName();
         } else {
-            displayName = gameTeam.getChatColor() + gameTeam.getName() + " | " + gamePlayer.getNickName();
+            displayName = gameTeam.getName() + " | " + gamePlayer.getNickName();
         }
 
         player.setPlayerListName(MessageUtil.color(displayName));
@@ -188,11 +189,11 @@ public class TabList {
         String prefix;
 
         if (gamePlayer.isRespawning()) {
-            prefix = "&7" + gameTeam.getName() + " | ";
+            prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
         } else if (gamePlayer.isSpectator()) {
-            prefix = "&7" + gameTeam.getName() + " | ";
+            prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
         } else {
-            prefix = gameTeam.getChatColor() + gameTeam.getName() + " | ";
+            prefix = gameTeam.getName() + " | ";
         }
 
         // 设置前缀和后缀
