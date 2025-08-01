@@ -18,6 +18,10 @@ import java.util.*;
 public class TabList {
 
     private static final HashMap<GamePlayer, Team> teamMap = new HashMap<>();
+    /**
+     * 存储每个玩家的固定随机数，用于TabList排序
+     */
+    private static final HashMap<GamePlayer, Integer> playerRandomNumbers = new HashMap<>();
     public static GameManager gameManager;
     /**
      * TabList自动更新任务
@@ -86,7 +90,7 @@ public class TabList {
     }
 
     /**
-     * 清除所有注册的team
+     * 清除所有注册的team和玩家随机数映射
      */
     public static void cleanUpScoreBoard() {
         Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager(), "ScoreboardManager为空").getMainScoreboard();
@@ -95,6 +99,8 @@ public class TabList {
                 team.unregister();
             }
         }
+
+        playerRandomNumbers.clear();
     }
 
     /**
@@ -207,7 +213,7 @@ public class TabList {
 
     /**
      * 生成有序的队伍名称，用于TabList排序
-     * 格式: "sort#[队伍优先级][玩家状态][随机数]"
+     * 格式: "sort#[队伍优先级][玩家状态][固定随机数]"
      *
      * @param gamePlayer 游戏玩家
      * @return 排序用的队伍名称
@@ -223,8 +229,10 @@ public class TabList {
         int playerPriority = getPlayerPriority(gamePlayer);
         teamName.append(playerPriority);
 
-        // 添加随机数避免冲突
-        teamName.append(String.format("%03d", (int) (Math.random() * 1000)));
+        // 添加固定随机数避免冲突 每个玩家只生成一次
+        int randomNumber = playerRandomNumbers.computeIfAbsent(gamePlayer,
+                k -> (int) (Math.random() * 1000));
+        teamName.append(String.format("%03d", randomNumber));
 
         return teamName.toString();
     }
