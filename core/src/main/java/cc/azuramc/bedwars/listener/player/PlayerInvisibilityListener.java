@@ -54,6 +54,8 @@ public class PlayerInvisibilityListener implements Listener {
             if (gamePlayer.isInvisible()) {
                 gamePlayer.endInvisibility();
             }
+
+            gamePlayer.startInvisibilityTask();
         }
     }
 
