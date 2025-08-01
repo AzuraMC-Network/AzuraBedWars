@@ -140,7 +140,7 @@ public class LobbyBoardProvider implements Listener {
         List<String> lines = new ArrayList<>();
 
         // 添加地图信息
-        lines.add("§a7" + DATE_FORMAT.format(Calendar.getInstance().getTime()));
+        lines.add("§7" + DATE_FORMAT.format(Calendar.getInstance().getTime()));
         lines.add(EMPTY_LINE);
         lines.add("§f地图: §a" + gameManager.getMapData().getName());
         lines.add("§f队伍: §a" + gameManager.getMapData().getPlayers().getTeam() + "人 " + gameManager.getGameTeams().size() + "队");

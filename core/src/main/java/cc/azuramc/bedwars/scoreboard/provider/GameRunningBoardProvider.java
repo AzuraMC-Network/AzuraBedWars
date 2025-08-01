@@ -130,7 +130,7 @@ public class GameRunningBoardProvider implements Listener {
         List<String> lines = new ArrayList<>();
 
         // 添加日期行
-        lines.add("§a7" + DATE_FORMAT.format(Calendar.getInstance().getTime()));
+        lines.add("§7" + DATE_FORMAT.format(Calendar.getInstance().getTime()));
         lines.add(EMPTY_LINE);
         // 添加事件信息
         lines.add(gameManager.getGameEventManager().formattedNextEvent());
