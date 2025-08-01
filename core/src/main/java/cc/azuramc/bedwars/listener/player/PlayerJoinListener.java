@@ -98,6 +98,7 @@ public class PlayerJoinListener implements Listener {
             // 如果是有权限的玩家且游戏正在运行且玩家没有团队，则不添加到gameManager
             if (hasAdminPermission && !playerHasTeam) {
                 // 有权限的玩家强行加入但不添加到gameManager，直接设为观察者
+                gameManager.addPlayer(gamePlayer);
                 gamePlayer.setSpectator();
                 return;
             }
