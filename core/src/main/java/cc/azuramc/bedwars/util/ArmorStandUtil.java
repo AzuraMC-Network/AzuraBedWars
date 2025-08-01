@@ -1,13 +1,13 @@
 package cc.azuramc.bedwars.util;
 
-import cc.azuramc.bedwars.util.nms.NMSUtils;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 
 /**
@@ -120,16 +120,14 @@ public class ArmorStandUtil {
             return;
         }
 
-        try {
-            Constructor constructor = NMSUtils.getNMSClass("PacketPlayOutEntityTeleport").getConstructor(int.class, int.class, int.class, int.class, byte.class, byte.class, boolean.class);
-            Method method = NMSUtils.getNMSClass("MathHelper").getMethod("floor", double.class);
-            Object packet = constructor.newInstance(armorStand.getEntityId(), method.invoke(null, location.getX() * 32.0D), method.invoke(null, location.getY() * 32.0D), method.invoke(null, location.getZ() * 32.0D), (byte) (location.getYaw() * 256.0f / 360.0f), (byte) (location.getPitch() * 256.0f / 360.0f), true);
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                NMSUtils.sendPacket(player, packet);
-            }
-        } catch (Exception e) {
-            // 捕获并记录异常，但不要中断游戏流程
-            LoggerUtil.warn("无法移动盔甲架: " + e.getMessage());
+        WrapperPlayServerEntityTeleport packetTp = new WrapperPlayServerEntityTeleport(
+                armorStand.getEntityId(),
+                SpigotConversionUtil.fromBukkitLocation(location),
+                false
+        );
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PacketEvents.getAPI().getPlayerManager().sendPacket(player, packetTp);
         }
     }
 }

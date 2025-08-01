@@ -32,6 +32,9 @@ allprojects {
         maven {
             url = "https://raw.githubusercontent.com/eurotech/kura_addons/mvn-repo/"
         }
+        maven {
+            url = "https://repo.codemc.io/repository/maven-releases/"
+        }
     }
 }
 
@@ -53,6 +56,7 @@ subprojects {
 
     dependencies {
         compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+        compileOnly("com.github.retrooper:packetevents-spigot:2.9.3")
         compileOnly 'org.projectlombok:lombok:1.18.34'
         annotationProcessor 'org.projectlombok:lombok:1.18.34'
     }

@@ -29,6 +29,8 @@ import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.config.DatabaseConfig;
+import com.github.retrooper.packetevents.PacketEvents;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
@@ -84,9 +86,16 @@ public final class AzuraBedWars extends JavaPlugin {
     public static final String MAP_TABLE_NAME = "bw_map";
 
     @Override
+    public void onLoad() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().load();
+    }
+
+    @Override
     public void onEnable() {
         long startTime = System.currentTimeMillis();
         instance = this;
+        PacketEvents.getAPI().init();
 
         TabList.cleanUpScoreBoard();
 
@@ -145,6 +154,7 @@ public final class AzuraBedWars extends JavaPlugin {
         }
 
         TabList.cleanUpScoreBoard();
+        PacketEvents.getAPI().terminate();
     }
 
     /**
