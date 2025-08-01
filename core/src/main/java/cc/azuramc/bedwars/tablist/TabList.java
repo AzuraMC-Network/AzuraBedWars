@@ -194,7 +194,10 @@ public class TabList {
 
         String prefix;
 
-        if (gamePlayer.isRespawning()) {
+        if (gamePlayer.isInvisible()) {
+            team.removeEntry(gamePlayer.getName());
+            return;
+        } else if (gamePlayer.isRespawning()) {
             prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
         } else if (gamePlayer.isSpectator()) {
             prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
@@ -272,6 +275,11 @@ public class TabList {
         // 复活中
         if (gamePlayer.isRespawning()) {
             return 7;
+        }
+
+        // 隐身
+        if (gamePlayer.isInvisible()) {
+            return 6;
         }
 
         // 普通存活玩家
