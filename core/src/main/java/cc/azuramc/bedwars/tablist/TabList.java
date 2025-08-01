@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.game.*;
 import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -12,7 +11,9 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author an5w1r@163.com
@@ -91,20 +92,6 @@ public class TabList {
 
         updateTabList(gamePlayer);
         updateTag(gamePlayer, team);
-    }
-
-    /**
-     * 清除所有注册的team和玩家随机数映射
-     */
-    public static void cleanUpScoreBoard() {
-        Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager(), "ScoreboardManager为空").getMainScoreboard();
-        for (Team team : new ArrayList<>(scoreboard.getTeams())) {
-            if (team.getName().startsWith("sort#")) {
-                team.unregister();
-            }
-        }
-
-        playerRandomNumbers.clear();
     }
 
     /**

@@ -97,8 +97,6 @@ public final class AzuraBedWars extends JavaPlugin {
         instance = this;
         PacketEvents.getAPI().init();
 
-        TabList.cleanUpScoreBoard();
-
         setupNMSSupport();
         // 初始化配置系统
         initConfigSystem();
@@ -153,7 +151,6 @@ public final class AzuraBedWars extends JavaPlugin {
             ormHandler.shutdown();
         }
 
-        TabList.cleanUpScoreBoard();
         PacketEvents.getAPI().terminate();
     }
 
