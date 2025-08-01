@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.tablist.TabList;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -110,7 +109,6 @@ public class PlayerJoinListener implements Listener {
 
         // 正常情况下添加玩家到gameManager
         gameManager.addPlayer(gamePlayer);
-        TabList.changeTabListNameWhenWaiting(gamePlayer);
     }
 
     /**

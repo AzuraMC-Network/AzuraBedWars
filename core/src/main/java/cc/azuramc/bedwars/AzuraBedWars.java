@@ -263,6 +263,8 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 配置世界设置
         configureWorlds();
+
+        TabList.startAutoUpdate(this, gameManager);
         LoggerUtil.info("游戏相关特性加载完成");
     }
 

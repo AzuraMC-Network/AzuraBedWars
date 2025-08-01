@@ -4,8 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.map.MapData;
-import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.game.TeamColor;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -69,14 +67,14 @@ public class LoadGameUtil {
         v.setMetadata("Shop", new FixedMetadataValue(plugin, "Shop"));
         ab.setGravity(false);
         ab.setVisible(false);
-        
+
         // 版本兼容处理 - 1.8版本使用setPassenger，1.9+使用addPassenger
         if (VersionUtil.isVersion18()) {
             ab.setPassenger(v);
         } else {
             ab.addPassenger(v);
         }
-        
+
         spawnArmorStand2(location.add(0.0D, 1.3D, 0.0D), "§b§l物品商人");
     }
 
@@ -94,7 +92,7 @@ public class LoadGameUtil {
         spawnArmorStand2(location.add(0.0D, 1.3D, 0.0D), "§e§l团队升级");
         ab.setGravity(false);
         ab.setVisible(false);
-        
+
         // 版本兼容处理 - 1.8版本使用setPassenger，1.9+使用addPassenger
         if (VersionUtil.isVersion18()) {
             ab.setPassenger(v);
@@ -182,23 +180,5 @@ public class LoadGameUtil {
             gameManager.getArmorStand().put(as, name);
         }
 
-    }
-
-    public static void setPlayerTeamTab() {
-        GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
-
-        for (TeamColor teamColor : TeamColor.values()) {
-            GameTeam gameTeam = gameManager.getTeam(teamColor);
-            if (gameTeam == null) {
-                continue;
-            }
-
-            // 更新队伍所有玩家的TabList显示名称
-            gameTeam.getAlivePlayers().forEach(gamePlayer -> {
-                if (gamePlayer != null) {
-                    cc.azuramc.bedwars.tablist.TabList.changeTabListNameInGame(gamePlayer);
-                }
-            });
-        }
     }
 }
