@@ -30,7 +30,6 @@ public class BlockShopPage implements ShopData {
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.GLASS.get()).setAmount(4).getItem(), "防爆玻璃", ColorType.COLOR, new PriceCost(XMaterial.IRON_INGOT.get(), 12, 12)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.END_STONE.get()).setAmount(12).getItem(), "末地石", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 24, 24)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.LADDER.get()).setAmount(16).getItem(), "梯子", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 4, 4)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.OAK_SIGN.get()).setAmount(8).getItem(), "告示牌", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 2, 2)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.OAK_PLANKS.get()).setAmount(16).getItem(), "橡木板", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 4, 20)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.SLIME_BLOCK.get()).setAmount(4).getItem(), "史莱姆块", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 2, 10)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.COBWEB.get()).setAmount(2).getItem(), "蜘蛛网", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 4, 20)));
