@@ -40,7 +40,7 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 1. **Fork项目**
 2. **创建功能分支** (`git checkout -b feature/YourFeatureName`)
 3. **提交更改** (`git commit -m 'Add some AmazingFeature'`)
-4. **推送到分支** (`git push origin feature/AmazingFeature`)
+4. **推送到分支** (`git push origin feature/YourFeatureName`)
 5. **创建Pull Request (请推送至develop分支)**
 
 ### 代码规范
