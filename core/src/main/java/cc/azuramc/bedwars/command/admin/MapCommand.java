@@ -328,7 +328,7 @@ public class MapCommand {
         player.sendMessage(MessageUtil.color(" &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND)));
         player.sendMessage(MessageUtil.color(" &9&l▸ &f绿宝石资源点: &b" + mapData.getDrops(MapData.DropType.EMERALD)));
         player.sendMessage(" ");
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f地图文件物理地址: &b" + mapData.getFileUrl()));
+        player.sendMessage(MessageUtil.color(" &9&l▸ &f地图文件物理地址: &b" + mapData.getProcessedFileUrl()));
         player.sendMessage(MessageUtil.CHAT_BAR);
     }
 
