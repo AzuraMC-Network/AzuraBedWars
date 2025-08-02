@@ -3,6 +3,9 @@ package cc.azuramc.bedwars.util;
 import cc.azuramc.bedwars.AzuraBedWars;
 import org.bukkit.Bukkit;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author An5w1r
  */
@@ -34,5 +37,15 @@ public class LoggerUtil {
 
     public static void printChat(String message) {
         info("[Chat] " + message);
+    }
+
+    public static void printChat(String... message) {
+        info("[Chat] " + Arrays.toString(message));
+    }
+
+    public static void printChat(List<String> message) {
+        for (String s : message) {
+            info("[Chat] " + s);
+        }
     }
 }

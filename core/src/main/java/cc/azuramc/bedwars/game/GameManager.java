@@ -678,12 +678,8 @@ public class GameManager {
      * @param texts    消息文本
      */
     public void broadcastTeamMessage(GameTeam gameTeam, String... texts) {
-        gameTeam.getAlivePlayers().forEach(gamePlayer ->
-                Arrays.stream(texts).forEach(text -> {
-                    gamePlayer.sendMessage(text);
-                    LoggerUtil.printChat(text);
-                })
-        );
+        gameTeam.getAlivePlayers().forEach(gamePlayer -> Arrays.stream(texts).forEach(gamePlayer::sendMessage));
+        LoggerUtil.printChat(texts);
     }
 
     /**
@@ -693,8 +689,8 @@ public class GameManager {
      * @param textList 消息文本
      */
     public void broadcastTeamMessage(GameTeam gameTeam, List<String> textList) {
-        gameTeam.getAlivePlayers().forEach(player ->
-                textList.forEach(player::sendMessage));
+        gameTeam.getAlivePlayers().forEach(player -> textList.forEach(player::sendMessage));
+        LoggerUtil.printChat(textList);
     }
 
     /**
@@ -706,8 +702,7 @@ public class GameManager {
      * @param pitch    音调
      */
     public void broadcastTeamSound(GameTeam gameTeam, Sound sound, float volume, float pitch) {
-        gameTeam.getAlivePlayers().forEach(gamePlayer ->
-                gamePlayer.playSound(sound, volume, pitch));
+        gameTeam.getAlivePlayers().forEach(gamePlayer -> gamePlayer.playSound(sound, volume, pitch));
     }
 
     /**
@@ -716,12 +711,8 @@ public class GameManager {
      * @param texts 消息文本
      */
     public void broadcastSpectatorMessage(String... texts) {
-        GamePlayer.getSpectators().forEach(gamePlayer ->
-                Arrays.stream(texts).forEach(text -> {
-                    gamePlayer.sendMessage(text);
-                    LoggerUtil.printChat(text);
-                })
-        );
+        GamePlayer.getSpectators().forEach(gamePlayer -> Arrays.stream(texts).forEach(gamePlayer::sendMessage));
+        LoggerUtil.printChat(texts);
     }
 
     /**
@@ -730,12 +721,8 @@ public class GameManager {
      * @param textList 消息文本
      */
     public void broadcastSpectatorMessage(List<String> textList) {
-        GamePlayer.getSpectators().forEach(gamePlayer ->
-                textList.forEach(text -> {
-                    gamePlayer.sendMessage(text);
-                    LoggerUtil.printChat(text);
-                })
-        );
+        GamePlayer.getSpectators().forEach(gamePlayer -> textList.forEach(gamePlayer::sendMessage));
+        LoggerUtil.printChat(textList);
     }
 
     /**
@@ -744,12 +731,8 @@ public class GameManager {
      * @param texts 消息文本
      */
     public void broadcastMessage(String... texts) {
-        GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
-                Arrays.stream(texts).forEach(text -> {
-                    gamePlayer.sendMessage(text);
-                    LoggerUtil.printChat(text);
-                })
-        );
+        GamePlayer.getOnlinePlayers().forEach(gamePlayer -> Arrays.stream(texts).forEach(gamePlayer::sendMessage));
+        LoggerUtil.printChat(texts);
     }
 
     /**
@@ -759,11 +742,9 @@ public class GameManager {
      */
     public void broadcastMessage(List<String> textList) {
         GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
-                textList.forEach(text -> {
-                    gamePlayer.sendMessage(text);
-                    LoggerUtil.printChat(text);
-                })
+                textList.forEach(gamePlayer::sendMessage)
         );
+        LoggerUtil.printChat(textList);
     }
 
     /**
