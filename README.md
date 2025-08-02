@@ -5,76 +5,92 @@
 [![Spigot](https://img.shields.io/badge/Spigot-API-blue.svg)](https://www.spigotmc.org/)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
-一个正在开发的BedWars(起床战争)插件
-
-## 项目简介
-
-AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目前正在开发中。
-
-### 前言
-
-- 此项目并未完成，还差很多的特性才能完成，计划维护至2.0.0版本
-- 我们计划支持1.8-1.21+版本，但很可惜目前只在1.8.8版本进行开发测试
-- 如果使用此项目请自行负责遇到的任何问题，我们只建议用来测试使用，不要放到生产环境
-- 如果你有建议和发现的问题，可以在issue提出，我们会考虑尽快支持
-- 本人并不是很熟悉BukkitAPI等，可能项目里有很多有歧义的地方
-
-## 性能展示
-
-- 这是在16人对局完成后的spark profiler结果，或许这是能吸引您选择我们项目的原因(打码的都是反作弊插件)
-
-![性能测试结果](image/spark.png)
-
-## 快速开始
-
-### 系统要求
-
-- **Java**: 17 或更高版本
-- **Minecraft**: 1.8.8
-- **数据存储**: MySQL (必须)
-- **依赖插件**:
-    - PacketEvents (必装)
-    - Vault (可选)
-    - LuckPerms (可选)
-
-## 贡献
-
-我们欢迎所有形式的贡献！无论是报告bug、提出新功能建议，还是提交代码，我们都非常感激。
-
-### 如何贡献
-
-1. **Fork项目**
-2. **创建功能分支** (`git checkout -b feature/YourFeatureName`)
-3. **提交更改** (`git commit -m 'Add some AmazingFeature'`)
-4. **推送到分支** (`git push origin feature/YourFeatureName`)
-5. **创建Pull Request (请推送至develop分支)**
-
-### 代码规范
-
-- 遵循Java编码规范
-- 使用有意义的变量和方法名
-- 添加适当的注释
-- 确保代码通过所有测试
-
-## 许可证
-
-本项目采用GNU Affero General Public License v3.0 (AGPL-3.0) 许可证
-
-## 作者
-
-- **An5w1r_** - 主要开发者
-- **Ant1Aura** - 贡献者
-- **ImCur_** - 贡献者
-
-## 联系方式
-
-- **邮箱**: an5w1r@163.com
-- **QQ群**: 1046048297
-
-## 免责声明
-
-本项目目前处于开发阶段，可能存在不稳定的功能。在生产环境中使用前，请充分测试。
+[English](README.md) | [中文](README_CN.md)
 
 ---
 
-⭐ 如果这个项目对你有帮助，请给我们一个星标！ 
+A BedWars plugin currently under development
+
+## Project Introduction
+
+AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project is currently under development.
+
+### Preface
+
+- This project is not yet complete and still needs many features to be finished. It is planned to be maintained until
+  version 2.0.0
+- We plan to support versions 1.8-1.21+, but unfortunately, development and testing are currently only done on version
+  1.8.8
+- If you use this project, you are responsible for any issues you encounter. We only recommend using it for testing
+  purposes, not for production environments
+- If you have suggestions or find issues, you can raise them in issues, and we will consider supporting them as soon as
+  possible
+- I am not very familiar with BukkitAPI, etc., so there may be many ambiguous places in the project
+
+## Performance Showcase
+
+- This is the spark profiler result after a 16-player game completion. Perhaps this is what can attract you to choose
+  our project (the censored parts are anti-cheat plugins)
+
+![Performance Test Results](image/spark.png)
+
+## Quick Start
+
+### Demo Server
+
+- [AzuraBedWars-DemoServer](https://github.com/MindsMaster/AzuraBedWars-DemoServer)
+- You can download the packaged demo server here to use directly
+
+### Requirements
+
+- **Java**: 17 or higher
+- **Minecraft**: 1.8.8
+- **Data Storage**: MySQL (required)
+- **Dependencies**:
+  - PacketEvents (required)
+  - Vault (optional)
+  - LuckPerms (optional)
+
+## Contributing
+
+We welcome all forms of contributions! Whether it's reporting bugs, suggesting new features, or submitting code, we are
+very grateful.
+
+### How to Contribute
+
+1. **Fork the project**
+2. **Create a feature branch** (`git checkout -b feature/YourFeatureName`)
+3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
+4. **Push to the branch** (`git push origin feature/YourFeatureName`)
+5. **Create a Pull Request (please push to the develop branch)**
+
+### Code Standards
+
+- Follow Java coding conventions
+- Use meaningful variable and method names
+- Add appropriate comments
+- Ensure code passes all tests
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0)
+
+## Authors
+
+- **An5w1r_** - Main Developer
+- **Ant1Aura** - Contributor
+- **ImCur_** - Contributor
+
+## Contact
+
+- **Email**: an5w1r@163.com
+- **QQ Group**: 1046048297
+
+## Disclaimer
+
+This project is currently in development and may have unstable features. Please test thoroughly before using in
+production environments.
+
+---
+
+⭐ If this project helps you, please give us a star! 
