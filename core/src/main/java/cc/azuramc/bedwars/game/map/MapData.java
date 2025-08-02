@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.game.map;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import lombok.Getter;
@@ -8,7 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.plugin.Plugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +41,74 @@ public class MapData {
         this.bases = new ArrayList<>();
         this.drops = new ArrayList<>();
         this.shops = new ArrayList<>();
+    }
+
+    /**
+     * 获取处理后的文件URL，支持变量替换
+     *
+     * @param plugin 插件实例，用于获取插件根目录
+     * @return 处理后的文件路径
+     */
+    public String getProcessedFileUrl(Plugin plugin) {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return null;
+        }
+        return processPathVariables(fileUrl, plugin);
+    }
+
+    /**
+     * 获取处理后的文件URL，自动获取插件实例
+     *
+     * @return 处理后的文件路径
+     */
+    public String getProcessedFileUrl() {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return null;
+        }
+        Plugin plugin = AzuraBedWars.getInstance();
+        return processPathVariables(fileUrl, plugin);
+    }
+
+    /**
+     * 文件路径变量支持：
+     * 在fileUrl字段中可以使用以下变量来实现相对路径：
+     * - {$baseDir}: 插件根目录（plugins文件夹）
+     * - {$pluginDir}: 插件数据文件夹（plugins/AzuraBedWars）
+     * - {$serverDir}: 服务器根目录
+     * 示例：
+     * - "{$baseDir}/maps/myMap" -> "plugins/maps/myMap"
+     * - "{$pluginDir}/worlds/map1" -> "plugins/AzuraBedWars/worlds/map1"
+     * - "{$serverDir}/custom/maps/test" -> "server/custom/maps/test"
+     *
+     * @param path   原始路径
+     * @param plugin 插件实例
+     * @return 处理后的路径
+     */
+    private String processPathVariables(String path, Plugin plugin) {
+        if (path == null || path.isEmpty()) {
+            return path;
+        }
+
+        String processedPath = path;
+
+        if (processedPath.contains("{$baseDir}")) {
+            File pluginDataFolder = plugin.getDataFolder();
+            String baseDir = pluginDataFolder.getParentFile().getAbsolutePath();
+            processedPath = processedPath.replace("{$baseDir}", baseDir);
+        }
+
+        if (processedPath.contains("{$pluginDir}")) {
+            String pluginDir = plugin.getDataFolder().getAbsolutePath();
+            processedPath = processedPath.replace("{$pluginDir}", pluginDir);
+        }
+
+        if (processedPath.contains("{$serverDir}")) {
+            String serverDir = Bukkit.getWorldContainer().getParentFile().getAbsolutePath();
+            processedPath = processedPath.replace("{$serverDir}", serverDir);
+        }
+
+
+        return processedPath;
     }
 
     public void setWaitingLocation(Location location) {

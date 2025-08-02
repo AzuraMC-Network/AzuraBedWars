@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.game.map;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.WorldUtil;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
@@ -24,18 +25,18 @@ import java.util.Map;
  */
 @Getter
 public class MapManager {
-    
+
     private final IMapStorage defaultStorage;
 
     private final Map<String, MapData> loadedMaps = new HashMap<>();
-    
+
     /**
      * 创建地图管理器
      */
     public MapManager() {
         this.defaultStorage = MapStorageFactory.getDefaultStorage();
     }
-    
+
     /**
      * 加载地图数据
      * @param mapName 地图名称
@@ -46,17 +47,17 @@ public class MapManager {
         if (loadedMaps.containsKey(mapName)) {
             return loadedMaps.get(mapName);
         }
-        
+
         // 否则从存储加载
         MapData mapData = defaultStorage.loadMap(mapName);
         if (mapData != null) {
             mapData.setName(mapName);
             loadedMaps.put(mapName, mapData);
         }
-        
+
         return mapData;
     }
-    
+
     /**
      * 保存地图数据
      * @param mapName 地图名称
@@ -84,7 +85,7 @@ public class MapManager {
         }
         return false;
     }
-    
+
     /**
      * 预加载所有地图数据到内存
      */
@@ -99,7 +100,7 @@ public class MapManager {
         }
     }
 
-    
+
     /**
      * 判断地图数据是否存在
      * @param mapName 地图名称
@@ -108,7 +109,7 @@ public class MapManager {
     public boolean exists(String mapName) {
         return loadedMaps.containsKey(mapName) || defaultStorage.exists(mapName);
     }
-    
+
     /**
      * 删除地图数据
      * @param mapName 地图名称
@@ -118,7 +119,7 @@ public class MapManager {
         loadedMaps.remove(mapName);
         return defaultStorage.deleteMap(mapName);
     }
-    
+
     /**
      * 加载地图的物理文件并创建世界
      * 该方法加载地图数据，并将物理文件复制到适当位置，然后创建Bukkit世界
@@ -130,7 +131,7 @@ public class MapManager {
         if (mapName == null || mapUrl == null) {
             return null;
         }
-        
+
         try {
             // 如果世界已经存在，先卸载它
             World existingWorld = Bukkit.getWorld(mapName);
@@ -138,7 +139,7 @@ public class MapManager {
                 LoggerUtil.info("正在卸载已经存在的世界 " + mapName);
                 Bukkit.unloadWorld(existingWorld, false);
             }
-            
+
             // 检查目标目录是否存在，存在则删除
             File targetDir = new File(Bukkit.getWorldContainer(), mapName);
             if (targetDir.exists()) {
@@ -150,22 +151,22 @@ public class MapManager {
                     return null;
                 }
             }
-            
+
             // 确保源目录存在
             File sourceDir = new File(mapUrl);
             if (!sourceDir.exists() || !sourceDir.isDirectory()) {
                 LoggerUtil.warn("源地图目录不存在: " + mapUrl);
                 return null;
             }
-            
+
             // 复制地图文件
             FileUtils.copyDirectory(sourceDir, targetDir);
-            
+
             // 创建世界
             WorldCreator worldCreator = new WorldCreator(mapName);
             worldCreator.environment(World.Environment.NORMAL);
             World mapWorld = Bukkit.createWorld(worldCreator);
-            
+
             // 设置世界属性
             if (mapWorld != null) {
                 return WorldUtil.setWorldRules(mapWorld);
@@ -174,10 +175,10 @@ public class MapManager {
             LoggerUtil.error("加载地图世界时出错: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return null;
     }
-    
+
     /**
      * 加载地图和世界
      * 从存储加载地图数据，并创建对应的世界
@@ -190,9 +191,9 @@ public class MapManager {
         if (mapData == null) {
             return null;
         }
-        
+
         // 获取地图文件URL
-        String mapUrl = mapData.getFileUrl();
+        String mapUrl = mapData.getProcessedFileUrl(AzuraBedWars.getInstance());
         if (mapUrl == null || mapUrl.isEmpty()) {
             LoggerUtil.warn("地图 " + mapName + " 没有设置物理路径(URL)");
             return null;
@@ -204,10 +205,10 @@ public class MapManager {
             LoggerUtil.warn("world 加载失败");
             return null;
         }
-        
+
         return mapData;
     }
-    
+
     /**
      * 设置地图的物理路径
      * @param mapName 地图名称
@@ -219,11 +220,11 @@ public class MapManager {
         if (mapData == null) {
             return false;
         }
-        
+
         mapData.setFileUrl(mapUrl);
         return saveMapData(mapName, mapData);
     }
-    
+
     /**
      * 获取地图的物理路径
      * @param mapName 地图名称
@@ -231,7 +232,7 @@ public class MapManager {
      */
     public String getMapUrl(String mapName) {
         MapData mapData = loadedMaps.get(mapName);
-        return mapData != null ? mapData.getFileUrl() : null;
+        return mapData != null ? mapData.getProcessedFileUrl() : null;
     }
 
-} 
+}
