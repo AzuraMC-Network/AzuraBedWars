@@ -482,7 +482,7 @@ public class GamePlayer {
         }
 
         if (gameTeam.getFallingProtectionUpgrade() > 0) {
-            ItemStack boots = player.getInventory().getArmorContents()[3];
+            ItemStack boots = player.getInventory().getArmorContents()[0];
             if (boots != null) {
                 boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getFallingProtectionUpgrade());
                 player.updateInventory();
