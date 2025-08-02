@@ -42,7 +42,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'com.gradleup.shadow'
     group = 'cc.azuramc'
-    version = '1.0.0'
+    version = '1.0.0-Pre-alpha'
 
     def targetJavaVersion = 17
     java {
