@@ -41,7 +41,7 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
      * @param priority 事件优先级
      */
     public EmeraldUpdateEvent(int level, int second, int priority) {
-        super("绿宝石升级到" + level + "级", second, priority);
+        super("绿宝石升级到" + toRoman(level) + "级", second, priority);
         this.level = level;
     }
 
