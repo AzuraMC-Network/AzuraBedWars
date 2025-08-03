@@ -224,10 +224,7 @@ public class GamePlayer {
      * 开始隐身任务
      */
     public void startInvisibilityTask() {
-        if (invisibilityTask != null && !invisibilityTask.isCancelled()) {
-            invisibilityTask.cancel();
-            this.setInvisible(false);
-        }
+        endInvisibility();
 
         ArmorHider.hideArmor(this, GamePlayer.getGamePlayers());
         this.setInvisible(true);
@@ -259,10 +256,7 @@ public class GamePlayer {
      * 开始陷阱免疫任务
      */
     public void startTrapProtectionTask() {
-        if (trapProtectionTask != null && !trapProtectionTask.isCancelled()) {
-            trapProtectionTask.cancel();
-            this.setHasTrapProtection(false);
-        }
+        endTrapProtection();
 
         this.setHasTrapProtection(true);
         trapProtectionTask = new BukkitRunnable() {
