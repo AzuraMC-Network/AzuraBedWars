@@ -36,7 +36,7 @@ public class MagicMilk implements Listener {
                 protectedPlayers.remove(uuid);
                 player.sendMessage("§c你的陷阱免疫效果已消失！");
             }
-        }.runTaskLater(JavaPlugin.getProvidingPlugin(MagicMilk.class), 20 * 30); // 30秒后执
+        }.runTaskLater(JavaPlugin.getProvidingPlugin(MagicMilk.class), 20 * 30); // 30s
     }
 
     public static boolean isTrapImmune(UUID uuid) {
