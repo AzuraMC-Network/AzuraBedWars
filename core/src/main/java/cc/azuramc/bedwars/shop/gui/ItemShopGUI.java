@@ -12,6 +12,7 @@ import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
 import cc.azuramc.bedwars.shop.*;
 import cc.azuramc.bedwars.shop.page.DefaultShopPage;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
@@ -741,6 +742,7 @@ public class ItemShopGUI extends CustomGUI {
      */
     private void handleRegularItemGiving(GamePlayer gamePlayer, ShopItemType shopItemType) {
         ItemBuilder itemBuilder = new ItemBuilder().setItemStack(shopItemType.getItemStack().clone());
+        itemBuilder.setDisplayName(shopItemType.getDisplayName());
         Player player = gamePlayer.getPlayer();
 
         // 处理剑特殊情况
@@ -781,5 +783,6 @@ public class ItemShopGUI extends CustomGUI {
 
         // 将物品添加到玩家库存
         player.getInventory().addItem(itemBuilder.getItem());
+        LoggerUtil.debug("item: " + itemBuilder.getItem().getType().name());
     }
 }

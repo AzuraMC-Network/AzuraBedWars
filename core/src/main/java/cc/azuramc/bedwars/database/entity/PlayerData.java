@@ -56,48 +56,48 @@ public class PlayerData {
     }
 
     public void addLevel(int level) {
-        this.level = this.level + level;
+        this.level += level;
     }
 
     public void addExperience(double experience) {
-        this.experience = this.experience + experience;
+        this.experience += experience;
     }
 
     public void addKills(int kills) {
         gamePlayer.addCurrentGameKills(kills);
-        this.kills = this.kills + kills;
+        this.kills += kills;
     }
 
     public void addDeaths(int deaths) {
         gamePlayer.addCurrentGameDeaths(deaths);
-        this.deaths = this.deaths + deaths;
+        this.deaths += deaths;
     }
 
     public void addAssists(int assists) {
         gamePlayer.addCurrentGameAssists(assists);
-        this.assists = this.assists + assists;
+        this.assists += assists;
     }
 
     public void addFinalKills(int finalKills) {
         gamePlayer.addCurrentGameFinalKills(finalKills);
-        this.finalKills = this.finalKills + finalKills;
+        this.finalKills += finalKills;
     }
 
     public void addDestroyedBeds(int destroyedBeds) {
         gamePlayer.addCurrentGameDestroyedBeds(destroyedBeds);
-        this.destroyedBeds = this.destroyedBeds + destroyedBeds;
+        this.destroyedBeds += destroyedBeds;
     }
 
     public void addWins(int wins) {
-        this.wins = this.wins + wins;
+        this.wins += wins;
     }
 
     public void addLosses(int losses) {
-        this.losses = this.losses + losses;
+        this.losses += losses;
     }
 
     public void addGames(int games) {
-        this.games = this.games + games;
+        this.games += games;
     }
 
     public void addLevel() {
