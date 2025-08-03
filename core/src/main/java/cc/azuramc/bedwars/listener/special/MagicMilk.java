@@ -34,7 +34,10 @@ public class MagicMilk implements Listener {
             @Override
             public void run() {
                 protectedPlayers.remove(uuid);
-                player.sendMessage("§c你的陷阱免疫效果已消失！");
+                Player onlinePlayer = org.bukkit.Bukkit.getPlayer(uuid);
+                if (onlinePlayer != null) {
+                    onlinePlayer.sendMessage("§c你的陷阱免疫效果已消失！");
+                }
             }
         }.runTaskLater(JavaPlugin.getProvidingPlugin(MagicMilk.class), 20 * 30); // 30s
     }
