@@ -742,7 +742,7 @@ public class ItemShopGUI extends CustomGUI {
      */
     private void handleRegularItemGiving(GamePlayer gamePlayer, ShopItemType shopItemType) {
         ItemBuilder itemBuilder = new ItemBuilder().setItemStack(shopItemType.getItemStack().clone());
-        itemBuilder.setDisplayName(shopItemType.getDisplayName());
+        //itemBuilder.setDisplayName(shopItemType.getDisplayName());
         Player player = gamePlayer.getPlayer();
 
         // 处理剑特殊情况
