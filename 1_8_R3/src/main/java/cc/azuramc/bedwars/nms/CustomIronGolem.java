@@ -83,11 +83,11 @@ public class CustomIronGolem extends EntityIronGolem {
         CraftLivingEntity craft = (CraftLivingEntity) entity.getBukkitEntity();
         craft.setRemoveWhenFarAway(false);
 
-        String name = "{TeamColor}{despawn}s &8[ {TeamColor}{health}&8]"
-                .replace("{TeamColor}", gameTeam.getChatColor().toString())
-                .replace("{despawn}", String.valueOf(despawn))
-                .replace("{health}", String.valueOf((int) health));
-        entity.setCustomName(name);
+//        String name = "{TeamColor}{despawn}s &8[ {TeamColor}{health}&8]"
+//                .replace("{TeamColor}", gameTeam.getChatColor().toString())
+//                .replace("{despawn}", String.valueOf(despawn))
+//                .replace("{health}", String.valueOf((int) health));
+//        entity.setCustomName(name);
         entity.setCustomNameVisible(true);
 
         world.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
