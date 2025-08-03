@@ -373,35 +373,35 @@ public class GamePlayer {
      * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addKills等方法会触发一次这个方法)
      */
     public void addCurrentGameKills(int currentGameKills) {
-        this.currentGameKills = this.currentGameKills + currentGameKills;
+        this.currentGameKills += currentGameKills;
     }
 
     /**
      * 增加玩家本局最终击杀数据 (不建议直接调用它增加，playerData类的addFinalKills等方法会触发一次这个方法)
      */
     public void addCurrentGameFinalKills(int currentGameFinalKills) {
-        this.currentGameFinalKills = this.currentGameFinalKills + currentGameFinalKills;
+        this.currentGameFinalKills += currentGameFinalKills;
     }
 
     /**
      * 增加玩家本局助攻数据 (不建议直接调用它增加，playerData类的addAssists等方法会触发一次这个方法)
      */
     public void addCurrentGameAssists(int currentGameAssists) {
-        this.currentGameAssists = this.currentGameAssists + currentGameAssists;
+        this.currentGameAssists += currentGameAssists;
     }
 
     /**
      * 增加玩家本局死亡数据 (不建议直接调用它增加，playerData类的addDeaths等方法会触发一次这个方法)
      */
     public void addCurrentGameDeaths(int currentGameDeaths) {
-        this.currentGameDeaths = this.currentGameDeaths + currentGameDeaths;
+        this.currentGameDeaths += currentGameDeaths;
     }
 
     /**
      * 增加玩家本局破坏床数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
      */
     public void addCurrentGameDestroyedBeds(int currentGameDestroyedBeds) {
-        this.currentGameDestroyedBeds = this.currentGameDestroyedBeds + currentGameDestroyedBeds;
+        this.currentGameDestroyedBeds += currentGameDestroyedBeds;
     }
 
     /**

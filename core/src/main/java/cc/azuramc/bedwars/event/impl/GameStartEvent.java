@@ -114,7 +114,7 @@ public class GameStartEvent extends AbstractGameEvent {
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player -> {
             PotionEffectType fastDigging = XPotion.HASTE.get();
             if (fastDigging != null) {
-                // 将等级减1 因为Minecraft药水效果等级从0开始 而我们的等级从1开始
+                // Subtract 1 from the level because Minecraft potion effect levels start at 0
                 int effectLevel = gameTeam.getMagicMinerUpgrade() - 1;
                 player.getPlayer().addPotionEffect(new PotionEffect(fastDigging,
                     CONFIG.getUpgrade().getHasteEffectDuration(),
@@ -191,6 +191,7 @@ public class GameStartEvent extends AbstractGameEvent {
         TrapManager trapManager = gameTeam.getTrapManager();
         trapManager.deactivateTrap(TrapType.BLINDNESS);
 
+        // Check if the player has trap protection before applying the effect
         if (!gamePlayer.isHasTrapProtection()) {
             // 给敌方玩家添加 失明 缓慢 效果
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
@@ -249,6 +250,7 @@ public class GameStartEvent extends AbstractGameEvent {
         TrapManager trapManager = gameTeam.getTrapManager();
         trapManager.deactivateTrap(TrapType.ALARM);
 
+        // Check if the player has trap protection before applying the effect
         if (!gamePlayer.isHasTrapProtection()) {
             if (gamePlayer.isInvisible()) {
                 gamePlayer.endInvisibility();
@@ -272,6 +274,7 @@ public class GameStartEvent extends AbstractGameEvent {
         TrapManager trapManager = gameTeam.getTrapManager();
         trapManager.deactivateTrap(TrapType.MINER);
 
+        // Check if the player has trap protection before applying the effect
         if (!gamePlayer.isHasTrapProtection()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType miningFatigue = XPotion.MINING_FATIGUE.get();
