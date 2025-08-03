@@ -30,11 +30,10 @@ public class PlayerResourcePutListener implements Listener {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
         Action action = event.getAction();
-        ItemStack item = event.getItem();
 
         if (gamePlayer == null
                 || gameManager.getGameState() != GameState.RUNNING
-                || item == null
+                || event.getItem() == null
                 || action != Action.LEFT_CLICK_BLOCK) {
             return;
         }
@@ -65,6 +64,19 @@ public class PlayerResourcePutListener implements Listener {
 
         if (targetInventory == null) return;
 
+        ItemStack item = event.getItem();
+        ItemStack resource;
+        switch (item.getType()) {
+            case IRON_INGOT:
+            case GOLD_INGOT:
+            case DIAMOND:
+            case EMERALD:
+                resource = item;
+                break;
+            default:
+                return;
+        }
+
         Inventory inventory = player.getInventory();
         boolean hasFailures = false;
         int transferredCount = 0;
@@ -72,7 +84,7 @@ public class PlayerResourcePutListener implements Listener {
 
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack item1 = inventory.getItem(i);
-            if (item1 != null && item1.getType() == item.getType()) {
+            if (item1 != null && item1.getType() == resource.getType()) {
                 totalItems += item1.getAmount();
                 HashMap<Integer, ItemStack> left = targetInventory.addItem(item1.clone());
 
