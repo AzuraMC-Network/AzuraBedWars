@@ -114,9 +114,11 @@ public class GameStartEvent extends AbstractGameEvent {
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player -> {
             PotionEffectType fastDigging = XPotion.HASTE.get();
             if (fastDigging != null) {
+                // Subtract 1 from the level because Minecraft potion effect levels start at 0
+                int effectLevel = gameTeam.getMagicMinerUpgrade() - 1;
                 player.getPlayer().addPotionEffect(new PotionEffect(fastDigging,
                     CONFIG.getUpgrade().getHasteEffectDuration(),
-                    gameTeam.getMagicMinerUpgrade()));
+                        effectLevel));
             }
         })));
     }
@@ -189,18 +191,21 @@ public class GameStartEvent extends AbstractGameEvent {
         TrapManager trapManager = gameTeam.getTrapManager();
         trapManager.deactivateTrap(TrapType.BLINDNESS);
 
-        // 给敌方玩家添加 失明 缓慢 效果
-        AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            PotionEffectType blindness = XPotion.BLINDNESS.get();
-            gamePlayer.getPlayer().addPotionEffect(new PotionEffect(blindness,
-                    CONFIG.getUpgrade().getTrapEffectDuration(),
-                    CONFIG.getUpgrade().getTrapEffectAmplifier()));
+        // Check if the player has trap protection before applying the effect
+        if (!gamePlayer.isHasTrapProtection()) {
+            // 给敌方玩家添加 失明 缓慢 效果
+            AzuraBedWars.getInstance().mainThreadRunnable(() -> {
+                PotionEffectType blindness = XPotion.BLINDNESS.get();
+                gamePlayer.getPlayer().addPotionEffect(new PotionEffect(blindness,
+                        CONFIG.getUpgrade().getTrapEffectDuration(),
+                        CONFIG.getUpgrade().getTrapEffectAmplifier()));
 
-            PotionEffectType slowness = XPotion.SLOWNESS.get();
-            gamePlayer.getPlayer().addPotionEffect(new PotionEffect(slowness,
-                    CONFIG.getUpgrade().getTrapEffectDuration(),
-                    CONFIG.getUpgrade().getTrapEffectAmplifier()));
-        });
+                PotionEffectType slowness = XPotion.SLOWNESS.get();
+                gamePlayer.getPlayer().addPotionEffect(new PotionEffect(slowness,
+                        CONFIG.getUpgrade().getTrapEffectDuration(),
+                        CONFIG.getUpgrade().getTrapEffectAmplifier()));
+            });
+        }
 
         // 通知团队成员陷阱被触发
         announceTrapTrigger(gameTeam);
@@ -245,8 +250,11 @@ public class GameStartEvent extends AbstractGameEvent {
         TrapManager trapManager = gameTeam.getTrapManager();
         trapManager.deactivateTrap(TrapType.ALARM);
 
-        if (gamePlayer.isInvisible()) {
-            gamePlayer.endInvisibility();
+        // Check if the player has trap protection before applying the effect
+        if (!gamePlayer.isHasTrapProtection()) {
+            if (gamePlayer.isInvisible()) {
+                gamePlayer.endInvisibility();
+            }
         }
 
         // 通知团队成员陷阱被触发
@@ -259,21 +267,24 @@ public class GameStartEvent extends AbstractGameEvent {
     /**
      * 触发挖掘疲劳陷阱
      *
-     * @param player 触发陷阱的玩家
+     * @param gamePlayer 触发陷阱的玩家
      * @param gameTeam 拥有陷阱的团队
      */
-    private void triggerMinerTrap(GamePlayer player, GameTeam gameTeam) {
+    private void triggerMinerTrap(GamePlayer gamePlayer, GameTeam gameTeam) {
         TrapManager trapManager = gameTeam.getTrapManager();
         trapManager.deactivateTrap(TrapType.MINER);
 
-        AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            PotionEffectType miningFatigue = XPotion.MINING_FATIGUE.get();
-            if (miningFatigue != null) {
-                player.getPlayer().addPotionEffect(new PotionEffect(miningFatigue,
-                    CONFIG.getUpgrade().getMiningFatigueEffectDuration(),
-                    CONFIG.getUpgrade().getMiningFatigueEffectAmplifier()));
-            }
-        });
+        // Check if the player has trap protection before applying the effect
+        if (!gamePlayer.isHasTrapProtection()) {
+            AzuraBedWars.getInstance().mainThreadRunnable(() -> {
+                PotionEffectType miningFatigue = XPotion.MINING_FATIGUE.get();
+                if (miningFatigue != null) {
+                    gamePlayer.getPlayer().addPotionEffect(new PotionEffect(miningFatigue,
+                            CONFIG.getUpgrade().getMiningFatigueEffectDuration(),
+                            CONFIG.getUpgrade().getMiningFatigueEffectAmplifier()));
+                }
+            });
+        }
 
         // 通知团队成员陷阱被触发
         announceTrapTrigger(gameTeam);
