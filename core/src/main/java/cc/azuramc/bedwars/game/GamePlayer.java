@@ -231,6 +231,7 @@ public class GamePlayer {
         invisibilityTask = new BukkitRunnable() {
             @Override
             public void run() {
+                sendMessage("&c隐身效果结束");
                 endInvisibility();
             }
         };
@@ -262,6 +263,7 @@ public class GamePlayer {
         trapProtectionTask = new BukkitRunnable() {
             @Override
             public void run() {
+                sendMessage("&c魔法牛奶效果结束");
                 endTrapProtection();
             }
         };
