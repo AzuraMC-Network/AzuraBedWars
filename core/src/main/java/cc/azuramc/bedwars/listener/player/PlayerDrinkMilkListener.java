@@ -38,7 +38,7 @@ public class PlayerDrinkMilkListener implements Listener {
             return;
         }
 
-        if (itemStack != XMaterial.MILK_BUCKET.parseItem()) {
+        if (itemStack.getType() != XMaterial.MILK_BUCKET.get()) {
             return;
         }
 
