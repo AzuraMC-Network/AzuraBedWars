@@ -61,7 +61,7 @@ public class PlayerFastPutListener implements Listener {
                 return;
         }
 
-        if (!isOtherTeamChest(gamePlayer, block)) {
+        if (isOtherTeamChest(gamePlayer, block) && blockType != Material.ENDER_CHEST) {
             return;
         }
 
@@ -125,12 +125,12 @@ public class PlayerFastPutListener implements Listener {
             if (team.getSpawnLocation().distance(block.getLocation()) <= 18) {
                 if (!team.getAlivePlayers().isEmpty() && !team.isInTeam(gamePlayer)) {
                     gamePlayer.sendMessage("&c只有该队伍的玩家才可以使用这个箱子");
-                    return false;
+                    return true;
                 }
                 break;
             }
         }
 
-        return true;
+        return false;
     }
 }
