@@ -44,10 +44,6 @@ public class PlayerDrinkMilkListener implements Listener {
 
         LoggerUtil.debug("PlayerDrinkMilkListener$onDrink | " + player.getName() + " now has trap protection");
 
-        if (gamePlayer.isHasTrapProtection()) {
-            gamePlayer.endTrapProtection();
-        }
-
         gamePlayer.startTrapProtectionTask();
     }
 }
