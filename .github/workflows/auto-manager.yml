@@ -2,13 +2,17 @@ name: Auto Label
 
 on:
   issues:
-    types: [ opened, labeled, unlabeled ]
+    types: [ opened, labeled, unlabeled, closed, edited ]
   pull_request:
-    types: [ opened, labeled, unlabeled ]
+    types: [ opened, labeled, unlabeled, closed, edited ]
 
 jobs:
   auto-label:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
 
     steps:
       - name: Auto Label Issues
@@ -50,14 +54,20 @@ jobs:
             }
             
             // Add labels if not already present
-            for (const label of newLabels) {
-              if (!labels.includes(label)) {
-                await github.rest.issues.addLabels({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  labels: [label]
-                });
+            if (newLabels.length > 0) {
+              const labelsToAdd = newLabels.filter(label => !labels.includes(label));
+              if (labelsToAdd.length > 0) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    labels: labelsToAdd
+                  });
+                  console.log(`Added labels: ${labelsToAdd.join(', ')}`);
+                } catch (error) {
+                  console.error('Error adding labels:', error);
+                }
               }
             }
 
@@ -97,14 +107,162 @@ jobs:
               newLabels.push('💥 Breaking Change');
             }
             
+            // Check for develop to master PR (normal release)
+            const baseBranch = pr.base.ref.toLowerCase();
+            const headBranch = pr.head.ref.toLowerCase();
+            
+            if ((headBranch === 'develop' || headBranch.includes('develop')) && 
+                (baseBranch === 'master' || baseBranch === 'main')) {
+              newLabels.push('🚀 Release');
+            }
+            
+            // Check for other important branch flows
+            if (headBranch.includes('release/') && (baseBranch === 'master' || baseBranch === 'main')) {
+              newLabels.push('🚀 Release');
+            }
+            
+            if ((headBranch === 'master' || headBranch === 'main') && headBranch === 'develop') {
+              newLabels.push('🔄 Sync');
+            }
+            
             // Add labels if not already present
-            for (const label of newLabels) {
-              if (!labels.includes(label)) {
+            if (newLabels.length > 0) {
+              const labelsToAdd = newLabels.filter(label => !labels.includes(label));
+              if (labelsToAdd.length > 0) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    labels: labelsToAdd
+                  });
+                  console.log(`Added labels: ${labelsToAdd.join(', ')}`);
+                } catch (error) {
+                  console.error('Error adding labels:', error);
+                }
+              }
+            }
+
+      - name: Check Issue Commit References
+        uses: actions/github-script@v7
+        if: github.event_name == 'issues' && github.event.action == 'edited'
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            
+            // Check if issue body contains commit references
+            const body = issue.body || '';
+            const commitPattern = /\b[a-f0-9]{7,40}\b/gi;
+            const commitMatches = body.match(commitPattern);
+            
+            if (commitMatches && commitMatches.length > 0) {
+              // Check if "In Progress" label is not already present
+              if (!labels.includes('🔄 In Progress')) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    labels: ['🔄 In Progress']
+                  });
+                  console.log('Added "In Progress" label');
+                } catch (error) {
+                  console.error('Error adding In Progress label:', error);
+                }
+              }
+            }
+
+      - name: Handle Closed Issues
+        uses: actions/github-script@v7
+        if: github.event_name == 'issues' && github.event.action == 'closed'
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            
+            try {
+              // Remove "In Progress" label if present
+              if (labels.includes('🔄 In Progress')) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: '🔄 In Progress'
+                });
+                console.log('Removed "In Progress" label');
+              }
+            
+              // Add "Done" label
+              if (!labels.includes('✅ Done')) {
                 await github.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  issue_number: pr.number,
-                  labels: [label]
+                  issue_number: issue.number,
+                  labels: ['✅ Done']
                 });
+                console.log('Added "Done" label');
               }
+            } catch (error) {
+              console.error('Error handling closed issue:', error);
+            }
+
+      - name: Handle Closed PRs
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request' && github.event.action == 'closed'
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const labels = pr.labels.map(l => l.name);
+            
+            try {
+              // Check if PR was merged or just closed
+              if (pr.merged) {
+                // Remove "In Progress" label if present
+                if (labels.includes('🔄 In Progress')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    name: '🔄 In Progress'
+                  });
+                  console.log('Removed "In Progress" label from merged PR');
+                }
+            
+                // Add "Merged" label
+                if (!labels.includes('✅ Merged')) {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    labels: ['✅ Merged']
+                  });
+                  console.log('Added "Merged" label');
+                }
+              } else {
+                // PR was closed without merging
+                // Remove "In Progress" label if present
+                if (labels.includes('🔄 In Progress')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    name: '🔄 In Progress'
+                  });
+                  console.log('Removed "In Progress" label from cancelled PR');
+                }
+            
+                // Add "Cancelled" label
+                if (!labels.includes('❌ Cancelled')) {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    labels: ['❌ Cancelled']
+                  });
+                  console.log('Added "Cancelled" label');
+                }
+              }
+            } catch (error) {
+              console.error('Error handling closed PR:', error);
             }
