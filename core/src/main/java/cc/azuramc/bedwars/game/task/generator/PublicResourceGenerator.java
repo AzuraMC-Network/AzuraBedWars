@@ -1,9 +1,6 @@
 package cc.azuramc.bedwars.game.task.generator;
 
-/**
- * @author An5w1r@163.com
- */
-
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.map.MapData;
@@ -14,17 +11,19 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
 /**
- * 自定义资源生成器类
- * 可以动态修改最大堆叠数量和掉落物品间隔
+ * 自定义公共资源生成器类。
+ * 可动态修改掉落间隔和最大堆叠量，用于地图中的公共掉落点。
+ * @author An5w1r@163.com
  */
 @Getter
 @Setter
-public class PublicResourceGenerator extends BukkitRunnable {
+public class PublicResourceGenerator {
     private String taskName;
     private final Material material;
     private final MapData.DropType dropType;
@@ -32,7 +31,7 @@ public class PublicResourceGenerator extends BukkitRunnable {
     private long interval = 20L;
     private int level = 1;
     private long lastDropTime = 0;
-    private BukkitRunnable currentTask;
+    private BukkitTask currentTask;
     private final GameManager gameManager;
 
     /**
@@ -52,11 +51,14 @@ public class PublicResourceGenerator extends BukkitRunnable {
         this.lastDropTime = System.currentTimeMillis();
     }
 
-    @Override
-    public void run() {
-        gameManager.getMapData().getDropLocations(dropType).forEach(location -> dropItem(location, material, getMaxStack()));
-        lastDropTime = System.currentTimeMillis();
-        gameManager.getGeneratorManager().immediateUpdateDisplay(taskName);
+    /**
+     * 启动任务
+     */
+    public void startTask() {
+        if (currentTask != null) {
+            currentTask.cancel();
+        }
+        currentTask = new GeneratorTask().runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
     }
 
     /**
@@ -124,11 +126,36 @@ public class PublicResourceGenerator extends BukkitRunnable {
 
     public int getSecondsToNextDrop() {
         long now = System.currentTimeMillis();
-        long intervalMs = interval * 50;
+        // 1 tick = 50ms
+        long intervalMs = interval * 50L;
         if (intervalMs <= 0) return 0;
         long timeSinceLast = now - lastDropTime;
         long timeInCurrent = timeSinceLast % intervalMs;
         long timeToNext = intervalMs - timeInCurrent;
         return (int) Math.ceil((double) timeToNext / 1000);
+    }
+
+    /**
+     * 重新启动任务以应用新的间隔
+     */
+    public void restartTask() {
+        if (currentTask != null) {
+            currentTask.cancel();
+        }
+        // 重置最后掉落时间，确保倒计时从新间隔开始
+        lastDropTime = System.currentTimeMillis();
+        currentTask = new GeneratorTask().runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
+    }
+
+    /**
+     * 内部任务类，用于处理资源生成
+     */
+    private class GeneratorTask extends BukkitRunnable {
+        @Override
+        public void run() {
+            gameManager.getMapData().getDropLocations(dropType).forEach(location -> dropItem(location, material, getMaxStack()));
+            lastDropTime = System.currentTimeMillis();
+            gameManager.getGeneratorManager().immediateUpdateDisplay(taskName);
+        }
     }
 }

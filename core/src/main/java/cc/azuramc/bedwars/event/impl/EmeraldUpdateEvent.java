@@ -63,6 +63,8 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
         emeraldGen.setLevel(level);
         int newMaxStack = genManager.getMaxStackForResource("绿宝石", level);
         emeraldGen.setMaxStack(newMaxStack);
+        // 重新启动任务以应用新的间隔
+        emeraldGen.restartTask();
     }
 
     /**
