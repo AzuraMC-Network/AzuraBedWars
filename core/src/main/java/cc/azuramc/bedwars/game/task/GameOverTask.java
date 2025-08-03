@@ -1,14 +1,14 @@
 package cc.azuramc.bedwars.game.task;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.TaskConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
-import cc.azuramc.bedwars.util.FireWorkUtil;
-import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
+import cc.azuramc.bedwars.util.FireWorkUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -57,7 +57,7 @@ public class GameOverTask extends BukkitRunnable {
     private static final String WINNERS_PREFIX = MESSAGE_CONFIG.getWinnersPrefix();
     private static final String NO_WINNER = MESSAGE_CONFIG.getNoWinner();
     private static final String RANK_PREFIX = MESSAGE_CONFIG.getRankPrefix();
-    
+
     private final GameManager gameManager;
     private int countdown = DEFAULT_COUNTDOWN;
     private boolean isFirstRun = true;
@@ -97,32 +97,32 @@ public class GameOverTask extends BukkitRunnable {
 
         --countdown;
     }
-    
+
     /**
      * 显示游戏结果，包括队伍标题和排行榜
-     * 
+     *
      * @param winner 胜利队伍
      */
     private void displayGameResults(GameTeam winner) {
         // 为每个队伍显示胜利或失败标题
         displayTeamTitles(winner);
-        
+
         // 构建胜利者文本
         String winnerText = buildWinnerText(winner);
-        
+
         // 生成并显示排行榜
         List<String> messages = generateLeaderboard(winnerText);
         for (String line : messages) {
             Bukkit.broadcastMessage(line);
         }
-        
+
         // 增加胜利队伍玩家的胜利次数
         updatePlayerStats(winner);
     }
-    
+
     /**
      * 为每个队伍显示胜利或失败标题
-     * 
+     *
      * @param winner 胜利队伍
      */
     private void displayTeamTitles(GameTeam winner) {
@@ -137,16 +137,16 @@ public class GameOverTask extends BukkitRunnable {
             }
         });
     }
-    
+
     /**
      * 构建胜利者文本
-     * 
+     *
      * @param winner 胜利队伍
      * @return 胜利者文本
      */
     private String buildWinnerText(GameTeam winner) {
         StringBuilder winnerText = new StringBuilder();
-        
+
         if (winner != null) {
             // 添加所有胜利队伍玩家名称
             boolean isFirst = true;
@@ -160,46 +160,46 @@ public class GameOverTask extends BukkitRunnable {
         } else {
             winnerText.append(NO_WINNER);
         }
-        
+
         return winnerText.toString();
     }
-    
+
     /**
      * 生成排行榜消息
-     * 
+     *
      * @param winnerText 胜利者文本
      * @return 排行榜消息列表
      */
     private List<String> generateLeaderboard(String winnerText) {
         List<String> messages = new ArrayList<>();
-        
+
         // 添加标题和分隔线
         messages.add(SEPARATOR_LINE);
         messages.add(GAME_TITLE);
         messages.add(" ");
         messages.add(WINNERS_PREFIX + winnerText);
         messages.add(" ");
-        
+
         // 添加击杀排行
         int i = 0;
-        for (GamePlayer gamePlayer : GamePlayer.sortFinalKills()) {
+        for (GamePlayer gamePlayer : GamePlayer.sortCurrentGameFinalKills()) {
             if (i > 2) {
                 continue;
             }
-            messages.add(RANK_PREFIX + LEAD[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getPlayerData().getFinalKills());
+            messages.add(RANK_PREFIX + LEAD[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getCurrentGameFinalKills());
             i++;
         }
-        
+
         // 添加底部分隔线
         messages.add(" ");
         messages.add(SEPARATOR_LINE);
-        
+
         return messages;
     }
-    
+
     /**
      * 更新玩家统计数据
-     * 
+     *
      * @param winner 胜利队伍
      */
     private void updatePlayerStats(GameTeam winner) {
@@ -209,10 +209,10 @@ public class GameOverTask extends BukkitRunnable {
             }
         }
     }
-    
+
     /**
      * 为胜利队伍玩家生成烟花
-     * 
+     *
      * @param winner 胜利队伍
      */
     private void spawnVictoryFireworks(GameTeam winner) {
@@ -223,17 +223,17 @@ public class GameOverTask extends BukkitRunnable {
             ));
         }
     }
-    
+
     /**
      * 执行服务器关闭前的清理工作
      */
     private void performShutdown() {
         // 释放强制加载的区块
         ChunkListener.releaseForceLoadedChunks();
-        
+
         // 取消当前任务
         cancel();
-        
+
         // 延迟关闭服务器
         new BukkitRunnable() {
             @Override
