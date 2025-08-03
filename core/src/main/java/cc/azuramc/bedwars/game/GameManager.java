@@ -127,7 +127,7 @@ public class GameManager {
 
         this.arrowDisplayEnabled = settingsConfig.getDisplayDamage().isArrowDisplayEnabled();
         this.attackDisplayEnabled = settingsConfig.getDisplayDamage().isAttackDisplayEnabled();
-        this.teamBlockSearchRadius = settingsConfig.getSetupMap().getTeamBlockSearchRadius();
+        this.teamBlockSearchRadius = settingsConfig.getTeamBlockSearchRadius();
     }
 
     /**
