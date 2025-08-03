@@ -114,9 +114,11 @@ public class GameStartEvent extends AbstractGameEvent {
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player -> {
             PotionEffectType fastDigging = XPotion.HASTE.get();
             if (fastDigging != null) {
+                // 将等级减1 因为Minecraft药水效果等级从0开始 而我们的等级从1开始
+                int effectLevel = gameTeam.getMagicMinerUpgrade() - 1;
                 player.getPlayer().addPotionEffect(new PotionEffect(fastDigging,
                     CONFIG.getUpgrade().getHasteEffectDuration(),
-                    gameTeam.getMagicMinerUpgrade()));
+                        effectLevel));
             }
         })));
     }
