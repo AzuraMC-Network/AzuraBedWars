@@ -90,6 +90,10 @@ public class GamePlayer {
     private int currentGameDeaths;
     private int currentGameDestroyedBeds;
 
+    // 陷阱免疫相关
+    private boolean hasTrapProtection;
+    private BukkitRunnable trapProtectionTask;
+
     /**
      * 构造方法
      *
@@ -130,6 +134,8 @@ public class GamePlayer {
         // 游戏模式
         this.gameModeType = playerData.getMode();
         this.experienceSources = new HashMap<>();
+
+        this.hasTrapProtection = false;
     }
 
     /**
@@ -241,6 +247,30 @@ public class GamePlayer {
         this.setInvisible(false);
         if (invisibilityTask != null) {
             invisibilityTask.cancel();
+        }
+    }
+
+    /**
+     * 开始陷阱免疫任务
+     */
+    public void startTrapProtectionTask() {
+        this.setHasTrapProtection(true);
+        trapProtectionTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                endTrapProtection();
+            }
+        };
+        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance(), 30 * 20);
+    }
+
+    /**
+     * 取消陷阱免疫任务
+     */
+    public void endTrapProtection() {
+        this.setHasTrapProtection(false);
+        if (trapProtectionTask != null) {
+            trapProtectionTask.cancel();
         }
     }
 
@@ -704,6 +734,8 @@ public class GamePlayer {
         player.setExhaustion(0.0f);
         player.setHealth(MAX_HEALTH);
         player.setFireTicks(0);
+        this.endInvisibility();
+        this.endTrapProtection();
     }
 
     /**
