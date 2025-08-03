@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,6 +62,11 @@ public class GUIListener implements Listener {
             if (customGUI.getPlayer().equals(player)) {
                 event.setCancelled(true);
 
+                // 如果是点击自己背包则返回
+                if (event.getClickedInventory() instanceof PlayerInventory) {
+                    return;
+                }
+
                 List<GUIItem> guiItems = customGUI.items.stream().filter(guiItem -> guiItem.getSize() == event.getSlot()).collect(Collectors.toList());
                 if (guiItems.isEmpty()) {
                     return;
@@ -101,9 +107,9 @@ public class GUIListener implements Listener {
                     return;
                 }
 
-                if(guiAction == null){
+                if (guiAction == null) {
                     newGUIAction.getRunnable().run(event);
-                }else {
+                } else {
                     guiAction.getRunnable().run();
                 }
 
