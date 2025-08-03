@@ -474,7 +474,7 @@ public class TeamShopGUI extends CustomGUI {
     }
 
     /**
-     * 添加挖掘疲劳陷阱升级选项
+     * 添加反击陷阱升级选项
      */
     private void addFightBackTrap(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
