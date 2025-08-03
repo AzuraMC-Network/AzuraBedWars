@@ -15,6 +15,7 @@ import org.bukkit.entity.ArmorStand;
 import java.util.*;
 
 /**
+ * 资源刷新管理类，负责注册task等操作
  * @author An5w1r@163.com
  */
 public class GeneratorManager {
@@ -133,13 +134,15 @@ public class GeneratorManager {
         String taskName = task.getTaskName();
         // 如果已存在同名任务，取消旧任务
         if (privateResourceGeneratorMap.containsKey(taskName)) {
-            privateResourceGeneratorMap.get(taskName).cancel();
+            PrivateResourceGenerator oldTask = privateResourceGeneratorMap.get(taskName);
+            if (oldTask.getCurrentTask() != null) {
+                oldTask.getCurrentTask().cancel();
+            }
         }
         // 添加新任务
         privateResourceGeneratorMap.put(taskName, task);
-        task.setCurrentTask(task);
         // 启动任务
-        task.runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
+        task.startTask();
     }
 
     /**
@@ -156,13 +159,15 @@ public class GeneratorManager {
         String taskName = task.getTaskName();
         // 如果已存在同名任务，取消旧任务
         if (publicResourceGeneratorMap.containsKey(taskName)) {
-            publicResourceGeneratorMap.get(taskName).cancel();
+            PublicResourceGenerator oldTask = publicResourceGeneratorMap.get(taskName);
+            if (oldTask.getCurrentTask() != null) {
+                oldTask.getCurrentTask().cancel();
+            }
         }
         // 添加新任务
         publicResourceGeneratorMap.put(taskName, task);
-        task.setCurrentTask(task);
         // 启动任务
-        task.runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
+        task.startTask();
     }
 
     public PublicResourceGenerator getPublicResourceGenerator(String name) {
