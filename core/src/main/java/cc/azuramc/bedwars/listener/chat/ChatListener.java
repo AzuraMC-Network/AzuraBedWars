@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.chat;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.ChatConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -27,14 +27,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
  */
 public class ChatListener implements Listener {
 
-    private static final ChatConfig CONFIG = AzuraBedWars.getInstance().getChatConfig();
-
-    public static final String GLOBAL_CHAT_PREFIX = CONFIG.getGlobalChatPrefix();
-    private static final String SPECTATOR_PREFIX = CONFIG.getSpectatorPrefix();
-    private static final String GLOBAL_CHAT_TAG = CONFIG.getGlobalChatTag();
-    private static final String TEAM_CHAT_TAG = CONFIG.getTeamChatTag();
-    private static final String CHAT_SEPARATOR = CONFIG.getChatSeparator();
-    private static final int GLOBAL_CHAT_COOLDOWN = CONFIG.getGlobalChatCooldown();
+    private static final SettingsConfig.ChatConfig CHAT_CONFIG = AzuraBedWars.getInstance().getSettingsConfig().getChatConfig();
 
     private static GameManager gameManager;
     private static AzuraBedWars plugin;
@@ -98,7 +91,7 @@ public class ChatListener implements Listener {
 
         // 启动倒计时
         gamePlayer.setShoutCooldown(true);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> gamePlayer.setShoutCooldown(false), GLOBAL_CHAT_COOLDOWN * 20L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> gamePlayer.setShoutCooldown(false), CHAT_CONFIG.getGlobalChatCooldown() * 20L);
     }
 
     /**
@@ -118,7 +111,7 @@ public class ChatListener implements Listener {
             globalPrefix = VaultUtil.getPlayerPrefix(gamePlayer);
         }
 
-        return globalPrefix + "§6[" + gamePlayer.getPlayerData().getLevel() + "✫] " + "§7" + gamePlayer.getNickName() + " " + CHAT_SEPARATOR + " " + message;
+        return globalPrefix + "§6[" + gamePlayer.getPlayerData().getLevel() + "✫] " + "§7" + gamePlayer.getNickName() + " " + CHAT_CONFIG.getChatSeparator() + " " + message;
     }
 
     /**
@@ -146,7 +139,7 @@ public class ChatListener implements Listener {
         }
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        boolean isGlobalChat = message.startsWith(GLOBAL_CHAT_PREFIX);
+        boolean isGlobalChat = message.startsWith(CHAT_CONFIG.getGlobalChatPrefix());
 
         // 构建团队聊天消息
         String formattedMessage = buildTeamChatMessage(gamePlayer, gameTeam, message, isGlobalChat);
@@ -171,7 +164,7 @@ public class ChatListener implements Listener {
      * @param message    消息内容
      */
     public static void handleSpectatorChat(GamePlayer gamePlayer, String message) {
-        String spectatorMessage = SPECTATOR_PREFIX + "§f" + gamePlayer.getNickName() + CHAT_SEPARATOR + message;
+        String spectatorMessage = CHAT_CONFIG.getSpectatorPrefix() + "§f" + gamePlayer.getNickName() + CHAT_CONFIG.getChatSeparator() + message;
 
         if (gamePlayer.getPlayer().hasPermission("azurabedwars.admin")) {
             gameManager.broadcastMessage(spectatorMessage);
@@ -191,13 +184,13 @@ public class ChatListener implements Listener {
      */
     public static String buildTeamChatMessage(GamePlayer gamePlayer, GameTeam gameTeam, String message, boolean isGlobalChat) {
 
-        return (isGlobalChat ? GLOBAL_CHAT_TAG : TEAM_CHAT_TAG) + " " +
+        return (isGlobalChat ? CHAT_CONFIG.getGlobalChatTag() : CHAT_CONFIG.getTeamChatTag()) + " " +
                 gameTeam.getChatColor() +
                 "[" +
                 gameTeam.getName() +
                 "] " +
                 gamePlayer.getNickName() +
-                CHAT_SEPARATOR +
+                CHAT_CONFIG.getChatSeparator() +
                 (isGlobalChat ? message.substring(1) : message);
     }
 }
