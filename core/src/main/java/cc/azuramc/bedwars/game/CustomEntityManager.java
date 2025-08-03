@@ -102,8 +102,8 @@ public class CustomEntityManager {
         }
 
         // 更新实体状态
-        updateEntityName();
         liveLeftTime--;
+        updateEntityName();
 
         // 检查是否到达消失时间
         if (liveLeftTime <= 0) {
@@ -147,7 +147,7 @@ public class CustomEntityManager {
                 .replace("{TeamColor}", gameTeam.getChatColor().toString())
                 .replace("{TeamName}", gameTeam.getName())
                 .replace("{Countdown}", String.valueOf(liveLeftTime))
-                .replace("{Health}", String.valueOf((int) livingEntity.getHealth()));
+                .replace("{Health}", String.valueOf((int) (livingEntity.getHealth() + 0.5)));
 
         livingEntity.setCustomName(displayName);
     }
