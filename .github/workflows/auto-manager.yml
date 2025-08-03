@@ -107,13 +107,19 @@ jobs:
               newLabels.push('💥 Breaking Change');
             }
             
-            // Check for develop to master PR (normal release)
+            // Check for develop to master PR
             const baseBranch = pr.base.ref.toLowerCase();
             const headBranch = pr.head.ref.toLowerCase();
             
             if ((headBranch === 'develop' || headBranch.includes('develop')) && 
                 (baseBranch === 'master' || baseBranch === 'main')) {
-              newLabels.push('🚀 Release');
+              // Check if PR title contains [Release] tag
+              if (pr.title.includes('[Release]') || pr.title.includes('[release]') || 
+                  pr.title.toLowerCase().includes('[release]')) {
+                newLabels.push('🚀 Release');
+              } else {
+                newLabels.push('🔄 Sync');
+              }
             }
             
             // Check for other important branch flows
@@ -121,7 +127,7 @@ jobs:
               newLabels.push('🚀 Release');
             }
             
-            if ((headBranch === 'master' || headBranch === 'main') && headBranch === 'develop') {
+            if ((headBranch === 'master' || headBranch === 'main') && baseBranch === 'develop') {
               newLabels.push('🔄 Sync');
             }
             
