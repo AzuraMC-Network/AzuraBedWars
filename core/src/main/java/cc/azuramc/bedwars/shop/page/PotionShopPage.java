@@ -26,9 +26,9 @@ public class PotionShopPage implements ShopData {
     public PotionShopPage() {
         mainShopItem = new ShopItemType(new ItemBuilder().setType(XMaterial.BREWING_STAND.get()).setLores("§e点击查看！").getItem(), "§a药水", ColorType.NONE, null);
 
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.POTION.get()).setPotionData(new PotionEffect(PotionEffectType.SPEED, 900, 2)).getItem(), "速度药水§7（45秒）", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.POTION.get()).setPotionData(new PotionEffect(Objects.requireNonNull(XPotion.JUMP_BOOST.get()), 900, 5)).getItem(), "跳跃药水§7（45秒）", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.POTION.get()).setPotionData(new PotionEffect(PotionEffectType.INVISIBILITY, 600, 1)).getItem(), "隐身药水§7（30秒）", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 2, 200)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.POTION.get()).setPotionData(new PotionEffect(PotionEffectType.SPEED, 900, 2)).setDisplayName("§b速度药水§7（45秒）").getItem(), "速度药水§7（45秒）", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.POTION.get()).setPotionData(new PotionEffect(Objects.requireNonNull(XPotion.JUMP_BOOST.get()), 900, 5)).setDisplayName("跳跃药水§7（45秒）").getItem(), "跳跃药水§7（45秒）", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 1, 100)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.POTION.get()).setPotionData(new PotionEffect(PotionEffectType.INVISIBILITY, 600, 1)).setDisplayName("§b隐身药水§7（30秒）").getItem(), "隐身药水§7（30秒）", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 2, 200)));
     }
 
 }
