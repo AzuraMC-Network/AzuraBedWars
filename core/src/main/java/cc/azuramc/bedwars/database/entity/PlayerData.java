@@ -56,65 +56,92 @@ public class PlayerData {
     }
 
     public void addLevel(int level) {
-        this.level = this.level + level;
+        this.level += level;
     }
+
     public void addExperience(double experience) {
-        this.experience = this.experience + experience;
+        this.experience += experience;
     }
+
     public void addKills(int kills) {
-        this.kills = this.kills + kills;
+        gamePlayer.addCurrentGameKills(kills);
+        this.kills += kills;
     }
+
     public void addDeaths(int deaths) {
-        this.deaths = this.deaths + deaths;
+        gamePlayer.addCurrentGameDeaths(deaths);
+        this.deaths += deaths;
     }
+
     public void addAssists(int assists) {
-        this.assists = this.assists + assists;
+        gamePlayer.addCurrentGameAssists(assists);
+        this.assists += assists;
     }
+
     public void addFinalKills(int finalKills) {
-        this.finalKills = this.finalKills + finalKills;
+        gamePlayer.addCurrentGameFinalKills(finalKills);
+        this.finalKills += finalKills;
     }
+
     public void addDestroyedBeds(int destroyedBeds) {
-        this.destroyedBeds = this.destroyedBeds + destroyedBeds;
+        gamePlayer.addCurrentGameDestroyedBeds(destroyedBeds);
+        this.destroyedBeds += destroyedBeds;
     }
+
     public void addWins(int wins) {
-        this.wins = this.wins + wins;
+        this.wins += wins;
     }
+
     public void addLosses(int losses) {
-        this.losses = this.losses + losses;
+        this.losses += losses;
     }
+
     public void addGames(int games) {
-        this.games = this.games + games;
+        this.games += games;
     }
 
     public void addLevel() {
         this.level++;
     }
+
     public void addKills() {
         PlayerLevelManager.addExperience(this.gamePlayer, 1);
+        gamePlayer.addCurrentGameKills();
         this.kills++;
     }
+
     public void addDeaths() {
+        gamePlayer.addCurrentGameDeaths();
         this.deaths++;
     }
+
     public void addAssists() {
         PlayerLevelManager.addExperience(this.gamePlayer, 0.5);
+        gamePlayer.addCurrentGameAssists();
         this.assists++;
     }
+
     public void addFinalKills() {
         PlayerLevelManager.addExperience(this.gamePlayer, 2);
+        gamePlayer.addCurrentGameFinalKills();
         this.finalKills++;
     }
+
     public void addDestroyedBeds() {
         PlayerLevelManager.addExperience(this.gamePlayer, 3);
+        gamePlayer.addCurrentGameDestroyedBeds();
         this.destroyedBeds++;
     }
+
     public void addWins() {
         PlayerLevelManager.addExperience(this.gamePlayer, 5);
         this.wins++;
     }
+
     public void addLosses() {
         this.losses++;
     }
+
     public void addGames() {
         PlayerLevelManager.addExperience(this.gamePlayer, 0.1);
         this.games++;

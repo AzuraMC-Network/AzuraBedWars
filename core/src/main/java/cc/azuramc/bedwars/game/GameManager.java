@@ -870,6 +870,13 @@ public class GameManager {
             player.setGameMode(GameMode.SURVIVAL);
             gamePlayer.cleanState();
             gamePlayer.getPlayerData().addGames();
+
+            // 重置本局游戏数据
+            gamePlayer.setCurrentGameKills(0);
+            gamePlayer.setCurrentGameFinalKills(0);
+            gamePlayer.setCurrentGameAssists(0);
+            gamePlayer.setCurrentGameDeaths(0);
+            gamePlayer.setCurrentGameDestroyedBeds(0);
         }
     }
 
