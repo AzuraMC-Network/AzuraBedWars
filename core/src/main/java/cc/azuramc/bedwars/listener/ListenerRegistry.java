@@ -47,6 +47,7 @@ public class ListenerRegistry {
         register(new PlayerJoinListener());
         register(new PlayerLobbyInteractListener());
         register(new PlayerMiscListener());
+        register(new MagicMilk());
         register(new PlayerResourcePutListener());
         if (VersionUtil.isLessThan113()) {
             register(new PlayerPickUpListenerLowVersion());
@@ -76,7 +77,6 @@ public class ListenerRegistry {
         register(new RescuePlatformListener());
         register(new WarpPowderListener());
         register(new SilverFishListener());
-        register(new MagicMilk());
 
         // spectator package
         register(new SpectatorCompassListener());
