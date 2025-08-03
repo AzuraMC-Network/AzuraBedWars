@@ -319,7 +319,7 @@ public class GamePlayer {
      */
     public static List<GamePlayer> sortFinalKills() {
         List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> player2.getPlayerData().getFinalKills() - player1.getPlayerData().getFinalKills());
+        list.sort((player1, player2) -> Integer.compare(player2.getPlayerData().getFinalKills(), player1.getPlayerData().getFinalKills()));
         return list;
     }
 
@@ -330,7 +330,7 @@ public class GamePlayer {
      */
     public static List<GamePlayer> sortCurrentGameFinalKills() {
         List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> player2.getCurrentGameFinalKills() - player1.getCurrentGameFinalKills());
+        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameFinalKills(), player1.getCurrentGameFinalKills()));
         return list;
     }
 
