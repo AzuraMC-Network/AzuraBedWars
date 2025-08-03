@@ -41,7 +41,7 @@ public class DiamondUpdateEvent extends AbstractGameEvent {
      * @param priority 事件优先级
      */
     public DiamondUpdateEvent(int level, int second, int priority) {
-        super("钻石资源点升级到" + level + "级", second, priority);
+        super("钻石资源点升级到" + toRoman(level) + "级", second, priority);
         this.level = level;
     }
 

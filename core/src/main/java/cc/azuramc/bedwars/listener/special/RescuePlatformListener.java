@@ -31,7 +31,7 @@ public class RescuePlatformListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onInteract(PlayerInteractEvent event) {
         // 只处理右键点击
-        if (isLeftClick(event.getAction())) {
+        if (!isRightClick(event.getAction())) {
             return;
         }
 
@@ -63,7 +63,7 @@ public class RescuePlatformListener implements Listener {
      * @param action 交互动作
      * @return 是否为左键点击
      */
-    private boolean isLeftClick(Action action) {
-        return action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK;
+    private boolean isRightClick(Action action) {
+        return action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK;
     }
 }
