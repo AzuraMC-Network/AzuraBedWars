@@ -44,6 +44,7 @@ public class PlayerDrinkMilkListener implements Listener {
 
         LoggerUtil.debug("PlayerDrinkMilkListener$onDrink | " + player.getName() + " now has trap protection");
 
+        gamePlayer.sendMessage("&a你喝下了魔法牛奶，将会在30s内不受陷阱效果影响");
         gamePlayer.startTrapProtectionTask();
     }
 }
