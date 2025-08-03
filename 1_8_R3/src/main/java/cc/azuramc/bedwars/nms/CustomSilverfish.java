@@ -80,10 +80,10 @@ public class CustomSilverfish extends EntitySilverfish {
         CraftLivingEntity craft = (CraftLivingEntity) entity.getBukkitEntity();
         craft.setRemoveWhenFarAway(false);
 
-        String name = "{TeamColor}&l{TeamName} &r{TeamColor}Silverfish"
-                .replace("{TeamColor}", gameTeam.getChatColor().toString())
-                .replace("{TeamName}", gameTeam.getName());
-        entity.setCustomName(name);
+//        String name = "{TeamColor}&l{TeamName} &r{TeamColor}Silverfish"
+//                .replace("{TeamColor}", gameTeam.getChatColor().toString())
+//                .replace("{TeamName}", gameTeam.getName());
+//        entity.setCustomName(name);
         entity.setCustomNameVisible(true);
 
         world.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
