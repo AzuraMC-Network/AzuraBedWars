@@ -68,7 +68,6 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private MessageConfig messageConfig;
     @Getter private ItemConfig itemConfig;
     @Getter private PlayerConfig playerConfig;
-    @Getter private ChatConfig chatConfig;
     @Getter private ScoreboardConfig scoreboardConfig;
     @Getter private JedisManager jedisManager;
     @Getter private PubSubListener pubSubListener;
@@ -394,7 +393,6 @@ public final class AzuraBedWars extends JavaPlugin {
         configFactory.registerSupplier("messages", MessageConfig::new);
         configFactory.registerSupplier("items", ItemConfig::new);
         configFactory.registerSupplier("player", PlayerConfig::new);
-        configFactory.registerSupplier("chat", ChatConfig::new);
         configFactory.registerSupplier("scoreboard", ScoreboardConfig::new);
 
         // 初始化默认配置
@@ -407,7 +405,6 @@ public final class AzuraBedWars extends JavaPlugin {
         messageConfig = configManager.getConfig("messages", MessageConfig.class);
         itemConfig = configManager.getConfig("items", ItemConfig.class);
         playerConfig = configManager.getConfig("player", PlayerConfig.class);
-        chatConfig = configManager.getConfig("chat", ChatConfig.class);
         scoreboardConfig = configManager.getConfig("scoreboard", ScoreboardConfig.class);
 
         // 保存配置
