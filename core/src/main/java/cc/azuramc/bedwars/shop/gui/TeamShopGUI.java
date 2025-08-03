@@ -323,7 +323,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + RESOURCE_FURNACE)
-                            .setLores(getArmorUpgradeLore(currentLevel, gameModeType))
+                            .setLores(getResourceFurnaceUpgradeLore(currentLevel, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         }
@@ -488,7 +488,7 @@ public class TeamShopGUI extends CustomGUI {
                             .setType(getFightbackTrapMaterial())
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.FIGHT_BACK.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.INACTIVE, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.INACTIVE, getFightbackTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
@@ -506,7 +506,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.FIGHT_BACK.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.ACTIVE, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.ACTIVE, getFightbackTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         } else {
@@ -516,7 +516,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.FIGHT_BACK.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.FULLED, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.FULLED, getFightbackTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         }
@@ -536,7 +536,7 @@ public class TeamShopGUI extends CustomGUI {
             setItem(16, new ItemBuilder()
                             .setType(getAlarmTrapMaterial())
                             .setDisplayName("§a" + TrapType.ALARM.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.INACTIVE, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.INACTIVE, getAlarmTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
@@ -553,7 +553,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .setDisplayName("§a" + TrapType.ALARM.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.ACTIVE, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.ACTIVE, getAlarmTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         } else {
@@ -562,7 +562,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .setDisplayName("§a" + TrapType.ALARM.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.FULLED, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.FULLED, getAlarmTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         }
@@ -583,7 +583,7 @@ public class TeamShopGUI extends CustomGUI {
                             .setType(getMinerTrapMaterial())
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.MINER.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.INACTIVE, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.INACTIVE, getMinerTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {
                         if (!processPayment(gamePlayer, price, gameModeType)) {
@@ -601,7 +601,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.MINER.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.ACTIVE, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.ACTIVE, getMinerTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         } else {
@@ -611,7 +611,7 @@ public class TeamShopGUI extends CustomGUI {
                             .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                             .setDisplayName("§a" + TrapType.MINER.getDisplayName())
-                            .setLores(getTrapItemLore(TrapState.FULLED, getBlindnessTrapLore(), price, gameModeType))
+                            .setLores(getTrapItemLore(TrapState.FULLED, getMinerTrapLore(), price, gameModeType))
                             .getItem(),
                     new GUIAction(0, () -> {}, false));
         }
