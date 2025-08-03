@@ -35,8 +35,8 @@ public class UtilityShopPage implements ShopData {
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.SNOWBALL.get()).getItem(), "蠹虫", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 40, 40)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.WOLF_SPAWN_EGG.get()).getItem(), "梦幻守护者", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 128, 128)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.CHEST.get()).getItem(), "速建防御塔", ColorType.NONE, new PriceCost(XMaterial.IRON_INGOT.get(), 64, 64)));
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.SPONGE.get()).getItem(),"海绵",ColorType.NONE,new PriceCost(XMaterial.GOLD_INGOT.get(),2,20))); // 没写逻辑
-        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.MILK_BUCKET.get()).getItem(),"魔法牛奶",ColorType.NONE,new PriceCost(XMaterial.GOLD_INGOT.get(),4,40))); // 没写逻辑
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.SPONGE.get()).getItem(),"海绵",ColorType.NONE,new PriceCost(XMaterial.GOLD_INGOT.get(),2,20)));
+        shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.MILK_BUCKET.get()).getItem(),"魔法牛奶",ColorType.NONE,new PriceCost(XMaterial.GOLD_INGOT.get(),4,40)));
 
     }
 }
