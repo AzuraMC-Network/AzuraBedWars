@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.scoreboard.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.ScoreboardConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
@@ -29,26 +29,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LobbyBoardProvider implements Listener {
 
-    private static final ScoreboardConfig.LobbyScoreboard CONFIG = AzuraBedWars.getInstance().getScoreboardConfig().getLobbyScoreboard();
+    private static final SettingsConfig.LobbyScoreboard LOBBY_BOARD_CONFIG = AzuraBedWars.getInstance().getSettingsConfig().getLobbyScoreboard();
 
     private static GameManager gameManager;
-
-    private static final String TITLE = CONFIG.getTitle();
-    private static final String SERVER_INFO = CONFIG.getServerInfo();
-    private static final String WAITING_MESSAGE = CONFIG.getWaitingMessage();
-    private static final String EMPTY_LINE = CONFIG.getEmptyLine();
-    private static final String DEFAULT_MODE = CONFIG.getDefaultMode();
-    private static final String EXP_MODE = CONFIG.getExpMode();
 
     /**
      * 玩家计分板更新状态缓存
      */
     private static final ConcurrentHashMap<UUID, Long> LAST_UPDATE_TIME = new ConcurrentHashMap<>();
-
-    /**
-     * 更新间隔（毫秒）
-     */
-    private static final long UPDATE_INTERVAL = CONFIG.getUpdateInterval();
 
     /**
      * 日期格式化器缓存
@@ -97,7 +85,7 @@ public class LobbyBoardProvider implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         if (gamePlayer != null && gamePlayer.getBoard() == null) {
             FastBoard board = new FastBoard(player);
-            board.updateTitle(TITLE);
+            board.updateTitle(LOBBY_BOARD_CONFIG.getTitle());
             gamePlayer.setBoard(board);
             updatePlayerBoard(gamePlayer);
         }
@@ -114,7 +102,7 @@ public class LobbyBoardProvider implements Listener {
             UUID playerId = gamePlayer.getUuid();
             long lastUpdate = LAST_UPDATE_TIME.getOrDefault(playerId, 0L);
 
-            if (currentTime - lastUpdate >= UPDATE_INTERVAL) {
+            if (currentTime - lastUpdate >= LOBBY_BOARD_CONFIG.getUpdateInterval()) {
                 updatePlayerBoard(gamePlayer);
                 LAST_UPDATE_TIME.put(playerId, currentTime);
             }
@@ -141,29 +129,29 @@ public class LobbyBoardProvider implements Listener {
 
         // 添加地图信息
         lines.add("§7" + DATE_FORMAT.format(Calendar.getInstance().getTime()));
-        lines.add(EMPTY_LINE);
+        lines.add(LOBBY_BOARD_CONFIG.getEmptyLine());
         lines.add("§f地图: §a" + gameManager.getMapData().getName());
         lines.add("§f队伍: §a" + gameManager.getMapData().getPlayers().getTeam() + "人 " + gameManager.getGameTeams().size() + "队");
         lines.add("§f作者: §a" + gameManager.getMapData().getAuthor());
-        lines.add(EMPTY_LINE);
+        lines.add(LOBBY_BOARD_CONFIG.getEmptyLine());
         // 添加玩家信息
         lines.add("§f玩家: §a" + GamePlayer.getOnlinePlayers().size() + "/" + gameManager.getMaxPlayers());
-        lines.add(EMPTY_LINE);
+        lines.add(LOBBY_BOARD_CONFIG.getEmptyLine());
         // 添加倒计时信息
         String countdown = getCountdown();
         if (countdown != null) {
             lines.add(countdown);
         }
-        lines.add(EMPTY_LINE);
+        lines.add(LOBBY_BOARD_CONFIG.getEmptyLine());
         // 添加模式信息
-        String modeText = gamePlayer.getPlayerData().getMode() == GameModeType.DEFAULT ? DEFAULT_MODE : EXP_MODE;
+        String modeText = gamePlayer.getPlayerData().getMode() == GameModeType.DEFAULT ? LOBBY_BOARD_CONFIG.getDefaultMode() : LOBBY_BOARD_CONFIG.getExpMode();
         lines.add("§f你的模式: §a" + modeText);
-        lines.add(EMPTY_LINE);
+        lines.add(LOBBY_BOARD_CONFIG.getEmptyLine());
         // 添加版本信息
         lines.add("§f版本: §a" + plugin.getDescription().getVersion());
-        lines.add(EMPTY_LINE);
+        lines.add(LOBBY_BOARD_CONFIG.getEmptyLine());
         // 添加服务器信息
-        lines.add(SERVER_INFO);
+        lines.add(LOBBY_BOARD_CONFIG.getServerInfo());
 
         // 更新计分板
         board.updateLines(lines.toArray(new String[0]));
@@ -196,7 +184,7 @@ public class LobbyBoardProvider implements Listener {
         if (gameStartTask != null) {
             return gameStartTask.getCountdown() + "秒后开始";
         } else if (currentGameManager.getGameState() == GameState.WAITING) {
-            return WAITING_MESSAGE;
+            return LOBBY_BOARD_CONFIG.getWaitingMessage();
         }
 
         return null;
@@ -220,27 +208,6 @@ public class LobbyBoardProvider implements Listener {
 
             // 移除缓存
             LAST_UPDATE_TIME.remove(player.getUniqueId());
-        }
-    }
-
-    /**
-     * 设置更新间隔
-     *
-     * @param interval 更新间隔（毫秒）
-     */
-    public static void setUpdateInterval(long interval) {
-        if (interval > 0) {
-            // 通过反射修改常量值
-            try {
-                java.lang.reflect.Field field = LobbyBoardProvider.class.getDeclaredField("UPDATE_INTERVAL");
-                field.setAccessible(true);
-                java.lang.reflect.Field modifiersField = java.lang.reflect.Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                modifiersField.setInt(field, field.getModifiers() & ~java.lang.reflect.Modifier.FINAL);
-                field.set(null, interval);
-            } catch (Exception e) {
-                // 忽略错误
-            }
         }
     }
 

@@ -127,18 +127,6 @@ public class ScoreboardManager implements Listener {
     }
 
     /**
-     * 设置计分板更新间隔
-     *
-     * @param interval 更新间隔（毫秒）
-     */
-    public void setUpdateInterval(long interval) {
-        if (interval > 0) {
-            GameRunningBoardProvider.setUpdateInterval(interval);
-            LobbyBoardProvider.setUpdateInterval(interval);
-        }
-    }
-
-    /**
      * 初始化计分板系统
      * 注册监听器
      *
