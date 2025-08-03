@@ -50,11 +50,6 @@ public class PlayerInvisibilityListener implements Listener {
         if (itemName.contains("隐身")) {
             LoggerUtil.debug("PlayerInvisibilityListener$onDrink | invisible player is " + player.getName());
 
-            // 如果玩家已经隐身，取消之前的任务
-            if (gamePlayer.isInvisible()) {
-                gamePlayer.endInvisibility();
-            }
-
             gamePlayer.startInvisibilityTask();
         }
     }
