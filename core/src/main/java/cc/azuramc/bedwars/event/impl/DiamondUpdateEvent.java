@@ -63,6 +63,8 @@ public class DiamondUpdateEvent extends AbstractGameEvent {
         diamondGen.setLevel(level);
         int newMaxStack = genManager.getMaxStackForResource("钻石", level);
         diamondGen.setMaxStack(newMaxStack);
+        // 重新启动任务以应用新的间隔
+        diamondGen.restartTask();
     }
 
     /**

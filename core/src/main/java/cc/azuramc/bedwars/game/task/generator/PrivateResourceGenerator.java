@@ -1,9 +1,5 @@
 package cc.azuramc.bedwars.game.task.generator;
 
-/**
- * @author An5w1r@163.com
- */
-
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.game.GameManager;
 import lombok.Getter;
@@ -18,8 +14,7 @@ import org.bukkit.util.Vector;
 import java.util.Collection;
 
 /**
- * 自定义资源生成器类
- * 可以动态修改最大堆叠数量和掉落物品间隔
+ * @author An5w1r@163.com
  */
 @Getter
 @Setter
