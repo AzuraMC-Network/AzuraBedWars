@@ -90,6 +90,10 @@ public class GamePlayer {
     private int currentGameDeaths;
     private int currentGameDestroyedBeds;
 
+    // 陷阱免疫相关
+    private boolean hasTrapProtection;
+    private BukkitRunnable trapProtectionTask;
+
     /**
      * 构造方法
      *
@@ -130,6 +134,8 @@ public class GamePlayer {
         // 游戏模式
         this.gameModeType = playerData.getMode();
         this.experienceSources = new HashMap<>();
+
+        this.hasTrapProtection = false;
     }
 
     /**
@@ -218,11 +224,14 @@ public class GamePlayer {
      * 开始隐身任务
      */
     public void startInvisibilityTask() {
+        endInvisibility();
+
         ArmorHider.hideArmor(this, GamePlayer.getGamePlayers());
         this.setInvisible(true);
         invisibilityTask = new BukkitRunnable() {
             @Override
             public void run() {
+                sendMessage("&c隐身效果结束");
                 endInvisibility();
             }
         };
@@ -241,6 +250,33 @@ public class GamePlayer {
         this.setInvisible(false);
         if (invisibilityTask != null) {
             invisibilityTask.cancel();
+        }
+    }
+
+    /**
+     * 开始陷阱免疫任务
+     */
+    public void startTrapProtectionTask() {
+        endTrapProtection();
+
+        this.setHasTrapProtection(true);
+        trapProtectionTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                sendMessage("&c魔法牛奶效果结束");
+                endTrapProtection();
+            }
+        };
+        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance(), 30 * 20);
+    }
+
+    /**
+     * 取消陷阱免疫任务
+     */
+    public void endTrapProtection() {
+        this.setHasTrapProtection(false);
+        if (trapProtectionTask != null) {
+            trapProtectionTask.cancel();
         }
     }
 
@@ -289,7 +325,7 @@ public class GamePlayer {
      */
     public static List<GamePlayer> sortFinalKills() {
         List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> player2.getPlayerData().getFinalKills() - player1.getPlayerData().getFinalKills());
+        list.sort((player1, player2) -> Integer.compare(player2.getPlayerData().getFinalKills(), player1.getPlayerData().getFinalKills()));
         return list;
     }
 
@@ -300,7 +336,7 @@ public class GamePlayer {
      */
     public static List<GamePlayer> sortCurrentGameFinalKills() {
         List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> player2.getCurrentGameFinalKills() - player1.getCurrentGameFinalKills());
+        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameFinalKills(), player1.getCurrentGameFinalKills()));
         return list;
     }
 
@@ -343,35 +379,35 @@ public class GamePlayer {
      * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addKills等方法会触发一次这个方法)
      */
     public void addCurrentGameKills(int currentGameKills) {
-        this.currentGameKills = this.currentGameKills + currentGameKills;
+        this.currentGameKills += currentGameKills;
     }
 
     /**
      * 增加玩家本局最终击杀数据 (不建议直接调用它增加，playerData类的addFinalKills等方法会触发一次这个方法)
      */
     public void addCurrentGameFinalKills(int currentGameFinalKills) {
-        this.currentGameFinalKills = this.currentGameFinalKills + currentGameFinalKills;
+        this.currentGameFinalKills += currentGameFinalKills;
     }
 
     /**
      * 增加玩家本局助攻数据 (不建议直接调用它增加，playerData类的addAssists等方法会触发一次这个方法)
      */
     public void addCurrentGameAssists(int currentGameAssists) {
-        this.currentGameAssists = this.currentGameAssists + currentGameAssists;
+        this.currentGameAssists += currentGameAssists;
     }
 
     /**
      * 增加玩家本局死亡数据 (不建议直接调用它增加，playerData类的addDeaths等方法会触发一次这个方法)
      */
     public void addCurrentGameDeaths(int currentGameDeaths) {
-        this.currentGameDeaths = this.currentGameDeaths + currentGameDeaths;
+        this.currentGameDeaths += currentGameDeaths;
     }
 
     /**
      * 增加玩家本局破坏床数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
      */
     public void addCurrentGameDestroyedBeds(int currentGameDestroyedBeds) {
-        this.currentGameDestroyedBeds = this.currentGameDestroyedBeds + currentGameDestroyedBeds;
+        this.currentGameDestroyedBeds += currentGameDestroyedBeds;
     }
 
     /**
@@ -704,6 +740,8 @@ public class GamePlayer {
         player.setExhaustion(0.0f);
         player.setHealth(MAX_HEALTH);
         player.setFireTicks(0);
+        this.endInvisibility();
+        this.endTrapProtection();
     }
 
     /**

@@ -4,26 +4,22 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.LoggerUtil;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author An5w1r@163.com
  */
-public class PlayerInvisibilityListener implements Listener {
+public class PlayerDrinkMilkListener implements Listener {
 
     private final AzuraBedWars plugin;
-    private static final Map<GamePlayer, BukkitRunnable> invisibilityTasks = new HashMap<>();
 
-    public PlayerInvisibilityListener(AzuraBedWars plugin) {
+    public PlayerDrinkMilkListener(AzuraBedWars plugin) {
         this.plugin = plugin;
     }
 
@@ -42,16 +38,13 @@ public class PlayerInvisibilityListener implements Listener {
             return;
         }
 
-        String itemName =  itemStack.getItemMeta().getDisplayName();
-        if (itemName == null || itemName.isEmpty()) {
+        if (itemStack.getType() != XMaterial.MILK_BUCKET.get()) {
             return;
         }
 
-        if (itemName.contains("隐身")) {
-            LoggerUtil.debug("PlayerInvisibilityListener$onDrink | invisible player is " + player.getName());
+        LoggerUtil.debug("PlayerDrinkMilkListener$onDrink | " + player.getName() + " now has trap protection");
 
-            gamePlayer.startInvisibilityTask();
-        }
+        gamePlayer.sendMessage("&a你喝下了魔法牛奶，将会在30s内不受陷阱效果影响");
+        gamePlayer.startTrapProtectionTask();
     }
-
 }

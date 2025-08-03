@@ -44,13 +44,14 @@ public class ListenerRegistry {
         register(new PlayerDamageListener());
         register(new PlayerDeathReasonListener());
         register(new PlayerDragToolListener());
+        register(new PlayerDrinkMilkListener(plugin));
         register(new PlayerDropListener());
+        register(new PlayerFastPutListener());
         register(new PlayerInteractShopListener());
         register(new PlayerInvisibilityListener(plugin));
         register(new PlayerJoinListener());
         register(new PlayerLobbyInteractListener());
         register(new PlayerMiscListener());
-        register(new PlayerResourcePutListener());
         if (VersionUtil.isLessThan113()) {
             register(new PlayerPickUpListenerLowVersion());
         } else {
