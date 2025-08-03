@@ -333,7 +333,7 @@ public class GamePlayer {
     }
 
     /**
-     * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
+     * 增加玩家本局拆床数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
      */
     public void addCurrentGameDestroyedBeds() {
         this.currentGameDestroyedBeds++;
@@ -361,6 +361,20 @@ public class GamePlayer {
     }
 
     /**
+     * 增加玩家本局死亡数据 (不建议直接调用它增加，playerData类的addDeaths等方法会触发一次这个方法)
+     */
+    public void addCurrentGameDeaths(int currentGameDeaths) {
+        this.currentGameDeaths = this.currentGameDeaths + currentGameDeaths;
+    }
+
+    /**
+     * 增加玩家本局破坏床数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
+     */
+    public void addCurrentGameDestroyedBeds(int currentGameDestroyedBeds) {
+        this.currentGameDestroyedBeds = this.currentGameDestroyedBeds + currentGameDestroyedBeds;
+    }
+
+    /**
      * 获取指定资源来源的经验值
      * @param resourceType 资源类型
      * @return 经验数量，如果该类型不存在则返回 -1
@@ -382,20 +396,6 @@ public class GamePlayer {
             }
         }
         return spectators;
-    }
-
-    /**
-     * 增加玩家本局死亡数据 (不建议直接调用它增加，playerData类的addDeaths等方法会触发一次这个方法)
-     */
-    public void addCurrentGameDeaths(int currentGameDeaths) {
-        this.currentGameDeaths = this.currentGameDeaths + currentGameDeaths;
-    }
-
-    /**
-     * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
-     */
-    public void addCurrentGameDestroyedBeds(int currentGameDestroyedBeds) {
-        this.currentGameDestroyedBeds = this.currentGameDestroyedBeds + currentGameDestroyedBeds;
     }
 
     /**

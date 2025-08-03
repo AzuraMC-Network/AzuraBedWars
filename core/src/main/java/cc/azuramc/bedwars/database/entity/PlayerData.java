@@ -117,19 +117,19 @@ public class PlayerData {
 
     public void addAssists() {
         PlayerLevelManager.addExperience(this.gamePlayer, 0.5);
-        gamePlayer.addCurrentGameKills();
+        gamePlayer.addCurrentGameAssists();
         this.assists++;
     }
 
     public void addFinalKills() {
         PlayerLevelManager.addExperience(this.gamePlayer, 2);
-        gamePlayer.addCurrentGameKills();
+        gamePlayer.addCurrentGameFinalKills();
         this.finalKills++;
     }
 
     public void addDestroyedBeds() {
         PlayerLevelManager.addExperience(this.gamePlayer, 3);
-        gamePlayer.addCurrentGameKills();
+        gamePlayer.addCurrentGameDestroyedBeds();
         this.destroyedBeds++;
     }
 
