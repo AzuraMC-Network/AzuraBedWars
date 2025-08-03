@@ -53,17 +53,22 @@ public class CustomIronGolem extends EntityIronGolem {
         this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.5D, false));
         this.goalSelector.a(3, new PathfinderGoalRandomStroll(this, 1D));
         this.goalSelector.a(4, new PathfinderGoalRandomLookaround(this));
+        this.goalSelector.a(5, new PathfinderGoalMoveTowardsTarget(this, 1.0D, 20.0F));
     }
 
     private void setupTargets() {
-        this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, true));
-        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, 20, true, false,
+        // 主动寻找玩家目标
+        this.targetSelector.a(1, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, 25, true, false,
                 human -> human != null && human.isAlive()
                         && !gameTeam.isInTeam(GamePlayer.get(human.getUniqueID()))
                         && !GamePlayer.get(human.getUniqueID()).isSpectator()));
-        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, CustomIronGolem.class, 20, true, false,
+
+        // 主动寻找铁傀儡目标
+        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, CustomIronGolem.class, 25, true, false,
                 golem -> golem != null && golem.getGameTeam() != gameTeam));
-        this.targetSelector.a(4, new PathfinderGoalNearestAttackableTarget<>(this, CustomSilverfish.class, 20, true, false,
+
+        // 主动寻找蠹虫目标
+        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, CustomSilverfish.class, 25, true, false,
                 customSilverfish -> customSilverfish != null && customSilverfish.getGameTeam() != gameTeam));
     }
 
