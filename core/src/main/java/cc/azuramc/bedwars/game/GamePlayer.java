@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * 管理玩家在游戏中的状态、装备、数据等
  * 提供玩家相关的各种操作方法
- * <b>【重构说明】业务层统一只用GamePlayer，Player仅用于与Bukkit API交互</b>
+ * <b>业务层统一只用GamePlayer，Player仅用于与Bukkit API交互</b>
  * </p>
  * @author an5w1r@163.com
  */
@@ -83,6 +83,17 @@ public class GamePlayer {
 
     private boolean isReconnect;
 
+    // 本局游戏数据
+    private int currentGameKills;
+    private int currentGameFinalKills;
+    private int currentGameAssists;
+    private int currentGameDeaths;
+    private int currentGameDestroyedBeds;
+
+    // 陷阱免疫相关
+    private boolean hasTrapProtection;
+    private BukkitRunnable trapProtectionTask;
+
     /**
      * 构造方法
      *
@@ -113,9 +124,18 @@ public class GamePlayer {
 
         this.isReconnect = false;
 
+        // 初始化本局游戏数据
+        this.currentGameKills = 0;
+        this.currentGameFinalKills = 0;
+        this.currentGameAssists = 0;
+        this.currentGameDeaths = 0;
+        this.currentGameDestroyedBeds = 0;
+
         // 游戏模式
         this.gameModeType = playerData.getMode();
         this.experienceSources = new HashMap<>();
+
+        this.hasTrapProtection = false;
     }
 
     /**
@@ -204,6 +224,11 @@ public class GamePlayer {
      * 开始隐身任务
      */
     public void startInvisibilityTask() {
+        if (invisibilityTask != null && !invisibilityTask.isCancelled()) {
+            invisibilityTask.cancel();
+            this.setInvisible(false);
+        }
+
         ArmorHider.hideArmor(this, GamePlayer.getGamePlayers());
         this.setInvisible(true);
         invisibilityTask = new BukkitRunnable() {
@@ -227,6 +252,35 @@ public class GamePlayer {
         this.setInvisible(false);
         if (invisibilityTask != null) {
             invisibilityTask.cancel();
+        }
+    }
+
+    /**
+     * 开始陷阱免疫任务
+     */
+    public void startTrapProtectionTask() {
+        if (trapProtectionTask != null && !trapProtectionTask.isCancelled()) {
+            trapProtectionTask.cancel();
+            this.setHasTrapProtection(false);
+        }
+
+        this.setHasTrapProtection(true);
+        trapProtectionTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                endTrapProtection();
+            }
+        };
+        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance(), 30 * 20);
+    }
+
+    /**
+     * 取消陷阱免疫任务
+     */
+    public void endTrapProtection() {
+        this.setHasTrapProtection(false);
+        if (trapProtectionTask != null) {
+            trapProtectionTask.cancel();
         }
     }
 
@@ -269,6 +323,98 @@ public class GamePlayer {
     }
 
     /**
+     * 按最终击杀数排序玩家 (总数居)
+     *
+     * @return 排序后的玩家列表
+     */
+    public static List<GamePlayer> sortFinalKills() {
+        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
+        list.sort((player1, player2) -> Integer.compare(player2.getPlayerData().getFinalKills(), player1.getPlayerData().getFinalKills()));
+        return list;
+    }
+
+    /**
+     * 按本局最终击杀数排序玩家
+     *
+     * @return 排序后的玩家列表
+     */
+    public static List<GamePlayer> sortCurrentGameFinalKills() {
+        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
+        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameFinalKills(), player1.getCurrentGameFinalKills()));
+        return list;
+    }
+
+    /**
+     * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addKills等方法会触发一次这个方法)
+     */
+    public void addCurrentGameKills() {
+        this.currentGameKills++;
+    }
+
+    /**
+     * 增加玩家本局最终击杀数据 (不建议直接调用它增加，playerData类的addFinalKills等方法会触发一次这个方法)
+     */
+    public void addCurrentGameFinalKills() {
+        this.currentGameFinalKills++;
+    }
+
+    /**
+     * 增加玩家本局助攻数据 (不建议直接调用它增加，playerData类的addAssists等方法会触发一次这个方法)
+     */
+    public void addCurrentGameAssists() {
+        this.currentGameAssists++;
+    }
+
+    /**
+     * 增加玩家本局死亡数据 (不建议直接调用它增加，playerData类的addDeaths等方法会触发一次这个方法)
+     */
+    public void addCurrentGameDeaths() {
+        this.currentGameDeaths++;
+    }
+
+    /**
+     * 增加玩家本局拆床数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
+     */
+    public void addCurrentGameDestroyedBeds() {
+        this.currentGameDestroyedBeds++;
+    }
+
+    /**
+     * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addKills等方法会触发一次这个方法)
+     */
+    public void addCurrentGameKills(int currentGameKills) {
+        this.currentGameKills += currentGameKills;
+    }
+
+    /**
+     * 增加玩家本局最终击杀数据 (不建议直接调用它增加，playerData类的addFinalKills等方法会触发一次这个方法)
+     */
+    public void addCurrentGameFinalKills(int currentGameFinalKills) {
+        this.currentGameFinalKills += currentGameFinalKills;
+    }
+
+    /**
+     * 增加玩家本局助攻数据 (不建议直接调用它增加，playerData类的addAssists等方法会触发一次这个方法)
+     */
+    public void addCurrentGameAssists(int currentGameAssists) {
+        this.currentGameAssists += currentGameAssists;
+    }
+
+    /**
+     * 增加玩家本局死亡数据 (不建议直接调用它增加，playerData类的addDeaths等方法会触发一次这个方法)
+     */
+    public void addCurrentGameDeaths(int currentGameDeaths) {
+        this.currentGameDeaths += currentGameDeaths;
+    }
+
+    /**
+     * 增加玩家本局破坏床数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
+     */
+    public void addCurrentGameDestroyedBeds(int currentGameDestroyedBeds) {
+        this.currentGameDestroyedBeds += currentGameDestroyedBeds;
+    }
+
+    /**
      * 获取指定资源来源的经验值
      * @param resourceType 资源类型
      * @return 经验数量，如果该类型不存在则返回 -1
@@ -290,17 +436,6 @@ public class GamePlayer {
             }
         }
         return spectators;
-    }
-
-    /**
-     * 按最终击杀数排序玩家
-     *
-     * @return 排序后的玩家列表
-     */
-    public static List<GamePlayer> sortFinalKills() {
-        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> player2.getPlayerData().getFinalKills() - player1.getPlayerData().getFinalKills());
-        return list;
     }
 
     /**
@@ -609,6 +744,8 @@ public class GamePlayer {
         player.setExhaustion(0.0f);
         player.setHealth(MAX_HEALTH);
         player.setFireTicks(0);
+        this.endInvisibility();
+        this.endTrapProtection();
     }
 
     /**
