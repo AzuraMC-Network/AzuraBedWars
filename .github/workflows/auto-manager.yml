@@ -1,0 +1,110 @@
+name: Auto Label
+
+on:
+  issues:
+    types: [ opened, labeled, unlabeled ]
+  pull_request:
+    types: [ opened, labeled, unlabeled ]
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Auto Label Issues
+        uses: actions/github-script@v7
+        if: github.event_name == 'issues'
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            
+            // Auto label based on title and body content
+            const title = issue.title.toLowerCase();
+            const body = issue.body?.toLowerCase() || '';
+            
+            const newLabels = [];
+            
+            // Bug detection
+            if (title.includes('bug') || title.includes('error') || title.includes('crash') || 
+                body.includes('bug') || body.includes('error') || body.includes('crash')) {
+              newLabels.push('🐛 Bug');
+            }
+            
+            // Feature request detection
+            if (title.includes('feature') || title.includes('enhancement') || title.includes('request') ||
+                body.includes('feature') || body.includes('enhancement') || body.includes('request')) {
+              newLabels.push('✨ Feature Request');
+            }
+            
+            // Documentation
+            if (title.includes('doc') || title.includes('documentation') ||
+                body.includes('doc') || body.includes('documentation')) {
+              newLabels.push('📚 Documentation');
+            }
+            
+            // High priority
+            if (title.includes('urgent') || title.includes('critical') || title.includes('high priority') ||
+                body.includes('urgent') || body.includes('critical') || body.includes('high priority')) {
+              newLabels.push('🚨 High Priority');
+            }
+            
+            // Add labels if not already present
+            for (const label of newLabels) {
+              if (!labels.includes(label)) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: [label]
+                });
+              }
+            }
+
+      - name: Auto Label PRs
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const labels = pr.labels.map(l => l.name);
+            
+            // Auto label based on branch name and title
+            const branch = pr.head.ref.toLowerCase();
+            const title = pr.title.toLowerCase();
+            
+            const newLabels = [];
+            
+            // Branch-based labeling
+            if (branch.includes('fix/') || branch.includes('bugfix/')) {
+              newLabels.push('🐛 Bug Fix');
+            }
+            
+            if (branch.includes('feature/') || branch.includes('feat/')) {
+              newLabels.push('✨ New Feature');
+            }
+            
+            if (branch.includes('hotfix/')) {
+              newLabels.push('🚑 Hot Fix');
+            }
+            
+            if (branch.includes('docs/') || branch.includes('documentation/')) {
+              newLabels.push('📚 Documentation');
+            }
+            
+            // Title-based labeling
+            if (title.includes('breaking') || title.includes('breaking change')) {
+              newLabels.push('💥 Breaking Change');
+            }
+            
+            // Add labels if not already present
+            for (const label of newLabels) {
+              if (!labels.includes(label)) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  labels: [label]
+                });
+              }
+            }
