@@ -51,7 +51,7 @@ public class ListenerRegistry {
         register(new PlayerJoinListener());
         register(new PlayerLobbyInteractListener());
         register(new PlayerMiscListener());
-        register(new PlayerResourcePutListener());
+        register(new PlayerFastPutListener());
         if (VersionUtil.isLessThan113()) {
             register(new PlayerPickUpListenerLowVersion());
         } else {
