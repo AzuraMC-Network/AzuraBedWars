@@ -10,10 +10,7 @@ import cc.azuramc.bedwars.listener.projectile.EggBridgeListener;
 import cc.azuramc.bedwars.listener.projectile.FireballListener;
 import cc.azuramc.bedwars.listener.server.ServerListener;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
-import cc.azuramc.bedwars.listener.special.IronGolemSpawnListener;
-import cc.azuramc.bedwars.listener.special.RescuePlatformListener;
-import cc.azuramc.bedwars.listener.special.SilverFishListener;
-import cc.azuramc.bedwars.listener.special.WarpPowderListener;
+import cc.azuramc.bedwars.listener.special.*;
 import cc.azuramc.bedwars.listener.spectator.SpectatorCompassListener;
 import cc.azuramc.bedwars.listener.spectator.SpectatorInteractAtEntityListener;
 import cc.azuramc.bedwars.listener.world.ChunkListener;
@@ -79,6 +76,7 @@ public class ListenerRegistry {
         register(new RescuePlatformListener());
         register(new WarpPowderListener());
         register(new SilverFishListener());
+        register(new MagicMilk());
 
         // spectator package
         register(new SpectatorCompassListener());

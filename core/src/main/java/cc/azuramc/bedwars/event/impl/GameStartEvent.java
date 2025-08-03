@@ -11,6 +11,7 @@ import cc.azuramc.bedwars.game.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.trap.TrapManager;
 import cc.azuramc.bedwars.game.trap.TrapType;
+import cc.azuramc.bedwars.listener.special.MagicMilk;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XPotion;
 import com.cryptomorin.xseries.XSound;
@@ -153,6 +154,7 @@ public class GameStartEvent extends AbstractGameEvent {
         TrapManager trapManager = gameTeam.getTrapManager();
 
         if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
+            if (MagicMilk.isTrapImmune(gamePlayer.getUuid())) return;
             // 触发致盲陷阱
             if (trapManager.isTrapActive(TrapType.BLINDNESS)) {
                 LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger blindness trap, gamePlayer: " + gamePlayer.getName());

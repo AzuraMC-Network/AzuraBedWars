@@ -274,6 +274,7 @@ public class PlayerDamageListener implements Listener {
         if (gamePlayer.isInvisible()) {
             gamePlayer.endInvisibility();
         }
+
     }
 
     /**
