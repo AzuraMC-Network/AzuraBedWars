@@ -82,6 +82,7 @@ public class GamePlayer {
     private boolean shear;
 
     private boolean isReconnect;
+    private boolean protectedPlayer;
 
     /**
      * 构造方法
@@ -116,6 +117,8 @@ public class GamePlayer {
         // 游戏模式
         this.gameModeType = playerData.getMode();
         this.experienceSources = new HashMap<>();
+
+        this.protectedPlayer = false;
     }
 
     /**
@@ -148,6 +151,7 @@ public class GamePlayer {
     public static GamePlayer get(UUID uuid) {
         return GAME_PLAYERS.getOrDefault(uuid, null);
     }
+
 
     /**
      * 通过Bukkit Player对象获取GamePlayer实例
@@ -389,6 +393,14 @@ public class GamePlayer {
      */
     public void setSpectator() {
         SpectatorManager.add(this);
+    }
+
+    /**
+     * 设置玩家魔法牛奶状态
+     * @param bool
+     */
+    public void setprotectedPlayer(Boolean bool) {
+        protectedPlayer = bool;
     }
 
     /**
