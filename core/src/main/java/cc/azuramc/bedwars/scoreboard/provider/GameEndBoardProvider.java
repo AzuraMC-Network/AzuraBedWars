@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.scoreboard.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.ScoreboardConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -28,13 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GameEndBoardProvider implements Listener {
 
-    private static final ScoreboardConfig.LobbyScoreboard CONFIG = AzuraBedWars.getInstance().getScoreboardConfig().getLobbyScoreboard();
-    private static final String TITLE = CONFIG.getTitle();
-    private static final String SERVER_INFO = CONFIG.getServerInfo();
-    private static final String WAITING_MESSAGE = CONFIG.getWaitingMessage();
-    private static final String EMPTY_LINE = CONFIG.getEmptyLine();
-    private static final String DEFAULT_MODE = CONFIG.getDefaultMode();
-    private static final String EXP_MODE = CONFIG.getExpMode();
+    private static final SettingsConfig.LobbyScoreboard LOBBY_BOARD_CONFIG = AzuraBedWars.getInstance().getSettingsConfig().getLobbyScoreboard();
 
     /**
      * 日期格式化器缓存
@@ -45,10 +39,7 @@ public class GameEndBoardProvider implements Listener {
      * 玩家计分板更新状态缓存
      */
     private static final ConcurrentHashMap<UUID, Long> LAST_UPDATE_TIME = new ConcurrentHashMap<>();
-    /**
-     * 更新间隔（毫秒）
-     */
-    private static final long UPDATE_INTERVAL = CONFIG.getUpdateInterval();
+
     private static GameManager gameManager;
     /**
      * 插件实例缓存
@@ -92,7 +83,7 @@ public class GameEndBoardProvider implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         if (gamePlayer != null && gamePlayer.getBoard() == null) {
             FastBoard board = new FastBoard(player);
-            board.updateTitle(TITLE);
+            board.updateTitle(LOBBY_BOARD_CONFIG.getTitle());
             gamePlayer.setBoard(board);
             updatePlayerBoard(gamePlayer);
         }
@@ -109,7 +100,7 @@ public class GameEndBoardProvider implements Listener {
             UUID playerId = gamePlayer.getUuid();
             long lastUpdate = LAST_UPDATE_TIME.getOrDefault(playerId, 0L);
 
-            if (currentTime - lastUpdate >= UPDATE_INTERVAL) {
+            if (currentTime - lastUpdate >= LOBBY_BOARD_CONFIG.getUpdateInterval()) {
                 updatePlayerBoard(gamePlayer);
                 LAST_UPDATE_TIME.put(playerId, currentTime);
             }
@@ -136,12 +127,12 @@ public class GameEndBoardProvider implements Listener {
 
         // 添加日期行
         lines.add("§7" + DATE_FORMAT.format(Calendar.getInstance().getTime()));
-        lines.add(EMPTY_LINE);
+        lines.add(LOBBY_BOARD_CONFIG.getEmptyLine());
         // 添加事件信息
         lines.add("§c游戏结束");
-        lines.add(EMPTY_LINE);
+        lines.add(LOBBY_BOARD_CONFIG.getEmptyLine());
         // 添加服务器信息
-        lines.add(SERVER_INFO);
+        lines.add(LOBBY_BOARD_CONFIG.getServerInfo());
 
 
         // 更新计分板
@@ -175,7 +166,7 @@ public class GameEndBoardProvider implements Listener {
         if (gameStartTask != null) {
             return gameStartTask.getCountdown() + "秒后开始";
         } else if (currentGameManager.getGameState() == GameState.WAITING) {
-            return WAITING_MESSAGE;
+            return LOBBY_BOARD_CONFIG.getWaitingMessage();
         }
 
         return null;
@@ -199,27 +190,6 @@ public class GameEndBoardProvider implements Listener {
 
             // 移除缓存
             LAST_UPDATE_TIME.remove(player.getUniqueId());
-        }
-    }
-
-    /**
-     * 设置更新间隔
-     *
-     * @param interval 更新间隔（毫秒）
-     */
-    public static void setUpdateInterval(long interval) {
-        if (interval > 0) {
-            // 通过反射修改常量值
-            try {
-                java.lang.reflect.Field field = GameEndBoardProvider.class.getDeclaredField("UPDATE_INTERVAL");
-                field.setAccessible(true);
-                java.lang.reflect.Field modifiersField = java.lang.reflect.Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                modifiersField.setInt(field, field.getModifiers() & ~java.lang.reflect.Modifier.FINAL);
-                field.set(null, interval);
-            } catch (Exception e) {
-                // 忽略错误
-            }
         }
     }
 
