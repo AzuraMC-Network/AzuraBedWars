@@ -36,14 +36,14 @@ allprojects {
             url = "https://repo.codemc.io/repository/maven-releases/"
         }
     }
-}
 
-subprojects {
     apply plugin: 'java'
     apply plugin: 'com.gradleup.shadow'
     group = 'cc.azuramc'
     version = '1.0.0-beta.1'
+}
 
+subprojects {
     def targetJavaVersion = 17
     java {
         def javaVersion = JavaVersion.toVersion(targetJavaVersion)
@@ -68,5 +68,5 @@ dependencies {
 }
 
 shadowJar {
-    archiveVersion.set(project.version.toString())
+    archiveVersion.set(version.toString())
 }
