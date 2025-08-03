@@ -68,7 +68,7 @@ public class ToolSetUtil {
      * @return 如果只有一个工具同类型工具则返回true
      */
     public static boolean isOnlyOneTool(Player player, ItemStack tool) {
-        if (tool == null || !ToolSetUtil.PROTECTED_TOOLS.contains(tool.getType())) {
+        if (tool == null || !PROTECTED_TOOLS.contains(tool.getType())) {
             return false;
         }
 
