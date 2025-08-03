@@ -11,9 +11,7 @@ import java.util.Set;
 
 public class ToolSetUtil {
 
-    /**
-     * 定义受保护的工具类型
-     */
+    /** 定义受保护的工具类型 */
     public static final Set<Material> PROTECTED_TOOLS;
 
     static {
