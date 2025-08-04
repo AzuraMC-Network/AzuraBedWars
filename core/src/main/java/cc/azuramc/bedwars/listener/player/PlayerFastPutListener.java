@@ -61,7 +61,7 @@ public class PlayerFastPutListener implements Listener {
                 return;
         }
 
-        if (isOtherTeamChest(gamePlayer, block) && blockType != Material.ENDER_CHEST) {
+        if (blockType != Material.ENDER_CHEST && isOtherTeamChest(gamePlayer, block)) {
             return;
         }
 
