@@ -38,6 +38,9 @@ public class TeamShopGUI extends CustomGUI {
     public TeamShopGUI(GamePlayer gamePlayer, GameManager gameManager) {
         super(gamePlayer, "§8团队升级", 54);
 
+        if (gamePlayer.getPlayerData() == null) {
+            return;
+        }
         GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
 
         // 设置界面边框
@@ -134,7 +137,13 @@ public class TeamShopGUI extends CustomGUI {
      */
     private void setupTrapList(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
         TrapManager trapManager = gameTeam.getTrapManager();
+        if (trapManager == null) {
+            return;
+        }
 
         // 设置空的陷阱槽位
         for (int i = 39 + trapManager.getActiveTrapCount(); i < 42; i++) {
