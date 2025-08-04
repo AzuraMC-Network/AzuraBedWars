@@ -123,7 +123,7 @@ public class TeamUpgradeCheckTask {
             // 队列式触发 只触发第一个陷阱
             TrapType firstTrap = trapManager.getFirstActiveTrap();
             if (firstTrap != null) {
-                LoggerUtil.debug("TeamUpgradeTask$handleEnemyInTeamTerritory | trigger " + firstTrap.name() + " trap, gamePlayer: " + gamePlayer.getName());
+                LoggerUtil.debug("TeamUpgradeCheckTask$handleEnemyInTeamTerritory | trigger " + firstTrap.name() + " trap, gamePlayer: " + gamePlayer.getName());
 
                 // 更新玩家陷阱触发时间
                 gamePlayer.startTrapTriggerCooldownTask();
