@@ -155,152 +155,15 @@ public class GameStartEvent extends AbstractGameEvent {
         TrapManager trapManager = gameTeam.getTrapManager();
 
         if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
-            // 触发致盲陷阱
-            if (trapManager.isTrapActive(TrapType.BLINDNESS)) {
-                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger blindness trap, gamePlayer: " + gamePlayer.getName());
-                triggerBlindnessTrap(gamePlayer, gameTeam);
-            }
-
-            // 触发反击陷阱
-            if (trapManager.isTrapActive(TrapType.FIGHT_BACK)) {
-                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger fightback trap, gamePlayer: " + gamePlayer.getName());
-                triggerFightbackTrap(gamePlayer, gameTeam);
-            }
-
-            // 触发反击陷阱
-            if (trapManager.isTrapActive(TrapType.ALARM)) {
-                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger alarm trap, gamePlayer: " + gamePlayer.getName());
-                triggerAlarmTrap(gamePlayer, gameTeam);
-            }
-
-            // 触发挖掘疲劳陷阱
-            if (trapManager.isTrapActive(TrapType.MINER)) {
-                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger mining fatigue trap, gamePlayer: " + gamePlayer.getName());
-                triggerMinerTrap(gamePlayer, gameTeam);
+            // 直接遍历激活的陷阱，使用策略模式触发
+            for (TrapType trapType : trapManager.getActiveTraps()) {
+                LoggerUtil.debug("GameStartEvent$handleEnemyInTeamTerritory | trigger " + trapType.name() + " trap, gamePlayer: " + gamePlayer.getName());
+                trapManager.getTrapStrategy(trapType).triggerTrap(gamePlayer, gameTeam);
             }
         }
     }
 
-    /**
-     * 触发失明陷阱
-     *
-     * @param gamePlayer 触发陷阱的玩家
-     * @param gameTeam 拥有陷阱的团队
-     */
-    private void triggerBlindnessTrap(GamePlayer gamePlayer, GameTeam gameTeam) {
-        TrapManager trapManager = gameTeam.getTrapManager();
-        trapManager.deactivateTrap(TrapType.BLINDNESS);
 
-        // Check if the player has trap protection before applying the effect
-        if (!gamePlayer.isHasTrapProtection()) {
-            // 给敌方玩家添加 失明 缓慢 效果
-            AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-                PotionEffectType blindness = XPotion.BLINDNESS.get();
-                gamePlayer.getPlayer().addPotionEffect(new PotionEffect(blindness,
-                        CONFIG.getUpgrade().getTrapEffectDuration(),
-                        CONFIG.getUpgrade().getTrapEffectAmplifier()));
-
-                PotionEffectType slowness = XPotion.SLOWNESS.get();
-                gamePlayer.getPlayer().addPotionEffect(new PotionEffect(slowness,
-                        CONFIG.getUpgrade().getTrapEffectDuration(),
-                        CONFIG.getUpgrade().getTrapEffectAmplifier()));
-            });
-        }
-
-        // 通知团队成员陷阱被触发
-        announceTrapTrigger(gameTeam);
-    }
-
-    /**
-     * 触发反击陷阱
-     *
-     * @param gamePlayer 触发陷阱的玩家
-     * @param gameTeam 拥有陷阱的团队
-     */
-    private void triggerFightbackTrap(GamePlayer gamePlayer, GameTeam gameTeam) {
-        TrapManager trapManager = gameTeam.getTrapManager();
-        trapManager.deactivateTrap(TrapType.FIGHT_BACK);
-
-        // 给己方玩家添加速度和跳跃提升效果
-        AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            PotionEffectType blindness = XPotion.SPEED.get();
-            PotionEffectType jumpBoost = XPotion.JUMP_BOOST.get();
-            gameTeam.getAlivePlayers().forEach(player -> {
-                player.getPlayer().addPotionEffect(new PotionEffect(blindness,
-                        15,
-                        1));
-
-                player.getPlayer().addPotionEffect(new PotionEffect(jumpBoost,
-                        15,
-                        1));
-            });
-        });
-
-        // 通知团队成员陷阱被触发
-        announceTrapTrigger(gameTeam);
-    }
-
-    /**
-     * 触发警报陷阱
-     *
-     * @param gamePlayer 触发陷阱的玩家
-     * @param gameTeam 拥有陷阱的团队
-     */
-    private void triggerAlarmTrap(GamePlayer gamePlayer, GameTeam gameTeam) {
-        TrapManager trapManager = gameTeam.getTrapManager();
-        trapManager.deactivateTrap(TrapType.ALARM);
-
-        // Check if the player has trap protection before applying the effect
-        if (!gamePlayer.isHasTrapProtection()) {
-            if (gamePlayer.isInvisible()) {
-                gamePlayer.endInvisibility();
-            }
-        }
-
-        // 通知团队成员陷阱被触发
-        AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
-            player1.sendTitle("§c§l陷阱触发！", "&e触发者 " + gamePlayer.getGameTeam().getName() + gamePlayer.getName(), 0, 40, 0);
-            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
-        })));
-    }
-
-    /**
-     * 触发挖掘疲劳陷阱
-     *
-     * @param gamePlayer 触发陷阱的玩家
-     * @param gameTeam 拥有陷阱的团队
-     */
-    private void triggerMinerTrap(GamePlayer gamePlayer, GameTeam gameTeam) {
-        TrapManager trapManager = gameTeam.getTrapManager();
-        trapManager.deactivateTrap(TrapType.MINER);
-
-        // Check if the player has trap protection before applying the effect
-        if (!gamePlayer.isHasTrapProtection()) {
-            AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-                PotionEffectType miningFatigue = XPotion.MINING_FATIGUE.get();
-                if (miningFatigue != null) {
-                    gamePlayer.getPlayer().addPotionEffect(new PotionEffect(miningFatigue,
-                            CONFIG.getUpgrade().getMiningFatigueEffectDuration(),
-                            CONFIG.getUpgrade().getMiningFatigueEffectAmplifier()));
-                }
-            });
-        }
-
-        // 通知团队成员陷阱被触发
-        announceTrapTrigger(gameTeam);
-    }
-
-    /**
-     * 通知团队成员陷阱被触发
-     *
-     * @param gameTeam 游戏团队
-     */
-    private void announceTrapTrigger(GameTeam gameTeam) {
-        AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
-            player1.sendTitle("§c§l陷阱触发！", null, 0, 40, 0);
-            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
-        })));
-    }
 
     /**
      * 启动资源生成器
