@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author an5w1r@163.com
  */
-public abstract class AbstractTrapStrategy implements ITrapStrategy {
+public abstract class AbstractTrapStrategy implements TrapStrategy {
 
     /**
      * 资源类型名称缓存

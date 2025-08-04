@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public interface IUpgradeStrategy {
+public interface UpgradeStrategy {
 
     /**
      * 获取升级名称

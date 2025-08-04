@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public abstract class AbstractTieredIUpgradeStrategy extends AbstractIUpgradeStrategy {
+public abstract class AbstractTieredUpgradeStrategy extends AbstractUpgradeStrategy {
 
     @Override
     public boolean canUpgrade(GamePlayer gamePlayer) {

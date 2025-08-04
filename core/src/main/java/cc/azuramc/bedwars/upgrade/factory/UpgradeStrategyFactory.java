@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.upgrade.factory;
 
-import cc.azuramc.bedwars.upgrade.upgrade.IUpgradeStrategy;
+import cc.azuramc.bedwars.upgrade.upgrade.UpgradeStrategy;
 import cc.azuramc.bedwars.upgrade.upgrade.impl.*;
 
 import java.util.HashMap;
@@ -14,16 +14,16 @@ import java.util.Map;
  */
 public class UpgradeStrategyFactory {
 
-    private static final Map<String, IUpgradeStrategy> STRATEGY_CACHE = new HashMap<>();
+    private static final Map<String, UpgradeStrategy> STRATEGY_CACHE = new HashMap<>();
 
     static {
         // 初始化所有升级策略
-        STRATEGY_CACHE.put("磨刀石", new SharpenedSwordsIUpgradeStrategy());
-        STRATEGY_CACHE.put("精制护甲", new ReinforcedArmorIUpgradeStrategyAbstract());
-        STRATEGY_CACHE.put("疯狂矿工", new ManicMinerIUpgradeStrategyAbstract());
-        STRATEGY_CACHE.put("铁锻炉", new ResourceFurnaceIUpgradeStrategyAbstract());
-        STRATEGY_CACHE.put("治愈池", new HealingPoolIUpgradeStrategy());
-        STRATEGY_CACHE.put("缓冲靴子", new FallingProtectionIUpgradeStrategyAbstract());
+        STRATEGY_CACHE.put("磨刀石", new SharpenedSwordsUpgradeStrategy());
+        STRATEGY_CACHE.put("精制护甲", new ReinforcedArmorUpgradeStrategyAbstract());
+        STRATEGY_CACHE.put("疯狂矿工", new ManicMinerUpgradeStrategyAbstract());
+        STRATEGY_CACHE.put("铁锻炉", new ResourceFurnaceUpgradeStrategyAbstract());
+        STRATEGY_CACHE.put("治愈池", new HealingPoolUpgradeStrategy());
+        STRATEGY_CACHE.put("缓冲靴子", new FallingProtectionUpgradeStrategyAbstract());
     }
 
     /**
@@ -32,7 +32,7 @@ public class UpgradeStrategyFactory {
      * @param upgradeName 升级名称
      * @return 升级策略实例
      */
-    public static IUpgradeStrategy getStrategy(String upgradeName) {
+    public static UpgradeStrategy getStrategy(String upgradeName) {
         return STRATEGY_CACHE.get(upgradeName);
     }
 
@@ -41,7 +41,7 @@ public class UpgradeStrategyFactory {
      *
      * @return 所有升级策略的Map
      */
-    public static Map<String, IUpgradeStrategy> getAllStrategies() {
+    public static Map<String, UpgradeStrategy> getAllStrategies() {
         return new HashMap<>(STRATEGY_CACHE);
     }
 }

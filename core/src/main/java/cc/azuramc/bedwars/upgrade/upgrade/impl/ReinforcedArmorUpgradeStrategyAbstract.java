@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.upgrade.upgrade.impl;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.upgrade.upgrade.AbstractTieredIUpgradeStrategy;
+import cc.azuramc.bedwars.upgrade.upgrade.AbstractTieredUpgradeStrategy;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class ReinforcedArmorIUpgradeStrategyAbstract extends AbstractTieredIUpgradeStrategy {
+public class ReinforcedArmorUpgradeStrategyAbstract extends AbstractTieredUpgradeStrategy {
 
     @Override
     public String getUpgradeName() {
