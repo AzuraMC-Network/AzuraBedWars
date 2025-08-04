@@ -38,12 +38,12 @@ public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
 
     @Override
     public boolean canUpgrade(GamePlayer gamePlayer) {
-        return !gamePlayer.getGameTeam().isHasSharpnessUpgrade();
+        return !gamePlayer.getGameTeam().getUpgradeManager().hasSharpnessUpgrade();
     }
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().isHasSharpnessUpgrade() ? 1 : 0;
+        return gamePlayer.getGameTeam().getUpgradeManager().hasSharpnessUpgrade() ? 1 : 0;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
         List<String> lore = new ArrayList<>(getDescription());
         lore.add("");
 
-        boolean isUnlocked = gamePlayer.getGameTeam().isHasSharpnessUpgrade();
+        boolean isUnlocked = gamePlayer.getGameTeam().getUpgradeManager().hasSharpnessUpgrade();
         String tierColor = isUnlocked ? "§a" : "§e";
         int price = getUpgradePrice(0);
 
@@ -80,7 +80,7 @@ public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        gameTeam.setHasSharpnessUpgrade(true);
+        gameTeam.getUpgradeManager().setSharpnessUpgrade(true);
 
         // 为团队所有玩家的剑添加锋利附魔
         for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {

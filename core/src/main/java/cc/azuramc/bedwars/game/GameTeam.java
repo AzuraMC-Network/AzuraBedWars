@@ -1,13 +1,11 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
-import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
-import cc.azuramc.bedwars.game.task.generator.PrivateResourceGenerator;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.GUIData;
 import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.upgrade.trap.TrapManager;
-import com.cryptomorin.xseries.XMaterial;
+import cc.azuramc.bedwars.upgrade.upgrade.UpgradeManager;
 import lombok.Data;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -48,14 +46,8 @@ public class GameTeam {
     private boolean isDestroyed;
     private GamePlayer destroyPlayer;
 
-    private boolean hasSharpnessUpgrade;
-    private int protectionUpgrade;
-    private int magicMinerUpgrade;
-    private int resourceFurnaceUpgrade;
-    private boolean hasHealPoolUpgrade;
-    private int fallingProtectionUpgrade;
-
     private TrapManager trapManager;
+    private UpgradeManager upgradeManager;
 
     /**
      * 创建一个游戏团队
@@ -87,15 +79,8 @@ public class GameTeam {
         this.hasBed = false;
         this.isDestroyed = false;
 
-        // 团队升级初始化
-        this.hasSharpnessUpgrade = false;
-        this.protectionUpgrade = 0;
-        this.magicMinerUpgrade = 0;
-        this.resourceFurnaceUpgrade = 0;
-        this.hasHealPoolUpgrade = false;
-        this.fallingProtectionUpgrade = 0;
-
         this.trapManager = new TrapManager();
+        this.upgradeManager = new UpgradeManager(this);
     }
 
     /**
@@ -280,68 +265,6 @@ public class GameTeam {
 
         if (destroyed) {
             this.destroyPlayer = destroyer;
-        }
-    }
-
-    /**
-     * 设置资源熔炉升级等级
-     * @param level 升级等级，必须在0到4之间
-     */
-    public void setResourceFurnaceUpgrade(int level) {
-        if (level < 0 || level > 5) {
-            return;
-        }
-
-        GeneratorManager generatorManager = gameManager.getGeneratorManager();
-
-        PrivateResourceGenerator ironGenerator = generatorManager.getPrivateResourceGenerator("铁锭" + this.getName());
-        PrivateResourceGenerator goldGenerator = generatorManager.getPrivateResourceGenerator("金锭" + this.getName());
-
-        switch (level) {
-            case 1:
-                this.resourceFurnaceUpgrade = 1;
-                ironGenerator.setInterval(20L * 1);
-                ironGenerator.setMaxStack(48);
-
-                goldGenerator.setInterval(20L * 3);
-                goldGenerator.setMaxStack(8);
-                break;
-            case 2:
-                this.resourceFurnaceUpgrade = 2;
-                ironGenerator.setInterval((long) (20L * 0.8));
-                ironGenerator.setMaxStack(72);
-
-                goldGenerator.setInterval((long) (20L * 2.4));
-                goldGenerator.setMaxStack(12);
-                break;
-            case 3:
-                this.resourceFurnaceUpgrade = 3;
-                ironGenerator.setInterval((long) (20L * 0.6));
-                ironGenerator.setMaxStack(96);
-                goldGenerator.setInterval(20L * 2);
-                goldGenerator.setMaxStack(16);
-
-                PrivateResourceGenerator emerald = null;
-                if (XMaterial.EMERALD.get() != null) {
-                    emerald = new PrivateResourceGenerator(
-                            gameManager,
-                            "绿宝石" + this.getName(),
-                            this.resourceDropLocation,
-                            XMaterial.EMERALD.get(),
-                            2
-                    );
-                }
-                generatorManager.addPrivateResourceTask(emerald, 20L * 60);
-                break;
-            case 4:
-                this.resourceFurnaceUpgrade = 4;
-                ironGenerator.setInterval((long) (20L * 0.4));
-                ironGenerator.setMaxStack(128);
-                goldGenerator.setInterval((long) (20L * 1.6));
-                goldGenerator.setMaxStack(24);
-
-                generatorManager.getPrivateResourceGenerator("绿宝石" + this.getName()).setInterval(20L * 30);
-                break;
         }
     }
 
