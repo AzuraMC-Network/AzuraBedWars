@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.game.trap;
+package cc.azuramc.bedwars.upgrade.trap;
 
 /**
  * @author An5w1r@163.com
