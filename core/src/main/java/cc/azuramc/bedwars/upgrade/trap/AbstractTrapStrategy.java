@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.upgrade.trap;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
@@ -25,7 +26,7 @@ import java.util.Map;
  *
  * @author an5w1r@163.com
  */
-public abstract class AbstractITrapStrategy implements ITrapStrategy {
+public abstract class AbstractTrapStrategy implements ITrapStrategy {
 
     /**
      * 资源类型名称缓存
@@ -37,6 +38,20 @@ public abstract class AbstractITrapStrategy implements ITrapStrategy {
         RESOURCE_NAMES.put(XMaterial.DIAMOND.get(), "钻石");
     }
 
+    /**
+     * 获取陷阱类型枚举
+     *
+     * @return 陷阱类型枚举
+     */
+    protected abstract TrapType getTrapTypeEnum();
+
+    /**
+     * 执行购买
+     *
+     * @param gamePlayer  游戏玩家
+     * @param gameManager 游戏管理器
+     * @return 是否购买成功
+     */
     @Override
     public boolean performPurchase(GamePlayer gamePlayer, GameManager gameManager) {
         GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
@@ -58,6 +73,13 @@ public abstract class AbstractITrapStrategy implements ITrapStrategy {
         return success;
     }
 
+    /**
+     * 创建陷阱物品
+     *
+     * @param gamePlayer   游戏玩家
+     * @param gameModeType 游戏模式
+     * @return 陷阱物品
+     */
     @Override
     public ItemStack createTrapItem(GamePlayer gamePlayer, GameModeType gameModeType) {
         ItemBuilder builder = new ItemBuilder()
@@ -80,6 +102,13 @@ public abstract class AbstractITrapStrategy implements ITrapStrategy {
         return builder.getItem();
     }
 
+    /**
+     * 获取陷阱Lore
+     *
+     * @param gamePlayer   游戏玩家
+     * @param gameModeType 游戏模式
+     * @return Lore列表
+     */
     @Override
     public List<String> getTrapLore(GamePlayer gamePlayer, GameModeType gameModeType) {
         List<String> lore = new ArrayList<>(getDescription());
@@ -105,6 +134,12 @@ public abstract class AbstractITrapStrategy implements ITrapStrategy {
         return lore;
     }
 
+    /**
+     * 获取陷阱状态
+     *
+     * @param gamePlayer 游戏玩家
+     * @return 陷阱状态
+     */
     @Override
     public TrapState getTrapState(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
@@ -133,13 +168,6 @@ public abstract class AbstractITrapStrategy implements ITrapStrategy {
         trapManager.activateTrap(getTrapTypeEnum());
         return true;
     }
-
-    /**
-     * 获取陷阱类型枚举
-     *
-     * @return 陷阱类型枚举
-     */
-    protected abstract TrapType getTrapTypeEnum();
 
     /**
      * 处理支付
@@ -238,5 +266,40 @@ public abstract class AbstractITrapStrategy implements ITrapStrategy {
         } else {
             return (price * 100) + "级";
         }
+    }
+
+    @Override
+    public void triggerTrap(GamePlayer triggerPlayer, GameTeam ownerTeam) {
+        TrapManager trapManager = ownerTeam.getTrapManager();
+        trapManager.deactivateTrap(getTrapTypeEnum());
+
+        // 执行具体的陷阱效果
+        if (!triggerPlayer.isHasTrapProtection()) {
+            applyTrapEffect(triggerPlayer, ownerTeam);
+        }
+
+        // 通知团队成员陷阱被触发
+        announceTrapTrigger(ownerTeam);
+    }
+
+    /**
+     * 应用陷阱效果
+     * 子类需要重写此方法来实现具体的陷阱效果
+     *
+     * @param triggerPlayer 触发陷阱的玩家
+     * @param ownerTeam     拥有陷阱的团队
+     */
+    protected abstract void applyTrapEffect(GamePlayer triggerPlayer, GameTeam ownerTeam);
+
+    /**
+     * 通知团队成员陷阱被触发
+     *
+     * @param gameTeam 游戏团队
+     */
+    protected void announceTrapTrigger(GameTeam gameTeam) {
+        AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
+            player1.sendTitle("§c§l陷阱触发！", null, 0, 40, 0);
+            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+        })));
     }
 }

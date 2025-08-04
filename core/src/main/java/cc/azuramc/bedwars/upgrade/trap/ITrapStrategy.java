@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.upgrade.trap;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -87,4 +88,12 @@ public interface ITrapStrategy {
      * @return 陷阱状态
      */
     TrapState getTrapState(GamePlayer gamePlayer);
+
+    /**
+     * 触发陷阱
+     *
+     * @param triggerPlayer 游戏玩家
+     * @param ownerTeam     拥有陷阱的TEAM
+     */
+    void triggerTrap(GamePlayer triggerPlayer, GameTeam ownerTeam);
 }

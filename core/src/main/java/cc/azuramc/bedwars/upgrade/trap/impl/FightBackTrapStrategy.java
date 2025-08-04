@@ -1,12 +1,16 @@
 package cc.azuramc.bedwars.upgrade.trap.impl;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.upgrade.trap.AbstractITrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.AbstractTrapStrategy;
 import cc.azuramc.bedwars.upgrade.trap.TrapManager;
 import cc.azuramc.bedwars.upgrade.trap.TrapType;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XPotion;
 import org.bukkit.Material;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -15,11 +19,16 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class FightBackITrapStrategy extends AbstractITrapStrategy {
+public class FightBackTrapStrategy extends AbstractTrapStrategy {
+
+    @Override
+    protected TrapType getTrapTypeEnum() {
+        return TrapType.FIGHT_BACK;
+    }
 
     @Override
     public String getDisplayName() {
-        return "反击陷阱";
+        return TrapType.FIGHT_BACK.getDisplayName();
     }
 
     @Override
@@ -50,7 +59,19 @@ public class FightBackITrapStrategy extends AbstractITrapStrategy {
     }
 
     @Override
-    protected TrapType getTrapTypeEnum() {
-        return TrapType.FIGHT_BACK;
+    protected void applyTrapEffect(GamePlayer triggerPlayer, GameTeam ownerTeam) {
+        // 给己方玩家添加速度和跳跃提升效果
+        AzuraBedWars.getInstance().mainThreadRunnable(() -> {
+            PotionEffectType speed = XPotion.SPEED.get();
+            PotionEffectType jumpBoost = XPotion.JUMP_BOOST.get();
+            ownerTeam.getAlivePlayers().forEach(player -> {
+                if (speed != null) {
+                    player.getPlayer().addPotionEffect(new PotionEffect(speed, 15 * 20, 1));
+                }
+                if (jumpBoost != null) {
+                    player.getPlayer().addPotionEffect(new PotionEffect(jumpBoost, 15 * 20, 1));
+                }
+            });
+        });
     }
 }

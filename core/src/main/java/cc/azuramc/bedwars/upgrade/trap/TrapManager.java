@@ -1,5 +1,9 @@
 package cc.azuramc.bedwars.upgrade.trap;
 
+import cc.azuramc.bedwars.upgrade.trap.impl.AlarmTrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.impl.BlindnessTrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.impl.FightBackTrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.impl.MinerTrapStrategy;
 import org.bukkit.Material;
 
 import java.util.*;
@@ -114,5 +118,21 @@ public class TrapManager {
             statusMap.put(type, activeTraps.contains(type));
         }
         return statusMap;
+    }
+
+    /**
+     * 获取陷阱策略实例
+     *
+     * @param trapType 陷阱类型
+     * @return 陷阱策略实例
+     */
+    public ITrapStrategy getTrapStrategy(TrapType trapType) {
+        return switch (trapType) {
+            case BLINDNESS -> new BlindnessTrapStrategy();
+            case FIGHT_BACK -> new FightBackTrapStrategy();
+            case ALARM -> new AlarmTrapStrategy();
+            case MINER -> new MinerTrapStrategy();
+            default -> throw new IllegalArgumentException("Unknown trap type: " + trapType);
+        };
     }
 }
