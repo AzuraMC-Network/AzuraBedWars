@@ -126,7 +126,7 @@ public class TrapManager {
      * @param trapType 陷阱类型
      * @return 陷阱策略实例
      */
-    public ITrapStrategy getTrapStrategy(TrapType trapType) {
+    public TrapStrategy getTrapStrategy(TrapType trapType) {
         return switch (trapType) {
             case BLINDNESS -> new BlindnessTrapStrategy();
             case FIGHT_BACK -> new FightBackTrapStrategy();
