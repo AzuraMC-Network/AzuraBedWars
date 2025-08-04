@@ -18,11 +18,6 @@ import java.util.List;
 public class AlarmITrapStrategy extends AbstractITrapStrategy {
 
     @Override
-    public String getTrapType() {
-        return "ALARM";
-    }
-
-    @Override
     public String getDisplayName() {
         return "警报陷阱";
     }
