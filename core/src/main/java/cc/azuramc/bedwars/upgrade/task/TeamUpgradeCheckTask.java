@@ -115,10 +115,21 @@ public class TeamUpgradeCheckTask {
         TrapManager trapManager = gameTeam.getTrapManager();
 
         if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
-            // 直接遍历激活的陷阱，使用策略模式触发
-            for (TrapType trapType : trapManager.getActiveTraps()) {
-                LoggerUtil.debug("TeamUpgradeTask$handleEnemyInTeamTerritory | trigger " + trapType.name() + " trap, gamePlayer: " + gamePlayer.getName());
-                trapManager.getTrapStrategy(trapType).triggerTrap(gamePlayer, gameTeam);
+            // 检查陷阱触发冷却
+            if (gamePlayer.isTrapTriggerCooldown()) {
+                return;
+            }
+
+            // 队列式触发 只触发第一个陷阱
+            TrapType firstTrap = trapManager.getFirstActiveTrap();
+            if (firstTrap != null) {
+                LoggerUtil.debug("TeamUpgradeTask$handleEnemyInTeamTerritory | trigger " + firstTrap.name() + " trap, gamePlayer: " + gamePlayer.getName());
+
+                // 更新玩家陷阱触发时间
+                gamePlayer.startTrapTriggerCooldownTask();
+
+                // 触发陷阱
+                trapManager.getTrapStrategy(firstTrap).triggerTrap(gamePlayer, gameTeam);
             }
         }
     }

@@ -35,6 +35,14 @@ public class TrapManager {
     }
 
     /**
+     * 获取第一个激活的陷阱（用于队列式触发）
+     * @return 第一个激活的陷阱，如果没有激活的陷阱则返回null
+     */
+    public TrapType getFirstActiveTrap() {
+        return activeTraps.isEmpty() ? null : activeTraps.iterator().next();
+    }
+
+    /**
      * 获取激活陷阱的显示名称列表
      */
     public List<String> getActiveTrapNames() {

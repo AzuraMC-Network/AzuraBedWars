@@ -94,6 +94,10 @@ public class GamePlayer {
     private boolean hasTrapProtection;
     private BukkitRunnable trapProtectionTask;
 
+    // 陷阱触发冷却相关
+    private boolean isTrapTriggerCooldown;
+    private BukkitRunnable trapTriggerTask;
+
     /**
      * 构造方法
      *
@@ -136,6 +140,8 @@ public class GamePlayer {
         this.experienceSources = new HashMap<>();
 
         this.hasTrapProtection = false;
+
+        this.isTrapTriggerCooldown = false;
     }
 
     /**
@@ -275,6 +281,32 @@ public class GamePlayer {
      */
     public void endTrapProtection() {
         this.setHasTrapProtection(false);
+        if (trapProtectionTask != null) {
+            trapProtectionTask.cancel();
+        }
+    }
+
+    /**
+     * 开始陷阱触发冷却任务
+     */
+    public void startTrapTriggerCooldownTask() {
+        endTrapTriggerCooldownTask();
+
+        this.setTrapTriggerCooldown(true);
+        trapProtectionTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                endTrapTriggerCooldownTask();
+            }
+        };
+        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance(), 8 * 20);
+    }
+
+    /**
+     * 取消陷阱触发冷却
+     */
+    public void endTrapTriggerCooldownTask() {
+        this.setTrapTriggerCooldown(false);
         if (trapProtectionTask != null) {
             trapProtectionTask.cancel();
         }
