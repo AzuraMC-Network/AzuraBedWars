@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.game.task.generator.PrivateResourceGenerator;
-import cc.azuramc.bedwars.game.trap.TrapManager;
+import cc.azuramc.bedwars.upgrade.trap.TrapManager;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import org.bukkit.ChatColor;
