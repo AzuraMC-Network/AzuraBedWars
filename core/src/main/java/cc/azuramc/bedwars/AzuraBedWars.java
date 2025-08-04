@@ -82,8 +82,6 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private NMSAccess nmsAccess;
     @Getter private LuckPerms luckPermsApi;
 
-    public static final String MAP_TABLE_NAME = "bw_map";
-
     @Override
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
