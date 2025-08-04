@@ -23,14 +23,14 @@ public class TrapManager {
     /**
      * 获取激活的陷阱数量
      */
-    public int getActiveTrapCount() {
+    public synchronized int getActiveTrapCount() {
         return activeTraps.size();
     }
 
     /**
      * 获取激活的陷阱类型列表
      */
-    public List<TrapType> getActiveTraps() {
+    public synchronized List<TrapType> getActiveTraps() {
         return new ArrayList<>(activeTraps);
     }
 
@@ -38,7 +38,7 @@ public class TrapManager {
      * 获取第一个激活的陷阱（用于队列式触发）
      * @return 第一个激活的陷阱，如果没有激活的陷阱则返回null
      */
-    public TrapType getFirstActiveTrap() {
+    public synchronized TrapType getFirstActiveTrap() {
         return activeTraps.isEmpty() ? null : activeTraps.iterator().next();
     }
 
@@ -55,7 +55,7 @@ public class TrapManager {
      * 根据陷阱激活数量动态调整价格
      * @return 当前陷阱的价格
      */
-    public int getCurrentTrapPrice() {
+    public synchronized int getCurrentTrapPrice() {
         if (activeTraps.isEmpty()) {
             return 1;
         }
@@ -66,14 +66,14 @@ public class TrapManager {
     /**
      * 检查特定陷阱是否激活
      */
-    public boolean isTrapActive(TrapType trapType) {
+    public synchronized boolean isTrapActive(TrapType trapType) {
         return activeTraps.contains(trapType);
     }
 
     /**
      * 检查是否达到最大陷阱数量限制
      */
-    public boolean isReachedActiveLimit() {
+    public synchronized boolean isReachedActiveLimit() {
         return activeTraps.size() >= maxTrapCount;
     }
 
@@ -81,21 +81,21 @@ public class TrapManager {
     /**
      * 激活指定陷阱
      */
-    public void activateTrap(TrapType trapType) {
+    public synchronized void activateTrap(TrapType trapType) {
         activeTraps.add(trapType);
     }
 
     /**
      * 停用指定陷阱
      */
-    public void deactivateTrap(TrapType trapType) {
+    public synchronized void deactivateTrap(TrapType trapType) {
         activeTraps.remove(trapType);
     }
 
     /**
      * 设置陷阱激活状态
      */
-    public void setTrapActive(TrapType trapType, boolean active) {
+    public synchronized void setTrapActive(TrapType trapType, boolean active) {
         if (active) {
             activeTraps.add(trapType);
         } else {

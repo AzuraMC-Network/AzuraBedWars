@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -54,23 +53,39 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
      */
     @Override
     public boolean performPurchase(GamePlayer gamePlayer, GameManager gameManager) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        TrapManager trapManager = gameTeam.getTrapManager();
         GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
         int price = getPrice(gamePlayer);
 
-        // 处理支付
-        if (!processPayment(gamePlayer, price, gameModeType)) {
+        // 先检查是否有足够资源
+        if (!canAfford(gamePlayer, price, gameModeType)) {
+            Player player = gamePlayer.getPlayer();
+            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            player.sendMessage("§c没有足够资源购买！");
             return false;
         }
 
-        // 执行具体的购买逻辑
-        boolean success = doPurchase(gamePlayer, gameManager);
+        // 使用synchronized块确保检查和激活的原子性
+        synchronized (trapManager) {
+            // 检查陷阱是否可购买
+            if (trapManager.isTrapActive(getTrapTypeEnum()) || trapManager.isReachedActiveLimit()) {
+                return false;
+            }
 
-        if (success) {
-            // 刷新GUI
-            new TeamShopGUI(gamePlayer, gameManager).open();
+            // 先进行支付
+            if (!processPayment(gamePlayer, price, gameModeType)) {
+                return false;
+            }
+
+            // 支付成功后激活陷阱
+            trapManager.activateTrap(getTrapTypeEnum());
         }
 
-        return success;
+        // 通知团队所有打开TeamShopGUI的玩家刷新界面
+        gameTeam.notifyTeamShopGUIRefresh();
+
+        return true;
     }
 
     /**
@@ -135,6 +150,19 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     }
 
     /**
+     * 检查是否可以购买
+     *
+     * @param gamePlayer 游戏玩家
+     * @return 是否可以购买
+     */
+    @Override
+    public boolean canPurchase(GamePlayer gamePlayer) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        TrapManager trapManager = gameTeam.getTrapManager();
+        return !trapManager.isTrapActive(getTrapTypeEnum()) && !trapManager.isReachedActiveLimit();
+    }
+
+    /**
      * 获取陷阱状态
      *
      * @param gamePlayer 游戏玩家
@@ -155,22 +183,23 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     }
 
     /**
-     * 执行具体的购买逻辑
+     * 检查是否有足够资源支付
      *
-     * @param gamePlayer  游戏玩家
-     * @param gameManager 游戏管理器
-     * @return 是否购买成功
+     * @param gamePlayer   游戏玩家
+     * @param price        价格
+     * @param gameModeType 游戏模式
+     * @return 是否有足够资源
      */
-    protected boolean doPurchase(GamePlayer gamePlayer, GameManager gameManager) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        TrapManager trapManager = gameTeam.getTrapManager();
-
-        trapManager.activateTrap(getTrapTypeEnum());
-        return true;
+    protected boolean canAfford(GamePlayer gamePlayer, int price, GameModeType gameModeType) {
+        if (gameModeType == GameModeType.DEFAULT) {
+            return canAffordItem(gamePlayer, XMaterial.DIAMOND.get(), price);
+        } else {
+            return canAffordExperience(gamePlayer, price * 100);
+        }
     }
 
     /**
-     * 处理支付
+     * 处理支付（实际扣除资源）
      *
      * @param gamePlayer   游戏玩家
      * @param price        价格
@@ -179,21 +208,21 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
      */
     protected boolean processPayment(GamePlayer gamePlayer, int price, GameModeType gameModeType) {
         if (gameModeType == GameModeType.DEFAULT) {
-            return processItemPayment(gamePlayer, XMaterial.DIAMOND.get(), price);
+            return spendItem(gamePlayer, XMaterial.DIAMOND.get(), price);
         } else {
-            return processExperiencePayment(gamePlayer, price * 100);
+            return spendExperience(gamePlayer, price * 100);
         }
     }
 
     /**
-     * 处理物品支付
+     * 检查是否有足够物品
      *
      * @param gamePlayer 玩家
      * @param material   物品类型
      * @param amount     数量
-     * @return 是否支付成功
+     * @return 是否有足够物品
      */
-    private boolean processItemPayment(GamePlayer gamePlayer, Material material, int amount) {
+    private boolean canAffordItem(GamePlayer gamePlayer, Material material, int amount) {
         Player player = gamePlayer.getPlayer();
 
         // 计算玩家拥有的资源总数
@@ -206,12 +235,20 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
             }
         }
 
-        // 检查是否有足够资源
-        if (playerTotal < amount) {
-            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
-            player.sendMessage("§c没有足够资源购买！");
-            return false;
-        }
+        return playerTotal >= amount;
+    }
+
+    /**
+     * 扣除物品
+     *
+     * @param gamePlayer 玩家
+     * @param material   物品类型
+     * @param amount     数量
+     * @return 是否扣除成功
+     */
+    private boolean spendItem(GamePlayer gamePlayer, Material material, int amount) {
+        Player player = gamePlayer.getPlayer();
+        ItemStack[] inventory = player.getInventory().getContents();
 
         // 扣除资源
         int remainingToDeduct = amount;
@@ -234,19 +271,26 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     }
 
     /**
-     * 处理经验支付
+     * 检查是否有足够经验
      *
      * @param gamePlayer 游戏玩家
      * @param xpLevel    经验等级
-     * @return 是否支付成功
+     * @return 是否有足够经验
      */
-    private boolean processExperiencePayment(GamePlayer gamePlayer, int xpLevel) {
+    private boolean canAffordExperience(GamePlayer gamePlayer, int xpLevel) {
         Player player = gamePlayer.getPlayer();
-        if (player.getLevel() < xpLevel) {
-            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
-            player.sendMessage("§c没有足够资源购买！");
-            return false;
-        }
+        return player.getLevel() >= xpLevel;
+    }
+
+    /**
+     * 扣除经验
+     *
+     * @param gamePlayer 游戏玩家
+     * @param xpLevel    经验等级
+     * @return 是否扣除成功
+     */
+    private boolean spendExperience(GamePlayer gamePlayer, int xpLevel) {
+        Player player = gamePlayer.getPlayer();
 
         player.setLevel(player.getLevel() - xpLevel);
         player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
@@ -280,6 +324,9 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
 
         // 通知团队成员陷阱被触发
         announceTrapTrigger(ownerTeam);
+
+        // 通知团队所有打开TeamShopGUI的玩家刷新界面
+        ownerTeam.notifyTeamShopGUIRefresh();
     }
 
     /**
