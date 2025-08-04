@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public interface ITrapStrategy {
+public interface TrapStrategy {
 
     /**
      * 获取陷阱显示名称

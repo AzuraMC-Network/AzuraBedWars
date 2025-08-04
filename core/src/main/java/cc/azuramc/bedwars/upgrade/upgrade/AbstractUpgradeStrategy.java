@@ -22,7 +22,7 @@ import java.util.Map;
  *
  * @author an5w1r@163.com
  */
-public abstract class AbstractIUpgradeStrategy implements IUpgradeStrategy {
+public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
     /**
      * 升级价格缓存（升级类型 -> 等级 -> 价格）

@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.upgrade.upgrade.AbstractIUpgradeStrategy;
+import cc.azuramc.bedwars.upgrade.upgrade.AbstractUpgradeStrategy;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class SharpenedSwordsIUpgradeStrategy extends AbstractIUpgradeStrategy {
+public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
 
     @Override
     public String getUpgradeName() {

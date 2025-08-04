@@ -9,10 +9,10 @@ import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.upgrade.factory.TrapStrategyFactory;
 import cc.azuramc.bedwars.upgrade.factory.UpgradeStrategyFactory;
-import cc.azuramc.bedwars.upgrade.trap.ITrapStrategy;
 import cc.azuramc.bedwars.upgrade.trap.TrapManager;
+import cc.azuramc.bedwars.upgrade.trap.TrapStrategy;
 import cc.azuramc.bedwars.upgrade.trap.TrapType;
-import cc.azuramc.bedwars.upgrade.upgrade.IUpgradeStrategy;
+import cc.azuramc.bedwars.upgrade.upgrade.UpgradeStrategy;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -67,14 +67,14 @@ public class TeamShopGUI extends CustomGUI {
      * 设置升级选项
      */
     private void setupUpgradeOptions(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        Map<String, IUpgradeStrategy> strategies = UpgradeStrategyFactory.getAllStrategies();
+        Map<String, UpgradeStrategy> strategies = UpgradeStrategyFactory.getAllStrategies();
 
         // 升级选项的槽位映射
         int[] upgradeSlots = {10, 11, 12, 19, 20, 21};
         String[] upgradeNames = {"磨刀石", "精制护甲", "疯狂矿工", "铁锻炉", "治愈池", "缓冲靴子"};
 
         for (int i = 0; i < upgradeNames.length; i++) {
-            IUpgradeStrategy strategy = strategies.get(upgradeNames[i]);
+            UpgradeStrategy strategy = strategies.get(upgradeNames[i]);
             if (strategy != null) {
                 setupUpgradeItem(upgradeSlots[i], strategy, gamePlayer, gameManager, gameModeType);
             }
@@ -84,7 +84,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 设置单个升级选项
      */
-    private void setupUpgradeItem(int slot, IUpgradeStrategy strategy, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void setupUpgradeItem(int slot, UpgradeStrategy strategy, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         ItemStack item = strategy.createUpgradeItem(gamePlayer, gameModeType);
 
         GUIAction action = new GUIAction(0, () -> {
@@ -100,14 +100,14 @@ public class TeamShopGUI extends CustomGUI {
      * 设置陷阱选项
      */
     private void setupTrapOptions(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        Map<TrapType, ITrapStrategy> strategies = TrapStrategyFactory.getAllStrategies();
+        Map<TrapType, TrapStrategy> strategies = TrapStrategyFactory.getAllStrategies();
 
         // 陷阱选项的槽位映射
         int[] trapSlots = {14, 15, 16, 23};
         TrapType[] trapTypes = {TrapType.BLINDNESS, TrapType.FIGHT_BACK, TrapType.ALARM, TrapType.MINER};
 
         for (int i = 0; i < trapTypes.length; i++) {
-            ITrapStrategy strategy = strategies.get(trapTypes[i]);
+            TrapStrategy strategy = strategies.get(trapTypes[i]);
             if (strategy != null) {
                 setupTrapItem(trapSlots[i], strategy, gamePlayer, gameManager, gameModeType);
             }
@@ -117,7 +117,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 设置单个陷阱选项
      */
-    private void setupTrapItem(int slot, ITrapStrategy strategy, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void setupTrapItem(int slot, TrapStrategy strategy, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
         ItemStack item = strategy.createTrapItem(gamePlayer, gameModeType);
 
         GUIAction action = new GUIAction(0, () -> {
@@ -159,7 +159,7 @@ public class TeamShopGUI extends CustomGUI {
         if (trapManager.getActiveTrapCount() >= 1) {
             for (int j = 39; j < trapManager.getActiveTrapCount() + 39; j++) {
                 TrapType trapType = trapManager.getActiveTraps().get(j - 39);
-                ITrapStrategy strategy = TrapStrategyFactory.getStrategy(trapType);
+                TrapStrategy strategy = TrapStrategyFactory.getStrategy(trapType);
 
                 if (strategy != null) {
                     ItemStack item = new ItemBuilder()

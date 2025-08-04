@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.upgrade.factory;
 
-import cc.azuramc.bedwars.upgrade.trap.ITrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.TrapStrategy;
 import cc.azuramc.bedwars.upgrade.trap.TrapType;
 import cc.azuramc.bedwars.upgrade.trap.impl.AlarmTrapStrategy;
 import cc.azuramc.bedwars.upgrade.trap.impl.BlindnessTrapStrategy;
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class TrapStrategyFactory {
 
-    private static final Map<TrapType, ITrapStrategy> STRATEGY_CACHE = new HashMap<>();
+    private static final Map<TrapType, TrapStrategy> STRATEGY_CACHE = new HashMap<>();
 
     static {
         // 初始化所有陷阱策略
@@ -34,7 +34,7 @@ public class TrapStrategyFactory {
      * @param trapType 陷阱类型
      * @return 陷阱策略实例
      */
-    public static ITrapStrategy getStrategy(TrapType trapType) {
+    public static TrapStrategy getStrategy(TrapType trapType) {
         return STRATEGY_CACHE.get(trapType);
     }
 
@@ -43,7 +43,7 @@ public class TrapStrategyFactory {
      *
      * @return 所有陷阱策略的Map
      */
-    public static Map<TrapType, ITrapStrategy> getAllStrategies() {
+    public static Map<TrapType, TrapStrategy> getAllStrategies() {
         return new HashMap<>(STRATEGY_CACHE);
     }
 }
