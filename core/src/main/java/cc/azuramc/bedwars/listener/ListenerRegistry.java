@@ -2,15 +2,19 @@ package cc.azuramc.bedwars.listener;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.listener.block.*;
-import cc.azuramc.bedwars.listener.chat.*;
+import cc.azuramc.bedwars.listener.block.BlockBreakListener;
+import cc.azuramc.bedwars.listener.block.PlacementListener;
+import cc.azuramc.bedwars.listener.chat.ChatListener;
 import cc.azuramc.bedwars.listener.player.*;
-import cc.azuramc.bedwars.listener.projectile.*;
-import cc.azuramc.bedwars.listener.server.*;
-import cc.azuramc.bedwars.listener.setup.*;
+import cc.azuramc.bedwars.listener.projectile.EggBridgeListener;
+import cc.azuramc.bedwars.listener.projectile.FireballListener;
+import cc.azuramc.bedwars.listener.server.ServerListener;
+import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.listener.special.*;
-import cc.azuramc.bedwars.listener.spectator.*;
-import cc.azuramc.bedwars.listener.world.*;
+import cc.azuramc.bedwars.listener.spectator.SpectatorCompassListener;
+import cc.azuramc.bedwars.listener.spectator.SpectatorInteractAtEntityListener;
+import cc.azuramc.bedwars.listener.world.ChunkListener;
+import cc.azuramc.bedwars.listener.world.ExplodeListener;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
@@ -69,11 +73,12 @@ public class ListenerRegistry {
         }
 
         // special package
+        register(new EntityDeathListener());
+        register(new CustomEntityDamageListener());
         register(new IronGolemSpawnListener());
         register(new RescuePlatformListener());
-        register(new WarpPowderListener());
         register(new SilverFishListener());
-        register(new EntityDeathListener());
+        register(new WarpPowderListener());
 
         // spectator package
         register(new SpectatorCompassListener());
