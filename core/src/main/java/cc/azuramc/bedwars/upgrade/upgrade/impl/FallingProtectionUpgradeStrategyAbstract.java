@@ -35,7 +35,7 @@ public class FallingProtectionUpgradeStrategyAbstract extends AbstractTieredUpgr
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().getFallingProtectionUpgrade();
+        return gamePlayer.getGameTeam().getUpgradeManager().getFallingProtectionUpgrade();
     }
 
     @Override
@@ -51,16 +51,16 @@ public class FallingProtectionUpgradeStrategyAbstract extends AbstractTieredUpgr
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        int currentLevel = gameTeam.getFallingProtectionUpgrade();
+        int currentLevel = gameTeam.getUpgradeManager().getFallingProtectionUpgrade();
         int nextLevel = currentLevel + 1;
 
-        gameTeam.setFallingProtectionUpgrade(nextLevel);
+        gameTeam.getUpgradeManager().setFallingProtectionUpgrade(nextLevel);
 
         // 为团队所有玩家的护甲添加摔落保护附魔
         gameTeam.getAlivePlayers().forEach(gamePlayers -> {
             ItemStack boots = gamePlayers.getPlayer().getInventory().getArmorContents()[0];
             if (boots != null) {
-                boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getFallingProtectionUpgrade());
+                boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getUpgradeManager().getFallingProtectionUpgrade());
                 gamePlayers.updateInventory();
             }
         });

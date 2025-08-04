@@ -67,7 +67,7 @@ public class TeamUpgradeCheckTask {
      * @param gameTeam 游戏团队
      */
     private void applyManicMinerEffect(GameTeam gameTeam) {
-        if (gameTeam.getMagicMinerUpgrade() <= 0) {
+        if (gameTeam.getUpgradeManager().getMagicMinerUpgrade() <= 0) {
             return;
         }
 
@@ -75,7 +75,7 @@ public class TeamUpgradeCheckTask {
             PotionEffectType fastDigging = XPotion.HASTE.get();
             if (fastDigging != null) {
                 // Subtract 1 from the level because Minecraft potion effect levels start at 0
-                int effectLevel = gameTeam.getMagicMinerUpgrade() - 1;
+                int effectLevel = gameTeam.getUpgradeManager().getMagicMinerUpgrade() - 1;
                 player.getPlayer().addPotionEffect(new PotionEffect(fastDigging,
                         CONFIG.getUpgrade().getHasteEffectDuration(),
                         effectLevel));
@@ -92,7 +92,7 @@ public class TeamUpgradeCheckTask {
     private void applyHealingPoolEffect(GamePlayer gamePlayer, GameTeam gameTeam) {
         double distance = gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
 
-        if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.isHasHealPoolUpgrade()) {
+        if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.getUpgradeManager().hasHealPoolUpgrade()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType regeneration = XPotion.REGENERATION.get();
                 if (regeneration != null) {

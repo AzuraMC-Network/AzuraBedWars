@@ -91,20 +91,35 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         int currentLevel = getCurrentLevel(gamePlayer);
         int price = getUpgradePrice(currentLevel);
 
-        // 处理支付
-        if (!processPayment(gamePlayer, price, gameModeType)) {
+        // 先检查是否有足够资源
+        if (!canAfford(gamePlayer, price, gameModeType)) {
+            Player player = gamePlayer.getPlayer();
+            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            player.sendMessage("§c没有足够资源购买！");
             return false;
         }
 
-        // 执行具体的升级逻辑
-        boolean success = doUpgrade(gamePlayer, gameManager);
+        // 使用UpgradeManager作为同步锁确保升级操作的原子性
+        synchronized (gamePlayer.getGameTeam().getUpgradeManager()) {
+            // 再次检查是否可以升级
+            if (!canUpgrade(gamePlayer)) {
+                return false;
+            }
 
-        if (success) {
-            // 刷新GUI
-            new TeamShopGUI(gamePlayer, gameManager).open();
+            // 先进行支付
+            if (!processPayment(gamePlayer, price, gameModeType)) {
+                return false;
+            }
+
+            // 执行具体的升级逻辑
+            if (!doUpgrade(gamePlayer, gameManager)) {
+                return false;
+            }
         }
 
-        return success;
+        // 升级成功，刷新GUI
+        new TeamShopGUI(gamePlayer, gameManager).open();
+        return true;
     }
 
     @Override
@@ -136,6 +151,22 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
      * @return 是否升级成功
      */
     protected abstract boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager);
+
+    /**
+     * 检查是否有足够资源支付
+     *
+     * @param gamePlayer   游戏玩家
+     * @param price        价格
+     * @param gameModeType 游戏模式
+     * @return 是否有足够资源
+     */
+    protected boolean canAfford(GamePlayer gamePlayer, int price, GameModeType gameModeType) {
+        if (gameModeType == GameModeType.DEFAULT) {
+            return canAffordItem(gamePlayer, XMaterial.DIAMOND.get(), price);
+        } else {
+            return canAffordExperience(gamePlayer, price * 100);
+        }
+    }
 
     /**
      * 处理支付
@@ -219,6 +250,42 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         player.setLevel(player.getLevel() - xpLevel);
         player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
         return true;
+    }
+
+    /**
+     * 检查是否有足够物品
+     *
+     * @param gamePlayer 玩家
+     * @param material   物品类型
+     * @param amount     数量
+     * @return 是否有足够物品
+     */
+    private boolean canAffordItem(GamePlayer gamePlayer, Material material, int amount) {
+        Player player = gamePlayer.getPlayer();
+
+        // 计算玩家拥有的资源总数
+        int playerTotal = 0;
+        ItemStack[] inventory = player.getInventory().getContents();
+
+        for (ItemStack item : inventory) {
+            if (item != null && item.getType().equals(material)) {
+                playerTotal += item.getAmount();
+            }
+        }
+
+        return playerTotal >= amount;
+    }
+
+    /**
+     * 检查是否有足够经验
+     *
+     * @param gamePlayer 游戏玩家
+     * @param xpLevel    经验等级
+     * @return 是否有足够经验
+     */
+    private boolean canAffordExperience(GamePlayer gamePlayer, int xpLevel) {
+        Player player = gamePlayer.getPlayer();
+        return player.getLevel() >= xpLevel;
     }
 
     /**
