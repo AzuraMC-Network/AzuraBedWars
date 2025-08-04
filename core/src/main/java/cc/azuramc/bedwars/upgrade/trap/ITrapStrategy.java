@@ -17,13 +17,6 @@ import java.util.List;
 public interface ITrapStrategy {
 
     /**
-     * 获取陷阱类型
-     *
-     * @return 陷阱类型
-     */
-    String getTrapType();
-
-    /**
      * 获取陷阱显示名称
      *
      * @return 陷阱显示名称

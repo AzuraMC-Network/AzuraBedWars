@@ -18,11 +18,6 @@ import java.util.List;
 public class MinerITrapStrategy extends AbstractITrapStrategy {
 
     @Override
-    public String getTrapType() {
-        return "MINER";
-    }
-
-    @Override
     public String getDisplayName() {
         return "挖掘疲劳陷阱";
     }
