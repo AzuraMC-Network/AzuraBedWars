@@ -82,6 +82,7 @@ public class EventConfig {
         public static class Upgrade {
             private double healingPoolRange = 7.0;
             private double trapTriggerRange = 20.0;
+            private int trapTriggerCooldownSeconds = 3;
 
             private int hasteEffectDuration = 40;
             private int regenerationEffectDuration = 60;
