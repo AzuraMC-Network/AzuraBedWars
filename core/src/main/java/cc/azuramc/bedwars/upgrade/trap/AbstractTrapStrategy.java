@@ -58,16 +58,15 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
         GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
         int price = getPrice(gamePlayer);
 
-        // 先检查是否有足够资源
-        if (!canAfford(gamePlayer, price, gameModeType)) {
-            Player player = gamePlayer.getPlayer();
-            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
-            player.sendMessage("§c没有足够资源购买！");
-            return false;
-        }
-
-        // 使用synchronized块确保检查和激活的原子性
         synchronized (trapManager) {
+            // 检查是否有足够资源
+            if (!canAfford(gamePlayer, price, gameModeType)) {
+                Player player = gamePlayer.getPlayer();
+                player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+                player.sendMessage("§c没有足够资源购买！");
+                return false;
+            }
+
             // 检查陷阱是否可购买
             if (trapManager.isTrapActive(getTrapTypeEnum()) || trapManager.isReachedActiveLimit()) {
                 return false;
