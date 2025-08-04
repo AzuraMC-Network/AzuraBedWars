@@ -2,10 +2,10 @@ package cc.azuramc.bedwars.upgrade.factory;
 
 import cc.azuramc.bedwars.upgrade.trap.ITrapStrategy;
 import cc.azuramc.bedwars.upgrade.trap.TrapType;
-import cc.azuramc.bedwars.upgrade.trap.impl.AlarmITrapStrategy;
-import cc.azuramc.bedwars.upgrade.trap.impl.BlindnessITrapStrategy;
-import cc.azuramc.bedwars.upgrade.trap.impl.FightBackITrapStrategy;
-import cc.azuramc.bedwars.upgrade.trap.impl.MinerITrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.impl.AlarmTrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.impl.BlindnessTrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.impl.FightBackTrapStrategy;
+import cc.azuramc.bedwars.upgrade.trap.impl.MinerTrapStrategy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +22,10 @@ public class TrapStrategyFactory {
 
     static {
         // 初始化所有陷阱策略
-        STRATEGY_CACHE.put(TrapType.BLINDNESS, new BlindnessITrapStrategy());
-        STRATEGY_CACHE.put(TrapType.FIGHT_BACK, new FightBackITrapStrategy());
-        STRATEGY_CACHE.put(TrapType.ALARM, new AlarmITrapStrategy());
-        STRATEGY_CACHE.put(TrapType.MINER, new MinerITrapStrategy());
+        STRATEGY_CACHE.put(TrapType.BLINDNESS, new BlindnessTrapStrategy());
+        STRATEGY_CACHE.put(TrapType.FIGHT_BACK, new FightBackTrapStrategy());
+        STRATEGY_CACHE.put(TrapType.ALARM, new AlarmTrapStrategy());
+        STRATEGY_CACHE.put(TrapType.MINER, new MinerTrapStrategy());
     }
 
     /**
