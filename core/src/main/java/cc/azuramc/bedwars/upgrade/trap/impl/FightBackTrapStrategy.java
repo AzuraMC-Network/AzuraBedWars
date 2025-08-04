@@ -45,13 +45,6 @@ public class FightBackTrapStrategy extends AbstractTrapStrategy {
     }
 
     @Override
-    public boolean canPurchase(GamePlayer gamePlayer) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        TrapManager trapManager = gameTeam.getTrapManager();
-        return !trapManager.isTrapActive(TrapType.FIGHT_BACK) && !trapManager.isReachedActiveLimit();
-    }
-
-    @Override
     public int getPrice(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         TrapManager trapManager = gameTeam.getTrapManager();

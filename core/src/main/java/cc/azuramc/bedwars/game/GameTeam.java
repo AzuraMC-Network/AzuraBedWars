@@ -3,6 +3,9 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.game.task.generator.PrivateResourceGenerator;
+import cc.azuramc.bedwars.gui.base.CustomGUI;
+import cc.azuramc.bedwars.gui.base.GUIData;
+import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.upgrade.trap.TrapManager;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
@@ -12,6 +15,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -339,5 +343,30 @@ public class GameTeam {
                 generatorManager.getPrivateResourceGenerator("绿宝石" + this.getName()).setInterval(20L * 30);
                 break;
         }
+    }
+
+    /**
+     * 通知所有打开TeamShopGUI的团队成员刷新界面
+     */
+    public void notifyTeamShopGUIRefresh() {
+        // 确保GUI刷新操作在主线程中执行，避免CancelledPacketHandleException
+        cc.azuramc.bedwars.AzuraBedWars.getInstance().mainThreadRunnable(() -> {
+            for (GamePlayer gamePlayer : getAlivePlayers()) {
+                // 检查玩家是否在线
+                Player player = gamePlayer.getPlayer();
+                if (player == null) {
+                    continue;
+                }
+
+                // 检查玩家是否打开了TeamShopGUI
+                if (GUIData.getCURRENT_GUI().containsKey(player)) {
+                    CustomGUI currentGUI = GUIData.getCURRENT_GUI().get(player);
+                    if (currentGUI instanceof TeamShopGUI) {
+                        // 重新打开TeamShopGUI以刷新内容
+                        new TeamShopGUI(gamePlayer, gameManager).open();
+                    }
+                }
+            }
+        });
     }
 }
