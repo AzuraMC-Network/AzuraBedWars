@@ -80,14 +80,14 @@ public class EventConfig {
 
         @Data
         public static class Upgrade {
-            private double healingPoolRange = 7.0;
+            private double healingPoolRange = 18.0;
             private double trapTriggerRange = 20.0;
 
             private int hasteEffectDuration = 40;
             private int regenerationEffectDuration = 60;
-            private int regenerationEffectAmplifier = 1;
+            private int regenerationEffectAmplifier = 0;
             private int trapEffectDuration = 160;
-            private int trapEffectAmplifier = 1;
+            private int trapEffectAmplifier = 0;
             private int miningFatigueEffectDuration = 160;
             private int miningFatigueEffectAmplifier = 0;
         }

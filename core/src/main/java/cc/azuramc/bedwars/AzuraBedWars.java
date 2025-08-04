@@ -26,6 +26,7 @@ import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.tablist.TabList;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
+import cc.azuramc.bedwars.util.bstats.Metrics;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.config.DatabaseConfig;
@@ -81,8 +82,6 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private NMSAccess nmsAccess;
     @Getter private LuckPerms luckPermsApi;
 
-    public static final String MAP_TABLE_NAME = "bw_map";
-
     @Override
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
@@ -117,6 +116,8 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 初始化命令和通信系统
         initCommands();
+        // bStats
+        loadBStats();
 
         Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "加载完成耗时 " + (System.currentTimeMillis() - startTime) + " ms");
     }
@@ -406,5 +407,13 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 保存配置
         configManager.saveAll();
+    }
+
+    /**
+     * bStats class load
+     */
+    public void loadBStats() {
+        int pluginId = 26773;
+        Metrics metrics = new Metrics(this, pluginId);
     }
 }

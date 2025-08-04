@@ -2,8 +2,8 @@ package cc.azuramc.bedwars.gui.base;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
-import cc.azuramc.bedwars.gui.base.component.GUIItem;
 import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
+import cc.azuramc.bedwars.gui.base.component.GUIItem;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -42,6 +42,11 @@ public class CustomGUI {
     }
 
     public void open() {
+        // 检查玩家是否在线
+        if (player == null) {
+            return;
+        }
+
         Inventory inventory = Bukkit.createInventory(null, size, title);
 
         for (GUIItem guiItem : items) {
