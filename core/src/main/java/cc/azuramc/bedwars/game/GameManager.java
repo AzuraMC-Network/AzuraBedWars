@@ -21,6 +21,7 @@ import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
 import cc.azuramc.bedwars.tablist.TabList;
+import cc.azuramc.bedwars.upgrade.task.TeamUpgradeCheckTask;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.ServerMOTD;
@@ -851,6 +852,18 @@ public class GameManager {
 
         // 开始挂机状态检测
         PlayerAFKListener.startCheckAFKTask();
+
+        // 注册团队升级任务
+        registerTeamUpgradeCheckTask();
+    }
+
+    /**
+     * 注册团队升级任务，处理团队效果和陷阱
+     */
+    private void registerTeamUpgradeCheckTask() {
+        TeamUpgradeCheckTask teamUpgradeCheckTask = new TeamUpgradeCheckTask(this);
+        String taskName = plugin.getMessageConfig().getStart().getTeamUpgradeTaskName();
+        gameEventManager.registerRunnable(taskName, (s, c) -> teamUpgradeCheckTask.execute());
     }
 
     /**
