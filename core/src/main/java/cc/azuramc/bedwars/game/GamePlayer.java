@@ -293,13 +293,13 @@ public class GamePlayer {
         endTrapTriggerCooldownTask();
 
         this.setTrapTriggerCooldown(true);
-        trapProtectionTask = new BukkitRunnable() {
+        trapTriggerTask = new BukkitRunnable() {
             @Override
             public void run() {
                 endTrapTriggerCooldownTask();
             }
         };
-        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance(), 8 * 20);
+        trapTriggerTask.runTaskLater(AzuraBedWars.getInstance(), 8 * 20);
     }
 
     /**
@@ -307,8 +307,8 @@ public class GamePlayer {
      */
     public void endTrapTriggerCooldownTask() {
         this.setTrapTriggerCooldown(false);
-        if (trapProtectionTask != null) {
-            trapProtectionTask.cancel();
+        if (trapTriggerTask != null) {
+            trapTriggerTask.cancel();
         }
     }
 
