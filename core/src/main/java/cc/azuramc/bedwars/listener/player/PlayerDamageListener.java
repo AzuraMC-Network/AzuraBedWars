@@ -411,11 +411,13 @@ public class PlayerDamageListener implements Listener {
 
         // 普通攻击伤害显示
         if (ATTACK_DISPLAY_ENABLED && attackPlayer.isViewingArrowDamage()) {
-            int finalDamage = (int) (event.getFinalDamage() + 0.5);
+            int finalDamage = Math.round((float) event.getFinalDamage());
+            int currentHealth = Math.round((float) gamePlayer.getPlayer().getHealth());
+            int remainingHealth = Math.max(currentHealth - finalDamage, 0);
             attackPlayer.sendTitle(
                     "&r ",
-                    "&b伤害 &f- &e" + finalDamage + "  &b血量 &f- &e" + ((int) gamePlayer.getPlayer().getHealth() - finalDamage) +
-                            "&f/&e" + (int) PlayerUtil.getMaxHealth(gamePlayer.getPlayer()),
+                    "&b伤害 &f- &e" + finalDamage + "  &b血量 &f- &e" + remainingHealth +
+                            "&f/&e" + Math.round((float) PlayerUtil.getMaxHealth(gamePlayer.getPlayer())),
                     1, ATTACK_DISPLAY_TITLE_TICKS,
                     5);
         }

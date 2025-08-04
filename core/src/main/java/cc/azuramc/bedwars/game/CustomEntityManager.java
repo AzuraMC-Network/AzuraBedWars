@@ -147,7 +147,7 @@ public class CustomEntityManager {
                 .replace("{TeamColor}", gameTeam.getChatColor().toString())
                 .replace("{TeamName}", gameTeam.getName())
                 .replace("{Countdown}", String.valueOf(liveLeftTime))
-                .replace("{Health}", String.valueOf((int) (livingEntity.getHealth() + 0.5)));
+                .replace("{Health}", String.valueOf(Math.round((float) livingEntity.getHealth())));
 
         livingEntity.setCustomName(displayName);
     }
