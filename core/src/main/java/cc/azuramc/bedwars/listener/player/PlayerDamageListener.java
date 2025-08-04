@@ -414,7 +414,7 @@ public class PlayerDamageListener implements Listener {
             int finalDamage = (int) (event.getFinalDamage() + 0.5);
             attackPlayer.sendTitle(
                     "&r ",
-                    "&b伤害 &f- &e" + finalDamage + "  &b血量 &f- &e" + ((int) gamePlayer.getPlayer().getHealth() - finalDamage) +
+                    "&b伤害 &f- &e" + finalDamage + "  &b血量 &f- &e" + (Math.max(((int) gamePlayer.getPlayer().getHealth() - finalDamage), 0)) +
                             "&f/&e" + (int) PlayerUtil.getMaxHealth(gamePlayer.getPlayer()),
                     1, ATTACK_DISPLAY_TITLE_TICKS,
                     5);
