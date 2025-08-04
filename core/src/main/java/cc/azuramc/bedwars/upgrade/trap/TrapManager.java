@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.game.trap;
+package cc.azuramc.bedwars.upgrade.trap;
 
 import org.bukkit.Material;
 
