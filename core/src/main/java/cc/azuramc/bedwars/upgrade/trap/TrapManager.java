@@ -1,9 +1,6 @@
 package cc.azuramc.bedwars.upgrade.trap;
 
-import cc.azuramc.bedwars.upgrade.trap.impl.AlarmTrapStrategy;
-import cc.azuramc.bedwars.upgrade.trap.impl.BlindnessTrapStrategy;
-import cc.azuramc.bedwars.upgrade.trap.impl.FightBackTrapStrategy;
-import cc.azuramc.bedwars.upgrade.trap.impl.MinerTrapStrategy;
+import cc.azuramc.bedwars.upgrade.factory.TrapStrategyFactory;
 import org.bukkit.Material;
 
 import java.util.*;
@@ -135,12 +132,10 @@ public class TrapManager {
      * @return 陷阱策略实例
      */
     public TrapStrategy getTrapStrategy(TrapType trapType) {
-        return switch (trapType) {
-            case BLINDNESS -> new BlindnessTrapStrategy();
-            case FIGHT_BACK -> new FightBackTrapStrategy();
-            case ALARM -> new AlarmTrapStrategy();
-            case MINER -> new MinerTrapStrategy();
-            default -> throw new IllegalArgumentException("Unknown trap type: " + trapType);
-        };
+        TrapStrategy strategy = TrapStrategyFactory.getStrategy(trapType);
+        if (strategy == null) {
+            throw new IllegalArgumentException("Unknown or unsupported trap type: " + trapType);
+        }
+        return strategy;
     }
 }
