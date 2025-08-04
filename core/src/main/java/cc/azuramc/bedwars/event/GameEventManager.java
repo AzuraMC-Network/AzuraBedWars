@@ -205,6 +205,7 @@ public class GameEventManager implements Runnable {
                     task.getEvent().run(seconds, this.currentEvent);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 LoggerUtil.warn("任务 '" + name + "' 执行错误: " + e.getMessage());
             }
         });

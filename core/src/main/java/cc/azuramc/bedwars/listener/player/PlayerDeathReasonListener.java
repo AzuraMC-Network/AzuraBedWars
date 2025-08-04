@@ -139,7 +139,7 @@ public class PlayerDeathReasonListener implements Listener {
             gameManager.broadcastMessage(getRandomBroadcast(cause, null, deadDisplayName, mainColor, finalKillStr));
         }
         else {
-            int killerHeart = (int) (killer.getHealth() + 0.5);
+            int killerHeart = Math.round((float) killer.getHealth());
             String killerDisplayName =
                     gameKiller.getGameTeam().getChatColor()
                             + "[" + gameKiller.getGameTeam().getName() + "] "
