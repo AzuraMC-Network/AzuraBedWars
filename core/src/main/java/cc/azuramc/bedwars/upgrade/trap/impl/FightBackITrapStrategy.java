@@ -18,11 +18,6 @@ import java.util.List;
 public class FightBackITrapStrategy extends AbstractITrapStrategy {
 
     @Override
-    public String getTrapType() {
-        return "FIGHT_BACK";
-    }
-
-    @Override
     public String getDisplayName() {
         return "反击陷阱";
     }

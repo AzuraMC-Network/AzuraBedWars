@@ -18,11 +18,6 @@ import java.util.List;
 public class BlindnessITrapStrategy extends AbstractITrapStrategy {
 
     @Override
-    public String getTrapType() {
-        return "BLINDNESS";
-    }
-
-    @Override
     public String getDisplayName() {
         return "致盲陷阱";
     }
