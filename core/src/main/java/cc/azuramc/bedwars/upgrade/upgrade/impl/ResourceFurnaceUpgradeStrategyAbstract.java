@@ -34,7 +34,7 @@ public class ResourceFurnaceUpgradeStrategyAbstract extends AbstractTieredUpgrad
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().getResourceFurnaceUpgrade();
+        return gamePlayer.getGameTeam().getUpgradeManager().getResourceFurnaceUpgrade();
     }
 
     @Override
@@ -56,10 +56,10 @@ public class ResourceFurnaceUpgradeStrategyAbstract extends AbstractTieredUpgrad
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        int currentLevel = gameTeam.getResourceFurnaceUpgrade();
+        int currentLevel = gameTeam.getUpgradeManager().getResourceFurnaceUpgrade();
         int nextLevel = currentLevel + 1;
 
-        gameTeam.setResourceFurnaceUpgrade(nextLevel);
+        gameTeam.getUpgradeManager().setResourceFurnaceUpgrade(nextLevel);
         LoggerUtil.debug("资源炉升级到等级 " + nextLevel + "，当前价格: " + getUpgradePrice(currentLevel));
 
         return true;

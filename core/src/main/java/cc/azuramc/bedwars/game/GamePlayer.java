@@ -634,20 +634,20 @@ public class GamePlayer {
                 break;
         }
 
-        if (gameTeam.getProtectionUpgrade() > 0) {
+        if (gameTeam.getUpgradeManager().getProtectionUpgrade() > 0) {
             for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
                 ItemStack armor = player.getInventory().getArmorContents()[i];
                 if (armor != null) {
-                    armor.addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getProtectionUpgrade());
+                    armor.addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getUpgradeManager().getProtectionUpgrade());
                     player.updateInventory();
                 }
             }
         }
 
-        if (gameTeam.getFallingProtectionUpgrade() > 0) {
+        if (gameTeam.getUpgradeManager().getFallingProtectionUpgrade() > 0) {
             ItemStack boots = player.getInventory().getArmorContents()[0];
             if (boots != null) {
-                boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getFallingProtectionUpgrade());
+                boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getUpgradeManager().getFallingProtectionUpgrade());
                 player.updateInventory();
             }
         }
@@ -661,7 +661,7 @@ public class GamePlayer {
                 player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
             }
         }
-        if (gameTeam.isHasSharpnessUpgrade()) {
+        if (gameTeam.getUpgradeManager().hasSharpnessUpgrade()) {
             player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addEnchant(XEnchantment.SHARPNESS.get(), 1).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
         } else {
             player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());

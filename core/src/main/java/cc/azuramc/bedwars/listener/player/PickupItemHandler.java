@@ -85,7 +85,7 @@ public class PickupItemHandler {
         }
 
         // 添加锋利附魔
-        if (gamePlayer.getGameTeam().isHasSharpnessUpgrade()) {
+        if (gamePlayer.getGameTeam().getUpgradeManager().hasSharpnessUpgrade()) {
             itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
         }
 

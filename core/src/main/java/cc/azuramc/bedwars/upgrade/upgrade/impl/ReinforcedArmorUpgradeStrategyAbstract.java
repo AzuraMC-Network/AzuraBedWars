@@ -36,7 +36,7 @@ public class ReinforcedArmorUpgradeStrategyAbstract extends AbstractTieredUpgrad
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().getProtectionUpgrade();
+        return gamePlayer.getGameTeam().getUpgradeManager().getProtectionUpgrade();
     }
 
     @Override
@@ -52,10 +52,10 @@ public class ReinforcedArmorUpgradeStrategyAbstract extends AbstractTieredUpgrad
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        int currentLevel = gameTeam.getProtectionUpgrade();
+        int currentLevel = gameTeam.getUpgradeManager().getProtectionUpgrade();
         int nextLevel = currentLevel + 1;
 
-        gameTeam.setProtectionUpgrade(nextLevel);
+        gameTeam.getUpgradeManager().setProtectionUpgrade(nextLevel);
 
         // 为团队所有玩家的护甲添加保护附魔
         for (GamePlayer teamPlayer : gameTeam.getAlivePlayers()) {
