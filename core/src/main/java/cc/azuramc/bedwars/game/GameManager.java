@@ -20,7 +20,7 @@ import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
-import cc.azuramc.bedwars.tablist.TabList;
+import cc.azuramc.bedwars.tablist.TabListManager;
 import cc.azuramc.bedwars.upgrade.task.TeamUpgradeCheckTask;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
@@ -92,6 +92,8 @@ public class GameManager {
 
     private int teamBlockSearchRadius;
 
+    private TabListManager tabListManager;
+
     /**
      * 创建一个新的游戏实例
      *
@@ -109,6 +111,9 @@ public class GameManager {
         this.generatorManager = new GeneratorManager(this);
         this.gameEventManager = new GameEventManager(this);
         initializeConfigs();
+
+        this.tabListManager = new TabListManager(this);
+        tabListManager.startAutoUpdate(plugin);
     }
 
     private void initializeConfigs() {
@@ -318,13 +323,13 @@ public class GameManager {
 
         if (gameState == GameState.RUNNING) {
             handlePlayerJoinRunningGame(gamePlayer);
-            TabList.addToTab(gamePlayer);
+            tabListManager.addToTab(gamePlayer);
             return;
         }
 
         handlePlayerJoinWaitingGame(gamePlayer);
 
-        TabList.addToTab(gamePlayer);
+        tabListManager.addToTab(gamePlayer);
     }
 
     /**
@@ -846,7 +851,7 @@ public class GameManager {
         markEmptyTeams();
 
         // 更新所有玩家的TabList显示名称
-        TabList.updateAllTabListNames();
+        tabListManager.updateAllTabListNames();
 
         GamePlayer.getOnlinePlayers().forEach(GamePlayer::giveInventory);
 

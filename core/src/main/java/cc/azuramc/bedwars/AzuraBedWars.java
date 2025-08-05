@@ -23,7 +23,6 @@ import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
-import cc.azuramc.bedwars.tablist.TabList;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.bedwars.util.bstats.Metrics;
@@ -260,7 +259,6 @@ public final class AzuraBedWars extends JavaPlugin {
         // 配置世界设置
         configureWorlds();
 
-        TabList.startAutoUpdate(this, gameManager);
         LoggerUtil.info("游戏相关特性加载完成");
     }
 
