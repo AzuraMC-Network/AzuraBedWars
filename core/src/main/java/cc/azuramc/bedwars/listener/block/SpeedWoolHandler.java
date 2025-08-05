@@ -57,7 +57,7 @@ public class SpeedWoolHandler {
                 // 放置方块
                 if (relativeBlock.getType() == Material.AIR) {
                     relativeBlock.setType(item.getType());
-                    if (VersionUtil.isLessThan113() && item.getData() != null) {
+                    if (VersionUtil.isLessThan1_13() && item.getData() != null) {
                         MapUtil.setBlockData(relativeBlock, item.getData().getData());
                     }
 
