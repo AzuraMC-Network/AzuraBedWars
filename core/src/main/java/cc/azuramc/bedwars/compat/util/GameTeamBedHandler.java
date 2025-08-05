@@ -5,8 +5,9 @@ import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Bed;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,48 +88,32 @@ public class GameTeamBedHandler {
      */
     private void determineBedsForNewVersions(Block block1, Block block2) {
         try {
-            // 使用反射获取方法和类，而不是直接引用BlockData API
-            Method getBlockDataMethod = Block.class.getMethod("getBlockData");
-            Object bedData1 = getBlockDataMethod.invoke(block1);
-            Object bedData2 = getBlockDataMethod.invoke(block2);
+            BlockData bedData1 = block1.getBlockData();
+            BlockData bedData2 = block2.getBlockData();
 
-            // 如果不是Bed类型，则抛出异常以便回退到备用方法
-            if (!"org.bukkit.block.data.type.Bed".equals(bedData1.getClass().getName())) {
+            // 检查是否为床类型
+            if (!(bedData1 instanceof Bed bed1) ||
+                    !(bedData2 instanceof Bed bed2)) {
                 throw new IllegalArgumentException("Block is not a bed");
             }
 
-            // 获取Part枚举和getPart方法
-            Class<?> bedClass = Class.forName("org.bukkit.block.data.type.Bed");
-            Method getPartMethod = bedClass.getMethod("getPart");
-            Method getFacingMethod = bedClass.getMethod("getFacing");
-
-            // 获取Part枚举类
-            Class<?> partEnum = Class.forName("org.bukkit.block.data.type.Bed$Part");
-            Object headPart = null;
-
-            // 获取HEAD枚举值
-            for (Object enumConstant : partEnum.getEnumConstants()) {
-                if ("HEAD".equals(enumConstant.toString())) {
-                    headPart = enumConstant;
-                    break;
-                }
-            }
+            // 转换为床类型
 
             // 获取床部件类型和朝向
-            Object part1 = getPartMethod.invoke(bedData1);
-            Object part2 = getPartMethod.invoke(bedData2);
+            Bed.Part part1 = bed1.getPart();
+            Bed.Part part2 = bed2.getPart();
 
-            if (part1.equals(headPart)) {
+            if (part1 == Bed.Part.HEAD) {
                 gameTeam.setBedHead(block1);
                 gameTeam.setBedFeet(block2);
-                gameTeam.setBedFace((BlockFace) getFacingMethod.invoke(bedData1));
+                gameTeam.setBedFace(bed1.getFacing());
             } else {
                 gameTeam.setBedFeet(block1);
                 gameTeam.setBedHead(block2);
-                gameTeam.setBedFace((BlockFace) getFacingMethod.invoke(bedData2));
+                gameTeam.setBedFace(bed2.getFacing());
             }
         } catch (Exception e) {
-            // 如果反射失败或出错，使用默认值
+            // 如果API调用失败或出错，使用默认值
             setFallbackBedValues(block1, block2);
         }
     }
