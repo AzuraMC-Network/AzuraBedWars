@@ -72,7 +72,7 @@ public class GameTeamBedHandler {
      * @param block2 第二个床方块
      */
     private void determineBedParts(Block block1, Block block2) {
-        if (!VersionUtil.isLessThan113()) {
+        if (!VersionUtil.isLessThan1_13()) {
             determineBedsForNewVersions(block1, block2);
         } else {
             determineBedsForOldVersions(block1, block2);

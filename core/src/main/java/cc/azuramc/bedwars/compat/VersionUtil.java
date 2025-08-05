@@ -64,16 +64,16 @@ public class VersionUtil {
     }
 
     /**
-     * 判断是否是1.13及以下版本
+     * 判断是否是1.13以下版本
      */
-    public static boolean isLessThan113() {
+    public static boolean isLessThan1_13() {
         return isLessThan(1, 13);
     }
 
     /**
-     * 判断是否是1.16及以下版本
+     * 判断是否是1.16以下版本
      */
-    public static boolean isLessThan116() {
+    public static boolean isLessThan1_16() {
         return isLessThan(1, 16);
     }
 
@@ -81,7 +81,7 @@ public class VersionUtil {
      * 检查服务器版本是否是1.8.x
      * @return 是否是1.8.x版本
      */
-    public static boolean isVersion18() {
+    public static boolean isVersion1_8() {
         return MINOR_NUMBER == 8;
     }
 }

@@ -5,12 +5,10 @@ import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.Method;
@@ -41,7 +39,7 @@ public class ItemBuilder {
     
     // 静态初始化块，在类首次加载时初始化反射缓存
     static {
-        if (VersionUtil.isVersion18()) {
+        if (VersionUtil.isVersion1_8()) {
             try {
                 craftItemStackClass = Class.forName("org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack");
                 nmsItemStackClass = Class.forName("net.minecraft.server.v1_8_R3.ItemStack");
@@ -126,7 +124,7 @@ public class ItemBuilder {
         itemStack.setType(skullMaterial);
         
         // 为旧版本设置数据值
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             setDurabilityCompat(itemStack, (short) 3);
         }
 
@@ -147,7 +145,7 @@ public class ItemBuilder {
             }
             
             // 1.13+使用setOwningPlayer方法
-            if (!VersionUtil.isLessThan113()) {
+            if (!VersionUtil.isLessThan1_13()) {
                 Method setOwningPlayer = SkullMeta.class.getMethod("setOwningPlayer", OfflinePlayer.class);
                 setOwningPlayer.invoke(skullMeta, offlinePlayer);
             } else {
@@ -180,7 +178,7 @@ public class ItemBuilder {
     public ItemBuilder setUnbreakable(boolean unbreakable, boolean hide) {
         try {
             // 优先使用NMS方法设置Unbreakable标签（适用于1.8）
-            if (VersionUtil.isVersion18()) {
+            if (VersionUtil.isVersion1_8()) {
                 this.itemStack = setUnbreakableNbt(this.itemStack, unbreakable);
                 
                 // 如果需要隐藏标签且物品元数据存在
@@ -384,7 +382,7 @@ public class ItemBuilder {
      */
     @SuppressWarnings("deprecation")
     private short getDurabilityCompat(ItemStack item) {
-        if (!VersionUtil.isLessThan113()) {
+        if (!VersionUtil.isLessThan1_13()) {
             try {
                 // 1.13+使用Damageable接口
                 if (item.getItemMeta() instanceof org.bukkit.inventory.meta.Damageable) {
@@ -407,7 +405,7 @@ public class ItemBuilder {
      */
     @SuppressWarnings("deprecation")
     private void setDurabilityCompat(ItemStack item, short durability) {
-        if (!VersionUtil.isLessThan113()) {
+        if (!VersionUtil.isLessThan1_13()) {
             // 1.13+尝试使用Damageable接口
             ItemMeta meta = item.getItemMeta();
             if (meta instanceof org.bukkit.inventory.meta.Damageable) {
@@ -561,6 +559,19 @@ public class ItemBuilder {
      */
     public ItemBuilder addEnchant(Enchantment enchantment, int level) {
         itemStack.addUnsafeEnchantment(enchantment, level);
+        return this;
+    }
+
+    @SuppressWarnings("all")
+    public ItemBuilder setSpawnEggType(EntityType type) {
+        XMaterial x = XMaterial.matchXMaterial(type.name().toUpperCase() + "_SPAWN_EGG").orElse(XMaterial.AIR);
+        if (VersionUtil.isLessThan1_13()) {
+            if ("MONSTER_EGG".equals(itemStack.getType().name()))
+                itemStack.setDurability(x.getData());
+        }
+        else {
+            itemStack.setType(x.get());
+        }
         return this;
     }
 
