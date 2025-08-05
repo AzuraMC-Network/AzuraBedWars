@@ -32,18 +32,4 @@ public class PlayerUseBucketListener implements Listener {
         Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> player.getInventory().removeItem(XMaterial.BUCKET.parseItem()), 2L);
     }
 
-    @EventHandler
-    public void onMilk(PlayerItemConsumeEvent event) {
-        if (event.getItem().getType() != XMaterial.MILK_BUCKET.get())
-            return;
-
-        Player p = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(p);
-
-        if (gamePlayer == null || gameManager.getGameState() != GameState.RUNNING)
-            return;
-
-        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> p.getInventory().remove(Material.BUCKET), 2L);
-    }
-
 }
