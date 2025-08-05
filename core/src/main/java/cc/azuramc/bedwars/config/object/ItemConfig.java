@@ -15,7 +15,6 @@ public class ItemConfig {
     private WarpPowder warpPowder = new WarpPowder();
     private SpeedWoolHandler speedWoolHandler = new SpeedWoolHandler();
     private EggBridge eggBridge = new EggBridge();
-    private FireBall fireBall = new FireBall();
 
     private GameManager gameManager = new GameManager();
 
@@ -53,14 +52,5 @@ public class ItemConfig {
     public static class EggBridge {
         private int eggCooldownSeconds = 3;    // 搭桥蛋冷却时间
         private String eggCooldownMessage = "&c搭桥蛋冷却中！";
-    }
-
-    @Data
-    public static class FireBall {
-        private int fireballExplosionRadiusX = 4;
-        private int fireballExplosionRadiusY = 3;
-        private int fireballExplosionRadiusZ = 4;
-        private int fireballDamage = 3;
-        private double fireballKnockbackMultiplier = 0.5;
     }
 }
