@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
-import cc.azuramc.bedwars.database.connection.ORMHandler;
 import cc.azuramc.bedwars.database.dao.PlayerDataDao;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
@@ -60,7 +59,6 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter @Setter private MapData mapData;
     @Getter private Economy econ = null;
     @Getter private Chat chat = null;
-    @Getter private ORMHandler ormHandler = null;
     @Getter private ConfigManager configManager;
     @Getter private SettingsConfig settingsConfig;
     @Getter private EventConfig eventConfig;
@@ -145,9 +143,11 @@ public final class AzuraBedWars extends JavaPlugin {
             playerDataService.shutdown();
         }
 
-        if (ormHandler != null) {
-            ormHandler.shutdown();
+        if (ormClient != null) {
+            ormClient.close();
         }
+
+        AzuraORM.shutdownAll();
 
         PacketEvents.getAPI().terminate();
     }
@@ -177,7 +177,6 @@ public final class AzuraBedWars extends JavaPlugin {
         ormClient = AzuraORM.getClient();
         playerDataDao = new PlayerDataDao(this);
         playerDataService = new PlayerDataService(this);
-        ormHandler = new ORMHandler(this);
     }
 
     /**
