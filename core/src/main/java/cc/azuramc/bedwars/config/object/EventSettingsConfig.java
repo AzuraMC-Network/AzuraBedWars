@@ -3,6 +3,9 @@ package cc.azuramc.bedwars.config.object;
 import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author An5w1r@163.com
  */
@@ -66,13 +69,21 @@ public class EventSettingsConfig {
         private String defeatTitle = MessageUtil.color("&c&l失败！");
         private String defeatSubtitle = MessageUtil.color("&7你输掉了这场游戏");
 
-        // 排行榜标题及分隔线
-        private String[] lead = MessageUtil.color(new String[]{"&e&l击杀数第一名", "&6&l击杀数第二名", "&c&l击杀数第三名"});
-        private String separatorLine = MessageUtil.color("&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-        private String gameTitle = MessageUtil.color("&f                                              &l起床战争");
-        private String winnersPrefix = MessageUtil.color("                                    &e胜利者 &7- ");
-        private String noWinner = MessageUtil.color("&7无");
-        private String rankPrefix = MessageUtil.color("                          ");
+        private String noWinner = MessageUtil.color("&e平局！没有队伍获胜");
+
+        private List<String> customLeaderboardMessages = new ArrayList<>(List.of(
+                "§a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+                "§f                                   §l起床战争",
+                "",
+                "§f          <winnerFormat>",
+                "",
+                "",
+                "§e                          §l击杀数第一名 §7- <firstName> - <firstKills>",
+                "§6                          §l击杀数第二名 §7- <secondName> - <secondKills>",
+                "§c                          §l击杀数第三名 §7- <thirdName> - <thirdKills>",
+                "",
+                "§a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+        ));
     }
 
     @Data
