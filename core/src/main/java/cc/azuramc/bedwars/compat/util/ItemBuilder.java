@@ -200,7 +200,10 @@ public class ItemBuilder {
             ItemMeta itemMeta = itemStack.getItemMeta();
             if (itemMeta != null) {
                 try {
-                    itemMeta.setUnbreakable(unbreakable);
+                    // 尝试使用反射调用setUnbreakable方法（1.9-1.10）
+                    Method setUnbreakableMethod = ItemMeta.class.getDeclaredMethod("setUnbreakable", boolean.class);
+                    setUnbreakableMethod.invoke(itemMeta, unbreakable);
+
                     if (hide) {
                         try {
                             itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
