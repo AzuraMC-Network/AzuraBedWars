@@ -148,9 +148,9 @@ public class GeneratorManager {
                 if (level == 3) return resourceSpawnConfig.getMaxDiamondStackLevel3();
                 break;
             case "绿宝石":
-                if (level == 1) return resourceSpawnConfig.getMaxDiamondStackLevel1();
-                if (level == 2) return resourceSpawnConfig.getMaxDiamondStackLevel2();
-                if (level == 3) return resourceSpawnConfig.getMaxDiamondStackLevel3();
+                if (level == 1) return resourceSpawnConfig.getMaxEmeraldStackLevel1();
+                if (level == 2) return resourceSpawnConfig.getMaxEmeraldStackLevel2();
+                if (level == 3) return resourceSpawnConfig.getMaxEmeraldStackLevel3();
                 break;
         }
         return 0;
