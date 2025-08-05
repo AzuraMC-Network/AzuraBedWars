@@ -373,6 +373,28 @@ public class GamePlayer {
     }
 
     /**
+     * 按本局助攻数排序玩家
+     *
+     * @return 排序后的玩家列表
+     */
+    public static List<GamePlayer> sortCurrentGameAssists() {
+        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
+        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameAssists(), player1.getCurrentGameAssists()));
+        return list;
+    }
+
+    /**
+     * 按本局拆床数排序玩家
+     *
+     * @return 排序后的玩家列表
+     */
+    public static List<GamePlayer> sortCurrentGameBedBreaks() {
+        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
+        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameDestroyedBeds(), player1.getCurrentGameDestroyedBeds()));
+        return list;
+    }
+
+    /**
      * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addKills等方法会触发一次这个方法)
      */
     public void addCurrentGameKills() {
