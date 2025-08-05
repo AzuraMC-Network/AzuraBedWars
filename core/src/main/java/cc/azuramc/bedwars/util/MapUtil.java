@@ -128,7 +128,7 @@ public class MapUtil {
      */
     public static void setBlockData(Block block, byte data) {
         try {
-            if (VersionUtil.isLessThan113()) {
+            if (VersionUtil.isLessThan1_13()) {
                 // 1.8 - 1.12版本使用反射调用setData方法
                 Method setDataMethod = Block.class.getMethod("setData", byte.class);
                 setDataMethod.invoke(block, data);

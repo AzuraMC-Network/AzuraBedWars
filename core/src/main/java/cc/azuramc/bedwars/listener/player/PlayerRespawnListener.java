@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -38,8 +39,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class PlayerRespawnListener implements Listener {
 
+    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
+    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
     private final static PlayerConfig.PlayerRespawn CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerRespawn();
-    private final static MessageConfig.PlayerRespawn MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getPlayerRespawn();
 
     private static final int RESPAWN_COUNTDOWN_SECONDS = CONFIG.getRespawnCountdownSeconds();
     private static final int RESPAWN_PROTECTION_TICKS = CONFIG.getRespawnProtectionTicks();
@@ -48,18 +50,6 @@ public class PlayerRespawnListener implements Listener {
     private static final int TITLE_FADE_OUT = 1;
     private static final long RESPAWN_DELAY_TICKS = 1L;
     private static final long RESPAWN_TIMER_PERIOD = 20L;
-
-    private static final String RESPAWN_COUNTDOWN_TITLE = MESSAGE_CONFIG.getRespawnCountdownTitle();
-    private static final String RESPAWN_COUNTDOWN_SUBTITLE = MESSAGE_CONFIG.getRespawnCountdownSubTitle();
-    private static final String RESPAWN_COMPLETE_TITLE = MESSAGE_CONFIG.getRespawnCompleteTitle();
-    private static final String RESPAWN_COMPLETE_SUBTITLE = MESSAGE_CONFIG.getRespawnCompleteSubTitle();
-    private static final String DEATH_PERMANENT_TITLE = MESSAGE_CONFIG.getDeathPermanentTitle();
-    private static final String DEATH_PERMANENT_SUBTITLE = MESSAGE_CONFIG.getDeathPermanentSubTitle();
-    private static final String TEAM_ELIMINATED_FORMAT = MESSAGE_CONFIG.getTeamEliminatedFormat();
-    private static final String TEAM_ELIMINATED_MSG = MESSAGE_CONFIG.getTeamEliminatedMessage();
-    private static final String PLAY_AGAIN_MESSAGE = MESSAGE_CONFIG.getPlayAgainMessage();
-    private static final String PLAY_AGAIN_BUTTON = MESSAGE_CONFIG.getPlayAgainButton();
-    private static final String PLAY_AGAIN_COMMAND = MESSAGE_CONFIG.getPlayAgainCommand();
 
     public static final List<GamePlayer> RESPAWN_PROTECT = new ArrayList<>();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
@@ -135,7 +125,7 @@ public class PlayerRespawnListener implements Listener {
                 teleportToRespawnLocation(event);
 
                 // 设置为观察者
-                SpectatorManager.toSpectator(gamePlayer, DEATH_PERMANENT_TITLE, DEATH_PERMANENT_SUBTITLE);
+                SpectatorManager.toSpectator(gamePlayer, messageConfig.getDeathPermanentTitle(), messageConfig.getDeathPermanentSubTitle());
             }
         }.runTaskLater(AzuraBedWars.getInstance(), RESPAWN_DELAY_TICKS);
 
@@ -153,9 +143,9 @@ public class PlayerRespawnListener implements Listener {
      * @param gamePlayer 游戏玩家
      */
     private void sendPlayAgainMessage(GamePlayer gamePlayer) {
-        TextComponent textComponent = new TextComponent(PLAY_AGAIN_MESSAGE);
-        textComponent.addExtra(PLAY_AGAIN_BUTTON);
-        textComponent.getExtra().get(0).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, PLAY_AGAIN_COMMAND));
+        TextComponent textComponent = new TextComponent(messageConfig.getPlayAgainMessage());
+        textComponent.addExtra(messageConfig.getPlayAgainButton());
+        textComponent.getExtra().get(0).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, settingsConfig.getPlayAgainCommand()));
         gamePlayer.getPlayer().spigot().sendMessage(textComponent);
     }
 
@@ -168,11 +158,11 @@ public class PlayerRespawnListener implements Listener {
         String destroyerName = gameTeam.getDestroyPlayer() != null ? gameTeam.getDestroyPlayer().getNickName() : "null";
 
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
-        gameManager.broadcastMessage(TEAM_ELIMINATED_FORMAT);
+        gameManager.broadcastMessage(messageConfig.getTeamEliminatedFormat());
         gameManager.broadcastMessage(" ");
-        gameManager.broadcastMessage(String.format(TEAM_ELIMINATED_MSG, gameTeam.getChatColor() + gameTeam.getName(), destroyerName));
+        gameManager.broadcastMessage(String.format(messageConfig.getTeamEliminatedMessage(), gameTeam.getChatColor() + gameTeam.getName(), destroyerName));
         gameManager.broadcastMessage(" ");
-        gameManager.broadcastMessage(TEAM_ELIMINATED_FORMAT);
+        gameManager.broadcastMessage(messageConfig.getTeamEliminatedFormat());
     }
 
     /**
@@ -211,7 +201,7 @@ public class PlayerRespawnListener implements Listener {
                 }
                 if (delay.get() > 0) {
                     // 显示倒计时
-                    gamePlayer.sendTitle(String.format(RESPAWN_COUNTDOWN_TITLE, delay.get()), RESPAWN_COUNTDOWN_SUBTITLE,
+                    gamePlayer.sendTitle(String.format(messageConfig.getRespawnCountdownTitle(), delay.get()), messageConfig.getRespawnCountdownSubTitle(),
                             TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
                     delay.decrementAndGet();
                     return;
@@ -256,7 +246,7 @@ public class PlayerRespawnListener implements Listener {
         applyDamageProtection(gamePlayer);
 
         // 显示重生成功标题
-        gamePlayer.sendTitle(RESPAWN_COMPLETE_TITLE, RESPAWN_COMPLETE_SUBTITLE, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
+        gamePlayer.sendTitle(messageConfig.getRespawnCompleteTitle(), messageConfig.getRespawnCompleteSubTitle(), TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
     }
 
     /**

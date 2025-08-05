@@ -1,11 +1,10 @@
 package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.TaskConfig;
-import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameState;
 import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -19,31 +18,12 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class GameStartTask extends BukkitRunnable {
 
-    private static final TaskConfig.GameStartConfig CONFIG = AzuraBedWars.getInstance().getTaskConfig().getGameStart();
-    private static final MessageConfig.GameStart MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getGameStart();
-
-    private static final int DEFAULT_COUNTDOWN = CONFIG.getDefaultCountdown();
-    private static final int QUICK_START_COUNTDOWN = CONFIG.getQuickStartCountdown();
-
-    /**
-     * 公告时间点
-     */
-    private static final int[] ANNOUNCEMENT_TIMES = CONFIG.getAnnouncementTimes();
-
-    private static final String TITLE_COUNTDOWN = MESSAGE_CONFIG.getTitle().getTitleCountdown();
-    private static final String SUBTITLE_TEXT = MESSAGE_CONFIG.getTitle().getSubtitleText();
-    private static final int TITLE_FADE_IN = CONFIG.getTitle().getFadeIn();
-    private static final int TITLE_STAY = CONFIG.getTitle().getTitleStay();
-    private static final int TITLE_FADE_OUT = CONFIG.getTitle().getFadeOut();
-
-    private static final String MSG_COUNTDOWN = MESSAGE_CONFIG.getMsgCountdown();
-    private static final String MSG_NOT_ENOUGH_PLAYERS = MESSAGE_CONFIG.getMsgNotEnoughPlayers();
-    private static final String MSG_GAME_FULL = MESSAGE_CONFIG.getMsgGameFull();
+    private static final EventSettingsConfig.GameStartEvent gameStartConfig = AzuraBedWars.getInstance().getEventSettingsConfig().getGameStartEvent();
 
     private final GameManager gameManager;
-    
+
     @Getter
-    private int countdown = DEFAULT_COUNTDOWN;
+    private int countdown = gameStartConfig.getDefaultCountdown();
 
     /**
      * 是否处于快速开始状态
@@ -96,12 +76,12 @@ public class GameStartTask extends BukkitRunnable {
 
     /**
      * 判断当前时间是否需要公告
-     * 
+     *
      * @param time 当前倒计时时间
      * @return 是否需要公告
      */
     private boolean isAnnouncementTime(int time) {
-        for (int announcementTime : ANNOUNCEMENT_TIMES) {
+        for (int announcementTime : gameStartConfig.getAnnouncementTimes()) {
             if (time == announcementTime) {
                 return true;
             }
@@ -114,8 +94,8 @@ public class GameStartTask extends BukkitRunnable {
      */
     private void handleNotEnoughPlayers() {
         isQuickStartMode = false;
-        gameManager.broadcastMessage(MSG_NOT_ENOUGH_PLAYERS);
-        countdown = DEFAULT_COUNTDOWN;
+        gameManager.broadcastMessage(gameStartConfig.getMsgNotEnoughPlayers());
+        countdown = gameStartConfig.getDefaultCountdown();
         gameManager.setGameState(GameState.WAITING);
         gameManager.setGameStartTask(null);
         AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
@@ -127,12 +107,9 @@ public class GameStartTask extends BukkitRunnable {
      */
     private void sendCountdownAnnouncement() {
         for (GamePlayer player : GamePlayer.getOnlinePlayers()) {
-            player.sendMessage(String.format(MSG_COUNTDOWN, countdown));
-            player.sendTitle(
-                    String.format(TITLE_COUNTDOWN, countdown), SUBTITLE_TEXT, TITLE_FADE_IN,
-                TITLE_STAY, 
-                TITLE_FADE_OUT
-            );
+            player.sendMessage(String.format(gameStartConfig.getMsgCountdown(), countdown));
+            player.sendTitle(String.format(gameStartConfig.getTitleCountdown(), countdown), gameStartConfig.getSubtitleText(),
+                    gameStartConfig.getFadeIn(), gameStartConfig.getTitleStay(), gameStartConfig.getFadeOut());
             player.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 1F, 10F);
         }
     }
@@ -142,11 +119,11 @@ public class GameStartTask extends BukkitRunnable {
      */
     private void checkForQuickStart() {
         boolean isFull = GamePlayer.getOnlinePlayers().size() >= gameManager.getMaxPlayers();
-        
-        if (!isQuickStartMode && isFull && countdown > QUICK_START_COUNTDOWN) {
+
+        if (!isQuickStartMode && isFull && countdown > gameStartConfig.getDefaultCountdown()) {
             isQuickStartMode = true;
-            countdown = QUICK_START_COUNTDOWN;
-            gameManager.broadcastMessage(MSG_GAME_FULL);
+            countdown = gameStartConfig.getQuickStartCountdown();
+            gameManager.broadcastMessage(gameStartConfig.getMsgGameFull());
         }
     }
 
@@ -171,7 +148,7 @@ public class GameStartTask extends BukkitRunnable {
      */
     private void updatePlayerExperience() {
         float progressPercentage = calculateProgress();
-        
+
         for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
             Player player = gamePlayer.getPlayer();
             player.setLevel(countdown);
@@ -181,14 +158,14 @@ public class GameStartTask extends BukkitRunnable {
 
     /**
      * 计算倒计时进度
-     * 
+     *
      * @return 进度百分比 (0.0-1.0)
      */
     private float calculateProgress() {
-        if (countdown >= DEFAULT_COUNTDOWN) {
+        if (countdown >= gameStartConfig.getDefaultCountdown()) {
             return 1.0F;
         } else {
-            return (float) countdown / DEFAULT_COUNTDOWN;
+            return (float) countdown / gameStartConfig.getDefaultCountdown();
         }
     }
 }

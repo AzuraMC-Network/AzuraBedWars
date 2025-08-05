@@ -1,8 +1,7 @@
 package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.TaskConfig;
+import cc.azuramc.bedwars.config.object.ResourceSpawnConfig;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.util.LoggerUtil;
@@ -22,28 +21,10 @@ import java.util.*;
  * @author an5w1r@163.com
  */
 public class GeneratorTask {
+    private static final ResourceSpawnConfig resourceSpawnConfig = AzuraBedWars.getInstance().getResourceSpawnConfig();
     private final GameManager gameManager;
     private boolean timer;
     private int taskId = -1;
-    /**
-     * 检测资源周围范围（方块）
-     */
-
-    private final float NAME_DISPLAY_HEIGHT;
-    private final float RESOURCE_TYPE_HEIGHT;
-    private final float LEVEL_DISPLAY_HEIGHT;
-
-    private final String DIAMOND_GENERATOR_NAME;
-    private final String DIAMOND_TIME_DISPLAY;
-    private final String EMERALD_GENERATOR_NAME;
-    private final String EMERALD_TIME_DISPLAY;
-
-    private final String TIME_REMAINING_FORMAT;
-    private final String DIAMOND_NAME;
-    private final String EMERALD_NAME;
-    private final String LEVEL_I;
-    private final String LEVEL_II;
-    private final String LEVEL_III;
 
     /**
      * 创建资源生成计时器
@@ -52,24 +33,6 @@ public class GeneratorTask {
      */
     public GeneratorTask(GameManager gameManager) {
         this.gameManager = gameManager;
-        TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
-        MessageConfig.Generator messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGenerator();
-
-        NAME_DISPLAY_HEIGHT = config.getNameDisplayHeight();
-        RESOURCE_TYPE_HEIGHT = config.getResourceTypeHeight();
-        LEVEL_DISPLAY_HEIGHT = config.getLevelDisplayHeight();
-
-        DIAMOND_GENERATOR_NAME = messageConfig.getDiamondGeneratorName();
-        DIAMOND_TIME_DISPLAY = messageConfig.getDiamondTimeDisplay();
-        EMERALD_GENERATOR_NAME = messageConfig.getEmeraldGeneratorName();
-        EMERALD_TIME_DISPLAY = messageConfig.getEmeraldTimeDisplay();
-
-        TIME_REMAINING_FORMAT = messageConfig.getTimeRemainingFormat();
-        DIAMOND_NAME = messageConfig.getDiamondName();
-        EMERALD_NAME = messageConfig.getEmeraldName();
-        LEVEL_I = messageConfig.getLevelI();
-        LEVEL_II = messageConfig.getLevelII();
-        LEVEL_III = messageConfig.getLevelIII();
     }
 
     /**
@@ -162,16 +125,16 @@ public class GeneratorTask {
         try {
             // 钻石显示更新
             if (gameManager.getArmorStand() != null && !gameManager.getArmorStand().isEmpty()) {
-                registerResourceDisplay(DIAMOND_TIME_DISPLAY, DIAMOND_GENERATOR_NAME,
-                    gameManager.getArmorStand().keySet(), DIAMOND_NAME);
+                registerResourceDisplay(resourceSpawnConfig.getDiamondTimeDisplay(), resourceSpawnConfig.getDiamondGeneratorName(),
+                        gameManager.getArmorStand().keySet(), resourceSpawnConfig.getDiamondName());
             } else {
                 LoggerUtil.warn("无法注册钻石显示更新：盔甲架集合为空");
             }
 
             // 绿宝石显示更新
             if (gameManager.getArmorSande() != null && !gameManager.getArmorSande().isEmpty()) {
-                registerResourceDisplay(EMERALD_TIME_DISPLAY, EMERALD_GENERATOR_NAME,
-                    gameManager.getArmorSande().keySet(), EMERALD_NAME);
+                registerResourceDisplay(resourceSpawnConfig.getEmeraldTimeDisplay(), resourceSpawnConfig.getEmeraldGeneratorName(),
+                        gameManager.getArmorSande().keySet(), resourceSpawnConfig.getEmeraldName());
             } else {
                 LoggerUtil.warn("无法注册绿宝石显示更新：盔甲架集合为空");
             }
@@ -224,12 +187,12 @@ public class GeneratorTask {
                             updateTimeDisplay(armorStand, generatorName);
 
                             // 更新资源名称显示
-                            if (armorStand.getFallDistance() == RESOURCE_TYPE_HEIGHT) {
+                            if (armorStand.getFallDistance() == resourceSpawnConfig.getResourceTypeHeight()) {
                                 armorStand.setCustomName(resourceName);
                             }
 
                             // 更新等级显示
-                            if (armorStand.getFallDistance() == LEVEL_DISPLAY_HEIGHT) {
+                            if (armorStand.getFallDistance() == resourceSpawnConfig.getLevelDisplayHeight()) {
                                 updateLevelDisplay(armorStand, currentEventLevel);
                             }
                         } catch (Exception e) {
@@ -257,7 +220,7 @@ public class GeneratorTask {
                 return;
             }
 
-            if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
+            if (armorStand.getFallDistance() == resourceSpawnConfig.getNameDisplayHeight()) {
                 int timeRemaining = 0;
                 GameEventRunnable gameEventRunnable = gameManager.getGameEventManager().getRunnable().getOrDefault(generatorName, null);
 
@@ -265,7 +228,7 @@ public class GeneratorTask {
                     timeRemaining = gameEventRunnable.getSeconds() - gameEventRunnable.getNextSeconds();
                 }
 
-                String displayText = String.format(TIME_REMAINING_FORMAT, timeRemaining);
+                String displayText = String.format(resourceSpawnConfig.getTimeRemainingFormat(), timeRemaining);
                 armorStand.setCustomName(displayText);
             }
         } catch (Exception e) {
@@ -287,11 +250,11 @@ public class GeneratorTask {
 
             String levelDisplay;
             if (currentEvent <= 1) {
-                levelDisplay = LEVEL_I;
+                levelDisplay = resourceSpawnConfig.getLevelI();
             } else if (currentEvent == 2) {
-                levelDisplay = LEVEL_II;
+                levelDisplay = resourceSpawnConfig.getLevelII();
             } else {
-                levelDisplay = LEVEL_III;
+                levelDisplay = resourceSpawnConfig.getLevelIII();
             }
 
             armorStand.setCustomName(levelDisplay);

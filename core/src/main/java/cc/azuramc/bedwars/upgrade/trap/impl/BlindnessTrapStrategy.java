@@ -55,15 +55,15 @@ public class BlindnessTrapStrategy extends AbstractTrapStrategy {
             PotionEffectType blindness = XPotion.BLINDNESS.get();
             if (blindness != null) {
                 triggerPlayer.getPlayer().addPotionEffect(new PotionEffect(blindness,
-                        AzuraBedWars.getInstance().getEventConfig().getStartEvent().getUpgrade().getTrapEffectDuration(),
-                        AzuraBedWars.getInstance().getEventConfig().getStartEvent().getUpgrade().getTrapEffectAmplifier()));
+                        teamUpgradeConfig.getTrapEffectDuration(),
+                        teamUpgradeConfig.getTrapEffectAmplifier()));
             }
 
             PotionEffectType slowness = XPotion.SLOWNESS.get();
             if (slowness != null) {
                 triggerPlayer.getPlayer().addPotionEffect(new PotionEffect(slowness,
-                        AzuraBedWars.getInstance().getEventConfig().getStartEvent().getUpgrade().getTrapEffectDuration(),
-                        AzuraBedWars.getInstance().getEventConfig().getStartEvent().getUpgrade().getTrapEffectAmplifier()));
+                        teamUpgradeConfig.getTrapEffectDuration(),
+                        teamUpgradeConfig.getTrapEffectAmplifier()));
             }
         });
     }

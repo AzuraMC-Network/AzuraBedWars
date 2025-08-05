@@ -25,7 +25,7 @@ public class PlayerUtil {
     @SuppressWarnings("deprecation")
     public static ItemStack getItemInHand(Player player) {
 
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             return player.getItemInHand();
         }
 
@@ -39,7 +39,7 @@ public class PlayerUtil {
      */
     @SuppressWarnings("deprecation")
     public static void setItemInHand(Player player, ItemStack item) {
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             player.setItemInHand(item);
             return;
         }
@@ -106,7 +106,7 @@ public class PlayerUtil {
      */
     @SuppressWarnings("deprecation")
     public static void hidePlayer(Player player, Player target) {
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             player.hidePlayer(target);
             return;
         }
@@ -120,7 +120,7 @@ public class PlayerUtil {
      */
     @SuppressWarnings("deprecation")
     public static void showPlayer(Player player, Player target) {
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             player.showPlayer(target);
             return;
         }
@@ -135,7 +135,7 @@ public class PlayerUtil {
      */
     @SuppressWarnings("deprecation")
     public static void callPlayerRespawnEvent(Player player, Location respawnLocation) {
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             Bukkit.getPluginManager().callEvent(new PlayerRespawnEvent(player, respawnLocation, false));
         } else {
             Bukkit.getPluginManager().callEvent(new PlayerRespawnEvent(player, respawnLocation, false,
@@ -149,7 +149,7 @@ public class PlayerUtil {
      */
     @SuppressWarnings("deprecation")
     public static double getMaxHealth(Player player) {
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             return player.getMaxHealth();
         }
 

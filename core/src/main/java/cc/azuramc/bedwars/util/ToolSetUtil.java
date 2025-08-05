@@ -41,7 +41,7 @@ public class ToolSetUtil {
         );
 
         // 只有1.16+版本才添加下界合金工具
-        if (!VersionUtil.isLessThan116()) {
+        if (!VersionUtil.isLessThan1_16()) {
             // 确保材质存在再添加
             Material netheritePickaxe = XMaterial.NETHERITE_PICKAXE.get();
             Material netheriteAxe = XMaterial.NETHERITE_AXE.get();
