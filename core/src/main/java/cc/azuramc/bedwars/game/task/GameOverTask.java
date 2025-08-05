@@ -142,28 +142,117 @@ public class GameOverTask extends BukkitRunnable {
     private List<String> generateLeaderboard(String winnerText) {
         List<String> messages = new ArrayList<>();
 
-        // 添加标题和分隔线
-        messages.add(gameOverConfig.getSeparatorLine());
-        messages.add(gameOverConfig.getGameTitle());
-        messages.add(" ");
-        messages.add(gameOverConfig.getWinnersPrefix() + winnerText);
-        messages.add(" ");
 
-        // 添加击杀排行
-        int i = 0;
-        for (GamePlayer gamePlayer : GamePlayer.sortCurrentGameFinalKills()) {
-            if (i > 2) {
-                continue;
+        // 使用自定义排行榜配置
+        List<String> customMessages = gameOverConfig.getCustomLeaderboardMessages();
+        if (customMessages != null && !customMessages.isEmpty()) {
+            for (String message : customMessages) {
+                String processedMessage = processLeaderboardPlaceholders(message, winnerText);
+                if (!processedMessage.trim().isEmpty()) {
+                    messages.add(processedMessage);
+                }
             }
-            messages.add(gameOverConfig.getRankPrefix() + gameOverConfig.getLead()[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getCurrentGameFinalKills());
-            i++;
+        }
+        return messages;
+    }
+
+    /**
+     * 处理排行榜占位符
+     *
+     * @param message    原始消息
+     * @param winnerText 胜利者文本
+     * @return 处理后的消息
+     */
+    private String processLeaderboardPlaceholders(String message, String winnerText) {
+        if (message == null) {
+            return "";
         }
 
-        // 添加底部分隔线
-        messages.add(" ");
-        messages.add(gameOverConfig.getSeparatorLine());
+        String processedMessage = message;
 
-        return messages;
+        // 处理胜利者占位符
+        processedMessage = processedMessage.replace("<winnerFormat>", winnerText);
+
+        // 获取排行榜数据
+        List<GamePlayer> killRanking = GamePlayer.sortCurrentGameFinalKills();
+        List<GamePlayer> assistRanking = GamePlayer.sortCurrentGameAssists();
+        List<GamePlayer> bedBreakRanking = GamePlayer.sortCurrentGameBedBreaks();
+
+        // 处理击杀排行占位符
+        processedMessage = processRankingPlaceholders(processedMessage, killRanking, "Kills");
+
+        // 处理助攻排行占位符
+        processedMessage = processRankingPlaceholders(processedMessage, assistRanking, "Assists");
+
+        // 处理拆床排行占位符
+        processedMessage = processRankingPlaceholders(processedMessage, bedBreakRanking, "BedBreaks");
+
+        return processedMessage;
+    }
+
+    /**
+     * 处理排行榜占位符的通用方法
+     *
+     * @param message 原始消息
+     * @param ranking 排行榜数据
+     * @param type    排行类型（Kills/Assists/BedBreaks）
+     * @return 处理后的消息
+     */
+    private String processRankingPlaceholders(String message, List<GamePlayer> ranking, String type) {
+        String processedMessage = message;
+
+        // 处理前三名占位符
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            GamePlayer player = ranking.get(i);
+            String rank = getRankName(i);
+
+            // 替换名称占位符
+            processedMessage = processedMessage.replace("<" + rank + "Name>", player.getNickName());
+
+            // 替换数值占位符
+            int value = getPlayerValue(player, type);
+            processedMessage = processedMessage.replace("<" + rank + type + ">", String.valueOf(value));
+        }
+
+        // 如果排行榜不足3人，将剩余占位符替换为空字符串
+        for (int i = ranking.size(); i < 3; i++) {
+            String rank = getRankName(i);
+            processedMessage = processedMessage.replace("<" + rank + "Name>", "");
+            processedMessage = processedMessage.replace("<" + rank + type + ">", "0");
+        }
+
+        return processedMessage;
+    }
+
+    /**
+     * 获取排名名称
+     *
+     * @param index 排名索引（0-2）
+     * @return 排名名称
+     */
+    private String getRankName(int index) {
+        return switch (index) {
+            case 0 -> "first";
+            case 1 -> "second";
+            case 2 -> "third";
+            default -> "first";
+        };
+    }
+
+    /**
+     * 获取玩家指定类型的数值
+     *
+     * @param player 玩家
+     * @param type   类型
+     * @return 数值
+     */
+    private int getPlayerValue(GamePlayer player, String type) {
+        return switch (type) {
+            case "Kills" -> player.getCurrentGameFinalKills();
+            case "Assists" -> player.getCurrentGameAssists();
+            case "BedBreaks" -> player.getCurrentGameDestroyedBeds();
+            default -> 0;
+        };
     }
 
     /**
