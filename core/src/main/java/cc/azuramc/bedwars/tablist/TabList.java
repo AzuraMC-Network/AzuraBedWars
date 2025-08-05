@@ -4,6 +4,10 @@ import cc.azuramc.bedwars.game.*;
 import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
+import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,6 +34,11 @@ public class TabList {
      * TabList自动更新任务
      */
     private static BukkitTask updateTask;
+
+    @Getter
+    private static String header = "";
+    @Getter
+    private static String footer = "";
 
     /**
      * 队伍颜色优先级排序 - 用于TabList显示顺序
@@ -70,6 +79,7 @@ public class TabList {
             public void run() {
                 try {
                     updateAllTabListNames();
+                    updateHeaderFooter();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -92,6 +102,9 @@ public class TabList {
 
         updateTabList(gamePlayer);
         updateTag(gamePlayer, team);
+
+        // 发送当前的Header和Footer给新加入的玩家
+        sendCurrentHeaderFooter(gamePlayer.getPlayer());
     }
 
     /**
@@ -116,8 +129,8 @@ public class TabList {
                 updateTag(gamePlayer, newTeam);
             }
         }
+        updateHeaderFooterByGameStateWithList();
     }
-
 
     /**
      * 使用ScoreboardAPI设置玩家tabList显示
@@ -206,6 +219,109 @@ public class TabList {
     }
 
     /**
+     * 设置Header内容（支持列表）
+     *
+     * @param lines Header文本行列表，支持颜色代码和占位符
+     */
+    public static void setHeader(List<String> lines) {
+        if (lines == null || lines.isEmpty()) {
+            header = "";
+        } else {
+            header = String.join("\n", lines);
+        }
+    }
+
+    /**
+     * 设置Footer内容（支持列表）
+     *
+     * @param lines Footer文本行列表，支持颜色代码和占位符
+     */
+    public static void setFooter(List<String> lines) {
+        if (lines == null || lines.isEmpty()) {
+            footer = "";
+        } else {
+            footer = String.join("\n", lines);
+        }
+    }
+
+    /**
+     * 设置Header内容
+     *
+     * @param header Header文本，支持颜色代码和占位符
+     */
+    public static void setHeader(String header) {
+        TabList.header = header != null ? header : "";
+    }
+
+    /**
+     * 设置Footer内容
+     *
+     * @param footer Footer文本，支持颜色代码和占位符
+     */
+    public static void setFooter(String footer) {
+        TabList.footer = footer != null ? footer : "";
+    }
+
+    /**
+     * 更新所有在线玩家的Header和Footer
+     */
+    public static void updateHeaderFooter() {
+        for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
+            Player player = gamePlayer.getPlayer();
+            if (player != null && player.isOnline()) {
+                sendHeaderFooter(player, header, footer);
+            }
+        }
+    }
+
+    /**
+     * 发送Header和Footer数据包给指定玩家
+     *
+     * @param player 目标玩家
+     * @param header Header文本
+     * @param footer Footer文本
+     */
+    public static void sendHeaderFooter(Player player, String header, String footer) {
+        if (player == null || !player.isOnline()) {
+            return;
+        }
+
+        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+
+        String processedHeader = MessageUtil.parse(player, header);
+        String processedFooter = MessageUtil.parse(player, footer)
+                .replace("<currentGameKill>", String.valueOf(gamePlayer.getCurrentGameKills()))
+                .replace("<currentGameFinalKill>", String.valueOf(gamePlayer.getCurrentGameFinalKills()))
+                .replace("<currentGameBedBreak>", String.valueOf(gamePlayer.getCurrentGameDestroyedBeds()));
+
+        // 将String转换为Adventure Component
+        Component headerComponent = Component.text(processedHeader);
+        Component footerComponent = Component.text(processedFooter);
+
+        // 创建数据包
+        WrapperPlayServerPlayerListHeaderAndFooter packet = new WrapperPlayServerPlayerListHeaderAndFooter(headerComponent, footerComponent);
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+    }
+
+    /**
+     * 发送当前设置的Header和Footer给指定玩家
+     *
+     * @param player 目标玩家
+     */
+    public static void sendCurrentHeaderFooter(Player player) {
+        sendHeaderFooter(player, header, footer);
+    }
+
+    /**
+     * 清除Header和Footer
+     */
+    public static void clearHeaderFooter() {
+        header = "";
+        footer = "";
+        updateHeaderFooter();
+    }
+
+    /**
      * 生成有序的队伍名称，用于TabList排序
      * 格式: "sort#[队伍优先级][玩家状态][固定随机数]"
      *
@@ -277,4 +393,64 @@ public class TabList {
         return 0;
     }
 
+    /**
+     * 根据游戏阶段自动设置Header和Footer（使用列表方式）
+     */
+    public static void updateHeaderFooterByGameStateWithList() {
+        if (gameManager == null) {
+            return;
+        }
+
+        GameState gameState = gameManager.getGameState();
+
+        switch (gameState) {
+            case WAITING:
+                // 使用列表方式设置多行Header
+                List<String> waitingHeader = Arrays.asList(
+                        "&b你正在 &eAzuraMC &b游玩起床战争",
+                        ""
+                );
+                setHeader(waitingHeader);
+
+                List<String> waitingFooter = Arrays.asList(
+                        "",
+                        "&bas.azuramc.cc"
+                );
+                setFooter(waitingFooter);
+                break;
+
+            case RUNNING:
+                List<String> runningHeader = Arrays.asList(
+                        "&b你正在 &eAzuraMC &b游玩起床战争",
+                        ""
+                );
+                setHeader(runningHeader);
+
+                List<String> runningFooter = Arrays.asList(
+                        "",
+                        "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>",
+                        "&bas.azuramc.cc"
+                );
+                setFooter(runningFooter);
+                break;
+
+            case ENDING:
+                GameTeam winner = gameManager.getWinner();
+                String winnerName = winner != null ? winner.getName() : "无";
+                List<String> endingHeader = Arrays.asList(
+                        "&b你正在 &eAzuraMC &b游玩起床战争",
+                        "&b游戏结束 &e" + winnerName + " &b获胜",
+                        ""
+                );
+                setHeader(endingHeader);
+
+                List<String> endingFooter = Arrays.asList(
+                        "",
+                        "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>",
+                        "&bas.azuramc.cc"
+                );
+                setFooter(endingFooter);
+                break;
+        }
+    }
 }
