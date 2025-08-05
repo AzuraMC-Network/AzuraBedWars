@@ -1,8 +1,7 @@
 package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.TaskConfig;
+import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -24,42 +23,10 @@ import java.util.Objects;
  */
 public class GameOverTask extends BukkitRunnable {
 
-    private static final TaskConfig.GameOverConfig CONFIG = AzuraBedWars.getInstance().getTaskConfig().getGameOver();
-    private static final MessageConfig.GameOver MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getGameOver();
-
-    /**
-     * 游戏结束倒计时时间(秒)
-     */
-    private static final int DEFAULT_COUNTDOWN = CONFIG.getDefaultCountdown();
-
-    private static final int TITLE_FADE_IN = CONFIG.getTitleFadeIn();
-    private static final int TITLE_STAY = CONFIG.getTitleStay();
-    private static final int TITLE_FADE_OUT = CONFIG.getTitleFadeOut();
-
-    /**
-     * 服务器关闭延迟(ticks)
-     */
-    private static final long SHUTDOWN_DELAY = CONFIG.getShutdownDelay();
-
-    /**
-     * 烟花高度
-     */
-    private static final double FIREWORK_HEIGHT = CONFIG.getFireworkHeight();
-
-    private static final String VICTORY_TITLE = MESSAGE_CONFIG.getVictoryTitle();
-    private static final String VICTORY_SUBTITLE = MESSAGE_CONFIG.getVictorySubtitle();
-    private static final String DEFEAT_TITLE = MESSAGE_CONFIG.getDefeatTitle();
-    private static final String DEFEAT_SUBTITLE = MESSAGE_CONFIG.getDefeatSubtitle();
-
-    private static final String[] LEAD = MESSAGE_CONFIG.getLead();
-    private static final String SEPARATOR_LINE = MESSAGE_CONFIG.getSeparatorLine();
-    private static final String GAME_TITLE = MESSAGE_CONFIG.getGameTitle();
-    private static final String WINNERS_PREFIX = MESSAGE_CONFIG.getWinnersPrefix();
-    private static final String NO_WINNER = MESSAGE_CONFIG.getNoWinner();
-    private static final String RANK_PREFIX = MESSAGE_CONFIG.getRankPrefix();
+    private static final EventSettingsConfig.GameOverEvent gameOverConfig = AzuraBedWars.getInstance().getEventSettingsConfig().getGameOverEvent();
 
     private final GameManager gameManager;
-    private int countdown = DEFAULT_COUNTDOWN;
+    private int countdown = gameOverConfig.getDefaultCountdown();
     private boolean isFirstRun = true;
 
     /**
@@ -129,10 +96,12 @@ public class GameOverTask extends BukkitRunnable {
         gameManager.getGameTeams().forEach(team -> {
             boolean isWinner = winner != null && winner.getName().equals(team.getName());
             if (isWinner) {
-                gameManager.broadcastTeamTitle(team, VICTORY_TITLE, VICTORY_SUBTITLE, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT
+                gameManager.broadcastTeamTitle(team, gameOverConfig.getVictoryTitle(), gameOverConfig.getVictorySubtitle(),
+                        gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
                 );
             } else {
-                gameManager.broadcastTeamTitle(team, DEFEAT_TITLE, DEFEAT_SUBTITLE, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT
+                gameManager.broadcastTeamTitle(team, gameOverConfig.getDefeatTitle(), gameOverConfig.getDefeatSubtitle(),
+                        gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
                 );
             }
         });
@@ -158,7 +127,7 @@ public class GameOverTask extends BukkitRunnable {
                 isFirst = false;
             }
         } else {
-            winnerText.append(NO_WINNER);
+            winnerText.append(gameOverConfig.getNoWinner());
         }
 
         return winnerText.toString();
@@ -173,28 +142,117 @@ public class GameOverTask extends BukkitRunnable {
     private List<String> generateLeaderboard(String winnerText) {
         List<String> messages = new ArrayList<>();
 
-        // 添加标题和分隔线
-        messages.add(SEPARATOR_LINE);
-        messages.add(GAME_TITLE);
-        messages.add(" ");
-        messages.add(WINNERS_PREFIX + winnerText);
-        messages.add(" ");
 
-        // 添加击杀排行
-        int i = 0;
-        for (GamePlayer gamePlayer : GamePlayer.sortCurrentGameFinalKills()) {
-            if (i > 2) {
-                continue;
+        // 使用自定义排行榜配置
+        List<String> customMessages = gameOverConfig.getCustomLeaderboardMessages();
+        if (customMessages != null && !customMessages.isEmpty()) {
+            for (String message : customMessages) {
+                String processedMessage = processLeaderboardPlaceholders(message, winnerText);
+                if (!processedMessage.trim().isEmpty()) {
+                    messages.add(processedMessage);
+                }
             }
-            messages.add(RANK_PREFIX + LEAD[i] + " §7- " + gamePlayer.getNickName() + " - " + gamePlayer.getCurrentGameFinalKills());
-            i++;
+        }
+        return messages;
+    }
+
+    /**
+     * 处理排行榜占位符
+     *
+     * @param message    原始消息
+     * @param winnerText 胜利者文本
+     * @return 处理后的消息
+     */
+    private String processLeaderboardPlaceholders(String message, String winnerText) {
+        if (message == null) {
+            return "";
         }
 
-        // 添加底部分隔线
-        messages.add(" ");
-        messages.add(SEPARATOR_LINE);
+        String processedMessage = message;
 
-        return messages;
+        // 处理胜利者占位符
+        processedMessage = processedMessage.replace("<winnerFormat>", winnerText);
+
+        // 获取排行榜数据
+        List<GamePlayer> killRanking = GamePlayer.sortCurrentGameFinalKills();
+        List<GamePlayer> assistRanking = GamePlayer.sortCurrentGameAssists();
+        List<GamePlayer> bedBreakRanking = GamePlayer.sortCurrentGameBedBreaks();
+
+        // 处理击杀排行占位符
+        processedMessage = processRankingPlaceholders(processedMessage, killRanking, "Kills");
+
+        // 处理助攻排行占位符
+        processedMessage = processRankingPlaceholders(processedMessage, assistRanking, "Assists");
+
+        // 处理拆床排行占位符
+        processedMessage = processRankingPlaceholders(processedMessage, bedBreakRanking, "BedBreaks");
+
+        return processedMessage;
+    }
+
+    /**
+     * 处理排行榜占位符的通用方法
+     *
+     * @param message 原始消息
+     * @param ranking 排行榜数据
+     * @param type    排行类型（Kills/Assists/BedBreaks）
+     * @return 处理后的消息
+     */
+    private String processRankingPlaceholders(String message, List<GamePlayer> ranking, String type) {
+        String processedMessage = message;
+
+        // 处理前三名占位符
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            GamePlayer player = ranking.get(i);
+            String rank = getRankName(i);
+
+            // 替换名称占位符
+            processedMessage = processedMessage.replace("<" + rank + "Name>", player.getNickName());
+
+            // 替换数值占位符
+            int value = getPlayerValue(player, type);
+            processedMessage = processedMessage.replace("<" + rank + type + ">", String.valueOf(value));
+        }
+
+        // 如果排行榜不足3人，将剩余占位符替换为空字符串
+        for (int i = ranking.size(); i < 3; i++) {
+            String rank = getRankName(i);
+            processedMessage = processedMessage.replace("<" + rank + "Name>", "");
+            processedMessage = processedMessage.replace("<" + rank + type + ">", "0");
+        }
+
+        return processedMessage;
+    }
+
+    /**
+     * 获取排名名称
+     *
+     * @param index 排名索引（0-2）
+     * @return 排名名称
+     */
+    private String getRankName(int index) {
+        return switch (index) {
+            case 0 -> "first";
+            case 1 -> "second";
+            case 2 -> "third";
+            default -> "first";
+        };
+    }
+
+    /**
+     * 获取玩家指定类型的数值
+     *
+     * @param player 玩家
+     * @param type   类型
+     * @return 数值
+     */
+    private int getPlayerValue(GamePlayer player, String type) {
+        return switch (type) {
+            case "Kills" -> player.getCurrentGameFinalKills();
+            case "Assists" -> player.getCurrentGameAssists();
+            case "BedBreaks" -> player.getCurrentGameDestroyedBeds();
+            default -> 0;
+        };
     }
 
     /**
@@ -218,7 +276,7 @@ public class GameOverTask extends BukkitRunnable {
     private void spawnVictoryFireworks(GameTeam winner) {
         if (winner != null) {
             winner.getAlivePlayers().forEach(gamePlayer -> FireWorkUtil.spawnFireWork(
-                gamePlayer.getPlayer().getLocation().add(0.0D, FIREWORK_HEIGHT, 0.0D),
+                    gamePlayer.getPlayer().getLocation().add(0.0D, gameOverConfig.getFireworkHeight(), 0.0D),
                     Objects.requireNonNull(gamePlayer.getPlayer().getLocation().getWorld())
             ));
         }
@@ -240,6 +298,6 @@ public class GameOverTask extends BukkitRunnable {
             public void run() {
                 Bukkit.shutdown();
             }
-        }.runTaskLater(AzuraBedWars.getInstance(), SHUTDOWN_DELAY);
+        }.runTaskLater(AzuraBedWars.getInstance(), gameOverConfig.getShutdownDelay());
     }
 }

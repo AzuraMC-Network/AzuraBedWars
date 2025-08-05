@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
-import cc.azuramc.bedwars.database.connection.ORMHandler;
 import cc.azuramc.bedwars.database.dao.PlayerDataDao;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
@@ -23,7 +22,6 @@ import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
-import cc.azuramc.bedwars.tablist.TabList;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.bedwars.util.bstats.Metrics;
@@ -61,14 +59,17 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter @Setter private MapData mapData;
     @Getter private Economy econ = null;
     @Getter private Chat chat = null;
-    @Getter private ORMHandler ormHandler = null;
     @Getter private ConfigManager configManager;
     @Getter private SettingsConfig settingsConfig;
-    @Getter private EventConfig eventConfig;
-    @Getter private TaskConfig taskConfig;
+    @Getter
+    private EventSettingsConfig eventSettingsConfig;
+    @Getter
+    private ResourceSpawnConfig resourceSpawnConfig;
     @Getter private MessageConfig messageConfig;
     @Getter private ItemConfig itemConfig;
     @Getter private PlayerConfig playerConfig;
+    @Getter
+    private TeamUpgradeConfig teamUpgradeConfig;
     @Getter private JedisManager jedisManager;
     @Getter private PubSubListener pubSubListener;
     @Getter private MapLoader mapLoader;
@@ -81,8 +82,6 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private NMSProvider nmsProvider;
     @Getter private NMSAccess nmsAccess;
     @Getter private LuckPerms luckPermsApi;
-
-    public static final String MAP_TABLE_NAME = "bw_map";
 
     @Override
     public void onLoad() {
@@ -148,9 +147,11 @@ public final class AzuraBedWars extends JavaPlugin {
             playerDataService.shutdown();
         }
 
-        if (ormHandler != null) {
-            ormHandler.shutdown();
+        if (ormClient != null) {
+            ormClient.close();
         }
+
+        AzuraORM.shutdownAll();
 
         PacketEvents.getAPI().terminate();
     }
@@ -180,7 +181,6 @@ public final class AzuraBedWars extends JavaPlugin {
         ormClient = AzuraORM.getClient();
         playerDataDao = new PlayerDataDao(this);
         playerDataService = new PlayerDataService(this);
-        ormHandler = new ORMHandler(this);
     }
 
     /**
@@ -262,7 +262,6 @@ public final class AzuraBedWars extends JavaPlugin {
         // 配置世界设置
         configureWorlds();
 
-        TabList.startAutoUpdate(this, gameManager);
         LoggerUtil.info("游戏相关特性加载完成");
     }
 
@@ -390,22 +389,24 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 注册配置对象供应商
         configFactory.registerSupplier("settings", SettingsConfig::new);
-        configFactory.registerSupplier("events", EventConfig::new);
-        configFactory.registerSupplier("tasks", TaskConfig::new);
-        configFactory.registerSupplier("messages", MessageConfig::new);
+        configFactory.registerSupplier("eventSettings", EventSettingsConfig::new);
+        configFactory.registerSupplier("tasks", ResourceSpawnConfig::new);
+        configFactory.registerSupplier("message", MessageConfig::new);
         configFactory.registerSupplier("items", ItemConfig::new);
         configFactory.registerSupplier("player", PlayerConfig::new);
+        configFactory.registerSupplier("teamUpgrade", TeamUpgradeConfig::new);
 
         // 初始化默认配置
         configFactory.initializeDefaults(configManager);
 
         // 获取配置对象
         settingsConfig = configManager.getConfig("settings", SettingsConfig.class);
-        eventConfig = configManager.getConfig("events", EventConfig.class);
-        taskConfig = configManager.getConfig("tasks", TaskConfig.class);
-        messageConfig = configManager.getConfig("messages", MessageConfig.class);
+        eventSettingsConfig = configManager.getConfig("eventSettings", EventSettingsConfig.class);
+        resourceSpawnConfig = configManager.getConfig("tasks", ResourceSpawnConfig.class);
+        messageConfig = configManager.getConfig("message", MessageConfig.class);
         itemConfig = configManager.getConfig("items", ItemConfig.class);
         playerConfig = configManager.getConfig("player", PlayerConfig.class);
+        teamUpgradeConfig = configManager.getConfig("teamUpgrade", TeamUpgradeConfig.class);
 
         // 保存配置
         configManager.saveAll();

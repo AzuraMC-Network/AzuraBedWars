@@ -60,7 +60,7 @@ public class EggBridgeListener implements Listener {
         if (gamePlayer.isEggBridgeCooldown()) {
             shooter.sendMessage(MessageUtil.color(EGG_COOLDOWN_MESSAGE));
             event.setCancelled(true);
-            if (VersionUtil.isLessThan113()) {
+            if (VersionUtil.isLessThan1_13()) {
                 gamePlayer.getPlayer().getInventory().addItem(XMaterial.EGG.parseItem());
             }
             return;

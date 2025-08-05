@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
@@ -42,10 +42,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class GamePlayer {
 
-    private static final PlayerConfig.GamePlayer CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getGamePlayer();
+    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
 
     public static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
-    private static final int MAX_HEALTH = CONFIG.getMaxHealth();
+    private static final int MAX_HEALTH = settingsConfig.getMaxHealth();
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
 
@@ -369,6 +369,28 @@ public class GamePlayer {
     public static List<GamePlayer> sortCurrentGameFinalKills() {
         List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
         list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameFinalKills(), player1.getCurrentGameFinalKills()));
+        return list;
+    }
+
+    /**
+     * 按本局助攻数排序玩家
+     *
+     * @return 排序后的玩家列表
+     */
+    public static List<GamePlayer> sortCurrentGameAssists() {
+        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
+        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameAssists(), player1.getCurrentGameAssists()));
+        return list;
+    }
+
+    /**
+     * 按本局拆床数排序玩家
+     *
+     * @return 排序后的玩家列表
+     */
+    public static List<GamePlayer> sortCurrentGameBedBreaks() {
+        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
+        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameDestroyedBeds(), player1.getCurrentGameDestroyedBeds()));
         return list;
     }
 

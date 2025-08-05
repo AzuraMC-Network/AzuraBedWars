@@ -69,7 +69,7 @@ public class LoadGameUtil {
         ab.setVisible(false);
 
         // 版本兼容处理 - 1.8版本使用setPassenger，1.9+使用addPassenger
-        if (VersionUtil.isVersion18()) {
+        if (VersionUtil.isVersion1_8()) {
             ab.setPassenger(v);
         } else {
             ab.addPassenger(v);
@@ -94,7 +94,7 @@ public class LoadGameUtil {
         ab.setVisible(false);
 
         // 版本兼容处理 - 1.8版本使用setPassenger，1.9+使用addPassenger
-        if (VersionUtil.isVersion18()) {
+        if (VersionUtil.isVersion1_8()) {
             ab.setPassenger(v);
         } else {
             ab.addPassenger(v);

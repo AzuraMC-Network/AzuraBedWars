@@ -22,7 +22,7 @@ public class WoolUtil {
      * @param teamColor 颜色
      */
     public static void setWoolBlockColor(Block block, TeamColor teamColor) {
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             block.setType(Material.valueOf("WOOL"));
             BlockState state = block.getState();
             state.setData(new Wool(teamColor.getDyeColor()));
@@ -41,7 +41,7 @@ public class WoolUtil {
      * @param z z
      */
     public static void setWoolBlockColor(Block block, TeamColor teamColor, int x, int y, int z) {
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             block.getRelative(x, y, z).setType(Material.valueOf("WOOL"));
             BlockState state = block.getRelative(x, y, z).getState();
             state.setData(new Wool(teamColor.getDyeColor()));
@@ -60,7 +60,7 @@ public class WoolUtil {
     public static TeamColor getTeamColorFromWoolBlock(Block block) {
         String blockType = block.getType().name();
 
-        if (!VersionUtil.isLessThan113()) {
+        if (!VersionUtil.isLessThan1_13()) {
             // 1.13+版本的羊毛命名格式为 COLOR_WOOL
             String colorName = blockType.substring(0, blockType.length() - 5);
             // 映射颜色名称到TeamColor
@@ -147,7 +147,7 @@ public class WoolUtil {
      * @return 对应颜色的羊毛物品
      */
     public static ItemStack getColoredWool(TeamColor teamColor) {
-        if (VersionUtil.isLessThan113()) {
+        if (VersionUtil.isLessThan1_13()) {
             return new ItemStack(Material.valueOf("WOOL"), 1, getWoolDataFromTeamColor(teamColor));
         } else {
             return XMaterial.matchXMaterial(teamColor.getDyeColor().toString() + "_WOOL")

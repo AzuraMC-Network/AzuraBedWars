@@ -13,6 +13,8 @@ import cc.azuramc.bedwars.util.LoggerUtil;
  */
 public class MapStorageFactory {
 
+    private static final String MAP_TABLE_NAME = "bw_map";
+
     private static JsonMapStorage jsonMapStorage;
     private static MySQLMapStorage mysqlMapStorage;
 
@@ -33,8 +35,7 @@ public class MapStorageFactory {
      */
     public static MySQLMapStorage getMysqlStorage() {
         if (mysqlMapStorage == null) {
-            String table = AzuraBedWars.MAP_TABLE_NAME;
-            mysqlMapStorage = new MySQLMapStorage(AzuraBedWars.getInstance(), table);
+            mysqlMapStorage = new MySQLMapStorage(AzuraBedWars.getInstance(), MAP_TABLE_NAME);
         }
         return mysqlMapStorage;
     }

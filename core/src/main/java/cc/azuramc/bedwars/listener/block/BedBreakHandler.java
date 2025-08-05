@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.listener.block;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsDestroyBedEvent;
 import cc.azuramc.bedwars.compat.util.BedUtil;
-import cc.azuramc.bedwars.config.object.EventConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -21,11 +21,7 @@ public class BedBreakHandler {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
     private static final GameManager GAME_MANAGER = PLUGIN.getGameManager();
-
-    private static final EventConfig.DestroyBedEvent CONFIG = AzuraBedWars.getInstance().getEventConfig().getDestroyBedEvent();
-
-    private static final int BED_SEARCH_RADIUS = CONFIG.getBedSearchRadius();
-    private static final int BED_DESTROY_REWARD = CONFIG.getBedDestroyReward();
+    private static final SettingsConfig settingsConfig = PLUGIN.getSettingsConfig();
 
     /**
      * 处理床方块破坏
@@ -39,14 +35,15 @@ public class BedBreakHandler {
         event.setCancelled(true);
 
         // 不能破坏自己的床
-        if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= BED_SEARCH_RADIUS) {
+        //TODO: 应该改为判断破坏的床是不是自家的床的block
+        if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getBedSearchRadius()) {
             gamePlayer.sendMessage("§c你不能破坏你家的床");
             return;
         }
 
         // 查找床所属团队
         for (GameTeam targetTeam : GAME_MANAGER.getGameTeams()) {
-            if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= BED_SEARCH_RADIUS) {
+            if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getBedSearchRadius()) {
                 if (!targetTeam.isDead()) {
                     processBedDestruction(gamePlayer, gameTeam, targetTeam, block);
                     return;
@@ -107,14 +104,14 @@ public class BedBreakHandler {
                     cancel();
                     return;
                 }
-                gamePlayer.sendActionBar("§6+" + BED_DESTROY_REWARD + "个金币");
+                gamePlayer.sendActionBar("§6+" + settingsConfig.getBedDestroyReward() + "个金币");
                 i++;
             }
         }.runTaskTimerAsynchronously(PLUGIN, 0, 10);
 
         if (!VaultUtil.ecoIsNull) {
-            gamePlayer.sendMessage("§6+" + BED_DESTROY_REWARD + "个金币 (破坏床)");
-            VaultUtil.depositPlayer(gamePlayer, BED_DESTROY_REWARD);
+            gamePlayer.sendMessage("§6+" + settingsConfig.getBedDestroyReward() + "个金币 (破坏床)");
+            VaultUtil.depositPlayer(gamePlayer, settingsConfig.getBedDestroyReward());
         }
     }
 

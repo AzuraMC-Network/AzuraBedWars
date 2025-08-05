@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.projectile;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.ItemConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.Location;
@@ -19,13 +19,8 @@ import java.util.UUID;
  */
 public class FireballHandler implements Listener {
 
-    private static final ItemConfig.FireBall CONFIG = AzuraBedWars.getInstance().getItemConfig().getFireBall();
+    private static final SettingsConfig.FireBall fireballConfig = AzuraBedWars.getInstance().getSettingsConfig().getFireBall();
 
-    private static final int FIREBALL_EXPLOSION_RADIUS_X = CONFIG.getFireballExplosionRadiusX();
-    private static final int FIREBALL_EXPLOSION_RADIUS_Y = CONFIG.getFireballExplosionRadiusY();
-    private static final int FIREBALL_EXPLOSION_RADIUS_Z = CONFIG.getFireballExplosionRadiusZ();
-    private static final int FIREBALL_DAMAGE = CONFIG.getFireballDamage();
-    private static final double FIREBALL_KNOCK_BACK_MULTIPLIER = CONFIG.getFireballKnockbackMultiplier();
     public static final String FIREBALL_METADATA = "GAME_FIREBALL";
     public static final String NO_FALL_DAMAGE_METADATA = "FIREBALL_PLAYER_FALL_MODIFY";
 
@@ -94,7 +89,7 @@ public class FireballHandler implements Listener {
         Player player = gamePlayer.getPlayer();
 
         // 造成伤害
-        player.damage(FIREBALL_DAMAGE);
+        player.damage(fireballConfig.getFireballDamage());
 
         // 记录伤害来源（用于助攻系统）
         gamePlayer.setLastDamage(ownerPlayer);

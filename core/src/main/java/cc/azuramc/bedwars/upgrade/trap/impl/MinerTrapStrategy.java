@@ -55,8 +55,8 @@ public class MinerTrapStrategy extends AbstractTrapStrategy {
             PotionEffectType miningFatigue = XPotion.MINING_FATIGUE.get();
             if (miningFatigue != null) {
                 triggerPlayer.getPlayer().addPotionEffect(new PotionEffect(miningFatigue,
-                        AzuraBedWars.getInstance().getEventConfig().getStartEvent().getUpgrade().getMiningFatigueEffectDuration(),
-                        AzuraBedWars.getInstance().getEventConfig().getStartEvent().getUpgrade().getMiningFatigueEffectAmplifier()));
+                        teamUpgradeConfig.getMiningFatigueEffectDuration(),
+                        teamUpgradeConfig.getMiningFatigueEffectAmplifier()));
             }
         });
     }

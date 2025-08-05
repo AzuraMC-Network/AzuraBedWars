@@ -6,8 +6,8 @@ import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
@@ -33,7 +33,7 @@ import java.util.List;
 public class WarpPowder extends AbstractSpecialItem {
 
     private static final ItemConfig.WarpPowder CONFIG = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
-    private static final MessageConfig.WarpPowder MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getWarpPowder();
+    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
 
     /** 默认传送时间（秒） */
     private static final int DEFAULT_TELEPORT_TIME = CONFIG.getDefaultTeleportTime();
@@ -48,9 +48,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
     /** 取消传送物品名称 */
     private static final String CANCEL_ITEM_NAME = CONFIG.getCancelItemName();
-    private static final String TELEPORT_START_MESSAGE = MESSAGE_CONFIG.getTeleportStartMessage();
-    private static final String TELEPORT_CANCEL_MESSAGE = MESSAGE_CONFIG.getTeleportCancelMessage();
-    
+
     /** 完整传送时间 */
     private final int fullTeleportingTime;
     /** 游戏实例 */
@@ -65,7 +63,7 @@ public class WarpPowder extends AbstractSpecialItem {
     private BukkitTask teleportingTask;
     /** 剩余传送时间 */
     private double teleportingTime;
-    
+
     /**
      * 默认构造函数
      */
@@ -78,10 +76,10 @@ public class WarpPowder extends AbstractSpecialItem {
         this.teleportingTask = null;
         this.teleportingTime = DEFAULT_TELEPORT_TIME;
     }
-    
+
     /**
      * 带参数的构造函数
-     * 
+     *
      * @param teleportTime 传送时间（秒）
      */
     public WarpPowder(int teleportTime) {
@@ -96,7 +94,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
     /**
      * 取消传送
-     * 
+     *
      * @param removeSpecial 是否从游戏中移除此特殊物品
      * @param showMessage 是否显示取消消息
      */
@@ -104,7 +102,7 @@ public class WarpPowder extends AbstractSpecialItem {
         if (gamePlayer == null || teleportingTask == null) {
             return;
         }
-        
+
         Player player = gamePlayer.getPlayer();
         if (player == null) {
             return;
@@ -124,7 +122,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
         // 显示消息
         if (showMessage) {
-            gamePlayer.sendMessage(TELEPORT_CANCEL_MESSAGE);
+            gamePlayer.sendMessage(messageConfig.getWarpPowderCancelMessage());
         }
 
         // 恢复物品
@@ -133,17 +131,17 @@ public class WarpPowder extends AbstractSpecialItem {
 
     /**
      * 恢复玩家的物品
-     * 
+     *
      * @param player 玩家
      */
     private void restorePlayerItem(Player player) {
         if (stack == null) {
             return;
         }
-        
+
         // 减少物品数量
         setStackAmount(this.getStack().getAmount() - 1);
-        
+
         // 查找并替换取消物品
         int cancelItemSlot = player.getInventory().first(getCancelItemStack());
         if (cancelItemSlot >= 0) {
@@ -159,7 +157,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
     /**
      * 获取取消传送的物品
-     * 
+     *
      * @return 取消传送物品
      */
     private ItemStack getCancelItemStack() {
@@ -179,7 +177,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
     /**
      * 获取使用此物品的玩家
-     * 
+     *
      * @return 玩家
      */
     public GamePlayer getPlayer() {
@@ -188,7 +186,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
     /**
      * 设置使用此物品的玩家
-     * 
+     *
      * @param gamePlayer 玩家
      */
     public void setPlayer(GamePlayer gamePlayer) {
@@ -197,19 +195,19 @@ public class WarpPowder extends AbstractSpecialItem {
 
     /**
      * 启动传送任务
-     * 
+     *
      * @return 是否成功启动
      */
     public boolean runTask() {
         if (gamePlayer == null || gameManager == null) {
             return false;
         }
-        
+
         Player player = gamePlayer.getPlayer();
         if (player == null) {
             return false;
         }
-        
+
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam == null || gameTeam.getSpawnLocation() == null) {
             gamePlayer.sendMessage("§c无法找到你的队伍出生点!");
@@ -223,16 +221,16 @@ public class WarpPowder extends AbstractSpecialItem {
 
         // 重置传送时间
         teleportingTime = fullTeleportingTime;
-        
+
         // 发送开始传送消息
-        gamePlayer.sendMessage(String.format(TELEPORT_START_MESSAGE, this.fullTeleportingTime));
-        
+        gamePlayer.sendMessage(String.format(messageConfig.getWarpPowderStartMessage(), this.fullTeleportingTime));
+
         // 播放开始传送音效
         player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0f, 1.0f);
 
         // 计算每个tick减少的时间
         final double perThrough = (Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((fullTeleportingTime * 20) / CIRCLE_COUNT)) / 20);
-        
+
         // 创建传送任务
         this.teleportingTask = new BukkitRunnable() {
             public double through = 0.0;
@@ -242,7 +240,7 @@ public class WarpPowder extends AbstractSpecialItem {
                 try {
                     // 减少剩余传送时间
                     WarpPowder.this.teleportingTime = teleportingTime - perThrough;
-                    
+
                     // 获取目标位置
                     GameTeam team = gamePlayer.getGameTeam();
                     if (team == null) {
@@ -250,7 +248,7 @@ public class WarpPowder extends AbstractSpecialItem {
                         WarpPowder.this.cancelTeleport(true, true);
                         return;
                     }
-                    
+
                     Location targetLoc = team.getSpawnLocation();
                     if (targetLoc == null) {
                         cancel();
@@ -271,7 +269,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
                     // 生成粒子效果
                     createTeleportParticles(player.getLocation(), targetLoc, through);
-                    
+
                     // 增加计数器
                     this.through += 1.0;
                 } catch (Exception ex) {
@@ -282,22 +280,22 @@ public class WarpPowder extends AbstractSpecialItem {
             }
         }.runTaskTimer(AzuraBedWars.getInstance(), 0L,
                 (long) Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((this.fullTeleportingTime * 20) / CIRCLE_COUNT)));
-        
+
         // 添加到游戏中的特殊物品列表
         this.gameManager.addSpecialItem(this);
         return true;
     }
-    
+
     /**
      * 创建传送粒子效果
-     * 
+     *
      * @param fromLoc 起始位置
      * @param toLoc 目标位置
      * @param through 当前高度计数
      */
     private void createTeleportParticles(Location fromLoc, Location toLoc, double through) {
         double y = (PARTICLE_HEIGHT / CIRCLE_COUNT) * through;
-        
+
         for (int i = 0; i < CIRCLE_ELEMENTS; i++) {
             double alpha = (360.0 / CIRCLE_ELEMENTS) * i;
             double x = PARTICLE_RADIUS * Math.sin(Math.toRadians(alpha));
@@ -317,7 +315,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
     /**
      * 设置物品堆叠数量
-     * 
+     *
      * @param amount 数量
      */
     public void setStackAmount(int amount) {
@@ -325,19 +323,19 @@ public class WarpPowder extends AbstractSpecialItem {
             this.stack.setAmount(Math.max(0, amount));
         }
     }
-    
+
     /**
      * 检查玩家是否正在传送中
-     * 
+     *
      * @return 是否传送中
      */
     public boolean isTeleporting() {
         return this.teleportingTask != null && !this.teleportingTask.isCancelled();
     }
-    
+
     /**
      * 获取剩余传送时间
-     * 
+     *
      * @return 剩余时间（秒）
      */
     public double getRemainingTime() {

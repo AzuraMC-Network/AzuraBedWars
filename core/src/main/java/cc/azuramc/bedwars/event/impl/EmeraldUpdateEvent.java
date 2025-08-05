@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.event.GameEventRunnable;
 import cc.azuramc.bedwars.game.GameManager;
@@ -16,17 +17,7 @@ import cc.azuramc.bedwars.game.task.generator.PublicResourceGenerator;
 public class EmeraldUpdateEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
-
-    /**
-     * 绿宝石资源点刷新标识符
-     */
-    private static final String EVENT_NAME = PLUGIN.getMessageConfig().getEmeraldUpdate().getEventName();
-
-    /**
-     * 定义各等级的绿宝石刷新时间（秒）
-     */
-    private static final int LEVEL_2_REFRESH_SECONDS = PLUGIN.getEventConfig().getEmeraldUpdateEvent().getLevel2RefreshSecond();
-    private static final int LEVEL_3_REFRESH_SECONDS = PLUGIN.getEventConfig().getEmeraldUpdateEvent().getLevel3RefreshSecond();
+    private static final EventSettingsConfig.EmeraldUpdateEvent emeraldUpdateConfig = PLUGIN.getEventSettingsConfig().getEmeraldUpdateEvent();
 
     /**
      * 当前升级等级
@@ -74,10 +65,9 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
      */
     private int getRefreshSecondsForLevel() {
         return switch (level) {
-            case 2 -> LEVEL_2_REFRESH_SECONDS;
-            case 3 -> LEVEL_3_REFRESH_SECONDS;
-            // 默认使用2级刷新时间
-            default -> LEVEL_2_REFRESH_SECONDS;
+            case 2 -> emeraldUpdateConfig.getLevel2RefreshSecond();
+            case 3 -> emeraldUpdateConfig.getLevel3RefreshSecond();
+            default -> emeraldUpdateConfig.getLevel1RefreshSecond();
         };
     }
 

@@ -1,8 +1,7 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.EventConfig;
-import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.spectator.task.SpectatorCompassTask;
@@ -18,14 +17,13 @@ import com.cryptomorin.xseries.XSound;
 public class GameStartEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
-    private static final EventConfig.StartEvent CONFIG = PLUGIN.getEventConfig().getStartEvent();
-    private static final MessageConfig.Start MESSAGE_EVENT = PLUGIN.getMessageConfig().getStart();
+    private static final EventSettingsConfig.GameStartEvent gameStartConfig = PLUGIN.getEventSettingsConfig().getGameStartEvent();
 
     /**
      * 创建游戏开始事件
      */
     public GameStartEvent() {
-        super(MESSAGE_EVENT.getEventName(), PLUGIN.getEventConfig().getStartEvent().getCountDown(), PLUGIN.getEventConfig().getStartEvent().getEventPriority());
+        super("开始游戏", gameStartConfig.getCountDown(), 0);
     }
 
     /**
@@ -37,11 +35,8 @@ public class GameStartEvent extends AbstractGameEvent {
     @Override
     public void executeRunnable(GameManager gameManager, int seconds) {
         gameManager.broadcastSound(XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
-        gameManager.broadcastTitleToAll(
-                MESSAGE_EVENT.getTitle().getTitleString(), MESSAGE_EVENT.getTitle().getSubtitle() + seconds, CONFIG.getTitle().getFadeIn(),
-            CONFIG.getTitle().getTitleStay(),
-            CONFIG.getTitle().getFadeOut()
-        );
+        gameManager.broadcastTitleToAll(gameStartConfig.getTitleString(), gameStartConfig.getSubtitle() + seconds,
+                gameStartConfig.getFadeIn(), gameStartConfig.getTitleStay(), gameStartConfig.getFadeOut());
     }
 
     /**
