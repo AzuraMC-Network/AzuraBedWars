@@ -17,15 +17,9 @@ import java.text.DecimalFormat;
  */
 public class SpectatorTarget {
 
-    private static final MessageConfig.Spectator.Target MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getTarget();
+    private static final MessageConfig.Spectator spectatorConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator();
     private static final PlayerConfig.Spectator.Target CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getTarget();
 
-    private static final String TARGET_LOST_MESSAGE = MESSAGE_CONFIG.getTargetLostMessage();
-    private static final String FIRST_PERSON_TITLE = MESSAGE_CONFIG.getFirstPersonTitle();
-    private static final String FIRST_PERSON_SUBTITLE = MESSAGE_CONFIG.getFirstPersonSubTitle();
-    private static final String FIRST_PERSON_ACTION_BAR = MESSAGE_CONFIG.getFirstPersonActionBar();
-    private static final String THIRD_PERSON_ACTION_BAR = MESSAGE_CONFIG.getThirdPersonActionBar();
-    private static final String MENU_HINT = MESSAGE_CONFIG.getMenuHint();
     private static final double AUTO_TP_DISTANCE = CONFIG.getAutoTPDistance();
     private static final int TITLE_FADE_IN = 0;
     private static final int TITLE_DURATION = CONFIG.getTitleDuration();
@@ -88,20 +82,20 @@ public class SpectatorTarget {
 
         // 第一人称旁观模式
         if (isFirstPersonViewActive()) {
-            String actionBarText = String.format(FIRST_PERSON_ACTION_BAR,
-                target.getName(), (int)target.getHealth()) + MENU_HINT;
+            String actionBarText = String.format(spectatorConfig.getFirstPersonActionBar(),
+                    target.getName(), (int) target.getHealth()) + spectatorConfig.getMenuHint();
             gamePlayer.sendActionBar(actionBarText);
             return;
         }
 
         // 检查是否在同一世界
         if (!isSameWorld()) {
-            gamePlayer.sendActionBar(TARGET_LOST_MESSAGE);
+            gamePlayer.sendActionBar(spectatorConfig.getTargetLostMessage());
             return;
         }
 
         // 第三人称旁观模式
-        String actionBarText = String.format(THIRD_PERSON_ACTION_BAR,
+        String actionBarText = String.format(spectatorConfig.getThirdPersonActionBar(),
             target.getName(), (int)target.getHealth(), df.format(getDistance()));
         gamePlayer.sendActionBar(actionBarText);
     }
@@ -204,7 +198,7 @@ public class SpectatorTarget {
      */
     private void activateFirstPersonView() {
         gamePlayer.sendTitle(
-                String.format(FIRST_PERSON_TITLE, target.getName()), FIRST_PERSON_SUBTITLE, TITLE_FADE_IN,
+                String.format(spectatorConfig.getFirstPersonTitle(), target.getName()), spectatorConfig.getFirstPersonSubTitle(), TITLE_FADE_IN,
                 TITLE_DURATION,
             TITLE_FADE_OUT
         );

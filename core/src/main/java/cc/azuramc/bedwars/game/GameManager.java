@@ -47,8 +47,8 @@ import java.util.*;
 @Data
 public class GameManager {
 
+    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
     private ItemConfig.GameManager itemConfig;
-    private MessageConfig.Game messageConfig;
     private SettingsConfig settingsConfig;
 
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
@@ -118,11 +118,10 @@ public class GameManager {
 
     private void initializeConfigs() {
         this.itemConfig = plugin.getItemConfig().getGameManager();
-        this.messageConfig = plugin.getMessageConfig().getGame();
         this.settingsConfig = plugin.getSettingsConfig();
 
-        this.msgPlayerReconnect = messageConfig.getMsgPlayerReconnect();
-        this.msgPlayerLeave = messageConfig.getMsgPlayerLeave();
+        this.msgPlayerReconnect = messageConfig.getPlayerReconnectMessage();
+        this.msgPlayerLeave = messageConfig.getPlayerLeaveMessage();
 
         this.resourceSelectorMaterial = XMaterial.PAPER.get();
         this.resourceSelectorName = itemConfig.getResourceSelectorName();
@@ -867,8 +866,7 @@ public class GameManager {
      */
     private void registerTeamUpgradeCheckTask() {
         TeamUpgradeCheckTask teamUpgradeCheckTask = new TeamUpgradeCheckTask(this);
-        String taskName = plugin.getMessageConfig().getStart().getTeamUpgradeTaskName();
-        gameEventManager.registerRunnable(taskName, (s, c) -> teamUpgradeCheckTask.execute());
+        gameEventManager.registerRunnable("团队升级", (s, c) -> teamUpgradeCheckTask.execute());
     }
 
     /**

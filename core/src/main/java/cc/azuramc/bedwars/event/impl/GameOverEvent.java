@@ -2,8 +2,7 @@ package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.BedwarsGameOverEvent;
-import cc.azuramc.bedwars.config.object.EventConfig;
-import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.task.GameOverTask;
@@ -18,11 +17,10 @@ import org.bukkit.Bukkit;
 public class GameOverEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
-    private static final EventConfig.OverEvent CONFIG = PLUGIN.getEventConfig().getOverEvent();
-    private static final MessageConfig.Over MESSAGE_CONFIG = PLUGIN.getMessageConfig().getOver();
+    private static final EventSettingsConfig.GameOverEvent gameOverConfig = PLUGIN.getEventSettingsConfig().getGameOverEvent();
 
     public GameOverEvent() {
-        super(MESSAGE_CONFIG.getEventName(), CONFIG.getExecuteSecond(), 6);
+        super("游戏结束", gameOverConfig.getExecuteSeconds(), 6);
     }
 
     @Override

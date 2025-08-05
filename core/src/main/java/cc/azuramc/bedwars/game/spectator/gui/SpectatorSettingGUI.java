@@ -24,10 +24,10 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class SpectatorSettingGUI extends CustomGUI {
 
-    private static final MessageConfig.Spectator.SettingGUI MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getSettingGUI();
+    private static final MessageConfig.Spectator spectatorConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator();
+
     private static final PlayerConfig.Spectator.SettingGUI CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getSettingGUI();
 
-    private static final String GUI_TITLE = MESSAGE_CONFIG.getGuiTitle();
     private static final int INVENTORY_SIZE = CONFIG.getInventorySize();
     private static final int MAX_POTION_DURATION = Integer.MAX_VALUE;
 
@@ -43,26 +43,13 @@ public class SpectatorSettingGUI extends CustomGUI {
     private static final int HIDE_OTHERS_SLOT = CONFIG.getHideOthersSlot();
     private static final int FLY_SLOT = CONFIG.getFlySlot();
 
-    private static final String SPEED_REMOVED = MESSAGE_CONFIG.getSpeedRemoved();
-    private static final String SPEED_ADDED = MESSAGE_CONFIG.getSpeedAdded();
-    private static final String AUTO_TP_ENABLED = MESSAGE_CONFIG.getAutoTPEnabled();
-    private static final String AUTO_TP_DISABLED = MESSAGE_CONFIG.getAutoTPDisabled();
-    private static final String NIGHT_VISION_ENABLED = MESSAGE_CONFIG.getNightVersionEnabled();
-    private static final String NIGHT_VISION_DISABLED = MESSAGE_CONFIG.getNightVersionDisabled();
-    private static final String FIRST_PERSON_ENABLED = MESSAGE_CONFIG.getFirstPersonEnabled();
-    private static final String FIRST_PERSON_DISABLED = MESSAGE_CONFIG.getFirstPersonDisabled();
-    private static final String HIDE_OTHERS_ENABLED = MESSAGE_CONFIG.getHideOthersEnabled();
-    private static final String HIDE_OTHERS_DISABLED = MESSAGE_CONFIG.getHideOthersDisabled();
-    private static final String FLY_ENABLED = MESSAGE_CONFIG.getFlyEnabled();
-    private static final String FLY_DISABLED = MESSAGE_CONFIG.getFlyDisabled();
-
     /**
      * 构造函数
      *
      * @param gamePlayer 打开GUI的玩家
      */
     public SpectatorSettingGUI(GamePlayer gamePlayer) {
-        super(gamePlayer, GUI_TITLE, INVENTORY_SIZE);
+        super(gamePlayer, spectatorConfig.getSpectatorSettingsGuiTitle(), INVENTORY_SIZE);
         SpectatorSettings spectatorSettings = SpectatorSettings.get(gamePlayer);
 
         initializeSpeedItems(gamePlayer, spectatorSettings);
@@ -131,9 +118,9 @@ public class SpectatorSettingGUI extends CustomGUI {
             removeSpeedEffect(gamePlayer);
             if (level > 0) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, MAX_POTION_DURATION, level - 1));
-                player.sendMessage(String.format(SPEED_ADDED, level));
+                player.sendMessage(String.format(spectatorConfig.getSpeedAdded(), level));
             } else {
-                player.sendMessage(SPEED_REMOVED);
+                player.sendMessage(spectatorConfig.getSpeedRemoved());
             }
             settings.setSpeed(level);
         }, true);
@@ -227,7 +214,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.AUTO_TP);
             settings.setOption(SpectatorSettings.Option.AUTO_TP, newValue);
-            gamePlayer.sendMessage(newValue ? AUTO_TP_ENABLED : AUTO_TP_DISABLED);
+            gamePlayer.sendMessage(newValue ? spectatorConfig.getAutoTPEnabled() : spectatorConfig.getAutoTPDisabled());
         }, true);
     }
 
@@ -248,7 +235,7 @@ public class SpectatorSettingGUI extends CustomGUI {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, MAX_POTION_DURATION, 1));
             }
             settings.setOption(SpectatorSettings.Option.NIGHT_VISION, newValue);
-            player.sendMessage(newValue ? NIGHT_VISION_ENABLED : NIGHT_VISION_DISABLED);
+            player.sendMessage(newValue ? spectatorConfig.getNightVersionEnabled() : spectatorConfig.getNightVersionDisabled());
         }, true);
     }
 
@@ -265,7 +252,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.FIRST_PERSON);
             settings.setOption(SpectatorSettings.Option.FIRST_PERSON, newValue);
-            gamePlayer.sendMessage(newValue ? FIRST_PERSON_ENABLED : FIRST_PERSON_DISABLED);
+            gamePlayer.sendMessage(newValue ? spectatorConfig.getFirstPersonEnabled() : spectatorConfig.getFirstPersonDisabled());
 
             if (!newValue && gamePlayer.isSpectator() && player.getGameMode() == GameMode.SPECTATOR) {
                 gamePlayer.sendTitle("§e退出旁观模式", null, 0, 20, 0);
@@ -286,7 +273,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.HIDE_OTHER);
             settings.setOption(SpectatorSettings.Option.HIDE_OTHER, newValue);
-            gamePlayer.sendMessage(newValue ? HIDE_OTHERS_ENABLED : HIDE_OTHERS_DISABLED);
+            gamePlayer.sendMessage(newValue ? spectatorConfig.getHideOthersEnabled() : spectatorConfig.getHideOthersDisabled());
         }, true);
     }
 
@@ -303,7 +290,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.FLY);
             settings.setOption(SpectatorSettings.Option.FLY, newValue);
-            gamePlayer.sendMessage(newValue ? FLY_ENABLED : FLY_DISABLED);
+            gamePlayer.sendMessage(newValue ? spectatorConfig.getFlyEnabled() : spectatorConfig.getFlyDisabled());
 
             if (newValue) {
                 if (player.isOnGround()) {
