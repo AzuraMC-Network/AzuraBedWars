@@ -43,7 +43,7 @@ public class BedBreakHandler {
 
         // 查找床所属团队
         for (GameTeam targetTeam : GAME_MANAGER.getGameTeams()) {
-            if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getBedDestroyReward()) {
+            if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getBedSearchRadius()) {
                 if (!targetTeam.isDead()) {
                     processBedDestruction(gamePlayer, gameTeam, targetTeam, block);
                     return;
