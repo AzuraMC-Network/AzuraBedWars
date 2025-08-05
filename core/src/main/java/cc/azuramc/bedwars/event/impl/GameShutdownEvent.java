@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -17,24 +18,13 @@ import org.bukkit.Bukkit;
 public class GameShutdownEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
-
-    private static final String EVENT_NAME = PLUGIN.getMessageConfig().getShutdown().getEventName();
-
-    /**
-     * 游戏结束延迟关服时间（秒）
-     */
-    private static final int SHUTDOWN_DELAY_SECONDS = PLUGIN.getEventConfig().getShutdownEvent().getShutdownDelaySecond();
-
-    /**
-     * 事件优先级（在所有事件结束后触发）
-     */
-    private static final int END_EVENT_PRIORITY = 7;
+    private static final EventSettingsConfig.GameOverEvent gameOverConfig = PLUGIN.getEventSettingsConfig().getGameOverEvent();
 
     /**
      * 创建游戏结束事件
      */
     public GameShutdownEvent() {
-        super(EVENT_NAME, SHUTDOWN_DELAY_SECONDS, END_EVENT_PRIORITY);
+        super("游戏关闭", gameOverConfig.getExecuteSeconds(), 7);
     }
 
     /**

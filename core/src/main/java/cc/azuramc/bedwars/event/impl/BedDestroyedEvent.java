@@ -1,12 +1,11 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.compat.util.BedUtil;
+import cc.azuramc.bedwars.config.object.EventSettingsConfig;
+import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.event.AbstractGameEvent;
-import cc.azuramc.bedwars.compat.util.BedUtil;
-import cc.azuramc.bedwars.config.object.EventConfig;
 import com.cryptomorin.xseries.XSound;
 
 import java.util.logging.Level;
@@ -23,37 +22,20 @@ import java.util.logging.Level;
 public class BedDestroyedEvent extends AbstractGameEvent {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
-    private static final EventConfig.DestroyBedEvent CONFIG = PLUGIN.getEventConfig().getDestroyBedEvent();
-    private static final MessageConfig.DestroyBed MESSAGE_CONFIG = PLUGIN.getMessageConfig().getDestroyBed();
-
-    /**
-     * 事件相关常量
-     */
-    private static final String EVENT_NAME = MESSAGE_CONFIG.getEventName();
-    private static final int EXECUTE_SECONDS = CONFIG.getExecuteSecond();
-    private static final int PRIORITY = 5;
-
-    /**
-     * 标题显示相关常量
-     */
-    private static final String TITLE = MESSAGE_CONFIG.getTitle().getTitleString();
-    private static final String SUBTITLE = MESSAGE_CONFIG.getTitle().getSubtitle();
-    private static final int TITLE_FADE_IN = CONFIG.getTitle().getFadeIn();
-    private static final int TITLE_STAY = CONFIG.getTitle().getTitleStay();
-    private static final int TITLE_FADE_OUT = CONFIG.getTitle().getFadeOut();
+    private static final EventSettingsConfig.BedDestroyedEvent bedDestroyedConfig = PLUGIN.getEventSettingsConfig().getBedDestroyedEvent();
 
     /**
      * 创建床自毁事件
      * 默认在游戏开始6分钟后触发，优先级为5
      */
     public BedDestroyedEvent() {
-        super(EVENT_NAME, EXECUTE_SECONDS, PRIORITY);
+        super("床自毁", 360, 5);
     }
 
     /**
      * 执行床自毁事件
      * 销毁所有队伍的床，播放音效，并向玩家显示提示
-     * 
+     *
      * @param gameManager 当前游戏实例
      */
     @Override
@@ -74,12 +56,13 @@ public class BedDestroyedEvent extends AbstractGameEvent {
 
         // 播放音效和显示标题
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 1, 1);
-        gameManager.broadcastTitleToAll(TITLE, SUBTITLE, TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
+        gameManager.broadcastTitleToAll(bedDestroyedConfig.getTitle(), bedDestroyedConfig.getSubtitle(),
+                bedDestroyedConfig.getFadeIn(), bedDestroyedConfig.getTitleStay(), bedDestroyedConfig.getFadeOut());
     }
-    
+
     /**
      * 销毁所有队伍的床
-     * 
+     *
      * @param gameManager 当前游戏实例
      */
     private void destroyAllBeds(GameManager gameManager) {

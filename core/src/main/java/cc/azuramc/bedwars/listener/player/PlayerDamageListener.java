@@ -35,13 +35,11 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class PlayerDamageListener implements Listener {
 
-    private final static MessageConfig.PlayerDeath MESSAGE_CONFIG = AzuraBedWars.getInstance().getMessageConfig().getPlayerDeath();
+    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
     private final static PlayerConfig.PlayerDeath CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
 
     private static final String METADATA_SHOP = "Shop";
     private static final String METADATA_SHOP2 = "Shop2";
-    private static final String COINS_ACTION_BAR = MESSAGE_CONFIG.getCoinsActionBar();
-    private static final String COINS_MESSAGE = MESSAGE_CONFIG.getCoinsMessage();
     private static final int COINS_ACTIONBAR_TIMES = CONFIG.getCoinsActionBarTimes();
     private static final int ACTIONBAR_PERIOD = CONFIG.getActionBarPeriod();
     private static final int RESPAWN_DELAY = 10;
@@ -280,11 +278,11 @@ public class PlayerDamageListener implements Listener {
                     cancel();
                     return;
                 }
-                gamePlayer.sendActionBar(COINS_ACTION_BAR);
+                gamePlayer.sendActionBar(messageConfig.getNormalKillRewardsMessage());
                 i++;
             }
         }.runTaskTimerAsynchronously(plugin, 0, ACTIONBAR_PERIOD);
-        gamePlayer.sendMessage(COINS_MESSAGE);
+        gamePlayer.sendMessage(messageConfig.getFinalKillRewardsMessage());
     }
 
     /**
