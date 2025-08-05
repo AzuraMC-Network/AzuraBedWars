@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
@@ -42,10 +42,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class GamePlayer {
 
-    private static final PlayerConfig.GamePlayer CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getGamePlayer();
+    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
 
     public static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
-    private static final int MAX_HEALTH = CONFIG.getMaxHealth();
+    private static final int MAX_HEALTH = settingsConfig.getMaxHealth();
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
 

@@ -19,12 +19,15 @@ public class SettingsConfig {
     private int bedSearchRadius = 18;
     private int bedDestroyReward = 10;
     private String playAgainCommand = MessageUtil.color("/not impl now");
+    private int maxHealth = 20;
+    private int maxNoMovementTime = 45;
 
     private DatabaseConfig database = new DatabaseConfig();
     private ChatConfig chatConfig = new ChatConfig();
     private GameScoreboard gameScoreboard = new GameScoreboard();
     private LobbyScoreboard lobbyScoreboard = new LobbyScoreboard();
     private DisplayDamage displayDamage = new DisplayDamage();
+    private FireBall fireBall = new FireBall();
 
     @Data
     public static class DatabaseConfig {
@@ -33,6 +36,11 @@ public class SettingsConfig {
         private String username = "root";
         private String password = "123456";
         private String database = "azurabw";
+    }
+
+    @Data
+    public static class FireBall {
+        private int fireballDamage = 3;
     }
 
     @Data
@@ -48,7 +56,7 @@ public class SettingsConfig {
 
     @Data
     public static class GameScoreboard {
-        private String title = MessageUtil.color("&e&l超级起床战争");
+        private String title = MessageUtil.color("&e&l起床战争");
         private String serverInfo = MessageUtil.color("&bas.azuramc.cc");
         private String myTeamMark = MessageUtil.color(" &7(我的队伍)");
         private String bedDestroyed = MessageUtil.color("&7❤");
@@ -61,7 +69,7 @@ public class SettingsConfig {
 
     @Data
     public static class LobbyScoreboard {
-        private String title = MessageUtil.color("&e&l超级起床战争");
+        private String title = MessageUtil.color("&e&l起床战争");
         private String serverInfo = MessageUtil.color("&bas.azuramc.cc");
         private String waitingMessage = MessageUtil.color("&f等待中...");
         private String emptyLine = MessageUtil.color("");
