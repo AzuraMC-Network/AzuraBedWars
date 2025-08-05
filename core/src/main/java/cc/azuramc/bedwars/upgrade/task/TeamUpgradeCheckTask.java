@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.upgrade.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.EventConfig;
+import cc.azuramc.bedwars.config.object.TeamUpgradeConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -22,7 +22,7 @@ import java.util.Objects;
  */
 public class TeamUpgradeCheckTask {
 
-    private static final EventConfig.StartEvent CONFIG = AzuraBedWars.getInstance().getEventConfig().getStartEvent();
+    private static final TeamUpgradeConfig teamUpgradeConfig = AzuraBedWars.getInstance().getTeamUpgradeConfig();
 
     private final GameManager gameManager;
 
@@ -77,7 +77,7 @@ public class TeamUpgradeCheckTask {
                 // Subtract 1 from the level because Minecraft potion effect levels start at 0
                 int effectLevel = gameTeam.getUpgradeManager().getMagicMinerUpgrade() - 1;
                 player.getPlayer().addPotionEffect(new PotionEffect(fastDigging,
-                        CONFIG.getUpgrade().getHasteEffectDuration(),
+                        teamUpgradeConfig.getHasteEffectDuration(),
                         effectLevel));
             }
         })));
@@ -92,13 +92,13 @@ public class TeamUpgradeCheckTask {
     private void applyHealingPoolEffect(GamePlayer gamePlayer, GameTeam gameTeam) {
         double distance = gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
 
-        if (distance <= CONFIG.getUpgrade().getHealingPoolRange() && gameTeam.getUpgradeManager().hasHealPoolUpgrade()) {
+        if (distance <= teamUpgradeConfig.getHealingPoolRange() && gameTeam.getUpgradeManager().hasHealPoolUpgrade()) {
             AzuraBedWars.getInstance().mainThreadRunnable(() -> {
                 PotionEffectType regeneration = XPotion.REGENERATION.get();
                 if (regeneration != null) {
                     gamePlayer.getPlayer().addPotionEffect(new PotionEffect(regeneration,
-                            CONFIG.getUpgrade().getRegenerationEffectDuration(),
-                            CONFIG.getUpgrade().getRegenerationEffectAmplifier()));
+                            teamUpgradeConfig.getRegenerationEffectDuration(),
+                            teamUpgradeConfig.getRegenerationEffectAmplifier()));
                 }
             });
         }
@@ -114,7 +114,7 @@ public class TeamUpgradeCheckTask {
         double distance = gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
         TrapManager trapManager = gameTeam.getTrapManager();
 
-        if (distance <= CONFIG.getUpgrade().getTrapTriggerRange() && !gameTeam.isDead()) {
+        if (distance <= teamUpgradeConfig.getTrapTriggerRange() && !gameTeam.isDead()) {
             // 检查陷阱触发冷却
             if (gamePlayer.isTrapTriggerCooldown()) {
                 return;

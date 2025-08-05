@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.upgrade.trap;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
+import cc.azuramc.bedwars.config.object.TeamUpgradeConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -27,6 +28,7 @@ import java.util.Map;
  */
 public abstract class AbstractTrapStrategy implements TrapStrategy {
 
+    public static final TeamUpgradeConfig teamUpgradeConfig = AzuraBedWars.getInstance().getTeamUpgradeConfig();
     /**
      * 资源类型名称缓存
      */

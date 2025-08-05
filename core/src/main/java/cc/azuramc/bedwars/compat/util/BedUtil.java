@@ -70,7 +70,7 @@ public class BedUtil {
 
             try {
                 // 使用兼容性代码处理床方块
-                if (VersionUtil.isLessThan113()) {
+                if (VersionUtil.isLessThan1_13()) {
                     // 1.8-1.12版本使用旧API
                     org.bukkit.material.Bed bedBlock = (org.bukkit.material.Bed) targetBlock.getState().getData();
 

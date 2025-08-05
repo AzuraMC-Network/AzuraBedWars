@@ -18,15 +18,10 @@ import org.bukkit.inventory.ItemStack;
  */
 public class SpectatorCompassGUI extends CustomGUI {
 
-    private static final MessageConfig.Spectator.CompassGUI CONFIG = AzuraBedWars.getInstance().getMessageConfig().getSpectator().getCompassGUI();
+    private static final MessageConfig.Spectator spectatorConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator();
 
-    private static final String GUI_TITLE = CONFIG.getGuiTitle();
     private static final int SMALL_INVENTORY_SIZE = 27;
     private static final int LARGE_INVENTORY_SIZE = 54;
-    private static final String HEALTH_FORMAT = CONFIG.getHealthFormat();
-    private static final String FOOD_FORMAT = CONFIG.getFoodFormat();
-    private static final String LEVEL_FORMAT = CONFIG.getLevelFormat();
-    private static final String DISTANCE_FORMAT = CONFIG.getDistanceFormat();
 
     /**
      * 构造函数
@@ -34,7 +29,7 @@ public class SpectatorCompassGUI extends CustomGUI {
      * @param gamePlayer 打开GUI的玩家
      */
     public SpectatorCompassGUI(GamePlayer gamePlayer) {
-        super(gamePlayer, GUI_TITLE, calculateInventorySize());
+        super(gamePlayer, spectatorConfig.getSpectatorCompassGuiTitle(), calculateInventorySize());
         initializeItems();
     }
 
@@ -88,10 +83,10 @@ public class SpectatorCompassGUI extends CustomGUI {
             .setDisplayName(gameTeam.getName() + " " + gamePlayer.getNickName())
             .setLores(
                 " ",
-                String.format(HEALTH_FORMAT, (int) targetPlayer.getHealth()),
-                String.format(FOOD_FORMAT, targetPlayer.getFoodLevel()),
-                String.format(LEVEL_FORMAT, targetPlayer.getLevel()),
-                String.format(DISTANCE_FORMAT, (int) targetPlayer.getLocation().distance(gamePlayer.getPlayer().getLocation()))
+                    String.format(spectatorConfig.getHealthFormat(), (int) targetPlayer.getHealth()),
+                    String.format(spectatorConfig.getFoodFormat(), targetPlayer.getFoodLevel()),
+                    String.format(spectatorConfig.getLevelFormat(), targetPlayer.getLevel()),
+                    String.format(spectatorConfig.getDistanceFormat(), (int) targetPlayer.getLocation().distance(gamePlayer.getPlayer().getLocation()))
             )
             .getItem();
     }

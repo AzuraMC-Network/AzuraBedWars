@@ -9,22 +9,10 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode
 public class PlayerConfig {
-
-    private GamePlayer gamePlayer = new GamePlayer();
-    private AFKCheck afkCheck = new AFKCheck();
     private PlayerDeath playerDeath = new PlayerDeath();
     private PlayerRespawn playerRespawn = new PlayerRespawn();
     private Spectator spectator = new Spectator();
 
-    @Data
-    public static class GamePlayer {
-        private int maxHealth = 20;
-    }
-
-    @Data
-    public static class AFKCheck {
-        private int maxNoMovementTime = 45;
-    }
 
     @Data
     public static class PlayerDeath {

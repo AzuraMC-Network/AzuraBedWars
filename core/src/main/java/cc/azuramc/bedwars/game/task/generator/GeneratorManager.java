@@ -1,8 +1,7 @@
 package cc.azuramc.bedwars.game.task.generator;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.TaskConfig;
+import cc.azuramc.bedwars.config.object.ResourceSpawnConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.map.MapData;
@@ -20,52 +19,15 @@ import java.util.*;
  */
 public class GeneratorManager {
 
+    private static final ResourceSpawnConfig resourceSpawnConfig = AzuraBedWars.getInstance().getResourceSpawnConfig();
     private final GameManager gameManager;
     private final Map<String, PublicResourceGenerator> publicResourceGeneratorMap;
     private final Map<String, PrivateResourceGenerator> privateResourceGeneratorMap;
-
-    private final int MAX_DIAMOND_STACK_LEVEL_1;
-    private final int MAX_EMERALD_STACK_LEVEL_1;
-    private final int MAX_DIAMOND_STACK_LEVEL_2;
-    private final int MAX_EMERALD_STACK_LEVEL_2;
-    private final int MAX_DIAMOND_STACK_LEVEL_3;
-    private final int MAX_EMERALD_STACK_LEVEL_3;
-    private final float NAME_DISPLAY_HEIGHT;
-    private final float RESOURCE_TYPE_HEIGHT;
-    private final float LEVEL_DISPLAY_HEIGHT;
-    private final String DIAMOND_GENERATOR_NAME;
-    private final String EMERALD_GENERATOR_NAME;
-    private final String TIME_REMAINING_FORMAT;
-    private final String DIAMOND_NAME;
-    private final String EMERALD_NAME;
-    private final String LEVEL_I;
-    private final String LEVEL_II;
-    private final String LEVEL_III;
 
     public GeneratorManager(GameManager gameManager) {
         this.gameManager = gameManager;
         this.publicResourceGeneratorMap = new HashMap<>();
         this.privateResourceGeneratorMap = new HashMap<>();
-
-        TaskConfig.GeneratorConfig config = AzuraBedWars.getInstance().getTaskConfig().getGenerator();
-        MAX_DIAMOND_STACK_LEVEL_1 = config.getMaxDiamondStackLevel1();
-        MAX_EMERALD_STACK_LEVEL_1 = config.getMaxEmeraldStackLevel1();
-        MAX_DIAMOND_STACK_LEVEL_2 = config.getMaxDiamondStackLevel2();
-        MAX_EMERALD_STACK_LEVEL_2 = config.getMaxEmeraldStackLevel2();
-        MAX_DIAMOND_STACK_LEVEL_3 = config.getMaxDiamondStackLevel3();
-        MAX_EMERALD_STACK_LEVEL_3 = config.getMaxEmeraldStackLevel3();
-        MessageConfig.Generator messageConfig = AzuraBedWars.getInstance().getMessageConfig().getGenerator();
-        NAME_DISPLAY_HEIGHT = config.getNameDisplayHeight();
-        RESOURCE_TYPE_HEIGHT = config.getResourceTypeHeight();
-        LEVEL_DISPLAY_HEIGHT = config.getLevelDisplayHeight();
-        DIAMOND_GENERATOR_NAME = messageConfig.getDiamondGeneratorName();
-        EMERALD_GENERATOR_NAME = messageConfig.getEmeraldGeneratorName();
-        TIME_REMAINING_FORMAT = messageConfig.getTimeRemainingFormat();
-        DIAMOND_NAME = messageConfig.getDiamondName();
-        EMERALD_NAME = messageConfig.getEmeraldName();
-        LEVEL_I = messageConfig.getLevelI();
-        LEVEL_II = messageConfig.getLevelII();
-        LEVEL_III = messageConfig.getLevelIII();
     }
 
     public void initGeneratorTasks() {
@@ -181,22 +143,22 @@ public class GeneratorManager {
     public int getMaxStackForResource(String resource, int level) {
         switch (resource) {
             case "钻石":
-                if (level == 1) return MAX_DIAMOND_STACK_LEVEL_1;
-                if (level == 2) return MAX_DIAMOND_STACK_LEVEL_2;
-                if (level == 3) return MAX_DIAMOND_STACK_LEVEL_3;
+                if (level == 1) return resourceSpawnConfig.getMaxDiamondStackLevel1();
+                if (level == 2) return resourceSpawnConfig.getMaxDiamondStackLevel2();
+                if (level == 3) return resourceSpawnConfig.getMaxDiamondStackLevel3();
                 break;
             case "绿宝石":
-                if (level == 1) return MAX_EMERALD_STACK_LEVEL_1;
-                if (level == 2) return MAX_EMERALD_STACK_LEVEL_2;
-                if (level == 3) return MAX_EMERALD_STACK_LEVEL_3;
+                if (level == 1) return resourceSpawnConfig.getMaxEmeraldStackLevel1();
+                if (level == 2) return resourceSpawnConfig.getMaxEmeraldStackLevel2();
+                if (level == 3) return resourceSpawnConfig.getMaxEmeraldStackLevel3();
                 break;
         }
         return 0;
     }
 
     public void initDisplayUpdaters() {
-        initResourceDisplayUpdater("钻石", DIAMOND_GENERATOR_NAME, gameManager.getArmorStand().keySet(), DIAMOND_NAME);
-        initResourceDisplayUpdater("绿宝石", EMERALD_GENERATOR_NAME, gameManager.getArmorSande().keySet(), EMERALD_NAME);
+        initResourceDisplayUpdater("钻石", resourceSpawnConfig.getDiamondGeneratorName(), gameManager.getArmorStand().keySet(), resourceSpawnConfig.getDiamondName());
+        initResourceDisplayUpdater("绿宝石", resourceSpawnConfig.getEmeraldGeneratorName(), gameManager.getArmorSande().keySet(), resourceSpawnConfig.getEmeraldName());
     }
 
     private void updateResourceDisplay(Set<ArmorStand> armorStands, PublicResourceGenerator generator, String resourceDisplayName) {
@@ -211,17 +173,17 @@ public class GeneratorManager {
             if (location.getWorld() == null || !location.getChunk().isLoaded()) {
                 continue;
             }
-            if (armorStand.getFallDistance() == NAME_DISPLAY_HEIGHT) {
+            if (armorStand.getFallDistance() == resourceSpawnConfig.getNameDisplayHeight()) {
                 int timeRemaining = generator.getSecondsToNextDrop();
-                String displayText = String.format(TIME_REMAINING_FORMAT, timeRemaining);
+                String displayText = String.format(resourceSpawnConfig.getTimeRemainingFormat(), timeRemaining);
                 armorStand.setCustomName(displayText);
             }
-            if (armorStand.getFallDistance() == RESOURCE_TYPE_HEIGHT) {
+            if (armorStand.getFallDistance() == resourceSpawnConfig.getResourceTypeHeight()) {
                 armorStand.setCustomName(resourceDisplayName);
             }
-            if (armorStand.getFallDistance() == LEVEL_DISPLAY_HEIGHT) {
+            if (armorStand.getFallDistance() == resourceSpawnConfig.getLevelDisplayHeight()) {
                 int level = generator.getLevel();
-                String levelDisplay = level <= 1 ? LEVEL_I : (level == 2 ? LEVEL_II : LEVEL_III);
+                String levelDisplay = level <= 1 ? resourceSpawnConfig.getLevelI() : (level == 2 ? resourceSpawnConfig.getLevelII() : resourceSpawnConfig.getLevelIII());
                 armorStand.setCustomName(levelDisplay);
             }
         }
@@ -232,12 +194,12 @@ public class GeneratorManager {
         if (generator == null) return;
         Set<ArmorStand> armorStands;
         String resourceDisplayName;
-        if (generatorName.equals(DIAMOND_GENERATOR_NAME)) {
+        if (generatorName.equals(resourceSpawnConfig.getDiamondGeneratorName())) {
             armorStands = new HashSet<>(gameManager.getArmorStand().keySet());
-            resourceDisplayName = DIAMOND_NAME;
-        } else if (generatorName.equals(EMERALD_GENERATOR_NAME)) {
+            resourceDisplayName = resourceSpawnConfig.getDiamondName();
+        } else if (generatorName.equals(resourceSpawnConfig.getEmeraldGeneratorName())) {
             armorStands = new HashSet<>(gameManager.getArmorSande().keySet());
-            resourceDisplayName = EMERALD_NAME;
+            resourceDisplayName = resourceSpawnConfig.getEmeraldName();
         } else {
             return;
         }
