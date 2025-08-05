@@ -8,7 +8,10 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.*;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.Method;
@@ -25,7 +28,7 @@ import java.util.UUID;
  */
 public class ItemBuilder {
     private ItemStack itemStack;
-    
+
     // 反射缓存
     private static Class<?> craftItemStackClass;
     private static Class<?> nmsItemStackClass;
@@ -36,7 +39,7 @@ public class ItemBuilder {
     private static Method setTagMethod;
     private static Method asBukkitCopyMethod;
     private static boolean reflectionInitialized = false;
-    
+
     // 静态初始化块，在类首次加载时初始化反射缓存
     static {
         if (VersionUtil.isVersion1_8()) {
@@ -44,13 +47,13 @@ public class ItemBuilder {
                 craftItemStackClass = Class.forName("org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack");
                 nmsItemStackClass = Class.forName("net.minecraft.server.v1_8_R3.ItemStack");
                 nbtTagCompoundClass = Class.forName("net.minecraft.server.v1_8_R3.NBTTagCompound");
-                
+
                 asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
                 getTagMethod = nmsItemStackClass.getMethod("getTag");
                 setBooleanMethod = nbtTagCompoundClass.getMethod("setBoolean", String.class, boolean.class);
                 setTagMethod = nmsItemStackClass.getMethod("setTag", nbtTagCompoundClass);
                 asBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
-                
+
                 reflectionInitialized = true;
             } catch (Exception e) {
                 // 记录初始化失败，稍后会回退到备用方法
@@ -59,7 +62,7 @@ public class ItemBuilder {
             }
         }
     }
-    
+
     /**
      * 创建空物品构建器
      */
@@ -68,7 +71,7 @@ public class ItemBuilder {
             itemStack = new ItemStack(XMaterial.AIR.get());
         }
     }
-    
+
     /**
      * 创建指定类型的物品构建器
      * @param material 物品类型
@@ -76,7 +79,7 @@ public class ItemBuilder {
     public ItemBuilder(Material material) {
         itemStack = new ItemStack(material);
     }
-    
+
     /**
      * 创建基于现有物品的构建器
      * @param itemStack 现有物品
@@ -122,7 +125,7 @@ public class ItemBuilder {
     public ItemBuilder setOwner(String owner) {
         Material skullMaterial = getPlayerSkullMaterial();
         itemStack.setType(skullMaterial);
-        
+
         // 为旧版本设置数据值
         if (VersionUtil.isLessThan1_13()) {
             setDurabilityCompat(itemStack, (short) 3);
@@ -132,7 +135,7 @@ public class ItemBuilder {
         if (skullMeta == null) {
             return this;
         }
-        
+
         try {
             // 尝试使用UUID
             OfflinePlayer offlinePlayer;
@@ -143,11 +146,10 @@ public class ItemBuilder {
                 // 如果不是UUID，使用名称
                 offlinePlayer = Bukkit.getOfflinePlayer(owner);
             }
-            
+
             // 1.13+使用setOwningPlayer方法
             if (!VersionUtil.isLessThan1_13()) {
-                Method setOwningPlayer = SkullMeta.class.getMethod("setOwningPlayer", OfflinePlayer.class);
-                setOwningPlayer.invoke(skullMeta, offlinePlayer);
+                skullMeta.setOwningPlayer(offlinePlayer);
             } else {
                 // 1.8-1.12使用setOwner方法
                 skullMeta.setOwner(owner);
@@ -155,7 +157,7 @@ public class ItemBuilder {
         } catch (Exception e) {
             // 忽略异常，继续处理
         }
-        
+
         itemStack.setItemMeta(skullMeta);
         return this;
     }
@@ -180,7 +182,7 @@ public class ItemBuilder {
             // 优先使用NMS方法设置Unbreakable标签（适用于1.8）
             if (VersionUtil.isVersion1_8()) {
                 this.itemStack = setUnbreakableNbt(this.itemStack, unbreakable);
-                
+
                 // 如果需要隐藏标签且物品元数据存在
                 if (hide && this.itemStack.getItemMeta() != null) {
                     ItemMeta meta = this.itemStack.getItemMeta();
@@ -193,15 +195,12 @@ public class ItemBuilder {
                 }
                 return this;
             }
-            
+
             // 对于更高版本，尝试使用原生API
             ItemMeta itemMeta = itemStack.getItemMeta();
             if (itemMeta != null) {
                 try {
-                    // 尝试使用反射调用setUnbreakable方法（1.9-1.10）
-                    Method setUnbreakableMethod = ItemMeta.class.getDeclaredMethod("setUnbreakable", boolean.class);
-                    setUnbreakableMethod.invoke(itemMeta, unbreakable);
-                    
+                    itemMeta.setUnbreakable(unbreakable);
                     if (hide) {
                         try {
                             itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
@@ -209,7 +208,7 @@ public class ItemBuilder {
                             // 某些版本可能不支持此标志
                         }
                     }
-                    
+
                     itemStack.setItemMeta(itemMeta);
                 } catch (Exception e) {
                     // 如果反射失败，尝试使用NBT方法
@@ -219,10 +218,10 @@ public class ItemBuilder {
         } catch (Exception e) {
             LoggerUtil.warn("设置物品不可破坏失败: " + e.getMessage());
         }
-        
+
         return this;
     }
-    
+
     /**
      * 使用NBT标签设置物品为不可破坏(适用于1.8)
      * @param item 需要设置的物品
@@ -233,50 +232,50 @@ public class ItemBuilder {
         if (item == null) {
             return null;
         }
-        
+
         // 如果反射未初始化且需要设置为不可破坏，尝试初始化反射
         if (!reflectionInitialized && unbreakable) {
             try {
                 String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-                
+
                 craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + version + ".inventory.CraftItemStack");
                 nmsItemStackClass = Class.forName("net.minecraft.server." + version + ".ItemStack");
                 nbtTagCompoundClass = Class.forName("net.minecraft.server." + version + ".NBTTagCompound");
-                
+
                 asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
                 getTagMethod = nmsItemStackClass.getMethod("getTag");
                 setBooleanMethod = nbtTagCompoundClass.getMethod("setBoolean", String.class, boolean.class);
                 setTagMethod = nmsItemStackClass.getMethod("setTag", nbtTagCompoundClass);
                 asBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
-                
+
                 reflectionInitialized = true;
             } catch (Exception e) {
                 LoggerUtil.warn("无法初始化NMS反射: " + e.getMessage());
                 return item;
             }
         }
-        
+
         // 如果反射初始化失败或不需要设置为不可破坏，直接返回原物品
         if (!reflectionInitialized || !unbreakable) {
             return item;
         }
-        
+
         try {
             // 使用缓存的反射对象
             Object nmsItem = asNMSCopyMethod.invoke(null, item);
             Object tag = getTagMethod.invoke(nmsItem);
-            
+
             // 如果没有标签就创建一个
             if (tag == null) {
                 tag = nbtTagCompoundClass.getDeclaredConstructor().newInstance();
             }
-            
+
             // 设置Unbreakable标签
             setBooleanMethod.invoke(tag, "Unbreakable", true);
-            
+
             // 将标签设置回物品
             setTagMethod.invoke(nmsItem, tag);
-            
+
             // 转换回Bukkit物品
             return (ItemStack) asBukkitCopyMethod.invoke(null, nmsItem);
         } catch (Exception e) {
@@ -361,11 +360,11 @@ public class ItemBuilder {
         if (isPlayerSkull(this.itemStack.getType()) && getDurabilityCompat(this.itemStack) == 3) {
             return this;
         }
-        
+
         setDurabilityCompat(this.itemStack, (short) durability);
         return this;
     }
-    
+
     /**
      * 检查是否是玩家头颅
      * @param material 材质
@@ -374,7 +373,7 @@ public class ItemBuilder {
     private boolean isPlayerSkull(Material material) {
         return XMaterial.PLAYER_HEAD.get() == material;
     }
-    
+
     /**
      * 兼容性方法：获取物品耐久度
      * @param item 物品
@@ -397,7 +396,7 @@ public class ItemBuilder {
             return item.getDurability();
         }
     }
-    
+
     /**
      * 兼容性方法：设置物品耐久度/数据值
      * @param item 物品
@@ -414,7 +413,7 @@ public class ItemBuilder {
                 return;
             }
         }
-        
+
         // 旧版本或回退方案
         try {
             item.setDurability(durability);
@@ -475,12 +474,12 @@ public class ItemBuilder {
         if (itemMeta == null) {
             return this;
         }
-        
+
         List<String> lore = itemMeta.getLore();
         if (lore == null) {
             lore = new ArrayList<>();
         }
-        
+
         lore.add(string);
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
@@ -497,12 +496,12 @@ public class ItemBuilder {
         if (itemMeta == null) {
             return this;
         }
-        
+
         List<String> lore = itemMeta.getLore();
         if (lore == null) {
             lore = new ArrayList<>();
         }
-        
+
         lore.addAll(Arrays.asList(strings));
         itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
