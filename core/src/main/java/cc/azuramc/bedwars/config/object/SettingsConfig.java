@@ -16,6 +16,9 @@ public class SettingsConfig {
     private String mapStorage = "JSON";
     private boolean enabledJedisMapFeature = false;
     private String defaultMapName = "game";
+    private int bedSearchRadius = 18;
+    private int bedDestroyReward = 10;
+    private String playAgainCommand = MessageUtil.color("/not impl now");
 
     private DatabaseConfig database = new DatabaseConfig();
     private ChatConfig chatConfig = new ChatConfig();

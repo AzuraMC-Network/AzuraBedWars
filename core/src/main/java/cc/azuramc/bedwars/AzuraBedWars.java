@@ -61,11 +61,15 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private Chat chat = null;
     @Getter private ConfigManager configManager;
     @Getter private SettingsConfig settingsConfig;
-    @Getter private EventConfig eventConfig;
-    @Getter private TaskConfig taskConfig;
+    @Getter
+    private EventSettingsConfig eventSettingsConfig;
+    @Getter
+    private ResourceSpawnConfig resourceSpawnConfig;
     @Getter private MessageConfig messageConfig;
     @Getter private ItemConfig itemConfig;
     @Getter private PlayerConfig playerConfig;
+    @Getter
+    private TeamUpgradeConfig teamUpgradeConfig;
     @Getter private JedisManager jedisManager;
     @Getter private PubSubListener pubSubListener;
     @Getter private MapLoader mapLoader;
@@ -385,22 +389,24 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 注册配置对象供应商
         configFactory.registerSupplier("settings", SettingsConfig::new);
-        configFactory.registerSupplier("events", EventConfig::new);
-        configFactory.registerSupplier("tasks", TaskConfig::new);
-        configFactory.registerSupplier("messages", MessageConfig::new);
+        configFactory.registerSupplier("eventSettings", EventSettingsConfig::new);
+        configFactory.registerSupplier("tasks", ResourceSpawnConfig::new);
+        configFactory.registerSupplier("message", MessageConfig::new);
         configFactory.registerSupplier("items", ItemConfig::new);
         configFactory.registerSupplier("player", PlayerConfig::new);
+        configFactory.registerSupplier("teamUpgrade", TeamUpgradeConfig::new);
 
         // 初始化默认配置
         configFactory.initializeDefaults(configManager);
 
         // 获取配置对象
         settingsConfig = configManager.getConfig("settings", SettingsConfig.class);
-        eventConfig = configManager.getConfig("events", EventConfig.class);
-        taskConfig = configManager.getConfig("tasks", TaskConfig.class);
-        messageConfig = configManager.getConfig("messages", MessageConfig.class);
+        eventSettingsConfig = configManager.getConfig("eventSettings", EventSettingsConfig.class);
+        resourceSpawnConfig = configManager.getConfig("tasks", ResourceSpawnConfig.class);
+        messageConfig = configManager.getConfig("message", MessageConfig.class);
         itemConfig = configManager.getConfig("items", ItemConfig.class);
         playerConfig = configManager.getConfig("player", PlayerConfig.class);
+        teamUpgradeConfig = configManager.getConfig("teamUpgrade", TeamUpgradeConfig.class);
 
         // 保存配置
         configManager.saveAll();
