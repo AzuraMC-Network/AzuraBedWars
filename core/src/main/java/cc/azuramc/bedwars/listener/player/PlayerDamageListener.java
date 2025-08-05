@@ -5,13 +5,19 @@ import cc.azuramc.bedwars.api.event.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
-import cc.azuramc.bedwars.game.*;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
 import cc.azuramc.bedwars.util.DamageUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.VaultUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -162,46 +168,29 @@ public class PlayerDamageListener implements Listener {
         Entity entity = event.getEntity();
         Entity attacker = event.getDamager();
 
-        GamePlayer gamePlayer = entity instanceof Player ? GamePlayer.get(entity.getUniqueId()) : null;
+        // 只处理受击者为玩家的情况
+        if (!(entity instanceof Player)) {
+            return;
+        }
 
-        // 检查受击者是否为玩家
+        GamePlayer gamePlayer = GamePlayer.get(entity.getUniqueId());
         if (gamePlayer == null) {
             return;
         }
 
-        // 攻击者不为玩家
+        // 攻击者为玩家
         if (attacker instanceof Player) {
             // 玩家VS玩家处理
             handlePlayerVsPlayerDamage(event, gamePlayer, attacker);
         }
-
-        // 攻击者不为投掷物
-        if (attacker instanceof Projectile) {
+        // 攻击者为投掷物
+        else if (attacker instanceof Projectile) {
             // 投掷物攻击玩家处理
             handleProjectileDamage(event, gamePlayer, (Projectile) attacker);
         }
-
-        if (attacker instanceof IronGolem || attacker instanceof Silverfish) {
-            // 处理自定义生物
-            handlePlayerVsCustomEntity(event, attacker, gamePlayer);
-        }
     }
 
-    private void handlePlayerVsCustomEntity(EntityDamageByEntityEvent event, Entity entity, GamePlayer gamePlayer) {
 
-        CustomEntityManager customEntityManager = CustomEntityManager.getCustomEntityMap().get(entity.getUniqueId());
-        GamePlayer summoner = customEntityManager.getSummoner();
-
-        GameTeam entityTeam = customEntityManager.getGameTeam();
-
-        // 如果自定义生物的队伍和被攻击者不同
-        if (gamePlayer.getGameTeam() != entityTeam) {
-            gamePlayer.setLastDamage(summoner);
-            return;
-        }
-
-        event.setCancelled(true);
-    }
 
     /**
      * 处理等待状态的伤害

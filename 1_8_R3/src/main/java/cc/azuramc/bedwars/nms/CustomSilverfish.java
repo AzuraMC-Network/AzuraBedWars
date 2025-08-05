@@ -47,24 +47,27 @@ public class CustomSilverfish extends EntitySilverfish {
     private void setupGoals() {
         this.goalSelector.a(1, new PathfinderGoalFloat(this));
         this.goalSelector.a(2, new PathfinderGoalMeleeAttack(this, 1.9D, false));
-        this.goalSelector.a(3, new PathfinderGoalRandomStroll(this, 1.5D));
-        this.goalSelector.a(4, new PathfinderGoalRandomLookaround(this));
-        this.goalSelector.a(5, new PathfinderGoalMoveTowardsTarget(this, 1.0D, 20.0F));
+        this.goalSelector.a(3, new PathfinderGoalMoveTowardsTarget(this, 1.0D, 20.0F));
+        this.goalSelector.a(4, new PathfinderGoalRandomStroll(this, 1.5D));
+        this.goalSelector.a(5, new PathfinderGoalRandomLookaround(this));
     }
 
     private void setupTargets() {
+        // 被攻击时立即反击
+        this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, true));
+
         // 主动寻找玩家目标
-        this.targetSelector.a(1, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, 25, true, false,
+        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, 20, true, false,
                 human -> human != null && human.isAlive()
                         && !gameTeam.isInTeam(GamePlayer.get(human.getUniqueID()))
                         && !GamePlayer.get(human.getUniqueID()).isSpectator()));
 
         // 主动寻找铁傀儡目标
-        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, CustomIronGolem.class, 25, true, false,
+        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, CustomIronGolem.class, 20, true, false,
                 golem -> golem != null && golem.getGameTeam() != gameTeam));
 
         // 主动寻找其他蠹虫目标
-        this.targetSelector.a(3, new PathfinderGoalNearestAttackableTarget<>(this, CustomSilverfish.class, 25, true, false,
+        this.targetSelector.a(4, new PathfinderGoalNearestAttackableTarget<>(this, CustomSilverfish.class, 20, true, false,
                 fish -> fish != null && fish.getGameTeam() != gameTeam));
     }
 
