@@ -89,10 +89,7 @@ public class GameOverTask extends BukkitRunnable {
 
     private boolean isTie(GameTeam winner) {
         if (winner == null) {
-            long aliveTeams = gameManager.getGameTeams().stream()
-                    .filter(team -> !team.isDead())
-                    .count();
-            return aliveTeams > 1;
+            return gameManager.isTie();
         }
         return false;
     }
@@ -106,28 +103,31 @@ public class GameOverTask extends BukkitRunnable {
         boolean isTie = isTie(winner);
 
         gameManager.getGameTeams().forEach(team -> {
+            String title;
+            String subtitle;
+
             if (isTie) {
                 if (!team.isDead()) {
-                    gameManager.broadcastTeamTitle(team, gameOverConfig.getTieTitle(), gameOverConfig.getTieSubtitle(),
-                            gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
-                    );
+                    title = gameOverConfig.getTieTitle();
+                    subtitle = gameOverConfig.getTieSubtitle();
                 } else {
-                    gameManager.broadcastTeamTitle(team, gameOverConfig.getDefeatTitle(), gameOverConfig.getDefeatSubtitle(),
-                            gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
-                    );
+                    title = gameOverConfig.getDefeatTitle();
+                    subtitle = gameOverConfig.getDefeatSubtitle();
                 }
             } else {
                 boolean isWinner = winner != null && winner.getName().equals(team.getName());
                 if (isWinner) {
-                    gameManager.broadcastTeamTitle(team, gameOverConfig.getVictoryTitle(), gameOverConfig.getVictorySubtitle(),
-                            gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
-                    );
+                    title = gameOverConfig.getVictoryTitle();
+                    subtitle = gameOverConfig.getVictorySubtitle();
                 } else {
-                    gameManager.broadcastTeamTitle(team, gameOverConfig.getDefeatTitle(), gameOverConfig.getDefeatSubtitle(),
-                            gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
-                    );
+                    title = gameOverConfig.getDefeatTitle();
+                    subtitle = gameOverConfig.getDefeatSubtitle();
                 }
             }
+
+            gameManager.broadcastTeamTitle(team, title, subtitle,
+                    gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
+            );
         });
     }
 

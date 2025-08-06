@@ -936,6 +936,17 @@ public class GameManager {
         return null;
     }
 
+    public List<GameTeam> getAliveTeams() {
+        return gameTeams.stream()
+                .filter(team -> !team.isDead())
+                .toList();
+    }
+
+    public boolean isTie() {
+        List<GameTeam> aliveTeams = getAliveTeams();
+        return aliveTeams.size() > 1;
+    }
+
     /**
      * 寻找最近的敌方玩家
      *
