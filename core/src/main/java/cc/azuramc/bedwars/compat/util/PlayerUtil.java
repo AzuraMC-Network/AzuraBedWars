@@ -61,6 +61,10 @@ public class PlayerUtil {
             return;
         }
 
+        if (player.getItemInHand() == null) {
+            return;
+        }
+
         if (VersionUtil.isVersion1_8()) {
             if (player.getItemInHand().getType() == item.getType()) {
                 player.setItemInHand(null);
