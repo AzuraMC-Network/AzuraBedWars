@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
@@ -18,6 +19,8 @@ import fr.mrmicky.fastboard.FastBoard;
 import lombok.Data;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -55,9 +58,9 @@ public class GamePlayer {
     private final PlayerData playerData;
     private final PlayerCompass playerCompass;
 
-    GameModeType gameModeType;
+    private GameModeType gameModeType;
     /** 使用 HashMap 存储经验来源，键是资源名(String)，值是经验数量(Integer) */
-    Map<String, Integer> experienceSources;
+    private Map<String, Integer> experienceSources;
 
     private String nickName;
     private FastBoard board;
@@ -73,7 +76,8 @@ public class GamePlayer {
 
     // 隐身相关
     private boolean isInvisible;
-    private BukkitRunnable invisibilityTask;
+    private BukkitRunnable invisibilityWaitingTask;
+    private BukkitRunnable invisibilityFootStepTask;
 
     // 装备状态
     private ArmorType armorType;
@@ -234,14 +238,38 @@ public class GamePlayer {
 
         ArmorHider.hideArmor(this, GamePlayer.getGamePlayers());
         this.setInvisible(true);
-        invisibilityTask = new BukkitRunnable() {
+
+        // 如果脚印线程不存在则创建, 存在则沿用之前的避免堆积 (个人理解较为简便)
+        if (invisibilityFootStepTask == null) {
+            invisibilityFootStepTask = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!GamePlayer.this.isInvisible) {
+                        this.cancel();
+                        GamePlayer.this.invisibilityFootStepTask = null;
+                        return;
+                    }
+                    Player p = GamePlayer.this.getPlayer();
+                    // versions...
+                    if (VersionUtil.isVersion1_8()) {
+                        p.getWorld().playEffect(p.getLocation().add(0, 0.1, 0), Effect.valueOf("FOOTSTEP"), 0);
+                    }
+                    else if (VersionUtil.isLessThan1_13()) {
+                        p.getWorld().spawnParticle(Particle.valueOf("FOOTSTEP"), p.getLocation().add(0, 0.1, 0), 1);
+                    }
+                }
+            };
+            invisibilityFootStepTask.runTaskTimer(AzuraBedWars.getInstance(), 1L, 5L);
+        }
+
+        invisibilityWaitingTask = new BukkitRunnable() {
             @Override
             public void run() {
                 sendMessage("&c隐身效果结束");
                 endInvisibility();
             }
         };
-        invisibilityTask.runTaskLater(AzuraBedWars.getInstance(), 30 * 20);
+        invisibilityWaitingTask.runTaskLater(AzuraBedWars.getInstance(), 30 * 20);
     }
 
     /**
@@ -254,8 +282,9 @@ public class GamePlayer {
         }
 
         this.setInvisible(false);
-        if (invisibilityTask != null) {
-            invisibilityTask.cancel();
+        if (invisibilityWaitingTask != null) {
+            invisibilityWaitingTask.cancel();
+            invisibilityWaitingTask = null;
         }
     }
 
