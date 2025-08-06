@@ -87,22 +87,46 @@ public class GameOverTask extends BukkitRunnable {
         updatePlayerStats(winner);
     }
 
+    private boolean isTie(GameTeam winner) {
+        if (winner == null) {
+            long aliveTeams = gameManager.getGameTeams().stream()
+                    .filter(team -> !team.isDead())
+                    .count();
+            return aliveTeams > 1;
+        }
+        return false;
+    }
+
     /**
      * 为每个队伍显示胜利或失败标题
      *
      * @param winner 胜利队伍
      */
     private void displayTeamTitles(GameTeam winner) {
+        boolean isTie = isTie(winner);
+
         gameManager.getGameTeams().forEach(team -> {
-            boolean isWinner = winner != null && winner.getName().equals(team.getName());
-            if (isWinner) {
-                gameManager.broadcastTeamTitle(team, gameOverConfig.getVictoryTitle(), gameOverConfig.getVictorySubtitle(),
-                        gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
-                );
+            if (isTie) {
+                if (!team.isDead()) {
+                    gameManager.broadcastTeamTitle(team, gameOverConfig.getTieTitle(), gameOverConfig.getTieSubtitle(),
+                            gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
+                    );
+                } else {
+                    gameManager.broadcastTeamTitle(team, gameOverConfig.getDefeatTitle(), gameOverConfig.getDefeatSubtitle(),
+                            gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
+                    );
+                }
             } else {
-                gameManager.broadcastTeamTitle(team, gameOverConfig.getDefeatTitle(), gameOverConfig.getDefeatSubtitle(),
-                        gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
-                );
+                boolean isWinner = winner != null && winner.getName().equals(team.getName());
+                if (isWinner) {
+                    gameManager.broadcastTeamTitle(team, gameOverConfig.getVictoryTitle(), gameOverConfig.getVictorySubtitle(),
+                            gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
+                    );
+                } else {
+                    gameManager.broadcastTeamTitle(team, gameOverConfig.getDefeatTitle(), gameOverConfig.getDefeatSubtitle(),
+                            gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
+                    );
+                }
             }
         });
     }
@@ -261,7 +285,13 @@ public class GameOverTask extends BukkitRunnable {
      * @param winner 胜利队伍
      */
     private void updatePlayerStats(GameTeam winner) {
-        if (winner != null) {
+        if (isTie(winner)) {
+            gameManager.getGameTeams().stream()
+                    .filter(team -> !team.isDead())
+                    .flatMap(team -> team.getAlivePlayers().stream());
+            // maybe we need to add a addTies method?
+//                    .forEach(gamePlayer -> gamePlayer.getPlayerData().addTies());
+        } else if (winner != null) {
             for (GamePlayer gamePlayer : winner.getAlivePlayers()) {
                 gamePlayer.getPlayerData().addWins();
             }
@@ -274,7 +304,17 @@ public class GameOverTask extends BukkitRunnable {
      * @param winner 胜利队伍
      */
     private void spawnVictoryFireworks(GameTeam winner) {
-        if (winner != null) {
+        if (isTie(winner)) {
+            if (gameOverConfig.isTieFireworkEnabled()) {
+                gameManager.getGameTeams().stream()
+                        .filter(team -> !team.isDead())
+                        .flatMap(team -> team.getAlivePlayers().stream())
+                        .forEach(gamePlayer -> FireWorkUtil.spawnFireWork(
+                                gamePlayer.getPlayer().getLocation().add(0.0D, gameOverConfig.getFireworkHeight(), 0.0D),
+                                Objects.requireNonNull(gamePlayer.getPlayer().getLocation().getWorld())
+                        ));
+            }
+        } else if (winner != null) {
             winner.getAlivePlayers().forEach(gamePlayer -> FireWorkUtil.spawnFireWork(
                     gamePlayer.getPlayer().getLocation().add(0.0D, gameOverConfig.getFireworkHeight(), 0.0D),
                     Objects.requireNonNull(gamePlayer.getPlayer().getLocation().getWorld())
