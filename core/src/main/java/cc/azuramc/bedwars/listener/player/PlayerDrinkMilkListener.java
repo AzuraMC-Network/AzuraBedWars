@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.LoggerUtil;
@@ -43,6 +44,9 @@ public class PlayerDrinkMilkListener implements Listener {
         }
 
         LoggerUtil.debug("PlayerDrinkMilkListener$onDrink | " + player.getName() + " now has trap protection");
+
+        event.setCancelled(true);
+        PlayerUtil.setItemInHand(player, itemStack, true);
 
         gamePlayer.sendMessage("&a你喝下了魔法牛奶，将会在30s内不受陷阱效果影响");
         gamePlayer.startTrapProtectionTask();
