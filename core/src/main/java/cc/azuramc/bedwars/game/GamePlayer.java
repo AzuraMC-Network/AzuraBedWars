@@ -58,9 +58,9 @@ public class GamePlayer {
     private final PlayerData playerData;
     private final PlayerCompass playerCompass;
 
-    GameModeType gameModeType;
+    private GameModeType gameModeType;
     /** 使用 HashMap 存储经验来源，键是资源名(String)，值是经验数量(Integer) */
-    Map<String, Integer> experienceSources;
+    private Map<String, Integer> experienceSources;
 
     private String nickName;
     private FastBoard board;
