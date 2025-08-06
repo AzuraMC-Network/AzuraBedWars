@@ -81,10 +81,7 @@ public class GameStateTabListProvider {
         String gameResult;
 
         if (winner == null) {
-            long aliveTeams = gameManager.getGameTeams().stream()
-                    .filter(team -> !team.isDead())
-                    .count();
-            if (aliveTeams > 1) {
+            if (gameManager.isTie()) {
                 gameResult = "Tie";
             } else {
                 gameResult = "No Winner";
