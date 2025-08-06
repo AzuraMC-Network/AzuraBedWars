@@ -39,12 +39,47 @@ public class PlayerUtil {
      */
     @SuppressWarnings("deprecation")
     public static void setItemInHand(Player player, ItemStack item) {
-        if (VersionUtil.isLessThan1_13()) {
+        if (VersionUtil.isVersion1_8()) {
             player.setItemInHand(item);
             return;
         }
 
         player.getInventory().setItemInMainHand(item);
+    }
+
+    /**
+     * 设置或移除玩家手中的物品
+     *
+     * @param player   玩家
+     * @param item     要设置或移除的物品
+     * @param isRemove 是否为移除操作
+     */
+    @SuppressWarnings("deprecation")
+    public static void setItemInHand(Player player, ItemStack item, boolean isRemove) {
+        if (!isRemove) {
+            setItemInHand(player, item);
+            return;
+        }
+
+        if (player.getItemInHand() == null) {
+            return;
+        }
+
+        if (VersionUtil.isVersion1_8()) {
+            if (player.getItemInHand().getType() == item.getType()) {
+                player.setItemInHand(null);
+            }
+            return;
+        }
+
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        ItemStack offHand = player.getInventory().getItemInOffHand();
+
+        if (mainHand.getType() == item.getType()) {
+            player.getInventory().setItemInMainHand(null);
+        } else if (offHand.getType() == item.getType()) {
+            player.getInventory().setItemInOffHand(null);
+        }
     }
 
     public static void hidePlayer(GamePlayer gamePlayer, List<GamePlayer> targetList) {

@@ -10,10 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author An5w1r@163.com
@@ -21,7 +17,6 @@ import java.util.Map;
 public class PlayerInvisibilityListener implements Listener {
 
     private final AzuraBedWars plugin;
-    private static final Map<GamePlayer, BukkitRunnable> invisibilityTasks = new HashMap<>();
 
     public PlayerInvisibilityListener(AzuraBedWars plugin) {
         this.plugin = plugin;
