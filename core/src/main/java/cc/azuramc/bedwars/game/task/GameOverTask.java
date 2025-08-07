@@ -288,9 +288,8 @@ public class GameOverTask extends BukkitRunnable {
         if (isTie(winner)) {
             gameManager.getGameTeams().stream()
                     .filter(team -> !team.isDead())
-                    .flatMap(team -> team.getAlivePlayers().stream());
-            // maybe we need to add a addTies method?
-//                    .forEach(gamePlayer -> gamePlayer.getPlayerData().addTies());
+                    .flatMap(team -> team.getAlivePlayers().stream())
+                    .forEach(gamePlayer -> gamePlayer.getPlayerData().addTies());
         } else if (winner != null) {
             for (GamePlayer gamePlayer : winner.getAlivePlayers()) {
                 gamePlayer.getPlayerData().addWins();
