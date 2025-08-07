@@ -1,29 +1,44 @@
-## Description
+## 📌 Pull Request Summary
 
-Brief description of what this PR does.
+<!-- Briefly describe what this PR does and why it is needed -->
+<!-- Example: Fix null pointer on player logout handler -->
 
-## Type of Change
+---
 
-Please delete options that are not relevant:
+## 🔍 Type of Change (select one)
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
+**Please do not remove any content. To select an option, place an `x` inside the `[ ]` brackets like this: `[x]`.**
 
-## Testing
+- [ ] bugfix
+- [ ] feature
+- [ ] breaking-change
+- [ ] refactor
+- [ ] performance
+- [ ] chore
+- [ ] ci
+- [ ] docs
+- [ ] test
+- [ ] style
 
-Please describe the tests that you ran to verify your changes.
+---
 
-## Checklist
+## ✅ Checklist (before submitting)
 
-Before submitting your PR, please ensure:
+- [ ] Changes have been tested locally
+- [ ] No new linter warnings or errors
+- [ ] Code follows project style guidelines
+- [ ] Tests have been added or updated if necessary
+- [ ] Documentation has been updated if applicable
 
-- [ ] My code follows the project's style guidelines
-- [ ] I have performed a self-review of my own code
-- [ ] My changes generate no new warnings
-- [ ] I have tested my changes
+---
 
-## Additional Information
+## 📎 Related Issues / PRs
 
-Add any other context about the PR here. 
+<!-- Example: Closes #123 / Fixes #456 / Depends on #789 -->
+Closes #
+
+---
+
+## 💬 Additional Notes
+
+<!-- Any other information developers/reviewers should be aware of -->

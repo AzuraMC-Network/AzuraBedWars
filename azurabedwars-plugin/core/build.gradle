@@ -1,0 +1,24 @@
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+dependencies {
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly "org.spigotmc:spigot-api:${spigotVersion}"
+    compileOnly "me.clip:placeholderapi:${placeholderApiVersion}"
+    compileOnly "net.luckperms:api:${luckPermsVersion}"
+
+    implementation "org.apache.commons:commons-lang3:${commonsLangVersion}"
+    implementation "commons-io:commons-io:${commonsIoVersion}"
+    implementation "com.github.Revxrsal.Lamp:common:${lampVersion}"
+    implementation "com.github.Revxrsal.Lamp:bukkit:${lampVersion}"
+    implementation "redis.clients:jedis:${jedisVersion}"
+    implementation "com.github.cryptomorin:XSeries:${xseriesVersion}"
+    implementation "fr.mrmicky:fastboard:${fastboardVersion}"
+
+    implementation files('libs/AzuraORM-1.0.0-all.jar')
+}

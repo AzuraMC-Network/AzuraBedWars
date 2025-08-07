@@ -23,6 +23,11 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 - 如果你有建议和发现的问题，可以在issue提出，我们会考虑尽快支持
 - 本人并不是很熟悉BukkitAPI等，可能项目里有很多有歧义的地方
 
+### 结构解释
+
+- `azurabedwars-plugin` — Minecraft BedWars 插件
+- `azurabedwars-dashboard` — Spring Boot 后台管理系统，本质是一个网站，用来动态管理运行azurabedwars-plugin的服务器的配置等
+
 ## 性能展示
 
 - 这是在16人对局完成后的spark profiler结果，或许这是能吸引您选择我们项目的原因(打码的都是反作弊插件)
