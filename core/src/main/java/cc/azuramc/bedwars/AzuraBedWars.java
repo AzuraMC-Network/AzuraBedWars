@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.dao.PlayerDataDao;
+import cc.azuramc.bedwars.database.service.DatabaseVersionService;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.CustomEntityManager;
@@ -79,6 +80,8 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter private AzuraOrmClient ormClient;
     @Getter private PlayerDataDao playerDataDao;
     @Getter private PlayerDataService playerDataService;
+    @Getter
+    private DatabaseVersionService databaseVersionService;
     @Getter private NMSProvider nmsProvider;
     @Getter private NMSAccess nmsAccess;
     @Getter private LuckPerms luckPermsApi;
@@ -179,6 +182,10 @@ public final class AzuraBedWars extends JavaPlugin {
 
         AzuraORM.initialize(config, true);
         ormClient = AzuraORM.getClient();
+
+        // 初始化数据库版本管理
+        databaseVersionService = new DatabaseVersionService(this);
+
         playerDataDao = new PlayerDataDao(this);
         playerDataService = new PlayerDataService(this);
     }
