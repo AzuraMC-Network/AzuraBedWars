@@ -78,11 +78,21 @@ public class GameStateTabListProvider {
      */
     private void setEndingStateContent(GameManager gameManager, HeaderFooterManager headerFooterManager) {
         GameTeam winner = gameManager.getWinner();
-        String winnerName = winner != null ? winner.getName() : "无";
+        String gameResult;
+
+        if (winner == null) {
+            if (gameManager.isTie()) {
+                gameResult = "Tie";
+            } else {
+                gameResult = "No Winner";
+            }
+        } else {
+            gameResult = winner.getName() + " Won";
+        }
 
         List<String> endingHeader = Arrays.asList(
                 "&b你正在 &eAzuraMC &b游玩起床战争",
-                "&b游戏结束 &e" + winnerName + " &b获胜",
+                "&b游戏结束 &e" + gameResult,
                 ""
         );
         headerFooterManager.setHeader(endingHeader);
