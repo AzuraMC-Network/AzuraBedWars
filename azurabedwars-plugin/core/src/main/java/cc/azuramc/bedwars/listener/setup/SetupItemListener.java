@@ -69,7 +69,6 @@ public class SetupItemListener implements Listener {
         }
 
         if (plugin.getSetupItemManager().handleItemClick(player, itemName, mapName)) {
-            ;
             event.setCancelled(true);
         }
     }
