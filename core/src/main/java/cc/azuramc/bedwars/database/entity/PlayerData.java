@@ -24,8 +24,10 @@ public class PlayerData {
     private int deaths;
     private int assists;
     private int finalKills;
+    private int finalDeaths;
     private int destroyedBeds;
     private int wins;
+    private int ties;
     private int losses;
     private int games;
     private String shopDataJson;
@@ -44,9 +46,11 @@ public class PlayerData {
         this.setDeaths(0);
         this.setAssists(0);
         this.setFinalKills(0);
+        this.setFinalDeaths(0);
         this.setDestroyedBeds(0);
         this.setWins(0);
         this.setLosses(0);
+        this.setTies(0);
         this.setGames(0);
         this.setShopDataJson("{}");
         this.setCreatedAt(new Timestamp(System.currentTimeMillis()));
@@ -83,6 +87,10 @@ public class PlayerData {
         this.finalKills += finalKills;
     }
 
+    public void addFinalDeaths(int finalDeaths) {
+        this.finalDeaths += finalDeaths;
+    }
+
     public void addDestroyedBeds(int destroyedBeds) {
         gamePlayer.addCurrentGameDestroyedBeds(destroyedBeds);
         this.destroyedBeds += destroyedBeds;
@@ -90,6 +98,10 @@ public class PlayerData {
 
     public void addWins(int wins) {
         this.wins += wins;
+    }
+
+    public void addTies(int ties) {
+        this.ties += ties;
     }
 
     public void addLosses(int losses) {
@@ -127,6 +139,10 @@ public class PlayerData {
         this.finalKills++;
     }
 
+    public void addFinalDeaths() {
+        this.finalDeaths++;
+    }
+
     public void addDestroyedBeds() {
         PlayerLevelManager.addExperience(this.gamePlayer, 3);
         gamePlayer.addCurrentGameDestroyedBeds();
@@ -136,6 +152,10 @@ public class PlayerData {
     public void addWins() {
         PlayerLevelManager.addExperience(this.gamePlayer, 5);
         this.wins++;
+    }
+
+    public void addTies() {
+        this.ties++;
     }
 
     public void addLosses() {

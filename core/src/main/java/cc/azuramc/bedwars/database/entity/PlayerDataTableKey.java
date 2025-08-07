@@ -17,8 +17,10 @@ public class PlayerDataTableKey {
     public static String deaths = "deaths";
     public static String assists = "assists";
     public static String finalKills = "finalKills";
+    public static String finalDeaths = "finalDeaths";
     public static String destroyedBeds = "destroyedBeds";
     public static String wins = "wins";
+    public static String ties = "ties";
     public static String losses = "losses";
     public static String games = "games";
     public static String shopDataJson = "shopDataJson";
