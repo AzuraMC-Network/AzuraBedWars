@@ -329,6 +329,7 @@ public class PlayerDamageListener implements Listener {
                 VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
             }
             gameKiller.getPlayerData().addFinalKills();
+            gamePlayer.getPlayerData().addFinalDeaths();
         } else {
             gameKiller.getPlayerData().addKills();
         }
