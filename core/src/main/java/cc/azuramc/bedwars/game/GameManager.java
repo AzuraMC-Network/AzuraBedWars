@@ -925,10 +925,26 @@ public class GameManager {
      * @return 获胜团队，如果没有则返回null
      */
     public GameTeam getWinner() {
+        List<GameTeam> aliveTeams = gameTeams.stream()
+                .filter(team -> !team.isDead())
+                .toList();
+
+        if (aliveTeams.size() == 1) {
+            return aliveTeams.get(0);
+        }
+
+        return null;
+    }
+
+    public List<GameTeam> getAliveTeams() {
         return gameTeams.stream()
                 .filter(team -> !team.isDead())
-                .findFirst()
-                .orElse(null);
+                .toList();
+    }
+
+    public boolean isTie() {
+        List<GameTeam> aliveTeams = getAliveTeams();
+        return aliveTeams.size() > 1;
     }
 
     /**
