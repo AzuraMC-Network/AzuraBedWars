@@ -7,7 +7,7 @@
 
 ## 🔍 Type of Change (select one)
 
-<!-- ✅ Select only one -->
+**Please do not remove any content. To select an option, place an `x` inside the `[ ]` brackets like this: `[x]`.**
 
 - [ ] bugfix
 - [ ] feature
