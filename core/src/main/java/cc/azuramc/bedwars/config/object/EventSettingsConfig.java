@@ -68,8 +68,12 @@ public class EventSettingsConfig {
         private String victorySubtitle = MessageUtil.color("&7你获得了最终的胜利");
         private String defeatTitle = MessageUtil.color("&c&l失败！");
         private String defeatSubtitle = MessageUtil.color("&7你输掉了这场游戏");
+        private String tieTitle = MessageUtil.color("&e&lTies！");
+        private String tieSubtitle = MessageUtil.color("&7No team has won");
 
-        private String noWinner = MessageUtil.color("&e平局！没有队伍获胜");
+        private String noWinner = MessageUtil.color("&eTie! No team has won");
+
+        private boolean tieFireworkEnabled = true;
 
         private List<String> customLeaderboardMessages = new ArrayList<>(List.of(
                 "§a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
