@@ -50,7 +50,7 @@ public class DatabaseVersionService {
         try {
             String addFinalDeathsSql = "ALTER TABLE player_data ADD COLUMN finalDeaths INT DEFAULT 0 AFTER finalKills";
 
-            String addTilesSql = "ALTER TABLE player_data ADD COLUMN tiles INT DEFAULT 0 AFTER wins";
+            String addTilesSql = "ALTER TABLE player_data ADD COLUMN ties INT DEFAULT 0 AFTER wins";
 
             try (Connection conn = plugin.getOrmClient().getConnection()) {
                 try (PreparedStatement stmt = conn.prepareStatement(addFinalDeathsSql)) {
@@ -62,9 +62,9 @@ public class DatabaseVersionService {
 
                 try (PreparedStatement stmt = conn.prepareStatement(addTilesSql)) {
                     stmt.executeUpdate();
-                    LoggerUtil.info("成功添加 tiles 字段到 player_data 表");
+                    LoggerUtil.info("成功添加 ties 字段到 player_data 表");
                 } catch (SQLException e) {
-                    LoggerUtil.info("tiles 字段可能已存在或添加失败: " + e.getMessage());
+                    LoggerUtil.info("ties 字段可能已存在或添加失败: " + e.getMessage());
                 }
             }
 
