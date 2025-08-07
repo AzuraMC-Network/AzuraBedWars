@@ -1,8 +1,6 @@
-rootProject.name = 'AzuraBedWars'
+rootProject.name = 'azurabedwars-plugin'
 
-include (
-        'azurabedwars-plugin',
+include(
         'azurabedwars-plugin:core',
         'azurabedwars-plugin:1_8_R3'
-
 )
