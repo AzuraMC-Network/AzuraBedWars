@@ -77,6 +77,113 @@ jobs:
               }
             }
 
+      - name: Update PR Labels on Edit
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request' && github.event.action == 'edited'
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const labels = pr.labels.map(l => l.name);
+            const prBody = pr.body || '';
+            
+            // Template-based labels to manage
+            const templateLabels = [
+              '🐛 Bug Fix', '✨ New Feature', '💥 Breaking Change', 
+              '♻️ Refactor', '⚡ Performance', '🔧 Chore', 
+              '👷 CI', '📚 Documentation', '🧪 Test', '💄 Style',
+              '✅ Ready for Review', '🚧 Work in Progress'
+            ];
+            
+            // Remove existing template-based labels
+            for (const label of templateLabels) {
+              if (labels.includes(label)) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    name: label
+                  });
+                  console.log(`Removed label: ${label}`);
+                } catch (error) {
+                  console.error(`Error removing label ${label}:`, error);
+                }
+              }
+            }
+            
+            const newLabels = [];
+            
+            // Re-parse PR body for template-based labeling
+            const typeRegex = /- \[x\] (bugfix|feature|breaking-change|refactor|performance|chore|ci|docs|test|style)/gi;
+            let match;
+            while ((match = typeRegex.exec(prBody)) !== null) {
+              const changeType = match[1].toLowerCase();
+            
+              switch (changeType) {
+                case 'bugfix':
+                  newLabels.push('🐛 Bug Fix');
+                  break;
+                case 'feature':
+                  newLabels.push('✨ New Feature');
+                  break;
+                case 'breaking-change':
+                  newLabels.push('💥 Breaking Change');
+                  break;
+                case 'refactor':
+                  newLabels.push('♻️ Refactor');
+                  break;
+                case 'performance':
+                  newLabels.push('⚡ Performance');
+                  break;
+                case 'chore':
+                  newLabels.push('🔧 Chore');
+                  break;
+                case 'ci':
+                  newLabels.push('👷 CI');
+                  break;
+                case 'docs':
+                  newLabels.push('📚 Documentation');
+                  break;
+                case 'test':
+                  newLabels.push('🧪 Test');
+                  break;
+                case 'style':
+                  newLabels.push('💄 Style');
+                  break;
+              }
+            }
+            
+            // Check checklist completion status
+            const checklistRegex = /- \[x\]/gi;
+            const completedChecks = (prBody.match(checklistRegex) || []).length;
+            const totalChecks = (prBody.match(/- \[ \]/gi) || []).length + completedChecks;
+            
+            if (totalChecks > 0) {
+              if (completedChecks === totalChecks) {
+                newLabels.push('✅ Ready for Review');
+              } else {
+                newLabels.push('🚧 Work in Progress');
+              }
+            }
+            
+            // Add new labels
+            if (newLabels.length > 0) {
+              const labelsToAdd = newLabels.filter(label => !labels.includes(label));
+              if (labelsToAdd.length > 0) {
+                try {
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    labels: labelsToAdd
+                  });
+                  console.log(`Added labels: ${labelsToAdd.join(', ')}`);
+                } catch (error) {
+                  console.error('Error adding labels:', error);
+                }
+              }
+            }
+
       - name: Auto Label PRs
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
@@ -128,6 +235,21 @@ jobs:
               }
             }
             
+            // Check for other branches merging to develop
+            if (baseBranch === 'develop' || baseBranch.includes('develop')) {
+              if (headBranch.includes('feature/') || headBranch.includes('feat/')) {
+                newLabels.push('✨ Feature Integration');
+              } else if (headBranch.includes('fix/') || headBranch.includes('bugfix/')) {
+                newLabels.push('🐛 Bug Fix Integration');
+              } else if (headBranch.includes('hotfix/')) {
+                newLabels.push('🚑 Hotfix Integration');
+              } else if (headBranch.includes('docs/') || headBranch.includes('documentation/')) {
+                newLabels.push('📚 Documentation Integration');
+              } else {
+                newLabels.push('🔄 Integration');
+              }
+            }
+            
             // Check for other important branch flows
             if (headBranch.includes('release/') && (baseBranch === 'master' || baseBranch === 'main')) {
               newLabels.push('🚀 Release');
@@ -135,6 +257,62 @@ jobs:
             
             if ((headBranch === 'master' || headBranch === 'main') && baseBranch === 'develop') {
               newLabels.push('🔄 Sync');
+            }
+            
+            // Parse PR body for template-based labeling
+            const prBody = pr.body || '';
+            
+            // Extract type of change from PR template
+            const typeRegex = /- \[x\] (bugfix|feature|breaking-change|refactor|performance|chore|ci|docs|test|style)/gi;
+            let match;
+            while ((match = typeRegex.exec(prBody)) !== null) {
+              const changeType = match[1].toLowerCase();
+            
+              switch (changeType) {
+                case 'bugfix':
+                  newLabels.push('🐛 Bug Fix');
+                  break;
+                case 'feature':
+                  newLabels.push('✨ New Feature');
+                  break;
+                case 'breaking-change':
+                  newLabels.push('💥 Breaking Change');
+                  break;
+                case 'refactor':
+                  newLabels.push('♻️ Refactor');
+                  break;
+                case 'performance':
+                  newLabels.push('⚡ Performance');
+                  break;
+                case 'chore':
+                  newLabels.push('🔧 Chore');
+                  break;
+                case 'ci':
+                  newLabels.push('👷 CI');
+                  break;
+                case 'docs':
+                  newLabels.push('📚 Documentation');
+                  break;
+                case 'test':
+                  newLabels.push('🧪 Test');
+                  break;
+                case 'style':
+                  newLabels.push('💄 Style');
+                  break;
+              }
+            }
+            
+            // Check if all checklist items are completed
+            const checklistRegex = /- \[x\]/gi;
+            const completedChecks = (prBody.match(checklistRegex) || []).length;
+            const totalChecks = (prBody.match(/- \[ \]/gi) || []).length + completedChecks;
+            
+            if (totalChecks > 0) {
+              if (completedChecks === totalChecks) {
+                newLabels.push('✅ Ready for Review');
+              } else {
+                newLabels.push('🚧 Work in Progress');
+              }
             }
             
             // Add labels if not already present
