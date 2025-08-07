@@ -44,8 +44,10 @@ public class PlayerDataDao {
                     .column(PlayerDataTableKey.assists, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.deaths, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.finalKills, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
+                    .column(PlayerDataTableKey.finalDeaths, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.destroyedBeds, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.wins, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
+                    .column(PlayerDataTableKey.ties, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.losses, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.games, DataType.Type.INT.getSql(), DataType.DEFAULT(0))
                     .column(PlayerDataTableKey.shopDataJson, DataType.Type.TEXT.getSql())
@@ -80,8 +82,10 @@ public class PlayerDataDao {
                     .values(PlayerDataTableKey.deaths, playerData.getDeaths())
                     .values(PlayerDataTableKey.assists, playerData.getAssists())
                     .values(PlayerDataTableKey.finalKills, playerData.getFinalKills())
+                    .values(PlayerDataTableKey.finalDeaths, playerData.getFinalDeaths())
                     .values(PlayerDataTableKey.destroyedBeds, playerData.getDestroyedBeds())
                     .values(PlayerDataTableKey.wins, playerData.getWins())
+                    .values(PlayerDataTableKey.ties, playerData.getTies())
                     .values(PlayerDataTableKey.losses, playerData.getLosses())
                     .values(PlayerDataTableKey.games, playerData.getGames())
                     .values(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
@@ -121,8 +125,10 @@ public class PlayerDataDao {
                     .set(PlayerDataTableKey.deaths, playerData.getDeaths())
                     .set(PlayerDataTableKey.assists, playerData.getAssists())
                     .set(PlayerDataTableKey.finalKills, playerData.getFinalKills())
+                    .set(PlayerDataTableKey.finalDeaths, playerData.getFinalDeaths())
                     .set(PlayerDataTableKey.destroyedBeds, playerData.getDestroyedBeds())
                     .set(PlayerDataTableKey.wins, playerData.getWins())
+                    .set(PlayerDataTableKey.ties, playerData.getTies())
                     .set(PlayerDataTableKey.losses, playerData.getLosses())
                     .set(PlayerDataTableKey.games, playerData.getGames())
                     .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
@@ -155,8 +161,10 @@ public class PlayerDataDao {
                             PlayerDataTableKey.deaths,
                             PlayerDataTableKey.assists,
                             PlayerDataTableKey.finalKills,
+                            PlayerDataTableKey.finalDeaths,
                             PlayerDataTableKey.destroyedBeds,
                             PlayerDataTableKey.wins,
+                            PlayerDataTableKey.ties,
                             PlayerDataTableKey.losses,
                             PlayerDataTableKey.games,
                             PlayerDataTableKey.shopDataJson,
@@ -179,8 +187,10 @@ public class PlayerDataDao {
                 playerData.setDeaths(resultSet.getInt(PlayerDataTableKey.deaths));
                 playerData.setAssists(resultSet.getInt(PlayerDataTableKey.assists));
                 playerData.setFinalKills(resultSet.getInt(PlayerDataTableKey.finalKills));
+                playerData.setFinalDeaths(resultSet.getInt(PlayerDataTableKey.finalDeaths));
                 playerData.setDestroyedBeds(resultSet.getInt(PlayerDataTableKey.destroyedBeds));
                 playerData.setWins(resultSet.getInt(PlayerDataTableKey.wins));
+                playerData.setTies(resultSet.getInt(PlayerDataTableKey.ties));
                 playerData.setLosses(resultSet.getInt(PlayerDataTableKey.losses));
                 playerData.setGames(resultSet.getInt(PlayerDataTableKey.games));
                 playerData.setShopDataJson(resultSet.getString(PlayerDataTableKey.shopDataJson));
