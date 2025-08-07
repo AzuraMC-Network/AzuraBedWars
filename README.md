@@ -27,6 +27,12 @@ AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project 
   possible
 - I am not very familiar with BukkitAPI, etc., so there may be many ambiguous places in the project
 
+### Project Structure
+
+- `azurabedwars-plugin` — The core Minecraft BedWars plugin running on the server.
+- `azurabedwars-dashboard` — A Spring Boot web dashboard for dynamically managing plugin configurations and server
+  settings.
+
 ## Performance Showcase
 
 - This is the spark profiler result after a 16-player game completion. Perhaps this is what can attract you to choose
