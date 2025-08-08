@@ -4,8 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.dao.DatabaseVersionDao;
 import cc.azuramc.bedwars.util.LoggerUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,34 +44,6 @@ public class DatabaseVersionService {
         // });
     }
 
-    private void initVersionSql() {
-        try {
-            String addFinalDeathsSql = "ALTER TABLE player_data ADD COLUMN finalDeaths INT DEFAULT 0 AFTER finalKills";
-
-            String addTiesSql = "ALTER TABLE player_data ADD COLUMN ties INT DEFAULT 0 AFTER wins";
-
-            try (Connection conn = plugin.getOrmClient().getConnection()) {
-                try (PreparedStatement stmt = conn.prepareStatement(addFinalDeathsSql)) {
-                    stmt.executeUpdate();
-                    LoggerUtil.info("成功添加 finalDeaths 字段到 player_data 表");
-                } catch (SQLException e) {
-                    LoggerUtil.info("finalDeaths 字段可能已存在或添加失败: " + e.getMessage());
-                }
-
-                try (PreparedStatement stmt = conn.prepareStatement(addTiesSql)) {
-                    stmt.executeUpdate();
-                    LoggerUtil.info("成功添加 ties 字段到 player_data 表");
-                } catch (SQLException e) {
-                    LoggerUtil.info("ties 字段可能已存在或添加失败: " + e.getMessage());
-                }
-            }
-
-        } catch (SQLException e) {
-            LoggerUtil.error("执行数据库版本SQL操作失败: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
     /**
      * 初始化数据库版本管理
      */
@@ -89,7 +59,6 @@ public class DatabaseVersionService {
                 // 首次安装，插入初始版本
                 databaseVersionDao.insertVersion(CURRENT_VERSION);
                 LoggerUtil.info("数据库版本管理初始化完成，当前版本: " + CURRENT_VERSION);
-                initVersionSql();
             } else if (currentVersion != CURRENT_VERSION) {
                 // 需要升级
                 performVersionUpgrade(currentVersion, CURRENT_VERSION);
