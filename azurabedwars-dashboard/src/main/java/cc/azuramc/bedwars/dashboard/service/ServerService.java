@@ -37,6 +37,11 @@ public class ServerService implements IServerService {
     }
 
     @Override
+    public Optional<Server> getServerByDisplayName(String displayName) {
+        return serverRepository.findByDisplayName(displayName);
+    }
+
+    @Override
     public Optional<Server> updateServer(Integer id, ServerDto serverDTO) {
         Optional<Server> existingServer = serverRepository.findById(id);
         if (existingServer.isPresent()) {

@@ -17,6 +17,8 @@ public interface IServerService {
 
     Optional<Server> getServerById(Integer id);
 
+    Optional<Server> getServerByDisplayName(String displayName);
+
     Optional<Server> updateServer(Integer id, ServerDto serverDTO);
 
     boolean deleteServer(Integer id);
