@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>AzuraBedWars Dashboard</title>
+    <link href="style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="logo">
+                <i class="fas fa-gamepad"></i>
+                AzuraBedWars
+            </h1>
+            <p class="subtitle">Server Management Dashboard</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <input class="search-input" id="searchInput" placeholder="Search servers by name..." type="text">
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <button class="add-btn" id="addServerBtn">
+                <i class="fas fa-plus"></i>
+                Add Server
+            </button>
+        </section>
+
+        <!-- Servers Grid -->
+        <section class="servers-section">
+            <div class="servers-grid" id="serversGrid">
+                <!-- Server cards will be dynamically loaded here -->
+            </div>
+            <div class="loading-spinner" id="loadingSpinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading servers...</p>
+            </div>
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-server"></i>
+                <h3>No servers found</h3>
+                <p>Add your first server to get started</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Add/Edit Server Modal -->
+<div class="modal" id="serverModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Add New Server</h2>
+            <button class="close-btn" id="closeModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="server-form" id="serverForm">
+            <div class="form-group">
+                <label for="channelId">Channel ID</label>
+                <input id="channelId" name="channelId" required type="text">
+            </div>
+            <div class="form-group">
+                <label for="displayName">Display Name</label>
+                <input id="displayName" name="displayName" required type="text">
+            </div>
+            <div class="form-group">
+                <label for="defaultMap">Default Map</label>
+                <input id="defaultMap" name="defaultMap" required type="text">
+            </div>
+            <div class="form-actions">
+                <button class="cancel-btn" id="cancelBtn" type="button">Cancel</button>
+                <button class="submit-btn" id="submitBtn" type="submit">
+                    <i class="fas fa-save"></i>
+                    Save Server
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification">
+    <div class="notification-content">
+        <i class="notification-icon"></i>
+        <span class="notification-message"></span>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
