@@ -39,6 +39,15 @@ public class ServerController {
         return server.map(ResponseMessage::success).orElseGet(() -> ResponseMessage.notFound("Server not found with id: " + id));
     }
 
+    @GetMapping("/name/{displayName}")
+    public ResponseMessage<Server> getServerByDisplayName(@PathVariable String displayName) {
+        Optional<Server> server = serverService.getServerByDisplayName(displayName);
+        if (server.isPresent()) {
+            return ResponseMessage.success(server.get());
+        }
+        return ResponseMessage.notFound("Server not found with displayName: " + displayName);
+    }
+
     @PutMapping("/{id}")
     public ResponseMessage<Server> updateServer(@PathVariable Integer id, @Validated @RequestBody ServerDto serverDTO) {
         Optional<Server> updatedServer = serverService.updateServer(id, serverDTO);
