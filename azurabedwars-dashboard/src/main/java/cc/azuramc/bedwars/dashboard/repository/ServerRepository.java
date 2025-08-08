@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface ServerRepository extends CrudRepository<Server, Integer> {
 
     Optional<Server> findByDisplayName(String displayName);
+
+    Optional<Server> findByChannelId(String channelId);
 }

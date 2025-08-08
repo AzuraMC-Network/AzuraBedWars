@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * @author An5w1r@163.com
@@ -28,7 +30,8 @@ public class ServerService implements IServerService {
 
     @Override
     public List<Server> getAllServers() {
-        return (List<Server>) serverRepository.findAll();
+        return StreamSupport.stream(serverRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     @Override

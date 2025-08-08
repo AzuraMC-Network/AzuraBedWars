@@ -22,6 +22,14 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <!-- Navigation Header -->
+        <section class="nav-header">
+            <h2 class="section-title">
+                <i class="fas fa-server"></i>
+                Server Management
+            </h2>
+        </section>
+
         <!-- Search Section -->
         <section class="search-section">
             <div class="search-container">
@@ -37,7 +45,7 @@
         </section>
 
         <!-- Servers Grid -->
-        <section class="servers-section">
+        <section class="servers-section" id="serversSection">
             <div class="servers-grid" id="serversGrid">
                 <!-- Server cards will be dynamically loaded here -->
             </div>
@@ -51,6 +59,8 @@
                 <p>Add your first server to get started</p>
             </div>
         </section>
+
+
     </main>
 </div>
 
@@ -84,6 +94,153 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+
+<!-- Send Message Modal -->
+<div class="modal" id="sendMessageModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Send Message</h2>
+            <button class="close-btn" id="closeSendMessageModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="send-message-form" id="sendMessageForm">
+            <div class="form-group">
+                <label for="messageChannel">Channel</label>
+                <input id="messageChannel" name="messageChannel" readonly type="text">
+            </div>
+            <div class="form-group">
+                <label for="messageContent">Message Content</label>
+                <textarea id="messageContent" name="messageContent" placeholder="Enter your message..." required
+                          rows="4"></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="cancel-btn" id="cancelSendMessageBtn" type="button">Cancel</button>
+                <button class="submit-btn" id="submitSendMessageBtn" type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                    Send Message
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Server Details Modal -->
+<div class="modal" id="serverDetailsModal">
+    <div class="modal-content server-details-modal-content">
+        <div class="modal-header">
+            <h2 id="serverDetailsModalTitle">Server Details</h2>
+            <button class="close-btn" id="closeServerDetailsModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="server-details">
+            <div class="server-info-section">
+                <div class="server-basic-info" id="serverBasicInfo">
+                    <!-- Server basic info will be loaded here -->
+                </div>
+                <div class="server-channel-stats">
+                    <div class="channel-stats" id="serverChannelStats">
+                        <!-- Channel statistics will be loaded here -->
+                    </div>
+                </div>
+                <div class="channel-actions-container">
+                    <div class="channel-actions">
+                        <button class="send-message-btn" id="serverSendMessageBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Message
+                        </button>
+                        <button class="clear-messages-btn" id="serverClearMessagesBtn">
+                            <i class="fas fa-trash"></i>
+                            Clear Messages
+                        </button>
+                        <button class="update-auto-reply-btn" id="updateAutoReplyBtn">
+                            <i class="fas fa-robot"></i>
+                            Update Auto Reply
+                        </button>
+                        <button class="subscription-status-btn" id="subscriptionStatusBtn">
+                            <i class="fas fa-info-circle"></i>
+                            Subscription Status
+                        </button>
+                    </div>
+                </div>
+                <div class="server-channel-info">
+                    <h3>📋 Channel Information</h3>
+                    <p>Channel details and configuration will be displayed here.</p>
+                </div>
+            </div>
+            <div class="server-messages-container">
+                <div class="messages-header">
+                    <h3>Recent Messages</h3>
+                    <div class="messages-pagination">
+                        <button class="pagination-btn" disabled id="serverPrevPageBtn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="page-info" id="serverPageInfo">Page 1 of 1</span>
+                        <button class="pagination-btn" disabled id="serverNextPageBtn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="messages-list" id="serverMessagesList">
+                    <!-- Messages will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Auto Reply Modal -->
+<div class="modal" id="updateAutoReplyModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Update Auto Reply</h2>
+            <button class="close-btn" id="closeUpdateAutoReplyModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="update-auto-reply-form" id="updateAutoReplyForm">
+            <div class="form-group">
+                <label for="autoReplyServerId">Server ID</label>
+                <input id="autoReplyServerId" name="autoReplyServerId" readonly type="text">
+            </div>
+            <div class="form-group">
+                <label for="autoReplyDefaultMap">Default Map</label>
+                <input id="autoReplyDefaultMap" name="autoReplyDefaultMap" placeholder="Enter default map name..."
+                       required type="text">
+            </div>
+            <div class="form-actions">
+                <button class="cancel-btn" id="cancelAutoReplyBtn" type="button">Cancel</button>
+                <button class="submit-btn" id="submitAutoReplyBtn" type="submit">
+                    <i class="fas fa-save"></i>
+                    Update Auto Reply
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Subscription Status Modal -->
+<div class="modal" id="subscriptionStatusModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Subscription Status</h2>
+            <button class="close-btn" id="closeSubscriptionStatusModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="subscription-status-content" id="subscriptionStatusContent">
+            <!-- Subscription status will be loaded here -->
+        </div>
+        <div class="form-actions">
+            <button class="refresh-subscription-btn" id="refreshSubscriptionBtn">
+                <i class="fas fa-sync-alt"></i>
+                Refresh Subscription
+            </button>
+        </div>
     </div>
 </div>
 
