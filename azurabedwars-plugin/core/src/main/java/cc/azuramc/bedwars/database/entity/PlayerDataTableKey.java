@@ -16,14 +16,14 @@ public class PlayerDataTableKey {
     public static String kills = "kills";
     public static String deaths = "deaths";
     public static String assists = "assists";
-    public static String finalKills = "finalKills";
-    public static String finalDeaths = "finalDeaths";
-    public static String destroyedBeds = "destroyedBeds";
+    public static String finalKills = "final_kills";
+    public static String finalDeaths = "final_deaths";
+    public static String destroyedBeds = "destroyed_beds";
     public static String wins = "wins";
     public static String ties = "ties";
     public static String losses = "losses";
     public static String games = "games";
-    public static String shopDataJson = "shopDataJson";
+    public static String shopDataJson = "shop_data_json";
     public static String createdAt = "created_at";
     public static String updatedAt = "updated_at";
 
