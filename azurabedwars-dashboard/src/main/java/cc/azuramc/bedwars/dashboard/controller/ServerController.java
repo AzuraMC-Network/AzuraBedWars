@@ -42,10 +42,7 @@ public class ServerController {
     @GetMapping("/name/{displayName}")
     public ResponseMessage<Server> getServerByDisplayName(@PathVariable String displayName) {
         Optional<Server> server = serverService.getServerByDisplayName(displayName);
-        if (server.isPresent()) {
-            return ResponseMessage.success(server.get());
-        }
-        return ResponseMessage.notFound("Server not found with displayName: " + displayName);
+        return server.map(ResponseMessage::success).orElseGet(() -> ResponseMessage.notFound("Server not found with displayName: " + displayName));
     }
 
     @PutMapping("/{id}")
