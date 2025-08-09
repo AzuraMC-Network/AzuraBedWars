@@ -26,6 +26,7 @@ import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.bedwars.util.bstats.Metrics;
+import cc.azuramc.bedwars.util.nms.ReflectionUtil;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.config.DatabaseConfig;
@@ -142,6 +143,8 @@ public final class AzuraBedWars extends JavaPlugin {
             initGameFeatures();
         }
 
+        // ReflectionUtil初始化版本
+        ReflectionUtil.initializeVersions();
         // 初始化命令和通信系统
         initCommands();
         // bStats
