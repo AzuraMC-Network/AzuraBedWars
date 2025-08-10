@@ -94,13 +94,6 @@ public class VersionUtil {
     }
 
     /**
-     * 判断是否是1.16以下版本
-     */
-    public static boolean isLessThan1_16() {
-        return isLessThan(1, 16);
-    }
-
-    /**
      * 检查服务器版本是否是1.8.x
      *
      * @return 是否是1.8.x版本
