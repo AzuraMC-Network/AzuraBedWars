@@ -46,7 +46,7 @@ public class NMS_v1_8_R3 implements NMSAccess {
     @Override
     public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, double damage) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        LoggerUtil.debug("NMS_v1_8_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn + ", damage: " + damage);
+        LoggerUtil.debug("NMS_v1_8_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", damage: " + damage);
         return CustomSilverfish.spawn(loc, gameTeam, speed, health, damage);
     }
 
