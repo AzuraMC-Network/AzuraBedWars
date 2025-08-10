@@ -94,5 +94,23 @@
         }
       ]
     }
+  },
+  "EntityFireball": {
+    "className": {
+      "versionRanges": [
+        {
+          "condition": "lessThan",
+          "major": 1,
+          "minor": 17,
+          "value": "net.minecraft.server.{nmsVersion}.EntityFireball"
+        },
+        {
+          "condition": "greaterOrEqual",
+          "major": 1,
+          "minor": 17,
+          "value": "net.minecraft.world.entity.projectile.EntityFireball"
+        }
+      ]
+    }
   }
 }
