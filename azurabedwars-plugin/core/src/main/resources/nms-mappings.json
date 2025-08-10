@@ -1,72 +1,98 @@
 {
   "EntityFireball": {
     "className": {
-      "v1_8_R3": "net.minecraft.server.v1_8_R3.EntityFireball",
-      "v1_12_R1": "net.minecraft.server.v1_12_R1.EntityFireball",
-      "v1_16_R1": "net.minecraft.server.v1_16_R1.EntityFireball",
-      "v1_16_R2": "net.minecraft.server.v1_16_R2.EntityFireball",
-      "v1_16_R3": "net.minecraft.server.v1_16_R3.EntityFireball",
-      "v1_17_R1": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_18_R1": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_18_R2": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_19_R1": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_19_R2": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_19_R3": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_20_R1": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_20_R2": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_20_R3": "net.minecraft.world.entity.projectile.EntityFireball",
-      "v1_20_R4": "net.minecraft.world.entity.projectile.EntityFireball"
+      "versionRanges": [
+        {
+          "condition": "lessThan",
+          "major": 1,
+          "minor": 17,
+          "value": "net.minecraft.server.{nmsVersion}.EntityFireball"
+        },
+        {
+          "condition": "greaterOrEqual",
+          "major": 1,
+          "minor": 17,
+          "value": "net.minecraft.world.entity.projectile.EntityFireball"
+        }
+      ]
     },
     "dirX": {
-      "v1_8_R3": "dirX",
-      "v1_12_R1": "dirX",
-      "v1_16_R1": "dirX",
-      "v1_16_R2": "dirX",
-      "v1_16_R3": "dirX",
-      "v1_17_R1": "b",
-      "v1_18_R1": "b",
-      "v1_18_R2": "b",
-      "v1_19_R1": "b",
-      "v1_19_R2": "b",
-      "v1_19_R3": "b",
-      "v1_20_R1": "b",
-      "v1_20_R2": "b",
-      "v1_20_R3": "b",
-      "v1_20_R4": "d"
+      "versionRanges": [
+        {
+          "condition": "lessThan",
+          "major": 1,
+          "minor": 17,
+          "value": "dirX"
+        },
+        {
+          "condition": "greaterOrEqual",
+          "major": 1,
+          "minor": 17,
+          "excludeVersions": [
+            "v1_20_R4"
+          ],
+          "value": "b"
+        },
+        {
+          "condition": "specificVersions",
+          "versions": [
+            "v1_20_R4"
+          ],
+          "value": "d"
+        }
+      ]
     },
     "dirY": {
-      "v1_8_R3": "dirY",
-      "v1_12_R1": "dirY",
-      "v1_16_R1": "dirY",
-      "v1_16_R2": "dirY",
-      "v1_16_R3": "dirY",
-      "v1_17_R1": "c",
-      "v1_18_R1": "c",
-      "v1_18_R2": "c",
-      "v1_19_R1": "c",
-      "v1_19_R2": "c",
-      "v1_19_R3": "c",
-      "v1_20_R1": "c",
-      "v1_20_R2": "c",
-      "v1_20_R3": "c",
-      "v1_20_R4": "e"
+      "versionRanges": [
+        {
+          "condition": "lessThan",
+          "major": 1,
+          "minor": 17,
+          "value": "dirY"
+        },
+        {
+          "condition": "greaterOrEqual",
+          "major": 1,
+          "minor": 17,
+          "excludeVersions": [
+            "v1_20_R4"
+          ],
+          "value": "c"
+        },
+        {
+          "condition": "specificVersions",
+          "versions": [
+            "v1_20_R4"
+          ],
+          "value": "e"
+        }
+      ]
     },
     "dirZ": {
-      "v1_8_R3": "dirZ",
-      "v1_12_R1": "dirZ",
-      "v1_16_R1": "dirZ",
-      "v1_16_R2": "dirZ",
-      "v1_16_R3": "dirZ",
-      "v1_17_R1": "d",
-      "v1_18_R1": "d",
-      "v1_18_R2": "d",
-      "v1_19_R1": "d",
-      "v1_19_R2": "d",
-      "v1_19_R3": "d",
-      "v1_20_R1": "d",
-      "v1_20_R2": "d",
-      "v1_20_R3": "d",
-      "v1_20_R4": "f"
+      "versionRanges": [
+        {
+          "condition": "lessThan",
+          "major": 1,
+          "minor": 17,
+          "value": "dirZ"
+        },
+        {
+          "condition": "greaterOrEqual",
+          "major": 1,
+          "minor": 17,
+          "excludeVersions": [
+            "v1_20_R4"
+          ],
+          "value": "d"
+        },
+        {
+          "condition": "specificVersions",
+          "versions": [
+            "v1_20_R4"
+          ],
+          "value": "f"
+        }
+      ]
     }
   }
 }
