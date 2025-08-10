@@ -36,6 +36,6 @@ public class SilverFishListener implements Listener {
 
         int despawn = 15;
         new CustomEntityManager(AzuraBedWars.getInstance().getNmsAccess().spawnSilverfish(location.add(0, 0.5, 0), gamePlayer,
-                0.25, 8, despawn, 4), gamePlayer, despawn);
+                0.25, 8, 4), gamePlayer, despawn);
     }
 }
