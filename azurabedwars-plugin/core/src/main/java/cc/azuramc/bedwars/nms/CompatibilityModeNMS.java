@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.nms;
 
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.util.nms.NMSMapping;
 import cc.azuramc.bedwars.util.nms.ReflectionUtil;
@@ -18,6 +19,15 @@ public class CompatibilityModeNMS implements NMSAccess {
 
     @Override
     public Fireball setFireballDirection(Fireball fireball, @NotNull Vector vector) {
+
+        // if the server version is 1.21 or higher, we can use the new method to set the velocity directly (mojang changed the way to set fireball direction)
+        if (VersionUtil.isLessThan(1, 21)) {
+            fireball.setVelocity(new Vector(vector.getX() * 0.1D, vector.getY() * 0.1D, vector.getZ() * 0.1D));
+            return fireball;
+        }
+
+        // compatibility mode for less than 1.21
+        // using reflection to set the direction of the fireball
         try {
             Object nmsFireball = ReflectionUtil.getNMSObject(fireball);
 
