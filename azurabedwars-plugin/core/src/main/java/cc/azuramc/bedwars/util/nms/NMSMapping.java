@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.bukkit.Bukkit;
 
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -27,13 +26,11 @@ public class NMSMapping {
 
     public static void initNmsMapping() {
         try {
-            version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+            version = VersionUtil.getNmsVersion();
 
             LoggerUtil.debug("NMSMapping$initNmsMapping | var version is: " + version);
 
-            InputStreamReader reader = new InputStreamReader(
-                    Objects.requireNonNull(NMSMapping.class.getResourceAsStream("/nms-mappings.json")), StandardCharsets.UTF_8
-            );
+            InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(NMSMapping.class.getResourceAsStream("/nms-mappings.json")), StandardCharsets.UTF_8);
             Gson gson = new Gson();
             rawMappings = gson.fromJson(reader, JsonObject.class);
 
