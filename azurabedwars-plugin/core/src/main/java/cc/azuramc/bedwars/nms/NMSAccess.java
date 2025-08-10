@@ -14,7 +14,7 @@ public interface NMSAccess {
 
     void registerCustomEntities();
 
-    LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn);
+    LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health);
 
-    LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn, double damage);
+    LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, double damage);
 }
