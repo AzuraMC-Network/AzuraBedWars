@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
+import cc.azuramc.bedwars.api.event.player.BedwarsPlayerReconnectEvent;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
@@ -423,6 +424,18 @@ public class GameManager {
         // 检查玩家团队状态
         if (gamePlayer.getGameTeam() != null) {
             if (gamePlayer.getGameTeam().isHasBed()) {
+                // 触发玩家重连事件
+                BedwarsPlayerReconnectEvent reconnectEvent = new BedwarsPlayerReconnectEvent(
+                        gamePlayer, gamePlayer.getGameTeam(), this
+                );
+                Bukkit.getPluginManager().callEvent(reconnectEvent);
+
+                // 检查事件是否被取消
+                if (reconnectEvent.isCancelled()) {
+                    gamePlayer.getPlayer().kickPlayer("canceled reconnect by event");
+                    return;
+                }
+
                 gamePlayer.setReconnect(true);
                 PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
                 broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
