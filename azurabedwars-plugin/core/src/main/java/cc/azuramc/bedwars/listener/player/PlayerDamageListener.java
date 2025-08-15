@@ -311,9 +311,6 @@ public class PlayerDamageListener implements Listener {
         GameTeam killerTeam = gameKiller == null ? null : gameKiller.getGameTeam();
         boolean isFinalKill = gameTeam != null && gameTeam.isDestroyed();
 
-        BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
-        Bukkit.getPluginManager().callEvent(event);
-
         if (gameKiller == null) {
             return;
         }
@@ -332,6 +329,9 @@ public class PlayerDamageListener implements Listener {
         }
 
         gamePlayer.getPlayerData().addDeaths();
+
+        BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     /**
