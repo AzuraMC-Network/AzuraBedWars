@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsGameOverEvent;
+import cc.azuramc.bedwars.api.event.game.BedwarsGameOverEvent;
 import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
@@ -26,11 +26,8 @@ public class GameOverEvent extends AbstractGameEvent {
 
     @Override
     public void execute(GameManager gameManager) {
-        BedwarsGameOverEvent bedwarsGameOverEvent = new BedwarsGameOverEvent(gameManager.getWinner());
+        BedwarsGameOverEvent bedwarsGameOverEvent = new BedwarsGameOverEvent(gameManager);
         Bukkit.getPluginManager().callEvent(bedwarsGameOverEvent);
-        if (bedwarsGameOverEvent.isCancelled()) {
-            return;
-        }
 
         Bukkit.getPluginManager().callEvent(new JedisGameEndEvent());
 
