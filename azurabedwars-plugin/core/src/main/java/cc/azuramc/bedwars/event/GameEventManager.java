@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.event;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsGameEndEvent;
+import cc.azuramc.bedwars.api.event.game.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.event.impl.*;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameState;
@@ -148,12 +148,9 @@ public class GameEventManager implements Runnable {
     private void handleGameOver() {
         if (gameManager.isOver() && !over) {
 
-            // 调用游戏结束事件
-            BedwarsGameEndEvent event = new BedwarsGameEndEvent();
-            Bukkit.getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                return;
-            }
+            // 触发游戏结束事件
+            BedwarsGameEndEvent gameEndEvent = new BedwarsGameEndEvent(gameManager);
+            Bukkit.getPluginManager().callEvent(gameEndEvent);
 
             // 设置GameState
             gameManager.setGameState(GameState.ENDING);

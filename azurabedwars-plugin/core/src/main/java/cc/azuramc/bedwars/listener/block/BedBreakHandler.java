@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsDestroyBedEvent;
+import cc.azuramc.bedwars.api.event.bed.BedwarsDestroyBedEvent;
 import cc.azuramc.bedwars.compat.util.BedUtil;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
@@ -65,9 +65,12 @@ public class BedBreakHandler {
     private static void processBedDestruction(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam, Block block) {
 
         // 触发床被破坏事件
-        BedwarsDestroyBedEvent event = new BedwarsDestroyBedEvent(gamePlayer, targetTeam);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
+        String message = "&f&l床被破坏 >>> " + targetTeam.getChatColor() + targetTeam.getName() + " 的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + " 破坏";
+        String title = "§c§l床被摧毁";
+        String subTitle = "§c死亡将无法复活";
+        BedwarsDestroyBedEvent apiEvent = new BedwarsDestroyBedEvent(gamePlayer, targetTeam, GAME_MANAGER, message, title, subTitle);
+        Bukkit.getPluginManager().callEvent(apiEvent);
+        if (apiEvent.isCancelled()) {
             return;
         }
 
@@ -78,7 +81,7 @@ public class BedBreakHandler {
         rewardBedDestruction(gamePlayer);
 
         // 广播消息
-        broadcastBedDestructionMessages(gamePlayer, gameTeam, targetTeam);
+        broadcastBedDestructionMessages(apiEvent);
 
         // 更新团队状态
         targetTeam.setDestroyPlayer(gamePlayer);
@@ -118,21 +121,19 @@ public class BedBreakHandler {
     /**
      * 广播床被破坏的消息
      *
-     * @param gamePlayer 破坏床的玩家
-     * @param gameTeam   玩家所在团队
-     * @param targetTeam 床所属团队
+     * @param event 床被破坏事件
      */
-    private static void broadcastBedDestructionMessages(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam) {
+    private static void broadcastBedDestructionMessages(BedwarsDestroyBedEvent event) {
         // 播放全局音效
         GAME_MANAGER.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 10, 10);
 
         // 发送全局消息
         GAME_MANAGER.broadcastMessage(" ");
-        GAME_MANAGER.broadcastMessage("&f&l床被破坏 >>> " + targetTeam.getChatColor() + targetTeam.getName() + " 的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + " 破坏");
+        GAME_MANAGER.broadcastMessage(event.getMessage());
         GAME_MANAGER.broadcastMessage(" ");
 
         // 向受影响的团队发送标题提示
-        GAME_MANAGER.broadcastTeamTitle(targetTeam, "§c§l床被摧毁", "§c死亡将无法复活", 1, 20, 1);
+        GAME_MANAGER.broadcastTeamTitle(event.getGameTeam(), event.getTitle(), event.getSubTitle(), 1, 20, 1);
     }
 
 

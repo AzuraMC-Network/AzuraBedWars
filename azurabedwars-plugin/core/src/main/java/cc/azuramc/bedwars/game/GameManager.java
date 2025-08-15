@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsGameLoadEvent;
-import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
+import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
+import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
@@ -94,6 +94,8 @@ public class GameManager {
 
     private TabListManager tabListManager;
 
+    private List<GamePlayer> allInGamePlayers;
+
     /**
      * 创建一个新的游戏实例
      *
@@ -114,6 +116,7 @@ public class GameManager {
 
         this.tabListManager = new TabListManager(this);
         tabListManager.startAutoUpdate(plugin);
+        this.allInGamePlayers = new ArrayList<>();
     }
 
     private void initializeConfigs() {
@@ -153,7 +156,7 @@ public class GameManager {
         }
 
         // call event
-        BedwarsGameLoadEvent event = new BedwarsGameLoadEvent(mapData.getMaxPlayers());
+        BedwarsGameLoadEvent event = new BedwarsGameLoadEvent(this, mapData);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
@@ -330,6 +333,7 @@ public class GameManager {
         handlePlayerJoinWaitingGame(gamePlayer);
 
         tabListManager.addToTab(gamePlayer);
+        allInGamePlayers.add(gamePlayer);
     }
 
     /**
@@ -468,6 +472,7 @@ public class GameManager {
 
         // 处理玩家离开对团队的影响
         handleTeamPlayerLeave(gamePlayer, gameTeam);
+        allInGamePlayers.remove(gamePlayer);
     }
 
     /**
@@ -831,7 +836,7 @@ public class GameManager {
      */
     public void start() {
 
-        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent();
+        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent(this);
         Bukkit.getPluginManager().callEvent(bedwarsGameStartEvent);
         if (bedwarsGameStartEvent.isCancelled()) {
             return;
