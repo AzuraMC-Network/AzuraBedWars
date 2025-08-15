@@ -5,7 +5,6 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Getter
 @Setter
-public class BedwarsDestroyBedEvent extends Event implements Cancellable {
+public class BedwarsDestroyBedEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
@@ -50,11 +49,6 @@ public class BedwarsDestroyBedEvent extends Event implements Cancellable {
     private String subTitle;
 
     /**
-     * 事件是否被取消
-     */
-    private boolean cancelled = false;
-
-    /**
      * 构造函数
      *
      * @param gamePlayer  破坏床的玩家
@@ -78,30 +72,9 @@ public class BedwarsDestroyBedEvent extends Event implements Cancellable {
         return HANDLERS;
     }
 
-    /**
-     * 获取事件是否被取消
-     *
-     * @return 是否被取消
-     */
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    /**
-     * 设置事件是否被取消
-     *
-     * @param cancelled 是否取消
-     */
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
-
     @Override
     public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
-
 
 }

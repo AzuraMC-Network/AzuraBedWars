@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
@@ -830,8 +831,10 @@ public class GamePlayer {
         player.setExhaustion(0.0f);
         player.setHealth(MAX_HEALTH);
         player.setFireTicks(0);
-        this.endInvisibility();
-        this.endTrapProtection();
+        if (this.gameTeam != null) {
+            this.endInvisibility();
+            this.endTrapProtection();
+        }
     }
 
     /**
@@ -859,17 +862,68 @@ public class GamePlayer {
         }
     }
 
-    @Override
-    public int hashCode() {
-        return uuid.hashCode();
+    /**
+     * 自定义 setSpectator 方法，触发状态变化事件
+     */
+    public void setSpectator(boolean spectator) {
+        if (this.gameTeam == null) {
+            return;
+        }
+        GameManager gameManager = this.getGameTeam().getGameManager();
+
+        this.isSpectator = spectator;
+        BedwarsPlayerStateChangeEvent stateEvent = new BedwarsPlayerStateChangeEvent(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR);
+        Bukkit.getPluginManager().callEvent(stateEvent);
+
+
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof GamePlayer)) {
-            return false;
+    /**
+     * 自定义 setRespawning 方法，触发状态变化事件
+     */
+    public void setRespawning(boolean respawning) {
+        if (this.gameTeam == null) {
+            return;
         }
-        return uuid.equals(((GamePlayer) obj).getUuid());
+        GameManager gameManager = this.getGameTeam().getGameManager();
+
+        this.isRespawning = respawning;
+        BedwarsPlayerStateChangeEvent stateEvent = new BedwarsPlayerStateChangeEvent(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING);
+        Bukkit.getPluginManager().callEvent(stateEvent);
+
+    }
+
+    /**
+     * 自定义 setInvisible 方法，触发状态变化事件
+     */
+    public void setInvisible(boolean invisible) {
+        if (this.gameTeam == null) {
+            return;
+        }
+        GameManager gameManager = this.getGameTeam().getGameManager();
+
+        this.isInvisible = invisible;
+        BedwarsPlayerStateChangeEvent stateEvent = new BedwarsPlayerStateChangeEvent(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE);
+        Bukkit.getPluginManager().callEvent(stateEvent);
+
+    }
+
+    /**
+     * 自定义 setReconnect 方法，触发状态变化事件
+     */
+    public void setReconnect(boolean reconnect) {
+        if (this.gameTeam == null) {
+            return;
+        }
+        GameManager gameManager = this.getGameTeam().getGameManager();
+
+        this.isReconnect = reconnect;
+        BedwarsPlayerStateChangeEvent stateEvent = new BedwarsPlayerStateChangeEvent(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT);
+        Bukkit.getPluginManager().callEvent(stateEvent);
     }
 
     /**
@@ -916,5 +970,19 @@ public class GamePlayer {
                 gamePlayer.sendActionBar("§c没有目标");
             }
         }
+    }
+
+    // don't remove this, it is preventing stack overflow error
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof GamePlayer)) {
+            return false;
+        }
+        return uuid.equals(((GamePlayer) obj).getUuid());
     }
 }

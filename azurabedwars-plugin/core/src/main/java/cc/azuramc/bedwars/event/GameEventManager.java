@@ -148,10 +148,6 @@ public class GameEventManager implements Runnable {
     private void handleGameOver() {
         if (gameManager.isOver() && !over) {
 
-            // 触发游戏结束事件
-            BedwarsGameEndEvent gameEndEvent = new BedwarsGameEndEvent(gameManager);
-            Bukkit.getPluginManager().callEvent(gameEndEvent);
-
             // 设置GameState
             gameManager.setGameState(GameState.ENDING);
 
@@ -160,6 +156,10 @@ public class GameEventManager implements Runnable {
                 currentEvent().execute(gameManager);
             }, GAME_OVER_DELAY_TICKS);
             over = true;
+
+            // 触发游戏结束事件
+            BedwarsGameEndEvent gameEndEvent = new BedwarsGameEndEvent(gameManager);
+            Bukkit.getPluginManager().callEvent(gameEndEvent);
         }
     }
 
