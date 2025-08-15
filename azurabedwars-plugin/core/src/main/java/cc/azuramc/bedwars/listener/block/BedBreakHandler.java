@@ -64,24 +64,8 @@ public class BedBreakHandler {
      */
     private static void processBedDestruction(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam, Block block) {
 
-        // 触发床被破坏事件
-        String message = "&f&l床被破坏 >>> " + targetTeam.getChatColor() + targetTeam.getName() + " 的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + " 破坏";
-        String title = "§c§l床被摧毁";
-        String subTitle = "§c死亡将无法复活";
-        BedwarsDestroyBedEvent apiEvent = new BedwarsDestroyBedEvent(gamePlayer, targetTeam, GAME_MANAGER, message, title, subTitle);
-        Bukkit.getPluginManager().callEvent(apiEvent);
-        if (apiEvent.isCancelled()) {
-            return;
-        }
-
         // 掉落床方块物品
         BedUtil.dropTargetBlock(block);
-
-        // 奖励金币
-        rewardBedDestruction(gamePlayer);
-
-        // 广播消息
-        broadcastBedDestructionMessages(apiEvent);
 
         // 更新团队状态
         targetTeam.setDestroyPlayer(gamePlayer);
@@ -89,6 +73,19 @@ public class BedBreakHandler {
 
         // 更新玩家统计数据
         gamePlayer.getPlayerData().addDestroyedBeds();
+
+        // 触发床被破坏事件
+        String message = "&f&l床被破坏 >>> " + targetTeam.getChatColor() + targetTeam.getName() + " 的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + " 破坏";
+        String title = "§c§l床被摧毁";
+        String subTitle = "§c死亡将无法复活";
+        BedwarsDestroyBedEvent apiEvent = new BedwarsDestroyBedEvent(gamePlayer, targetTeam, GAME_MANAGER, message, title, subTitle);
+        Bukkit.getPluginManager().callEvent(apiEvent);
+
+        // 奖励金币
+        rewardBedDestruction(gamePlayer);
+
+        // 广播消息
+        broadcastBedDestructionMessages(apiEvent);
     }
 
     /**

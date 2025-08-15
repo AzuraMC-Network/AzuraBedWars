@@ -21,6 +21,7 @@ import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
+import cc.azuramc.bedwars.tablist.TabListEventListener;
 import cc.azuramc.bedwars.tablist.TabListManager;
 import cc.azuramc.bedwars.upgrade.task.TeamUpgradeCheckTask;
 import cc.azuramc.bedwars.util.LoadGameUtil;
@@ -116,7 +117,8 @@ public class GameManager {
         initializeConfigs();
 
         this.tabListManager = new TabListManager(this);
-        tabListManager.startAutoUpdate(plugin);
+        Bukkit.getPluginManager().registerEvents(new TabListEventListener(tabListManager), plugin);
+//        tabListManager.startAutoUpdate(plugin);
         this.allInGamePlayers = new ArrayList<>();
     }
 
@@ -849,12 +851,6 @@ public class GameManager {
      */
     public void start() {
 
-        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent(this);
-        Bukkit.getPluginManager().callEvent(bedwarsGameStartEvent);
-        if (bedwarsGameStartEvent.isCancelled()) {
-            return;
-        }
-
         Bukkit.getPluginManager().callEvent(new JedisGameStartEvent());
 
         gameState = GameState.RUNNING;
@@ -878,6 +874,9 @@ public class GameManager {
 
         // 注册团队升级任务
         registerTeamUpgradeCheckTask();
+
+        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent(this);
+        Bukkit.getPluginManager().callEvent(bedwarsGameStartEvent);
     }
 
     /**
