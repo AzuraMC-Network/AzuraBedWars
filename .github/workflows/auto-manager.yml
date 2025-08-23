@@ -519,26 +519,29 @@ jobs:
               let labelsToRemove = [];
             
               // Determine which labels should be present based on time
+              let mostRecentApplicableLabel = null;
+            
+              // Find the most recent applicable time label
+              for (let i = timeLabels.length - 1; i >= 0; i--) {
+                const timeLabel = timeLabels[i];
+                if (hoursDiff >= timeLabel.hours) {
+                  mostRecentApplicableLabel = timeLabel;
+                  break;
+                }
+              }
+            
+              // Process all labels based on the most recent applicable one
               for (let i = 0; i < timeLabels.length; i++) {
                 const timeLabel = timeLabels[i];
                 const hasLabel = labels.includes(timeLabel.label);
             
-                if (hoursDiff >= timeLabel.hours) {
-                  // Should have this label
+                if (mostRecentApplicableLabel && timeLabel.label === mostRecentApplicableLabel.label) {
+                  // Should have this label (the most recent applicable one)
                   if (!hasLabel) {
                     labelsToAdd.push(timeLabel.label);
                   }
-            
-                  // Remove previous time labels (progression)
-                  for (let j = 0; j < i; j++) {
-                    const prevLabel = timeLabels[j].label;
-                    if (labels.includes(prevLabel)) {
-                      labelsToRemove.push(prevLabel);
-                    }
-                  }
-                  break; // Only add the most recent applicable label
                 } else {
-                  // Should not have this label
+                  // Should not have this label (either too early or superseded)
                   if (hasLabel) {
                     labelsToRemove.push(timeLabel.label);
                   }
