@@ -3,6 +3,9 @@ package cc.azuramc.bedwars.config.object;
 import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Data;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 设置配置对象
  * 存储插件的基本设置信息
@@ -27,6 +30,9 @@ public class SettingsConfig {
     private ChatConfig chatConfig = new ChatConfig();
     private GameScoreboard gameScoreboard = new GameScoreboard();
     private LobbyScoreboard lobbyScoreboard = new LobbyScoreboard();
+    private WaitingState waitingState = new WaitingState();
+    private RunningState runningState = new RunningState();
+    private EndingState endingState = new EndingState();
     private DisplayDamage displayDamage = new DisplayDamage();
     private FireBall fireBall = new FireBall();
 
@@ -78,6 +84,39 @@ public class SettingsConfig {
         private String expMode = MessageUtil.color("经验模式");
         // 默认为0.5秒更新一次 50ms = 1tick
         private long updateInterval = 500;
+    }
+
+    @Data
+    public static class WaitingState {
+        private List<String> header = Arrays.asList(
+                MessageUtil.color("&b你正在 &eAzuraMC &b游玩起床战争")
+        );
+        private List<String> footer = Arrays.asList(
+                MessageUtil.color("&bas.azuramc.cc")
+        );
+    }
+
+    @Data
+    public static class RunningState {
+        private List<String> header = Arrays.asList(
+                MessageUtil.color("&b你正在 &eAzuraMC &b游玩起床战争")
+        );
+        private List<String> footer = Arrays.asList(
+                MessageUtil.color("&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>"),
+                MessageUtil.color("&bas.azuramc.cc")
+        );
+    }
+
+    @Data
+    public static class EndingState {
+        private List<String> header = Arrays.asList(
+                MessageUtil.color("&b你正在 &eAzuraMC &b游玩起床战争"),
+                MessageUtil.color("&b游戏结束 &e<gameResult>")
+        );
+        private List<String> footer = Arrays.asList(
+                MessageUtil.color("&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>"),
+                MessageUtil.color("&bas.azuramc.cc")
+        );
     }
 
     @Data
