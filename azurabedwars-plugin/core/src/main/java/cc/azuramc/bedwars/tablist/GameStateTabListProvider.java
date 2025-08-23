@@ -43,13 +43,11 @@ public class GameStateTabListProvider {
      */
     private void setWaitingStateContent(HeaderFooterManager headerFooterManager) {
         List<String> waitingHeader = Arrays.asList(
-                "&b你正在 &eAzuraMC &b游玩起床战争",
-                ""
+                "&b你正在 &eAzuraMC &b游玩起床战争"
         );
         headerFooterManager.setHeader(waitingHeader);
 
         List<String> waitingFooter = Arrays.asList(
-                "",
                 "&bas.azuramc.cc"
         );
         headerFooterManager.setFooter(waitingFooter);
@@ -60,13 +58,11 @@ public class GameStateTabListProvider {
      */
     private void setRunningStateContent(HeaderFooterManager headerFooterManager) {
         List<String> runningHeader = Arrays.asList(
-                "&b你正在 &eAzuraMC &b游玩起床战争",
-                ""
+                "&b你正在 &eAzuraMC &b游玩起床战争"
         );
         headerFooterManager.setHeader(runningHeader);
 
         List<String> runningFooter = Arrays.asList(
-                "",
                 "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>",
                 "&bas.azuramc.cc"
         );
@@ -92,13 +88,11 @@ public class GameStateTabListProvider {
 
         List<String> endingHeader = Arrays.asList(
                 "&b你正在 &eAzuraMC &b游玩起床战争",
-                "&b游戏结束 &e" + gameResult,
-                ""
+                "&b游戏结束 &e" + gameResult
         );
         headerFooterManager.setHeader(endingHeader);
 
         List<String> endingFooter = Arrays.asList(
-                "",
                 "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>",
                 "&bas.azuramc.cc"
         );
