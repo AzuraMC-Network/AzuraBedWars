@@ -33,55 +33,6 @@ public class FileDownloader {
     }
 
     /**
-     * 验证文件名是否安全，防止路径遍历攻击
-     *
-     * @param fileName 要验证的文件名
-     * @return 如果文件名安全返回true，否则返回false
-     */
-    private boolean isSafeFileName(String fileName) {
-        if (fileName == null || fileName.trim().isEmpty()) {
-            LoggerUtil.error("文件名为空或null");
-            return false;
-        }
-
-        // 移除首尾空白字符
-        fileName = fileName.trim();
-
-        // 检查文件名长度（防止过长文件名攻击）
-        if (fileName.length() > 255) {
-            LoggerUtil.error("文件名过长: " + fileName.length() + " 字符");
-            return false;
-        }
-
-        // 禁止路径遍历字符
-        if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
-            LoggerUtil.error("文件名包含危险的路径字符: " + fileName);
-            return false;
-        }
-
-        // 禁止控制字符和特殊字符
-        if (fileName.matches(".*[\\x00-\\x1F\\x7F<>:\"|?*].*")) {
-            LoggerUtil.error("文件名包含非法字符: " + fileName);
-            return false;
-        }
-
-        // 要求以.jar结尾（符合业务逻辑）
-        if (!fileName.toLowerCase().endsWith(".jar")) {
-            LoggerUtil.error("文件名必须以.jar结尾: " + fileName);
-            return false;
-        }
-
-        // 检查是否只包含安全的文件名字符（字母、数字、下划线、短横线、点）
-        if (!fileName.matches("^[\\w\\-.]+\\.jar$")) {
-            LoggerUtil.error("文件名包含不安全的字符: " + fileName);
-            return false;
-        }
-
-        LoggerUtil.verbose("文件名安全验证通过: " + fileName);
-        return true;
-    }
-
-    /**
      * 下载文件
      *
      * @param releaseInfo 版本信息
@@ -91,15 +42,6 @@ public class FileDownloader {
         String downloadUrl = releaseInfo.getDownloadUrl();
         String fileName = releaseInfo.getFileName();
         long expectedSize = releaseInfo.getFileSize();
-
-        // 文件名安全性验证
-        if (!isSafeFileName(fileName)) {
-            String errorMsg = "检测到不安全的文件名，可能存在路径遍历攻击: " + fileName;
-            LoggerUtil.error(errorMsg);
-            LoggerUtil.error("下载来源: " + downloadUrl);
-            LoggerUtil.error("安全检查失败，拒绝下载操作");
-            throw new SecurityException(errorMsg);
-        }
 
         lastProgressBytes = 0;
         lastProgressPercentage = 0.0;
