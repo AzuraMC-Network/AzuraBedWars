@@ -60,7 +60,7 @@ public class FileDownloader {
         }
 
         // 禁止控制字符和特殊字符
-        if (fileName.matches(".*[\\x00-\\x1F\\x7F<>:\"|?*].*")) {
+        if (containsIllegalCharacters(fileName)) {
             LoggerUtil.error("文件名包含非法字符: " + fileName);
             return false;
         }
@@ -71,13 +71,75 @@ public class FileDownloader {
             return false;
         }
 
-        // 检查是否只包含安全的文件名字符（字母、数字、下划线、短横线、点）
-        if (!fileName.matches("^[\\w\\-.]+\\.jar$")) {
+        // 检查是否只包含安全的文件名字符
+        if (!containsOnlySafeCharacters(fileName)) {
             LoggerUtil.error("文件名包含不安全的字符: " + fileName);
             return false;
         }
 
         LoggerUtil.verbose("文件名安全验证通过: " + fileName);
+        return true;
+    }
+
+    /**
+     * 检查文件名是否包含非法字符
+     * 使用字符遍历方式避免ReDoS攻击，替代正则表达式
+     * 检查控制字符(0x00-0x1F)、DEL字符(0x7F)和特殊字符(<>:"|?*)
+     *
+     * @param fileName 要检查的文件名
+     * @return 如果包含非法字符返回true，否则返回false
+     */
+    private boolean containsIllegalCharacters(String fileName) {
+        for (int i = 0; i < fileName.length(); i++) {
+            char c = fileName.charAt(i);
+
+            // 检查控制字符 (0x00-0x1F)
+            if (c <= 0x1F) {
+                return true;
+            }
+
+            // 检查DEL字符 (0x7F)
+            if (c == 0x7F) {
+                return true;
+            }
+
+            // 检查特殊字符
+            if (c == '<' || c == '>' || c == ':' || c == '"' || c == '|' || c == '?' || c == '*') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean containsOnlySafeCharacters(String fileName) {
+        // 必须以.jar结尾
+        if (!fileName.toLowerCase().endsWith(".jar")) {
+            return false;
+        }
+
+        for (int i = 0; i < fileName.length(); i++) {
+            char c = fileName.charAt(i);
+
+            // 允许字母（大小写）
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                continue;
+            }
+
+            // 允许数字
+            if (c >= '0' && c <= '9') {
+                continue;
+            }
+
+            // 允许下划线、短横线、点
+            if (c == '_' || c == '-' || c == '.') {
+                continue;
+            }
+
+            // 其他字符都不允许
+            return false;
+        }
+
         return true;
     }
 
