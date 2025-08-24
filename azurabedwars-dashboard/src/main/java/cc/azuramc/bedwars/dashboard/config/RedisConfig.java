@@ -21,7 +21,7 @@ public class RedisConfig {
     @Value("${spring.data.redis.port:6379}")
     private int port;
 
-    @Value("${spring.redis.timeout:5000}")
+    @Value("${spring.data.redis.timeout:5000}")
     private int timeout;
 
 

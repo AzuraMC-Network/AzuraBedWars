@@ -85,8 +85,6 @@ public interface ChannelMessageRepository extends JpaRepository<ChannelMessage, 
     long deleteByMessageTimeBefore(LocalDateTime beforeTime);
 
     /**
-     * 获取所有有消息记录的频道名称
-     * /**
      * 获取所有不同的频道名称
      */
     @Query("SELECT DISTINCT cm.channelName FROM ChannelMessage cm ORDER BY cm.channelName")

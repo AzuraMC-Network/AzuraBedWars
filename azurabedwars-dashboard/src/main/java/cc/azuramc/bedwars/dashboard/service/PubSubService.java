@@ -6,7 +6,8 @@ import cc.azuramc.bedwars.dashboard.util.JedisUtil;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
@@ -27,7 +28,7 @@ import java.util.stream.StreamSupport;
  */
 @Slf4j
 @Service
-public class PubSubService implements CommandLineRunner {
+public class PubSubService {
 
     // 订阅线程池
     private final ExecutorService subscriptionExecutor = Executors.newCachedThreadPool(r -> {
@@ -49,22 +50,13 @@ public class PubSubService implements CommandLineRunner {
     private AutoReplyService autoReplyService;
 
     /**
-     * 应用启动时自动订阅所有服务器频道
+     * 应用完全启动后自动订阅所有服务器频道
      */
-    @Override
-    public void run(String... args) throws Exception {
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
         log.info("[PubSubService] 启动 Redis Pub/Sub 服务");
 
-        // 延迟启动订阅，确保所有 Bean 都已初始化
-        CompletableFuture.runAsync(() -> {
-            try {
-                Thread.sleep(2000); // 等待 2 秒
-                subscribeToAllServerChannels();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.error("[PubSubService] 启动订阅被中断", e);
-            }
-        }, subscriptionExecutor);
+        CompletableFuture.runAsync(this::subscribeToAllServerChannels, subscriptionExecutor);
     }
 
     /**
@@ -73,7 +65,7 @@ public class PubSubService implements CommandLineRunner {
     public void subscribeToAllServerChannels() {
         try {
             List<Server> servers = StreamSupport.stream(serverRepository.findAll().spliterator(), false)
-                    .collect(Collectors.toList());
+                    .toList();
             Set<String> channels = servers.stream()
                     .map(Server::getChannelId)
                     .filter(channelId -> channelId != null && !channelId.trim().isEmpty())
