@@ -28,7 +28,7 @@ public class TabListPacketSender {
             return;
         }
 
-        String processedHeader = MessageUtil.parse(player, header);
+        String processedHeader = processHeaderPlaceholders(MessageUtil.parse(player, header), gamePlayer);
         String processedFooter = processFooterPlaceholders(MessageUtil.parse(player, footer), gamePlayer);
 
         // 将String转换为Adventure Component
@@ -49,6 +49,24 @@ public class TabListPacketSender {
     public void sendCurrentHeaderFooter(Player player, HeaderFooterManager headerFooterManager) {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
         sendHeaderFooter(player, headerFooterManager.getHeader(), headerFooterManager.getFooter(), gamePlayer);
+    }
+
+    /**
+     * 处理Header中的占位符
+     *
+     * @param header     原始Header文本
+     * @param gamePlayer 游戏玩家
+     * @return 处理后的Header文本
+     */
+    private String processHeaderPlaceholders(String header, GamePlayer gamePlayer) {
+        if (gamePlayer == null) {
+            return header;
+        }
+
+        return header
+                .replace("<currentGameKill>", String.valueOf(gamePlayer.getCurrentGameKills()))
+                .replace("<currentGameFinalKill>", String.valueOf(gamePlayer.getCurrentGameFinalKills()))
+                .replace("<currentGameBedBreak>", String.valueOf(gamePlayer.getCurrentGameDestroyedBeds()));
     }
 
     /**

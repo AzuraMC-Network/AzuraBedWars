@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsPlayerKillEvent;
+import cc.azuramc.bedwars.api.event.player.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
@@ -311,9 +311,6 @@ public class PlayerDamageListener implements Listener {
         GameTeam killerTeam = gameKiller == null ? null : gameKiller.getGameTeam();
         boolean isFinalKill = gameTeam != null && gameTeam.isDestroyed();
 
-        BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
-        Bukkit.getPluginManager().callEvent(event);
-
         if (gameKiller == null) {
             return;
         }
@@ -332,6 +329,9 @@ public class PlayerDamageListener implements Listener {
         }
 
         gamePlayer.getPlayerData().addDeaths();
+
+        BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     /**

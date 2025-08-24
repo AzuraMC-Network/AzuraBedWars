@@ -1,13 +1,13 @@
-package cc.azuramc.azurabedwarsdashboard;
+package cc.azuramc.bedwars.dashboard;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AzurabedwarsDashboardApplication {
+public class AzuraBedWarsDashboardApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AzurabedwarsDashboardApplication.class, args);
+        SpringApplication.run(AzuraBedWarsDashboardApplication.class, args);
     }
 
 }

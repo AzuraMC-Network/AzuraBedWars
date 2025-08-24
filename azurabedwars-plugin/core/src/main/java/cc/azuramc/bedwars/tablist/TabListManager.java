@@ -1,8 +1,10 @@
 package cc.azuramc.bedwars.tablist;
 
+
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Getter;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -17,7 +19,7 @@ import java.util.Map;
  *
  * @author an5w1r@163.com
  */
-public class TabListManager {
+public class TabListManager implements Listener {
 
     @Getter
     private final GameManager gameManager;
@@ -31,6 +33,7 @@ public class TabListManager {
     private final TabListPacketSender packetSender;
     @Getter
     private final GameStateTabListProvider gameStateProvider;
+
     private final Map<GamePlayer, Team> teamMap = new HashMap<>();
     private BukkitTask updateTask;
 

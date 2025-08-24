@@ -71,7 +71,7 @@ public class CustomSilverfish extends EntitySilverfish {
                 fish -> fish != null && fish.getGameTeam() != gameTeam));
     }
 
-    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, int despawn, double damage) {
+    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, double damage) {
         WorldServer world = ((CraftWorld) loc.getWorld()).getHandle();
         CustomSilverfish entity = new CustomSilverfish(world, gameTeam);
 

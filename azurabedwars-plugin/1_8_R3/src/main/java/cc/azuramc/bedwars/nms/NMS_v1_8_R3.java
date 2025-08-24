@@ -37,17 +37,17 @@ public class NMS_v1_8_R3 implements NMSAccess {
     }
 
     @Override
-    public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn) {
+    public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        LoggerUtil.debug("NMS_v1_8_R3$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn);
-        return CustomIronGolem.spawn(loc, gameTeam, speed, health, despawn);
+        LoggerUtil.debug("NMS_v1_8_R3$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health);
+        return CustomIronGolem.spawn(loc, gameTeam, speed, health);
     }
 
     @Override
-    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, int despawn, double damage) {
+    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, double damage) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        LoggerUtil.debug("NMS_v1_8_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", despawn: " + despawn + ", damage: " + damage);
-        return CustomSilverfish.spawn(loc, gameTeam, speed, health, despawn, damage);
+        LoggerUtil.debug("NMS_v1_8_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health + ", damage: " + damage);
+        return CustomSilverfish.spawn(loc, gameTeam, speed, health, damage);
     }
 
     @SuppressWarnings("rawtypes")

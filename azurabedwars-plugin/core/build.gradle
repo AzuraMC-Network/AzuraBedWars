@@ -8,17 +8,17 @@ processResources {
 }
 dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly "org.spigotmc:spigot-api:${spigotVersion}"
-    compileOnly "me.clip:placeholderapi:${placeholderApiVersion}"
-    compileOnly "net.luckperms:api:${luckPermsVersion}"
+    compileOnly "org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT"
+    compileOnly "me.clip:placeholderapi:2.11.6"
+    compileOnly "net.luckperms:api:5.4"
 
-    implementation "org.apache.commons:commons-lang3:${commonsLangVersion}"
-    implementation "commons-io:commons-io:${commonsIoVersion}"
-    implementation "com.github.Revxrsal.Lamp:common:${lampVersion}"
-    implementation "com.github.Revxrsal.Lamp:bukkit:${lampVersion}"
-    implementation "redis.clients:jedis:${jedisVersion}"
-    implementation "com.github.cryptomorin:XSeries:${xseriesVersion}"
-    implementation "fr.mrmicky:fastboard:${fastboardVersion}"
+    implementation "org.apache.commons:commons-lang3:3.18.0"
+    implementation "commons-io:commons-io:2.18.0"
+    implementation "com.github.Revxrsal.Lamp:common:3.2.1"
+    implementation "com.github.Revxrsal.Lamp:bukkit:3.2.1"
+    implementation "redis.clients:jedis:5.1.5"
+    implementation "com.github.cryptomorin:XSeries:13.3.3"
+    implementation "fr.mrmicky:fastboard:2.1.5"
 
     implementation files('libs/AzuraORM-1.0.0-all.jar')
 }

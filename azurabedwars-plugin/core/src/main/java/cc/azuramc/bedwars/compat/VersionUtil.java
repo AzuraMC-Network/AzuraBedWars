@@ -24,7 +24,7 @@ public class VersionUtil {
     }
 
     /**
-     * 获取次版本号 (返回格式e.g. 1.12.2 返回 2)
+     * 获取补丁版本号 (返回格式e.g. 1.12.2 返回 2)
      */
     public static int getPatchNumber() {
         return PATCH_NUMBER;
@@ -57,6 +57,22 @@ public class VersionUtil {
     }
 
     /**
+     * 判断是否大于等于指定版本（包含补丁版本比较）
+     */
+    public static boolean isGreaterOrEqual(int major, int minor, int patch) {
+        if (MAJOR_NUMBER > major) {
+            return true;
+        } else if (MAJOR_NUMBER == major) {
+            if (MINOR_NUMBER > minor) {
+                return true;
+            } else if (MINOR_NUMBER == minor) {
+                return PATCH_NUMBER >= patch;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 判断是否小于指定版本
      */
     public static boolean isLessThan(int major, int minor) {
@@ -64,17 +80,17 @@ public class VersionUtil {
     }
 
     /**
+     * 判断是否小于指定版本（包含补丁版本比较）
+     */
+    public static boolean isLessThan(int major, int minor, int patch) {
+        return !isGreaterOrEqual(major, minor, patch);
+    }
+
+    /**
      * 判断是否是1.13以下版本
      */
     public static boolean isLessThan1_13() {
         return isLessThan(1, 13);
-    }
-
-    /**
-     * 判断是否是1.16以下版本
-     */
-    public static boolean isLessThan1_16() {
-        return isLessThan(1, 16);
     }
 
     /**

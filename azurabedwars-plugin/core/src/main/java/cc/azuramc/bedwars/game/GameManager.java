@@ -1,8 +1,9 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsGameLoadEvent;
-import cc.azuramc.bedwars.api.event.BedwarsGameStartEvent;
+import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
+import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
+import cc.azuramc.bedwars.api.event.player.BedwarsPlayerReconnectEvent;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
@@ -20,6 +21,7 @@ import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
+import cc.azuramc.bedwars.tablist.TabListEventListener;
 import cc.azuramc.bedwars.tablist.TabListManager;
 import cc.azuramc.bedwars.upgrade.task.TeamUpgradeCheckTask;
 import cc.azuramc.bedwars.util.LoadGameUtil;
@@ -94,6 +96,8 @@ public class GameManager {
 
     private TabListManager tabListManager;
 
+    private List<GamePlayer> allInGamePlayers;
+
     /**
      * 创建一个新的游戏实例
      *
@@ -113,7 +117,9 @@ public class GameManager {
         initializeConfigs();
 
         this.tabListManager = new TabListManager(this);
-        tabListManager.startAutoUpdate(plugin);
+        Bukkit.getPluginManager().registerEvents(new TabListEventListener(tabListManager), plugin);
+//        tabListManager.startAutoUpdate(plugin);
+        this.allInGamePlayers = new ArrayList<>();
     }
 
     private void initializeConfigs() {
@@ -153,7 +159,7 @@ public class GameManager {
         }
 
         // call event
-        BedwarsGameLoadEvent event = new BedwarsGameLoadEvent(mapData.getMaxPlayers());
+        BedwarsGameLoadEvent event = new BedwarsGameLoadEvent(this, mapData);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
@@ -330,6 +336,7 @@ public class GameManager {
         handlePlayerJoinWaitingGame(gamePlayer);
 
         tabListManager.addToTab(gamePlayer);
+        allInGamePlayers.add(gamePlayer);
     }
 
     /**
@@ -419,6 +426,18 @@ public class GameManager {
         // 检查玩家团队状态
         if (gamePlayer.getGameTeam() != null) {
             if (gamePlayer.getGameTeam().isHasBed()) {
+                // 触发玩家重连事件
+                BedwarsPlayerReconnectEvent reconnectEvent = new BedwarsPlayerReconnectEvent(
+                        gamePlayer, gamePlayer.getGameTeam(), this
+                );
+                Bukkit.getPluginManager().callEvent(reconnectEvent);
+
+                // 检查事件是否被取消
+                if (reconnectEvent.isCancelled()) {
+                    gamePlayer.getPlayer().kickPlayer("canceled reconnect by event");
+                    return;
+                }
+
                 gamePlayer.setReconnect(true);
                 PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
                 broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
@@ -468,6 +487,7 @@ public class GameManager {
 
         // 处理玩家离开对团队的影响
         handleTeamPlayerLeave(gamePlayer, gameTeam);
+        allInGamePlayers.remove(gamePlayer);
     }
 
     /**
@@ -831,12 +851,6 @@ public class GameManager {
      */
     public void start() {
 
-        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent();
-        Bukkit.getPluginManager().callEvent(bedwarsGameStartEvent);
-        if (bedwarsGameStartEvent.isCancelled()) {
-            return;
-        }
-
         Bukkit.getPluginManager().callEvent(new JedisGameStartEvent());
 
         gameState = GameState.RUNNING;
@@ -860,6 +874,9 @@ public class GameManager {
 
         // 注册团队升级任务
         registerTeamUpgradeCheckTask();
+
+        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent(this);
+        Bukkit.getPluginManager().callEvent(bedwarsGameStartEvent);
     }
 
     /**

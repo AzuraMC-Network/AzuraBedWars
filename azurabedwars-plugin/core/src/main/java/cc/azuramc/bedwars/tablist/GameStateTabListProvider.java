@@ -1,10 +1,12 @@
 package cc.azuramc.bedwars.tablist;
 
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +16,12 @@ import java.util.List;
  * @author an5w1r@163.com
  */
 public class GameStateTabListProvider {
+
+    private final SettingsConfig settingsConfig;
+
+    public GameStateTabListProvider() {
+        this.settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
+    }
 
     /**
      * 根据游戏阶段自动设置Header和Footer
@@ -42,35 +50,18 @@ public class GameStateTabListProvider {
      * 设置等待状态的内容
      */
     private void setWaitingStateContent(HeaderFooterManager headerFooterManager) {
-        List<String> waitingHeader = Arrays.asList(
-                "&b你正在 &eAzuraMC &b游玩起床战争",
-                ""
-        );
-        headerFooterManager.setHeader(waitingHeader);
-
-        List<String> waitingFooter = Arrays.asList(
-                "",
-                "&bas.azuramc.cc"
-        );
-        headerFooterManager.setFooter(waitingFooter);
+        SettingsConfig.WaitingState waitingState = settingsConfig.getWaitingState();
+        headerFooterManager.setHeader(waitingState.getHeader());
+        headerFooterManager.setFooter(waitingState.getFooter());
     }
 
     /**
      * 设置运行状态的内容
      */
     private void setRunningStateContent(HeaderFooterManager headerFooterManager) {
-        List<String> runningHeader = Arrays.asList(
-                "&b你正在 &eAzuraMC &b游玩起床战争",
-                ""
-        );
-        headerFooterManager.setHeader(runningHeader);
-
-        List<String> runningFooter = Arrays.asList(
-                "",
-                "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>",
-                "&bas.azuramc.cc"
-        );
-        headerFooterManager.setFooter(runningFooter);
+        SettingsConfig.RunningState runningState = settingsConfig.getRunningState();
+        headerFooterManager.setHeader(runningState.getHeader());
+        headerFooterManager.setFooter(runningState.getFooter());
     }
 
     /**
@@ -90,18 +81,16 @@ public class GameStateTabListProvider {
             gameResult = winner.getName() + " Won";
         }
 
-        List<String> endingHeader = Arrays.asList(
-                "&b你正在 &eAzuraMC &b游玩起床战争",
-                "&b游戏结束 &e" + gameResult,
-                ""
-        );
-        headerFooterManager.setHeader(endingHeader);
+        SettingsConfig.EndingState endingState = settingsConfig.getEndingState();
 
-        List<String> endingFooter = Arrays.asList(
-                "",
-                "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>",
-                "&bas.azuramc.cc"
-        );
-        headerFooterManager.setFooter(endingFooter);
+        // 处理Header中的占位符
+        List<String> processedHeader = new ArrayList<>();
+        for (String line : endingState.getHeader()) {
+            processedHeader.add(line.replace("<gameResult>", gameResult));
+        }
+        headerFooterManager.setHeader(processedHeader);
+
+        // Footer直接使用配置
+        headerFooterManager.setFooter(endingState.getFooter());
     }
 }
