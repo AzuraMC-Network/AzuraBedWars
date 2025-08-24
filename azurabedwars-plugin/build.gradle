@@ -36,6 +36,9 @@ allprojects {
             url = "https://repo.codemc.io/repository/maven-releases/"
         }
     }
+
+    group = 'cc.azuramc'
+    version = '1.0.0-beta.7'
 }
 
 subprojects {
@@ -53,9 +56,9 @@ subprojects {
 
     dependencies {
         compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-        compileOnly "com.github.retrooper:packetevents-spigot:${packeteventsVersion}"
-        compileOnly "org.projectlombok:lombok:${lombokVersion}"
-        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        compileOnly "com.github.retrooper:packetevents-spigot:2.9.3"
+        compileOnly "org.projectlombok:lombok:1.18.34"
+        annotationProcessor "org.projectlombok:lombok:1.18.34"
     }
 }
 
