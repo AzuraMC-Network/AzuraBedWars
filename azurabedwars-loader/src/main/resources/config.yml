@@ -1,0 +1,56 @@
+# AzuraBedWars Loader 配置文件
+
+# GitHub 仓库配置
+github:
+  # 仓库所有者
+  owner: "AzuraMC-Network"
+  # 仓库名称
+  repo: "AzuraBedWars"
+  # GitHub API URL (通常不需要修改)
+  api-url: "https://api.github.com"
+
+# 下载配置
+download:
+  # 是否下载预发布版本 (true: 包含预发布版本, false: 仅正式版本)
+  include-prerelease: true
+  # 连接超时时间 (秒)
+  connect-timeout: 60
+  # 读取超时时间 (秒)
+  read-timeout: 600
+  # 下载重试次数
+  retry-count: 5
+  # 重试间隔时间 (秒)
+  retry-delay: 5
+  # 下载缓冲区大小 (字节)
+  buffer-size: 65536
+  # 网络优化设置
+  enable-network-optimization: true
+  # 连接测试超时 (秒)
+  connection-test-timeout: 10
+  # 多线程下载设置
+  enable-multithreaded-download: true
+  # 下载线程数 (建议2-16个线程)
+  thread-count: 8
+
+# 文件管理
+files:
+  # 下载的插件文件名前缀
+  plugin-prefix: "AzuraBedWars"
+  # 临时文件后缀
+  temp-suffix: ".tmp"
+  # 版本信息文件名
+  version-file: "version.txt"
+
+# 日志配置
+logging:
+  # 是否显示详细日志
+  verbose: false
+  # 是否显示下载进度
+  show-progress: true
+
+# 错误处理
+error-handling:
+  # 下载失败时是否关闭服务器
+  shutdown-on-failure: true
+  # 关闭服务器前的延迟时间 (秒)
+  shutdown-delay: 5
