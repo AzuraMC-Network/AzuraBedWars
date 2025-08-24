@@ -8,7 +8,7 @@ import lombok.Data;
  * @author An5w1r@163.com
  */
 @Data
-@Table
+@Table(name = "servers")
 @Entity
 public class Server {
 
