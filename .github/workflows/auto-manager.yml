@@ -83,6 +83,13 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
+            
+            // Skip processing if PR is closed
+            if (pr.state === 'closed') {
+              console.log(`PR #${pr.number} is closed, skipping label update`);
+              return;
+            }
+            
             const labels = pr.labels.map(l => l.name);
             const prBody = pr.body || '';
             
@@ -190,6 +197,13 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
+            
+            // Skip processing if PR is closed
+            if (pr.state === 'closed') {
+              console.log(`PR #${pr.number} is closed, skipping auto-labeling`);
+              return;
+            }
+            
             const labels = pr.labels.map(l => l.name);
             
             // Auto label based on branch name and title
