@@ -43,6 +43,12 @@ public class FileDownloader {
         String fileName = releaseInfo.getFileName();
         long expectedSize = releaseInfo.getFileSize();
 
+        // Validate filename to prevent path traversal and absolute paths
+        if (fileName == null || fileName.contains("..") || fileName.contains("/") || fileName.contains("\\") || fileName.isEmpty()) {
+            LoggerUtil.error("非法文件名: " + fileName);
+            return null;
+        }
+
         lastProgressBytes = 0;
         lastProgressPercentage = 0.0;
 
