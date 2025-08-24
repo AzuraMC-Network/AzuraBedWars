@@ -27,6 +27,13 @@ jobs:
         with:
           script: |
             const issue = context.payload.issue;
+            
+            // Skip processing if issue is closed
+            if (issue.state === 'closed') {
+              console.log(`Issue #${issue.number} is closed, skipping auto-labeling`);
+              return;
+            }
+            
             const labels = issue.labels.map(l => l.name);
             
             // Auto label based on title and body content
@@ -353,6 +360,13 @@ jobs:
         with:
           script: |
             const issue = context.payload.issue;
+            
+            // Skip processing if issue is closed
+            if (issue.state === 'closed') {
+              console.log(`Issue #${issue.number} is closed, skipping commit reference check`);
+              return;
+            }
+            
             const labels = issue.labels.map(l => l.name);
             
             // Check if issue body contains commit references
@@ -683,6 +697,17 @@ jobs:
                   console.log('Removed "In Progress" label from merged PR');
                 }
             
+                // Remove "Work in Progress" label if present
+                if (labels.includes('🚧 Work in Progress')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    name: '🚧 Work in Progress'
+                  });
+                  console.log('Removed "Work in Progress" label from merged PR');
+                }
+            
                 // Add "Merged" label
                 if (!labels.includes('✅ Merged')) {
                   await github.rest.issues.addLabels({
@@ -704,6 +729,17 @@ jobs:
                     name: '🔄 In Progress'
                   });
                   console.log('Removed "In Progress" label from cancelled PR');
+                }
+            
+                // Remove "Work in Progress" label if present
+                if (labels.includes('🚧 Work in Progress')) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    name: '🚧 Work in Progress'
+                  });
+                  console.log('Removed "Work in Progress" label from cancelled PR');
                 }
             
                 // Add "Cancelled" label
