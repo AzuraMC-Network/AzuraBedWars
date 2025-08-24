@@ -1,10 +1,10 @@
-package cc.azuramc.azurabedwarsdashboard;
+package cc.azuramc.bedwars.dashboard;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AzurabedwarsDashboardApplicationTests {
+class AzuraBedWarsDashboardApplicationTests {
 
     @Test
     void contextLoads() {

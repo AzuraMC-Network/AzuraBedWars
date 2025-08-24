@@ -75,7 +75,7 @@ public class CustomIronGolem extends EntityIronGolem {
                 customSilverfish -> customSilverfish != null && customSilverfish.getGameTeam() != gameTeam));
     }
 
-    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, int despawn) {
+    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health) {
         WorldServer world = ((CraftWorld) loc.getWorld()).getHandle();
         CustomIronGolem entity = new CustomIronGolem(world, gameTeam);
 

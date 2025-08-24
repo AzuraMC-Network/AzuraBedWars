@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.api.event;
+package cc.azuramc.bedwars.api.event.player;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Getter;

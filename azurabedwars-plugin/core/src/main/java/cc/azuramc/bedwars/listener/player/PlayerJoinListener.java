@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.BedwarsGameLoadEvent;
+import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -108,7 +108,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onGameLoading(BedwarsGameLoadEvent event) {
         // 根据游戏最大玩家数设置服务器人数上限
-        serverMaxPlayers = event.getMaxPlayers();
+        serverMaxPlayers = event.getGameManager().getMaxPlayers();
     }
 
     /**
@@ -116,7 +116,7 @@ public class PlayerJoinListener implements Listener {
      */
     @EventHandler
     public void onServerListPing(ServerListPingEvent event) {
-        // 设置显示的最大玩家数为bed wars管理的最大人数限制
+        // 设置显示的最大玩家数为bedwars管理的最大人数限制
         event.setMaxPlayers(serverMaxPlayers);
     }
 }
