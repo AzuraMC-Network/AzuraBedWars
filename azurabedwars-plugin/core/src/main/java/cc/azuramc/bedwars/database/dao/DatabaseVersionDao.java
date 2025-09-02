@@ -1,14 +1,18 @@
 package cc.azuramc.bedwars.database.dao;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.database.entity.DatabaseVersion;
 import cc.azuramc.bedwars.database.entity.DatabaseVersionTableKey;
 import cc.azuramc.orm.AzuraOrmClient;
+import cc.azuramc.orm.builder.ColumnDefinitionBuilder;
 import cc.azuramc.orm.builder.DataType;
+import cc.azuramc.orm.builder.PreparedStatementBuildManager;
+import cc.azuramc.orm.mapper.ResultMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 /**
  * @author An5w1r@163.com
@@ -24,20 +28,19 @@ public class DatabaseVersionDao {
     /**
      * 创建数据库版本表
      */
-    public void createDatabaseVersionTable() throws SQLException {
-        try (Connection conn = ormClient.getConnection()) {
-            PreparedStatement createTableStmt = ormClient.createTable(conn)
-                    .createTable(DatabaseVersionTableKey.tableName)
+    public void createTable() {
+        try (Connection connection = ormClient.getConnection()) {
+            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
+            PreparedStatement createTableStmt = buildManager.createTable(DatabaseVersionTableKey.tableName)
                     .ifNotExists()
-                    .addIdColumn()
-                    .column(DatabaseVersionTableKey.version, DataType.Type.INT.getSql(), DataType.DEFAULT(1))
+                    .column(DatabaseVersionTableKey.version, ColumnDefinitionBuilder.of(DataType.Type.INT).build())
                     .engine("InnoDB")
                     .charset("utf8mb4")
-                    .collate("utf8mb4_unicode_ci")
                     .prepare();
 
-            createTableStmt.executeUpdate();
-            createTableStmt.close();
+            buildManager.execute(createTableStmt);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create table: " + DatabaseVersionTableKey.tableName, e);
         }
     }
 
@@ -47,24 +50,43 @@ public class DatabaseVersionDao {
      * @return 当前版本号，如果没有记录则返回-1
      */
     public int getCurrentVersion() throws SQLException {
-        try (Connection conn = ormClient.getConnection()) {
-            PreparedStatement selectStmt = ormClient.select(conn)
+        try (Connection connection = ormClient.getConnection()) {
+            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
+
+            Optional<Integer> result = buildManager.select()
                     .from(DatabaseVersionTableKey.tableName)
                     .select(DatabaseVersionTableKey.version)
                     .limit(1)
-                    .prepare();
+                    .executeQueryForObject(rs -> rs.getInt(DatabaseVersionTableKey.version));
 
-            ResultSet resultSet = selectStmt.executeQuery();
-            int version = -1;
+            return result.orElse(-1);
+        }
+    }
 
-            if (resultSet.next()) {
-                version = resultSet.getInt(DatabaseVersionTableKey.version);
-            }
+    /**
+     * 查询数据库版本记录
+     *
+     * @return DatabaseVersion对象，如果没有记录则返回null
+     */
+    public DatabaseVersion selectDatabaseVersion() {
+        try (Connection connection = ormClient.getConnection()) {
+            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
-            resultSet.close();
-            selectStmt.close();
+            ResultMapper<DatabaseVersion> mapper = rs -> {
+                DatabaseVersion databaseVersion = new DatabaseVersion();
+                databaseVersion.setVersion(rs.getInt(DatabaseVersionTableKey.version));
+                return databaseVersion;
+            };
 
-            return version;
+            Optional<DatabaseVersion> result = buildManager.select()
+                    .from(DatabaseVersionTableKey.tableName)
+                    .select(DatabaseVersionTableKey.version)
+                    .limit(1)
+                    .executeQueryForObject(mapper);
+
+            return result.orElse(null);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to select database version", e);
         }
     }
 
@@ -75,13 +97,31 @@ public class DatabaseVersionDao {
      */
     public void insertVersion(int version) throws SQLException {
         try (Connection conn = ormClient.getConnection()) {
-            PreparedStatement insertStmt = ormClient.insert(conn)
-                    .insertInto(DatabaseVersionTableKey.tableName)
+            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
+            PreparedStatement insertStmt = buildManager.insertInto(DatabaseVersionTableKey.tableName)
                     .values(DatabaseVersionTableKey.version, version)
+                    .prepare();
+
+            buildManager.execute(insertStmt);
+        }
+    }
+
+    /**
+     * 插入数据库版本记录
+     *
+     * @param databaseVersion 数据库版本对象
+     */
+    public void insertDatabaseVersion(DatabaseVersion databaseVersion) {
+        try (Connection connection = ormClient.getConnection()) {
+            PreparedStatement insertStmt = ormClient.insert(connection)
+                    .insertInto(DatabaseVersionTableKey.tableName)
+                    .values(DatabaseVersionTableKey.version, databaseVersion.getVersion())
                     .prepare();
 
             insertStmt.executeUpdate();
             insertStmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to insert database version", e);
         }
     }
 
@@ -92,14 +132,31 @@ public class DatabaseVersionDao {
      */
     public void updateVersion(int version) throws SQLException {
         try (Connection conn = ormClient.getConnection()) {
-            PreparedStatement updateStmt = ormClient.update(conn)
-                    .update(DatabaseVersionTableKey.tableName)
+            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
+            PreparedStatement updateStmt = buildManager.update(DatabaseVersionTableKey.tableName)
                     .set(DatabaseVersionTableKey.version, version)
                     .whereEquals("id", "1")
                     .prepare();
 
-            updateStmt.executeUpdate();
-            updateStmt.close();
+            buildManager.execute(updateStmt);
+        }
+    }
+
+    /**
+     * 更新数据库版本记录
+     *
+     * @param databaseVersion 数据库版本对象
+     */
+    public void updateDatabaseVersion(DatabaseVersion databaseVersion) {
+        try (Connection connection = ormClient.getConnection()) {
+            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
+            PreparedStatement updateStmt = buildManager.update(DatabaseVersionTableKey.tableName)
+                    .set(DatabaseVersionTableKey.version, databaseVersion.getVersion())
+                    .prepare();
+
+            buildManager.execute(updateStmt);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update database version", e);
         }
     }
 
@@ -109,20 +166,14 @@ public class DatabaseVersionDao {
      * @return 如果存在记录返回true，否则返回false
      */
     public boolean hasVersionRecord() throws SQLException {
-        try (Connection conn = ormClient.getConnection()) {
-            PreparedStatement selectStmt = ormClient.select(conn)
+        try (Connection connection = ormClient.getConnection()) {
+            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
+
+            return buildManager.select()
                     .from(DatabaseVersionTableKey.tableName)
                     .select(DatabaseVersionTableKey.version)
                     .limit(1)
-                    .prepare();
-
-            ResultSet resultSet = selectStmt.executeQuery();
-            boolean hasRecord = resultSet.next();
-
-            resultSet.close();
-            selectStmt.close();
-
-            return hasRecord;
+                    .executeQueryForExists();
         }
     }
 }
