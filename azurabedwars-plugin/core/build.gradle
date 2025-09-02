@@ -20,5 +20,5 @@ dependencies {
     implementation "com.github.cryptomorin:XSeries:13.3.3"
     implementation "fr.mrmicky:fastboard:2.1.5"
 
-    implementation files('libs/AzuraORM-1.0.0-all.jar')
+    implementation files('libs/AzuraORM-1.1.1-all.jar')
 }

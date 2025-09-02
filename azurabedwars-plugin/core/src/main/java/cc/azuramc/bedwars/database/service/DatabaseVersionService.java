@@ -50,7 +50,7 @@ public class DatabaseVersionService {
     private void initializeDatabase() {
         try {
             // 创建版本表
-            databaseVersionDao.createDatabaseVersionTable();
+            databaseVersionDao.createTable();
 
             // 检查当前版本
             int currentVersion = databaseVersionDao.getCurrentVersion();
