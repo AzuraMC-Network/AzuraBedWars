@@ -1,7 +1,8 @@
-package cc.azuramc.bedwars.util;
+package cc.azuramc.bedwars.util.hook;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.util.MessageUtil;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.query.QueryOptions;
