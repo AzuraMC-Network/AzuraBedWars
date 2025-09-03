@@ -100,59 +100,6 @@ public class PlayerDataDao {
         }
     }
 
-    public PlayerData insertPlayerDataWithRawJDBC(PlayerData playerData) {
-        String sql = "INSERT INTO " + PlayerDataTableKey.tableName + " (" +
-                PlayerDataTableKey.name + ", " +
-                PlayerDataTableKey.uuid + ", " +
-                PlayerDataTableKey.mode + ", " +
-                PlayerDataTableKey.level + ", " +
-                PlayerDataTableKey.experience + ", " +
-                PlayerDataTableKey.kills + ", " +
-                PlayerDataTableKey.deaths + ", " +
-                PlayerDataTableKey.assists + ", " +
-                PlayerDataTableKey.finalKills + ", " +
-                PlayerDataTableKey.finalDeaths + ", " +
-                PlayerDataTableKey.destroyedBeds + ", " +
-                PlayerDataTableKey.wins + ", " +
-                PlayerDataTableKey.ties + ", " +
-                PlayerDataTableKey.losses + ", " +
-                PlayerDataTableKey.games + ", " +
-                PlayerDataTableKey.shopDataJson +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection connection = ormClient.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-
-            stmt.setString(1, playerData.getName());
-            stmt.setString(2, playerData.getUuid().toString());
-            stmt.setString(3, playerData.getMode().name());
-            stmt.setInt(4, playerData.getLevel());
-            stmt.setDouble(5, playerData.getExperience());
-            stmt.setInt(6, playerData.getKills());
-            stmt.setInt(7, playerData.getDeaths());
-            stmt.setInt(8, playerData.getAssists());
-            stmt.setInt(9, playerData.getFinalKills());
-            stmt.setInt(10, playerData.getFinalDeaths());
-            stmt.setInt(11, playerData.getDestroyedBeds());
-            stmt.setInt(12, playerData.getWins());
-            stmt.setInt(13, playerData.getTies());
-            stmt.setInt(14, playerData.getLosses());
-            stmt.setInt(15, playerData.getGames());
-            stmt.setString(16, playerData.getShopDataJson());
-
-            // 执行插入操作
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected > 0) {
-                return playerData;
-            } else {
-                throw new RuntimeException("No rows were inserted");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to insert player data with raw JDBC", e);
-        }
-    }
-
     /**
      * 更新用户数据
      *
@@ -184,7 +131,6 @@ public class PlayerDataDao {
             throw new RuntimeException("Failed to update player data", e);
         }
     }
-
 
     /**
      * 根据 ID 查询用户
