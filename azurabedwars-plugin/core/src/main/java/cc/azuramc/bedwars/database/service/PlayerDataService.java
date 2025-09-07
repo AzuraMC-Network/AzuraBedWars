@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.database.service;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.dao.PlayerDataDao;
 import cc.azuramc.bedwars.database.entity.PlayerData;
+import cc.azuramc.bedwars.database.repository.PlayerDataRepository;
 import cc.azuramc.bedwars.game.GamePlayer;
 
 import java.util.HashMap;
@@ -12,10 +12,10 @@ import java.util.HashMap;
  */
 public class PlayerDataService {
 
-    private final PlayerDataDao playerDataDao;
+    private final PlayerDataRepository playerDataRepository;
 
     public PlayerDataService(AzuraBedWars plugin) {
-        this.playerDataDao = plugin.getPlayerDataDao();
+        this.playerDataRepository = plugin.getPlayerDataRepository();
         this.createTable();
     }
 
@@ -28,7 +28,7 @@ public class PlayerDataService {
      * 建表
      */
     public void createTable() {
-        playerDataDao.createTable();
+        playerDataRepository.createTable();
     }
 
     /**
@@ -43,7 +43,7 @@ public class PlayerDataService {
         // 如果缓存中没有数据，尝试从数据库查询
         if (playerData == null) {
             // 直接通过UUID查询完整数据
-            playerData = playerDataDao.selectPlayerDataByUuid(gamePlayer.getUuid(), gamePlayer);
+            playerData = playerDataRepository.selectPlayerDataByUuid(gamePlayer.getUuid(), gamePlayer);
 
             // 如果数据库中没有数据，创建新的玩家数据
             if (playerData.getId() == 0) {
@@ -67,7 +67,7 @@ public class PlayerDataService {
      * @return 插入成功后，带有生成ID的用户对象
      */
     public PlayerData insertPlayerData(GamePlayer gamePlayer) {
-        return playerDataDao.insertPlayerData(new PlayerData(gamePlayer));
+        return playerDataRepository.insertPlayerData(new PlayerData(gamePlayer));
 
     }
 
@@ -78,7 +78,7 @@ public class PlayerDataService {
      */
     public void updatePlayerData(GamePlayer gamePlayer) {
         PlayerData playerData = selectPlayerData(gamePlayer);
-        playerDataDao.updatePlayerData(playerData);
+        playerDataRepository.updatePlayerData(playerData);
     }
 
     public void shutdown() {
