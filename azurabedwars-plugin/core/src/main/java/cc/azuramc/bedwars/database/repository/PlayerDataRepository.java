@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.database.dao;
+package cc.azuramc.bedwars.database.repository;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
@@ -20,11 +20,11 @@ import java.util.UUID;
 /**
  * @author an5w1r@163.com
  */
-public class PlayerDataDao {
+public class PlayerDataRepository {
 
     private final AzuraOrmClient ormClient;
 
-    public PlayerDataDao(AzuraBedWars plugin) {
+    public PlayerDataRepository(AzuraBedWars plugin) {
         this.ormClient = plugin.getOrmClient();
     }
 
