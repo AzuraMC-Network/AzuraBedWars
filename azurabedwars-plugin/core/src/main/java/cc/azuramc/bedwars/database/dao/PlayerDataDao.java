@@ -55,6 +55,9 @@ public class PlayerDataDao {
                     .column(PlayerDataTableKey.shopDataJson, ColumnDefinitionBuilder.of(DataType.Type.TEXT).build())
                     .column(PlayerDataTableKey.createdAt, ColumnDefinitionBuilder.Common.createdAt())
                     .column(PlayerDataTableKey.updatedAt, ColumnDefinitionBuilder.Common.updatedAt())
+                    .index("idx_name", PlayerDataTableKey.name)
+                    .index("idx_uuid", PlayerDataTableKey.uuid)
+                    .index("idx_created_at", PlayerDataTableKey.createdAt)
                     .engine("InnoDB")
                     .charset("utf8mb4")
                     .prepare();
@@ -91,6 +94,8 @@ public class PlayerDataDao {
                     .values(PlayerDataTableKey.losses, playerData.getLosses())
                     .values(PlayerDataTableKey.games, playerData.getGames())
                     .values(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
+                    .values(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
+                    .values(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .prepare();
 
             buildManager.execute(insertStmt);
@@ -123,6 +128,8 @@ public class PlayerDataDao {
                     .set(PlayerDataTableKey.losses, playerData.getLosses())
                     .set(PlayerDataTableKey.games, playerData.getGames())
                     .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
+                    // I think we should not update createdAt when updating the record
+                    .set(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .whereEquals(PlayerDataTableKey.id, String.valueOf(playerData.getId()))
                     .prepare();
 
@@ -133,24 +140,24 @@ public class PlayerDataDao {
     }
 
     /**
-     * 根据 ID 查询用户
+     * 根据 UUID 查询用户
      *
-     * @param id 用户 ID
-     * @return 对应的 PlayerData 对象，如果不存在则返回 null
+     * @param uuid 用户 UUID
+     * @param gamePlayer 游戏玩家对象
+     * @return 对应的 PlayerData 对象，如果不存在则返回新的 PlayerData 对象
      */
-    public PlayerData selectPlayerDataById(int id, GamePlayer gamePlayer) {
+    public PlayerData selectPlayerDataByUuid(UUID uuid, GamePlayer gamePlayer) {
         try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
-            // 创建ResultMapper来映射PlayerData
             ResultMapper<PlayerData> playerDataMapper = rs -> {
                 PlayerData playerData = new PlayerData(gamePlayer);
-                playerData.setId(id);
+                playerData.setId(rs.getInt(PlayerDataTableKey.id));
                 playerData.setName(rs.getString(PlayerDataTableKey.name));
                 playerData.setUuid(UUID.fromString(rs.getString(PlayerDataTableKey.uuid)));
                 playerData.setMode(GameModeType.valueOf(rs.getString(PlayerDataTableKey.mode).toUpperCase()));
                 playerData.setLevel(rs.getInt(PlayerDataTableKey.level));
-                playerData.setExperience(rs.getInt(PlayerDataTableKey.experience));
+                playerData.setExperience(rs.getDouble(PlayerDataTableKey.experience));
                 playerData.setKills(rs.getInt(PlayerDataTableKey.kills));
                 playerData.setDeaths(rs.getInt(PlayerDataTableKey.deaths));
                 playerData.setAssists(rs.getInt(PlayerDataTableKey.assists));
@@ -169,12 +176,13 @@ public class PlayerDataDao {
 
             Optional<PlayerData> result = buildManager.select()
                     .from(PlayerDataTableKey.tableName)
-                    .select(PlayerDataTableKey.name,
+                    .select(PlayerDataTableKey.id,
+                            PlayerDataTableKey.name,
                             PlayerDataTableKey.uuid,
                             PlayerDataTableKey.mode,
                             PlayerDataTableKey.level,
-                            PlayerDataTableKey.kills,
                             PlayerDataTableKey.experience,
+                            PlayerDataTableKey.kills,
                             PlayerDataTableKey.deaths,
                             PlayerDataTableKey.assists,
                             PlayerDataTableKey.finalKills,
@@ -187,34 +195,12 @@ public class PlayerDataDao {
                             PlayerDataTableKey.shopDataJson,
                             PlayerDataTableKey.createdAt,
                             PlayerDataTableKey.updatedAt)
-                    .whereEquals(PlayerDataTableKey.id, String.valueOf(id))
+                    .whereEquals(PlayerDataTableKey.uuid, uuid.toString())
                     .executeQueryForObject(playerDataMapper);
 
             return result.orElse(new PlayerData(gamePlayer));
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to select player data by id", e);
-        }
-    }
-
-    /**
-     * 根据 UUID 查询用户
-     *
-     * @param uuid 用户 UUID
-     * @return 对应的 PlayerData 对象，如果不存在则返回 -1
-     */
-    public int selectPlayerDataIdByUuid(UUID uuid) {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
-
-            Optional<Integer> result = buildManager.select()
-                    .from(PlayerDataTableKey.tableName)
-                    .select(PlayerDataTableKey.id)
-                    .whereEquals(PlayerDataTableKey.uuid, uuid.toString())
-                    .executeQueryForObject(rs -> rs.getInt(PlayerDataTableKey.id));
-
-            return result.orElse(-1);
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to select player data id by uuid", e);
+            throw new RuntimeException("Failed to select player data by uuid", e);
         }
     }
 

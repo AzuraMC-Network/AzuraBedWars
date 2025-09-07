@@ -20,11 +20,6 @@ public class PlayerDataService {
     }
 
     /**
-     * 存储GamePlayer与对应ID(主键)关系
-     */
-    public HashMap<GamePlayer, Integer> playerIdMap = new HashMap<>();
-
-    /**
      * 存储GamePlayer与对应PlayerData的关系
      */
     public HashMap<GamePlayer, PlayerData> playerDataMap = new HashMap<>();
@@ -44,29 +39,20 @@ public class PlayerDataService {
      */
     public PlayerData selectPlayerData(GamePlayer gamePlayer) {
         PlayerData playerData = playerDataMap.getOrDefault(gamePlayer, null);
-        int playerId = playerIdMap.getOrDefault(gamePlayer, -1);
 
         // 如果缓存中没有数据，尝试从数据库查询
-        if (playerData == null || playerId == -1) {
-            // 先通过UUID获取玩家ID
-            playerId = playerDataDao.selectPlayerDataIdByUuid(gamePlayer.getUuid());
+        if (playerData == null) {
+            // 直接通过UUID查询完整数据
+            playerData = playerDataDao.selectPlayerDataByUuid(gamePlayer.getUuid(), gamePlayer);
 
-            if (playerId > 0) {
-                // 如果找到了ID，根据ID查询完整数据
-                playerData = playerDataDao.selectPlayerDataById(playerId, gamePlayer);
-
-                // 缓存数据
-                playerIdMap.put(gamePlayer, playerId);
-                playerDataMap.put(gamePlayer, playerData);
-            } else {
-                // 数据库中也没有数据，创建新的玩家数据
+            // 如果数据库中没有数据，创建新的玩家数据
+            if (playerData.getId() == 0) {
                 playerData = insertPlayerData(gamePlayer);
+            }
 
-                // 缓存新创建的数据
-                if (playerData != null) {
-                    playerIdMap.put(gamePlayer, playerData.getId());
-                    playerDataMap.put(gamePlayer, playerData);
-                }
+            // 缓存数据
+            if (playerData != null) {
+                playerDataMap.put(gamePlayer, playerData);
             }
         }
 
