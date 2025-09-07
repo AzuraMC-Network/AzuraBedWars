@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.database.dao;
+package cc.azuramc.bedwars.database.repository;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.DatabaseVersion;
@@ -17,11 +17,11 @@ import java.util.Optional;
 /**
  * @author An5w1r@163.com
  */
-public class DatabaseVersionDao {
+public class DatabaseVersionRepository {
 
     private final AzuraOrmClient ormClient;
 
-    public DatabaseVersionDao(AzuraBedWars plugin) {
+    public DatabaseVersionRepository(AzuraBedWars plugin) {
         this.ormClient = plugin.getOrmClient();
     }
 

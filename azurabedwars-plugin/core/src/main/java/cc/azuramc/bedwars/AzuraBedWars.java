@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
-import cc.azuramc.bedwars.database.dao.PlayerDataDao;
+import cc.azuramc.bedwars.database.repository.PlayerDataRepository;
 import cc.azuramc.bedwars.database.service.DatabaseVersionService;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
@@ -100,7 +100,7 @@ public final class AzuraBedWars extends JavaPlugin {
     @Getter
     private AzuraOrmClient ormClient;
     @Getter
-    private PlayerDataDao playerDataDao;
+    private PlayerDataRepository playerDataRepository;
     @Getter
     private PlayerDataService playerDataService;
     @Getter
@@ -215,7 +215,7 @@ public final class AzuraBedWars extends JavaPlugin {
         // 初始化数据库版本管理
         databaseVersionService = new DatabaseVersionService(this);
 
-        playerDataDao = new PlayerDataDao(this);
+        playerDataRepository = new PlayerDataRepository(this);
         playerDataService = new PlayerDataService(this);
     }
 
