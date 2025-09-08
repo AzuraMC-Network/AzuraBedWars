@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.database.service;
 
-import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.repository.DatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
 import cc.azuramc.bedwars.util.LoggerUtil;
 
 import java.sql.SQLException;
@@ -9,6 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 数据库版本服务
+ * 提供数据库版本管理的业务逻辑
+ *
  * @author An5w1r@163.com
  */
 public class DatabaseVersionService {
@@ -17,16 +19,15 @@ public class DatabaseVersionService {
      * 当前数据库版本号
      */
     private static final int CURRENT_VERSION = 1;
-    private final DatabaseVersionRepository databaseVersionRepository;
-    private final AzuraBedWars plugin;
+    private final IDatabaseVersionRepository databaseVersionRepository;
+
     /**
      * 版本升级映射表
      */
     private final Map<Integer, Runnable> versionUpgrades = new HashMap<>();
 
-    public DatabaseVersionService(AzuraBedWars plugin) {
-        this.plugin = plugin;
-        this.databaseVersionRepository = new DatabaseVersionRepository(plugin);
+    public DatabaseVersionService(IDatabaseVersionRepository databaseVersionRepository) {
+        this.databaseVersionRepository = databaseVersionRepository;
         this.initVersionUpgrades();
         this.initializeDatabase();
     }
@@ -35,9 +36,9 @@ public class DatabaseVersionService {
      * 初始化版本升级映射
      */
     private void initVersionUpgrades() {
-//        versionUpgrades.put(1, () -> {
-//            LoggerUtil.info("执行数据库版本升级: 1 -> 2");
-//        });
+        // versionUpgrades.put(1, () -> {
+        //     LoggerUtil.info("执行数据库版本升级: 1 -> 2");
+        // });
 
         // versionUpgrades.put(2, () -> {
         //     LoggerUtil.info("执行数据库版本升级: 2 -> 3");

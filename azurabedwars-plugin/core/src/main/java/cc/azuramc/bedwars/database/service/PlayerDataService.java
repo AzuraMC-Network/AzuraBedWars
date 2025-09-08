@@ -1,8 +1,7 @@
 package cc.azuramc.bedwars.database.service;
 
-import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
-import cc.azuramc.bedwars.database.repository.PlayerDataRepository;
+import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
 import cc.azuramc.bedwars.game.GamePlayer;
 
 import java.util.HashMap;
@@ -12,20 +11,20 @@ import java.util.HashMap;
  */
 public class PlayerDataService {
 
-    private final PlayerDataRepository playerDataRepository;
-
-    public PlayerDataService(AzuraBedWars plugin) {
-        this.playerDataRepository = plugin.getPlayerDataRepository();
-        this.createTable();
-    }
+    private final IPlayerDataRepository playerDataRepository;
 
     /**
      * 存储GamePlayer与对应PlayerData的关系
      */
     public HashMap<GamePlayer, PlayerData> playerDataMap = new HashMap<>();
 
+    public PlayerDataService(IPlayerDataRepository playerDataRepository) {
+        this.playerDataRepository = playerDataRepository;
+        this.createTable();
+    }
+
     /**
-     * 建表
+     * 创建玩家数据表
      */
     public void createTable() {
         playerDataRepository.createTable();
@@ -57,7 +56,6 @@ public class PlayerDataService {
         }
 
         return playerData;
-
     }
 
     /**
@@ -68,7 +66,6 @@ public class PlayerDataService {
      */
     public PlayerData insertPlayerData(GamePlayer gamePlayer) {
         return playerDataRepository.insertPlayerData(new PlayerData(gamePlayer));
-
     }
 
     /**
@@ -81,6 +78,9 @@ public class PlayerDataService {
         playerDataRepository.updatePlayerData(playerData);
     }
 
+    /**
+     * 关闭服务，保存所有缓存数据
+     */
     public void shutdown() {
         playerDataMap.keySet().forEach(this::updatePlayerData);
         playerDataMap.clear();

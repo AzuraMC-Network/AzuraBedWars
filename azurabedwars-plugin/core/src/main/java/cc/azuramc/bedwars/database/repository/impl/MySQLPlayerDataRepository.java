@@ -1,11 +1,11 @@
-package cc.azuramc.bedwars.database.repository;
+package cc.azuramc.bedwars.database.repository.impl;
 
-import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.entity.PlayerDataTableKey;
+import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
+import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.builder.ColumnDefinitionBuilder;
 import cc.azuramc.orm.builder.DataType;
 import cc.azuramc.orm.builder.PreparedStatementBuildManager;
@@ -20,19 +20,17 @@ import java.util.UUID;
 /**
  * @author an5w1r@163.com
  */
-public class PlayerDataRepository {
+public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
-    private final AzuraOrmClient ormClient;
+    private final IDatabaseProvider databaseProvider;
 
-    public PlayerDataRepository(AzuraBedWars plugin) {
-        this.ormClient = plugin.getOrmClient();
+    public MySQLPlayerDataRepository(IDatabaseProvider databaseProvider) {
+        this.databaseProvider = databaseProvider;
     }
 
-    /**
-     * 建表
-     */
+    @Override
     public void createTable() {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement createTableStmt = buildManager.createTable(PlayerDataTableKey.tableName)
                     .ifNotExists()
@@ -68,14 +66,9 @@ public class PlayerDataRepository {
         }
     }
 
-    /**
-     * 插入新的用户记录
-     *
-     * @param playerData 要插入的用户对象
-     * @return 插入的PlayerData对象
-     */
+    @Override
     public PlayerData insertPlayerData(PlayerData playerData) {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement insertStmt = buildManager.insertInto(PlayerDataTableKey.tableName)
                     .values(PlayerDataTableKey.name, playerData.getName())
@@ -105,13 +98,9 @@ public class PlayerDataRepository {
         }
     }
 
-    /**
-     * 更新用户数据
-     *
-     * @param playerData 要更新的用户对象
-     */
+    @Override
     public void updatePlayerData(PlayerData playerData) {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement updateStmt = buildManager.update(PlayerDataTableKey.tableName)
                     .set(PlayerDataTableKey.name, playerData.getName())
@@ -128,7 +117,6 @@ public class PlayerDataRepository {
                     .set(PlayerDataTableKey.losses, playerData.getLosses())
                     .set(PlayerDataTableKey.games, playerData.getGames())
                     .set(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
-                    // I think we should not update createdAt when updating the record
                     .set(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
                     .whereEquals(PlayerDataTableKey.id, String.valueOf(playerData.getId()))
                     .prepare();
@@ -139,15 +127,9 @@ public class PlayerDataRepository {
         }
     }
 
-    /**
-     * 根据 UUID 查询用户
-     *
-     * @param uuid 用户 UUID
-     * @param gamePlayer 游戏玩家对象
-     * @return 对应的 PlayerData 对象，如果不存在则返回新的 PlayerData 对象
-     */
+    @Override
     public PlayerData selectPlayerDataByUuid(UUID uuid, GamePlayer gamePlayer) {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
             ResultMapper<PlayerData> playerDataMapper = rs -> {
@@ -203,6 +185,4 @@ public class PlayerDataRepository {
             throw new RuntimeException("Failed to select player data by uuid", e);
         }
     }
-
-
 }
