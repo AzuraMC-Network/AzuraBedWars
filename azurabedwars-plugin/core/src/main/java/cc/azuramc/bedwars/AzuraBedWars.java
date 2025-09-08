@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
-import cc.azuramc.bedwars.database.repository.PlayerDataRepository;
+import cc.azuramc.bedwars.database.DatabaseServiceFactory;
 import cc.azuramc.bedwars.database.service.DatabaseVersionService;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
@@ -28,9 +28,7 @@ import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.bedwars.util.bstats.Metrics;
 import cc.azuramc.bedwars.util.nms.NMSMapping;
 import cc.azuramc.bedwars.util.nms.ReflectionUtil;
-import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
-import cc.azuramc.orm.config.DatabaseConfig;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
@@ -99,8 +97,6 @@ public final class AzuraBedWars extends JavaPlugin {
     private String databaseName;
     @Getter
     private AzuraOrmClient ormClient;
-    @Getter
-    private PlayerDataRepository playerDataRepository;
     @Getter
     private PlayerDataService playerDataService;
     @Getter
@@ -175,15 +171,7 @@ public final class AzuraBedWars extends JavaPlugin {
             jedisManager.shutdown();
         }
 
-        if (playerDataService != null) {
-            playerDataService.shutdown();
-        }
-
-        if (ormClient != null) {
-            ormClient.close();
-        }
-
-        AzuraORM.shutdownAll();
+        DatabaseServiceFactory.shutdown();
 
         PacketEvents.getAPI().terminate();
     }
@@ -193,30 +181,16 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initDatabases() {
         databaseName = settingsConfig.getDatabase().getDatabase();
-        SettingsConfig.DatabaseConfig database = settingsConfig.getDatabase();
-        DatabaseConfig config = new DatabaseConfig()
-                .setUrl("jdbc:mysql://" + database.getHost() + ":"
-                        + database.getPort() + "/" + database.getDatabase())
-                .setUsername(database.getUsername())
-                .setPassword(database.getPassword())
-                .setMaximumPoolSize(25)
-                .setMinimumIdle(5)
-                .setConnectionTimeout(10000L)
-                .setIdleTimeout(300000L)
-                .setMaxLifetime(900000L)
-                .setLeakDetectionThreshold(30000L)
-                .setPoolName("AzuraBedWars-Pool")
-                .setRegisterMbeans(true)
-                .setAutoCommit(true);
 
-        AzuraORM.initialize(config, true);
-        ormClient = AzuraORM.getClient();
+        // 使用新的数据库服务工厂初始化所有服务
+        DatabaseServiceFactory.initializeServices(this);
 
-        // 初始化数据库版本管理
-        databaseVersionService = new DatabaseVersionService(this);
+        // 获取服务实例
+        playerDataService = DatabaseServiceFactory.getPlayerDataService();
+        databaseVersionService = DatabaseServiceFactory.getDatabaseVersionService();
 
-        playerDataRepository = new PlayerDataRepository(this);
-        playerDataService = new PlayerDataService(this);
+        // 获取ORM客户端
+        ormClient = DatabaseServiceFactory.getDatabaseProvider().getOrmClient();
     }
 
     /**
