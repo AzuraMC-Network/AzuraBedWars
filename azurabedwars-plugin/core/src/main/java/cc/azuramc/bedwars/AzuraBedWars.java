@@ -56,57 +56,33 @@ public final class AzuraBedWars extends JavaPlugin {
 
     @Getter
     private static AzuraBedWars instance;
-    @Getter
+
+    private Chat chat = null;
+    private ConfigManager configManager;
+    private String databaseName;
+    private DatabaseVersionService databaseVersionService;
+    private Economy econ = null;
+    private EventSettingsConfig eventSettingsConfig;
     private GameManager gameManager;
-    @Getter
-    private MapManager mapManager;
-    @Getter
+    private ItemConfig itemConfig;
+    private JedisManager jedisManager;
+    private LuckPerms luckPermsApi;
     @Setter
     private MapData mapData;
-    @Getter
-    private Economy econ = null;
-    @Getter
-    private Chat chat = null;
-    @Getter
-    private ConfigManager configManager;
-    @Getter
-    private SettingsConfig settingsConfig;
-    @Getter
-    private EventSettingsConfig eventSettingsConfig;
-    @Getter
-    private ResourceSpawnConfig resourceSpawnConfig;
-    @Getter
-    private MessageConfig messageConfig;
-    @Getter
-    private ItemConfig itemConfig;
-    @Getter
-    private PlayerConfig playerConfig;
-    @Getter
-    private TeamUpgradeConfig teamUpgradeConfig;
-    @Getter
-    private JedisManager jedisManager;
-    @Getter
-    private PubSubListener pubSubListener;
-    @Getter
     private MapLoader mapLoader;
-    @Getter
-    private ScoreboardManager scoreboardManager;
-    @Getter
-    private SetupItemManager setupItemManager;
-    @Getter
-    private String databaseName;
-    @Getter
-    private AzuraOrmClient ormClient;
-    @Getter
-    private PlayerDataService playerDataService;
-    @Getter
-    private DatabaseVersionService databaseVersionService;
-    @Getter
-    private NMSProvider nmsProvider;
-    @Getter
+    private MapManager mapManager;
+    private MessageConfig messageConfig;
     private NMSAccess nmsAccess;
-    @Getter
-    private LuckPerms luckPermsApi;
+    private NMSProvider nmsProvider;
+    private AzuraOrmClient ormClient;
+    private PlayerConfig playerConfig;
+    private PlayerDataService playerDataService;
+    private PubSubListener pubSubListener;
+    private ResourceSpawnConfig resourceSpawnConfig;
+    private ScoreboardManager scoreboardManager;
+    private SettingsConfig settingsConfig;
+    private SetupItemManager setupItemManager;
+    private TeamUpgradeConfig teamUpgradeConfig;
 
     @Override
     public void onLoad() {
