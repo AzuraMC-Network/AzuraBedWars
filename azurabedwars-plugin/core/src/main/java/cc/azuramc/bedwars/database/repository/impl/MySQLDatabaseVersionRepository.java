@@ -1,9 +1,9 @@
-package cc.azuramc.bedwars.database.repository;
+package cc.azuramc.bedwars.database.repository.impl;
 
-import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.DatabaseVersion;
 import cc.azuramc.bedwars.database.entity.DatabaseVersionTableKey;
-import cc.azuramc.orm.AzuraOrmClient;
+import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
+import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
 import cc.azuramc.orm.builder.ColumnDefinitionBuilder;
 import cc.azuramc.orm.builder.DataType;
 import cc.azuramc.orm.builder.PreparedStatementBuildManager;
@@ -17,19 +17,17 @@ import java.util.Optional;
 /**
  * @author An5w1r@163.com
  */
-public class DatabaseVersionRepository {
+public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepository {
 
-    private final AzuraOrmClient ormClient;
+    private final IDatabaseProvider databaseProvider;
 
-    public DatabaseVersionRepository(AzuraBedWars plugin) {
-        this.ormClient = plugin.getOrmClient();
+    public MySQLDatabaseVersionRepository(IDatabaseProvider databaseProvider) {
+        this.databaseProvider = databaseProvider;
     }
 
-    /**
-     * 创建数据库版本表
-     */
+    @Override
     public void createTable() {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement createTableStmt = buildManager.createTable(DatabaseVersionTableKey.tableName)
                     .ifNotExists()
@@ -44,13 +42,9 @@ public class DatabaseVersionRepository {
         }
     }
 
-    /**
-     * 获取当前数据库版本
-     *
-     * @return 当前版本号，如果没有记录则返回-1
-     */
+    @Override
     public int getCurrentVersion() throws SQLException {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
             Optional<Integer> result = buildManager.select()
@@ -63,13 +57,9 @@ public class DatabaseVersionRepository {
         }
     }
 
-    /**
-     * 查询数据库版本记录
-     *
-     * @return DatabaseVersion对象，如果没有记录则返回null
-     */
+    @Override
     public DatabaseVersion selectDatabaseVersion() {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
             ResultMapper<DatabaseVersion> mapper = rs -> {
@@ -90,13 +80,9 @@ public class DatabaseVersionRepository {
         }
     }
 
-    /**
-     * 插入新的版本记录
-     *
-     * @param version 版本号
-     */
+    @Override
     public void insertVersion(int version) throws SQLException {
-        try (Connection conn = ormClient.getConnection()) {
+        try (Connection conn = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
             PreparedStatement insertStmt = buildManager.insertInto(DatabaseVersionTableKey.tableName)
                     .values(DatabaseVersionTableKey.version, version)
@@ -106,14 +92,10 @@ public class DatabaseVersionRepository {
         }
     }
 
-    /**
-     * 插入数据库版本记录
-     *
-     * @param databaseVersion 数据库版本对象
-     */
+    @Override
     public void insertDatabaseVersion(DatabaseVersion databaseVersion) {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatement insertStmt = ormClient.insert(connection)
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+            PreparedStatement insertStmt = databaseProvider.getOrmClient().insert(connection)
                     .insertInto(DatabaseVersionTableKey.tableName)
                     .values(DatabaseVersionTableKey.version, databaseVersion.getVersion())
                     .prepare();
@@ -125,13 +107,9 @@ public class DatabaseVersionRepository {
         }
     }
 
-    /**
-     * 更新版本记录（更新第一条记录）
-     *
-     * @param version 版本号
-     */
+    @Override
     public void updateVersion(int version) throws SQLException {
-        try (Connection conn = ormClient.getConnection()) {
+        try (Connection conn = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
             PreparedStatement updateStmt = buildManager.update(DatabaseVersionTableKey.tableName)
                     .set(DatabaseVersionTableKey.version, version)
@@ -142,13 +120,9 @@ public class DatabaseVersionRepository {
         }
     }
 
-    /**
-     * 更新数据库版本记录
-     *
-     * @param databaseVersion 数据库版本对象
-     */
+    @Override
     public void updateDatabaseVersion(DatabaseVersion databaseVersion) {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement updateStmt = buildManager.update(DatabaseVersionTableKey.tableName)
                     .set(DatabaseVersionTableKey.version, databaseVersion.getVersion())
@@ -160,13 +134,9 @@ public class DatabaseVersionRepository {
         }
     }
 
-    /**
-     * 检查版本表是否存在记录
-     *
-     * @return 如果存在记录返回true，否则返回false
-     */
+    @Override
     public boolean hasVersionRecord() throws SQLException {
-        try (Connection connection = ormClient.getConnection()) {
+        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
             return buildManager.select()
