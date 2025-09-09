@@ -2,10 +2,10 @@ package cc.azuramc.bedwars.database.repository.mysql;
 
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.entity.PlayerDataTableKey;
-import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.builder.ColumnDefinitionBuilder;
 import cc.azuramc.orm.builder.DataType;
 import cc.azuramc.orm.builder.PreparedStatementBuildManager;
@@ -22,15 +22,15 @@ import java.util.UUID;
  */
 public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
-    private final IDatabaseProvider databaseProvider;
+    private final AzuraOrmClient ormClient;
 
-    public MySQLPlayerDataRepository(IDatabaseProvider databaseProvider) {
-        this.databaseProvider = databaseProvider;
+    public MySQLPlayerDataRepository(AzuraOrmClient ormClient) {
+        this.ormClient = ormClient;
     }
 
     @Override
     public void createTable() {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement createTableStmt = buildManager.createTable(PlayerDataTableKey.tableName)
                     .ifNotExists()
@@ -68,7 +68,7 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
     @Override
     public PlayerData insertPlayerData(PlayerData playerData) {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement insertStmt = buildManager.insertInto(PlayerDataTableKey.tableName)
                     .values(PlayerDataTableKey.name, playerData.getName())
@@ -100,7 +100,7 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
     @Override
     public void updatePlayerData(PlayerData playerData) {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement updateStmt = buildManager.update(PlayerDataTableKey.tableName)
                     .set(PlayerDataTableKey.name, playerData.getName())
@@ -129,7 +129,7 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
     @Override
     public PlayerData selectPlayerDataByUuid(UUID uuid, GamePlayer gamePlayer) {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
             ResultMapper<PlayerData> playerDataMapper = rs -> {

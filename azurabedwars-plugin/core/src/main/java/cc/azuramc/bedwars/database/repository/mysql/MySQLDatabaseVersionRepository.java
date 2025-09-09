@@ -2,8 +2,8 @@ package cc.azuramc.bedwars.database.repository.mysql;
 
 import cc.azuramc.bedwars.database.entity.DatabaseVersion;
 import cc.azuramc.bedwars.database.entity.DatabaseVersionTableKey;
-import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
+import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.builder.ColumnDefinitionBuilder;
 import cc.azuramc.orm.builder.DataType;
 import cc.azuramc.orm.builder.PreparedStatementBuildManager;
@@ -19,15 +19,15 @@ import java.util.Optional;
  */
 public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepository {
 
-    private final IDatabaseProvider databaseProvider;
+    private final AzuraOrmClient ormClient;
 
-    public MySQLDatabaseVersionRepository(IDatabaseProvider databaseProvider) {
-        this.databaseProvider = databaseProvider;
+    public MySQLDatabaseVersionRepository(AzuraOrmClient ormClient) {
+        this.ormClient = ormClient;
     }
 
     @Override
     public void createTable() {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement createTableStmt = buildManager.createTable(DatabaseVersionTableKey.tableName)
                     .ifNotExists()
@@ -44,7 +44,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public int getCurrentVersion() throws SQLException {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
             Optional<Integer> result = buildManager.select()
@@ -59,7 +59,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public DatabaseVersion selectDatabaseVersion() {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
             ResultMapper<DatabaseVersion> mapper = rs -> {
@@ -82,7 +82,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void insertVersion(int version) throws SQLException {
-        try (Connection conn = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection conn = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
             PreparedStatement insertStmt = buildManager.insertInto(DatabaseVersionTableKey.tableName)
                     .values(DatabaseVersionTableKey.version, version)
@@ -94,8 +94,8 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void insertDatabaseVersion(DatabaseVersion databaseVersion) {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
-            PreparedStatement insertStmt = databaseProvider.getOrmClient().insert(connection)
+        try (Connection connection = ormClient.getConnection()) {
+            PreparedStatement insertStmt = ormClient.insert(connection)
                     .insertInto(DatabaseVersionTableKey.tableName)
                     .values(DatabaseVersionTableKey.version, databaseVersion.getVersion())
                     .prepare();
@@ -109,7 +109,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void updateVersion(int version) throws SQLException {
-        try (Connection conn = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection conn = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
             PreparedStatement updateStmt = buildManager.update(DatabaseVersionTableKey.tableName)
                     .set(DatabaseVersionTableKey.version, version)
@@ -122,7 +122,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void updateDatabaseVersion(DatabaseVersion databaseVersion) {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement updateStmt = buildManager.update(DatabaseVersionTableKey.tableName)
                     .set(DatabaseVersionTableKey.version, databaseVersion.getVersion())
@@ -136,7 +136,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public boolean hasVersionRecord() throws SQLException {
-        try (Connection connection = databaseProvider.getOrmClient().getConnection()) {
+        try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
 
             return buildManager.select()
