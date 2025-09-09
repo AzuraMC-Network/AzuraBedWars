@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.database.repository.impl;
+package cc.azuramc.bedwars.database.repository.mysql;
 
 import cc.azuramc.bedwars.database.entity.DatabaseVersion;
 import cc.azuramc.bedwars.database.entity.DatabaseVersionTableKey;
