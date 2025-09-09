@@ -1,7 +1,9 @@
-package cc.azuramc.bedwars.database.provider;
+package cc.azuramc.bedwars.database.provider.mysql;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.database.provider.DatabaseType;
+import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
