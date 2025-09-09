@@ -8,15 +8,19 @@ import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
 import lombok.Getter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -33,12 +37,30 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
     public MongoPlayerDataRepository() {
         mongoDatabaseProvider = (MongoDatabaseProvider) DatabaseProviderFactory.getProvider(AzuraBedWars.getInstance());
         MongoDatabase mongoDatabase = mongoDatabaseProvider.getMongoDatabase();
-        collection = mongoDatabase.getCollection(PlayerDataTableKey.tableName);
+        this.collection = getCollection(mongoDatabase);
+    }
+
+    public MongoCollection<Document> getCollection(MongoDatabase mongoDatabase) {
+        boolean collectionExists = mongoDatabase.listCollectionNames()
+                .into(new ArrayList<String>())
+                .contains(PlayerDataTableKey.tableName);
+
+        if (collectionExists) return mongoDatabase.getCollection(PlayerDataTableKey.tableName);
+        mongoDatabase.createCollection(PlayerDataTableKey.tableName);
+        return mongoDatabase.getCollection(PlayerDataTableKey.tableName);
     }
 
     @Override
     public void createTable() {
+        try {
+            IndexOptions options = new IndexOptions().unique(true);
+            collection.createIndex(Indexes.ascending(PlayerDataTableKey.uuid), options);
 
+            LoggerUtil.info("MongoDB 索引创建完毕");
+        } catch (Exception e) {
+            LoggerUtil.error("MongoDB 无法创建索引 " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -46,8 +68,8 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
         try {
             Document doc = new Document()
                     .append(PlayerDataTableKey.name, playerData.getName())
-                    .append(PlayerDataTableKey.uuid, playerData.getUuid())
-                    .append(PlayerDataTableKey.mode, playerData.getMode())
+                    .append(PlayerDataTableKey.uuid, playerData.getUuid().toString())
+                    .append(PlayerDataTableKey.mode, playerData.getMode().name())
                     .append(PlayerDataTableKey.level, playerData.getLevel())
                     .append(PlayerDataTableKey.experience, playerData.getExperience())
                     .append(PlayerDataTableKey.kills, playerData.getKills())
@@ -75,8 +97,9 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
     public void updatePlayerData(PlayerData playerData) {
         try {
             Document doc = new Document()
+                    .append(PlayerDataTableKey.uuid, playerData.getUuid().toString())
                     .append(PlayerDataTableKey.name, playerData.getName())
-                    .append(PlayerDataTableKey.mode, playerData.getMode())
+                    .append(PlayerDataTableKey.mode, playerData.getMode().name())
                     .append(PlayerDataTableKey.level, playerData.getLevel())
                     .append(PlayerDataTableKey.experience, playerData.getExperience())
                     .append(PlayerDataTableKey.kills, playerData.getKills())
@@ -90,7 +113,8 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
                     .append(PlayerDataTableKey.losses, playerData.getLosses())
                     .append(PlayerDataTableKey.games, playerData.getGames())
                     .append(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
-                    .append(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt());
+                    .append(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
+                    .append(PlayerDataTableKey.createdAt, playerData.getCreatedAt());
 
             Bson filter = Filters.eq(PlayerDataTableKey.uuid, playerData.getUuid());
             UpdateOptions options = new UpdateOptions().upsert(true);

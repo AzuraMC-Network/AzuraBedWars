@@ -9,11 +9,14 @@ import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
 import lombok.Getter;
 import org.bson.Document;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * @Author Irina
@@ -28,12 +31,23 @@ public class MongoDatabaseVersionRepository implements IDatabaseVersionRepositor
     public MongoDatabaseVersionRepository() {
         mongoDatabaseProvider = (MongoDatabaseProvider) DatabaseProviderFactory.getProvider(AzuraBedWars.getInstance());
         MongoDatabase mongoDatabase = mongoDatabaseProvider.getMongoDatabase();
-        collection = mongoDatabase.getCollection(DatabaseVersionTableKey.tableName);
+        this.collection = getCollection(mongoDatabase);
+    }
+
+    public MongoCollection<Document> getCollection(MongoDatabase mongoDatabase) {
+        boolean collectionExists = mongoDatabase.listCollectionNames()
+                .into(new ArrayList<String>())
+                .contains(DatabaseVersionTableKey.tableName);
+
+        if (collectionExists) return mongoDatabase.getCollection(DatabaseVersionTableKey.tableName);
+        mongoDatabase.createCollection(DatabaseVersionTableKey.tableName);
+        return mongoDatabase.getCollection(DatabaseVersionTableKey.tableName);
     }
 
     @Override
     public void createTable() {
-
+        IndexOptions options = new IndexOptions().unique(true);
+        collection.createIndex(Indexes.ascending(DatabaseVersionTableKey.version), options);
     }
 
     @Override
