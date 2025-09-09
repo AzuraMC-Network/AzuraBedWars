@@ -38,6 +38,7 @@ public class SettingsConfig {
 
     @Data
     public static class DatabaseConfig {
+        private String databaseType = "MySQL";
         private String host = "localhost";
         private int port = 3306;
         private String username = "root";
