@@ -3,8 +3,8 @@ package cc.azuramc.bedwars.util;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.map.MapData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -80,6 +80,13 @@ public class MapUtil {
         // 检查资源点保护
         for (MapData.RawLocation rawLocation : GAME_MANAGER.getMapData().getDrops()) {
             if (rawLocation.toLocation().distance(location) <= RESOURCE_SPAWN_PROTECTION_RADIUS) {
+                return true;
+            }
+        }
+
+        // 商人位置保护
+        for (MapData.RawLocation rawLocation : GAME_MANAGER.getMapData().getShops()) {
+            if (rawLocation.toLocation().distance(location) <= 3) {
                 return true;
             }
         }
