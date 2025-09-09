@@ -42,16 +42,6 @@ public class DatabaseProviderFactory {
     }
 
     /**
-     * 重置数据库提供者
-     */
-    public static void reset() {
-        if (currentProvider != null) {
-            currentProvider.shutdown();
-            currentProvider = null;
-        }
-    }
-
-    /**
      * 获取当前数据库类型
      *
      * @return 数据库类型名称
