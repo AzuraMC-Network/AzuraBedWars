@@ -26,7 +26,6 @@ import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.bedwars.util.bstats.Metrics;
 import cc.azuramc.bedwars.util.nms.NMSMapping;
 import cc.azuramc.bedwars.util.nms.ReflectionUtil;
-import cc.azuramc.orm.AzuraOrmClient;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
@@ -72,7 +71,6 @@ public final class AzuraBedWars extends JavaPlugin {
     private MessageConfig messageConfig;
     private NMSAccess nmsAccess;
     private NMSProvider nmsProvider;
-    private AzuraOrmClient ormClient;
     private PlayerConfig playerConfig;
     private PubSubListener pubSubListener;
     private ResourceSpawnConfig resourceSpawnConfig;

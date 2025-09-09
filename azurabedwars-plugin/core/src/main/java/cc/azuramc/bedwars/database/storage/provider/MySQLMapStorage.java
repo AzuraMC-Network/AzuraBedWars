@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.database.storage.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.database.provider.mysql.MySQLDatabaseProvider;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.util.LoggerUtil;
@@ -38,7 +39,8 @@ public class MySQLMapStorage implements IMapStorage {
      */
     public MySQLMapStorage(AzuraBedWars plugin, String tableName) {
         this.gson = new GsonBuilder().create();
-        this.ormClient = plugin.getOrmClient();
+        MySQLDatabaseProvider mySQLDatabaseProvider = (MySQLDatabaseProvider) plugin.getDatabaseProviderFactory().getDatabaseProvider();
+        this.ormClient = mySQLDatabaseProvider.getOrmClient();
         this.tableName = tableName;
 
         try {
