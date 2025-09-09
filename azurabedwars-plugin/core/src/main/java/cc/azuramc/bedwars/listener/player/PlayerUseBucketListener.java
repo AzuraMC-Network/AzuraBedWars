@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -24,6 +25,12 @@ public class PlayerUseBucketListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player);
 
         if (gamePlayer == null || gameManager.getGameState() != GameState.RUNNING) {
+            return;
+        }
+
+        if (MapUtil.isProtectedArea(player.getLocation())) {
+            event.setCancelled(true);
+            gamePlayer.sendMessage("&c你不能在此处放置水！");
             return;
         }
 
