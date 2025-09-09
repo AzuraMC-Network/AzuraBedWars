@@ -44,9 +44,10 @@ public class DatabaseProviderFactory {
         switch (DatabaseType.valueOf(databaseConfig.getDatabaseType().toUpperCase())) {
             case MYSQL:
                 this.databaseProvider = new MySQLDatabaseProvider(plugin);
+                MySQLDatabaseProvider mySQLDatabaseProvider = (MySQLDatabaseProvider) databaseProvider;
                 databaseProvider.initialize();
-                this.playerDataRepository = new MySQLPlayerDataRepository(plugin.getOrmClient());
-                this.databaseVersionRepository = new MySQLDatabaseVersionRepository(plugin.getOrmClient());
+                this.playerDataRepository = new MySQLPlayerDataRepository(mySQLDatabaseProvider.getOrmClient());
+                this.databaseVersionRepository = new MySQLDatabaseVersionRepository(mySQLDatabaseProvider.getOrmClient());
                 break;
             case MONGODB:
                 this.databaseProvider = new MongoDatabaseProvider(plugin, databaseConfig);
