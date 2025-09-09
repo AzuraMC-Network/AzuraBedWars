@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.database.repository.impl;
+package cc.azuramc.bedwars.database.repository.mysql;
 
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.entity.PlayerDataTableKey;
