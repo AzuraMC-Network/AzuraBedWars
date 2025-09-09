@@ -6,7 +6,6 @@ on:
   pull_request:
     types: [ opened, labeled, unlabeled, closed, edited ]
   push:
-    branches: [ main, master, develop ]
   issue_comment:
     types: [ created ]
   schedule:
@@ -241,23 +240,17 @@ jobs:
               newLabels.push('💥 Breaking Change');
             }
             
-            // Check for develop to master PR
+            // Check for release branches
             const baseBranch = pr.base.ref.toLowerCase();
             const headBranch = pr.head.ref.toLowerCase();
             
-            if ((headBranch === 'develop' || headBranch.includes('develop')) && 
-                (baseBranch === 'master' || baseBranch === 'main')) {
-              // Check if PR title contains [Release] tag
-              if (pr.title.includes('[Release]') || pr.title.includes('[release]') || 
-                  pr.title.toLowerCase().includes('[release]')) {
-                newLabels.push('🚀 Release');
-              } else {
-                newLabels.push('🔄 Sync');
-              }
+            // Release branch detection
+            if (headBranch.includes('release/')) {
+              newLabels.push('🚀 Release');
             }
             
-            // Check for other branches merging to develop
-            if (baseBranch === 'develop' || baseBranch.includes('develop')) {
+            // Integration branch detection (any branch merging to main branches)
+            if (baseBranch === 'main' || baseBranch === 'master' || baseBranch === 'develop') {
               if (headBranch.includes('feature/') || headBranch.includes('feat/')) {
                 newLabels.push('✨ Feature Integration');
               } else if (headBranch.includes('fix/') || headBranch.includes('bugfix/')) {
@@ -266,18 +259,9 @@ jobs:
                 newLabels.push('🚑 Hotfix Integration');
               } else if (headBranch.includes('docs/') || headBranch.includes('documentation/')) {
                 newLabels.push('📚 Documentation Integration');
-              } else {
+              } else if (headBranch !== baseBranch) {
                 newLabels.push('🔄 Integration');
               }
-            }
-            
-            // Check for other important branch flows
-            if (headBranch.includes('release/') && (baseBranch === 'master' || baseBranch === 'main')) {
-              newLabels.push('🚀 Release');
-            }
-            
-            if ((headBranch === 'master' || headBranch === 'main') && baseBranch === 'develop') {
-              newLabels.push('🔄 Sync');
             }
             
             // Parse PR body for template-based labeling
