@@ -16,18 +16,9 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
 
     private final AzuraBedWars plugin;
     private AzuraOrmClient ormClient;
-    private boolean initialized = false;
 
     public MySQLDatabaseProvider(AzuraBedWars plugin) {
         this.plugin = plugin;
-    }
-
-    @Override
-    public AzuraOrmClient getOrmClient() {
-        if (!initialized) {
-            throw new IllegalStateException("Database provider not initialized");
-        }
-        return ormClient;
     }
 
     @Override
@@ -51,7 +42,6 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
 
             AzuraORM.initialize(config, true);
             ormClient = AzuraORM.getClient();
-            initialized = true;
 
             LoggerUtil.info("MySQL数据库连接初始化成功");
             return true;
@@ -72,7 +62,6 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
                 LoggerUtil.error("关闭MySQL数据库连接时出错: " + e.getMessage());
             }
         }
-        initialized = false;
     }
 
     @Override

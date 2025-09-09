@@ -158,7 +158,7 @@ public class GamePlayer {
      * @return PlayerData实例
      */
     private PlayerData loadPlayerData(GamePlayer gamePlayer) {
-        PlayerDataService playerDataService = AzuraBedWars.getInstance().getPlayerDataService();
+        PlayerDataService playerDataService = AzuraBedWars.getInstance().getDatabaseProviderFactory().getPlayerDataService();
         return playerDataService.selectPlayerData(gamePlayer);
     }
 

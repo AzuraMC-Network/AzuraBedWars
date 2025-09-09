@@ -4,58 +4,60 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
 import cc.azuramc.bedwars.database.provider.mysql.MySQLDatabaseProvider;
+import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
+import cc.azuramc.bedwars.database.repository.mongodb.MongoPlayerDataRepository;
+import cc.azuramc.bedwars.database.repository.mysql.MySQLDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.mysql.MySQLPlayerDataRepository;
+import cc.azuramc.bedwars.database.service.DatabaseVersionService;
+import cc.azuramc.bedwars.database.service.PlayerDataService;
+import lombok.Getter;
 
 /**
  * @author an5w1r@163.com
  */
+@Getter
 public class DatabaseProviderFactory {
 
-    private static IDatabaseProvider currentProvider;
+    private final AzuraBedWars plugin;
+    private IDatabaseProvider databaseProvider;
 
-    /**
-     * 获取当前数据库提供者
-     *
-     * @param plugin 插件实例
-     * @return 数据库提供者实例
-     */
-    public static IDatabaseProvider getProvider(AzuraBedWars plugin) {
-        if (currentProvider == null) {
-            currentProvider = createProvider(plugin);
-        }
-        return currentProvider;
+    private IPlayerDataRepository playerDataRepository;
+    private IDatabaseVersionRepository databaseVersionRepository;
+
+    private PlayerDataService playerDataService;
+    private DatabaseVersionService databaseVersionService;
+
+    public DatabaseProviderFactory(AzuraBedWars plugin) {
+        this.plugin = plugin;
+        createProvider(plugin);
     }
 
     /**
      * 创建数据库提供者
      *
      * @param plugin 插件实例
-     * @return 数据库提供者实例
      */
-    private static IDatabaseProvider createProvider(AzuraBedWars plugin) {
-        SettingsConfig.DatabaseConfig db = plugin.getSettingsConfig().getDatabase();
+    public void createProvider(AzuraBedWars plugin) {
+        SettingsConfig.DatabaseConfig databaseConfig = plugin.getSettingsConfig().getDatabase();
 
-        return switch (DatabaseType.valueOf(db.getDatabaseType().toUpperCase())) {
-            case MYSQL -> new MySQLDatabaseProvider(plugin);
-            case MONGODB -> new MongoDatabaseProvider(plugin, db);
-            default -> null;
-        };
-    }
+        switch (DatabaseType.valueOf(databaseConfig.getDatabaseType().toUpperCase())) {
+            case MYSQL:
+                this.databaseProvider = new MySQLDatabaseProvider(plugin);
+                databaseProvider.initialize();
+                this.playerDataRepository = new MySQLPlayerDataRepository(plugin.getOrmClient());
+                this.databaseVersionRepository = new MySQLDatabaseVersionRepository(plugin.getOrmClient());
+                break;
+            case MONGODB:
+                this.databaseProvider = new MongoDatabaseProvider(plugin, databaseConfig);
+                databaseProvider.initialize();
+                this.playerDataRepository = new MongoPlayerDataRepository();
+                break;
+            default:
+                break;
+        }
 
-    /**
-     * 设置数据库提供者（用于测试或特殊场景）
-     *
-     * @param provider 数据库提供者实例
-     */
-    public static void setProvider(IDatabaseProvider provider) {
-        currentProvider = provider;
-    }
-
-    /**
-     * 获取当前数据库类型
-     *
-     * @return 数据库类型名称
-     */
-    public static DatabaseType getCurrentDatabaseType() {
-        return currentProvider != null ? currentProvider.getDatabaseType() : DatabaseType.UNKNOWN;
+        playerDataService = new PlayerDataService(playerDataRepository);
+        databaseVersionService = new DatabaseVersionService(databaseVersionRepository);
     }
 }

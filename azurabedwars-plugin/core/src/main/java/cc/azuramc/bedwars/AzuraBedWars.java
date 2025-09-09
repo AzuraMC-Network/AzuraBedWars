@@ -5,13 +5,6 @@ import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
-import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
-import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
-import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
-import cc.azuramc.bedwars.database.repository.mysql.MySQLDatabaseVersionRepository;
-import cc.azuramc.bedwars.database.repository.mysql.MySQLPlayerDataRepository;
-import cc.azuramc.bedwars.database.service.DatabaseVersionService;
-import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GameManager;
@@ -65,7 +58,7 @@ public final class AzuraBedWars extends JavaPlugin {
     private Chat chat = null;
     private ConfigManager configManager;
     private String databaseName;
-    private DatabaseVersionService databaseVersionService;
+    private DatabaseProviderFactory databaseProviderFactory;
     private Economy econ = null;
     private EventSettingsConfig eventSettingsConfig;
     private GameManager gameManager;
@@ -81,18 +74,12 @@ public final class AzuraBedWars extends JavaPlugin {
     private NMSProvider nmsProvider;
     private AzuraOrmClient ormClient;
     private PlayerConfig playerConfig;
-    private PlayerDataService playerDataService;
     private PubSubListener pubSubListener;
     private ResourceSpawnConfig resourceSpawnConfig;
     private ScoreboardManager scoreboardManager;
     private SettingsConfig settingsConfig;
     private SetupItemManager setupItemManager;
     private TeamUpgradeConfig teamUpgradeConfig;
-
-    // 数据库相关
-    private IDatabaseProvider databaseProvider;
-    private IPlayerDataRepository playerDataRepository;
-    private IDatabaseVersionRepository databaseVersionRepository;
 
     @Override
     public void onLoad() {
@@ -158,12 +145,9 @@ public final class AzuraBedWars extends JavaPlugin {
         }
 
         // 关闭数据库服务
-        if (playerDataService != null) {
-            playerDataService.shutdown();
-        }
-
-        if (databaseProvider != null) {
-            databaseProvider.shutdown();
+        if (databaseProviderFactory != null) {
+            databaseProviderFactory.getPlayerDataService().shutdown();
+            databaseProviderFactory.getDatabaseProvider().shutdown();
         }
 
         PacketEvents.getAPI().terminate();
@@ -174,25 +158,7 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initDatabases() {
         databaseName = settingsConfig.getDatabase().getDatabase();
-
-        // 获取数据库提供者
-        databaseProvider = DatabaseProviderFactory.getProvider(this);
-
-        // 初始化数据库提供者
-        if (!databaseProvider.initialize()) {
-            throw new RuntimeException("Failed to initialize database provider");
-        }
-
-        // 创建仓库实例
-        playerDataRepository = new MySQLPlayerDataRepository(databaseProvider);
-        databaseVersionRepository = new MySQLDatabaseVersionRepository(databaseProvider);
-
-        // 创建服务实例
-        playerDataService = new PlayerDataService(playerDataRepository);
-        databaseVersionService = new DatabaseVersionService(databaseVersionRepository);
-
-        // 获取ORM客户端
-        ormClient = databaseProvider.getOrmClient();
+        databaseProviderFactory = new DatabaseProviderFactory(this);
     }
 
     /**

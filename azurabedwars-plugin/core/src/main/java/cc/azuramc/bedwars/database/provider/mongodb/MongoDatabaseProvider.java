@@ -1,16 +1,10 @@
 package cc.azuramc.bedwars.database.provider.mongodb;
 
-/*
- * @Author Irina
- * @Date 2025/9/9 13:44
- */
-
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.provider.DatabaseType;
 import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import cc.azuramc.orm.AzuraOrmClient;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -20,6 +14,9 @@ import lombok.Getter;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author Irina
+ */
 @Getter
 public class MongoDatabaseProvider implements IDatabaseProvider {
 
@@ -36,23 +33,8 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
     }
 
     @Override
-    public AzuraOrmClient getOrmClient() {
-        if (!initialized) {
-            throw new IllegalStateException("Database provider not initialized");
-        }
-        return null;
-    }
-
-    @Override
     public boolean initialize() {
         try {
-//            DatabaseConfig config = new DatabaseConfig()
-//                    .setUrl("mongodb://" + database.getHost() + ":" + database.getPort() + "/" + database.getDatabase())
-//                    .setUsername(database.getUsername())
-//                    .setPassword(database.getPassword())
-//                    .setMaximumPoolSize(50)
-//                    .setMinPoolSize(5);
-
             String url = "mongodb://" +
                     databaseConfig.getUsername() + ":" +
                     databaseConfig.getPassword() + "@" +
@@ -69,7 +51,7 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
                         pool.maxConnectionLifeTime(900, TimeUnit.SECONDS);
                         pool.maxConnectionIdleTime(300, TimeUnit.SECONDS);
                     })
-                    .applicationName("AzuraBedWars-Pool")
+                    .applicationName("AzuraBedWars-MongoDB-Provider")
                     .build();
 
             mongoClient = MongoClients.create(settings);

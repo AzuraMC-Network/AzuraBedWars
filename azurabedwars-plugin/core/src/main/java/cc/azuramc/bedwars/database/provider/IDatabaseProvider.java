@@ -1,18 +1,9 @@
 package cc.azuramc.bedwars.database.provider;
 
-import cc.azuramc.orm.AzuraOrmClient;
-
 /**
  * @author an5w1r@163.com
  */
 public interface IDatabaseProvider {
-
-    /**
-     * 获取数据库连接客户端
-     *
-     * @return AzuraOrmClient实例
-     */
-    AzuraOrmClient getOrmClient();
 
     /**
      * 初始化数据库连接
