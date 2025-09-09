@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.database.repository.mongodb;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.entity.PlayerDataTableKey;
-import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
 import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
 import cc.azuramc.bedwars.game.GameModeType;
@@ -15,7 +14,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
-import lombok.Getter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -24,28 +22,25 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 /**
- * @Author Irina
- * @Data 2025/9/9 16:06
+ * @author Irina
  */
-
 public class MongoPlayerDataRepository implements IPlayerDataRepository {
-
-    @Getter
-    private final MongoDatabaseProvider mongoDatabaseProvider;
     private final MongoCollection<Document> collection;
 
     public MongoPlayerDataRepository() {
-        mongoDatabaseProvider = (MongoDatabaseProvider) DatabaseProviderFactory.getProvider(AzuraBedWars.getInstance());
+        MongoDatabaseProvider mongoDatabaseProvider = (MongoDatabaseProvider) AzuraBedWars.getInstance().getDatabaseProviderFactory().getDatabaseProvider();
         MongoDatabase mongoDatabase = mongoDatabaseProvider.getMongoDatabase();
         this.collection = getCollection(mongoDatabase);
     }
 
     public MongoCollection<Document> getCollection(MongoDatabase mongoDatabase) {
         boolean collectionExists = mongoDatabase.listCollectionNames()
-                .into(new ArrayList<String>())
+                .into(new ArrayList<>())
                 .contains(PlayerDataTableKey.tableName);
 
-        if (collectionExists) return mongoDatabase.getCollection(PlayerDataTableKey.tableName);
+        if (collectionExists) {
+            return mongoDatabase.getCollection(PlayerDataTableKey.tableName);
+        }
         mongoDatabase.createCollection(PlayerDataTableKey.tableName);
         return mongoDatabase.getCollection(PlayerDataTableKey.tableName);
     }
