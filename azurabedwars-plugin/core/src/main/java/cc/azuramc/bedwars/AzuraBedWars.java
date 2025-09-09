@@ -4,7 +4,12 @@ import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
-import cc.azuramc.bedwars.database.DatabaseServiceFactory;
+import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
+import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
+import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
+import cc.azuramc.bedwars.database.repository.impl.MySQLDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.impl.MySQLPlayerDataRepository;
 import cc.azuramc.bedwars.database.service.DatabaseVersionService;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
@@ -84,6 +89,11 @@ public final class AzuraBedWars extends JavaPlugin {
     private SetupItemManager setupItemManager;
     private TeamUpgradeConfig teamUpgradeConfig;
 
+    // 数据库相关
+    private IDatabaseProvider databaseProvider;
+    private IPlayerDataRepository playerDataRepository;
+    private IDatabaseVersionRepository databaseVersionRepository;
+
     @Override
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
@@ -147,7 +157,14 @@ public final class AzuraBedWars extends JavaPlugin {
             jedisManager.shutdown();
         }
 
-        DatabaseServiceFactory.shutdown();
+        // 关闭数据库服务
+        if (playerDataService != null) {
+            playerDataService.shutdown();
+        }
+
+        if (databaseProvider != null) {
+            databaseProvider.shutdown();
+        }
 
         PacketEvents.getAPI().terminate();
     }
@@ -158,15 +175,24 @@ public final class AzuraBedWars extends JavaPlugin {
     private void initDatabases() {
         databaseName = settingsConfig.getDatabase().getDatabase();
 
-        // 使用新的数据库服务工厂初始化所有服务
-        DatabaseServiceFactory.initializeServices(this);
+        // 获取数据库提供者
+        databaseProvider = DatabaseProviderFactory.getProvider(this);
 
-        // 获取服务实例
-        playerDataService = DatabaseServiceFactory.getPlayerDataService();
-        databaseVersionService = DatabaseServiceFactory.getDatabaseVersionService();
+        // 初始化数据库提供者
+        if (!databaseProvider.initialize()) {
+            throw new RuntimeException("Failed to initialize database provider");
+        }
+
+        // 创建仓库实例
+        playerDataRepository = new MySQLPlayerDataRepository(databaseProvider);
+        databaseVersionRepository = new MySQLDatabaseVersionRepository(databaseProvider);
+
+        // 创建服务实例
+        playerDataService = new PlayerDataService(playerDataRepository);
+        databaseVersionService = new DatabaseVersionService(databaseVersionRepository);
 
         // 获取ORM客户端
-        ormClient = DatabaseServiceFactory.getDatabaseProvider().getOrmClient();
+        ormClient = databaseProvider.getOrmClient();
     }
 
     /**
