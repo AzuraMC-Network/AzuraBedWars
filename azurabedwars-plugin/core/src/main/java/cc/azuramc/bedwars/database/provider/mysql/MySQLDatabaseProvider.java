@@ -8,10 +8,12 @@ import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
 import cc.azuramc.orm.config.DatabaseConfig;
+import lombok.Getter;
 
 /**
  * @author an5w1r@163.com
  */
+@Getter
 public class MySQLDatabaseProvider implements IDatabaseProvider {
 
     private final AzuraBedWars plugin;
