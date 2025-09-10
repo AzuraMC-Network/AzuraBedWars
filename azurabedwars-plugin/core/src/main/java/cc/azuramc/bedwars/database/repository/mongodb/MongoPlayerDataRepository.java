@@ -15,6 +15,7 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -80,6 +81,11 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
                     .append(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt());
 
             collection.insertOne(doc);
+
+            ObjectId objectId = doc.getObjectId("_id");
+            // 使用ObjectId的hashCode作为int类型的id
+            playerData.setId(objectId.hashCode());
+
             return playerData;
         } catch (Exception e) {
             throw new RuntimeException("Failed to insert player data", e);
@@ -89,8 +95,8 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
     @Override
     public void updatePlayerData(PlayerData playerData) {
         try {
-            Document doc = new Document()
-                    .append(PlayerDataTableKey.uuid, playerData.getUuid().toString())
+            // 使用$set操作符进行更新
+            Document updateDoc = new Document("$set", new Document()
                     .append(PlayerDataTableKey.name, playerData.getName())
                     .append(PlayerDataTableKey.mode, playerData.getMode().name())
                     .append(PlayerDataTableKey.level, playerData.getLevel())
@@ -106,13 +112,13 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
                     .append(PlayerDataTableKey.losses, playerData.getLosses())
                     .append(PlayerDataTableKey.games, playerData.getGames())
                     .append(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
-                    .append(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt())
-                    .append(PlayerDataTableKey.createdAt, playerData.getCreatedAt());
+                    .append(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt()));
 
-            Bson filter = Filters.eq(PlayerDataTableKey.uuid, playerData.getUuid());
+            // 使用UUID字符串进行过滤
+            Bson filter = Filters.eq(PlayerDataTableKey.uuid, playerData.getUuid().toString());
             UpdateOptions options = new UpdateOptions().upsert(true);
 
-            collection.updateOne(filter, doc, options);
+            collection.updateOne(filter, updateDoc, options);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update player data", e);
         }
@@ -126,12 +132,29 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
 
             PlayerData pd = new PlayerData(gamePlayer);
 
-            pd.setId(result.getInteger(PlayerDataTableKey.id));
+            // 使用MongoDB的_id字段，转换为int类型
+            ObjectId objectId = result.getObjectId("_id");
+            pd.setId(objectId.hashCode());
+
             pd.setName(result.getString(PlayerDataTableKey.name));
             pd.setUuid(UUID.fromString(result.getString(PlayerDataTableKey.uuid)));
-            pd.setMode((GameModeType) result.get(PlayerDataTableKey.mode));
+
+            // 正确转换GameModeType
+            String modeStr = result.getString(PlayerDataTableKey.mode);
+            pd.setMode(GameModeType.valueOf(modeStr.toUpperCase()));
+
             pd.setLevel(result.getInteger(PlayerDataTableKey.level));
-            pd.setExperience(result.getInteger(PlayerDataTableKey.experience));
+
+            // 正确获取double类型的experience
+            Object expObj = result.get(PlayerDataTableKey.experience);
+            if (expObj instanceof Double) {
+                pd.setExperience((Double) expObj);
+            } else if (expObj instanceof Integer) {
+                pd.setExperience(((Integer) expObj).doubleValue());
+            } else {
+                pd.setExperience(0.0);
+            }
+
             pd.setKills(result.getInteger(PlayerDataTableKey.kills));
             pd.setDeaths(result.getInteger(PlayerDataTableKey.deaths));
             pd.setAssists(result.getInteger(PlayerDataTableKey.assists));
@@ -143,8 +166,17 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
             pd.setLosses(result.getInteger(PlayerDataTableKey.losses));
             pd.setGames(result.getInteger(PlayerDataTableKey.games));
             pd.setShopDataJson(result.getString(PlayerDataTableKey.shopDataJson));
-            pd.setUpdatedAt((Timestamp) result.get(PlayerDataTableKey.updatedAt));
-            pd.setCreatedAt((Timestamp) result.get(PlayerDataTableKey.createdAt));
+
+            // 正确转换Timestamp
+            Object updatedAtObj = result.get(PlayerDataTableKey.updatedAt);
+            if (updatedAtObj instanceof Timestamp) {
+                pd.setUpdatedAt((Timestamp) updatedAtObj);
+            }
+
+            Object createdAtObj = result.get(PlayerDataTableKey.createdAt);
+            if (createdAtObj instanceof Timestamp) {
+                pd.setCreatedAt((Timestamp) createdAtObj);
+            }
 
             return pd;
         } catch (Exception e) {
