@@ -326,9 +326,8 @@ public class PlayerDamageListener implements Listener {
             gamePlayer.getPlayerData().addFinalDeaths();
         } else {
             gameKiller.getPlayerData().addKills();
+            gamePlayer.getPlayerData().addDeaths();
         }
-
-        gamePlayer.getPlayerData().addDeaths();
 
         BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
         Bukkit.getPluginManager().callEvent(event);
