@@ -69,9 +69,11 @@ public class MapStorageFactory {
             case JSON:
                 LoggerUtil.debug("MapStorageFactory$getStorage | input storageType is json");
                 getJsonStorage();
+                break;
             case MYSQL:
                 LoggerUtil.debug("MapStorageFactory$getStorage | input storageType is MySQL");
                 getMysqlStorage();
+                break;
         }
         return getJsonStorage();
     }
