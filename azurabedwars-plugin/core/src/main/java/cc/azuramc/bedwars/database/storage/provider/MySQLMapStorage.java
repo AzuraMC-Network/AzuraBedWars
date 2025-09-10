@@ -74,6 +74,9 @@ public class MySQLMapStorage implements IMapStorage {
 
     @Override
     public boolean saveMap(String mapName, MapData mapData) {
+        if (mapName == null || mapData == null) {
+            return false;
+        }
         String jsonData = gson.toJson(mapData);
         try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
