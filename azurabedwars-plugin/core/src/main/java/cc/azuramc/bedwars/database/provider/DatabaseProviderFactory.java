@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
 import cc.azuramc.bedwars.database.provider.mysql.MySQLDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
 import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
+import cc.azuramc.bedwars.database.repository.mongodb.MongoDatabaseVersionRepository;
 import cc.azuramc.bedwars.database.repository.mongodb.MongoPlayerDataRepository;
 import cc.azuramc.bedwars.database.repository.mysql.MySQLDatabaseVersionRepository;
 import cc.azuramc.bedwars.database.repository.mysql.MySQLPlayerDataRepository;
@@ -51,8 +52,10 @@ public class DatabaseProviderFactory {
                 break;
             case MONGODB:
                 this.databaseProvider = new MongoDatabaseProvider(plugin, databaseConfig);
+                MongoDatabaseProvider mongoDatabaseProvider = (MongoDatabaseProvider) databaseProvider;
                 databaseProvider.initialize();
-                this.playerDataRepository = new MongoPlayerDataRepository();
+                this.playerDataRepository = new MongoPlayerDataRepository(mongoDatabaseProvider);
+                this.databaseVersionRepository = new MongoDatabaseVersionRepository(mongoDatabaseProvider);
                 break;
             default:
                 break;

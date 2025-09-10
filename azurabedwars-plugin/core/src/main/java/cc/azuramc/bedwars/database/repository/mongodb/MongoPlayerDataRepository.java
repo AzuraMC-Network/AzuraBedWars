@@ -1,6 +1,5 @@
 package cc.azuramc.bedwars.database.repository.mongodb;
 
-import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.entity.PlayerDataTableKey;
 import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
@@ -27,8 +26,7 @@ import java.util.UUID;
 public class MongoPlayerDataRepository implements IPlayerDataRepository {
     private final MongoCollection<Document> collection;
 
-    public MongoPlayerDataRepository() {
-        MongoDatabaseProvider mongoDatabaseProvider = (MongoDatabaseProvider) AzuraBedWars.getInstance().getDatabaseProviderFactory().getDatabaseProvider();
+    public MongoPlayerDataRepository(MongoDatabaseProvider mongoDatabaseProvider) {
         MongoDatabase mongoDatabase = mongoDatabaseProvider.getMongoDatabase();
         this.collection = getCollection(mongoDatabase);
     }
@@ -123,7 +121,7 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
     @Override
     public PlayerData selectPlayerDataByUuid(UUID uuid, GamePlayer gamePlayer) {
         try {
-            Document result = collection.find(Filters.eq(PlayerDataTableKey.uuid, uuid)).first();
+            Document result = collection.find(Filters.eq(PlayerDataTableKey.uuid, uuid.toString())).first();
             if (result == null) return new PlayerData(gamePlayer);
 
             PlayerData pd = new PlayerData(gamePlayer);

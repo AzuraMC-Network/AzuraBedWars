@@ -1,6 +1,5 @@
 package cc.azuramc.bedwars.database.repository.mongodb;
 
-import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.DatabaseVersion;
 import cc.azuramc.bedwars.database.entity.DatabaseVersionTableKey;
 import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
@@ -21,8 +20,7 @@ import java.util.ArrayList;
 public class MongoDatabaseVersionRepository implements IDatabaseVersionRepository {
     private final MongoCollection<Document> collection;
 
-    public MongoDatabaseVersionRepository() {
-        MongoDatabaseProvider mongoDatabaseProvider = (MongoDatabaseProvider) AzuraBedWars.getInstance().getDatabaseProviderFactory().getDatabaseProvider();
+    public MongoDatabaseVersionRepository(MongoDatabaseProvider mongoDatabaseProvider) {
         MongoDatabase mongoDatabase = mongoDatabaseProvider.getMongoDatabase();
         this.collection = getCollection(mongoDatabase);
     }

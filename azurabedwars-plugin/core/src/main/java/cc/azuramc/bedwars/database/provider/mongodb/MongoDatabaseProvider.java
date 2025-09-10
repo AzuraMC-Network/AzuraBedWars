@@ -11,6 +11,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
+import org.bson.UuidRepresentation;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,12 +36,21 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
     @Override
     public boolean initialize() {
         try {
-            String url = "mongodb://" +
-                    databaseConfig.getUsername() + ":" +
-                    databaseConfig.getPassword() + "@" +
-                    databaseConfig.getHost() + ":" +
-                    databaseConfig.getPort() + "/" +
-                    databaseConfig.getDatabase();
+            String url;
+            if (databaseConfig.getUsername() != null && !databaseConfig.getUsername().isEmpty() &&
+                    databaseConfig.getPassword() != null && !databaseConfig.getPassword().isEmpty()) {
+                url = "mongodb://" +
+                        databaseConfig.getUsername() + ":" +
+                        databaseConfig.getPassword() + "@" +
+                        databaseConfig.getHost() + ":" +
+                        databaseConfig.getPort() + "/" +
+                        databaseConfig.getDatabase();
+            } else {
+                url = "mongodb://" +
+                        databaseConfig.getHost() + ":" +
+                        databaseConfig.getPort() + "/" +
+                        databaseConfig.getDatabase();
+            }
 
             MongoClientSettings settings = MongoClientSettings.builder()
                     .applyConnectionString(new ConnectionString(url))
@@ -51,6 +61,7 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
                         pool.maxConnectionLifeTime(900, TimeUnit.SECONDS);
                         pool.maxConnectionIdleTime(300, TimeUnit.SECONDS);
                     })
+                    .uuidRepresentation(UuidRepresentation.STANDARD)
                     .applicationName("AzuraBedWars-MongoDB-Provider")
                     .build();
 
