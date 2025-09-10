@@ -660,24 +660,20 @@ public class ItemShopGUI extends CustomGUI {
      * 处理护甲给予
      */
     private boolean handleArmorGiving(GamePlayer gamePlayer, int shopSlot, Material material, GameManager gameManager) {
-        Player player = gamePlayer.getPlayer();
 
         if (XMaterial.CHAINMAIL_BOOTS.get() == material) {
             gamePlayer.setArmorType(ArmorType.CHAINMAIL);
             gamePlayer.giveArmor();
-            player.updateInventory();
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
         } else if (XMaterial.IRON_BOOTS.get() == material) {
             gamePlayer.setArmorType(ArmorType.IRON);
             gamePlayer.giveArmor();
-            player.updateInventory();
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
         } else if (XMaterial.DIAMOND_BOOTS.get() == material) {
             gamePlayer.setArmorType(ArmorType.DIAMOND);
             gamePlayer.giveArmor();
-            player.updateInventory();
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
             return true;
         }
@@ -688,7 +684,6 @@ public class ItemShopGUI extends CustomGUI {
      * 处理工具给予
      */
     private boolean handleToolGiving(GamePlayer gamePlayer, int shopSlot, Material material, GameManager gameManager) {
-        Player player = gamePlayer.getPlayer();
 
         // 镐
         if (XMaterial.WOODEN_PICKAXE.get() == material) {
