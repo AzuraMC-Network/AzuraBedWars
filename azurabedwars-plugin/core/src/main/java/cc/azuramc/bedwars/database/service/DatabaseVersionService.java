@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.database.service;
 
-import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.dao.DatabaseVersionDao;
+import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
 import cc.azuramc.bedwars.util.LoggerUtil;
 
 import java.sql.SQLException;
@@ -9,6 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 数据库版本服务
+ * 提供数据库版本管理的业务逻辑
+ *
  * @author An5w1r@163.com
  */
 public class DatabaseVersionService {
@@ -17,16 +19,15 @@ public class DatabaseVersionService {
      * 当前数据库版本号
      */
     private static final int CURRENT_VERSION = 1;
-    private final DatabaseVersionDao databaseVersionDao;
-    private final AzuraBedWars plugin;
+    private final IDatabaseVersionRepository databaseVersionRepository;
+
     /**
      * 版本升级映射表
      */
     private final Map<Integer, Runnable> versionUpgrades = new HashMap<>();
 
-    public DatabaseVersionService(AzuraBedWars plugin) {
-        this.plugin = plugin;
-        this.databaseVersionDao = new DatabaseVersionDao(plugin);
+    public DatabaseVersionService(IDatabaseVersionRepository databaseVersionRepository) {
+        this.databaseVersionRepository = databaseVersionRepository;
         this.initVersionUpgrades();
         this.initializeDatabase();
     }
@@ -35,9 +36,9 @@ public class DatabaseVersionService {
      * 初始化版本升级映射
      */
     private void initVersionUpgrades() {
-//        versionUpgrades.put(1, () -> {
-//            LoggerUtil.info("执行数据库版本升级: 1 -> 2");
-//        });
+        // versionUpgrades.put(1, () -> {
+        //     LoggerUtil.info("执行数据库版本升级: 1 -> 2");
+        // });
 
         // versionUpgrades.put(2, () -> {
         //     LoggerUtil.info("执行数据库版本升级: 2 -> 3");
@@ -50,14 +51,14 @@ public class DatabaseVersionService {
     private void initializeDatabase() {
         try {
             // 创建版本表
-            databaseVersionDao.createDatabaseVersionTable();
+            databaseVersionRepository.createTable();
 
             // 检查当前版本
-            int currentVersion = databaseVersionDao.getCurrentVersion();
+            int currentVersion = databaseVersionRepository.getCurrentVersion();
 
             if (currentVersion == -1) {
                 // 首次安装，插入初始版本
-                databaseVersionDao.insertVersion(CURRENT_VERSION);
+                databaseVersionRepository.insertVersion(CURRENT_VERSION);
                 LoggerUtil.info("数据库版本管理初始化完成，当前版本: " + CURRENT_VERSION);
             } else if (currentVersion != CURRENT_VERSION) {
                 // 需要升级
@@ -89,10 +90,10 @@ public class DatabaseVersionService {
             }
 
             // 更新版本记录
-            if (databaseVersionDao.hasVersionRecord()) {
-                databaseVersionDao.updateVersion(toVersion);
+            if (databaseVersionRepository.hasVersionRecord()) {
+                databaseVersionRepository.updateVersion(toVersion);
             } else {
-                databaseVersionDao.insertVersion(toVersion);
+                databaseVersionRepository.insertVersion(toVersion);
             }
 
             LoggerUtil.info("数据库版本升级完成: " + fromVersion + " -> " + toVersion);
@@ -110,7 +111,7 @@ public class DatabaseVersionService {
      */
     public int getCurrentVersion() {
         try {
-            return databaseVersionDao.getCurrentVersion();
+            return databaseVersionRepository.getCurrentVersion();
         } catch (SQLException e) {
             LoggerUtil.error("获取数据库版本失败: " + e.getMessage());
             return -1;

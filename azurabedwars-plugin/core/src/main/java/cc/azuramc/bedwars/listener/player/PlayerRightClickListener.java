@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.spectator.gui.SpectatorCompassGUI;
 import cc.azuramc.bedwars.game.spectator.gui.SpectatorSettingGUI;
 import cc.azuramc.bedwars.util.BungeeUtil;
@@ -107,8 +106,6 @@ public class PlayerRightClickListener implements Listener {
             handleSlimeBallInteraction(event);
         } else if (material.name().toUpperCase().contains("BED")) {
             handleBedInteraction(event, gamePlayer, gameTeam);
-        } else if (material.name().toUpperCase().contains("WATER_BUCKIT")) {
-            handleWaterBucketInteraction(event, gamePlayer);
         }
     }
 
@@ -165,27 +162,6 @@ public class PlayerRightClickListener implements Listener {
 
         // 广播消息
         announceRejuvenationBedUsed(gamePlayer, gameTeam);
-    }
-
-    /**
-     * 处理水桶交互
-     */
-    private void handleWaterBucketInteraction(PlayerInteractEvent event, GamePlayer gamePlayer) {
-        // 检查是否靠近商店
-        for (MapData.RawLocation rawLocation : gameManager.getMapData().getShops()) {
-            if (rawLocation.toLocation().distance(gamePlayer.getPlayer().getLocation()) <= 5) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        // 检查是否靠近出生点
-        for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            if (gameTeam.getSpawnLocation().distance(gamePlayer.getPlayer().getLocation()) <= 8) {
-                event.setCancelled(true);
-                return;
-            }
-        }
     }
 
     /**

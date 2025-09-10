@@ -12,7 +12,7 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
 import cc.azuramc.bedwars.util.DamageUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import cc.azuramc.bedwars.util.VaultUtil;
+import cc.azuramc.bedwars.util.hook.VaultUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -326,9 +326,8 @@ public class PlayerDamageListener implements Listener {
             gamePlayer.getPlayerData().addFinalDeaths();
         } else {
             gameKiller.getPlayerData().addKills();
+            gamePlayer.getPlayerData().addDeaths();
         }
-
-        gamePlayer.getPlayerData().addDeaths();
 
         BedwarsPlayerKillEvent event = new BedwarsPlayerKillEvent(gamePlayer, gameKiller, isFinalKill);
         Bukkit.getPluginManager().callEvent(event);

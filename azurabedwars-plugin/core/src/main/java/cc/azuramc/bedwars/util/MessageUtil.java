@@ -89,4 +89,27 @@ public final class MessageUtil {
         return toReturn;
     }
 
+    public static ChatColor getLastChatColor(String string) {
+        if (string == null || string.isEmpty()) {
+            return ChatColor.RESET;
+        }
+
+        final char colorChar = ChatColor.COLOR_CHAR;
+
+        int length = string.length();
+
+        for (int index = length - 1; index > -1; index--) {
+            char section = string.charAt(index);
+            if (section == colorChar && index < length - 1) {
+                char c = string.charAt(index + 1);
+                ChatColor color = ChatColor.getByChar(c);
+                if (color != null) {
+                    return color;
+                }
+            }
+        }
+
+        return ChatColor.RESET;
+    }
+
 }
