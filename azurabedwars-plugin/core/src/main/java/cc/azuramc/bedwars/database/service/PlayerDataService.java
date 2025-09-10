@@ -45,7 +45,8 @@ public class PlayerDataService {
             playerData = playerDataRepository.selectPlayerDataByUuid(gamePlayer.getUuid(), gamePlayer);
 
             // 如果数据库中没有数据，创建新的玩家数据
-            if (playerData.getId() == 0) {
+            String databaseId = playerData.getId();
+            if (databaseId == null || databaseId.isEmpty() || databaseId.equals("0")) {
                 playerData = insertPlayerData(gamePlayer);
             }
 

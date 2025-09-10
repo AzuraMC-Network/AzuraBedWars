@@ -134,7 +134,7 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
             ResultMapper<PlayerData> playerDataMapper = rs -> {
                 PlayerData playerData = new PlayerData(gamePlayer);
-                playerData.setId(rs.getInt(PlayerDataTableKey.id));
+                playerData.setId(String.valueOf(rs.getInt(PlayerDataTableKey.id)));
                 playerData.setName(rs.getString(PlayerDataTableKey.name));
                 playerData.setUuid(UUID.fromString(rs.getString(PlayerDataTableKey.uuid)));
                 playerData.setMode(GameModeType.valueOf(rs.getString(PlayerDataTableKey.mode).toUpperCase()));
