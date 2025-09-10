@@ -259,9 +259,12 @@ jobs:
                 newLabels.push('🚑 Hotfix Integration');
               } else if (headBranch.includes('docs/') || headBranch.includes('documentation/')) {
                 newLabels.push('📚 Documentation Integration');
-              } else if (headBranch !== baseBranch) {
-                newLabels.push('🔄 Integration');
               }
+            }
+            
+            // General integration (master/main to develop)
+            if (baseBranch === 'develop' && (headBranch === 'main' || headBranch === 'master')) {
+              newLabels.push('🔄 Integration');
             }
             
             // Parse PR body for template-based labeling
