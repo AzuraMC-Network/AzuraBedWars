@@ -1,7 +1,8 @@
-package cc.azuramc.bedwars.util;
+package cc.azuramc.bedwars.util.hook;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.util.MessageUtil;
 
 /**
  * @author an5w1r@163.com
@@ -18,5 +19,9 @@ public class VaultUtil {
 
     public static String getPlayerPrefix(GamePlayer gamePlayer) {
         return MessageUtil.color(AzuraBedWars.getInstance().getChat().getPlayerPrefix(gamePlayer.getPlayer()));
+    }
+
+    public static String getPlayerSuffix(GamePlayer gamePlayer) {
+        return MessageUtil.color(AzuraBedWars.getInstance().getChat().getPlayerSuffix(gamePlayer.getPlayer()));
     }
 }

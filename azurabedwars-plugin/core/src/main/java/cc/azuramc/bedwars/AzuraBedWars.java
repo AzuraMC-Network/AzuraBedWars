@@ -4,9 +4,7 @@ import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
-import cc.azuramc.bedwars.database.dao.PlayerDataDao;
-import cc.azuramc.bedwars.database.service.DatabaseVersionService;
-import cc.azuramc.bedwars.database.service.PlayerDataService;
+import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GameManager;
@@ -28,9 +26,6 @@ import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.bedwars.util.bstats.Metrics;
 import cc.azuramc.bedwars.util.nms.NMSMapping;
 import cc.azuramc.bedwars.util.nms.ReflectionUtil;
-import cc.azuramc.orm.AzuraORM;
-import cc.azuramc.orm.AzuraOrmClient;
-import cc.azuramc.orm.config.DatabaseConfig;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
@@ -58,59 +53,31 @@ public final class AzuraBedWars extends JavaPlugin {
 
     @Getter
     private static AzuraBedWars instance;
-    @Getter
+
+    private Chat chat = null;
+    private ConfigManager configManager;
+    private String databaseName;
+    private DatabaseProviderFactory databaseProviderFactory;
+    private Economy econ = null;
+    private EventSettingsConfig eventSettingsConfig;
     private GameManager gameManager;
-    @Getter
-    private MapManager mapManager;
-    @Getter
+    private ItemConfig itemConfig;
+    private JedisManager jedisManager;
+    private LuckPerms luckPermsApi;
     @Setter
     private MapData mapData;
-    @Getter
-    private Economy econ = null;
-    @Getter
-    private Chat chat = null;
-    @Getter
-    private ConfigManager configManager;
-    @Getter
-    private SettingsConfig settingsConfig;
-    @Getter
-    private EventSettingsConfig eventSettingsConfig;
-    @Getter
-    private ResourceSpawnConfig resourceSpawnConfig;
-    @Getter
-    private MessageConfig messageConfig;
-    @Getter
-    private ItemConfig itemConfig;
-    @Getter
-    private PlayerConfig playerConfig;
-    @Getter
-    private TeamUpgradeConfig teamUpgradeConfig;
-    @Getter
-    private JedisManager jedisManager;
-    @Getter
-    private PubSubListener pubSubListener;
-    @Getter
     private MapLoader mapLoader;
-    @Getter
-    private ScoreboardManager scoreboardManager;
-    @Getter
-    private SetupItemManager setupItemManager;
-    @Getter
-    private String databaseName;
-    @Getter
-    private AzuraOrmClient ormClient;
-    @Getter
-    private PlayerDataDao playerDataDao;
-    @Getter
-    private PlayerDataService playerDataService;
-    @Getter
-    private DatabaseVersionService databaseVersionService;
-    @Getter
-    private NMSProvider nmsProvider;
-    @Getter
+    private MapManager mapManager;
+    private MessageConfig messageConfig;
     private NMSAccess nmsAccess;
-    @Getter
-    private LuckPerms luckPermsApi;
+    private NMSProvider nmsProvider;
+    private PlayerConfig playerConfig;
+    private PubSubListener pubSubListener;
+    private ResourceSpawnConfig resourceSpawnConfig;
+    private ScoreboardManager scoreboardManager;
+    private SettingsConfig settingsConfig;
+    private SetupItemManager setupItemManager;
+    private TeamUpgradeConfig teamUpgradeConfig;
 
     @Override
     public void onLoad() {
@@ -175,15 +142,11 @@ public final class AzuraBedWars extends JavaPlugin {
             jedisManager.shutdown();
         }
 
-        if (playerDataService != null) {
-            playerDataService.shutdown();
+        // 关闭数据库服务
+        if (databaseProviderFactory != null) {
+            databaseProviderFactory.getPlayerDataService().shutdown();
+            databaseProviderFactory.getDatabaseProvider().shutdown();
         }
-
-        if (ormClient != null) {
-            ormClient.close();
-        }
-
-        AzuraORM.shutdownAll();
 
         PacketEvents.getAPI().terminate();
     }
@@ -193,30 +156,7 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initDatabases() {
         databaseName = settingsConfig.getDatabase().getDatabase();
-        SettingsConfig.DatabaseConfig database = settingsConfig.getDatabase();
-        DatabaseConfig config = new DatabaseConfig()
-                .setUrl("jdbc:mysql://" + database.getHost() + ":"
-                        + database.getPort() + "/" + database.getDatabase())
-                .setUsername(database.getUsername())
-                .setPassword(database.getPassword())
-                .setMaximumPoolSize(25)
-                .setMinimumIdle(5)
-                .setConnectionTimeout(10000L)
-                .setIdleTimeout(300000L)
-                .setMaxLifetime(900000L)
-                .setLeakDetectionThreshold(30000L)
-                .setPoolName("AzuraBedWars-Pool")
-                .setRegisterMbeans(true)
-                .setAutoCommit(true);
-
-        AzuraORM.initialize(config, true);
-        ormClient = AzuraORM.getClient();
-
-        // 初始化数据库版本管理
-        databaseVersionService = new DatabaseVersionService(this);
-
-        playerDataDao = new PlayerDataDao(this);
-        playerDataService = new PlayerDataService(this);
+        databaseProviderFactory = new DatabaseProviderFactory(this);
     }
 
     /**

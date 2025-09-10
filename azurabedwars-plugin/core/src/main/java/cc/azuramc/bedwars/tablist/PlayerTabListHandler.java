@@ -1,12 +1,13 @@
 package cc.azuramc.bedwars.tablist;
 
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.util.LuckPermsUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
-import cc.azuramc.bedwars.util.VaultUtil;
+import cc.azuramc.bedwars.util.hook.LuckPermsUtil;
+import cc.azuramc.bedwars.util.hook.VaultUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -95,7 +96,8 @@ public class PlayerTabListHandler {
      */
     private void updateWaitingStateDisplayName(GamePlayer gamePlayer, Player player) {
         String prefix = getPlayerPrefix(gamePlayer);
-        player.setPlayerListName(prefix + gamePlayer.getNickName());
+        String suffix = getPlayerSuffix(gamePlayer);
+        player.setPlayerListName(prefix + gamePlayer.getNickName() + suffix);
     }
 
     /**
@@ -136,7 +138,12 @@ public class PlayerTabListHandler {
      */
     private void updateWaitingStateTag(GamePlayer gamePlayer, Team team, Player player, Scoreboard scoreboard) {
         String prefix = getPlayerPrefix(gamePlayer);
-        team.setPrefix(MessageUtil.color(prefix));
+        String suffix = getPlayerSuffix(gamePlayer);
+        team.setPrefix(prefix);
+        team.setSuffix(suffix);
+        if (VersionUtil.isGreaterOrEqual(1, 12)) {
+            team.setColor(MessageUtil.getLastChatColor(prefix));
+        }
         team.addEntry(player.getName());
         player.setScoreboard(scoreboard);
     }
@@ -160,6 +167,10 @@ public class PlayerTabListHandler {
         }
 
         team.setPrefix(MessageUtil.color(prefix));
+        team.setSuffix(getPlayerSuffix(gamePlayer));
+        if (VersionUtil.isGreaterOrEqual(1, 12)) {
+            team.setColor(MessageUtil.getLastChatColor(prefix));
+        }
         team.addEntry(player.getName());
         player.setScoreboard(scoreboard);
     }
@@ -172,6 +183,15 @@ public class PlayerTabListHandler {
             return LuckPermsUtil.getPrefix(gamePlayer);
         } else if (!VaultUtil.chatIsNull) {
             return VaultUtil.getPlayerPrefix(gamePlayer);
+        }
+        return "";
+    }
+
+    private String getPlayerSuffix(GamePlayer gamePlayer) {
+        if (LuckPermsUtil.isLoaded) {
+            return LuckPermsUtil.getSuffix(gamePlayer);
+        } else if (!VaultUtil.chatIsNull) {
+            return VaultUtil.getPlayerSuffix(gamePlayer);
         }
         return "";
     }

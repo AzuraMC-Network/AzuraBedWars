@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.database.entity;
 /**
  * @author an5w1r@163.com
  */
-
 public class PlayerDataTableKey {
 
     public static String tableName = "player_data";
