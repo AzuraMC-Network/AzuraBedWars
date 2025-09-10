@@ -16,7 +16,7 @@ import java.util.UUID;
 @Setter
 public class PlayerData {
 
-    private int id;
+    private String id;
     private String name;
     private UUID uuid;
     private GameModeType mode;

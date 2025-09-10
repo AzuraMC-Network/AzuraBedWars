@@ -83,8 +83,7 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
             collection.insertOne(doc);
 
             ObjectId objectId = doc.getObjectId("_id");
-            // 使用ObjectId的hashCode作为int类型的id
-            playerData.setId(objectId.hashCode());
+            playerData.setId(objectId.toString());
 
             return playerData;
         } catch (Exception e) {
@@ -132,9 +131,8 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
 
             PlayerData pd = new PlayerData(gamePlayer);
 
-            // 使用MongoDB的_id字段，转换为int类型
             ObjectId objectId = result.getObjectId("_id");
-            pd.setId(objectId.hashCode());
+            pd.setId(objectId.toString());
 
             pd.setName(result.getString(PlayerDataTableKey.name));
             pd.setUuid(UUID.fromString(result.getString(PlayerDataTableKey.uuid)));
