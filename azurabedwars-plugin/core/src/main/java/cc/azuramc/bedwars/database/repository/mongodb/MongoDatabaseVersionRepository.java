@@ -87,10 +87,10 @@ public class MongoDatabaseVersionRepository implements IDatabaseVersionRepositor
     public void updateVersion(int version) {
         try {
             UpdateOptions options = new UpdateOptions().upsert(true);
-            Document doc = new Document().append(DatabaseVersionTableKey.version, version);
-            collection.updateOne(Filters.exists(DatabaseVersionTableKey.version), doc, options);
+            Document updateDoc = new Document("$set", new Document().append(DatabaseVersionTableKey.version, version));
+            collection.updateOne(Filters.exists(DatabaseVersionTableKey.version), updateDoc, options);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to insert version", e);
+            throw new RuntimeException("Failed to update version", e);
         }
     }
 
@@ -98,10 +98,10 @@ public class MongoDatabaseVersionRepository implements IDatabaseVersionRepositor
     public void updateDatabaseVersion(DatabaseVersion databaseVersion) {
         try {
             UpdateOptions options = new UpdateOptions().upsert(true);
-            Document doc = new Document().append(DatabaseVersionTableKey.version, databaseVersion.getVersion());
-            collection.updateOne(Filters.exists(DatabaseVersionTableKey.version), doc, options);
+            Document updateDoc = new Document("$set", new Document().append(DatabaseVersionTableKey.version, databaseVersion.getVersion()));
+            collection.updateOne(Filters.exists(DatabaseVersionTableKey.version), updateDoc, options);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to insert database version", e);
+            throw new RuntimeException("Failed to update database version", e);
         }
     }
 
