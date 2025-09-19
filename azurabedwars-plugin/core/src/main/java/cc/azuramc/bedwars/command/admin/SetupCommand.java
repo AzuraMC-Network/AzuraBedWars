@@ -50,7 +50,7 @@ public class SetupCommand {
             return;
         }
 
-        List<String> messageList = List.of(
+        List<String> messageList = MessageUtil.color(List.of(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 设置工具",
                 "",
@@ -58,7 +58,7 @@ public class SetupCommand {
                 "&7 • &f/setup stop <mapName> &7结束配置地图",
                 "",
                 MessageUtil.CHAT_BAR
-        );
+        ));
 
         messageList.forEach(player::sendMessage);
     }

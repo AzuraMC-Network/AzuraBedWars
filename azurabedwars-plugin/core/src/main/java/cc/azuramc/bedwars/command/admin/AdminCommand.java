@@ -32,7 +32,7 @@ public class AdminCommand {
 
     @DefaultFor("bw")
     public void getHelpCommand(BukkitCommandActor actor) {
-        List<String> helpMessages = List.of(
+        List<String> helpMessages = MessageUtil.color(List.of(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助",
                 "",
@@ -44,7 +44,7 @@ public class AdminCommand {
                 "&7 • &f/bw loadWorld <worldName> &7加载世界",
                 "&7 • &f/bw start &7立即开始游戏 &3&o[仅非EditMode]",
                 MessageUtil.CHAT_BAR
-        );
+        ));
 
         CommandUtil.sendLayout(actor, helpMessages);
     }
