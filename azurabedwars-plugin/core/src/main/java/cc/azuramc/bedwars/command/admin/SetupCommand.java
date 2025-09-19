@@ -10,6 +10,8 @@ import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+import java.util.List;
+
 /**
  * 地图设置命令
  *
@@ -48,13 +50,17 @@ public class SetupCommand {
             return;
         }
 
-        player.sendMessage(MessageUtil.CHAT_BAR);
-        player.sendMessage(MessageUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 设置工具"));
-        player.sendMessage("");
-        player.sendMessage(MessageUtil.color("&7 • &f/setup start <mapName> &7开始配置地图"));
-        player.sendMessage(MessageUtil.color("&7 • &f/setup stop <mapName> &7结束配置地图"));
-        player.sendMessage("");
-        player.sendMessage(MessageUtil.CHAT_BAR);
+        List<String> messageList = List.of(
+                MessageUtil.CHAT_BAR,
+                "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 设置工具",
+                "",
+                "&7 • &f/setup start <mapName> &7开始配置地图",
+                "&7 • &f/setup stop <mapName> &7结束配置地图",
+                "",
+                MessageUtil.CHAT_BAR
+        );
+
+        messageList.forEach(player::sendMessage);
     }
 
     @Subcommand("start")

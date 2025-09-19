@@ -49,30 +49,34 @@ public class MapCommand {
             return;
         }
 
-        player.sendMessage(MessageUtil.CHAT_BAR);
-        player.sendMessage(MessageUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置"));
-        player.sendMessage("");
-        player.sendMessage(MessageUtil.color("&7 • &f/map create <mapName> &7创建新的地图"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map setWaiting <mapName> &7设置等待大厅位置"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map setAuthor <mapName> <authorName> &7设置地图作者名"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map setTeamPlayers <mapName> <number> &7设置队伍最大人数"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map setMinPlayers <mapName> <number> &7设置地图最小需要人数"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map setRespawn <mapName> &7设置地图重生点"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map addBase <mapName> &7增加基地出生点"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map addDrop <mapName> <type> &7增加资源点 (类型: BASE/DIAMOND/EMERALD)"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: ITEM/UPGRADE)"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map setPos1 <mapName> &7设置地图边界1"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map setPos2 <mapName> &7设置地图边界2"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map setUrl <url> &7设置地图文件物理路径"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map save <mapName> &7保存地图"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map load <mapName> &7加载地图配置"));
-        player.sendMessage("");
-        player.sendMessage(MessageUtil.color("&7 • &f/map list <type> &7查看指定存储方式地图列表"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: JSON/MYSQL)"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map info <mapName> &7查看地图信息"));
-        player.sendMessage(MessageUtil.color("&7 • &f/map align &7对齐玩家位置和视角为整数值"));
-        player.sendMessage(MessageUtil.CHAT_BAR);
+        List<String> messageList = List.of(
+                MessageUtil.CHAT_BAR,
+                "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置",
+                "",
+                "&7 • &f/map create <mapName> &7创建新的地图",
+                "&7 • &f/map setWaiting <mapName> &7设置等待大厅位置",
+                "&7 • &f/map setAuthor <mapName> <authorName> &7设置地图作者名",
+                "&7 • &f/map setTeamPlayers <mapName> <number> &7设置队伍最大人数",
+                "&7 • &f/map setMinPlayers <mapName> <number> &7设置地图最小需要人数",
+                "&7 • &f/map setRespawn <mapName> &7设置地图重生点",
+                "&7 • &f/map addBase <mapName> &7增加基地出生点",
+                "&7 • &f/map addDrop <mapName> <type> &7增加资源点 (类型: BASE/DIAMOND/EMERALD)",
+                "&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: ITEM/UPGRADE)",
+                "&7 • &f/map setPos1 <mapName> &7设置地图边界1",
+                "&7 • &f/map setPos2 <mapName> &7设置地图边界2",
+                "&7 • &f/map setUrl <url> &7设置地图文件物理路径",
+                "&7 • &f/map save <mapName> &7保存地图",
+                "&7 • &f/map load <mapName> &7加载地图配置",
+                "",
+                "&7 • &f/map list <type> &7查看指定存储方式地图列表",
+                "&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: JSON/MYSQL)",
+                "&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式",
+                "&7 • &f/map info <mapName> &7查看地图信息",
+                "&7 • &f/map align &7对齐玩家位置和视角为整数值",
+                MessageUtil.CHAT_BAR
+        );
+
+        messageList.forEach(player::sendMessage);
     }
 
     @Subcommand("check")
