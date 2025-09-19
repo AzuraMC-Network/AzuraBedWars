@@ -16,6 +16,7 @@ import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class MapCommand {
             return;
         }
 
-        List<String> messageList = List.of(
+        List<String> messageList = MessageUtil.color(List.of(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置",
                 "",
@@ -65,16 +66,21 @@ public class MapCommand {
                 "&7 • &f/map setPos1 <mapName> &7设置地图边界1",
                 "&7 • &f/map setPos2 <mapName> &7设置地图边界2",
                 "&7 • &f/map setUrl <url> &7设置地图文件物理路径",
+                "&7 •  &9&l▸ &f可用变量: ",
+                "&7 •  &9&l▸ &f- {$baseDir}: 插件根目录(plugins文件夹)",
+                "&7 •  &9&l▸ &f- {$pluginDir}: 插件数据文件夹(plugins/AzuraBedWars)",
+                "&7 •  &9&l▸ &f- {$serverDir}: 服务器根目录",
+                "&7 •",
                 "&7 • &f/map save <mapName> &7保存地图",
                 "&7 • &f/map load <mapName> &7加载地图配置",
-                "",
+                "&7 •",
                 "&7 • &f/map list <type> &7查看指定存储方式地图列表",
                 "&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: JSON/MYSQL)",
                 "&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式",
                 "&7 • &f/map info <mapName> &7查看地图信息",
                 "&7 • &f/map align &7对齐玩家位置和视角为整数值",
                 MessageUtil.CHAT_BAR
-        );
+        ));
 
         messageList.forEach(player::sendMessage);
     }
@@ -315,25 +321,39 @@ public class MapCommand {
             player.sendMessage(ChatColor.RED + "找不到地图: " + mapName);
             return;
         }
-        player.sendMessage(MessageUtil.CHAT_BAR);
-        player.sendMessage(MessageUtil.color("&b地图信息"));
-        player.sendMessage(" ");
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f名称: &b" + mapData.getName()));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f作者: &b" + mapData.getAuthor()));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f地图最小人数: &b" + mapData.getPlayers().getMin()));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f队伍最大人数: &b" + mapData.getPlayers().getTeam()));
-        player.sendMessage(" ");
-        player.sendMessage(MessageUtil.color(" &9&l▸ &fPos1: &b" + mapData.getPos1Location()));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &fPos2: &b" + mapData.getPos2Location()));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f大厅位置: &b" + mapData.getWaitingLocation()));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f复活时位置: &b" + mapData.getRespawnLocation()));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f基地出生点: &b" + mapData.getBases()));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE)));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND)));
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f绿宝石资源点: &b" + mapData.getDrops(MapData.DropType.EMERALD)));
-        player.sendMessage(" ");
-        player.sendMessage(MessageUtil.color(" &9&l▸ &f地图文件物理地址: &b" + mapData.getProcessedFileUrl()));
-        player.sendMessage(MessageUtil.CHAT_BAR);
+        List<String> messageList = new ArrayList<>();
+        messageList.addAll(MessageUtil.color(List.of(
+                MessageUtil.CHAT_BAR,
+                "&b地图信息",
+                "",
+                " &9&l▸ &f名称: &b" + mapData.getName(),
+                " &9&l▸ &f作者: &b" + mapData.getAuthor(),
+                " &9&l▸ &f地图最小人数: &b" + mapData.getPlayers().getMin(),
+                " &9&l▸ &f队伍最大人数: &b" + mapData.getPlayers().getTeam(),
+                "",
+                " &9&l▸ &fPos1: " + MessageUtil.formatLocation(mapData.getRegion().getPos1()),
+                " &9&l▸ &fPos2: " + MessageUtil.formatLocation(mapData.getRegion().getPos2()),
+                " &9&l▸ &f大厅位置: " + MessageUtil.formatLocation(mapData.getWaitingLocation()),
+                " &9&l▸ &f复活时位置: " + MessageUtil.formatLocation(mapData.getRespawnLocation()),
+                "",
+                " &9&l▸ &f基地出生点:"
+        )));
+
+        messageList.addAll(MessageUtil.color(MessageUtil.formatLocationList(mapData.getBases())));
+
+        messageList.addAll(MessageUtil.color(List.of(
+                "",
+                " &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE),
+                " &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND),
+                " &9&l▸ &f绿宝石资源点: &b" + mapData.getDrops(MapData.DropType.EMERALD),
+                "",
+                " &7&l注意: &7坐标精度已限制为2位小数",
+                "",
+                " &9&l▸ &f地图文件物理地址: &b" + mapData.getProcessedFileUrl(),
+                MessageUtil.CHAT_BAR
+        )));
+
+        messageList.forEach(player::sendMessage);
     }
 
     @Subcommand("save")
