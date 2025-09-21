@@ -90,10 +90,14 @@ public final class AzuraBedWars extends JavaPlugin {
         long startTime = System.currentTimeMillis();
         instance = this;
         PacketEvents.getAPI().init();
-
-        setupNMSSupport();
         // 初始化配置系统
         initConfigSystem();
+
+        // ReflectionUtil初始化版本
+        ReflectionUtil.initializeVersions();
+        NMSMapping.initNmsMapping();
+
+        setupNMSSupport();
 
         // 初始化基础服务
         initDatabases();
@@ -111,10 +115,6 @@ public final class AzuraBedWars extends JavaPlugin {
             initGameFeatures();
         }
 
-        // ReflectionUtil初始化版本
-        ReflectionUtil.initializeVersions();
-        NMSMapping.initNmsMapping();
-        // 初始化命令和通信系统
         initCommands();
         // bStats
         loadBStats();
