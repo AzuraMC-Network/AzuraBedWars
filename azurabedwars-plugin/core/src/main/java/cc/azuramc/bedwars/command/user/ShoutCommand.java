@@ -17,7 +17,7 @@ import revxrsal.commands.bukkit.BukkitCommandActor;
 public class ShoutCommand {
 
     @Dependency
-    private AzuraBedWars pluginDependency;
+    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     @Command("shout")
     public void shoutInGame(BukkitCommandActor actor, @Default("") String message) {

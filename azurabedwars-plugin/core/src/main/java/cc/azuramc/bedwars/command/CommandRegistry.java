@@ -8,9 +8,15 @@ import cc.azuramc.bedwars.command.exception.CommandExceptionHandler;
 import cc.azuramc.bedwars.command.user.ShoutCommand;
 import cc.azuramc.bedwars.command.user.StartCommand;
 import cc.azuramc.bedwars.command.user.ToggleDamageDisplayCommand;
+import cc.azuramc.bedwars.database.storage.MapStorageType;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.map.MapData;
 import lombok.Getter;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * 命令注册管理类
@@ -29,6 +35,7 @@ public class CommandRegistry {
         handler.registerDependency(AzuraBedWars.class, plugin);
         handler.setExceptionHandler(new CommandExceptionHandler());
 
+        registerAutoCompletions();
         registerCommonCommands();
 
         if (plugin.getSettingsConfig().isEditorMode()) {
@@ -65,6 +72,26 @@ public class CommandRegistry {
         if (gameManager != null && gameManager.isArrowDisplayEnabled() && gameManager.isAttackDisplayEnabled()) {
             handler.register(new ToggleDamageDisplayCommand());
         }
+    }
+
+    private void registerAutoCompletions() {
+        handler.getAutoCompleter().registerSuggestion("mapNames", (args, sender, command) ->
+                new ArrayList<>(plugin.getMapManager().getLoadedMaps().keySet()));
+
+        handler.getAutoCompleter().registerSuggestion("storageTypes", (args, sender, command) ->
+                Arrays.stream(MapStorageType.values()).map(Enum::name).collect(Collectors.toList()));
+
+        handler.getAutoCompleter().registerSuggestion("dropTypes", (args, sender, command) ->
+                Arrays.stream(MapData.DropType.values()).map(Enum::name).collect(Collectors.toList()));
+
+        handler.getAutoCompleter().registerSuggestion("shopTypes", (args, sender, command) ->
+                Arrays.stream(MapData.ShopType.values()).map(Enum::name).collect(Collectors.toList()));
+
+        handler.getAutoCompleter().registerSuggestion("pathVariables", (args, sender, command) ->
+                Arrays.asList("{$baseDir}", "{$pluginDir}", "{$serverDir}"));
+
+        handler.getAutoCompleter().registerSuggestion("booleanValues", (args, sender, command) ->
+                Arrays.asList("true", "false"));
     }
 
 }
