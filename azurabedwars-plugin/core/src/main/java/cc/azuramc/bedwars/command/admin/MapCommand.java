@@ -10,10 +10,7 @@ import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.DefaultFor;
-import revxrsal.commands.annotation.Dependency;
-import revxrsal.commands.annotation.Subcommand;
+import revxrsal.commands.annotation.*;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.ArrayList;
@@ -27,8 +24,6 @@ import java.util.List;
 public class MapCommand {
 
     @Dependency
-    private AzuraBedWars pluginDependency;
-
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private final MapManager mapManager = AzuraBedWars.getInstance().getMapManager();
 
@@ -136,6 +131,7 @@ public class MapCommand {
     }
 
     @Subcommand("setWaiting")
+    @AutoComplete("@mapNames")
     public void setWaiting(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -150,6 +146,7 @@ public class MapCommand {
     }
 
     @Subcommand("setRespawn")
+    @AutoComplete("@mapNames")
     public void setRespawn(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -164,6 +161,7 @@ public class MapCommand {
     }
 
     @Subcommand("addBase")
+    @AutoComplete("@mapNames")
     public void addBase(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -178,6 +176,7 @@ public class MapCommand {
     }
 
     @Subcommand("setPos1")
+    @AutoComplete("@mapNames")
     public void setPos1(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -192,6 +191,7 @@ public class MapCommand {
     }
 
     @Subcommand("setPos2")
+    @AutoComplete("@mapNames")
     public void setPos2(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -206,6 +206,7 @@ public class MapCommand {
     }
 
     @Subcommand("setAuthor")
+    @AutoComplete("@mapNames *")
     public void setAuthor(Player player, String mapName, String authorName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -228,6 +229,7 @@ public class MapCommand {
     }
 
     @Subcommand("setTeamPlayers")
+    @AutoComplete("@mapNames *")
     public void setTeamPlayers(Player player, String mapName, int value) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -246,6 +248,7 @@ public class MapCommand {
     }
 
     @Subcommand("setMinPlayers")
+    @AutoComplete("@mapNames *")
     public void setMinPlayers(Player player, String mapName, int value) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -264,6 +267,7 @@ public class MapCommand {
     }
 
     @Subcommand("addDrop")
+    @AutoComplete("@mapNames @dropTypes")
     public void addDrop(Player player, String mapName, String value) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -291,6 +295,7 @@ public class MapCommand {
 
 
     @Subcommand("setUrl")
+    @AutoComplete("@mapNames @pathVariables")
     public void setUrl(Player player, String mapName, String fileUrl) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -314,6 +319,7 @@ public class MapCommand {
     }
 
     @Subcommand("addShop")
+    @AutoComplete("@mapNames @shopTypes")
     public void addShop(Player player, String mapName, String value) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -339,6 +345,7 @@ public class MapCommand {
     }
 
     @Subcommand("preloadMap")
+    @AutoComplete("@mapNames")
     public void preloadMap(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -348,6 +355,7 @@ public class MapCommand {
     }
 
     @Subcommand("list")
+    @AutoComplete("@storageTypes")
     public void list(Player player, String type) {
         if (checkEditorMode(player)) {
             return;
@@ -377,7 +385,8 @@ public class MapCommand {
     }
 
     @Subcommand("migrate")
-    public void migrate(Player player, String sourceTypeString, String targetTypeString, String mapName) {
+    @AutoComplete("@storageTypes @storageTypes @mapNames")
+    public void migrate(Player player, String sourceTypeString, String targetTypeString, @Default("ALL") String mapName) {
         if (checkEditorMode(player)) {
             return;
         }
@@ -404,16 +413,19 @@ public class MapCommand {
             return;
         }
 
+        // 处理默认值"ALL"，转换为null以迁移所有地图
+        String actualMapName = "ALL".equals(mapName) ? null : mapName;
 
-        if (!MapStorageFactory.getStorage(sourceTypeEnum).exists(mapName)) {
-            player.sendMessage(ChatColor.RED + "找不到地图: " + mapName);
+        // 如果指定了具体地图名称，检查地图是否存在
+        if (actualMapName != null && !MapStorageFactory.getStorage(sourceTypeEnum).exists(actualMapName)) {
+            player.sendMessage(ChatColor.RED + "找不到地图: " + actualMapName);
             return;
         }
 
         player.sendMessage(ChatColor.YELLOW + "开始迁移地图数据从 " + sourceTypeEnum + " 到 " + targetTypeEnum +
-                (mapName != null ? " (地图: " + mapName + ")" : " (所有地图)"));
+                (actualMapName != null ? " (地图: " + actualMapName + ")" : " (所有地图)"));
 
-        boolean success = MapStorageFactory.migrateStorage(sourceTypeEnum, targetTypeEnum, mapName);
+        boolean success = MapStorageFactory.migrateStorage(sourceTypeEnum, targetTypeEnum, actualMapName);
 
         if (success) {
             player.sendMessage(ChatColor.GREEN + "地图数据迁移成功");
@@ -423,6 +435,7 @@ public class MapCommand {
     }
 
     @Subcommand("info")
+    @AutoComplete("@mapNames")
     public void info(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -468,6 +481,7 @@ public class MapCommand {
     }
 
     @Subcommand("save")
+    @AutoComplete("@mapNames")
     public void save(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
@@ -480,6 +494,7 @@ public class MapCommand {
     }
 
     @Subcommand("load")
+    @AutoComplete("@mapNames")
     public void load(Player player, String mapName) {
         if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;

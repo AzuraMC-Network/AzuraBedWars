@@ -3,8 +3,8 @@ package cc.azuramc.bedwars.command.user;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.CommandUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.DefaultFor;
@@ -19,7 +19,7 @@ import revxrsal.commands.bukkit.BukkitCommandActor;
 public class ToggleDamageDisplayCommand {
 
     @Dependency
-    private AzuraBedWars pluginDependency;
+    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     @DefaultFor({"displaydamage", "dd"})
     public void toggleDisplayDamage(BukkitCommandActor actor) {

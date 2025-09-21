@@ -4,10 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.DefaultFor;
-import revxrsal.commands.annotation.Dependency;
-import revxrsal.commands.annotation.Subcommand;
+import revxrsal.commands.annotation.*;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.List;
@@ -22,8 +19,6 @@ import java.util.List;
 public class SetupCommand {
 
     @Dependency
-    private AzuraBedWars pluginDependency;
-
     private final AzuraBedWars plugin;
     private final SetupItemManager setupItemManager;
 
@@ -64,6 +59,7 @@ public class SetupCommand {
     }
 
     @Subcommand("start")
+    @AutoComplete("@mapNames")
     public void startSetup(Player player, String mapName) {
         if (checkEditorMode(player)) {
             return;

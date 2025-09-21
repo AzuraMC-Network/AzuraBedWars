@@ -8,10 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.DefaultFor;
-import revxrsal.commands.annotation.Dependency;
-import revxrsal.commands.annotation.Subcommand;
+import revxrsal.commands.annotation.*;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
@@ -26,8 +23,6 @@ import java.util.Objects;
 public class AdminCommand {
 
     @Dependency
-    private AzuraBedWars pluginDependency;
-
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     @DefaultFor("bw")
@@ -56,6 +51,7 @@ public class AdminCommand {
     }
 
     @Subcommand("editorMode")
+    @AutoComplete("@booleanValues")
     public void editorMode(BukkitCommandActor actor, boolean value) {
         if (plugin.getSettingsConfig().isEditorMode() == value) {
             CommandUtil.sendLayout(actor, "&ceditorMode值已经是 " + value);
@@ -68,6 +64,7 @@ public class AdminCommand {
     }
 
     @Subcommand("debugMode")
+    @AutoComplete("@booleanValues")
     public void debugMode(BukkitCommandActor actor, boolean value) {
         if (plugin.getSettingsConfig().isEditorMode() == value) {
             CommandUtil.sendLayout(actor, "&cdebugMode值已经是 " + value);
