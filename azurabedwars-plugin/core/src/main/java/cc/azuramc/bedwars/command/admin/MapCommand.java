@@ -102,7 +102,7 @@ public class MapCommand {
                 "&7 • &f/map save <mapName> &7保存地图",
                 "&7 • &f/map load <mapName> &7加载地图配置",
                 "&7 •",
-                "&7 • &f/map list <type> &7查看指定存储方式地图列表",
+                "&7 • &f/map list [type] &7查看指定存储方式地图列表",
                 "&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: " + storageTypes + ")",
                 "&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式",
                 "&7 • &f/map info <mapName> &7查看地图信息",
@@ -379,35 +379,61 @@ public class MapCommand {
 
     @Subcommand("list")
     @AutoComplete("@storageTypes")
-    public void list(Player player, String type) {
+    public void list(Player player, @Default("CURRENT") String type) {
         if (checkEditorMode(player)) {
             return;
         }
         MapStorageType storageType;
 
-        try {
-            storageType = MapStorageType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(MessageUtil.color("&c无效的存储类型: " + type));
-            String validTypes = Arrays.stream(MapStorageType.values())
-                    .map(Enum::name)
-                    .collect(Collectors.joining("&7, &a"));
-            player.sendMessage(MessageUtil.color("&7有效的类型: &a" + validTypes));
-            return;
+        if ("CURRENT".equals(type)) {
+            storageType = MapStorageType.valueOf(plugin.getSettingsConfig().getMapStorage().toUpperCase());
+        } else {
+            try {
+                storageType = MapStorageType.valueOf(type.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                player.sendMessage(MessageUtil.color("&c无效的存储类型: " + type));
+                String validTypes = Arrays.stream(MapStorageType.values())
+                        .map(Enum::name)
+                        .collect(Collectors.joining("&7, &a"));
+                player.sendMessage(MessageUtil.color("&7有效的类型: &a" + validTypes));
+                return;
+            }
         }
 
         IMapStorage storage = MapStorageFactory.getStorage(storageType);
         List<String> mapNames = storage.getAllMapNames();
 
-        player.sendMessage(MessageUtil.color("&a存储类型 [" + storageType.name() + "] 中的地图列表 (" + mapNames.size() + "):"));
+        List<String> messageList = new ArrayList<>(MessageUtil.color(List.of(
+                MessageUtil.CHAT_BAR,
+                "&b存储类型 [" + storageType.name() + "] 中的地图列表",
+                "",
+                " &9&l▸ &f存储类型: &b" + storageType.name(),
+                " &9&l▸ &f地图总数: &b" + mapNames.size(),
+                ""
+        )));
 
         if (mapNames.isEmpty()) {
-            player.sendMessage(MessageUtil.color("&e没有找到地图"));
+            messageList.addAll(MessageUtil.color(List.of(
+                    " &e没有找到地图",
+                    "",
+                    MessageUtil.CHAT_BAR
+            )));
         } else {
+            messageList.addAll(MessageUtil.color(List.of(
+                    " &9&l▸ &f地图列表:"
+            )));
+
             for (String mapName : mapNames) {
-                player.sendMessage(ChatColor.YELLOW + "  - " + mapName);
+                messageList.add(MessageUtil.color(" &7  - &a" + mapName));
             }
+
+            messageList.addAll(MessageUtil.color(List.of(
+                    "",
+                    MessageUtil.CHAT_BAR
+            )));
         }
+
+        messageList.forEach(player::sendMessage);
     }
 
     @Subcommand("migrate")
