@@ -14,7 +14,9 @@ import revxrsal.commands.annotation.*;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author an5w1r@163.com
@@ -61,6 +63,21 @@ public class MapCommand {
             return;
         }
 
+        // 存储类型列表
+        String storageTypes = Arrays.stream(MapStorageType.values())
+                .map(Enum::name)
+                .collect(Collectors.joining("/"));
+
+        // 资源点类型列表
+        String dropTypes = Arrays.stream(MapData.DropType.values())
+                .map(Enum::name)
+                .collect(Collectors.joining("/"));
+
+        // 商店类型列表
+        String shopTypes = Arrays.stream(MapData.ShopType.values())
+                .map(Enum::name)
+                .collect(Collectors.joining("/"));
+
         List<String> messageList = MessageUtil.color(List.of(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置",
@@ -72,8 +89,8 @@ public class MapCommand {
                 "&7 • &f/map setMinPlayers <mapName> <number> &7设置地图最小需要人数",
                 "&7 • &f/map setRespawn <mapName> &7设置地图重生点",
                 "&7 • &f/map addBase <mapName> &7增加基地出生点",
-                "&7 • &f/map addDrop <mapName> <type> &7增加资源点 (类型: BASE/DIAMOND/EMERALD)",
-                "&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: ITEM/UPGRADE)",
+                "&7 • &f/map addDrop <mapName> <type> &7增加资源点 (类型: " + dropTypes + ")",
+                "&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: " + shopTypes + ")",
                 "&7 • &f/map setPos1 <mapName> &7设置地图边界1",
                 "&7 • &f/map setPos2 <mapName> &7设置地图边界2",
                 "&7 • &f/map setUrl <url> &7设置地图文件物理路径",
@@ -86,7 +103,7 @@ public class MapCommand {
                 "&7 • &f/map load <mapName> &7加载地图配置",
                 "&7 •",
                 "&7 • &f/map list <type> &7查看指定存储方式地图列表",
-                "&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: JSON/MYSQL)",
+                "&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: " + storageTypes + ")",
                 "&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式",
                 "&7 • &f/map info <mapName> &7查看地图信息",
                 "&7 • &f/map align &7对齐玩家位置和视角为整数值",
@@ -289,7 +306,10 @@ public class MapCommand {
             }
         } catch (IllegalArgumentException e) {
             player.sendMessage(MessageUtil.color("&c无效的资源点类型: " + value));
-            player.sendMessage(MessageUtil.color("&7有效的类型: &aBASE&7, &aDIAMOND&7, &aEMERALD"));
+            String validTypes = Arrays.stream(MapData.DropType.values())
+                    .map(Enum::name)
+                    .collect(Collectors.joining("&7, &a"));
+            player.sendMessage(MessageUtil.color("&7有效的类型: &a" + validTypes));
         }
     }
 
@@ -340,7 +360,10 @@ public class MapCommand {
             }
         } catch (IllegalArgumentException e) {
             player.sendMessage(MessageUtil.color("&c无效的商店类型: " + value));
-            player.sendMessage(MessageUtil.color("&7有效的类型: &aITEM&7, &aUPGRADE"));
+            String validTypes = Arrays.stream(MapData.ShopType.values())
+                    .map(Enum::name)
+                    .collect(Collectors.joining("&7, &a"));
+            player.sendMessage(MessageUtil.color("&7有效的类型: &a" + validTypes));
         }
     }
 
@@ -366,7 +389,10 @@ public class MapCommand {
             storageType = MapStorageType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {
             player.sendMessage(MessageUtil.color("&c无效的存储类型: " + type));
-            player.sendMessage(MessageUtil.color("&7有效的类型: &aJSON&7, &aMYSQL"));
+            String validTypes = Arrays.stream(MapStorageType.values())
+                    .map(Enum::name)
+                    .collect(Collectors.joining("&7, &a"));
+            player.sendMessage(MessageUtil.color("&7有效的类型: &a" + validTypes));
             return;
         }
 
