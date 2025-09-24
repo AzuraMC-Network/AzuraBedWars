@@ -288,7 +288,6 @@ public final class AzuraBedWars extends JavaPlugin {
      * 初始化自定义实体 (蠹虫 铁傀儡等)
      */
     private void initCustomEntities() {
-        nmsAccess.registerCustomEntities();
         new BukkitRunnable() {
             @Override
             public void run() {
