@@ -46,11 +46,6 @@ public class CompatibilityModeNMS implements NMSAccess {
     }
 
     @Override
-    public void registerCustomEntities() {
-
-    }
-
-    @Override
     public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health) {
         return null;
     }
