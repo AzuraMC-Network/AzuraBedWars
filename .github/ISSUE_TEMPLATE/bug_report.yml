@@ -47,7 +47,7 @@ body:
   - type: textarea
     id: steps
     attributes:
-      label: Steps to Reproduce
+      label: Steps to Reproduce (Optional)
       description: Steps to reproduce the behavior
       placeholder: |
         1. Go to '...'
@@ -55,25 +55,25 @@ body:
         3. Scroll down to '....'
         4. See error
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: expected
     attributes:
-      label: Expected Behavior
+      label: Expected Behavior (Optional)
       description: A clear description of what you expected to happen
       placeholder: What should happen instead?
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: actual
     attributes:
-      label: Actual Behavior
+      label: Actual Behavior (Optional)
       description: What actually happened
       placeholder: What actually happened?
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: logs
