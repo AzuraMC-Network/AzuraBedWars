@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * 频道消息实体类
  * 用于存储频道通信的消息记录
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Data
 @Builder

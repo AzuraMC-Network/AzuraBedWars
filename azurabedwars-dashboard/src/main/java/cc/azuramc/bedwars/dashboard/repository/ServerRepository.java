@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Repository
 public interface ServerRepository extends CrudRepository<Server, Integer> {

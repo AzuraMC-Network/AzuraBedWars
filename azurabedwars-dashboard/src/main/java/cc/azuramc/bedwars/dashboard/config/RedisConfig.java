@@ -10,7 +10,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * Redis 配置类
  * 配置 Jedis 连接池和相关参数
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Configuration
 public class RedisConfig {

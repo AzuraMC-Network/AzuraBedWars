@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Getter
 public class NMSProvider {

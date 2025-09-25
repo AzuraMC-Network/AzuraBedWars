@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class TowerNorth extends AbstractTower {
 

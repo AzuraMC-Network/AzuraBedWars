@@ -11,7 +11,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
  * Redis 工具类
  * 提供 Redis 连接管理和消息发布功能
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Slf4j
 @Component

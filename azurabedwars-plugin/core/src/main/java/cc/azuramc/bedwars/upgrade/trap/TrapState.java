@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.upgrade.trap;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public enum TrapState {
     /**

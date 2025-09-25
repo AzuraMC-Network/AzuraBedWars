@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public final class AzuraBedWarsLoader extends JavaPlugin {
 

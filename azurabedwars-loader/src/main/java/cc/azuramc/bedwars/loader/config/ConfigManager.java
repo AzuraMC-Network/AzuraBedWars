@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class ConfigManager {
     private final JavaPlugin plugin;

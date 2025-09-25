@@ -24,7 +24,7 @@ import java.util.stream.StreamSupport;
  * Redis Pub/Sub 服务
  * 管理 Redis 订阅、消息处理和频道管理
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Slf4j
 @Service

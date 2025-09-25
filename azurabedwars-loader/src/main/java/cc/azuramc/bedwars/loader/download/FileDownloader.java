@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class FileDownloader {
     private final ConfigManager configManager;

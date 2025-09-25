@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.dashboard.entity.dto;
 import lombok.Data;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Data
 public class ServerDto {

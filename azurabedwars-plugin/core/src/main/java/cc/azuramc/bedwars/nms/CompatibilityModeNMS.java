@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class CompatibilityModeNMS implements NMSAccess {
 

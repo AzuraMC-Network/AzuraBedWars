@@ -11,7 +11,7 @@ import java.util.Map;
  * 数据库版本服务
  * 提供数据库版本管理的业务逻辑
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class DatabaseVersionService {
 

@@ -19,7 +19,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class FireballListener implements Listener {
 

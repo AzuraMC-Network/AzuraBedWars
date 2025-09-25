@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class PlayerInvisibilityListener implements Listener {
 
