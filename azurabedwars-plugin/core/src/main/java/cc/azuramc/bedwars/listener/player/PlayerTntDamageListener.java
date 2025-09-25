@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.util.Vector;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class PlayerTntDamageListener implements Listener {
 

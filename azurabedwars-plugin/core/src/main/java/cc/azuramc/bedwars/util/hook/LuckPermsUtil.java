@@ -9,7 +9,7 @@ import net.luckperms.api.query.QueryOptions;
 import org.bukkit.entity.Player;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class LuckPermsUtil {
 

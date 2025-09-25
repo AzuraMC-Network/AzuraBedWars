@@ -7,7 +7,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public interface NMSAccess {
     Fireball setFireballDirection(Fireball fireball, Vector vector);

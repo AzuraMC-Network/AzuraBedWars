@@ -1,16 +1,16 @@
 package cc.azuramc.bedwars.popuptower.impl;
 
+import cc.azuramc.bedwars.game.TeamColor;
 import cc.azuramc.bedwars.popuptower.AbstractTower;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import cc.azuramc.bedwars.game.TeamColor;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class TowerWest extends AbstractTower {
 

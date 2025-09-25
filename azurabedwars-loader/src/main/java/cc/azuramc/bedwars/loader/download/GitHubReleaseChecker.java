@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class GitHubReleaseChecker {
     private final ConfigManager configManager;

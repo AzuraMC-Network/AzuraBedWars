@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.database.entity.DatabaseVersion;
 import java.sql.SQLException;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public interface IDatabaseVersionRepository {
 

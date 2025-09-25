@@ -12,7 +12,7 @@ import org.bukkit.material.Wool;
 import java.util.Objects;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class WoolUtil {
 

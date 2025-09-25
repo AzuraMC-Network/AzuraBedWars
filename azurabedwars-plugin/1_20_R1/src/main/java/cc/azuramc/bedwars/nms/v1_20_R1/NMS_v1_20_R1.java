@@ -12,7 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class NMS_v1_20_R1 implements NMSAccess {
 
