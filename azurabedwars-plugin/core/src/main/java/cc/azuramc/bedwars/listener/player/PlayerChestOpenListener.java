@@ -14,7 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class PlayerChestOpenListener implements Listener {
     @EventHandler

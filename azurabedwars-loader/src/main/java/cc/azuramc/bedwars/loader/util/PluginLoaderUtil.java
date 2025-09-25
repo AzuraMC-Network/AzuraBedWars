@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class PluginLoaderUtil {
     private final ConfigManager configManager;

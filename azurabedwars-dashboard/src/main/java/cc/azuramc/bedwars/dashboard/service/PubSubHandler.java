@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
  * Redis Pub/Sub 消息处理器
  * 处理从 Redis 订阅频道接收到的消息
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Slf4j
 @Component

@@ -20,7 +20,7 @@ import java.util.Collection;
  * 自定义公共资源生成器类。
  * 可动态修改掉落间隔和最大堆叠量，用于地图中的公共掉落点。
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Getter
 @Setter

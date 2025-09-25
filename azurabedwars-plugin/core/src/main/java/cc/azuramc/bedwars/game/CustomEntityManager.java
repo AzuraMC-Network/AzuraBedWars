@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class CustomEntityManager {
 
