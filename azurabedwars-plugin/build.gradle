@@ -65,6 +65,7 @@ subprojects {
 dependencies {
     implementation project(':azurabedwars-plugin:core')
     implementation project(':azurabedwars-plugin:1_8_R3')
+    implementation project(':azurabedwars-plugin:1_20_R1')
 }
 
 shadowJar {

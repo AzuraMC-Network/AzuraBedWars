@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
 public interface NMSAccess {
     Fireball setFireballDirection(Fireball fireball, Vector vector);
 
-    LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health);
+    LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health, double damage);
 
     LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, double damage);
 }
