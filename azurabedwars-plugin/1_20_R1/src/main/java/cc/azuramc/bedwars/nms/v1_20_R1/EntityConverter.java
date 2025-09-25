@@ -2,13 +2,11 @@ package cc.azuramc.bedwars.nms.v1_20_R1;
 
 import cc.azuramc.bedwars.util.LoggerUtil;
 import net.minecraft.world.entity.EntityInsentient;
-import net.minecraft.world.entity.ai.goal.PathfinderGoalSelector;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * @author an5w1r@163.com
@@ -79,13 +77,5 @@ public class EntityConverter {
      */
     public static boolean isValidEntityInsentient(Entity bukkitEntity) {
         return bukkitToNms(bukkitEntity) != null;
-    }
-
-    public static PathfinderGoalSelector getTargetSelector(@NotNull EntityInsentient entityInsentient) {
-        return entityInsentient.bP;
-    }
-
-    public static PathfinderGoalSelector getGoalSelector(@NotNull EntityInsentient entityInsentient) {
-        return entityInsentient.bO;
     }
 }
