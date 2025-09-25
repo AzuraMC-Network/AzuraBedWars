@@ -6,5 +6,7 @@ include (
         'azurabedwars-plugin',
         'azurabedwars-plugin:core',
         'azurabedwars-plugin:1_8_R3',
-        'azurabedwars-plugin:1_20_R1'
+        'azurabedwars-plugin:1_20_R1',
+        'azurabedwars-plugin:1_20_R2',
+        'azurabedwars-plugin:1_20_R3'
 )
