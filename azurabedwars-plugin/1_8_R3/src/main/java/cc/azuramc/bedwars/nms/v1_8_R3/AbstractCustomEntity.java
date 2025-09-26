@@ -17,6 +17,10 @@ public abstract class AbstractCustomEntity {
     @Getter
     private static ConcurrentHashMap<EntityInsentient, AbstractCustomEntity> customEntityMap = new ConcurrentHashMap<>();
 
+    private static Field pathfinderGoalSelectorFieldB;
+    private static Field pathfinderGoalSelectorFieldC;
+    private static boolean reflectionInitialized = false;
+
     protected EntityInsentient entityInsentient;
     protected EntityCreature entityCreature;
     protected GameTeam gameTeam;
@@ -36,18 +40,16 @@ public abstract class AbstractCustomEntity {
         setupTargets();
     }
 
-    protected void clearGoals() {
+    protected static void initializeReflection() {
         try {
-            Field b = PathfinderGoalSelector.class.getDeclaredField("b");
-            Field c = PathfinderGoalSelector.class.getDeclaredField("c");
-            b.setAccessible(true);
-            c.setAccessible(true);
-            b.set(entityInsentient.goalSelector, new UnsafeList<>());
-            c.set(entityInsentient.goalSelector, new UnsafeList<>());
-            b.set(entityInsentient.targetSelector, new UnsafeList<>());
-            c.set(entityInsentient.targetSelector, new UnsafeList<>());
+            pathfinderGoalSelectorFieldB = PathfinderGoalSelector.class.getDeclaredField("b");
+            pathfinderGoalSelectorFieldC = PathfinderGoalSelector.class.getDeclaredField("c");
+            pathfinderGoalSelectorFieldB.setAccessible(true);
+            pathfinderGoalSelectorFieldC.setAccessible(true);
+            reflectionInitialized = true;
         } catch (Exception e) {
             e.printStackTrace();
+            reflectionInitialized = false;
         }
     }
 
@@ -116,5 +118,20 @@ public abstract class AbstractCustomEntity {
 
         // 不攻击同队的蠹虫
         return customFish.getGameTeam() != gameTeam;
+    }
+
+    protected void clearGoals() {
+        if (!reflectionInitialized) {
+            return;
+        }
+
+        try {
+            pathfinderGoalSelectorFieldB.set(entityInsentient.goalSelector, new UnsafeList<>());
+            pathfinderGoalSelectorFieldC.set(entityInsentient.goalSelector, new UnsafeList<>());
+            pathfinderGoalSelectorFieldB.set(entityInsentient.targetSelector, new UnsafeList<>());
+            pathfinderGoalSelectorFieldC.set(entityInsentient.targetSelector, new UnsafeList<>());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
