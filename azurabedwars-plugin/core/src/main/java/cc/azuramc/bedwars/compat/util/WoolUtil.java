@@ -22,6 +22,7 @@ public class WoolUtil {
      * @param block     block
      * @param teamColor 颜色
      */
+    @SuppressWarnings("deprecation")
     public static void setWoolBlockColor(Block block, TeamColor teamColor) {
         if (VersionUtil.isLessThan1_13()) {
             block.setType(Material.valueOf("WOOL"));
@@ -42,6 +43,7 @@ public class WoolUtil {
      * @param y         y
      * @param z         z
      */
+    @SuppressWarnings("deprecation")
     public static void setWoolBlockColor(Block block, TeamColor teamColor, int x, int y, int z) {
         if (VersionUtil.isLessThan1_13()) {
             block.getRelative(x, y, z).setType(Material.valueOf("WOOL"));
@@ -148,6 +150,7 @@ public class WoolUtil {
      * @param teamColor 队伍颜色
      * @return 对应颜色的羊毛物品
      */
+    @SuppressWarnings("deprecation")
     public static ItemStack getColoredWool(TeamColor teamColor) {
         if (VersionUtil.isLessThan1_13()) {
             return new ItemStack(Material.valueOf("WOOL"), 1, getWoolDataFromTeamColor(teamColor));
