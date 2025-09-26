@@ -184,6 +184,14 @@ public class CustomEntityDamageListener implements Listener {
             return;
         }
 
+        if (event.getDamager().getType() == EntityType.IRON_GOLEM) {
+            event.setDamage(10.0);
+        }
+
+        if (event.getDamager().getType() == EntityType.SILVERFISH) {
+            event.setDamage(4.0);
+        }
+
         event.setCancelled(true);
     }
 }
