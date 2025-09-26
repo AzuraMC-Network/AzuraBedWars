@@ -240,6 +240,11 @@ public class GameTeam {
         return true;
     }
 
+    public void setDestroyed(boolean destroyed) {
+        this.isDestroyed = destroyed;
+        GameTeamBedHandler.destroyBed(this);
+    }
+
     /**
      * 获取团队当前的活跃玩家数量
      *
