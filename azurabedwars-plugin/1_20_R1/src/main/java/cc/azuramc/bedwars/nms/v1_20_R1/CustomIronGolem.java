@@ -26,7 +26,7 @@ public class CustomIronGolem extends AbstractCustomEntity {
         super(entityInsentient, gameTeam);
     }
 
-    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, double damage) {
+    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health) {
         Entity bukkitEntity = EntityConverter.spawnBukkitEntity(loc, EntityType.IRON_GOLEM);
         CraftLivingEntity craftLivingEntity = (CraftLivingEntity) bukkitEntity;
         EntityInsentient entityInsentient = EntityConverter.bukkitToNms(bukkitEntity);
@@ -39,7 +39,6 @@ public class CustomIronGolem extends AbstractCustomEntity {
 
         Objects.requireNonNull(entityInsentient.a(GenericAttributes.d), "Spawn IronGolem speed parameter is null").a(speed);
         Objects.requireNonNull(entityInsentient.a(GenericAttributes.a), "Spawn IronGolem health parameter is null").a(health);
-        Objects.requireNonNull(entityInsentient.a(GenericAttributes.f), "Spawn IronGolem damage parameter is null").a(damage);
         entityInsentient.getBukkitEntity().setCustomNameVisible(true);
         craftLivingEntity.setRemoveWhenFarAway(false);
         return craftLivingEntity;

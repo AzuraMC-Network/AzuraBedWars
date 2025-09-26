@@ -46,12 +46,12 @@ public class CompatibilityModeNMS implements NMSAccess {
     }
 
     @Override
-    public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health, double damage) {
+    public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health) {
         return null;
     }
 
     @Override
-    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, double damage) {
+    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health) {
         return null;
     }
 

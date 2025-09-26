@@ -17,7 +17,7 @@ public class CustomSilverfish extends AbstractCustomEntity {
         super(entityInsentient, gameTeam);
     }
 
-    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health, double damage) {
+    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health) {
         Entity bukkitEntity = EntityConverter.spawnBukkitEntity(loc, EntityType.SILVERFISH);
         CraftLivingEntity craftLivingEntity = (CraftLivingEntity) bukkitEntity;
         EntityInsentient entityInsentient = EntityConverter.bukkitToNms(bukkitEntity);
@@ -30,7 +30,6 @@ public class CustomSilverfish extends AbstractCustomEntity {
 
         entityInsentient.getAttributeInstance(GenericAttributes.maxHealth).setValue(health);
         entityInsentient.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(speed);
-        entityInsentient.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(damage);
         entityInsentient.setCustomNameVisible(true);
         craftLivingEntity.setRemoveWhenFarAway(false);
         return craftLivingEntity;
