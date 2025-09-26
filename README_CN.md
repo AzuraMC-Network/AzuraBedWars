@@ -1,7 +1,7 @@
 # AzuraBedWars
 
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.8+-green.svg)](https://www.minecraft.net/)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.8--1.21%2B-green.svg)](https://www.minecraft.net/)
 [![Spigot](https://img.shields.io/badge/Spigot-API-blue.svg)](https://www.spigotmc.org/)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
@@ -18,7 +18,7 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 ### 前言
 
 - 此项目并未完成，还差很多的特性才能完成，计划维护至2.0.0版本
-- 我们计划支持1.8-1.21+版本，但很可惜目前只在1.8.8版本进行开发测试
+- 本项目已提供对 Minecraft 1.8–1.21+ 版本的 NMS 支持，并计划在未来积极跟进和支持更新的版本。
 - 如果使用此项目请自行负责遇到的任何问题，我们只建议用来测试使用，不要放到生产环境
 - 如果你有建议和发现的问题，可以在issue提出，我们会考虑尽快支持
 - 本人并不是很熟悉BukkitAPI等，可能项目里有很多有歧义的地方
