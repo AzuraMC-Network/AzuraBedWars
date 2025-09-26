@@ -16,6 +16,10 @@ import org.bukkit.util.Vector;
  */
 public class NMS_v1_8_R3 implements NMSAccess {
 
+    public NMS_v1_8_R3() {
+        AbstractCustomEntity.initializeReflection();
+    }
+
     @Override
     public Fireball setFireballDirection(Fireball fireball, Vector vector) {
         EntityFireball fb = ((CraftFireball) fireball).getHandle();
