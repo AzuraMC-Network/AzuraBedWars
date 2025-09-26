@@ -4,6 +4,9 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 /**
@@ -15,4 +18,18 @@ public interface NMSAccess {
     LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health);
 
     LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health);
+
+    default ItemStack setItemUnbreakable(ItemStack itemStack, boolean unbreakable, boolean hide) {
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null) {
+            meta.setUnbreakable(unbreakable);
+            if (hide) {
+                meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+            } else {
+                meta.removeItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+            }
+            itemStack.setItemMeta(meta);
+        }
+        return itemStack;
+    }
 }

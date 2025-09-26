@@ -5,10 +5,15 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import net.minecraft.server.v1_9_R2.EntityFireball;
+import net.minecraft.server.v1_9_R2.NBTTagCompound;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftFireball;
+import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
 /**
@@ -41,5 +46,34 @@ public class NMS_v1_9_R2 implements NMSAccess {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         LoggerUtil.debug("NMS_v1_9_R2$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health);
         return CustomSilverfish.spawn(loc, gameTeam, speed, health);
+    }
+
+    @Override
+    public ItemStack setItemUnbreakable(ItemStack itemStack, boolean unbreakable, boolean hide) {
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null) {
+            if (hide) {
+                meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+            } else {
+                meta.removeItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+            }
+            itemStack.setItemMeta(meta);
+        }
+
+        net.minecraft.server.v1_9_R2.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = nmsItem.hasTag() ? nmsItem.getTag() : new NBTTagCompound();
+
+        if (tag == null) {
+            return itemStack;
+        }
+
+        if (unbreakable) {
+            tag.setBoolean("Unbreakable", true);
+        } else {
+            tag.remove("Unbreakable");
+        }
+
+        nmsItem.setTag(tag);
+        return CraftItemStack.asBukkitCopy(nmsItem);
     }
 }
