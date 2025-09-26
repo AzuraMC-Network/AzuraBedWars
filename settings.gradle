@@ -10,6 +10,8 @@ include (
         'azurabedwars-plugin:1_9_R2',
         'azurabedwars-plugin:v1_11_R1',
         'azurabedwars-plugin:v1_12_R1',
+        'azurabedwars-plugin:v1_13_R1',
+        'azurabedwars-plugin:v1_13_R2',
         'azurabedwars-plugin:1_20_R1',
         'azurabedwars-plugin:1_20_R2',
         'azurabedwars-plugin:1_20_R3',
