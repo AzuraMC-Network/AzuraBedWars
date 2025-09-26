@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.compat.util;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -14,55 +14,16 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * 物品构建工具类
- * 用于快速创建和配置各种物品
- * 提供跨版本兼容性支持(1.8-1.19+)
- *
  * @author an5w1r@163.com
  */
 public class ItemBuilder {
     private ItemStack itemStack;
-
-    // 反射缓存
-    private static Class<?> craftItemStackClass;
-    private static Class<?> nmsItemStackClass;
-    private static Class<?> nbtTagCompoundClass;
-    private static Method asNMSCopyMethod;
-    private static Method getTagMethod;
-    private static Method setBooleanMethod;
-    private static Method setTagMethod;
-    private static Method asBukkitCopyMethod;
-    private static boolean reflectionInitialized = false;
-
-    // 静态初始化块，在类首次加载时初始化反射缓存
-    static {
-        if (VersionUtil.isVersion1_8()) {
-            try {
-                craftItemStackClass = Class.forName("org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack");
-                nmsItemStackClass = Class.forName("net.minecraft.server.v1_8_R3.ItemStack");
-                nbtTagCompoundClass = Class.forName("net.minecraft.server.v1_8_R3.NBTTagCompound");
-
-                asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
-                getTagMethod = nmsItemStackClass.getMethod("getTag");
-                setBooleanMethod = nbtTagCompoundClass.getMethod("setBoolean", String.class, boolean.class);
-                setTagMethod = nmsItemStackClass.getMethod("setTag", nbtTagCompoundClass);
-                asBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
-
-                reflectionInitialized = true;
-            } catch (Exception e) {
-                // 记录初始化失败，稍后会回退到备用方法
-                LoggerUtil.warn("无法初始化NMS反射: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-    }
 
     /**
      * 创建空物品构建器
@@ -187,114 +148,8 @@ public class ItemBuilder {
      * @return 构建器实例
      */
     public ItemBuilder setUnbreakable(boolean unbreakable, boolean hide) {
-        try {
-            // 优先使用NMS方法设置Unbreakable标签（适用于1.8）
-            if (VersionUtil.isVersion1_8()) {
-                this.itemStack = setUnbreakableNbt(this.itemStack, unbreakable);
-
-                // 如果需要隐藏标签且物品元数据存在
-                if (hide && this.itemStack.getItemMeta() != null) {
-                    ItemMeta meta = this.itemStack.getItemMeta();
-                    try {
-                        meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-                    } catch (Exception ignored) {
-                        // 1.8可能不支持HIDE_UNBREAKABLE，忽略错误
-                    }
-                    this.itemStack.setItemMeta(meta);
-                }
-                return this;
-            }
-
-            // 对于更高版本，尝试使用原生API
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            if (itemMeta != null) {
-                try {
-                    // 尝试使用反射调用setUnbreakable方法（1.9-1.10）
-                    Method setUnbreakableMethod = ItemMeta.class.getDeclaredMethod("setUnbreakable", boolean.class);
-                    setUnbreakableMethod.invoke(itemMeta, unbreakable);
-
-                    if (hide) {
-                        try {
-                            itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-                        } catch (Exception ignored) {
-                            // 某些版本可能不支持此标志
-                        }
-                    }
-
-                    itemStack.setItemMeta(itemMeta);
-                } catch (Exception e) {
-                    // 如果反射失败，尝试使用NBT方法
-                    this.itemStack = setUnbreakableNbt(this.itemStack, unbreakable);
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtil.warn("设置物品不可破坏失败: " + e.getMessage());
-        }
-
+        this.itemStack = AzuraBedWars.getInstance().getNmsAccess().setItemUnbreakable(itemStack, unbreakable, hide);
         return this;
-    }
-
-    /**
-     * 使用NBT标签设置物品为不可破坏(适用于1.8)
-     *
-     * @param item        需要设置的物品
-     * @param unbreakable 是否不可破坏
-     * @return 设置后的物品
-     */
-    private ItemStack setUnbreakableNbt(ItemStack item, boolean unbreakable) {
-        if (item == null) {
-            return null;
-        }
-
-        // 如果反射未初始化且需要设置为不可破坏，尝试初始化反射
-        if (!reflectionInitialized && unbreakable) {
-            try {
-                String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-
-                craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + version + ".inventory.CraftItemStack");
-                nmsItemStackClass = Class.forName("net.minecraft.server." + version + ".ItemStack");
-                nbtTagCompoundClass = Class.forName("net.minecraft.server." + version + ".NBTTagCompound");
-
-                asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
-                getTagMethod = nmsItemStackClass.getMethod("getTag");
-                setBooleanMethod = nbtTagCompoundClass.getMethod("setBoolean", String.class, boolean.class);
-                setTagMethod = nmsItemStackClass.getMethod("setTag", nbtTagCompoundClass);
-                asBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", nmsItemStackClass);
-
-                reflectionInitialized = true;
-            } catch (Exception e) {
-                LoggerUtil.warn("无法初始化NMS反射: " + e.getMessage());
-                return item;
-            }
-        }
-
-        // 如果反射初始化失败或不需要设置为不可破坏，直接返回原物品
-        if (!reflectionInitialized || !unbreakable) {
-            return item;
-        }
-
-        try {
-            // 使用缓存的反射对象
-            Object nmsItem = asNMSCopyMethod.invoke(null, item);
-            Object tag = getTagMethod.invoke(nmsItem);
-
-            // 如果没有标签就创建一个
-            if (tag == null) {
-                tag = nbtTagCompoundClass.getDeclaredConstructor().newInstance();
-            }
-
-            // 设置Unbreakable标签
-            setBooleanMethod.invoke(tag, "Unbreakable", true);
-
-            // 将标签设置回物品
-            setTagMethod.invoke(nmsItem, tag);
-
-            // 转换回Bukkit物品
-            return (ItemStack) asBukkitCopyMethod.invoke(null, nmsItem);
-        } catch (Exception e) {
-            LoggerUtil.warn("使用NBT设置不可破坏失败: " + e.getMessage());
-            return item;
-        }
     }
 
     /**
