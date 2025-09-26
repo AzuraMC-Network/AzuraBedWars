@@ -38,6 +38,7 @@ public class PlayerInvisibilityListener implements Listener {
         }
 
         String itemName = itemStack.getItemMeta().getDisplayName();
+        // don't remove this null check (its useful for low version bukkit api)
         if (itemName == null || itemName.isEmpty()) {
             return;
         }
