@@ -51,7 +51,7 @@ AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project 
 ### Requirements
 
 - **Java**: 17 or higher
-- **Minecraft**: 1.8.8
+- **Minecraft**: 1.8.8 - 1.21.8
 - **Data Storage**: MySQL or MongoDB (required)
 - **Dependencies**:
   - PacketEvents (required)
