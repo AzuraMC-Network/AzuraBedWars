@@ -70,6 +70,7 @@ dependencies {
     implementation project(':azurabedwars-plugin:1_20_R3')
     implementation project(':azurabedwars-plugin:1_20_R4')
     implementation project(':azurabedwars-plugin:1_21_R1')
+    implementation project(':azurabedwars-plugin:1_21_R2')
 }
 
 shadowJar {
