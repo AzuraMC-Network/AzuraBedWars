@@ -1,7 +1,9 @@
 package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -25,8 +27,13 @@ public class TNTPlacementHandler {
         Block block = event.getBlock();
         block.setType(Material.AIR);
 
-        // 生成已激活的TNT实体
-        TNTPrimed tnt = block.getWorld().spawn(block.getLocation().add(0.5D, 0.0D, 0.5D), TNTPrimed.class);
+        block.getWorld().spawn(block.getLocation().add(0.5D, 0.0D, 0.5D), TNTPrimed.class);
+
+        try {
+            block.getWorld().playSound(block.getLocation(), XSound.ENTITY_TNT_PRIMED.get(), 1.0F, 1.0F);
+        } catch (Exception e) {
+            LoggerUtil.error("无法播放音效 请在Github反馈: " + e.getMessage());
+        }
 
         // 减少玩家物品栏中的TNT数量
         consumeItem(player, XMaterial.TNT.get());
