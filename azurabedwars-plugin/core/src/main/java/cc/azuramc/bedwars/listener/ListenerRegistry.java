@@ -76,6 +76,7 @@ public class ListenerRegistry {
         register(new EntityDeathListener());
         register(new CustomEntityDamageListener());
         register(new IronGolemSpawnListener());
+        register(new MobDropsListener());
         register(new RescuePlatformListener());
         register(new SilverFishListener());
         register(new WarpPowderListener());
