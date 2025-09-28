@@ -14,11 +14,10 @@ import cc.azuramc.bedwars.shop.*;
 import cc.azuramc.bedwars.shop.page.DefaultShopPage;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.util.ShopUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -26,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -36,26 +34,12 @@ import java.util.*;
  * @author an5w1r@163.com
  */
 public class ItemShopGUI extends CustomGUI {
-    /**
-     * 商店展示槽位
-     */
-    private static final Integer[] SHOP_SLOTS = new Integer[]{
-            19, 20, 21, 22, 23, 24, 25,
-            28, 29, 30, 31, 32, 33, 34,
-            37, 38, 39, 40, 41, 42, 43
-    };
 
     /**
      * 资源名称缓存
      */
     private static final Map<Material, String> RESOURCE_NAMES = new HashMap<>();
 
-    /**
-     * JSON处理器
-     */
-    private static final Gson GSON = new Gson();
-    private static final Type SHOP_DATA_TYPE = new TypeToken<Map<Integer, String>>() {
-    }.getType();
 
     /* 静态初始化资源名称 */
     static {
@@ -84,7 +68,7 @@ public class ItemShopGUI extends CustomGUI {
         // 初始化商店内容
         ShopData shopData = ShopManager.getSHOPS().get(slot);
         if (shopData instanceof DefaultShopPage) {
-            initializeCustomShop(gamePlayer, slot, gameManager);
+            initializeQuickBuyShop(gamePlayer, slot, gameManager);
         } else {
             initializeRegularShop(gamePlayer, shopData, slot, gameManager);
         }
@@ -131,58 +115,50 @@ public class ItemShopGUI extends CustomGUI {
     }
 
     /**
-     * 初始化默认商店(快捷购买) - 使用JSON格式
+     * 初始化快捷购买商店
+     * 优先显示用户自定义配置，空槽位显示DefaultShopPage的默认物品
      */
-    private void initializeCustomShop(GamePlayer gamePlayer, int slot, GameManager gameManager) {
+    private void initializeQuickBuyShop(GamePlayer gamePlayer, int slot, GameManager gameManager) {
         // 从数据库加载JSON格式的快捷商店配置
-        Map<Integer, String> shopDataMap = loadShopDataFromJson(gamePlayer.getPlayerData());
+        Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(gamePlayer.getPlayerData());
+
+        // 获取DefaultShopPage作为默认物品来源
+        ShopData defaultShopData = ShopManager.getSHOPS().get(slot);
+        List<ShopItemType> defaultItems = defaultShopData.getShopItems();
 
         // 遍历所有可用槽位
-        for (int slotIndex = 0; slotIndex < SHOP_SLOTS.length; slotIndex++) {
-            int actualSlotPosition = SHOP_SLOTS[slotIndex];
+        for (int slotIndex = 0; slotIndex < ShopUtil.SHOP_SLOTS.length; slotIndex++) {
+            int actualSlotPosition = ShopUtil.SHOP_SLOTS[slotIndex];
 
-            // 检查该槽位是否有配置的物品
+            // 检查该槽位是否有用户配置的物品
             String itemData = shopDataMap.get(slotIndex);
 
-            if (itemData == null || "AIR".equals(itemData)) {
-                // 设置空槽位
-                setEmptySlot(gamePlayer.getPlayer(), actualSlotPosition, slot, gameManager);
-            } else {
-                // 已有物品的槽位
+            if (itemData != null && !"AIR".equals(itemData)) {
+                // 用户有自定义物品配置
                 String[] itemInfo = itemData.split("#");
-                ShopItemType shopItemType = findItemType(itemInfo);
+                ShopItemType shopItemType = ShopUtil.findItemType(itemInfo);
 
                 if (shopItemType != null) {
-                    // 设置有物品的槽位
+                    // 设置用户自定义的物品
                     setItem(gamePlayer, slot, actualSlotPosition, gameManager, shopItemType, -1,
                             Arrays.asList("§7Shift+左键从快捷购买中移除", " "));
-                } else {
-                    // 数据错误，当作空槽位处理
-                    setEmptySlot(gamePlayer.getPlayer(), actualSlotPosition, slot, gameManager);
+                    continue;
                 }
+                // 如果自定义物品数据有误 继续使用默认物品逻辑
+            }
+
+            // 用户没有配置或配置无效 使用默认物品
+            if (slotIndex < defaultItems.size()) {
+                ShopItemType defaultItemType = defaultItems.get(slotIndex);
+                setItem(gamePlayer, slot, actualSlotPosition, gameManager, defaultItemType, slotIndex,
+                        Arrays.asList("§7Shift+左键添加到快捷购买", " "));
+            } else {
+                // 超出默认物品数量 设置空槽位
+                setEmptySlot(gamePlayer.getPlayer(), actualSlotPosition, slot, gameManager);
             }
         }
     }
 
-    /**
-     * 从数据库加载JSON格式的快捷商店配置
-     * 解析JSON为Map<Integer, String>
-     */
-    private Map<Integer, String> loadShopDataFromJson(PlayerData playerData) {
-        try {
-            String shopDataJson = playerData.getShopDataJson();
-            if (shopDataJson != null && !shopDataJson.trim().isEmpty()) {
-                Map<Integer, String> shopData = GSON.fromJson(shopDataJson, SHOP_DATA_TYPE);
-                return shopData != null ? shopData : new HashMap<>();
-            }
-        } catch (Exception e) {
-            // JSON解析失败，返回空Map
-            e.printStackTrace();
-        }
-
-        // 返回默认空配置
-        return new HashMap<>();
-    }
 
     /**
      * 初始化常规商店
@@ -191,7 +167,7 @@ public class ItemShopGUI extends CustomGUI {
         int itemIndex = -1;
         for (ShopItemType shopItemType : shopData.getShopItems()) {
             itemIndex++;
-            setItem(gamePlayer, shopSlot, SHOP_SLOTS[itemIndex], gameManager, shopItemType, itemIndex, null);
+            setItem(gamePlayer, shopSlot, ShopUtil.SHOP_SLOTS[itemIndex], gameManager, shopItemType, itemIndex, null);
         }
     }
 
@@ -213,22 +189,6 @@ public class ItemShopGUI extends CustomGUI {
                 }, false));
     }
 
-    /**
-     * 查找物品类型
-     */
-    private ShopItemType findItemType(String[] itemInfo) {
-        if (itemInfo == null || itemInfo.length != 2) {
-            return null;
-        }
-
-        for (ShopData shopData : ShopManager.getSHOPS()) {
-            if (shopData.getClass().getSimpleName().equals(itemInfo[0])) {
-                return shopData.getShopItems().get(Integer.parseInt(itemInfo[1]) - 1);
-            }
-        }
-
-        return null;
-    }
 
     /**
      * 设置商店物品
@@ -379,19 +339,19 @@ public class ItemShopGUI extends CustomGUI {
                                   ItemBuilder itemBuilder, int itemSlot, PlayerData playerData, GameManager gameManager) {
         if (shopSlot == 0) {
             // 从快捷购买移除
-            int slotIndex = Arrays.asList(SHOP_SLOTS).indexOf(displaySlot);
+            int slotIndex = Arrays.asList(ShopUtil.SHOP_SLOTS).indexOf(displaySlot);
             if (slotIndex == -1) {
                 return;
             }
 
             // 加载当前快捷商店配置
-            Map<Integer, String> shopDataMap = loadShopDataFromJson(playerData);
+            Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(playerData);
 
             // 移除指定槽位的物品
             shopDataMap.remove(slotIndex);
 
             // 保存回数据库
-            saveShopDataToJson(playerData, shopDataMap);
+            ShopUtil.saveShopDataToJson(playerData, shopDataMap);
 
             new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
         } else {
@@ -402,17 +362,6 @@ public class ItemShopGUI extends CustomGUI {
         }
     }
 
-    /**
-     * 将Map<Integer, String>保存为JSON格式到数据库
-     */
-    private void saveShopDataToJson(PlayerData playerData, Map<Integer, String> shopDataMap) {
-        try {
-            String jsonData = GSON.toJson(shopDataMap);
-            playerData.setShopDataJson(jsonData);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 检查是否可以购买物品
