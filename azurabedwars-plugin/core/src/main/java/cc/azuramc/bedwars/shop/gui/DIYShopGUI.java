@@ -7,34 +7,21 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.shop.*;
+import cc.azuramc.bedwars.util.ShopUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * 自定义商店GUI
- * 用于将物品添加到快捷购买菜单
- *
  * @author an5w1r@163.com
  */
 public class DIYShopGUI extends CustomGUI {
 
-    /**
-     * 商店可选择的槽位
-     */
-    private static final Integer[] SHOP_SLOTS = new Integer[]{
-            19, 20, 21, 22, 23, 24, 25,
-            28, 29, 30, 31, 32, 33, 34,
-            37, 38, 39, 40, 41, 42, 43
-    };
 
     /**
      * 灰色
@@ -45,12 +32,6 @@ public class DIYShopGUI extends CustomGUI {
      */
     private static final int EMPTY_SLOT_GLASS_COLOR = 14;
 
-    /**
-     * JSON处理器
-     */
-    private static final Gson GSON = new Gson();
-    private static final Type SHOP_DATA_TYPE = new TypeToken<Map<Integer, String>>() {
-    }.getType();
 
     /**
      * 创建自定义商店GUI
@@ -118,86 +99,49 @@ public class DIYShopGUI extends CustomGUI {
     }
 
     /**
-     * 设置商店槽位 - 新的JSON方式
+     * 设置商店槽位
      */
     private void setupShopSlots(GameManager gameManager, GamePlayer gamePlayer, String className) {
         PlayerData playerData = gamePlayer.getPlayerData();
         // 从数据库加载JSON格式的快捷商店配置
-        Map<Integer, String> shopDataMap = loadShopDataFromJson(playerData);
+        Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(playerData);
+
+        // 获取DefaultShopPage作为默认物品来源
+        ShopData defaultShopData = ShopManager.getSHOPS().get(0);
+        List<ShopItemType> defaultItems = defaultShopData.getShopItems();
 
         // 遍历所有可用槽位
-        for (int slotIndex = 0; slotIndex < SHOP_SLOTS.length; slotIndex++) {
-            int actualSlotPosition = SHOP_SLOTS[slotIndex];
+        for (int slotIndex = 0; slotIndex < ShopUtil.SHOP_SLOTS.length; slotIndex++) {
+            int actualSlotPosition = ShopUtil.SHOP_SLOTS[slotIndex];
 
-            // 检查该槽位是否有配置的物品
+            // 检查该槽位是否有用户配置的物品
             String itemData = shopDataMap.get(slotIndex);
 
-            if (itemData == null || "AIR".equals(itemData)) {
-                // 空槽位
-                setupEmptySlot(gameManager, gamePlayer, actualSlotPosition, slotIndex, className, playerData);
-            } else {
-                // 已有物品的槽位
+            if (itemData != null && !"AIR".equals(itemData)) {
+                // 用户有自定义物品配置
                 String[] itemInfo = itemData.split("#");
-                ShopItemType shopItemType = findItemType(itemInfo);
+                ShopItemType shopItemType = ShopUtil.findItemType(itemInfo);
 
                 if (shopItemType != null) {
                     setupOccupiedSlot(gameManager, gamePlayer, actualSlotPosition, shopItemType, className, slotIndex);
-                } else {
-                    // 数据错误，当作空槽位处理
-                    setupEmptySlot(gameManager, gamePlayer, actualSlotPosition, slotIndex, className, playerData);
+                    continue;
                 }
+                // 如果自定义物品数据有误，继续使用默认物品逻辑
+            }
+
+            // 用户没有配置或配置无效 使用默认物品
+            if (slotIndex < defaultItems.size()) {
+                ShopItemType defaultItemType = defaultItems.get(slotIndex);
+                setupDefaultSlot(gameManager, gamePlayer, actualSlotPosition, defaultItemType, className, slotIndex, playerData);
+            } else {
+                // 超出默认物品数量 设置真正的空槽位
+                setupEmptySlot(gameManager, gamePlayer, actualSlotPosition, slotIndex, className, playerData);
             }
         }
     }
 
-    /**
-     * 从数据库加载JSON格式的快捷商店配置
-     * 解析JSON为Map<Integer, String>
-     */
-    private Map<Integer, String> loadShopDataFromJson(PlayerData playerData) {
-        try {
-            String shopDataJson = playerData.getShopDataJson();
-            if (shopDataJson != null && !shopDataJson.trim().isEmpty()) {
-                Map<Integer, String> shopData = GSON.fromJson(shopDataJson, SHOP_DATA_TYPE);
-                return shopData != null ? shopData : new HashMap<>();
-            }
-        } catch (Exception e) {
-            // JSON解析失败，返回空Map
-            e.printStackTrace();
-        }
 
-        // 返回默认空配置
-        return new HashMap<>();
-    }
 
-    /**
-     * 将Map<Integer, String>保存为JSON格式到数据库
-     */
-    private void saveShopDataToJson(PlayerData playerData, Map<Integer, String> shopDataMap) {
-        try {
-            String jsonData = GSON.toJson(shopDataMap);
-            playerData.setShopDataJson(jsonData);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 查找物品类型
-     */
-    private ShopItemType findItemType(String[] itemInfo) {
-        if (itemInfo == null || itemInfo.length != 2) {
-            return null;
-        }
-
-        for (ShopData shopData : ShopManager.getSHOPS()) {
-            if (shopData.getClass().getSimpleName().equals(itemInfo[0])) {
-                return shopData.getShopItems().get(Integer.parseInt(itemInfo[1]) - 1);
-            }
-        }
-
-        return null;
-    }
 
     /**
      * 设置空槽位
@@ -211,13 +155,46 @@ public class DIYShopGUI extends CustomGUI {
                         .getItem(),
                 new GUIAction(0, () -> {
                     // 加载当前快捷商店配置
-                    Map<Integer, String> shopDataMap = loadShopDataFromJson(playerData);
+                    Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(playerData);
 
                     // 更新指定槽位的物品
                     shopDataMap.put(slotIndex, className);
 
                     // 保存回数据库
-                    saveShopDataToJson(playerData, shopDataMap);
+                    ShopUtil.saveShopDataToJson(playerData, shopDataMap);
+
+                    // 播放确认音效
+                    gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
+
+                    // 返回物品商店
+                    new ItemShopGUI(gamePlayer, 0, gameManager).open();
+                }, false));
+    }
+
+    /**
+     * 设置默认物品槽位
+     * 显示DefaultShopPage的默认物品 但允许用户替换
+     */
+    private void setupDefaultSlot(GameManager gameManager, GamePlayer gamePlayer, int slotPosition,
+                                  ShopItemType defaultItemType, String className, int slotIndex, PlayerData playerData) {
+        // 准备物品显示
+        ItemBuilder itemBuilder = prepareItemDisplay(gamePlayer, defaultItemType);
+
+        // 设置GUI项
+        super.setItem(slotPosition,
+                itemBuilder
+                        .setDisplayName("§a" + defaultItemType.getDisplayName() + " §7(默认)")
+                        .setLores("§7这是默认快捷购买物品", "§e点击替换为当前选择的物品")
+                        .getItem(),
+                new GUIAction(0, () -> {
+                    // 加载当前快捷商店配置
+                    Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(playerData);
+
+                    // 更新指定槽位的物品
+                    shopDataMap.put(slotIndex, className);
+
+                    // 保存回数据库
+                    ShopUtil.saveShopDataToJson(playerData, shopDataMap);
 
                     // 播放确认音效
                     gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
@@ -245,13 +222,13 @@ public class DIYShopGUI extends CustomGUI {
                     PlayerData playerData = gamePlayer.getPlayerData();
 
                     // 加载当前快捷商店配置
-                    Map<Integer, String> shopDataMap = loadShopDataFromJson(playerData);
+                    Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(playerData);
 
                     // 更新指定槽位的物品
                     shopDataMap.put(slotIndex, className);
 
                     // 保存回数据库
-                    saveShopDataToJson(playerData, shopDataMap);
+                    ShopUtil.saveShopDataToJson(playerData, shopDataMap);
 
                     // 播放确认音效
                     player.playSound(player.getLocation(), XSound.UI_BUTTON_CLICK.get(), 1, 10F);
