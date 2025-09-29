@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class ManicMinerUpgradeStrategyAbstract extends AbstractTieredUpgradeStrategy {
+public class ManicMinerUpgradeStrategy extends AbstractTieredUpgradeStrategy {
 
     @Override
     public String getUpgradeName() {
