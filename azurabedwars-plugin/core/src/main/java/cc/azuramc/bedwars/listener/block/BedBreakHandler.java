@@ -33,9 +33,9 @@ public class BedBreakHandler {
     public static void handleBedBreak(BlockBreakEvent event, Block block, GamePlayer gamePlayer, GameTeam gameTeam) {
         event.setCancelled(true);
 
-        // 不能破坏自己的床
-        //TODO: 应该改为判断破坏的床是不是自家的床的block
-        if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getBedSearchRadius()) {
+        // shouldn't use "==" to compare Block objects (I tested :<)
+        if (block.getLocation().equals(gameTeam.getBedFeet().getLocation())
+                || block.getLocation().equals(gameTeam.getBedHead().getLocation())) {
             gamePlayer.sendMessage("§c你不能破坏你家的床");
             return;
         }
