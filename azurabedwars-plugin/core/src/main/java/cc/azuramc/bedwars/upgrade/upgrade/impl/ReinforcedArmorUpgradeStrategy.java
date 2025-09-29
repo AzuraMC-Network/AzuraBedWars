@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class ReinforcedArmorUpgradeStrategyAbstract extends AbstractTieredUpgradeStrategy {
+public class ReinforcedArmorUpgradeStrategy extends AbstractTieredUpgradeStrategy {
 
     @Override
     public String getUpgradeName() {
