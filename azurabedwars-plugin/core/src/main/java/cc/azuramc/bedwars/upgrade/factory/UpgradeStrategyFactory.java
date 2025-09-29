@@ -19,11 +19,11 @@ public class UpgradeStrategyFactory {
     static {
         // 初始化所有升级策略
         STRATEGY_CACHE.put("磨刀石", new SharpenedSwordsUpgradeStrategy());
-        STRATEGY_CACHE.put("精制护甲", new ReinforcedArmorUpgradeStrategyAbstract());
-        STRATEGY_CACHE.put("疯狂矿工", new ManicMinerUpgradeStrategyAbstract());
-        STRATEGY_CACHE.put("铁锻炉", new ResourceFurnaceUpgradeStrategyAbstract());
+        STRATEGY_CACHE.put("精制护甲", new ReinforcedArmorUpgradeStrategy());
+        STRATEGY_CACHE.put("疯狂矿工", new ManicMinerUpgradeStrategy());
+        STRATEGY_CACHE.put("铁锻炉", new ResourceFurnaceUpgradeStrategy());
         STRATEGY_CACHE.put("治愈池", new HealingPoolUpgradeStrategy());
-        STRATEGY_CACHE.put("缓冲靴子", new FallingProtectionUpgradeStrategyAbstract());
+        STRATEGY_CACHE.put("缓冲靴子", new FallingProtectionUpgradeStrategy());
     }
 
     /**

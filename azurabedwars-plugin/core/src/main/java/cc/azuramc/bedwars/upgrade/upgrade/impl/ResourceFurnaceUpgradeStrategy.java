@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class ResourceFurnaceUpgradeStrategyAbstract extends AbstractTieredUpgradeStrategy {
+public class ResourceFurnaceUpgradeStrategy extends AbstractTieredUpgradeStrategy {
 
     @Override
     public String getUpgradeName() {

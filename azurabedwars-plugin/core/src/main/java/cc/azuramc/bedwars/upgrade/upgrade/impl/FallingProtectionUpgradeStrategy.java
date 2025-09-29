@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class FallingProtectionUpgradeStrategyAbstract extends AbstractTieredUpgradeStrategy {
+public class FallingProtectionUpgradeStrategy extends AbstractTieredUpgradeStrategy {
 
     @Override
     public String getUpgradeName() {
