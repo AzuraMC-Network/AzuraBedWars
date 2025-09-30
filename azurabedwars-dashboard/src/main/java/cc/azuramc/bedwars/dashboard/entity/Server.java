@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Data
 @Table(name = "servers")

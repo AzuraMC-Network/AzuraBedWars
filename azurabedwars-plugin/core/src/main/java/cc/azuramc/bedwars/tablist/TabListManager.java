@@ -96,9 +96,22 @@ public class TabListManager implements Listener {
      * 更新所有玩家的TabList显示名称
      */
     public void updateAllTabListNames() {
-        for (Map.Entry<GamePlayer, Team> entry : teamMap.entrySet()) {
+        // 使用迭代器安全地移除无效条目
+        var iterator = teamMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<GamePlayer, Team> entry = iterator.next();
             GamePlayer gamePlayer = entry.getKey();
             Team team = entry.getValue();
+
+            if (gamePlayer == null || gamePlayer.getPlayer() == null || !gamePlayer.getPlayer().isOnline()) {
+                // 清理无效的玩家条目
+                if (team != null) {
+                    team.removeEntry(gamePlayer != null ? gamePlayer.getName() : "");
+                    team.unregister();
+                }
+                iterator.remove();
+                continue;
+            }
 
             String newTeamName = teamSorter.generateSortedTeamName(gamePlayer);
 

@@ -18,7 +18,7 @@ import java.util.Collection;
  * 自定义资源生成器类
  * 可以动态修改最大堆叠数量和掉落物品间隔
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Getter
 @Setter

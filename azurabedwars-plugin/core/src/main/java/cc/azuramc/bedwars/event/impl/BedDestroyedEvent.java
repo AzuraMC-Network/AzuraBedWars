@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.event.impl;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.util.BedUtil;
+import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
 import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
@@ -11,13 +11,6 @@ import com.cryptomorin.xseries.XSound;
 import java.util.logging.Level;
 
 /**
- * 床自毁事件
- * <p>
- * 在游戏进行到一定时间后，自动销毁所有队伍的床，
- * 使游戏进入到更激烈的阶段。该事件触发时，会向所有玩家播放末影龙咆哮音效
- * 并显示床自毁的全屏提示。
- * </p>
- *
  * @author an5w1r@163.com
  */
 public class BedDestroyedEvent extends AbstractGameEvent {
@@ -75,7 +68,7 @@ public class BedDestroyedEvent extends AbstractGameEvent {
                 continue;
             }
 
-            BedUtil.destroyBed(gameTeam);
+            GameTeamBedHandler.destroyBed(gameTeam);
             gameTeam.setDestroyed(true);
         }
     }

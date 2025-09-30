@@ -16,7 +16,7 @@ import revxrsal.commands.bukkit.annotation.CommandPermission;
 public class StartCommand {
 
     @Dependency
-    private AzuraBedWars pluginDependency;
+    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     @Command({"bedwars start", "bw start", "azurabedwars start"})
     @CommandPermission("azurabedwars.forcestart")

@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * 资源刷新管理类，负责注册task等操作
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class GeneratorManager {
 

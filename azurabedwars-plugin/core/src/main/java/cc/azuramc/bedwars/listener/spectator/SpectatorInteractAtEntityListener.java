@@ -13,7 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class SpectatorInteractAtEntityListener implements Listener {
 

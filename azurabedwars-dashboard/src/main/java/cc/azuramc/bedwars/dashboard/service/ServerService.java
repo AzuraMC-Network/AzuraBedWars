@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Service
 public class ServerService implements IServerService {

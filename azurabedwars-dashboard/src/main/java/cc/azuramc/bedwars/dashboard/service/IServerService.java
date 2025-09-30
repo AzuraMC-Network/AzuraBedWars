@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public interface IServerService {
 

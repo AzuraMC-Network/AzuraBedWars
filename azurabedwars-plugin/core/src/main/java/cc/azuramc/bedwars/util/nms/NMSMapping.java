@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class NMSMapping {
     private static final Map<String, Map<String, Object>> mappings = new HashMap<>();

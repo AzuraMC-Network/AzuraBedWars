@@ -25,7 +25,7 @@ import java.util.Map;
  * 频道消息控制器
  * 提供频道消息管理和发送的 REST API
  *
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Slf4j
 @RestController

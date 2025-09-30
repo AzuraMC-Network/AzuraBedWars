@@ -1,0 +1,4 @@
+dependencies {
+    compileOnly project(':azurabedwars-plugin:core')
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+}

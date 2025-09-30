@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.bed.BedwarsDestroyBedEvent;
-import cc.azuramc.bedwars.compat.util.BedUtil;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -34,9 +33,9 @@ public class BedBreakHandler {
     public static void handleBedBreak(BlockBreakEvent event, Block block, GamePlayer gamePlayer, GameTeam gameTeam) {
         event.setCancelled(true);
 
-        // 不能破坏自己的床
-        //TODO: 应该改为判断破坏的床是不是自家的床的block
-        if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getBedSearchRadius()) {
+        // shouldn't use "==" to compare Block objects (I tested :<)
+        if (block.getLocation().equals(gameTeam.getBedFeet().getLocation())
+                || block.getLocation().equals(gameTeam.getBedHead().getLocation())) {
             gamePlayer.sendMessage("§c你不能破坏你家的床");
             return;
         }
@@ -45,7 +44,7 @@ public class BedBreakHandler {
         for (GameTeam targetTeam : GAME_MANAGER.getGameTeams()) {
             if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getBedSearchRadius()) {
                 if (!targetTeam.isDead()) {
-                    processBedDestruction(gamePlayer, gameTeam, targetTeam, block);
+                    processBedDestruction(gamePlayer, gameTeam, targetTeam);
                     return;
                 }
                 gamePlayer.sendMessage("§c此床没有队伍");
@@ -60,12 +59,8 @@ public class BedBreakHandler {
      * @param gamePlayer 游戏玩家
      * @param gameTeam   玩家所在团队
      * @param targetTeam 床所属团队
-     * @param block      床方块
      */
-    private static void processBedDestruction(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam, Block block) {
-
-        // 掉落床方块物品
-        BedUtil.dropTargetBlock(block);
+    private static void processBedDestruction(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam) {
 
         // 更新团队状态
         targetTeam.setDestroyPlayer(gamePlayer);

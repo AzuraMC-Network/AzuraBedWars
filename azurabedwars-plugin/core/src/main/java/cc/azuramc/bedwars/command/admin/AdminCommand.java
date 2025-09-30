@@ -8,13 +8,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.DefaultFor;
-import revxrsal.commands.annotation.Dependency;
-import revxrsal.commands.annotation.Subcommand;
+import revxrsal.commands.annotation.*;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -25,23 +23,25 @@ import java.util.Objects;
 public class AdminCommand {
 
     @Dependency
-    private AzuraBedWars pluginDependency;
-
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     @DefaultFor("bw")
     public void getHelpCommand(BukkitCommandActor actor) {
-        CommandUtil.sendLayout(actor, MessageUtil.CHAT_BAR);
-        CommandUtil.sendLayout(actor, MessageUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助"));
-        CommandUtil.sendLayout(actor, "");
-        CommandUtil.sendLayout(actor, MessageUtil.color("&7 • &f/bw reload &7重新加载配置文件"));
-        CommandUtil.sendLayout(actor, MessageUtil.color("&7 • &f/map &7查看地图相关指令帮助 &3&o[仅EditMode]"));
-        CommandUtil.sendLayout(actor, MessageUtil.color("&7 • &f/setup &7查看快速配置相关指令 &3&o[仅EditMode]"));
-        CommandUtil.sendLayout(actor, MessageUtil.color("&7 • &f/bw editorMode true/false &7开关编辑模式(重启后生效)"));
-        CommandUtil.sendLayout(actor, MessageUtil.color("&7 • &f/bw toWorld <worldName> &7前往世界"));
-        CommandUtil.sendLayout(actor, MessageUtil.color("&7 • &f/bw loadWorld <worldName> &7加载世界"));
-        CommandUtil.sendLayout(actor, MessageUtil.color("&7 • &f/bw start &7立即开始游戏 &3&o[仅非EditMode]"));
-        CommandUtil.sendLayout(actor, MessageUtil.CHAT_BAR);
+        List<String> helpMessages = MessageUtil.color(List.of(
+                MessageUtil.CHAT_BAR,
+                "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助",
+                "",
+                "&7 • &f/bw reload &7重新加载配置文件",
+                "&7 • &f/map &7查看地图相关指令帮助 &3&o[仅EditMode]",
+                "&7 • &f/setup &7查看快速配置相关指令 &3&o[仅EditMode]",
+                "&7 • &f/bw editorMode true/false &7开关编辑模式(重启后生效)",
+                "&7 • &f/bw toWorld <worldName> &7前往世界",
+                "&7 • &f/bw loadWorld <worldName> &7加载世界",
+                "&7 • &f/bw start &7立即开始游戏 &3&o[仅非EditMode]",
+                MessageUtil.CHAT_BAR
+        ));
+
+        CommandUtil.sendLayout(actor, helpMessages);
     }
 
     @Subcommand("reload")
@@ -51,6 +51,7 @@ public class AdminCommand {
     }
 
     @Subcommand("editorMode")
+    @AutoComplete("@booleanValues")
     public void editorMode(BukkitCommandActor actor, boolean value) {
         if (plugin.getSettingsConfig().isEditorMode() == value) {
             CommandUtil.sendLayout(actor, "&ceditorMode值已经是 " + value);
@@ -63,6 +64,7 @@ public class AdminCommand {
     }
 
     @Subcommand("debugMode")
+    @AutoComplete("@booleanValues")
     public void debugMode(BukkitCommandActor actor, boolean value) {
         if (plugin.getSettingsConfig().isEditorMode() == value) {
             CommandUtil.sendLayout(actor, "&cdebugMode值已经是 " + value);

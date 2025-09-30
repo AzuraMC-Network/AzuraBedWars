@@ -118,5 +118,13 @@ run/
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
-/server/*
+
+# Myself test environment folder (an5w1r@163.com)
 /server/
+/server_v1_14_R1/
+/server_v1_20_R1/
+/server_v1_20_R2/
+/server_v1_20_R4/
+/server_v1_21_R1/
+/server_v1_21_R2/
+/server_v1_21_R3/

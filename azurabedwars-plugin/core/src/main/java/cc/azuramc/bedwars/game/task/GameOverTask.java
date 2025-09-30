@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
-import cc.azuramc.bedwars.listener.world.ChunkListener;
 import cc.azuramc.bedwars.util.FireWorkUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -325,9 +324,6 @@ public class GameOverTask extends BukkitRunnable {
      * 执行服务器关闭前的清理工作
      */
     private void performShutdown() {
-        // 释放强制加载的区块
-        ChunkListener.releaseForceLoadedChunks();
-
         // 取消当前任务
         cancel();
 

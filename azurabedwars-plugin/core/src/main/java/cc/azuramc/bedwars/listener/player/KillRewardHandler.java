@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class KillRewardHandler {
 

@@ -97,7 +97,10 @@ public class CustomEntityDamageListener implements Listener {
         // 如果玩家攻击自己队伍的生物 取消伤害
         if (entityTeam != null && entityTeam.equals(attackerTeam)) {
             event.setCancelled(true);
+            return;
         }
+
+        customEntityManager.updateEntityName();
     }
 
     /**
@@ -133,7 +136,10 @@ public class CustomEntityDamageListener implements Listener {
         // 如果投掷物发射者与被攻击生物属于同一队伍 取消伤害
         if (entityTeam != null && entityTeam.equals(shooterTeam)) {
             event.setCancelled(true);
+            return;
         }
+
+        customEntityManager.updateEntityName();
     }
 
     /**
@@ -157,7 +163,10 @@ public class CustomEntityDamageListener implements Listener {
         // 如果攻击者与被攻击者属于同一队伍 取消伤害
         if (victimTeam != null && victimTeam.equals(attackerTeam)) {
             event.setCancelled(true);
+            return;
         }
+
+        victimEntityManager.updateEntityName();
     }
 
     /**
@@ -182,6 +191,14 @@ public class CustomEntityDamageListener implements Listener {
         if (gamePlayer.getGameTeam() != entityTeam) {
             gamePlayer.setLastDamage(summoner);
             return;
+        }
+
+        if (event.getDamager().getType() == EntityType.IRON_GOLEM) {
+            event.setDamage(10.0);
+        }
+
+        if (event.getDamager().getType() == EntityType.SILVERFISH) {
+            event.setDamage(4.0);
         }
 
         event.setCancelled(true);

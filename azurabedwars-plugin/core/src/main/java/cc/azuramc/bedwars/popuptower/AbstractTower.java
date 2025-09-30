@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.List;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public abstract class AbstractTower {
     private static final int BLOCKS_PER_TICK = 2;

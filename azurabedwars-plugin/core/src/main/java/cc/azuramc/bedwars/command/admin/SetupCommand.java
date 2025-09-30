@@ -4,11 +4,10 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.DefaultFor;
-import revxrsal.commands.annotation.Dependency;
-import revxrsal.commands.annotation.Subcommand;
+import revxrsal.commands.annotation.*;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
+
+import java.util.List;
 
 /**
  * 地图设置命令
@@ -20,8 +19,6 @@ import revxrsal.commands.bukkit.annotation.CommandPermission;
 public class SetupCommand {
 
     @Dependency
-    private AzuraBedWars pluginDependency;
-
     private final AzuraBedWars plugin;
     private final SetupItemManager setupItemManager;
 
@@ -48,16 +45,21 @@ public class SetupCommand {
             return;
         }
 
-        player.sendMessage(MessageUtil.CHAT_BAR);
-        player.sendMessage(MessageUtil.color("&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 设置工具"));
-        player.sendMessage("");
-        player.sendMessage(MessageUtil.color("&7 • &f/setup start <mapName> &7开始配置地图"));
-        player.sendMessage(MessageUtil.color("&7 • &f/setup stop <mapName> &7结束配置地图"));
-        player.sendMessage("");
-        player.sendMessage(MessageUtil.CHAT_BAR);
+        List<String> messageList = MessageUtil.color(List.of(
+                MessageUtil.CHAT_BAR,
+                "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 设置工具",
+                "",
+                "&7 • &f/setup start <mapName> &7开始配置地图",
+                "&7 • &f/setup stop <mapName> &7结束配置地图",
+                "",
+                MessageUtil.CHAT_BAR
+        ));
+
+        messageList.forEach(player::sendMessage);
     }
 
     @Subcommand("start")
+    @AutoComplete("@mapNames")
     public void startSetup(Player player, String mapName) {
         if (checkEditorMode(player)) {
             return;

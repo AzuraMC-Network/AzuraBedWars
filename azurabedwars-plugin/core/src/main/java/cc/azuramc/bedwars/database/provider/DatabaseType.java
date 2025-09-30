@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.database.provider;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public enum DatabaseType {
     /**
