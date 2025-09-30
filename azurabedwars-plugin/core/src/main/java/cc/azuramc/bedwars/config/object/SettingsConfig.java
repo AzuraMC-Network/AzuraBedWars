@@ -25,6 +25,8 @@ public class SettingsConfig {
     private String playAgainCommand = "/not impl now";
     private int maxHealth = 20;
     private int maxNoMovementTime = 45;
+    private int teamSpawnProtectionRadius = 6;
+    private int resourceSpawnProtectionRadius = 2;
 
     private DatabaseConfig database = new DatabaseConfig();
     private ChatConfig chatConfig = new ChatConfig();
