@@ -1,9 +1,11 @@
 package cc.azuramc.bedwars.game;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import lombok.Getter;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Silverfish;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -39,6 +41,8 @@ public class CustomEntityManager {
     @Getter
     private UUID uuid;
 
+    private BukkitTask refreshTask;
+
     /**
      * 构造函数
      *
@@ -61,6 +65,8 @@ public class CustomEntityManager {
         // 注册到管理器
         customEntityMap.put(uuid, this);
         updateEntityName();
+
+        startRefreshTask();
     }
 
     /**
@@ -92,9 +98,22 @@ public class CustomEntityManager {
     }
 
     /**
-     * 刷新实体状态，处理生命周期
+     * 启动自己的刷新任务
      */
-    public void refresh() {
+    private void startRefreshTask() {
+        refreshTask = AzuraBedWars.getInstance().getServer().getScheduler().runTaskTimer(
+                AzuraBedWars.getInstance(),
+                this::refresh,
+                0,
+                20L
+        );
+    }
+
+    /**
+     * 刷新实体状态，处理生命周期
+     * 每秒自动调用一次
+     */
+    private void refresh() {
         // 检查实体是否应该被移除
         if (shouldRemoveEntity()) {
             handleEntityRemoval();
@@ -133,8 +152,8 @@ public class CustomEntityManager {
     /**
      * 更新实体显示名称
      */
-    private void updateEntityName() {
-        if (gameTeam == null) {
+    public void updateEntityName() {
+        if (gameTeam == null || livingEntity == null || livingEntity.isDead()) {
             return;
         }
 
@@ -185,6 +204,11 @@ public class CustomEntityManager {
      * 清理资源
      */
     private void cleanup() {
+        if (refreshTask != null && !refreshTask.isCancelled()) {
+            refreshTask.cancel();
+            refreshTask = null;
+        }
+
         gameTeam = null;
         customEntityMap.remove(uuid);
     }

@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
-import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
@@ -39,7 +38,6 @@ import org.bukkit.Difficulty;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * AzuraBedWars插件主类
@@ -281,21 +279,6 @@ public final class AzuraBedWars extends JavaPlugin {
     private void setupNMSSupport() {
         nmsProvider = new NMSProvider();
         nmsAccess = nmsProvider.setup();
-        initCustomEntities();
-    }
-
-    /**
-     * 初始化自定义实体 (蠹虫 铁傀儡等)
-     */
-    private void initCustomEntities() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (CustomEntityManager customEntityManager : CustomEntityManager.getCustomEntityMap().values()) {
-                    customEntityManager.refresh();
-                }
-            }
-        }.runTaskTimer(this, 20L, 20L);
     }
 
     private void hookLuckPerms() {
