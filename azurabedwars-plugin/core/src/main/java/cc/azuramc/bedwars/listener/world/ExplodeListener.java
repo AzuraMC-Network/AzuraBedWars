@@ -41,6 +41,12 @@ public class ExplodeListener implements Listener {
             return;
         }
 
+        try {
+            entity.getWorld().playSound(entity.getLocation(), XSound.ENTITY_GENERIC_EXPLODE.get(), 4.0F, 1.0F);
+        } catch (Exception e) {
+            LoggerUtil.error("无法播放音效 请在Github反馈: " + e.getMessage());
+        }
+
         // 处理爆炸块列表
         processExplodedBlocks(event);
 
@@ -85,17 +91,7 @@ public class ExplodeListener implements Listener {
 
         // 处理可爆炸的方块
         for (Block block : blocksToExplode) {
-            // 清除方块并显示爆炸效果
             block.setType(Material.AIR);
-
-            // 播放爆炸音效
-            try {
-                block.getWorld().playSound(block.getLocation(), XSound.ENTITY_GENERIC_EXPLODE.get(), 0.5F, 1.0F);
-            } catch (Exception e) {
-                // 如果声音效果失败，记录日志但不中断游戏
-                LoggerUtil.warn("无法播放爆炸音效: " + e.getMessage());
-                e.printStackTrace();
-            }
 
             // 从游戏放置的方块列表中移除
             GAME_MANAGER.getBlocksLocation().remove(block.getLocation());

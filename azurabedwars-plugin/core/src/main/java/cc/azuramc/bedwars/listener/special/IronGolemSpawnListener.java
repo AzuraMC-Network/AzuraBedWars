@@ -6,12 +6,12 @@ import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,12 +33,8 @@ public class IronGolemSpawnListener implements Listener {
         Action action = event.getAction();
         Block block = event.getClickedBlock();
         ItemStack item = PlayerUtil.getItemInHand(player);
-        Location loc = null;
-        if (block != null) {
-            loc = block.getLocation();
-        }
 
-        if (loc == null) {
+        if (block == null) {
             return;
         }
 
@@ -59,51 +55,22 @@ public class IronGolemSpawnListener implements Listener {
 
         int despawn = 120;
 
-        // 寻找安全的生成位置
-        Location safeLocation = findSafeSpawnLocation(loc.clone().add(0, 1, 0));
-        if (safeLocation == null) {
-            // 如果找不到安全位置 给玩家提示
-            gamePlayer.sendMessage("§c无法在此位置生成铁傀儡，请选择更开阔的区域！");
+        // 获取点击面的位置 这样可以在墙的外侧生成
+        BlockFace face = event.getBlockFace();
+        Location spawnLocation = block.getRelative(face).getLocation().add(0.5, 0, 0.5);
+
+        if (!isLocationSafe(spawnLocation)) {
+            gamePlayer.sendMessage("§c无法在此位置生成铁傀儡，请选择更开阔的区域或确保在地上。");
             event.setCancelled(true);
             return;
         }
 
-        new CustomEntityManager(AzuraBedWars.getInstance().getNmsAccess().spawnIronGolem(safeLocation, gamePlayer,
+        new CustomEntityManager(AzuraBedWars.getInstance().getNmsAccess().spawnIronGolem(spawnLocation, gamePlayer,
                 0.25, 100), gamePlayer, despawn);
         event.setCancelled(true);
     }
 
-    /**
-     * 寻找安全的铁傀儡生成位置
-     * 铁傀儡需要3格高度的垂直空间
-     *
-     * @param originalLocation 原始生成位置
-     * @return 安全的生成位置，如果找不到则返回null
-     */
-    private Location findSafeSpawnLocation(Location originalLocation) {
-        // 首先检查原始位置是否安全
-        if (isLocationSafe(originalLocation)) {
-            return originalLocation;
-        }
 
-        // 如果原始位置不安全 在附近3x3范围内寻找替代位置
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                // 跳过原始位置
-                if (x == 0 && z == 0) {
-                    continue;
-                }
-
-                Location testLocation = originalLocation.clone().add(x, 0, z);
-                if (isLocationSafe(testLocation)) {
-                    return testLocation;
-                }
-            }
-        }
-
-        // 找不到安全位置
-        return null;
-    }
 
     /**
      * 检查位置是否安全（适合生成铁傀儡）
@@ -117,8 +84,9 @@ public class IronGolemSpawnListener implements Listener {
             return false;
         }
 
-        // 检查生成位置是否在保护区域内
-        if (MapUtil.isProtectedArea(location)) {
+        // 检查脚下是否有可站立的方块（不能是空气）
+        Block floorBlock = location.clone().add(0, -1, 0).getBlock();
+        if (floorBlock.getType() == Material.AIR || !floorBlock.getType().isSolid()) {
             return false;
         }
 
@@ -127,9 +95,29 @@ public class IronGolemSpawnListener implements Listener {
             Location checkLocation = location.clone().add(0, y, 0);
             Block block = checkLocation.getBlock();
 
-            // 如果不是空气方块 则位置不安全
-            if (block.getType() != Material.AIR) {
+            // 如果不是空气方块或者是流体 则false
+            if (block.getType() != Material.AIR && block.getType().isSolid()) {
                 return false;
+            }
+        }
+
+        // 检查2x2的占用空间
+        for (int x = 0; x < 2; x++) {
+            for (int z = 0; z < 2; z++) {
+                for (int y = 0; y < 3; y++) {
+                    Location checkLocation = location.clone().add(x - 0.5, y, z - 0.5);
+                    Block block = checkLocation.getBlock();
+
+                    if (block.getType() != Material.AIR && block.getType().isSolid()) {
+                        return false;
+                    }
+                }
+
+                // 检查脚下是否有支撑
+                Block supportBlock = location.clone().add(x - 0.5, -1, z - 0.5).getBlock();
+                if (supportBlock.getType() == Material.AIR || !supportBlock.getType().isSolid()) {
+                    return false;
+                }
             }
         }
 

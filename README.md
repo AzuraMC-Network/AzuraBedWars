@@ -1,7 +1,7 @@
 # AzuraBedWars
 
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.8+-green.svg)](https://www.minecraft.net/)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.8--1.21%2B-green.svg)](https://www.minecraft.net/)
 [![Spigot](https://img.shields.io/badge/Spigot-API-blue.svg)](https://www.spigotmc.org/)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
@@ -15,12 +15,19 @@ A BedWars plugin currently under development
 
 AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project is currently under development.
 
+### Branches
+
+- **master** — This branch contains the code for release builds.  
+  Updates are pushed at the beginning of each month, usually from the 1st to the 3rd.
+- **develop** — This branch is for daily updates and community pull requests.  
+  It may contain unstable or experimental features.
+
 ### Preface
 
 - This project is not yet complete and still needs many features to be finished. It is planned to be maintained until
   version 2.0.0
-- We plan to support versions 1.8-1.21+, but unfortunately, development and testing are currently only done on version
-  1.8.8
+- This project provides NMS support for Minecraft versions 1.8–1.21+, and we plan to actively maintain support for
+  future releases.
 - If you use this project, you are responsible for any issues you encounter. We only recommend using it for testing
   purposes, not for production environments
 - If you have suggestions or find issues, you can raise them in issues, and we will consider supporting them as soon as
@@ -51,7 +58,7 @@ AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project 
 ### Requirements
 
 - **Java**: 17 or higher
-- **Minecraft**: 1.8.8
+- **Minecraft**: 1.8.8 - 1.21.8
 - **Data Storage**: MySQL or MongoDB (required)
 - **Dependencies**:
   - PacketEvents (required)

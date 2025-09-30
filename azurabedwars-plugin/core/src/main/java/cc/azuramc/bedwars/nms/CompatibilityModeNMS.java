@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class CompatibilityModeNMS implements NMSAccess {
 
@@ -46,17 +46,12 @@ public class CompatibilityModeNMS implements NMSAccess {
     }
 
     @Override
-    public void registerCustomEntities() {
-
-    }
-
-    @Override
     public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health) {
         return null;
     }
 
     @Override
-    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health, double damage) {
+    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health) {
         return null;
     }
 

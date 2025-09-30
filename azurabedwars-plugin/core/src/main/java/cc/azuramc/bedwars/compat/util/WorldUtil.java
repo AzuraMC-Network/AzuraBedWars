@@ -15,11 +15,13 @@ public class WorldUtil {
         if (!VersionUtil.isLessThan1_13()) {
             world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
             world.setGameRule(GameRule.DO_FIRE_TICK, false);
+            world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
             return world;
         }
 
         world.setGameRuleValue("doMobSpawning", "false");
         world.setGameRuleValue("doFireTick", "false");
+        world.setGameRuleValue("announceAdvancements", "false");
         return world;
     }
 }

@@ -17,8 +17,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * 大厅计分板管理类
@@ -34,11 +36,6 @@ public class GameEndBoardProvider implements Listener {
      * 日期格式化器缓存
      */
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yy", Locale.CHINESE);
-
-    /**
-     * 玩家计分板更新状态缓存
-     */
-    private static final ConcurrentHashMap<UUID, Long> LAST_UPDATE_TIME = new ConcurrentHashMap<>();
 
     private static GameManager gameManager;
     /**
@@ -93,17 +90,8 @@ public class GameEndBoardProvider implements Listener {
      * 更新所有玩家的计分板
      */
     public static void updateBoard() {
-        long currentTime = System.currentTimeMillis();
-
         for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
-            // 检查更新间隔
-            UUID playerId = gamePlayer.getUuid();
-            long lastUpdate = LAST_UPDATE_TIME.getOrDefault(playerId, 0L);
-
-            if (currentTime - lastUpdate >= LOBBY_BOARD_CONFIG.getUpdateInterval()) {
-                updatePlayerBoard(gamePlayer);
-                LAST_UPDATE_TIME.put(playerId, currentTime);
-            }
+            updatePlayerBoard(gamePlayer);
         }
     }
 
@@ -187,9 +175,6 @@ public class GameEndBoardProvider implements Listener {
             FastBoard board = gamePlayer.getBoard();
             board.delete();
             gamePlayer.setBoard(null);
-
-            // 移除缓存
-            LAST_UPDATE_TIME.remove(player.getUniqueId());
         }
     }
 
@@ -203,7 +188,6 @@ public class GameEndBoardProvider implements Listener {
                 removeBoard(player);
             }
         }
-        LAST_UPDATE_TIME.clear();
     }
 
     /**

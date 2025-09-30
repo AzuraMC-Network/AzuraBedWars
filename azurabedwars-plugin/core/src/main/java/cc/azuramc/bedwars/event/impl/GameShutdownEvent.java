@@ -5,14 +5,10 @@ import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.event.AbstractGameEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.listener.world.ChunkListener;
 import cc.azuramc.bedwars.util.BungeeUtil;
 import org.bukkit.Bukkit;
 
 /**
- * 游戏结束事件
- * 处理游戏结束时需要执行的清理工作和关服操作
- *
  * @author an5w1r@163.com
  */
 public class GameShutdownEvent extends AbstractGameEvent {
@@ -41,17 +37,7 @@ public class GameShutdownEvent extends AbstractGameEvent {
             gameTeam.getGamePlayers().forEach(BungeeUtil::connectToLobby);
         }
 
-        performCleanup();
-
         shutdownServer();
-    }
-
-    /**
-     * 执行游戏结束前的清理工作
-     */
-    private void performCleanup() {
-        // 释放强制加载的区块
-        ChunkListener.releaseForceLoadedChunks();
     }
 
     /**

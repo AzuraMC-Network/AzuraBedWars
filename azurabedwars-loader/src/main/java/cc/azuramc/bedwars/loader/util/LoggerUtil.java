@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.loader.AzuraBedWarsLoader;
 import org.bukkit.Bukkit;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 public class LoggerUtil {
 

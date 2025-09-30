@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * @author An5w1r@163.com
+ * @author an5w1r@163.com
  */
 @Getter
 public class NMSProvider {
@@ -30,7 +30,7 @@ public class NMSProvider {
 
     private NMSAccess createNMSAccess(String version) {
         try {
-            return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + ".NMS_" + version).getDeclaredConstructor().newInstance();
+            return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + "." + version + ".NMS_" + version).getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             LoggerUtil.warn("未受支持的版本: " + e.getMessage());
         } catch (InstantiationException | IllegalAccessException e) {

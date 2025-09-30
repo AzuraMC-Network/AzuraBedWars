@@ -106,7 +106,9 @@ public class PlayerTabListHandler {
     private void updateGameStateDisplayName(GamePlayer gamePlayer, Player player, GameTeam gameTeam) {
         String displayName;
 
-        if (gamePlayer.isRespawning()) {
+        if (gameTeam == null) {
+            displayName = "&7[未知] | " + gamePlayer.getNickName();
+        } else if (gamePlayer.isRespawning()) {
             displayName = "&7" + gameTeam.getNameWithoutColor() + " | " + gamePlayer.getNickName();
         } else if (gamePlayer.isSpectator()) {
             displayName = "&7[旁观者] | " + gamePlayer.getNickName();
@@ -158,7 +160,10 @@ public class PlayerTabListHandler {
         }
 
         String prefix;
-        if (gamePlayer.isRespawning()) {
+        // 如果 gameTeam 为 null，直接显示为未分配状态
+        if (gameTeam == null) {
+            prefix = "&7[未分配] | ";
+        } else if (gamePlayer.isRespawning()) {
             prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
         } else if (gamePlayer.isSpectator()) {
             prefix = "&7[旁观者] | ";

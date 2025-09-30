@@ -294,23 +294,39 @@ public class GameManager {
 
         LoggerUtil.debug("GameManager$detectTeamColorFromWool | starting search in radius " + radius);
 
-        // 遍历位置周围的方块
+        // 遍历位置周围的方块（正方形区域，中心点优先）
         int checkedBlocks = 0;
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    checkedBlocks++;
-                    Block block = world.getBlockAt(
-                            location.getBlockX() + x,
-                            location.getBlockY() + y,
-                            location.getBlockZ() + z
-                    );
 
-                    // 检查方块是否为羊毛
-                    if (block.getType().name().contains("WOOL")) {
-                        // 根据羊毛颜色确定队伍颜色
-                        LoggerUtil.debug("GameManager$detectTeamColorFromWool | Found WOOL block! Type: " + block.getType().name());
-                        return WoolUtil.getTeamColorFromWoolBlock(block);
+        // 检查中心点本身
+        Block centerBlock = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        checkedBlocks++;
+        LoggerUtil.debug("GameManager$detectTeamColorFromWool | Checking center block first (x:0, y:0, z:0)");
+        if (centerBlock.getType().name().contains("WOOL")) {
+            LoggerUtil.debug("GameManager$detectTeamColorFromWool | Found WOOL block at center! Type: " + centerBlock.getType().name());
+            return WoolUtil.getTeamColorFromWoolBlock(centerBlock);
+        }
+
+        // 然后按距离从近到远扫描周围区域
+        for (int distance = 1; distance <= radius; distance++) {
+            for (int x = -distance; x <= distance; x++) {
+                for (int y = -distance; y <= distance; y++) {
+                    for (int z = -distance; z <= distance; z++) {
+                        // 只检查当前距离层的边界方块 避免重复检查内层
+                        if (Math.abs(x) == distance || Math.abs(y) == distance || Math.abs(z) == distance) {
+                            checkedBlocks++;
+                            Block block = world.getBlockAt(
+                                    location.getBlockX() + x,
+                                    location.getBlockY() + y,
+                                    location.getBlockZ() + z
+                            );
+
+                            // 检查方块是否为羊毛
+                            if (block.getType().name().contains("WOOL")) {
+                                // 根据羊毛颜色确定队伍颜色
+                                LoggerUtil.debug("GameManager$detectTeamColorFromWool | Found WOOL block! Type: " + block.getType().name() + " at layer: " + distance + " (x:" + x + ", y:" + y + ", z:" + z + ")");
+                                return WoolUtil.getTeamColorFromWoolBlock(block);
+                            }
+                        }
                     }
                 }
             }
@@ -389,20 +405,24 @@ public class GameManager {
         Player player = gamePlayer.getPlayer();
 
         // Game Mode Selection
-        player.getInventory().addItem(
-                new ItemBuilder()
-                        .setType(resourceSelectorMaterial)
-                        .setDisplayName(resourceSelectorName)
-                        .getItem()
-        );
+        if (settingsConfig.isEnableTeamSelection()) {
+            player.getInventory().addItem(
+                    new ItemBuilder()
+                            .setType(resourceSelectorMaterial)
+                            .setDisplayName(resourceSelectorName)
+                            .getItem()
+            );
+        }
 
         // Team Selection
-//        player.getInventory().setItem(2,
-//                new ItemBuilder()
-//                        .setType(teamSelectorMaterial)
-//                        .setDisplayName(teamSelectorName)
-//                        .getItem()
-//        );
+        if (settingsConfig.isEnableTeamSelection()) {
+            player.getInventory().setItem(2,
+                    new ItemBuilder()
+                            .setType(teamSelectorMaterial)
+                            .setDisplayName(teamSelectorName)
+                            .getItem()
+            );
+        }
 
         // Leave Game
         player.getInventory().setItem(8,

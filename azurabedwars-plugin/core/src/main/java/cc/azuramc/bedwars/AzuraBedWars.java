@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.config.ConfigManager;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
-import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
@@ -39,7 +38,6 @@ import org.bukkit.Difficulty;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * AzuraBedWars插件主类
@@ -90,10 +88,14 @@ public final class AzuraBedWars extends JavaPlugin {
         long startTime = System.currentTimeMillis();
         instance = this;
         PacketEvents.getAPI().init();
-
-        setupNMSSupport();
         // 初始化配置系统
         initConfigSystem();
+
+        // ReflectionUtil初始化版本
+        ReflectionUtil.initializeVersions();
+        NMSMapping.initNmsMapping();
+
+        setupNMSSupport();
 
         // 初始化基础服务
         initDatabases();
@@ -111,10 +113,6 @@ public final class AzuraBedWars extends JavaPlugin {
             initGameFeatures();
         }
 
-        // ReflectionUtil初始化版本
-        ReflectionUtil.initializeVersions();
-        NMSMapping.initNmsMapping();
-        // 初始化命令和通信系统
         initCommands();
         // bStats
         loadBStats();
@@ -281,22 +279,6 @@ public final class AzuraBedWars extends JavaPlugin {
     private void setupNMSSupport() {
         nmsProvider = new NMSProvider();
         nmsAccess = nmsProvider.setup();
-        initCustomEntities();
-    }
-
-    /**
-     * 初始化自定义实体 (蠹虫 铁傀儡等)
-     */
-    private void initCustomEntities() {
-        nmsAccess.registerCustomEntities();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (CustomEntityManager customEntityManager : CustomEntityManager.getCustomEntityMap().values()) {
-                    customEntityManager.refresh();
-                }
-            }
-        }.runTaskTimer(this, 20L, 20L);
     }
 
     private void hookLuckPerms() {
