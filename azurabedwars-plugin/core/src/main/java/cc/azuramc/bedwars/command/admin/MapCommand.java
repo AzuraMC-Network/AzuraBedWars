@@ -123,19 +123,7 @@ public class MapCommand {
 
     @Subcommand("create")
     public void createMap(Player player, String mapName) {
-        if (checkEditorMode(player)) {
-            return;
-        }
-        if (mapName == null || mapName.trim().isEmpty()) {
-            player.sendMessage(MessageUtil.color("&c地图名称不能为空!"));
-            return;
-        }
-        if (mapName.length() > 30) {
-            player.sendMessage(MessageUtil.color("&c地图名称长度不能超过30个字符!"));
-            return;
-        }
-        if (!mapName.matches("^[a-zA-Z0-9_\\-]+$")) {
-            player.sendMessage(MessageUtil.color("&c地图名称只能包含字母、数字、下划线和连字符!"));
+        if (checkEditorMode(player) || validateMapName(player, mapName)) {
             return;
         }
         if (mapManager.getLoadedMaps().containsKey(mapName)) {
