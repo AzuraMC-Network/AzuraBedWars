@@ -134,7 +134,24 @@ public class TeamSelectionGUI extends CustomGUI {
         ChatColor chatColor = teamColor.getChatColor();
         String teamName = teamColor.getName();
 
-        // 构建物品描述
+        List<String> loreList = new ArrayList<>();
+        loreList.add("§7队伍人数: §f" + currentPlayers + "§7/§f" + maxPlayers);
+
+        if (!team.getGamePlayers().isEmpty()) {
+            loreList.add("§7");
+            loreList.add("§7队伍成员:");
+            for (GamePlayer teamPlayer : team.getGamePlayers()) {
+                String memberName = teamPlayer.getPlayer().getName();
+                if (teamPlayer == getGamePlayer()) {
+                    loreList.add("§a  ▸ " + memberName + " §7(你)");
+                } else {
+                    loreList.add("§7  ▸ " + memberName);
+                }
+            }
+        }
+
+        loreList.add("§7");
+
         String statusLine;
         if (isSelected) {
             statusLine = "§a§l✓ 已选择";
@@ -143,14 +160,11 @@ public class TeamSelectionGUI extends CustomGUI {
         } else {
             statusLine = "§7点击选择此队伍";
         }
+        loreList.add(statusLine);
 
         setItem(slot, new ItemBuilder(coloredWoolItem)
                         .setDisplayName(chatColor + teamName)
-                        .setLores(
-                                "§7队伍人数: §f" + currentPlayers + "§7/§f" + maxPlayers,
-                                "§7",
-                                statusLine
-                        )
+                        .setLores(loreList.toArray(new String[0]))
                         .getItem(),
                 new GUIAction(0, () -> handleTeamSelection(getGamePlayer(), team, teamColor), true));
     }
@@ -176,13 +190,13 @@ public class TeamSelectionGUI extends CustomGUI {
 
         // 检查是否只能选择人数最少的队伍（平衡机制）
         GameTeam lowestTeam = gameManager.getLowestTeam();
-        if (lowestTeam != targetTeam && !targetTeam.getGamePlayers().isEmpty()) {
-            // 如果目标队伍不是人数最少的队伍，且不为空，则检查是否允许选择
+        if (lowestTeam != targetTeam) {
+            // 如果目标队伍不是人数最少的队伍，则检查是否允许选择
             int targetSize = targetTeam.getGamePlayers().size();
             int lowestSize = lowestTeam.getGamePlayers().size();
 
-            // 允许选择人数相等或只多1人的队伍，保持平衡
-            if (targetSize > lowestSize + 1) {
+            // 只允许选择人数最少的队伍
+            if (targetSize > lowestSize) {
                 player.sendMessage(MessageUtil.color("&c为了保持游戏平衡，请选择人数较少的队伍！"));
                 return;
             }
@@ -198,7 +212,6 @@ public class TeamSelectionGUI extends CustomGUI {
 
             // 更新玩家手中的队伍颜色物品
             player.getInventory().setItem(2, WoolUtil.getColoredWool(teamColor));
-            // TODO: 刷新GUI显示
         } else {
             player.sendMessage(MessageUtil.color("&c加入队伍失败，请稍后重试！"));
         }
