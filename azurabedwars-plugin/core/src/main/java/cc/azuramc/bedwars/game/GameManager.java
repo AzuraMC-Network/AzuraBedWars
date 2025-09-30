@@ -405,20 +405,24 @@ public class GameManager {
         Player player = gamePlayer.getPlayer();
 
         // Game Mode Selection
-        player.getInventory().addItem(
-                new ItemBuilder()
-                        .setType(resourceSelectorMaterial)
-                        .setDisplayName(resourceSelectorName)
-                        .getItem()
-        );
+        if (settingsConfig.isEnableTeamSelection()) {
+            player.getInventory().addItem(
+                    new ItemBuilder()
+                            .setType(resourceSelectorMaterial)
+                            .setDisplayName(resourceSelectorName)
+                            .getItem()
+            );
+        }
 
         // Team Selection
-        player.getInventory().setItem(2,
-                new ItemBuilder()
-                        .setType(teamSelectorMaterial)
-                        .setDisplayName(teamSelectorName)
-                        .getItem()
-        );
+        if (settingsConfig.isEnableTeamSelection()) {
+            player.getInventory().setItem(2,
+                    new ItemBuilder()
+                            .setType(teamSelectorMaterial)
+                            .setDisplayName(teamSelectorName)
+                            .getItem()
+            );
+        }
 
         // Leave Game
         player.getInventory().setItem(8,

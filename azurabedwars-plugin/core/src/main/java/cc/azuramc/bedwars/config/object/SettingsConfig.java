@@ -27,6 +27,8 @@ public class SettingsConfig {
     private int maxNoMovementTime = 45;
     private int teamSpawnProtectionRadius = 6;
     private int resourceSpawnProtectionRadius = 2;
+    private boolean enableGameModeSelection = true;
+    private boolean enableTeamSelection = true;
 
     private DatabaseConfig database = new DatabaseConfig();
     private ChatConfig chatConfig = new ChatConfig();
