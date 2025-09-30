@@ -17,11 +17,11 @@ import org.bukkit.event.Listener;
 public class ScoreboardManager implements Listener {
     private final GameManager gameManager;
     @Getter
-    GameEndBoardProvider gameEndBoardProvider;
+    private GameEndBoardProvider gameEndBoardProvider;
     @Getter
-    GameRunningBoardProvider gameRunningBoardProvider;
+    private GameRunningBoardProvider gameRunningBoardProvider;
     @Getter
-    LobbyBoardProvider lobbyBoardProvider;
+    private LobbyBoardProvider lobbyBoardProvider;
 
     /**
      * 构造函数

@@ -22,7 +22,7 @@ public class SettingsConfig {
     private String defaultMapName = "game";
     private int bedSearchRadius = 18;
     private int bedDestroyReward = 10;
-    private String playAgainCommand = MessageUtil.color("/not impl now");
+    private String playAgainCommand = "/not impl now";
     private int maxHealth = 20;
     private int maxNoMovementTime = 45;
 
@@ -71,8 +71,6 @@ public class SettingsConfig {
         private String bedAlive = MessageUtil.color("&c❤");
         private String separator = MessageUtil.color("&f | ");
         private String emptyLine = MessageUtil.color("");
-        // 默认为0.5秒更新一次 50ms = 1tick
-        private long updateInterval = 500;
     }
 
     @Data
@@ -83,8 +81,6 @@ public class SettingsConfig {
         private String emptyLine = MessageUtil.color("");
         private String defaultMode = MessageUtil.color("普通模式");
         private String expMode = MessageUtil.color("经验模式");
-        // 默认为0.5秒更新一次 50ms = 1tick
-        private long updateInterval = 500;
     }
 
     @Data
