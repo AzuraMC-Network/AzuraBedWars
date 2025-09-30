@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.map.MapData;
@@ -18,8 +19,8 @@ import java.lang.reflect.Method;
  */
 public class MapUtil {
 
-    private static final int TEAM_SPAWN_PROTECTION_RADIUS = 8;
-    private static final int RESOURCE_SPAWN_PROTECTION_RADIUS = 3;
+    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
+
     private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
 
     /**
@@ -31,7 +32,7 @@ public class MapUtil {
     public static boolean isProtectedRelativeLocation(Block block) {
         // 检查团队出生点保护
         for (GameTeam gameTeam : GAME_MANAGER.getGameTeams()) {
-            if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= TEAM_SPAWN_PROTECTION_RADIUS) {
+            if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getTeamSpawnProtectionRadius()) {
                 return true;
             }
         }
@@ -43,14 +44,14 @@ public class MapUtil {
 
         // 检查钻石资源点保护
         for (Location location : GAME_MANAGER.getMapData().getDropLocations(MapData.DropType.DIAMOND)) {
-            if (location.distance(block.getLocation()) <= RESOURCE_SPAWN_PROTECTION_RADIUS) {
+            if (location.distance(block.getLocation()) <= settingsConfig.getResourceSpawnProtectionRadius()) {
                 return true;
             }
         }
 
         // 检查绿宝石资源点保护
         for (Location location : GAME_MANAGER.getMapData().getDropLocations(MapData.DropType.EMERALD)) {
-            if (location.distance(block.getLocation()) <= RESOURCE_SPAWN_PROTECTION_RADIUS) {
+            if (location.distance(block.getLocation()) <= settingsConfig.getResourceSpawnProtectionRadius()) {
                 return true;
             }
         }
@@ -72,14 +73,14 @@ public class MapUtil {
 
         // 检查团队出生点保护
         for (GameTeam gameTeam : GAME_MANAGER.getGameTeams()) {
-            if (gameTeam.getSpawnLocation().distance(location) <= TEAM_SPAWN_PROTECTION_RADIUS) {
+            if (gameTeam.getSpawnLocation().distance(location) <= settingsConfig.getTeamSpawnProtectionRadius()) {
                 return true;
             }
         }
 
         // 检查资源点保护
         for (MapData.RawLocation rawLocation : GAME_MANAGER.getMapData().getDrops()) {
-            if (rawLocation.toLocation().distance(location) <= RESOURCE_SPAWN_PROTECTION_RADIUS) {
+            if (rawLocation.toLocation().distance(location) <= settingsConfig.getResourceSpawnProtectionRadius()) {
                 return true;
             }
         }
