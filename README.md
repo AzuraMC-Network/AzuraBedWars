@@ -15,6 +15,13 @@ A BedWars plugin currently under development
 
 AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project is currently under development.
 
+### Branches
+
+- **master** — This branch contains the code for release builds.  
+  Updates are pushed at the beginning of each month, usually from the 1st to the 3rd.
+- **develop** — This branch is for daily updates and community pull requests.  
+  It may contain unstable or experimental features.
+
 ### Preface
 
 - This project is not yet complete and still needs many features to be finished. It is planned to be maintained until
