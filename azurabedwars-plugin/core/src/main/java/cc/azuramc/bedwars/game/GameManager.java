@@ -87,8 +87,8 @@ public class GameManager {
     private List<GameTeam> gameTeams;
     private List<GameParty> gameParties;
 
-    private Map<ArmorStand, String> armorSande;
-    private Map<ArmorStand, String> armorStand;
+    private Set<ArmorStand> armorSande;
+    private Set<ArmorStand> armorStand;
 
     private List<AbstractSpecialItem> abstractSpecialItems;
 
@@ -108,8 +108,8 @@ public class GameManager {
         this.isForceStarted = false;
         this.gameTeams = new ArrayList<>();
         this.gameParties = new ArrayList<>();
-        this.armorSande = new HashMap<>();
-        this.armorStand = new HashMap<>();
+        this.armorSande = new HashSet<>();
+        this.armorStand = new HashSet<>();
         this.abstractSpecialItems = new ArrayList<>();
         ShopManager.init(this);
         this.generatorManager = new GeneratorManager(this);
