@@ -145,6 +145,34 @@ public class WoolUtil {
     }
 
     /**
+     * 根据数据值获取对应的颜色名称
+     *
+     * @param data 颜色数据值
+     * @return 颜色名称
+     */
+    public static String getColorNameFromData(byte data) {
+        return switch (data & 0xF) { // 只使用低4位
+            case 0 -> "WHITE";
+            case 1 -> "ORANGE";
+            case 2 -> "MAGENTA";
+            case 3 -> "LIGHT_BLUE";
+            case 4 -> "YELLOW";
+            case 5 -> "LIME";
+            case 6 -> "PINK";
+            case 7 -> "GRAY";
+            case 8 -> "SILVER";
+            case 9 -> "CYAN";
+            case 10 -> "PURPLE";
+            case 11 -> "BLUE";
+            case 12 -> "BROWN";
+            case 13 -> "GREEN";
+            case 14 -> "RED";
+            case 15 -> "BLACK";
+            default -> "WHITE";
+        };
+    }
+
+    /**
      * 获取指定颜色的羊毛物品
      *
      * @param teamColor 队伍颜色
