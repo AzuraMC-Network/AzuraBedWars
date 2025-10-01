@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.shop.gui.ItemShopGUI;
 import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
+import cc.azuramc.bedwars.util.LoadGameUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,12 +23,12 @@ public class PlayerInteractShopListener implements Listener {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
 
-        if (event.getRightClicked().hasMetadata("Shop")) {
+        if (event.getRightClicked().hasMetadata(LoadGameUtil.ITEM_SHOP_METADATA_KEY)) {
             handleItemShopInteraction(event, gamePlayer);
             return;
         }
 
-        if (event.getRightClicked().hasMetadata("Shop2")) {
+        if (event.getRightClicked().hasMetadata(LoadGameUtil.UPGRADE_SHOP_METADATA_KEY)) {
             handleTeamShopInteraction(event, gamePlayer);
         }
     }

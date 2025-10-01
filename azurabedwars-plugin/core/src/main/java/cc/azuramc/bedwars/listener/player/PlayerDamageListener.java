@@ -11,6 +11,7 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
 import cc.azuramc.bedwars.util.DamageUtil;
+import cc.azuramc.bedwars.util.LoadGameUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.hook.VaultUtil;
 import org.bukkit.Bukkit;
@@ -38,8 +39,6 @@ public class PlayerDamageListener implements Listener {
     private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
     private final static PlayerConfig.PlayerDeath CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
 
-    private static final String METADATA_SHOP = "Shop";
-    private static final String METADATA_SHOP2 = "Shop2";
     private static final int COINS_ACTIONBAR_TIMES = CONFIG.getCoinsActionBarTimes();
     private static final int ACTIONBAR_PERIOD = CONFIG.getActionBarPeriod();
     private static final int RESPAWN_DELAY = 10;
@@ -63,7 +62,8 @@ public class PlayerDamageListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         // 检查商店NPC伤害
-        if (event.getEntity().hasMetadata(METADATA_SHOP) || event.getEntity().hasMetadata(METADATA_SHOP2)) {
+        if (event.getEntity().hasMetadata(LoadGameUtil.ITEM_SHOP_METADATA_KEY)
+                || event.getEntity().hasMetadata(LoadGameUtil.UPGRADE_SHOP_METADATA_KEY)) {
             event.setCancelled(true);
             return;
         }

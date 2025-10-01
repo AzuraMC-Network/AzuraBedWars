@@ -158,8 +158,8 @@ public class GeneratorManager {
     }
 
     public void initDisplayUpdaters() {
-        initResourceDisplayUpdater("钻石", resourceSpawnConfig.getDiamondGeneratorName(), gameManager.getArmorStand().keySet(), resourceSpawnConfig.getDiamondName());
-        initResourceDisplayUpdater("绿宝石", resourceSpawnConfig.getEmeraldGeneratorName(), gameManager.getArmorSande().keySet(), resourceSpawnConfig.getEmeraldName());
+        initResourceDisplayUpdater("钻石", resourceSpawnConfig.getDiamondGeneratorName(), gameManager.getArmorStand(), resourceSpawnConfig.getDiamondName());
+        initResourceDisplayUpdater("绿宝石", resourceSpawnConfig.getEmeraldGeneratorName(), gameManager.getArmorSande(), resourceSpawnConfig.getEmeraldName());
     }
 
     private void updateResourceDisplay(Set<ArmorStand> armorStands, PublicResourceGenerator generator, String resourceDisplayName) {
@@ -196,10 +196,10 @@ public class GeneratorManager {
         Set<ArmorStand> armorStands;
         String resourceDisplayName;
         if (generatorName.equals(resourceSpawnConfig.getDiamondGeneratorName())) {
-            armorStands = new HashSet<>(gameManager.getArmorStand().keySet());
+            armorStands = new HashSet<>(gameManager.getArmorStand());
             resourceDisplayName = resourceSpawnConfig.getDiamondName();
         } else if (generatorName.equals(resourceSpawnConfig.getEmeraldGeneratorName())) {
-            armorStands = new HashSet<>(gameManager.getArmorSande().keySet());
+            armorStands = new HashSet<>(gameManager.getArmorSande());
             resourceDisplayName = resourceSpawnConfig.getEmeraldName();
         } else {
             return;
