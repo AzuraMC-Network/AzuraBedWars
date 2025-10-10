@@ -67,6 +67,7 @@ dependencies {
     implementation project(':azurabedwars-plugin:1_8_R3')
     implementation project(':azurabedwars-plugin:1_9_R1')
     implementation project(':azurabedwars-plugin:1_9_R2')
+    implementation project(':azurabedwars-plugin:1_10_R1')
     implementation project(':azurabedwars-plugin:v1_11_R1')
     implementation project(':azurabedwars-plugin:v1_12_R1')
     implementation project(':azurabedwars-plugin:v1_13_R1')
