@@ -47,28 +47,28 @@ public class CustomIronGolem extends AbstractCustomEntity {
 
     @Override
     protected void setupGoals() {
-        getGoalSelector(mob).addGoal(1, new FloatGoal(mob));
-        getGoalSelector(mob).addGoal(2, new MeleeAttackGoal(pathfinderMob, 1.5D, false));
-        getGoalSelector(mob).addGoal(3, new MoveTowardsTargetGoal(pathfinderMob, 1.0D, 20.0F));
-        getGoalSelector(mob).addGoal(4, new RandomStrollGoal(pathfinderMob, 1D));
-        getGoalSelector(mob).addGoal(5, new RandomLookAroundGoal(pathfinderMob));
+        mob.goalSelector.addGoal(1, new FloatGoal(mob));
+        mob.goalSelector.addGoal(2, new MeleeAttackGoal(pathfinderMob, 1.5D, false));
+        mob.goalSelector.addGoal(3, new MoveTowardsTargetGoal(pathfinderMob, 1.0D, 20.0F));
+        mob.goalSelector.addGoal(4, new RandomStrollGoal(pathfinderMob, 1D));
+        mob.goalSelector.addGoal(5, new RandomLookAroundGoal(pathfinderMob));
     }
 
     @Override
     protected void setupTargets() {
         // 被攻击时立即反击
-        getTargetSelector(mob).addGoal(1, new HurtByTargetGoal(pathfinderMob));
+        mob.targetSelector.addGoal(1, new HurtByTargetGoal(pathfinderMob));
 
         // 主动寻找玩家目标
-        getTargetSelector(mob).addGoal(2, new NearestAttackableTargetGoal<>(pathfinderMob, Player.class, 20, true, false,
+        mob.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(pathfinderMob, Player.class, 20, true, false,
                 this::isValidPlayerTarget));
 
         // 主动寻找铁傀儡目标
-        getTargetSelector(mob).addGoal(3, new NearestAttackableTargetGoal<>(pathfinderMob, IronGolem.class, 20, true, false,
+        mob.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(pathfinderMob, IronGolem.class, 20, true, false,
                 this::isValidIronGolemTarget));
 
         // 主动寻找其他蠹虫目标
-        getTargetSelector(mob).addGoal(4, new NearestAttackableTargetGoal<>(pathfinderMob, Silverfish.class, 20, true, false,
+        mob.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(pathfinderMob, Silverfish.class, 20, true, false,
                 this::isValidSilverfishTarget));
     }
 
