@@ -7,11 +7,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,8 +41,8 @@ public abstract class AbstractCustomEntity {
     }
 
     protected void clearGoals() {
-        getGoalSelector(mob).getAvailableGoals().clear();
-        getTargetSelector(mob).getAvailableGoals().clear();
+        mob.goalSelector.getAvailableGoals().clear();
+        mob.targetSelector.getAvailableGoals().clear();
     }
 
     protected void setupAttributes() {
@@ -109,13 +107,5 @@ public abstract class AbstractCustomEntity {
 
         AbstractCustomEntity customFish = AbstractCustomEntity.getCustomEntityMap().get(fish);
         return customFish.getGameTeam() != gameTeam;
-    }
-
-    protected GoalSelector getTargetSelector(@NotNull Mob mob) {
-        return mob.targetSelector;
-    }
-
-    protected GoalSelector getGoalSelector(@NotNull Mob mob) {
-        return mob.goalSelector;
     }
 }
