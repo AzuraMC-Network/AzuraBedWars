@@ -40,6 +40,7 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
                     .setLeakDetectionThreshold(30000L)
                     .setPoolName("AzuraBedWars-Pool")
                     .setRegisterMbeans(true)
+                    .setUseSSL(false)
                     .setAutoCommit(true);
 
             AzuraORM.initialize(config, true);
