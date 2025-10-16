@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.map.MapData;
 import com.cryptomorin.xseries.XMaterial;
@@ -169,8 +170,12 @@ public class LoadGameUtil {
         Villager villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class);
         configureShopVillager(villager, profession, plugin, metadataKey);
 
-        // 将村民放在盔甲架上
-        mountVillagerOnArmorStand(armorStand, villager);
+        //TODO: WE ARE MAKING A NEW PROJECT TO SOLVE THIS PROBLEM
+        if (VersionUtil.isVersion1_8()) {
+            mountVillagerOnArmorStand(armorStand, villager);
+        } else {
+            villager.setAI(false);
+        }
 
         // 创建名称标签
         Location nameTagLocation = spawnLocation.add(0.0D, NAME_TAG_Y_OFFSET, 0.0D);
@@ -204,7 +209,7 @@ public class LoadGameUtil {
     }
 
     /**
-     * 将村民挂载到盔甲架上（处理版本兼容性）
+     * 将村民挂载到盔甲架上
      */
     private static void mountVillagerOnArmorStand(ArmorStand armorStand, Villager villager) {
         armorStand.setPassenger(villager);
