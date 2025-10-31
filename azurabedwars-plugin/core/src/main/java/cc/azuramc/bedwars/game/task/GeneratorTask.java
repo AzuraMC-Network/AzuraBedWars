@@ -72,13 +72,11 @@ public class GeneratorTask {
 
                 // 安全地添加盔甲架到列表中
                 if (gameManager.getArmorSande() != null) {
-                    Set<ArmorStand> armorSandeSet = gameManager.getArmorSande().keySet();
-                    allArmor.addAll(armorSandeSet);
+                    allArmor.addAll(gameManager.getArmorSande());
                 }
 
                 if (gameManager.getArmorStand() != null) {
-                    Set<ArmorStand> armorStandSet = gameManager.getArmorStand().keySet();
-                    allArmor.addAll(armorStandSet);
+                    allArmor.addAll(gameManager.getArmorStand());
                 }
 
                 // 过滤掉无效的盔甲架
@@ -127,7 +125,7 @@ public class GeneratorTask {
             // 钻石显示更新
             if (gameManager.getArmorStand() != null && !gameManager.getArmorStand().isEmpty()) {
                 registerResourceDisplay(resourceSpawnConfig.getDiamondTimeDisplay(), resourceSpawnConfig.getDiamondGeneratorName(),
-                        gameManager.getArmorStand().keySet(), resourceSpawnConfig.getDiamondName());
+                        gameManager.getArmorStand(), resourceSpawnConfig.getDiamondName());
             } else {
                 LoggerUtil.warn("无法注册钻石显示更新：盔甲架集合为空");
             }
@@ -135,7 +133,7 @@ public class GeneratorTask {
             // 绿宝石显示更新
             if (gameManager.getArmorSande() != null && !gameManager.getArmorSande().isEmpty()) {
                 registerResourceDisplay(resourceSpawnConfig.getEmeraldTimeDisplay(), resourceSpawnConfig.getEmeraldGeneratorName(),
-                        gameManager.getArmorSande().keySet(), resourceSpawnConfig.getEmeraldName());
+                        gameManager.getArmorSande(), resourceSpawnConfig.getEmeraldName());
             } else {
                 LoggerUtil.warn("无法注册绿宝石显示更新：盔甲架集合为空");
             }

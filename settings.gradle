@@ -8,6 +8,7 @@ include (
         'azurabedwars-plugin:1_8_R3',
         'azurabedwars-plugin:1_9_R1',
         'azurabedwars-plugin:1_9_R2',
+        'azurabedwars-plugin:1_10_R1',
         'azurabedwars-plugin:v1_11_R1',
         'azurabedwars-plugin:v1_12_R1',
         'azurabedwars-plugin:v1_13_R1',
@@ -17,6 +18,7 @@ include (
         'azurabedwars-plugin:v1_16_R1',
         'azurabedwars-plugin:v1_16_R2',
         'azurabedwars-plugin:v1_16_R3',
+        'azurabedwars-plugin:v1_17_R1',
         'azurabedwars-plugin:v1_18_R1',
         'azurabedwars-plugin:v1_18_R2',
         'azurabedwars-plugin:v1_19_R1',
@@ -30,5 +32,7 @@ include (
         'azurabedwars-plugin:1_21_R2',
         'azurabedwars-plugin:1_21_R3',
         'azurabedwars-plugin:1_21_R4',
-        'azurabedwars-plugin:1_21_R5'
+        'azurabedwars-plugin:1_21_R5',
+        'azurabedwars-plugin:1_21_R6',
+        'azurabedwars-plugin:1_21_10',
 )

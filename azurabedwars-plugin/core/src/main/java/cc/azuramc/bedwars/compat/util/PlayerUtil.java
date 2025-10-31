@@ -5,13 +5,11 @@ import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.Objects;
 
 public class PlayerUtil {
 
@@ -180,17 +178,16 @@ public class PlayerUtil {
     }
 
     /**
-     * 获取玩家最大血量
+     * Gets the player's maximum health.
+     * Note: Although {@code Player#getMaxHealth()} is marked as deprecated,
+     * it still works properly at the current implementation level,
+     * so we safely ignore the deprecation for now.
      *
-     * @param player 玩家
+     * @param player the player
      */
     @SuppressWarnings("deprecation")
     public static double getMaxHealth(Player player) {
-        if (VersionUtil.isLessThan1_13()) {
-            return player.getMaxHealth();
-        }
-
-        return Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        return player.getMaxHealth();
     }
 
 }

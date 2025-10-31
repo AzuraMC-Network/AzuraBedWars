@@ -32,7 +32,7 @@ public class LoggerUtil {
             return;
         }
         Bukkit.broadcast(message, ADMIN_PERMISSION);
-        info(LOGGER_PREFIX + "[Debugger] " + message);
+        info("[Debugger] " + message);
     }
 
     public static void printChat(String message) {

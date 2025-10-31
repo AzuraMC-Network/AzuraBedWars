@@ -1,7 +1,10 @@
 package cc.azuramc.bedwars.nms;
 
+import cc.azuramc.bedwars.compat.util.WoolUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemFlag;
@@ -31,5 +34,16 @@ public interface NMSAccess {
             itemStack.setItemMeta(meta);
         }
         return itemStack;
+    }
+
+    default void setWoolBlockData(Block block, byte data) {
+        Material type = block.getType();
+        if (type.name().toUpperCase().contains("WOOL")) {
+            String colorName = WoolUtil.getColorNameFromData(data);
+            Material newType = Material.getMaterial(colorName + "_WOOL");
+            if (newType != null) {
+                block.setType(newType);
+            }
+        }
     }
 }
