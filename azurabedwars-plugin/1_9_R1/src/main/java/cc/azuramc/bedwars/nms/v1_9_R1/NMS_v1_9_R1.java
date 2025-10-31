@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.util.LoggerUtil;
 import net.minecraft.server.v1_9_R1.EntityFireball;
 import net.minecraft.server.v1_9_R1.NBTTagCompound;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftFireball;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Fireball;
@@ -71,5 +72,11 @@ public class NMS_v1_9_R1 implements NMSAccess {
 
         nmsItem.setTag(tag);
         return CraftItemStack.asBukkitCopy(nmsItem);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void setWoolBlockData(Block block, byte data) {
+        block.setData(data);
     }
 }

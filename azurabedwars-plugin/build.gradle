@@ -38,7 +38,7 @@ allprojects {
     }
 
     group = 'cc.azuramc'
-    version = '1.0.0-beta.9'
+    version = '1.0.0-beta.10'
 }
 
 subprojects {
@@ -56,7 +56,7 @@ subprojects {
 
     dependencies {
         compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-        compileOnly "com.github.retrooper:packetevents-spigot:2.9.3"
+        compileOnly "com.github.retrooper:packetevents-spigot:2.10.0"
         compileOnly "org.projectlombok:lombok:1.18.34"
         annotationProcessor "org.projectlombok:lombok:1.18.34"
     }
@@ -67,6 +67,7 @@ dependencies {
     implementation project(':azurabedwars-plugin:1_8_R3')
     implementation project(':azurabedwars-plugin:1_9_R1')
     implementation project(':azurabedwars-plugin:1_9_R2')
+    implementation project(':azurabedwars-plugin:1_10_R1')
     implementation project(':azurabedwars-plugin:v1_11_R1')
     implementation project(':azurabedwars-plugin:v1_12_R1')
     implementation project(':azurabedwars-plugin:v1_13_R1')
@@ -75,6 +76,7 @@ dependencies {
     implementation project(':azurabedwars-plugin:v1_15_R1')
     implementation project(':azurabedwars-plugin:v1_16_R1')
     implementation project(':azurabedwars-plugin:v1_16_R2')
+    implementation project(':azurabedwars-plugin:v1_17_R1')
     implementation project(':azurabedwars-plugin:v1_16_R3')
     implementation project(':azurabedwars-plugin:v1_18_R1')
     implementation project(':azurabedwars-plugin:v1_18_R2')
@@ -90,6 +92,8 @@ dependencies {
     implementation project(':azurabedwars-plugin:1_21_R3')
     implementation project(':azurabedwars-plugin:1_21_R4')
     implementation project(':azurabedwars-plugin:1_21_R5')
+    implementation project(':azurabedwars-plugin:1_21_R6')
+    implementation project(':azurabedwars-plugin:1_21_10')
 }
 
 shadowJar {
