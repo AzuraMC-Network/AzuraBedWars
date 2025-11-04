@@ -16,7 +16,7 @@ import java.nio.file.Files;
 public class ConfigManager {
     private final JavaPlugin plugin;
     private FileConfiguration config;
-    private File configFile;
+    private final File configFile;
 
     public ConfigManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -30,7 +30,11 @@ public class ConfigManager {
     public boolean loadConfig() {
         try {
             if (!plugin.getDataFolder().exists()) {
-                plugin.getDataFolder().mkdirs();
+                boolean success = plugin.getDataFolder().mkdirs();
+                if (!success) {
+                    LoggerUtil.error("failed to create data folder");
+                    return false;
+                }
             }
 
             if (!configFile.exists()) {

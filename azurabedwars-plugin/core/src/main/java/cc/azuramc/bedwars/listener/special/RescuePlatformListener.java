@@ -53,7 +53,9 @@ public class RescuePlatformListener implements Listener {
 
         // 如果创建成功，播放声音
         if (success) {
-            player.playSound(player.getLocation(), XSound.ENTITY_CHICKEN_EGG.get(), 1.0f, 1.0f);
+            if (XSound.ENTITY_CHICKEN_EGG.get() != null) {
+                player.playSound(player.getLocation(), XSound.ENTITY_CHICKEN_EGG.get(), 1.0f, 1.0f);
+            }
         }
     }
 

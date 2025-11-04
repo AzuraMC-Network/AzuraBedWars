@@ -25,6 +25,9 @@ public class ShoutCommand {
 
         GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
         GamePlayer gamePlayer = GamePlayer.get(actor.getUniqueId());
+        if (gamePlayer == null) {
+            return;
+        }
 
         // 游戏未开始时使用
         if (gameManager.getGameState() != GameState.RUNNING) {

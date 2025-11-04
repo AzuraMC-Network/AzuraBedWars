@@ -36,6 +36,9 @@ public class ToggleDamageDisplayCommand {
         }
 
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        if (gamePlayer == null) {
+            return;
+        }
 
         if (gamePlayer.isViewingArrowDamage()) {
             gamePlayer.setViewingArrowDamage(false);
@@ -60,6 +63,9 @@ public class ToggleDamageDisplayCommand {
         }
 
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        if (gamePlayer == null) {
+            return;
+        }
 
         if (gamePlayer.isViewingAttackDamage()) {
             gamePlayer.setViewingAttackDamage(false);

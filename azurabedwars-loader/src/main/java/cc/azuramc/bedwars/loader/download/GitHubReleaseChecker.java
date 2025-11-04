@@ -99,7 +99,7 @@ public class GitHubReleaseChecker {
                     while ((line = reader.readLine()) != null) {
                         errorResponse.append(line);
                     }
-                    LoggerUtil.error("错误详情: " + errorResponse.toString());
+                    LoggerUtil.error("错误详情: " + errorResponse);
                 } catch (Exception ignored) {
                 }
                 return null;
@@ -188,53 +188,8 @@ public class GitHubReleaseChecker {
     /**
      * Release信息数据类
      */
-    public static class ReleaseInfo {
-        private final String tagName;
-        private final String name;
-        private final String downloadUrl;
-        private final String fileName;
-        private final long fileSize;
-        private final boolean prerelease;
-        private final String publishedAt;
-
-        public ReleaseInfo(String tagName, String name, String downloadUrl,
-                           String fileName, long fileSize, boolean prerelease, String publishedAt) {
-            this.tagName = tagName;
-            this.name = name;
-            this.downloadUrl = downloadUrl;
-            this.fileName = fileName;
-            this.fileSize = fileSize;
-            this.prerelease = prerelease;
-            this.publishedAt = publishedAt;
-        }
-
-        public String getTagName() {
-            return tagName;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDownloadUrl() {
-            return downloadUrl;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public long getFileSize() {
-            return fileSize;
-        }
-
-        public boolean isPrerelease() {
-            return prerelease;
-        }
-
-        public String getPublishedAt() {
-            return publishedAt;
-        }
+    public record ReleaseInfo(String tagName, String name, String downloadUrl, String fileName, long fileSize,
+                              boolean prerelease, String publishedAt) {
 
         public long getAssetSize() {
             return fileSize;

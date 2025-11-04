@@ -150,9 +150,9 @@ public class FileDownloader {
      * @return 下载成功返回文件路径，失败返回null
      */
     public File downloadFile(GitHubReleaseChecker.ReleaseInfo releaseInfo) {
-        String downloadUrl = releaseInfo.getDownloadUrl();
-        String fileName = releaseInfo.getFileName();
-        long expectedSize = releaseInfo.getFileSize();
+        String downloadUrl = releaseInfo.downloadUrl();
+        String fileName = releaseInfo.fileName();
+        long expectedSize = releaseInfo.fileSize();
 
         // 文件名安全性验证
         if (!isSafeFileName(fileName)) {
@@ -185,6 +185,8 @@ public class FileDownloader {
                 if (tempFile.exists()) {
                     if (tempFile.delete()) {
                         LoggerUtil.verbose("已删除不完整的临时文件");
+                    } else {
+                        LoggerUtil.warn("无法删除不完整的临时文件: " + tempFile.getAbsolutePath());
                     }
                 }
             }
@@ -218,7 +220,9 @@ public class FileDownloader {
             LoggerUtil.error("下载失败，已尝试 " + retryCount + " 次");
             // 清理临时文件
             if (tempFile.exists()) {
-                tempFile.delete();
+                if (!tempFile.delete()) {
+                    LoggerUtil.warn("无法删除临时文件: " + tempFile.getAbsolutePath());
+                }
             }
             return null;
         }
@@ -226,7 +230,9 @@ public class FileDownloader {
         // 验证下载的文件
         if (!validateDownloadedFile(tempFile, expectedSize)) {
             LoggerUtil.error("下载的文件验证失败");
-            tempFile.delete();
+            if (!tempFile.delete()) {
+                LoggerUtil.warn("无法删除验证失败的临时文件: " + tempFile.getAbsolutePath());
+            }
             return null;
         }
 
@@ -234,8 +240,11 @@ public class FileDownloader {
         try {
             // 如果目标文件已存在，先删除
             if (targetFile.exists()) {
-                targetFile.delete();
-                LoggerUtil.verbose("已删除旧版本文件: " + targetFile.getName());
+                if (targetFile.delete()) {
+                    LoggerUtil.verbose("已删除旧版本文件: " + targetFile.getName());
+                } else {
+                    LoggerUtil.warn("无法删除旧版本文件: " + targetFile.getAbsolutePath());
+                }
             }
 
             // 移动临时文件
@@ -248,7 +257,9 @@ public class FileDownloader {
 
         } catch (IOException e) {
             LoggerUtil.error("移动临时文件时发生错误: " + e.getMessage());
-            tempFile.delete();
+            if (!tempFile.delete()) {
+                LoggerUtil.warn("无法删除移动失败的临时文件: " + tempFile.getAbsolutePath());
+            }
             return null;
         }
     }
@@ -575,9 +586,7 @@ public class FileDownloader {
                 // 最后一个线程处理剩余的所有字节
                 final long endByte = (i == actualThreadCount - 1) ? expectedSize - 1 : startByte + chunkSize - 1;
 
-                futures[i] = CompletableFuture.supplyAsync(() -> {
-                    return downloadChunk(downloadUrl, sharedFile, startByte, endByte, threadIndex, totalDownloaded, expectedSize, fileLock);
-                }, executor);
+                futures[i] = CompletableFuture.supplyAsync(() -> downloadChunk(downloadUrl, sharedFile, startByte, endByte, threadIndex, totalDownloaded, expectedSize, fileLock), executor);
             }
 
             // 等待所有线程完成

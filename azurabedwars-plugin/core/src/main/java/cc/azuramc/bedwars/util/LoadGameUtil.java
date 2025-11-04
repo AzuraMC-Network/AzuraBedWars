@@ -286,7 +286,9 @@ public class LoadGameUtil {
                 FALL_DISTANCE_7,
                 false
         );
-        blockStand.setHelmet(new ItemStack(blockMaterial.get()));
+        if (blockMaterial.get() != null) {
+            blockStand.setHelmet(new ItemStack(blockMaterial.get()));
+        }
         storageSet.add(blockStand);
 
         // 第二层 第一个名称标签
