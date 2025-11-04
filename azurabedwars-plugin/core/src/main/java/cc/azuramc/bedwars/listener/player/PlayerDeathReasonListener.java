@@ -24,8 +24,8 @@ public class PlayerDeathReasonListener implements Listener {
     @Setter
     private static boolean isFinalKill = false;
 
-    private static Map<EntityDamageEvent.DamageCause, List<String>> suicideBroadcastMap = new HashMap<>();
-    private static Map<EntityDamageEvent.DamageCause, List<String>> killBroadcastMap = new HashMap<>();
+    private static final Map<EntityDamageEvent.DamageCause, List<String>> suicideBroadcastMap = new HashMap<>();
+    private static final Map<EntityDamageEvent.DamageCause, List<String>> killBroadcastMap = new HashMap<>();
 
     // 设置死亡播报表, 默认类型VOID必须填写
     static {

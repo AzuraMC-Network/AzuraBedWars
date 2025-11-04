@@ -31,7 +31,7 @@ public class PublicResourceGenerator {
     private int maxStack;
     private long interval = 20L;
     private int level = 1;
-    private long lastDropTime = 0;
+    private long lastDropTime;
     private BukkitTask currentTask;
     private final GameManager gameManager;
 

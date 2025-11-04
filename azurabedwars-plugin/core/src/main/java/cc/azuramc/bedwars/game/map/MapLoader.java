@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author an5w1r@163.com
  */
+@Getter
 public class MapLoader {
     private static final String LOG_PREFIX = "[MapLoader] ";
     private static final String MAP_CHANNEL = "AZURA.BW." + IPUtil.getLocalIp();
@@ -31,9 +32,8 @@ public class MapLoader {
     private final MapManager mapManager;
     private final JedisManager jedisManager;
 
-    private boolean isMapLoading = false;
-    @Getter
-    private String currentLoadingMap = null;
+    private final boolean isMapLoading = false;
+    private final String currentLoadingMap = null;
 
     private static final long DEFAULT_WAIT_TIME = 60;
 

@@ -16,5 +16,5 @@ public enum GameState {
     /**
      * 游戏实例已结束
      */
-    ENDING;
+    ENDING
 }

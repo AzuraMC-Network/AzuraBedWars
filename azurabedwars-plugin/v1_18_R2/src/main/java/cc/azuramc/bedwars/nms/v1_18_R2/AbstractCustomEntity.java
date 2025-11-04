@@ -69,6 +69,9 @@ public abstract class AbstractCustomEntity {
         }
 
         GamePlayer gamePlayer = GamePlayer.get(human.getBukkitEntity().getUniqueId());
+        if (gamePlayer == null) {
+            return false;
+        }
         return !gameTeam.isInTeam(gamePlayer) && !gamePlayer.isSpectator();
     }
 

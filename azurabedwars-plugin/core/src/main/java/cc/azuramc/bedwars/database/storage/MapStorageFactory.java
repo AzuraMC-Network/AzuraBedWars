@@ -74,10 +74,6 @@ public class MapStorageFactory {
                 LoggerUtil.debug("MapStorageFactory$getStorage | input storageType is MySQL");
                 yield getMysqlStorage();
             }
-            default -> {
-                LoggerUtil.debug("MapStorageFactory$getStorage | unknown storageType, defaulting to JSON");
-                yield getJsonStorage();
-            }
         };
     }
 

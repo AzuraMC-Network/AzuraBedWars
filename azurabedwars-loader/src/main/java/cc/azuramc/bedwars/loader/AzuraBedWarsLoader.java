@@ -92,10 +92,10 @@ public final class AzuraBedWarsLoader extends JavaPlugin {
                         return;
                     }
 
-                    getLogger().info("发现最新版本: " + latestRelease.getTagName());
-                    LoggerUtil.verbose("版本名称: " + latestRelease.getName());
-                    LoggerUtil.verbose("发布时间: " + latestRelease.getPublishedAt());
-                    LoggerUtil.verbose("是否为预发布: " + latestRelease.isPrerelease());
+                    getLogger().info("发现最新版本: " + latestRelease.tagName());
+                    LoggerUtil.verbose("版本名称: " + latestRelease.name());
+                    LoggerUtil.verbose("发布时间: " + latestRelease.publishedAt());
+                    LoggerUtil.verbose("是否为预发布: " + latestRelease.prerelease());
 
                     // 检查是否需要下载
                     if (!shouldDownloadVersion(latestRelease)) {
@@ -123,7 +123,11 @@ public final class AzuraBedWarsLoader extends JavaPlugin {
         // 检查本地是否已存在该版本
         File pluginDir = getDataFolder();
         if (!pluginDir.exists()) {
-            pluginDir.mkdirs();
+            boolean success = pluginDir.mkdirs();
+            if (!success) {
+                LoggerUtil.error("Failed to create plugin folder");
+                return false;
+            }
         }
 
         // 查找现有的插件文件
@@ -144,8 +148,8 @@ public final class AzuraBedWarsLoader extends JavaPlugin {
 
         try {
             String currentVersion = java.nio.file.Files.readString(versionFile.toPath()).trim();
-            if (!release.getTagName().equals(currentVersion)) {
-                getLogger().info("发现新版本 (当前: " + currentVersion + ", 最新: " + release.getTagName() + ")");
+            if (!release.tagName().equals(currentVersion)) {
+                getLogger().info("发现新版本 (当前: " + currentVersion + ", 最新: " + release.tagName() + ")");
                 return true;
             }
         } catch (Exception e) {
@@ -161,19 +165,19 @@ public final class AzuraBedWarsLoader extends JavaPlugin {
      */
     private void downloadAndLoadPlugin(GitHubReleaseChecker.ReleaseInfo release) {
         try {
-            String downloadUrl = release.getDownloadUrl();
+            String downloadUrl = release.downloadUrl();
             if (downloadUrl == null || downloadUrl.isEmpty()) {
                 getLogger().severe("无法找到下载链接");
                 handleDownloadFailure("下载链接不存在");
                 return;
             }
 
-            getLogger().info("开始下载: " + release.getName());
+            getLogger().info("开始下载: " + release.name());
             LoggerUtil.verbose("下载链接: " + downloadUrl);
 
             // 准备下载路径
             File pluginDir = getDataFolder();
-            String fileName = configManager.getPluginPrefix() + "-" + release.getTagName() + ".jar";
+            String fileName = configManager.getPluginPrefix() + "-" + release.tagName() + ".jar";
 
             // 清理旧版本文件
             cleanupOldVersions(pluginDir);
@@ -206,7 +210,7 @@ public final class AzuraBedWarsLoader extends JavaPlugin {
                         LoggerUtil.verbose("文件是否存在: " + downloadedFile.exists());
 
                         // 保存版本信息
-                        saveVersionInfo(release.getTagName());
+                        saveVersionInfo(release.tagName());
 
                         // 加载插件
                         LoggerUtil.verbose("准备加载插件");
