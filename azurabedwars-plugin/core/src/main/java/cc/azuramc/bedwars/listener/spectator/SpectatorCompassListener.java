@@ -23,6 +23,9 @@ public class SpectatorCompassListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
         Material interactingMaterial = event.getMaterial();
 
         if (gameManager.getGameState() != GameState.RUNNING) {

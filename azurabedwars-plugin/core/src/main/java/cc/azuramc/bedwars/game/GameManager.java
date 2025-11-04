@@ -118,7 +118,6 @@ public class GameManager {
 
         this.tabListManager = new TabListManager(this);
         Bukkit.getPluginManager().registerEvents(new TabListEventListener(tabListManager), plugin);
-//        tabListManager.startAutoUpdate(plugin);
         this.allInGamePlayers = new ArrayList<>();
     }
 

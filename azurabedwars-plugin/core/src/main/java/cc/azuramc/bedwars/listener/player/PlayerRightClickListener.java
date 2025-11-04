@@ -36,6 +36,9 @@ public class PlayerRightClickListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
 
         if (gameManager.getGameState() != GameState.RUNNING) {
             return;
@@ -225,13 +228,26 @@ public class PlayerRightClickListener implements Listener {
     /**
      * 根据队伍的床朝向放置床
      */
+    @SuppressWarnings("deprecation")
     private void placeBedForTeam(GameTeam gameTeam) {
         BlockFace face = gameTeam.getBedFace();
+        if (face == null) {
+            return;
+        }
         LoggerUtil.debug("PlayerInteractListener$placeBedForTeam | bed face: " + face);
+        if (gameTeam.getBedHead() == null) {
+            return;
+        }
         Location bedHeadLocation = gameTeam.getBedHead().getLocation();
+
         LoggerUtil.debug("PlayerInteractListener$placeBedForTeam | bed head loc: " + bedHeadLocation);
         bedHeadLocation.getBlock().setType(Material.AIR);
-        bedHeadLocation.getBlock().setType(XMaterial.RED_BED.get());
+
+        Material redBed = XMaterial.RED_BED.get();
+        if (redBed == null) {
+            return;
+        }
+        bedHeadLocation.getBlock().setType(redBed);
         Block block = gameTeam.getBedHead();
 
         BlockState bedFoot = block.getState();
@@ -240,29 +256,29 @@ public class PlayerRightClickListener implements Listener {
         switch (face) {
             case NORTH:
                 bedHead = bedFoot.getBlock().getRelative(BlockFace.SOUTH).getState();
-                bedFoot.setType(XMaterial.RED_BED.get());
-                bedHead.setType(XMaterial.RED_BED.get());
+                bedFoot.setType(redBed);
+                bedHead.setType(redBed);
                 bedFoot.setRawData((byte) 0);
                 bedHead.setRawData((byte) 8);
                 break;
             case EAST:
                 bedHead = bedFoot.getBlock().getRelative(BlockFace.WEST).getState();
-                bedFoot.setType(XMaterial.RED_BED.get());
-                bedHead.setType(XMaterial.RED_BED.get());
+                bedFoot.setType(redBed);
+                bedHead.setType(redBed);
                 bedFoot.setRawData((byte) 1);
                 bedHead.setRawData((byte) 9);
                 break;
             case SOUTH:
                 bedHead = bedFoot.getBlock().getRelative(BlockFace.NORTH).getState();
-                bedFoot.setType(XMaterial.RED_BED.get());
-                bedHead.setType(XMaterial.RED_BED.get());
+                bedFoot.setType(redBed);
+                bedHead.setType(redBed);
                 bedFoot.setRawData((byte) 2);
                 bedHead.setRawData((byte) 10);
                 break;
             case WEST:
                 bedHead = bedFoot.getBlock().getRelative(BlockFace.EAST).getState();
-                bedFoot.setType(XMaterial.RED_BED.get());
-                bedHead.setType(XMaterial.RED_BED.get());
+                bedFoot.setType(redBed);
+                bedHead.setType(redBed);
                 bedFoot.setRawData((byte) 3);
                 bedHead.setRawData((byte) 11);
                 break;

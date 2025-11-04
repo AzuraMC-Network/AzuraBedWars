@@ -368,6 +368,9 @@ public class PlayerDamageListener implements Listener {
         }
 
         GamePlayer attackPlayer = GamePlayer.get(attacker.getUniqueId());
+        if (attackPlayer == null) {
+            return;
+        }
 
         // 观察者不能造成伤害
         if (attackPlayer.isSpectator()) {
@@ -424,6 +427,9 @@ public class PlayerDamageListener implements Listener {
         }
 
         GamePlayer attackerPlayer = GamePlayer.get(((Player) projectile.getShooter()).getUniqueId());
+        if (attackerPlayer == null) {
+            return;
+        }
 
         // 火球伤害特殊处理 (注意 火球伤害是在其他的类有处理 所以这里取消掉不管即可)
         if (projectile.getType() == EntityType.FIREBALL) {

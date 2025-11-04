@@ -25,9 +25,9 @@ public class KillRewardHandler {
             return;
         }
 
-        if (gameKiller.getGameModeType() == GameModeType.EXPERIENCE) {
+        if (gameKiller.getPlayerData().getMode() == GameModeType.EXPERIENCE) {
             // 1. 击杀者是经验模式
-            if (gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+            if (gamePlayer.getPlayerData().getMode() == GameModeType.EXPERIENCE) {
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player and killer all the 'EXPERIENCE' mode'");
                 // 1.1 被击杀者也是经验模式，直接给经验，无需转换
                 // 从experienceSources直接给予经验
@@ -40,7 +40,7 @@ public class KillRewardHandler {
             }
         } else {
             // 2. 击杀者是default模式
-            if (gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+            if (gamePlayer.getPlayerData().getMode() == GameModeType.EXPERIENCE) {
                 // 2.1 被击杀者是经验模式，需要将经验转换为物品
                 LoggerUtil.debug("Triggered PlayerDamageListener$processKillReward | player is 'DEFAULT' mode , killer is 'EXPERIENCE' mode");
 //                convertExperienceSourcesToItems(gamePlayer, gameKiller, event);

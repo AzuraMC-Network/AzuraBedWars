@@ -9,6 +9,9 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -170,8 +173,26 @@ public class GameEventManager implements Runnable {
         try {
             for (GameTeam gameTeam : gameManager.getGameTeams()) {
                 gameTeam.getAlivePlayers().forEach(player -> {
-                    if (Objects.equals(player.getPlayer().getLocation().getWorld(), gameTeam.getSpawnLocation().getWorld())) {
-                        int distance = (int) player.getPlayer().getLocation().distance(gameTeam.getSpawnLocation());
+                    Player bukkitPlayer = player.getPlayer();
+                    if (bukkitPlayer == null) {
+                        return;
+                    }
+
+                    Location playerLocation = bukkitPlayer.getLocation();
+                    World playerWorld = playerLocation.getWorld();
+                    if (playerWorld == null) {
+                        return;
+                    }
+
+                    Location spawnLocation = gameTeam.getSpawnLocation();
+                    World spawnWorld = spawnLocation.getWorld();
+                    if (spawnWorld == null) {
+                        return;
+                    }
+
+                    // 检查是否在同一世界
+                    if (Objects.equals(playerWorld, spawnWorld)) {
+                        int distance = (int) playerLocation.distance(spawnLocation);
                         String trackingMessage = "§f队伍: " + gameTeam.getChatColor() + gameTeam.getName() +
                                 "§f 追踪: " + gameTeam.getChatColor() + distance + "m";
                         player.sendActionBar(trackingMessage);

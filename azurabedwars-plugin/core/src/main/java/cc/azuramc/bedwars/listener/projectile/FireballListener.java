@@ -31,6 +31,9 @@ public class FireballListener implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
         Material material = event.getMaterial();
 
         if (gameManager.getGameState() != GameState.RUNNING) {

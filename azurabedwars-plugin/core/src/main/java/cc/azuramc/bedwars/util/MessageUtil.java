@@ -80,16 +80,14 @@ public final class MessageUtil {
     @NotNull
     public static String parse(@Nullable Player player, @Nullable String string) {
         if (usingPlaceholderAPI) {
-            try {
+            if (string != null) {
                 string = color(PlaceholderAPI.setPlaceholders(player, string));
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         } else {
             string = color(string);
         }
 
-        return string;
+        return string != null ? string : "";
     }
 
     @NotNull

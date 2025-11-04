@@ -62,7 +62,9 @@ public class AlarmTrapStrategy extends AbstractTrapStrategy {
         // 警报陷阱需要显示触发者信息
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
             player1.sendTitle("§c§l陷阱触发！", "&e触发者 " + gameTeam.getName() + " 队伍", 0, 40, 0);
-            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
+                player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            }
         })));
     }
 }

@@ -72,7 +72,7 @@ public class EggBridgeListener implements Listener {
         }
 
         // 存进生效的搭桥蛋列表
-        BRIDGES.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, GamePlayer.get(shooter.getUniqueId()).getGameTeam().getTeamColor()));
+        BRIDGES.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, gamePlayer.getGameTeam().getTeamColor()));
 
         // 创建冷却
         if (!gamePlayer.isEggBridgeCooldown()) {

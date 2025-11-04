@@ -80,6 +80,9 @@ public class PlayerMiscListener implements Listener {
     public void onSneak(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
 
         if (gameManager.getGameState() != GameState.RUNNING) {
             return;

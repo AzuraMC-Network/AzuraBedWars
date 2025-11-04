@@ -20,6 +20,9 @@ public class PlayerPickUpListenerLowVersion implements Listener {
         Player player = event.getPlayer();
         ItemStack itemStack = event.getItem().getItemStack();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        if (gamePlayer == null) {
+            return;
+        }
 
         // 基本条件检查
         if (PickupItemHandler.isPickupDisabled(gamePlayer)) {

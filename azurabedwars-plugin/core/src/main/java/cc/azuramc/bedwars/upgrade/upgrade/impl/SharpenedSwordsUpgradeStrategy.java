@@ -89,7 +89,9 @@ public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
             for (int i = 0; i < p.getInventory().getContents().length; i++) {
                 ItemStack item = p.getInventory().getContents()[i];
                 if (item != null && item.getType().toString().endsWith("_SWORD")) {
-                    item.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
+                    if (XEnchantment.SHARPNESS.get() != null) {
+                        item.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
+                    }
                 }
             }
         }

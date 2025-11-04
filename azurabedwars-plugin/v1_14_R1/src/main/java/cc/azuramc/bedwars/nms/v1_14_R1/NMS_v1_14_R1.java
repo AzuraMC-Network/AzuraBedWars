@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftFireball;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author an5w1r@163.com
@@ -21,7 +22,7 @@ public class NMS_v1_14_R1 implements NMSAccess {
     }
 
     @Override
-    public Fireball setFireballDirection(Fireball fireball, Vector vector) {
+    public Fireball setFireballDirection(@NotNull Fireball fireball, @NotNull Vector vector) {
         EntityFireball fb = ((CraftFireball) fireball).getHandle();
         fb.dirX = vector.getX() * 0.1D;
         fb.dirY = vector.getY() * 0.1D;

@@ -64,11 +64,11 @@ public class PlayerRespawnListener implements Listener {
     public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
-
-        GameTeam gameTeam = null;
-        if (gamePlayer != null) {
-            gameTeam = gamePlayer.getGameTeam();
+        if (gamePlayer == null) {
+            return;
         }
+
+        GameTeam gameTeam = gamePlayer.getGameTeam();
 
         // 游戏未运行时不处理
         if (gameManager.getGameState() != GameState.RUNNING) {
@@ -76,9 +76,7 @@ public class PlayerRespawnListener implements Listener {
         }
 
         // 清理玩家状态
-        if (gamePlayer != null) {
-            gamePlayer.cleanState();
-        }
+        gamePlayer.cleanState();
 
         // 如果玩家的床已经被摧毁，处理永久死亡
         if (gameTeam != null && gameTeam.isDestroyed()) {

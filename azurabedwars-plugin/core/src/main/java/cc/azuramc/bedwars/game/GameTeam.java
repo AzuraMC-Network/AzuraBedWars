@@ -29,7 +29,7 @@ import java.util.Objects;
  * @author an5w1r@163.com
  */
 @Data
-// 避免循环引用
+// it is preventing stack overflow error
 @ToString(exclude = {"gameManager"})
 public class GameTeam {
     /**

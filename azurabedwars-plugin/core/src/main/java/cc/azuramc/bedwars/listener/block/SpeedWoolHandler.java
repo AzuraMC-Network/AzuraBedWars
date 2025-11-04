@@ -65,7 +65,9 @@ public class SpeedWoolHandler {
                     relativeBlock.setMetadata(SPEED_WOOL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), taskId.toString()));
 
                     // 播放羊毛放置声音
-                    block.getWorld().playSound(relativeBlock.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 0.3f, 1.5f);
+                    if (XSound.BLOCK_WOOL_STEP.get() != null) {
+                        block.getWorld().playSound(relativeBlock.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 0.3f, 1.5f);
+                    }
                 }
 
                 i++;

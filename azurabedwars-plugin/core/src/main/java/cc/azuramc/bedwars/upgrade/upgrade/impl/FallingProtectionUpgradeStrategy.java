@@ -60,7 +60,9 @@ public class FallingProtectionUpgradeStrategy extends AbstractTieredUpgradeStrat
         gameTeam.getAlivePlayers().forEach(gamePlayers -> {
             ItemStack boots = gamePlayers.getPlayer().getInventory().getArmorContents()[0];
             if (boots != null) {
-                boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getUpgradeManager().getFallingProtectionUpgrade());
+                if (XEnchantment.FEATHER_FALLING.get() != null) {
+                    boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getUpgradeManager().getFallingProtectionUpgrade());
+                }
                 gamePlayers.updateInventory();
             }
         });

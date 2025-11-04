@@ -93,7 +93,9 @@ public class EggBridgeHandler implements Runnable {
         // 改变 AIR 为 指定颜色的羊毛
         WoolUtil.setWoolBlockColor(block, teamColor);
 
-        getPlayer().playSound(player.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 10F, 1F);
+        if (XSound.BLOCK_WOOL_STEP.get() != null) {
+            getPlayer().playSound(player.getLocation(), XSound.BLOCK_WOOL_STEP.get(), 10F, 1F);
+        }
     }
 
     public void cancel() {

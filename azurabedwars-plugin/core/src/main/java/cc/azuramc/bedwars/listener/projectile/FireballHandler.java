@@ -37,7 +37,11 @@ public class FireballHandler implements Listener {
         }
 
         // 获取火球发射者
-        GamePlayer ownerPlayer = GamePlayer.get((UUID) fireball.getMetadata(FIREBALL_METADATA).get(0).value());
+        Object metaData = fireball.getMetadata(FIREBALL_METADATA).get(0).value();
+        if (metaData == null) {
+            return;
+        }
+        GamePlayer ownerPlayer = GamePlayer.get((UUID) metaData);
         if (ownerPlayer == null) {
             return;
         }

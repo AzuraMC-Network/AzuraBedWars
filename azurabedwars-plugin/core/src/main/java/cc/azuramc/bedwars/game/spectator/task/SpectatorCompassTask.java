@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.spectator.SpectatorTarget;
 import com.cryptomorin.xseries.XMaterial;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,9 +21,7 @@ import org.bukkit.inventory.ItemStack;
  * @author an5w1r@163.com
  */
 public class SpectatorCompassTask {
-    /**
-     * 任务运行状态标志
-     */
+    @Getter
     private boolean isRunning;
 
     /**
@@ -141,12 +140,4 @@ public class SpectatorCompassTask {
         return item != null && item.getType() == COMPASS_MATERIAL;
     }
 
-    /**
-     * 检查任务是否正在运行
-     *
-     * @return 如果任务正在运行返回true，否则返回false
-     */
-    public boolean isRunning() {
-        return isRunning;
-    }
 }

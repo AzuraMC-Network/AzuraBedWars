@@ -64,7 +64,9 @@ public class ReinforcedArmorUpgradeStrategy extends AbstractTieredUpgradeStrateg
             for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
                 ItemStack armor = player.getInventory().getArmorContents()[i];
                 if (armor != null) {
-                    armor.addEnchantment(XEnchantment.PROTECTION.get(), nextLevel);
+                    if (XEnchantment.PROTECTION.get() != null) {
+                        armor.addEnchantment(XEnchantment.PROTECTION.get(), nextLevel);
+                    }
                     teamPlayer.updateInventory();
                 }
             }

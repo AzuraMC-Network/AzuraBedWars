@@ -94,7 +94,9 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         // 先检查是否有足够资源
         if (!canAfford(gamePlayer, price, gameModeType)) {
             Player player = gamePlayer.getPlayer();
-            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
+                player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            }
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
@@ -207,7 +209,9 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
         // 检查是否有足够资源
         if (playerTotal < amount) {
-            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
+                player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            }
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
@@ -228,7 +232,9 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
             }
         }
 
-        player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        if (XSound.ENTITY_ITEM_PICKUP.get() != null) {
+            player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        }
         return true;
     }
 
@@ -242,13 +248,17 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
     private boolean processExperiencePayment(GamePlayer gamePlayer, int xpLevel) {
         Player player = gamePlayer.getPlayer();
         if (player.getLevel() < xpLevel) {
-            player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
+                player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            }
             player.sendMessage("§c没有足够资源购买！");
             return false;
         }
 
         player.setLevel(player.getLevel() - xpLevel);
-        player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        if (XSound.ENTITY_ITEM_PICKUP.get() != null) {
+            player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        }
         return true;
     }
 

@@ -64,7 +64,9 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
             // 检查是否有足够资源
             if (!canAfford(gamePlayer, price, gameModeType)) {
                 Player player = gamePlayer.getPlayer();
-                player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+                if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
+                    player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+                }
                 player.sendMessage("§c没有足够资源购买！");
                 return false;
             }
@@ -267,7 +269,9 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
             }
         }
 
-        player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        if (XSound.ENTITY_ITEM_PICKUP.get() != null) {
+            player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        }
         return true;
     }
 
@@ -294,7 +298,9 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
         Player player = gamePlayer.getPlayer();
 
         player.setLevel(player.getLevel() - xpLevel);
-        player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        if (XSound.ENTITY_ITEM_PICKUP.get() != null) {
+            player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        }
         return true;
     }
 
@@ -347,7 +353,9 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     protected void announceTrapTrigger(GameTeam gameTeam) {
         AzuraBedWars.getInstance().mainThreadRunnable(() -> gameTeam.getAlivePlayers().forEach((player1 -> {
             player1.sendTitle("§c§l陷阱触发！", null, 0, 40, 0);
-            player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
+                player1.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            }
         })));
     }
 }

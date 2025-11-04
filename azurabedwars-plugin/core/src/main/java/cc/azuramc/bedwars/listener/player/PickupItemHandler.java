@@ -86,7 +86,9 @@ public class PickupItemHandler {
 
         // 添加锋利附魔
         if (gamePlayer.getGameTeam().getUpgradeManager().hasSharpnessUpgrade()) {
-            itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
+            if (XEnchantment.SHARPNESS.get() != null) {
+                itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
+            }
         }
 
         // 移除木剑
@@ -143,13 +145,17 @@ public class PickupItemHandler {
         int xp = calculateIngotXp(itemStack, gamePlayer);
 
         // 根据游戏模式处理拾取效果
-        if (gamePlayer.getGameModeType() == GameModeType.DEFAULT) {
+        if (gamePlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
             item.remove();
-            gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+            if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
+                gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+            }
             player.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
-        } else if (gamePlayer.getGameModeType() == GameModeType.EXPERIENCE) {
+        } else if (gamePlayer.getPlayerData().getMode() == GameModeType.EXPERIENCE) {
             item.remove();
-            gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+            if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
+                gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+            }
             player.setLevel(player.getLevel() + xp);
         }
 
@@ -190,13 +196,13 @@ public class PickupItemHandler {
                     return;
                 }
 
-                gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+                if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
+                    gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+                }
 
                 GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
-                if (nearbyPlayer.getGameModeType() == GameModeType.DEFAULT) {
+                if (nearbyPlayer != null && nearbyPlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
                     players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
-                } else {
-                    players.setLevel(players.getLevel() + xp);
                 }
             }
         }
@@ -230,7 +236,9 @@ public class PickupItemHandler {
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
         gamePlayer.addResourceExperience("DIAMOND", (int) xp);
-        gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+        if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
+            gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+        }
 
         return true;
     }
@@ -263,7 +271,9 @@ public class PickupItemHandler {
         item.remove();
         player.setLevel((int) (player.getLevel() + xp));
         gamePlayer.addResourceExperience("EMERALD", (int) xp);
-        gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+        if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
+            gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
+        }
 
         return true;
     }

@@ -22,6 +22,9 @@ public class PlayerInteractShopListener implements Listener {
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        if (gamePlayer == null) {
+            return;
+        }
 
         if (event.getRightClicked().hasMetadata(LoadGameUtil.ITEM_SHOP_METADATA_KEY)) {
             handleItemShopInteraction(event, gamePlayer);

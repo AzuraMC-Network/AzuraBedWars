@@ -164,7 +164,9 @@ public class DIYShopGUI extends CustomGUI {
                     ShopUtil.saveShopDataToJson(playerData, shopDataMap);
 
                     // 播放确认音效
-                    gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
+                    if (XSound.UI_BUTTON_CLICK.get() != null) {
+                        gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
+                    }
 
                     // 返回物品商店
                     new ItemShopGUI(gamePlayer, 0, gameManager).open();
@@ -197,7 +199,9 @@ public class DIYShopGUI extends CustomGUI {
                     ShopUtil.saveShopDataToJson(playerData, shopDataMap);
 
                     // 播放确认音效
-                    gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
+                    if (XSound.UI_BUTTON_CLICK.get() != null) {
+                        gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
+                    }
 
                     // 返回物品商店
                     new ItemShopGUI(gamePlayer, 0, gameManager).open();
@@ -231,7 +235,9 @@ public class DIYShopGUI extends CustomGUI {
                     ShopUtil.saveShopDataToJson(playerData, shopDataMap);
 
                     // 播放确认音效
-                    player.playSound(player.getLocation(), XSound.UI_BUTTON_CLICK.get(), 1, 10F);
+                    if (XSound.UI_BUTTON_CLICK.get() != null) {
+                        player.playSound(player.getLocation(), XSound.UI_BUTTON_CLICK.get(), 1, 10F);
+                    }
 
                     // 返回物品商店
                     new ItemShopGUI(gamePlayer, 0, gameManager).open();
