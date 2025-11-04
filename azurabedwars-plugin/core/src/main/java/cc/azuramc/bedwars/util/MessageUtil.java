@@ -8,6 +8,8 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public final class MessageUtil {
             + "------------------------------------------------";
 
 
-    public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+    public static void sendTitle(@NotNull Player player, @Nullable String title, @Nullable String subtitle, int fadeIn, int stay, int fadeOut) {
         if (title == null && subtitle == null) {
             return;
         }
@@ -37,24 +39,26 @@ public final class MessageUtil {
         Titles.sendTitle(player, fadeIn, stay, fadeOut, color(title), color(subtitle));
     }
 
-    public static void sendActionBar(Player player, String message) {
+    public static void sendActionBar(@NotNull Player player, @NotNull String message) {
         message = parse(player, message);
         ActionBar.sendActionBar(player, color(message));
     }
 
-    public static void sendMessage(Player player, String message) {
+    public static void sendMessage(@NotNull Player player, @NotNull String message) {
         message = parse(player, message);
         player.sendMessage(color(message));
     }
 
-    public static String color(String string) {
+    @NotNull
+    public static String color(@Nullable String string) {
         if (string == null) {
             return "";
         }
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 
-    public static List<String> color(List<String> lines) {
+    @NotNull
+    public static List<String> color(@NotNull List<String> lines) {
         List<String> toReturn = new ArrayList<>();
         for (String line : lines) {
             toReturn.add(ChatColor.translateAlternateColorCodes('&', line));
@@ -63,7 +67,8 @@ public final class MessageUtil {
         return toReturn;
     }
 
-    public static String[] color(String[] lines) {
+    @NotNull
+    public static String[] color(@NotNull String[] lines) {
         String[] colored = new String[lines.length];
         for (int i = 0; i < lines.length; i++) {
             colored[i] = ChatColor.translateAlternateColorCodes('&', lines[i]);
@@ -72,7 +77,8 @@ public final class MessageUtil {
     }
 
 
-    public static String parse(Player player, String string) {
+    @NotNull
+    public static String parse(@Nullable Player player, @Nullable String string) {
         if (usingPlaceholderAPI) {
             try {
                 string = color(PlaceholderAPI.setPlaceholders(player, string));
@@ -86,7 +92,8 @@ public final class MessageUtil {
         return string;
     }
 
-    public static List<String> parse(Player player, List<String> lines) {
+    @NotNull
+    public static List<String> parse(@Nullable Player player, @NotNull List<String> lines) {
         List<String> toReturn = new ArrayList<>();
         for (String line : lines) {
             toReturn.add(parse(player, color(line)));
@@ -95,7 +102,8 @@ public final class MessageUtil {
         return toReturn;
     }
 
-    public static ChatColor getLastChatColor(String string) {
+    @NotNull
+    public static ChatColor getLastChatColor(@Nullable String string) {
         if (string == null || string.isEmpty()) {
             return ChatColor.RESET;
         }
@@ -125,7 +133,8 @@ public final class MessageUtil {
      * @param location 要格式化的位置
      * @return 格式化后的字符串，如果location为null则返回"未设置"
      */
-    public static String formatLocation(Location location) {
+    @NotNull
+    public static String formatLocation(@Nullable Location location) {
         if (location == null) {
             return "&c未设置";
         }
@@ -148,7 +157,8 @@ public final class MessageUtil {
      * @param rawLocation 要格式化的原始位置
      * @return 格式化后的字符串，如果rawLocation为null则返回"未设置"
      */
-    public static String formatLocation(MapData.RawLocation rawLocation) {
+    @NotNull
+    public static String formatLocation(@Nullable MapData.RawLocation rawLocation) {
         if (rawLocation == null) {
             return "&c未设置";
         }
@@ -172,7 +182,8 @@ public final class MessageUtil {
      * @param locations RawLocation列表
      * @return 格式化后的字符串列表，如果列表为空则返回包含"无"的单元素列表
      */
-    public static List<String> formatLocationList(List<MapData.RawLocation> locations) {
+    @NotNull
+    public static List<String> formatLocationList(@Nullable List<MapData.RawLocation> locations) {
         if (locations == null || locations.isEmpty()) {
             return List.of("&c无");
         }

@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.config.object;
 
 import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,14 +31,23 @@ public class SettingsConfig {
     private boolean enableGameModeSelection = true;
     private boolean enableTeamSelection = true;
 
+    @NotNull
     private DatabaseConfig database = new DatabaseConfig();
+    @NotNull
     private ChatConfig chatConfig = new ChatConfig();
+    @NotNull
     private GameScoreboard gameScoreboard = new GameScoreboard();
+    @NotNull
     private LobbyScoreboard lobbyScoreboard = new LobbyScoreboard();
+    @NotNull
     private WaitingState waitingState = new WaitingState();
+    @NotNull
     private RunningState runningState = new RunningState();
+    @NotNull
     private EndingState endingState = new EndingState();
+    @NotNull
     private DisplayDamage displayDamage = new DisplayDamage();
+    @NotNull
     private FireBall fireBall = new FireBall();
 
     @Data
