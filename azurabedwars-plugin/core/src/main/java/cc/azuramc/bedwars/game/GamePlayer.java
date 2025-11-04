@@ -30,6 +30,8 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -112,7 +114,7 @@ public class GamePlayer {
      * @param uuid 玩家UUID
      * @param name 玩家名称
      */
-    public GamePlayer(UUID uuid, String name) {
+    public GamePlayer(@NotNull UUID uuid, @NotNull String name) {
         this.uuid = uuid;
         this.name = name;
 
@@ -153,23 +155,14 @@ public class GamePlayer {
     }
 
     /**
-     * 从数据库加载玩家数据
-     *
-     * @return PlayerData实例
-     */
-    private PlayerData loadPlayerData(GamePlayer gamePlayer) {
-        PlayerDataService playerDataService = AzuraBedWars.getInstance().getDatabaseProviderFactory().getPlayerDataService();
-        return playerDataService.selectPlayerData(gamePlayer);
-    }
-
-    /**
      * 创建或获取游戏玩家实例
      *
      * @param uuid 玩家UUID
      * @param name 玩家名称
      * @return 游戏玩家实例
      */
-    public static GamePlayer create(UUID uuid, String name) {
+    @NotNull
+    public static GamePlayer create(@NotNull UUID uuid, @NotNull String name) {
         return GAME_PLAYERS.computeIfAbsent(uuid, k -> new GamePlayer(uuid, name));
     }
 
@@ -177,9 +170,10 @@ public class GamePlayer {
      * 获取游戏玩家实例
      *
      * @param uuid 玩家UUID
-     * @return 游戏玩家实例
+     * @return 游戏玩家实例，如果不存在则返回null
      */
-    public static GamePlayer get(UUID uuid) {
+    @Nullable
+    public static GamePlayer get(@NotNull UUID uuid) {
         return GAME_PLAYERS.getOrDefault(uuid, null);
     }
 
@@ -187,9 +181,10 @@ public class GamePlayer {
      * 通过Bukkit Player对象获取GamePlayer实例
      *
      * @param player Bukkit Player对象
-     * @return GamePlayer实例
+     * @return GamePlayer实例，如果玩家为null或不存在则返回null
      */
-    public static GamePlayer get(Player player) {
+    @Nullable
+    public static GamePlayer get(@Nullable Player player) {
         if (player == null) {
             return null;
         }
@@ -199,8 +194,9 @@ public class GamePlayer {
     /**
      * 获取所有游戏玩家
      *
-     * @return 游戏玩家列表
+     * @return 游戏玩家列表（不为null）
      */
+    @NotNull
     public static List<GamePlayer> getGamePlayers() {
         return new ArrayList<>(GAME_PLAYERS.values());
     }
@@ -208,8 +204,9 @@ public class GamePlayer {
     /**
      * 获取所有团队玩家
      *
-     * @return 团队玩家列表
+     * @return 团队玩家列表（不为null）
      */
+    @NotNull
     public static List<GamePlayer> getTeamPlayers() {
         List<GamePlayer> teamPlayers = new ArrayList<>();
         for (GamePlayer player : GAME_PLAYERS.values()) {
@@ -223,8 +220,9 @@ public class GamePlayer {
     /**
      * 获取所有在线玩家
      *
-     * @return 在线玩家列表
+     * @return 在线玩家列表（不为null）
      */
+    @NotNull
     public static List<GamePlayer> getOnlinePlayers() {
         List<GamePlayer> onlinePlayers = new ArrayList<>();
         for (GamePlayer player : GAME_PLAYERS.values()) {
@@ -233,6 +231,17 @@ public class GamePlayer {
             }
         }
         return onlinePlayers;
+    }
+
+    /**
+     * 从数据库加载玩家数据
+     *
+     * @return PlayerData实例
+     */
+    @NotNull
+    private PlayerData loadPlayerData(@NotNull GamePlayer gamePlayer) {
+        PlayerDataService playerDataService = AzuraBedWars.getInstance().getDatabaseProviderFactory().getPlayerDataService();
+        return playerDataService.selectPlayerData(gamePlayer);
     }
 
     /**
@@ -351,7 +360,7 @@ public class GamePlayer {
      * @param resourceType 资源类型 (e.g., "iron")
      * @param amount       增加的数量
      */
-    public void addResourceExperience(String resourceType, int amount) {
+    public void addResourceExperience(@NotNull String resourceType, int amount) {
         if (amount <= 0) {
             LoggerUtil.warn("addResourceExperience 应该输入大于0的数值");
             return;
@@ -368,7 +377,7 @@ public class GamePlayer {
      * @param amount       消耗的数量
      * @return true 如果消耗成功，否则返回 false
      */
-    public boolean spendResourceExperience(String resourceType, int amount) {
+    public boolean spendResourceExperience(@NotNull String resourceType, int amount) {
         if (amount <= 0) {
             LoggerUtil.warn("spendResourceExperience 应该输入大于0的数值");
             return false;
@@ -536,8 +545,9 @@ public class GamePlayer {
     /**
      * 获取Bukkit玩家实例
      *
-     * @return Bukkit玩家实例
+     * @return Bukkit玩家实例，如果玩家离线则返回null
      */
+    @Nullable
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
@@ -556,7 +566,7 @@ public class GamePlayer {
      *
      * @param message 消息内容
      */
-    public void sendActionBar(String message) {
+    public void sendActionBar(@NotNull String message) {
         if (!isOnline()) {
             return;
         }
@@ -572,7 +582,7 @@ public class GamePlayer {
      * @param stay     停留时间
      * @param fadeOut  淡出时间
      */
-    public void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+    public void sendTitle(@Nullable String title, @Nullable String subTitle, int fadeIn, int stay, int fadeOut) {
         if (!isOnline()) {
             return;
         }
@@ -584,7 +594,7 @@ public class GamePlayer {
      *
      * @param message 消息内容
      */
-    public void sendMessage(String message) {
+    public void sendMessage(@NotNull String message) {
         if (!isOnline()) {
             return;
         }
@@ -598,7 +608,7 @@ public class GamePlayer {
      * @param volume 音量
      * @param pitch  音调
      */
-    public void playSound(Sound sound, float volume, float pitch) {
+    public void playSound(@NotNull Sound sound, float volume, float pitch) {
         if (!isOnline()) {
             return;
         }
@@ -617,7 +627,7 @@ public class GamePlayer {
      *
      * @param damager 伤害来源玩家
      */
-    public void setLastDamage(GamePlayer damager) {
+    public void setLastDamage(@NotNull GamePlayer damager) {
         assistsManager.setLastDamage(damager, System.currentTimeMillis());
     }
 
@@ -628,15 +638,16 @@ public class GamePlayer {
      * @param damager 伤害来源玩家
      * @param time    时间戳
      */
-    public void setLastDamage(GamePlayer damager, long time) {
+    public void setLastDamage(@NotNull GamePlayer damager, long time) {
         assistsManager.setLastDamage(damager, time);
     }
 
     /**
      * 获取最后伤害来源玩家
      *
-     * @return 伤害来源玩家
+     * @return 伤害来源玩家，如果没有则返回null
      */
+    @Nullable
     public GamePlayer getLastDamager() {
         List<GamePlayer> gamePlayers = assistsManager.getAssists();
         if (gamePlayers.isEmpty()) {
@@ -648,8 +659,9 @@ public class GamePlayer {
     /**
      * 获取最后伤害来源玩家列表
      *
-     * @return 伤害来源玩家列表
+     * @return 伤害来源玩家列表（不为null）
      */
+    @NotNull
     public List<GamePlayer> getLastDamagerList() {
         return assistsManager.getAssists();
     }

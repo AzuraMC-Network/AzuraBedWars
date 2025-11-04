@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -36,9 +37,10 @@ public class PlayerData {
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
+    @NotNull
     private GamePlayer gamePlayer;
 
-    public PlayerData(GamePlayer gamePlayer) {
+    public PlayerData(@NotNull GamePlayer gamePlayer) {
         this.setName(gamePlayer.getName());
         this.setUuid(gamePlayer.getUuid());
         this.setMode(GameModeType.DEFAULT);

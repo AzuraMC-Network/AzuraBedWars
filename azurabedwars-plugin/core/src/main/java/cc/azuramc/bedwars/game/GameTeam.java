@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import cc.azuramc.bedwars.upgrade.trap.TrapManager;
 import cc.azuramc.bedwars.upgrade.upgrade.UpgradeManager;
 import lombok.Data;
+import lombok.ToString;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -14,6 +15,8 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,8 @@ import java.util.Objects;
  * @author an5w1r@163.com
  */
 @Data
+// 避免循环引用
+@ToString(exclude = {"gameManager"})
 public class GameTeam {
     /**
      * 搜索床的范围
@@ -36,31 +41,43 @@ public class GameTeam {
      */
     public static final BlockFace DEFAULT_BED_FACE = BlockFace.NORTH;
 
+    @NotNull
     private final GameManager gameManager;
 
+    @NotNull
     private final TeamColor teamColor;
+    @NotNull
     private final Location spawnLocation;
+    @NotNull
     private final Location resourceDropLocation;
     private int maxPlayers;
 
+    @Nullable
     private Block bedFeet;
+    @Nullable
     private Block bedHead;
+    @Nullable
     private BlockFace bedFace;
     private boolean hasBed;
     private boolean isDestroyed;
+    @Nullable
     private GamePlayer destroyPlayer;
 
+    @NotNull
     private TrapManager trapManager;
+    @NotNull
     private UpgradeManager upgradeManager;
 
     /**
      * 创建一个游戏团队
      *
-     * @param teamColor  团队颜色
-     * @param location   出生点位置
-     * @param maxPlayers 最大玩家数
+     * @param gameManager          游戏管理器
+     * @param teamColor            团队颜色
+     * @param location             出生点位置
+     * @param resourceDropLocation 资源掉落位置
+     * @param maxPlayers           最大玩家数
      */
-    public GameTeam(GameManager gameManager, TeamColor teamColor, Location location, Location resourceDropLocation, int maxPlayers) {
+    public GameTeam(@NotNull GameManager gameManager, @NotNull TeamColor teamColor, @NotNull Location location, @NotNull Location resourceDropLocation, int maxPlayers) {
         this.gameManager = gameManager;
 
         this.teamColor = Objects.requireNonNull(teamColor, "团队颜色不能为空");
@@ -90,8 +107,9 @@ public class GameTeam {
     /**
      * 获取团队聊天颜色
      *
-     * @return 团队对应的聊天颜色
+     * @return 团队对应的聊天颜色（不为null）
      */
+    @NotNull
     public ChatColor getChatColor() {
         return teamColor.getChatColor();
     }
@@ -99,8 +117,9 @@ public class GameTeam {
     /**
      * 获取团队染料颜色
      *
-     * @return 团队对应的染料颜色
+     * @return 团队对应的染料颜色（不为null）
      */
+    @NotNull
     public DyeColor getDyeColor() {
         return teamColor.getDyeColor();
     }
@@ -108,8 +127,9 @@ public class GameTeam {
     /**
      * 获取团队颜色对象
      *
-     * @return 团队对应的颜色对象
+     * @return 团队对应的颜色对象（不为null）
      */
+    @NotNull
     public Color getColor() {
         return teamColor.getColor();
     }
@@ -117,8 +137,9 @@ public class GameTeam {
     /**
      * 获取团队名称
      *
-     * @return 团队名称
+     * @return 团队名称（不为null）
      */
+    @NotNull
     public String getName() {
         return teamColor.getName();
     }
@@ -126,8 +147,9 @@ public class GameTeam {
     /**
      * 获取团队名称 (移除前边的颜色符号)
      *
-     * @return 团队名称
+     * @return 团队名称（不为null）
      */
+    @NotNull
     public String getNameWithoutColor() {
         String teamName = teamColor.getName();
 
@@ -141,8 +163,9 @@ public class GameTeam {
     /**
      * 获取团队中所有玩家
      *
-     * @return 团队玩家列表
+     * @return 团队玩家列表（不为null）
      */
+    @NotNull
     public List<GamePlayer> getGamePlayers() {
         List<GamePlayer> teamPlayers = new ArrayList<>();
 
@@ -158,8 +181,9 @@ public class GameTeam {
     /**
      * 获取团队中所有存活的玩家
      *
-     * @return 存活玩家列表
+     * @return 存活玩家列表（不为null）
      */
+    @NotNull
     public List<GamePlayer> getAlivePlayers() {
         List<GamePlayer> alivePlayers = new ArrayList<>();
 
@@ -178,7 +202,7 @@ public class GameTeam {
      * @param gamePlayer 要检查的玩家
      * @return 如果玩家在团队中返回true，否则返回false
      */
-    public boolean isInTeam(GamePlayer gamePlayer) {
+    public boolean isInTeam(@Nullable GamePlayer gamePlayer) {
         if (gamePlayer == null) {
             return false;
         }
@@ -193,7 +217,7 @@ public class GameTeam {
      * @param targetPlayer   要检查的玩家
      * @return 如果玩家在团队中且不是排除的玩家，返回true，否则返回false
      */
-    public boolean isInTeam(GamePlayer excludedPlayer, GamePlayer targetPlayer) {
+    public boolean isInTeam(@Nullable GamePlayer excludedPlayer, @Nullable GamePlayer targetPlayer) {
         if (targetPlayer == null || excludedPlayer == null) {
             return false;
         }
@@ -207,7 +231,7 @@ public class GameTeam {
      * @param gamePlayer 要添加的玩家
      * @return 如果添加成功返回true，否则返回false
      */
-    public boolean addPlayer(GamePlayer gamePlayer) {
+    public boolean addPlayer(@Nullable GamePlayer gamePlayer) {
         if (gamePlayer == null || isFull() || isInTeam(gamePlayer)) {
             return false;
         }
@@ -269,7 +293,7 @@ public class GameTeam {
      * @param destroyed 床被摧毁状态
      * @param destroyer 摧毁床的玩家，可以为null
      */
-    public void setBedDestroyed(boolean destroyed, GamePlayer destroyer) {
+    public void setBedDestroyed(boolean destroyed, @Nullable GamePlayer destroyer) {
         this.isDestroyed = destroyed;
 
         if (destroyed) {
