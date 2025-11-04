@@ -8,16 +8,12 @@ import cc.azuramc.bedwars.listener.chat.ChatListener;
 import cc.azuramc.bedwars.util.CommandUtil;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Default;
-import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 
 /**
  * @author ant1aura@qq.com
  */
 public class ShoutCommand {
-
-    @Dependency
-    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     @Command("shout")
     public void shoutInGame(BukkitCommandActor actor, @Default("") String message) {

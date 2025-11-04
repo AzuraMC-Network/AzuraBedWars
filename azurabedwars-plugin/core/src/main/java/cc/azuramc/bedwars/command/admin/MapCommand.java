@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @CommandPermission("azurabedwars.admin")
 public class MapCommand {
 
-    @Dependency
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
     private final MapManager mapManager = AzuraBedWars.getInstance().getMapManager();
 

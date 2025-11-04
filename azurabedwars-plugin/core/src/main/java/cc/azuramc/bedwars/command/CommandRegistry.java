@@ -32,7 +32,6 @@ public class CommandRegistry {
     public CommandRegistry(AzuraBedWars plugin) {
         this.plugin = plugin;
         handler = BukkitCommandHandler.create(plugin);
-        handler.registerDependency(AzuraBedWars.class, plugin);
         handler.setExceptionHandler(new CommandExceptionHandler());
 
         registerAutoCompletions();
