@@ -234,7 +234,7 @@ public class WarpPowder extends AbstractSpecialItem {
         }
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        if (gameTeam == null || gameTeam.getSpawnLocation() == null) {
+        if (gameTeam == null) {
             gamePlayer.sendMessage("§c无法找到你的队伍出生点!");
             return false;
         }
@@ -251,7 +251,9 @@ public class WarpPowder extends AbstractSpecialItem {
         gamePlayer.sendMessage(String.format(messageConfig.getWarpPowderStartMessage(), this.fullTeleportingTime));
 
         // 播放开始传送音效
-        player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0f, 1.0f);
+        if (XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get() != null) {
+            player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0f, 1.0f);
+        }
 
         // 计算每个tick减少的时间
         final double perThrough = (Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((fullTeleportingTime * 20) / CIRCLE_COUNT)) / 20);
@@ -275,11 +277,6 @@ public class WarpPowder extends AbstractSpecialItem {
                     }
 
                     Location targetLoc = team.getSpawnLocation();
-                    if (targetLoc == null) {
-                        cancel();
-                        WarpPowder.this.cancelTeleport(true, true);
-                        return;
-                    }
 
                     // 传送完成
                     if (WarpPowder.this.teleportingTime <= 1.0) {

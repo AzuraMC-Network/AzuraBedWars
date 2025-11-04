@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
-import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -41,10 +40,8 @@ public class ExplodeListener implements Listener {
             return;
         }
 
-        try {
+        if (XSound.ENTITY_GENERIC_EXPLODE.get() != null) {
             entity.getWorld().playSound(entity.getLocation(), XSound.ENTITY_GENERIC_EXPLODE.get(), 4.0F, 1.0F);
-        } catch (Exception e) {
-            LoggerUtil.error("无法播放音效 请在Github反馈: " + e.getMessage());
         }
 
         // 处理爆炸块列表

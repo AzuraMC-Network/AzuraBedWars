@@ -131,7 +131,11 @@ public class PlacementListener implements Listener {
     private void handlePopUpTowerPlacement(BlockPlaceEvent event, Player player) {
         event.setCancelled(true);
         Location loc = event.getBlock().getLocation();
-        TeamColor color = GamePlayer.get(player).getGameTeam().getTeamColor();
+        GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
+        TeamColor color = gamePlayer.getGameTeam().getTeamColor();
         double rotation = (player.getLocation().getYaw() - 90.0F) % 360.0F;
         if (rotation < 0.0D) {
             rotation += 360.0D;

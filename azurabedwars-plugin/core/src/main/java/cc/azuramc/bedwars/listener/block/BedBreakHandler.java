@@ -9,6 +9,7 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.hook.VaultUtil;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -34,8 +35,12 @@ public class BedBreakHandler {
         event.setCancelled(true);
 
         // shouldn't use "==" to compare Block objects (I tested :<)
-        if (block.getLocation().equals(gameTeam.getBedFeet().getLocation())
-                || block.getLocation().equals(gameTeam.getBedHead().getLocation())) {
+        Location blockLocation = block.getLocation();
+        Block bedFeet = gameTeam.getBedFeet();
+        Block bedHead = gameTeam.getBedHead();
+
+        if ((bedFeet != null && blockLocation.equals(bedFeet.getLocation()))
+                || (bedHead != null && blockLocation.equals(bedHead.getLocation()))) {
             gamePlayer.sendMessage("§c你不能破坏你家的床");
             return;
         }

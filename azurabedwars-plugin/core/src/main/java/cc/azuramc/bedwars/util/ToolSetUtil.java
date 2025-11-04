@@ -18,27 +18,30 @@ public class ToolSetUtil {
 
     static {
         // 初始化基本工具集合
-        EnumSet<Material> tools = EnumSet.of(
-                XMaterial.DIAMOND_PICKAXE.get(),
-                XMaterial.GOLDEN_PICKAXE.get(),
-                XMaterial.IRON_PICKAXE.get(),
-                XMaterial.STONE_PICKAXE.get(),
-                XMaterial.WOODEN_PICKAXE.get(),
+        EnumSet<Material> tools = null;
+        if (XMaterial.DIAMOND_PICKAXE.get() != null) {
+            tools = EnumSet.of(
+                    XMaterial.DIAMOND_PICKAXE.get(),
+                    XMaterial.GOLDEN_PICKAXE.get(),
+                    XMaterial.IRON_PICKAXE.get(),
+                    XMaterial.STONE_PICKAXE.get(),
+                    XMaterial.WOODEN_PICKAXE.get(),
 
-                XMaterial.DIAMOND_AXE.get(),
-                XMaterial.GOLDEN_AXE.get(),
-                XMaterial.IRON_AXE.get(),
-                XMaterial.STONE_AXE.get(),
-                XMaterial.WOODEN_AXE.get(),
+                    XMaterial.DIAMOND_AXE.get(),
+                    XMaterial.GOLDEN_AXE.get(),
+                    XMaterial.IRON_AXE.get(),
+                    XMaterial.STONE_AXE.get(),
+                    XMaterial.WOODEN_AXE.get(),
 
-                XMaterial.DIAMOND_SWORD.get(),
-                XMaterial.GOLDEN_SWORD.get(),
-                XMaterial.IRON_SWORD.get(),
-                XMaterial.STONE_SWORD.get(),
-                XMaterial.WOODEN_SWORD.get(),
+                    XMaterial.DIAMOND_SWORD.get(),
+                    XMaterial.GOLDEN_SWORD.get(),
+                    XMaterial.IRON_SWORD.get(),
+                    XMaterial.STONE_SWORD.get(),
+                    XMaterial.WOODEN_SWORD.get(),
 
-                XMaterial.SHEARS.get()
-        );
+                    XMaterial.SHEARS.get()
+            );
+        }
 
         // 只有1.16+版本才添加下界合金工具
         if (VersionUtil.isGreaterOrEqual(1, 16)) {
@@ -47,14 +50,16 @@ public class ToolSetUtil {
             Material netheriteAxe = XMaterial.NETHERITE_AXE.get();
             Material netheriteSword = XMaterial.NETHERITE_SWORD.get();
 
-            if (netheritePickaxe != null) {
-                tools.add(netheritePickaxe);
-            }
-            if (netheriteAxe != null) {
-                tools.add(netheriteAxe);
-            }
-            if (netheriteSword != null) {
-                tools.add(netheriteSword);
+            if (tools != null) {
+                if (netheritePickaxe != null) {
+                    tools.add(netheritePickaxe);
+                }
+                if (netheriteAxe != null) {
+                    tools.add(netheriteAxe);
+                }
+                if (netheriteSword != null) {
+                    tools.add(netheriteSword);
+                }
             }
         }
 

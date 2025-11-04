@@ -30,6 +30,9 @@ public class PlayerDropListener implements Listener {
         if (gameManager.getGameState() == GameState.RUNNING) {
             Player player = event.getPlayer();
             GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+            if (gamePlayer == null) {
+                return;
+            }
             ItemStack itemStack = event.getItemDrop().getItemStack();
 
             if (gamePlayer.isSpectator()) {
@@ -52,7 +55,9 @@ public class PlayerDropListener implements Listener {
                     event.getItemDrop().remove();
                 }
 
-                itemStack.removeEnchantment(XEnchantment.SHARPNESS.get());
+                if (XEnchantment.SHARPNESS.get() != null) {
+                    itemStack.removeEnchantment(XEnchantment.SHARPNESS.get());
+                }
                 int size = 0;
                 for (int i = 0; i < player.getInventory().getSize(); i++) {
                     ItemStack itemStack1 = player.getInventory().getItem(i);

@@ -41,6 +41,9 @@ public class PlayerChestOpenListener implements Listener {
 
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
 
         if (gamePlayer.isSpectator()) {
             event.setCancelled(true);

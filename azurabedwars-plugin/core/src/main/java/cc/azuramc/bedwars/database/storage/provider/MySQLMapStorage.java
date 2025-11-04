@@ -61,7 +61,7 @@ public class MySQLMapStorage implements IMapStorage {
                     .ifNotExists()
                     .addIdColumn()
                     .column(mapKey, ColumnDefinitionBuilder.of(DataType.Type.VARCHAR).size(255).notNull().build())
-                    .column("json_data", ColumnDefinitionBuilder.of(DataType.Type.TEXT).build())
+                    .column(mapDataKey, ColumnDefinitionBuilder.of(DataType.Type.TEXT).build())
                     .engine("InnoDB")
                     .charset("utf8mb4")
                     .collate("utf8mb4_unicode_ci")
@@ -82,15 +82,15 @@ public class MySQLMapStorage implements IMapStorage {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             if (exists(mapName)) {
                 PreparedStatement updateStmt = buildManager.update(tableName)
-                        .set("json_data", jsonData)
-                        .whereEquals("map_name", mapName)
+                        .set(mapDataKey, jsonData)
+                        .whereEquals(mapKey, mapName)
                         .prepare();
 
                 buildManager.execute(updateStmt);
             } else {
                 PreparedStatement insertStmt = buildManager.insertInto(tableName)
-                        .values("map_name", mapName)
-                        .values("json_data", jsonData)
+                        .values(mapKey, mapName)
+                        .values(mapDataKey, jsonData)
                         .prepare();
 
                 buildManager.execute(insertStmt);
@@ -108,10 +108,10 @@ public class MySQLMapStorage implements IMapStorage {
 
             Optional<MapData> result = buildManager.select()
                     .from(tableName)
-                    .select("json_data")
-                    .whereEquals("map_name", mapName)
+                    .select(mapDataKey)
+                    .whereEquals(mapKey, mapName)
                     .executeQueryForObject(rs -> {
-                        String jsonData = rs.getString("json_data");
+                        String jsonData = rs.getString(mapDataKey);
                         return gson.fromJson(jsonData, MapData.class);
                     });
 
@@ -126,7 +126,7 @@ public class MySQLMapStorage implements IMapStorage {
         try (Connection connection = ormClient.getConnection()) {
             PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
             PreparedStatement deleteStmt = buildManager.deleteFrom(tableName)
-                    .whereEquals("map_name", mapName)
+                    .whereEquals(mapKey, mapName)
                     .prepare();
 
             int rowsAffected = buildManager.execute(deleteStmt);
@@ -143,8 +143,8 @@ public class MySQLMapStorage implements IMapStorage {
 
             return buildManager.select()
                     .from(tableName)
-                    .select("map_name")
-                    .whereEquals("map_name", mapName)
+                    .select(mapKey)
+                    .whereEquals(mapKey, mapName)
                     .executeQueryForExists();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to check if map exists: " + mapName, e);
@@ -158,8 +158,8 @@ public class MySQLMapStorage implements IMapStorage {
 
             return buildManager.select()
                     .from(tableName)
-                    .select("map_name")
-                    .executeQueryForList(rs -> rs.getString("map_name"));
+                    .select(mapKey)
+                    .executeQueryForList(rs -> rs.getString(mapKey));
         } catch (SQLException e) {
             throw new RuntimeException("Failed to get all map names", e);
         }

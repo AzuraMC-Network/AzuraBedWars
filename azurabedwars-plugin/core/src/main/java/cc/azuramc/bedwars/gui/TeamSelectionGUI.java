@@ -141,7 +141,7 @@ public class TeamSelectionGUI extends CustomGUI {
             loreList.add("§7");
             loreList.add("§7队伍成员:");
             for (GamePlayer teamPlayer : team.getGamePlayers()) {
-                String memberName = teamPlayer.getPlayer().getName();
+                String memberName = teamPlayer.getName();
                 if (teamPlayer == getGamePlayer()) {
                     loreList.add("§a  ▸ " + memberName + " §7(你)");
                 } else {
@@ -173,18 +173,17 @@ public class TeamSelectionGUI extends CustomGUI {
      * 处理队伍选择逻辑
      */
     private void handleTeamSelection(GamePlayer gamePlayer, GameTeam targetTeam, TeamColor teamColor) {
-        Player player = gamePlayer.getPlayer();
         GameTeam currentTeam = gamePlayer.getGameTeam();
 
         // 检查是否已经选择了该队伍
         if (currentTeam == targetTeam) {
-            player.sendMessage(MessageUtil.color("&c你已经选择了该队伍！"));
+            gamePlayer.sendMessage(MessageUtil.color("&c你已经选择了该队伍！"));
             return;
         }
 
         // 检查队伍是否已满
         if (targetTeam.isFull()) {
-            player.sendMessage(MessageUtil.color("&c该队伍已满，无法加入！"));
+            gamePlayer.sendMessage(MessageUtil.color("&c该队伍已满，无法加入！"));
             return;
         }
 
@@ -197,7 +196,7 @@ public class TeamSelectionGUI extends CustomGUI {
 
             // 只允许选择人数最少的队伍
             if (targetSize > lowestSize) {
-                player.sendMessage(MessageUtil.color("&c为了保持游戏平衡，请选择人数较少的队伍！"));
+                gamePlayer.sendMessage(MessageUtil.color("&c为了保持游戏平衡，请选择人数较少的队伍！"));
                 return;
             }
         }
@@ -207,13 +206,18 @@ public class TeamSelectionGUI extends CustomGUI {
             String teamDisplayName = teamColor.getName();
             ChatColor teamChatColor = teamColor.getChatColor();
 
-            player.sendMessage(MessageUtil.color("&a你选择了 " + teamChatColor + teamDisplayName));
-            player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0F, 1.0F);
+            gamePlayer.sendMessage(MessageUtil.color("&a你选择了 " + teamChatColor + teamDisplayName));
+            if (XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get() != null) {
+                gamePlayer.playSound(XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0F, 1.0F);
+            }
 
             // 更新玩家手中的队伍颜色物品
-            player.getInventory().setItem(2, WoolUtil.getColoredWool(teamColor));
+            Player player = gamePlayer.getPlayer();
+            if (player != null) {
+                player.getInventory().setItem(2, WoolUtil.getColoredWool(teamColor));
+            }
         } else {
-            player.sendMessage(MessageUtil.color("&c加入队伍失败，请稍后重试！"));
+            gamePlayer.sendMessage(MessageUtil.color("&c加入队伍失败，请稍后重试！"));
         }
     }
 }

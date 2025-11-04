@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class GameTeamBedHandler {
 
-    private GameTeam gameTeam;
+    private final GameTeam gameTeam;
     /**
      * 搜索床的范围
      */

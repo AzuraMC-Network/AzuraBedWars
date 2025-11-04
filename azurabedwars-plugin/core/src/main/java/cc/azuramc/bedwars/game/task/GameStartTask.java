@@ -110,7 +110,9 @@ public class GameStartTask extends BukkitRunnable {
             player.sendMessage(String.format(gameStartConfig.getMsgCountdown(), countdown));
             player.sendTitle(String.format(gameStartConfig.getTitleCountdown(), countdown), gameStartConfig.getSubtitleText(),
                     gameStartConfig.getFadeIn(), gameStartConfig.getTitleStay(), gameStartConfig.getFadeOut());
-            player.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 1F, 10F);
+            if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
+                player.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 1F, 10F);
+            }
         }
     }
 

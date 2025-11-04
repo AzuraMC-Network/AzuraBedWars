@@ -154,7 +154,10 @@ public class PlayerLevelManager {
      * @param newLevel   新等级
      */
     private static void handleSingleLevelUp(GamePlayer gamePlayer, int oldLevel, int newLevel) {
-        gamePlayer.getPlayer().sendMessage("§6恭喜！你从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
+        if (gamePlayer == null) {
+            return;
+        }
+        gamePlayer.sendMessage("§6恭喜！你从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
     }
 
     /**
@@ -166,7 +169,10 @@ public class PlayerLevelManager {
      * @param levelsGained 升级的等级数
      */
     private static void handleMultipleLevelUp(GamePlayer gamePlayer, int oldLevel, int newLevel, int levelsGained) {
-        gamePlayer.getPlayer().sendMessage("§6恭喜！你连续升级了 " + levelsGained + " 级！从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
+        if (gamePlayer == null) {
+            return;
+        }
+        gamePlayer.sendMessage("§6恭喜！你连续升级了 " + levelsGained + " 级！从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
     }
 
     /**

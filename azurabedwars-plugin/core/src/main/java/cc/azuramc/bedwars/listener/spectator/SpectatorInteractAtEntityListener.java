@@ -22,6 +22,9 @@ public class SpectatorInteractAtEntityListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
         GamePlayer gamePlayer = GamePlayer.get(event.getPlayer().getUniqueId());
+        if (gamePlayer == null) {
+            return;
+        }
         if (gamePlayer.isSpectator() && gameManager.getGameState() == GameState.RUNNING) {
             handleSpectatorEntityInteraction(event, gamePlayer);
         }
@@ -34,7 +37,11 @@ public class SpectatorInteractAtEntityListener implements Listener {
         if (event.getRightClicked() instanceof Player targetPlayer && SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) {
             event.setCancelled(true);
 
-            if (GamePlayer.get(targetPlayer.getUniqueId()).isSpectator()) {
+            GamePlayer targetGamePlayer = GamePlayer.get(targetPlayer.getUniqueId());
+            if (targetGamePlayer == null) {
+                return;
+            }
+            if (targetGamePlayer.isSpectator()) {
                 return;
             }
 

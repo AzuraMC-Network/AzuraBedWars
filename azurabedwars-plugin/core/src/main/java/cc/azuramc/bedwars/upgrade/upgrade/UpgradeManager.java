@@ -111,7 +111,7 @@ public class UpgradeManager {
         switch (level) {
             case 1:
                 this.resourceFurnaceUpgrade = 1;
-                ironGenerator.setInterval(20L * 1);
+                ironGenerator.setInterval(20L);
                 ironGenerator.setMaxStack(48);
 
                 goldGenerator.setInterval(20L * 3);

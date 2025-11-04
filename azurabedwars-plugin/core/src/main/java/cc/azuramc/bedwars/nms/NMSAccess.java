@@ -11,12 +11,13 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author an5w1r@163.com
  */
 public interface NMSAccess {
-    Fireball setFireballDirection(Fireball fireball, Vector vector);
+    Fireball setFireballDirection(@NotNull Fireball fireball, @NotNull Vector vector);
 
     LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health);
 

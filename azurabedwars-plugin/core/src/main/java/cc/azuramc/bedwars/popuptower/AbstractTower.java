@@ -52,13 +52,19 @@ public abstract class AbstractTower {
      * 开始建造塔
      */
     private void startBuilding(List<String> coordinates, Block chest, TeamColor color, Player player) {
+        GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
         final int[] currentIndex = {0};
         final int totalBlocks = coordinates.size();
 
         this.buildTask = Bukkit.getScheduler().runTaskTimer(
                 AzuraBedWars.getInstance(),
                 () -> {
-                    GamePlayer.get(player).playSound(XSound.ENTITY_CHICKEN_EGG.get(), 1.0F, 0.5F);
+                    if (XSound.ENTITY_CHICKEN_EGG.get() != null) {
+                        gamePlayer.playSound(XSound.ENTITY_CHICKEN_EGG.get(), 1.0F, 0.5F);
+                    }
 
                     for (int i = 0; i < BLOCKS_PER_TICK && currentIndex[0] < totalBlocks; i++) {
                         String coordinate = coordinates.get(currentIndex[0]);

@@ -56,13 +56,13 @@ public class GamePlayer {
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
 
+    private final Player player;
     private final UUID uuid;
     private final String name;
     private final AssistsManager assistsManager;
     private final PlayerData playerData;
     private final PlayerCompass playerCompass;
 
-    private GameModeType gameModeType;
     /**
      * 使用 HashMap 存储经验来源，键是资源名(String)，值是经验数量(Integer)
      */
@@ -111,12 +111,12 @@ public class GamePlayer {
     /**
      * 构造方法
      *
-     * @param uuid 玩家UUID
-     * @param name 玩家名称
+     * @param player Bukkit Player
      */
-    public GamePlayer(@NotNull UUID uuid, @NotNull String name) {
-        this.uuid = uuid;
-        this.name = name;
+    public GamePlayer(@NotNull Player player) {
+        this.player = player;
+        this.uuid = player.getUniqueId();
+        this.name = player.getName();
 
         // 初始化管理器
         this.assistsManager = new AssistsManager(this);
@@ -146,7 +146,6 @@ public class GamePlayer {
         this.currentGameDestroyedBeds = 0;
 
         // 游戏模式
-        this.gameModeType = playerData.getMode();
         this.experienceSources = new HashMap<>();
 
         this.hasTrapProtection = false;
@@ -157,13 +156,12 @@ public class GamePlayer {
     /**
      * 创建或获取游戏玩家实例
      *
-     * @param uuid 玩家UUID
-     * @param name 玩家名称
+     * @param player Bukkit Player
      * @return 游戏玩家实例
      */
     @NotNull
-    public static GamePlayer create(@NotNull UUID uuid, @NotNull String name) {
-        return GAME_PLAYERS.computeIfAbsent(uuid, k -> new GamePlayer(uuid, name));
+    public static GamePlayer create(@NotNull Player player) {
+        return GAME_PLAYERS.computeIfAbsent(player.getUniqueId(), k -> new GamePlayer(player));
     }
 
     /**
@@ -543,16 +541,6 @@ public class GamePlayer {
     }
 
     /**
-     * 获取Bukkit玩家实例
-     *
-     * @return Bukkit玩家实例，如果玩家离线则返回null
-     */
-    @Nullable
-    public Player getPlayer() {
-        return Bukkit.getPlayer(uuid);
-    }
-
-    /**
      * 检查玩家是否在线
      *
      * @return 是否在线
@@ -708,7 +696,9 @@ public class GamePlayer {
             for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
                 ItemStack armor = player.getInventory().getArmorContents()[i];
                 if (armor != null) {
-                    armor.addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getUpgradeManager().getProtectionUpgrade());
+                    if (XEnchantment.PROTECTION.get() != null) {
+                        armor.addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getUpgradeManager().getProtectionUpgrade());
+                    }
                     player.updateInventory();
                 }
             }
@@ -717,7 +707,9 @@ public class GamePlayer {
         if (gameTeam.getUpgradeManager().getFallingProtectionUpgrade() > 0) {
             ItemStack boots = player.getInventory().getArmorContents()[0];
             if (boots != null) {
-                boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getUpgradeManager().getFallingProtectionUpgrade());
+                if (XEnchantment.FEATHER_FALLING.get() != null) {
+                    boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getUpgradeManager().getFallingProtectionUpgrade());
+                }
                 player.updateInventory();
             }
         }
@@ -942,7 +934,7 @@ public class GamePlayer {
      * 玩家指南针内部类
      */
     @Getter
-    public class PlayerCompass {
+    public static class PlayerCompass {
         private final GamePlayer gamePlayer;
 
         public PlayerCompass(GamePlayer gamePlayer) {
@@ -984,7 +976,6 @@ public class GamePlayer {
         }
     }
 
-    // don't remove this, it is preventing stack overflow error
     @Override
     public int hashCode() {
         return uuid.hashCode();

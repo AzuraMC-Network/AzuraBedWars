@@ -145,9 +145,6 @@ public class TeamShopGUI extends CustomGUI {
             return;
         }
         TrapManager trapManager = gameTeam.getTrapManager();
-        if (trapManager == null) {
-            return;
-        }
 
         // 设置空的陷阱槽位
         for (int i = 39 + trapManager.getActiveTrapCount(); i < 42; i++) {
@@ -162,7 +159,7 @@ public class TeamShopGUI extends CustomGUI {
                                     "§7购买的陷阱会再次排列，具体",
                                     "§7费用取决已排列的陷阱数量。",
                                     "",
-                                    "§7下一个陷阱: §b" + formatPrice(trapManager.getCurrentTrapPrice(), gamePlayer.getGameModeType())
+                                    "§7下一个陷阱: §b" + formatPrice(trapManager.getCurrentTrapPrice(), gamePlayer.getPlayerData().getMode())
                             )
                             .getItem(),
                     new GUIAction(0, () -> {
@@ -187,7 +184,7 @@ public class TeamShopGUI extends CustomGUI {
                                     "§7购买的陷阱会再次排列，具体",
                                     "§7费用取决已排列的陷阱数量。",
                                     "",
-                                    "§7下一个陷阱: §b" + formatPrice(trapManager.getCurrentTrapPrice(), gamePlayer.getGameModeType())
+                                    "§7下一个陷阱: §b" + formatPrice(trapManager.getCurrentTrapPrice(), gamePlayer.getPlayerData().getMode())
                             )
                             .getItem();
 

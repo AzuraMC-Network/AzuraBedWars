@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 public class CompatibilityModeNMS implements NMSAccess {
 
     @Override
-    public Fireball setFireballDirection(Fireball fireball, @NotNull Vector vector) {
+    public Fireball setFireballDirection(@NotNull Fireball fireball, @NotNull Vector vector) {
 
         // if the server version is 1.21 or higher, we can use the new method to set the velocity directly (mojang changed the way to set fireball direction)
         if (VersionUtil.isLessThan(1, 21)) {

@@ -33,6 +33,9 @@ public class PlayerDrinkMilkListener implements Listener {
         }
 
         GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
 
         ItemStack itemStack = event.getItem();
         if (itemStack.getType() == Material.AIR || itemStack.getItemMeta() == null) {

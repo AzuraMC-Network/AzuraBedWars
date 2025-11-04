@@ -43,7 +43,7 @@ public class GeneratorManager {
                         48
                 );
             }
-            addPrivateResourceTask(iron, 20L * 1);
+            addPrivateResourceTask(iron, 20L);
 
             PrivateResourceGenerator gold = null;
             if (XMaterial.GOLD_INGOT.get() != null) {

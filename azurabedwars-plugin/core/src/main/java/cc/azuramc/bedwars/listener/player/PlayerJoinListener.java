@@ -9,9 +9,7 @@ import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.server.ServerListPingEvent;
@@ -23,21 +21,17 @@ public class PlayerJoinListener implements Listener {
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     private static int serverMaxPlayers = 16;
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onAsyncJoin(AsyncPlayerPreLoginEvent event) {
-        if (GamePlayer.get(event.getUniqueId()) != null) {
-            return;
-        }
-
-        GamePlayer.create(event.getUniqueId(), event.getName());
-    }
-
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
+        GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
+        GamePlayer.create(player);
 
         // 如果是正在运行的游戏且玩家有团队，允许重连
-        if (gameManager.getGameState() == GameState.RUNNING && GamePlayer.get(player.getUniqueId()).getGameTeam() != null) {
+        if (gameManager.getGameState() == GameState.RUNNING && gamePlayer.getGameTeam() != null) {
             event.allow();
             return;
         }

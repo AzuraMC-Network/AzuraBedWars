@@ -177,7 +177,7 @@ public class ItemShopGUI extends CustomGUI {
     private void setEmptySlot(Player player, int slotPosition, int shopSlot, GameManager gameManager) {
         setItem(slotPosition,
                 new ItemBuilder()
-                        .setItemStack(XMaterial.matchXMaterial("STAINED_GLASS_PANE:14").orElse(XMaterial.GLASS_PANE).parseItem())
+                        .setItemStack(Objects.requireNonNull(XMaterial.matchXMaterial("STAINED_GLASS_PANE:14").orElse(XMaterial.GLASS_PANE).parseItem()))
                         .setDisplayName("§c空闲的槽位")
                         .setLores("§7这是一个快捷购买槽位!§bShift+左键", "§7将任意物品放到这里~")
                         .getItem(),
@@ -201,7 +201,7 @@ public class ItemShopGUI extends CustomGUI {
         ItemBuilder itemBuilder = prepareItemDisplay(gamePlayer, shopItemType);
 
         // 创建物品说明
-        List<String> lore = createItemLore(shopItemType, gamePlayer.getGameModeType(), moreLore);
+        List<String> lore = createItemLore(shopItemType, gamePlayer.getPlayerData().getMode(), moreLore);
 
         // 设置商店项
         super.setItem(displaySlot,
@@ -378,7 +378,7 @@ public class ItemShopGUI extends CustomGUI {
         }
 
         // 如果已经有剪刀则不卖
-        if (XMaterial.SHEARS.get().equals(itemMaterial) && gamePlayer.isShear()) {
+        if (XMaterial.SHEARS.get() != null && XMaterial.SHEARS.get().equals(itemMaterial) && gamePlayer.isShear()) {
             return false;
         }
 
@@ -452,7 +452,9 @@ public class ItemShopGUI extends CustomGUI {
 
         // 检查是否有足够资源
         if (playerTotal < requiredAmount) {
-            gamePlayer.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
+                gamePlayer.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            }
             gamePlayer.sendMessage("§c没有足够资源购买！");
             return false;
         }
@@ -473,7 +475,9 @@ public class ItemShopGUI extends CustomGUI {
             }
         }
 
-        gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        if (XSound.ENTITY_ITEM_PICKUP.get() != null) {
+            gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        }
         return true;
     }
 
@@ -487,13 +491,17 @@ public class ItemShopGUI extends CustomGUI {
         int requiredXp = shopItemType.getPriceCost().xp();
 
         if (gamePlayer.getPlayer().getLevel() < requiredXp) {
-            gamePlayer.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
+                gamePlayer.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
+            }
             gamePlayer.sendMessage("§c没有足够资源购买！");
             return false;
         }
 
         gamePlayer.getPlayer().setLevel(gamePlayer.getPlayer().getLevel() - requiredXp);
-        gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        if (XSound.ENTITY_ITEM_PICKUP.get() != null) {
+            gamePlayer.playSound(XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
+        }
         return true;
 //        Player player = gamePlayer.getPlayer();
 //
@@ -704,7 +712,9 @@ public class ItemShopGUI extends CustomGUI {
         // 处理剑特殊情况
         String itemTypeName = shopItemType.getItemStack().getType().name();
         if (itemTypeName.endsWith("_SWORD") || itemTypeName.endsWith("SWORD")) {
-            player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
+            if (XMaterial.WOODEN_SWORD.get() != null) {
+                player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
+            }
 
             // 添加锋利附魔
             if (gamePlayer.getGameTeam().getUpgradeManager().hasSharpnessUpgrade()) {

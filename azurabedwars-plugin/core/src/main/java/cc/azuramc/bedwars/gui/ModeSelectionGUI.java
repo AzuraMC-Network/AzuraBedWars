@@ -8,7 +8,6 @@ import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
-import org.bukkit.entity.Player;
 
 /**
  * 模式选择GUI
@@ -80,7 +79,6 @@ public class ModeSelectionGUI extends CustomGUI {
      */
     private void setupDefaultModeItem(GamePlayer gamePlayer) {
         boolean isSelected = gamePlayer.getPlayerData().getMode() == GameModeType.DEFAULT;
-        Player player = gamePlayer.getPlayer();
 
         setItem(11, new ItemBuilder()
                         .setType(XMaterial.RED_BED.get())
@@ -94,16 +92,17 @@ public class ModeSelectionGUI extends CustomGUI {
                         .getItem(),
                 new GUIAction(0, () -> {
                     if (isSelected) {
-                        player.sendMessage("§a你已经选择了普通模式!");
+                        gamePlayer.sendMessage("§a你已经选择了普通模式!");
                         return;
                     }
 
                     gamePlayer.getPlayerData().setMode(GameModeType.DEFAULT);
-                    GamePlayer.get(player.getUniqueId()).setGameModeType(GameModeType.DEFAULT);
 
-                    player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 10F, 1F);
+                    if (XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get() != null) {
+                        gamePlayer.playSound(XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 10F, 1F);
+                    }
                     AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
-                    player.sendMessage("§a已选择普通模式!");
+                    gamePlayer.sendMessage("§a已选择普通模式!");
                 }, true));
     }
 
@@ -112,7 +111,6 @@ public class ModeSelectionGUI extends CustomGUI {
      */
     private void setupExperienceModeItem(GamePlayer gamePlayer) {
         boolean isSelected = gamePlayer.getPlayerData().getMode() == GameModeType.EXPERIENCE;
-        Player player = gamePlayer.getPlayer();
 
         setItem(15, new ItemBuilder()
                         .setType(XMaterial.EXPERIENCE_BOTTLE.get())
@@ -126,16 +124,17 @@ public class ModeSelectionGUI extends CustomGUI {
                         .getItem(),
                 new GUIAction(0, () -> {
                     if (isSelected) {
-                        player.sendMessage("§a你已经选择了经验模式!");
+                        gamePlayer.sendMessage("§a你已经选择了经验模式!");
                         return;
                     }
 
                     gamePlayer.getPlayerData().setMode(GameModeType.EXPERIENCE);
-                    GamePlayer.get(player.getUniqueId()).setGameModeType(GameModeType.EXPERIENCE);
 
-                    player.playSound(player.getLocation(), XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 10F, 1F);
+                    if (XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get() != null) {
+                        gamePlayer.playSound(XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 10F, 1F);
+                    }
                     AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
-                    player.sendMessage("§a已选择经验模式!");
+                    gamePlayer.sendMessage("§a已选择经验模式!");
                 }, true));
     }
 }

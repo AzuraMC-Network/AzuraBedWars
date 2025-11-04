@@ -51,7 +51,9 @@ public class PlayerAFKListener implements Listener {
                 long lastMove = AFK_LAST_MOVEMENT.getOrDefault(uuid, currentTime);
 
                 // 大于时间未移动
-                gamePlayer.setAfk(currentTime - lastMove >= settingsConfig.getMaxNoMovementTime() * 1000L);
+                if (gamePlayer != null) {
+                    gamePlayer.setAfk(currentTime - lastMove >= settingsConfig.getMaxNoMovementTime() * 1000L);
+                }
             }
         }, 0L, 20L);
     }
