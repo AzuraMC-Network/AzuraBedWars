@@ -8,7 +8,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.*;
+import revxrsal.commands.annotation.AutoComplete;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.annotation.DefaultFor;
+import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
@@ -18,14 +21,13 @@ import java.util.Objects;
 /**
  * @author an5w1r@163.com
  */
-@Command({"bedwars", "bw", "azurabedwars"})
+@Command({"azurabedwars", "bedwars", "abw", "bw"})
 @CommandPermission("azurabedwars.admin")
 public class AdminCommand {
 
-    @Dependency
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
-    @DefaultFor("bw")
+    @DefaultFor({"azurabedwars", "bedwars", "abw", "bw"})
     public void getHelpCommand(BukkitCommandActor actor) {
         List<String> helpMessages = MessageUtil.color(List.of(
                 MessageUtil.CHAT_BAR,

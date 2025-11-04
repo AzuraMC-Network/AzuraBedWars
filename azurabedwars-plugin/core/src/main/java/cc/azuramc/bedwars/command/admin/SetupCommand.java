@@ -4,7 +4,10 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.SetupItemManager;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.*;
+import revxrsal.commands.annotation.AutoComplete;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.annotation.DefaultFor;
+import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.List;
@@ -18,7 +21,6 @@ import java.util.List;
 @CommandPermission("azurabedwars.admin")
 public class SetupCommand {
 
-    @Dependency
     private final AzuraBedWars plugin;
     private final SetupItemManager setupItemManager;
 

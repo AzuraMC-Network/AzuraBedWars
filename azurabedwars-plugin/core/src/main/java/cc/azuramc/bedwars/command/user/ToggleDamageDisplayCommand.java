@@ -8,7 +8,6 @@ import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.DefaultFor;
-import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 
@@ -17,9 +16,6 @@ import revxrsal.commands.bukkit.BukkitCommandActor;
  */
 @Command({"displaydamage", "dd"})
 public class ToggleDamageDisplayCommand {
-
-    @Dependency
-    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
 
     @DefaultFor({"displaydamage", "dd"})
     public void toggleDisplayDamage(BukkitCommandActor actor) {
