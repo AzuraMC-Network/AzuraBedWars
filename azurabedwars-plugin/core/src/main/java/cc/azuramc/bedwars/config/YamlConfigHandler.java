@@ -80,7 +80,7 @@ public class YamlConfigHandler<T> implements IConfigHandler<T> {
     }
 
     /**
-     * 保存配置到YAML文件
+     * 保存配置到YAML文件（带字段注释）
      *
      * @param instance 要保存的配置实例
      */
@@ -99,11 +99,9 @@ public class YamlConfigHandler<T> implements IConfigHandler<T> {
             // 将Java对象转换为YAML
             YamlConfiguration yaml = converter.toYaml(instance);
 
-            // 添加文件头注释
-            yaml.options().header(generateHeader());
-
-            // 保存到文件
-            yaml.save(file);
+            // 使用带注释的方式保存YAML文件
+            // 会自动读取配置类字段上的 @ConfigComment 注解并添加注释
+            CommentedYamlWriter.save(yaml, instance, file, generateHeader());
 
             LoggerUtil.info("成功保存配置文件: " + file.getName());
 

@@ -10,6 +10,7 @@ AzuraBedWars 的配置系统支持两种格式：
 - ✅ 对外暴露YAML格式（用户友好）
 - ✅ 内部使用Java类操作（类型安全）
 - ✅ 支持JSON序列化（云存储兼容）
+- ✅ **字段注释功能**（使用 @ConfigComment 注解）
 - ✅ 自动转换和验证
 - ✅ 线程安全
 
@@ -62,6 +63,7 @@ YAML格式配置处理器，推荐使用。
 **特点：**
 - 读写YAML文件
 - 自动添加文件头注释
+- **自动读取 @ConfigComment 注解并为字段添加注释**
 - 详细的错误日志
 - 支持JSON序列化
 
@@ -304,6 +306,153 @@ public class MyConfig {
         private String password = "password";
     }
 }
+```
+
+## 为配置添加注释（@ConfigComment）
+
+使用 `@ConfigComment` 注解可以为YAML配置文件中的每个字段添加说明性注释，让用户更容易理解配置项的作用。
+
+### 基本用法
+
+```java
+import cc.azuramc.bedwars.config.annotation.ConfigComment;
+import lombok.Data;
+
+@Data
+public class MyConfig {
+    @ConfigComment("是否启用调试模式")
+    private boolean debugMode = false;
+
+    @ConfigComment("服务器最大玩家数")
+    private int maxPlayers = 100;
+
+    @ConfigComment("服务器名称")
+    private String serverName = "AzuraMC";
+}
+```
+
+生成的YAML文件：
+
+```yaml
+# AzuraBedWars 配置文件
+# ...
+
+# 是否启用调试模式
+debugMode: false
+
+# 服务器最大玩家数
+maxPlayers: 100
+
+# 服务器名称
+serverName: AzuraMC
+```
+
+### 多行注释
+
+```java
+@Data
+public class MyConfig {
+    @ConfigComment({
+        "玩家最大生命值",
+        "默认为20（10颗心）",
+        "修改此值需要重启服务器"
+    })
+    private int maxHealth = 20;
+}
+```
+
+生成的YAML文件：
+
+```yaml
+# 玩家最大生命值
+# 默认为20（10颗心）
+# 修改此值需要重启服务器
+maxHealth: 20
+```
+
+### 嵌套配置的注释
+
+```java
+@Data
+public class MyConfig {
+    @ConfigComment("数据库配置")
+    private DatabaseConfig database = new DatabaseConfig();
+
+    @Data
+    public static class DatabaseConfig {
+        @ConfigComment("数据库类型 (MySQL/SQLite)")
+        private String type = "MySQL";
+
+        @ConfigComment("数据库主机地址")
+        private String host = "localhost";
+
+        @ConfigComment({
+            "数据库端口",
+            "MySQL默认: 3306",
+            "PostgreSQL默认: 5432"
+        })
+        private int port = 3306;
+    }
+}
+```
+
+生成的YAML文件：
+
+```yaml
+# 数据库配置
+database:
+  # 数据库类型 (MySQL/SQLite)
+  type: MySQL
+
+  # 数据库主机地址
+  host: localhost
+
+  # 数据库端口
+  # MySQL默认: 3306
+  # PostgreSQL默认: 5432
+  port: 3306
+```
+
+### 完整示例
+
+查看示例文件了解更多用法：
+- `cc.azuramc.bedwars.config.example.CommentedConfigExample`
+
+### 注释最佳实践
+
+1. **简洁明了**：注释应该简短且易于理解
+2. **说明作用**：解释配置项的用途，而不是重复字段名
+3. **提供示例**：对于复杂配置，提供示例值或格式说明
+4. **注意事项**：如果修改配置有特殊要求，在注释中说明
+5. **中英文**：如果面向国际用户，考虑使用英文注释
+
+### 好的注释示例
+
+```java
+// ✅ 好的注释
+@ConfigComment({
+    "全局聊天冷却时间（秒）",
+    "防止玩家刷屏，设置为0表示无冷却"
+})
+private int globalChatCooldown = 10;
+
+// ✅ 好的注释
+@ConfigComment("火球造成的伤害值（注意：实际伤害还会受到距离影响）")
+private int fireballDamage = 3;
+
+// ❌ 不好的注释（仅重复字段名）
+@ConfigComment("调试模式")
+private boolean debugMode = false;
+
+// ❌ 不好的注释（过于冗长）
+@ConfigComment({
+    "这是一个用于控制是否启用调试模式的配置项",
+    "当你想要在控制台看到更多的日志信息时",
+    "可以将这个选项设置为true",
+    "但是请注意不要在生产环境中启用",
+    "因为这会产生大量的日志输出"
+})
+private boolean debugMode = false;
 ```
 
 ## 注意事项
