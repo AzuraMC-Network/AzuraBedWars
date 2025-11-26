@@ -70,24 +70,71 @@ public class ConfigFactory {
     }
 
     /**
-     * 初始化默认配置
+     * 初始化默认配置（JSON格式）
+     * 保留用于向后兼容
      *
      * @param configManager 配置管理器
      */
     @SuppressWarnings("unchecked")
     public void initializeDefaults(ConfigManager configManager) {
+        initializeDefaults(configManager, ConfigFormat.JSON);
+    }
+
+    /**
+     * 初始化默认配置（YAML格式）
+     *
+     * @param configManager 配置管理器
+     */
+    public void initializeDefaultsAsYaml(ConfigManager configManager) {
+        initializeDefaults(configManager, ConfigFormat.YAML);
+    }
+
+    /**
+     * 初始化默认配置（指定格式）
+     *
+     * @param configManager 配置管理器
+     * @param format        配置文件格式
+     */
+    @SuppressWarnings("unchecked")
+    public void initializeDefaults(ConfigManager configManager, ConfigFormat format) {
         for (Map.Entry<String, Supplier<?>> entry : configSuppliers.entrySet()) {
             String id = entry.getKey();
             Object defaultInstance = defaultInstances.get(id);
 
             if (defaultInstance != null) {
                 Class<?> configClass = defaultInstance.getClass();
-                ConfigHandler<Object> handler = new ConfigHandler<>(
-                        new File(configManager.getConfigDir(), id + ".json"),
-                        (Class<Object>) configClass
-                );
+
+                // 根据格式创建对应的处理器
+                IConfigHandler<Object> handler;
+                if (format == ConfigFormat.YAML) {
+                    handler = new YamlConfigHandler<>(
+                            new File(configManager.getConfigDir(), id + ".yml"),
+                            (Class<Object>) configClass
+                    );
+                } else {
+                    handler = new ConfigHandler<>(
+                            new File(configManager.getConfigDir(), id + ".json"),
+                            (Class<Object>) configClass
+                    );
+                }
+
                 configManager.registerConfig(id, handler, defaultInstance);
             }
         }
+    }
+
+    /**
+     * 配置文件格式枚举
+     */
+    public enum ConfigFormat {
+        /**
+         * JSON格式 - 适合云存储，但用户手动编辑不友好
+         */
+        JSON,
+
+        /**
+         * YAML格式 - 用户友好，易于手动编辑
+         */
+        YAML
     }
 }

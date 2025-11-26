@@ -8,13 +8,14 @@ import com.google.gson.JsonSyntaxException;
 import java.io.*;
 
 /**
- * 配置处理器
- * 负责单个配置文件的加载和保存
+ * JSON配置处理器
+ * 负责单个配置文件的加载和保存（JSON格式）
+ * 保留用于向后兼容或需要纯JSON配置的场景
  *
  * @param <T> 配置对象类型
  * @author an5w1r@163.com
  */
-public class ConfigHandler<T> {
+public class ConfigHandler<T> implements IConfigHandler<T> {
     private final File file;
     private final Gson gson;
     private final Class<T> clazz;
@@ -37,6 +38,7 @@ public class ConfigHandler<T> {
      * @param defaultInstance 默认实例
      * @return 加载的配置对象
      */
+    @Override
     public T load(T defaultInstance) {
         if (!file.exists()) {
             save(defaultInstance);
@@ -57,6 +59,7 @@ public class ConfigHandler<T> {
      *
      * @param instance 要保存的配置对象
      */
+    @Override
     public void save(Object instance) {
         try {
             // 确保父目录存在
@@ -74,5 +77,29 @@ public class ConfigHandler<T> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 将配置对象序列化为JSON字符串
+     * 用于云存储等场景
+     *
+     * @param instance 配置实例
+     * @return JSON字符串
+     */
+    @Override
+    public String toJson(Object instance) {
+        return gson.toJson(instance);
+    }
+
+    /**
+     * 从JSON字符串反序列化为配置对象
+     * 用于从云存储加载配置
+     *
+     * @param json JSON字符串
+     * @return 配置对象
+     */
+    @Override
+    public T fromJson(String json) {
+        return gson.fromJson(json, clazz);
     }
 }

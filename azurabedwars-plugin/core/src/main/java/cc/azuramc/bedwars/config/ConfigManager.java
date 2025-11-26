@@ -9,13 +9,14 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 配置管理器
  * 负责管理所有配置对象的加载和保存
+ * 支持多种配置格式（JSON、YAML等）
  *
  * @author an5w1r@163.com
  */
 public class ConfigManager {
     @Getter
     private final File configDir;
-    private final ConcurrentHashMap<String, ConfigHandler<?>> configHandlers;
+    private final ConcurrentHashMap<String, IConfigHandler<?>> configHandlers;
     private final ConcurrentHashMap<String, Object> configObjects;
 
     /**
@@ -41,10 +42,10 @@ public class ConfigManager {
      * 注册配置对象
      *
      * @param id              配置ID
-     * @param handler         配置处理器
+     * @param handler         配置处理器（支持JSON、YAML等格式）
      * @param defaultInstance 默认实例
      */
-    public <T> void registerConfig(String id, ConfigHandler<T> handler, T defaultInstance) {
+    public <T> void registerConfig(String id, IConfigHandler<T> handler, T defaultInstance) {
         configHandlers.put(id, handler);
         // 加载配置对象
         T config = handler.load(defaultInstance);
@@ -87,7 +88,7 @@ public class ConfigManager {
      * @param id 配置ID
      */
     public void saveConfig(String id) {
-        ConfigHandler<?> handler = configHandlers.get(id);
+        IConfigHandler<?> handler = configHandlers.get(id);
         Object config = configObjects.get(id);
         if (handler != null && config != null) {
             handler.save(config);
@@ -112,11 +113,46 @@ public class ConfigManager {
      * @param id 配置ID
      */
     public void reloadConfig(String id) {
-        ConfigHandler<?> handler = configHandlers.get(id);
+        IConfigHandler<?> handler = configHandlers.get(id);
         if (handler != null) {
             Object config = handler.load(null);
             if (config != null) {
                 configObjects.put(id, config);
+            }
+        }
+    }
+
+    /**
+     * 将指定配置转换为JSON字符串
+     * 用于云存储等场景
+     *
+     * @param id 配置ID
+     * @return JSON字符串，如果配置不存在返回null
+     */
+    public String configToJson(String id) {
+        IConfigHandler<?> handler = configHandlers.get(id);
+        Object config = configObjects.get(id);
+        if (handler != null && config != null) {
+            return handler.toJson(config);
+        }
+        return null;
+    }
+
+    /**
+     * 从JSON字符串加载配置
+     * 用于从云存储加载配置
+     *
+     * @param id   配置ID
+     * @param json JSON字符串
+     */
+    public void configFromJson(String id, String json) {
+        IConfigHandler<?> handler = configHandlers.get(id);
+        if (handler != null) {
+            Object config = handler.fromJson(json);
+            if (config != null) {
+                configObjects.put(id, config);
+                // 保存到本地文件
+                handler.save(config);
             }
         }
     }
