@@ -18,6 +18,8 @@ public class NMSProvider {
         this.nmsVersion = VersionUtil.getNmsVersion();
         this.access = createNMSAccess(nmsVersion);
 
+        // TODO: Doesn't support paper, when paper 1.20.5+ later, they use the mojang namespace. We will support paper again in the future.
+        // Useful link: https://forums.papermc.io/threads/important-dev-psa-future-removal-of-cb-package-relocation.1106/
         if (this.access == null) {
             LoggerUtil.warn("NMS支持未找到 (" + this.nmsVersion + ")! 启用兼容模式 可能存在意外问题!");
             access = new CompatibilityModeNMS();
