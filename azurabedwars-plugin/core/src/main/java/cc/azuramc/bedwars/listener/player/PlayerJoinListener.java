@@ -26,9 +26,8 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
         if (gamePlayer == null) {
-            return;
+            gamePlayer = GamePlayer.create(player);
         }
-        GamePlayer.create(player);
 
         // 如果是正在运行的游戏且玩家有团队，允许重连
         if (gameManager.getGameState() == GameState.RUNNING && gamePlayer.getGameTeam() != null) {

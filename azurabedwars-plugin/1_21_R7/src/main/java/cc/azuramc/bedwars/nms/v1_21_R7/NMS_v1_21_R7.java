@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.nms.v1_21_10;
+package cc.azuramc.bedwars.nms.v1_21_R7;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author an5w1r@163.com
  */
-public class NMS_v1_21_10 implements NMSAccess {
+public class NMS_v1_21_R7 implements NMSAccess {
 
     @Override
     public Fireball setFireballDirection(@NotNull Fireball fireball, @NotNull Vector vector) {
@@ -24,14 +24,14 @@ public class NMS_v1_21_10 implements NMSAccess {
     @Override
     public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        LoggerUtil.debug("NMS_v1_21_10$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health);
+        LoggerUtil.debug("NMS_v1_21_R6$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health);
         return CustomIronGolem.spawn(loc, gameTeam, speed, health);
     }
 
     @Override
     public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        LoggerUtil.debug("NMS_v1_21_10$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health);
+        LoggerUtil.debug("NMS_v1_21_R6$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health);
         return CustomSilverfish.spawn(loc, gameTeam, speed, health);
     }
 }
