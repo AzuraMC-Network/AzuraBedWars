@@ -34,5 +34,5 @@ include (
         'azurabedwars-plugin:1_21_R4',
         'azurabedwars-plugin:1_21_R5',
         'azurabedwars-plugin:1_21_R6',
-        'azurabedwars-plugin:1_21_10',
+        'azurabedwars-plugin:1_21_R7',
 )

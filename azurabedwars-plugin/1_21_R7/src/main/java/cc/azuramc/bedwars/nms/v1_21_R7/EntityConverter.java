@@ -1,10 +1,10 @@
-package cc.azuramc.bedwars.nms.v1_21_10;
+package cc.azuramc.bedwars.nms.v1_21_R7;
 
 import cc.azuramc.bedwars.util.LoggerUtil;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.EntityInsentient;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
@@ -35,7 +35,7 @@ public class EntityConverter {
      * @param bukkitEntity Bukkit实体
      * @return NMS EntityInsentient实体，如果转换失败返回null
      */
-    public static Mob bukkitToNms(Entity bukkitEntity) {
+    public static EntityInsentient bukkitToNms(Entity bukkitEntity) {
         if (!(bukkitEntity instanceof CraftEntity craftEntity)) {
             LoggerUtil.warn("实体不是CraftEntity类型: " + bukkitEntity.getClass().getSimpleName());
             return null;
@@ -43,22 +43,22 @@ public class EntityConverter {
 
         net.minecraft.world.entity.Entity nmsEntity = craftEntity.getHandle();
 
-        if (!(nmsEntity instanceof Mob)) {
-            LoggerUtil.warn("NMS实体不是Mob类型: " + nmsEntity.getClass().getSimpleName());
+        if (!(nmsEntity instanceof EntityInsentient)) {
+            LoggerUtil.warn("NMS实体不是EntityInsentient类型: " + nmsEntity.getClass().getSimpleName());
             return null;
         }
 
-        return (Mob) nmsEntity;
+        return (EntityInsentient) nmsEntity;
     }
 
     /**
-     * 生成实体并转换为NMS Mob
+     * 生成实体并转换为NMS EntityInsentient
      *
      * @param location   生成位置
      * @param entityType 实体类型
-     * @return NMS Mob实体，如果生成或转换失败返回null
+     * @return NMS EntityInsentient实体，如果生成或转换失败返回null
      */
-    public static Mob spawnAndConvert(Location location, EntityType entityType) {
+    public static EntityInsentient spawnAndConvert(Location location, EntityType entityType) {
         try {
             Entity bukkitEntity = spawnBukkitEntity(location, entityType);
             return bukkitToNms(bukkitEntity);
@@ -70,12 +70,12 @@ public class EntityConverter {
     }
 
     /**
-     * 检查实体是否为有效的Mob
+     * 检查实体是否为有效的EntityInsentient
      *
      * @param bukkitEntity 要检查的Bukkit实体
-     * @return 如果实体可以转换为Mob返回true
+     * @return 如果实体可以转换为EntityInsentient返回true
      */
-    public static boolean isValidMob(Entity bukkitEntity) {
+    public static boolean isValidEntityInsentient(Entity bukkitEntity) {
         return bukkitToNms(bukkitEntity) != null;
     }
 }

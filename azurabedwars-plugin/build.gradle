@@ -35,6 +35,9 @@ allprojects {
         maven {
             url = "https://repo.codemc.io/repository/maven-releases/"
         }
+        maven {
+            url = "https://repo.codemc.io/repository/nms/"
+        }
     }
 
     group = 'cc.azuramc'
@@ -93,7 +96,7 @@ dependencies {
     implementation project(':azurabedwars-plugin:1_21_R4')
     implementation project(':azurabedwars-plugin:1_21_R5')
     implementation project(':azurabedwars-plugin:1_21_R6')
-    implementation project(':azurabedwars-plugin:1_21_10')
+    implementation project(':azurabedwars-plugin:1_21_R7')
 }
 
 shadowJar {
