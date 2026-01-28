@@ -201,8 +201,12 @@ public class PickupItemHandler {
                 }
 
                 GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
-                if (nearbyPlayer != null && nearbyPlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
-                    players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
+                if (nearbyPlayer != null) {
+                    if (nearbyPlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
+                        players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
+                    } else {
+                        players.setLevel(players.getLevel() + xp);
+                    }
                 }
             }
         }
