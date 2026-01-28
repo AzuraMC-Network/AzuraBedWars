@@ -35,4 +35,5 @@ include (
         'azurabedwars-plugin:1_21_R5',
         'azurabedwars-plugin:1_21_R6',
         'azurabedwars-plugin:1_21_R7',
+        'azurabedwars-plugin:mojang-namespace',
 )

@@ -18,11 +18,11 @@ public class NMSProvider {
         this.nmsVersion = VersionUtil.getNmsVersion();
         this.access = createNMSAccess(nmsVersion);
 
-        // TODO: Doesn't support paper, when paper 1.20.5+ later, they use the mojang namespace. We will support paper again in the future.
-        // Useful link: https://forums.papermc.io/threads/important-dev-psa-future-removal-of-cb-package-relocation.1106/
         if (this.access == null) {
             LoggerUtil.warn("NMS支持未找到 (" + this.nmsVersion + ")! 启用兼容模式 可能存在意外问题!");
             access = new CompatibilityModeNMS();
+        } else if (nmsVersion == null) {
+            LoggerUtil.info("正在使用 Mojang Namespace 运行时");
         } else {
             LoggerUtil.info("正在使用受支持的版本! (" + this.nmsVersion + ")");
         }
@@ -31,7 +31,11 @@ public class NMSProvider {
     }
 
     private NMSAccess createNMSAccess(String version) {
+
         try {
+            if (version == null) {
+                return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + ".mojangnamespace.NMS_MojangNamespace").getDeclaredConstructor().newInstance();
+            }
             return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + "." + version + ".NMS_" + version).getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             LoggerUtil.warn("未受支持的版本: " + e.getMessage());
