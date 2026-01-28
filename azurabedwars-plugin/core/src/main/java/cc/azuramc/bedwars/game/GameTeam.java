@@ -30,7 +30,7 @@ import java.util.Objects;
  */
 @Data
 // it is preventing stack overflow error
-@ToString(exclude = {"gameManager"})
+@ToString(exclude = {"gameManager", "upgradeManager", "trapManager"})
 public class GameTeam {
     /**
      * 搜索床的范围
