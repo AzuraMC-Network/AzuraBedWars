@@ -51,7 +51,7 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 
 ### 运行要求
 
-- **Java**: 17 或更高版本
+- **Java**: 21 或更高版本
 - **Minecraft**: 1.8.8 - 1.21.8
 - **数据存储**: MySQL 或 MongoDB (必须)
 - **依赖插件**:

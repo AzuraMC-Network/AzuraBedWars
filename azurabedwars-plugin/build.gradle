@@ -47,7 +47,7 @@ allprojects {
 subprojects {
     apply plugin: 'java'
 
-    def targetJavaVersion = 17
+    def targetJavaVersion = 21
     java {
         def javaVersion = JavaVersion.toVersion(targetJavaVersion)
         sourceCompatibility = javaVersion
