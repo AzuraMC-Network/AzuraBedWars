@@ -7,10 +7,10 @@ processResources {
     }
 }
 dependencies {
-    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly "org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT"
     compileOnly "me.clip:placeholderapi:2.11.6"
     compileOnly "net.luckperms:api:5.4"
+    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
     compileOnly "org.jetbrains:annotations:26.0.2-1"
 
     implementation "org.apache.commons:commons-lang3:3.18.0"
