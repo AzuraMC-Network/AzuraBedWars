@@ -1,6 +1,6 @@
 # AzuraBedWars
 
-[![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
+[![Java](https://img.shields.io/badge/Java-21+-orange.svg)](https://www.oracle.com/java/)
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.8--1.21%2B-green.svg)](https://www.minecraft.net/)
 [![Spigot](https://img.shields.io/badge/Spigot-API-blue.svg)](https://www.spigotmc.org/)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -52,7 +52,7 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 ### 运行要求
 
 - **Java**: 21 或更高版本
-- **Minecraft**: 1.8.8 - 1.21.8
+- **Minecraft**: 1.8.8 - 1.21.11
 - **数据存储**: MySQL 或 MongoDB (必须)
 - **依赖插件**:
     - PacketEvents (必装)
