@@ -1,10 +1,9 @@
 package cc.azuramc.bedwars.database.repository.mongodb;
 
 import cc.azuramc.bedwars.database.entity.PlayerData;
-import cc.azuramc.bedwars.database.entity.PlayerDataTableKey;
+import cc.azuramc.bedwars.database.mapper.EntityMapper;
 import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.mongodb.client.MongoCollection;
@@ -14,10 +13,8 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -25,6 +22,10 @@ import java.util.UUID;
  * @author Irina
  */
 public class MongoPlayerDataRepository implements IPlayerDataRepository {
+
+    private static final String TABLE_NAME = EntityMapper.getTableName(PlayerData.class);
+    private static final String COL_UUID = EntityMapper.getQueryColumn(PlayerData.class, PlayerData.Query.BY_UUID.name());
+
     private final MongoCollection<Document> collection;
 
     public MongoPlayerDataRepository(MongoDatabaseProvider mongoDatabaseProvider) {
@@ -35,20 +36,20 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
     public MongoCollection<Document> getCollection(MongoDatabase mongoDatabase) {
         boolean collectionExists = mongoDatabase.listCollectionNames()
                 .into(new ArrayList<>())
-                .contains(PlayerDataTableKey.tableName);
+                .contains(TABLE_NAME);
 
         if (collectionExists) {
-            return mongoDatabase.getCollection(PlayerDataTableKey.tableName);
+            return mongoDatabase.getCollection(TABLE_NAME);
         }
-        mongoDatabase.createCollection(PlayerDataTableKey.tableName);
-        return mongoDatabase.getCollection(PlayerDataTableKey.tableName);
+        mongoDatabase.createCollection(TABLE_NAME);
+        return mongoDatabase.getCollection(TABLE_NAME);
     }
 
     @Override
     public void createTable() {
         try {
             IndexOptions options = new IndexOptions().unique(true);
-            collection.createIndex(Indexes.ascending(PlayerDataTableKey.uuid), options);
+            collection.createIndex(Indexes.ascending(COL_UUID), options);
 
             LoggerUtil.info("MongoDB 索引创建完毕");
         } catch (Exception e) {
@@ -60,26 +61,7 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
     @Override
     public PlayerData insertPlayerData(PlayerData playerData) {
         try {
-            Document doc = new Document()
-                    .append(PlayerDataTableKey.name, playerData.getName())
-                    .append(PlayerDataTableKey.uuid, playerData.getUuid().toString())
-                    .append(PlayerDataTableKey.mode, playerData.getMode().name())
-                    .append(PlayerDataTableKey.level, playerData.getLevel())
-                    .append(PlayerDataTableKey.experience, playerData.getExperience())
-                    .append(PlayerDataTableKey.kills, playerData.getKills())
-                    .append(PlayerDataTableKey.deaths, playerData.getDeaths())
-                    .append(PlayerDataTableKey.assists, playerData.getAssists())
-                    .append(PlayerDataTableKey.finalKills, playerData.getFinalKills())
-                    .append(PlayerDataTableKey.finalDeaths, playerData.getFinalDeaths())
-                    .append(PlayerDataTableKey.destroyedBeds, playerData.getDestroyedBeds())
-                    .append(PlayerDataTableKey.wins, playerData.getWins())
-                    .append(PlayerDataTableKey.ties, playerData.getTies())
-                    .append(PlayerDataTableKey.losses, playerData.getLosses())
-                    .append(PlayerDataTableKey.games, playerData.getGames())
-                    .append(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
-                    .append(PlayerDataTableKey.createdAt, playerData.getCreatedAt())
-                    .append(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt());
-
+            Document doc = EntityMapper.toDocument(playerData);
             collection.insertOne(doc);
 
             ObjectId objectId = doc.getObjectId("_id");
@@ -94,30 +76,9 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
     @Override
     public void updatePlayerData(PlayerData playerData) {
         try {
-            // 使用$set操作符进行更新
-            Document updateDoc = new Document("$set", new Document()
-                    .append(PlayerDataTableKey.name, playerData.getName())
-                    .append(PlayerDataTableKey.mode, playerData.getMode().name())
-                    .append(PlayerDataTableKey.level, playerData.getLevel())
-                    .append(PlayerDataTableKey.experience, playerData.getExperience())
-                    .append(PlayerDataTableKey.kills, playerData.getKills())
-                    .append(PlayerDataTableKey.deaths, playerData.getDeaths())
-                    .append(PlayerDataTableKey.assists, playerData.getAssists())
-                    .append(PlayerDataTableKey.finalKills, playerData.getFinalKills())
-                    .append(PlayerDataTableKey.finalDeaths, playerData.getFinalDeaths())
-                    .append(PlayerDataTableKey.destroyedBeds, playerData.getDestroyedBeds())
-                    .append(PlayerDataTableKey.wins, playerData.getWins())
-                    .append(PlayerDataTableKey.ties, playerData.getTies())
-                    .append(PlayerDataTableKey.losses, playerData.getLosses())
-                    .append(PlayerDataTableKey.games, playerData.getGames())
-                    .append(PlayerDataTableKey.shopDataJson, playerData.getShopDataJson())
-                    .append(PlayerDataTableKey.updatedAt, playerData.getUpdatedAt()));
-
-            // 使用UUID字符串进行过滤
-            Bson filter = Filters.eq(PlayerDataTableKey.uuid, playerData.getUuid().toString());
+            Document updateDoc = EntityMapper.toUpdateDocument(playerData);
             UpdateOptions options = new UpdateOptions().upsert(true);
-
-            collection.updateOne(filter, updateDoc, options);
+            collection.updateOne(Filters.eq(COL_UUID, playerData.getUuid().toString()), updateDoc, options);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update player data", e);
         }
@@ -126,57 +87,12 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
     @Override
     public PlayerData selectPlayerDataByUuid(UUID uuid, GamePlayer gamePlayer) {
         try {
-            Document result = collection.find(Filters.eq(PlayerDataTableKey.uuid, uuid.toString())).first();
-            if (result == null) return new PlayerData(gamePlayer);
-
-            PlayerData pd = new PlayerData(gamePlayer);
-
-            ObjectId objectId = result.getObjectId("_id");
-            pd.setId(objectId.toString());
-
-            pd.setName(result.getString(PlayerDataTableKey.name));
-            pd.setUuid(UUID.fromString(result.getString(PlayerDataTableKey.uuid)));
-
-            // 正确转换GameModeType
-            String modeStr = result.getString(PlayerDataTableKey.mode);
-            pd.setMode(GameModeType.valueOf(modeStr.toUpperCase()));
-
-            pd.setLevel(result.getInteger(PlayerDataTableKey.level));
-
-            // 正确获取double类型的experience
-            Object expObj = result.get(PlayerDataTableKey.experience);
-            if (expObj instanceof Double) {
-                pd.setExperience((Double) expObj);
-            } else if (expObj instanceof Integer) {
-                pd.setExperience(((Integer) expObj).doubleValue());
-            } else {
-                pd.setExperience(0.0);
+            Document result = collection.find(Filters.eq(COL_UUID, uuid.toString())).first();
+            if (result == null) {
+                return new PlayerData(gamePlayer);
             }
 
-            pd.setKills(result.getInteger(PlayerDataTableKey.kills));
-            pd.setDeaths(result.getInteger(PlayerDataTableKey.deaths));
-            pd.setAssists(result.getInteger(PlayerDataTableKey.assists));
-            pd.setFinalKills(result.getInteger(PlayerDataTableKey.finalKills));
-            pd.setFinalDeaths(result.getInteger(PlayerDataTableKey.finalDeaths));
-            pd.setDestroyedBeds(result.getInteger(PlayerDataTableKey.destroyedBeds));
-            pd.setWins(result.getInteger(PlayerDataTableKey.wins));
-            pd.setTies(result.getInteger(PlayerDataTableKey.ties));
-            pd.setLosses(result.getInteger(PlayerDataTableKey.losses));
-            pd.setGames(result.getInteger(PlayerDataTableKey.games));
-            pd.setShopDataJson(result.getString(PlayerDataTableKey.shopDataJson));
-
-            // 正确转换Timestamp
-            Object updatedAtObj = result.get(PlayerDataTableKey.updatedAt);
-            if (updatedAtObj instanceof Timestamp) {
-                pd.setUpdatedAt((Timestamp) updatedAtObj);
-            }
-
-            Object createdAtObj = result.get(PlayerDataTableKey.createdAt);
-            if (createdAtObj instanceof Timestamp) {
-                pd.setCreatedAt((Timestamp) createdAtObj);
-            }
-
-            return pd;
+            return EntityMapper.fromDocument(result, PlayerData.class, gamePlayer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to select player data", e);
         }

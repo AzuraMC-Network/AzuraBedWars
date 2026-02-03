@@ -1,18 +1,12 @@
 package cc.azuramc.bedwars.database.repository.mysql;
 
+import cc.azuramc.bedwars.database.dialect.SqlGenerator;
 import cc.azuramc.bedwars.database.entity.DatabaseVersion;
-import cc.azuramc.bedwars.database.entity.DatabaseVersionTableKey;
+import cc.azuramc.bedwars.database.mapper.EntityMapper;
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
 import cc.azuramc.orm.AzuraOrmClient;
-import cc.azuramc.orm.builder.ColumnDefinitionBuilder;
-import cc.azuramc.orm.builder.DataType;
-import cc.azuramc.orm.builder.PreparedStatementBuildManager;
-import cc.azuramc.orm.mapper.ResultMapper;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Optional;
+import java.sql.*;
 
 /**
  * @author an5w1r@163.com
@@ -21,60 +15,55 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     private final AzuraOrmClient ormClient;
 
+    private static final SqlGenerator SQL = SqlGenerator.mysql();
+
+    private static final String CREATE_TABLE_SQL = SQL.generateCreateTableSql(DatabaseVersion.class);
+    private static final String SELECT_SQL = SQL.generateSelectWithLimitSql(DatabaseVersion.class, 1);
+    private static final String INSERT_SQL = SQL.generateInsertSql(DatabaseVersion.class);
+    private static final String UPDATE_SQL = SQL.generateUpdateAllSql(DatabaseVersion.class);
+    private static final String EXISTS_SQL = SQL.generateExistsSql(DatabaseVersion.class);
+
+    private static final String COL_VERSION = EntityMapper.getQueryColumn(DatabaseVersion.class, DatabaseVersion.Query.BY_VERSION.name());
+
     public MySQLDatabaseVersionRepository(AzuraOrmClient ormClient) {
         this.ormClient = ormClient;
     }
 
     @Override
     public void createTable() {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
-            PreparedStatement createTableStmt = buildManager.createTable(DatabaseVersionTableKey.tableName)
-                    .ifNotExists()
-                    .column(DatabaseVersionTableKey.version, ColumnDefinitionBuilder.of(DataType.Type.INT).build())
-                    .engine("InnoDB")
-                    .charset("utf8mb4")
-                    .prepare();
-
-            buildManager.execute(createTableStmt);
+        try (Connection conn = ormClient.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(CREATE_TABLE_SQL);
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to create table: " + DatabaseVersionTableKey.tableName, e);
+            throw new RuntimeException("Failed to create table: database_version", e);
         }
     }
 
     @Override
     public int getCurrentVersion() throws SQLException {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
+        try (Connection conn = ormClient.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_SQL);
+             ResultSet rs = ps.executeQuery()) {
 
-            Optional<Integer> result = buildManager.select()
-                    .from(DatabaseVersionTableKey.tableName)
-                    .select(DatabaseVersionTableKey.version)
-                    .limit(1)
-                    .executeQueryForObject(rs -> rs.getInt(DatabaseVersionTableKey.version));
-
-            return result.orElse(-1);
+            if (rs.next()) {
+                return rs.getInt(COL_VERSION);
+            }
+            return -1;
         }
     }
 
     @Override
     public DatabaseVersion selectDatabaseVersion() {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
+        try (Connection conn = ormClient.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_SQL);
+             ResultSet rs = ps.executeQuery()) {
 
-            ResultMapper<DatabaseVersion> mapper = rs -> {
-                DatabaseVersion databaseVersion = new DatabaseVersion();
-                databaseVersion.setVersion(rs.getInt(DatabaseVersionTableKey.version));
-                return databaseVersion;
-            };
-
-            Optional<DatabaseVersion> result = buildManager.select()
-                    .from(DatabaseVersionTableKey.tableName)
-                    .select(DatabaseVersionTableKey.version)
-                    .limit(1)
-                    .executeQueryForObject(mapper);
-
-            return result.orElse(null);
+            if (rs.next()) {
+                DatabaseVersion dv = new DatabaseVersion();
+                dv.setVersion(rs.getInt(COL_VERSION));
+                return dv;
+            }
+            return null;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to select database version", e);
         }
@@ -82,26 +71,21 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void insertVersion(int version) throws SQLException {
-        try (Connection conn = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
-            PreparedStatement insertStmt = buildManager.insertInto(DatabaseVersionTableKey.tableName)
-                    .values(DatabaseVersionTableKey.version, version)
-                    .prepare();
+        try (Connection conn = ormClient.getConnection();
+             PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
 
-            buildManager.execute(insertStmt);
+            ps.setInt(1, version);
+            ps.executeUpdate();
         }
     }
 
     @Override
     public void insertDatabaseVersion(DatabaseVersion databaseVersion) {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatement insertStmt = ormClient.insert(connection)
-                    .insertInto(DatabaseVersionTableKey.tableName)
-                    .values(DatabaseVersionTableKey.version, databaseVersion.getVersion())
-                    .prepare();
+        try (Connection conn = ormClient.getConnection();
+             PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
 
-            insertStmt.executeUpdate();
-            insertStmt.close();
+            ps.setInt(1, databaseVersion.getVersion());
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to insert database version", e);
         }
@@ -109,26 +93,21 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void updateVersion(int version) throws SQLException {
-        try (Connection conn = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
-            PreparedStatement updateStmt = buildManager.update(DatabaseVersionTableKey.tableName)
-                    .set(DatabaseVersionTableKey.version, version)
-                    .whereEquals("id", "1")
-                    .prepare();
+        try (Connection conn = ormClient.getConnection();
+             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
 
-            buildManager.execute(updateStmt);
+            ps.setInt(1, version);
+            ps.executeUpdate();
         }
     }
 
     @Override
     public void updateDatabaseVersion(DatabaseVersion databaseVersion) {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
-            PreparedStatement updateStmt = buildManager.update(DatabaseVersionTableKey.tableName)
-                    .set(DatabaseVersionTableKey.version, databaseVersion.getVersion())
-                    .prepare();
+        try (Connection conn = ormClient.getConnection();
+             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
 
-            buildManager.execute(updateStmt);
+            ps.setInt(1, databaseVersion.getVersion());
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to update database version", e);
         }
@@ -136,14 +115,11 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public boolean hasVersionRecord() throws SQLException {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
+        try (Connection conn = ormClient.getConnection();
+             PreparedStatement ps = conn.prepareStatement(EXISTS_SQL);
+             ResultSet rs = ps.executeQuery()) {
 
-            return buildManager.select()
-                    .from(DatabaseVersionTableKey.tableName)
-                    .select(DatabaseVersionTableKey.version)
-                    .limit(1)
-                    .executeQueryForExists();
+            return rs.next();
         }
     }
 }

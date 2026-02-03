@@ -4,6 +4,10 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.provider.DatabaseType;
 import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
+import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
+import cc.azuramc.bedwars.database.repository.mysql.MySQLDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.mysql.MySQLPlayerDataRepository;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.orm.AzuraORM;
 import cc.azuramc.orm.AzuraOrmClient;
@@ -16,6 +20,8 @@ import lombok.Getter;
 @Getter
 public class MySQLDatabaseProvider implements IDatabaseProvider {
 
+    private static final String JDBC_URL_TEMPLATE = "jdbc:mysql://%s:%s/%s";
+
     private final AzuraBedWars plugin;
     private AzuraOrmClient ormClient;
 
@@ -27,9 +33,14 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
     public boolean initialize() {
         try {
             SettingsConfig.DatabaseConfig database = plugin.getSettingsConfig().getDatabase();
+            String jdbcUrl = JDBC_URL_TEMPLATE.formatted(
+                    database.getHost(),
+                    database.getPort(),
+                    database.getDatabase()
+            );
+
             DatabaseConfig config = new DatabaseConfig()
-                    .setUrl("jdbc:mysql://" + database.getHost() + ":"
-                            + database.getPort() + "/" + database.getDatabase())
+                    .setUrl(jdbcUrl)
                     .setUsername(database.getUsername())
                     .setPassword(database.getPassword())
                     .setMaximumPoolSize(25)
@@ -38,7 +49,7 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
                     .setIdleTimeout(300000L)
                     .setMaxLifetime(900000L)
                     .setLeakDetectionThreshold(30000L)
-                    .setPoolName("AzuraBedWars-Pool")
+                    .setPoolName("AzuraBedWars-MySQL-Pool")
                     .setRegisterMbeans(true)
                     .setUseSSL(false)
                     .setAutoCommit(true);
@@ -70,5 +81,15 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
     @Override
     public DatabaseType getDatabaseType() {
         return DatabaseType.MYSQL;
+    }
+
+    @Override
+    public IPlayerDataRepository createPlayerDataRepository() {
+        return new MySQLPlayerDataRepository(ormClient);
+    }
+
+    @Override
+    public IDatabaseVersionRepository createDatabaseVersionRepository() {
+        return new MySQLDatabaseVersionRepository(ormClient);
     }
 }

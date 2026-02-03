@@ -1,5 +1,8 @@
 package cc.azuramc.bedwars.database.entity;
 
+import cc.azuramc.bedwars.database.annotation.Column;
+import cc.azuramc.bedwars.database.annotation.QueryField;
+import cc.azuramc.bedwars.database.annotation.Table;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
@@ -15,30 +18,76 @@ import java.util.UUID;
  */
 @Getter
 @Setter
+@Table("player_data")
 public class PlayerData {
 
+    /**
+     * 查询键枚举
+     */
+    public enum Query {
+        BY_UUID
+    }
+
+    @Column(value = "id", primaryKey = true, autoIncrement = true)
     private String id;
+
+    @Column(value = "name", size = 16, nullable = false)
     private String name;
+
+    @QueryField("BY_UUID")
+    @Column(value = "uuid", size = 36, nullable = false)
     private UUID uuid;
+
+    @Column(value = "mode", size = 16, nullable = false)
     private GameModeType mode;
+
+    @Column(value = "level", defaultValue = "1")
     private int level;
+
+    @Column(value = "experience", defaultValue = "0.0")
     private double experience;
+
+    @Column(value = "kills", defaultValue = "0")
     private int kills;
+
+    @Column(value = "deaths", defaultValue = "0")
     private int deaths;
+
+    @Column(value = "assists", defaultValue = "0")
     private int assists;
+
+    @Column(value = "final_kills", defaultValue = "0")
     private int finalKills;
+
+    @Column(value = "final_deaths", defaultValue = "0")
     private int finalDeaths;
+
+    @Column(value = "destroyed_beds", defaultValue = "0")
     private int destroyedBeds;
+
+    @Column(value = "wins", defaultValue = "0")
     private int wins;
+
+    @Column(value = "ties", defaultValue = "0")
     private int ties;
+
+    @Column(value = "losses", defaultValue = "0")
     private int losses;
+
+    @Column(value = "games", defaultValue = "0")
     private int games;
+
+    @Column(value = "shop_data_json", type = "TEXT")
     private String shopDataJson;
+
+    @Column(value = "created_at", updatable = false)
     private Timestamp createdAt;
+
+    @Column(value = "updated_at")
     private Timestamp updatedAt;
 
     @NotNull
-    private GamePlayer gamePlayer;
+    private transient GamePlayer gamePlayer;
 
     public PlayerData(@NotNull GamePlayer gamePlayer) {
         this.setName(gamePlayer.getName());

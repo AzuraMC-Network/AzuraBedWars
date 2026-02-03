@@ -4,6 +4,10 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.provider.DatabaseType;
 import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
+import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
+import cc.azuramc.bedwars.database.repository.mongodb.MongoDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.mongodb.MongoPlayerDataRepository;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -21,6 +25,9 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class MongoDatabaseProvider implements IDatabaseProvider {
 
+    private static final String MONGO_URL_WITH_AUTH = "mongodb://%s:%s@%s:%s/%s";
+    private static final String MONGO_URL_NO_AUTH = "mongodb://%s:%s/%s";
+
     private final AzuraBedWars plugin;
     private final SettingsConfig.DatabaseConfig databaseConfig;
 
@@ -36,21 +43,7 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
     @Override
     public boolean initialize() {
         try {
-            String url;
-            if (databaseConfig.getUsername() != null && !databaseConfig.getUsername().isEmpty() &&
-                    databaseConfig.getPassword() != null && !databaseConfig.getPassword().isEmpty()) {
-                url = "mongodb://" +
-                        databaseConfig.getUsername() + ":" +
-                        databaseConfig.getPassword() + "@" +
-                        databaseConfig.getHost() + ":" +
-                        databaseConfig.getPort() + "/" +
-                        databaseConfig.getDatabase();
-            } else {
-                url = "mongodb://" +
-                        databaseConfig.getHost() + ":" +
-                        databaseConfig.getPort() + "/" +
-                        databaseConfig.getDatabase();
-            }
+            String url = buildConnectionUrl();
 
             MongoClientSettings settings = MongoClientSettings.builder()
                     .applyConnectionString(new ConnectionString(url))
@@ -72,9 +65,30 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
             LoggerUtil.info("MongoDB 数据库连接初始化成功");
             return true;
         } catch (Exception e) {
-            LoggerUtil.error("MongoDB 数据库连接初始化失败　" + e.getMessage());
+            LoggerUtil.error("MongoDB 数据库连接初始化失败: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private String buildConnectionUrl() {
+        boolean hasAuth = databaseConfig.getUsername() != null && !databaseConfig.getUsername().isEmpty()
+                && databaseConfig.getPassword() != null && !databaseConfig.getPassword().isEmpty();
+
+        if (hasAuth) {
+            return MONGO_URL_WITH_AUTH.formatted(
+                    databaseConfig.getUsername(),
+                    databaseConfig.getPassword(),
+                    databaseConfig.getHost(),
+                    databaseConfig.getPort(),
+                    databaseConfig.getDatabase()
+            );
+        } else {
+            return MONGO_URL_NO_AUTH.formatted(
+                    databaseConfig.getHost(),
+                    databaseConfig.getPort(),
+                    databaseConfig.getDatabase()
+            );
         }
     }
 
@@ -85,7 +99,7 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
             mongoClient.close();
             LoggerUtil.info("MongoDB 数据库连接关闭成功");
         } catch (Exception e) {
-            LoggerUtil.error("MongoDB 数据库连接在关闭时出现了一项错误　" + e.getMessage());
+            LoggerUtil.error("MongoDB 数据库连接在关闭时出现了一项错误: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -93,5 +107,15 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
     @Override
     public DatabaseType getDatabaseType() {
         return DatabaseType.MONGODB;
+    }
+
+    @Override
+    public IPlayerDataRepository createPlayerDataRepository() {
+        return new MongoPlayerDataRepository(this);
+    }
+
+    @Override
+    public IDatabaseVersionRepository createDatabaseVersionRepository() {
+        return new MongoDatabaseVersionRepository(this);
     }
 }

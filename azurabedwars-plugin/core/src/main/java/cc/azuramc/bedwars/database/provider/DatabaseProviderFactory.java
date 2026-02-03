@@ -6,62 +6,54 @@ import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
 import cc.azuramc.bedwars.database.provider.mysql.MySQLDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
 import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
-import cc.azuramc.bedwars.database.repository.mongodb.MongoDatabaseVersionRepository;
-import cc.azuramc.bedwars.database.repository.mongodb.MongoPlayerDataRepository;
-import cc.azuramc.bedwars.database.repository.mysql.MySQLDatabaseVersionRepository;
-import cc.azuramc.bedwars.database.repository.mysql.MySQLPlayerDataRepository;
 import cc.azuramc.bedwars.database.service.DatabaseVersionService;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import lombok.Getter;
 
 /**
+ * 数据库提供者工厂
+ *
  * @author an5w1r@163.com
  */
 @Getter
 public class DatabaseProviderFactory {
 
     private final AzuraBedWars plugin;
-    private IDatabaseProvider databaseProvider;
+    private final IDatabaseProvider databaseProvider;
 
-    private IPlayerDataRepository playerDataRepository;
-    private IDatabaseVersionRepository databaseVersionRepository;
+    private final IPlayerDataRepository playerDataRepository;
+    private final IDatabaseVersionRepository databaseVersionRepository;
 
-    private PlayerDataService playerDataService;
-    private DatabaseVersionService databaseVersionService;
+    private final PlayerDataService playerDataService;
+    private final DatabaseVersionService databaseVersionService;
 
     public DatabaseProviderFactory(AzuraBedWars plugin) {
         this.plugin = plugin;
-        createProvider(plugin);
+
+        this.databaseProvider = createProvider(plugin);
+        databaseProvider.initialize();
+
+        this.playerDataRepository = databaseProvider.createPlayerDataRepository();
+        this.databaseVersionRepository = databaseProvider.createDatabaseVersionRepository();
+
+        this.playerDataService = new PlayerDataService(playerDataRepository);
+        this.databaseVersionService = new DatabaseVersionService(databaseVersionRepository);
     }
 
     /**
-     * 创建数据库提供者
+     * 根据配置创建对应的数据库提供者
      *
      * @param plugin 插件实例
+     * @return 数据库提供者
      */
-    public void createProvider(AzuraBedWars plugin) {
-        SettingsConfig.DatabaseConfig databaseConfig = plugin.getSettingsConfig().getDatabase();
+    private IDatabaseProvider createProvider(AzuraBedWars plugin) {
+        SettingsConfig.DatabaseConfig config = plugin.getSettingsConfig().getDatabase();
+        DatabaseType type = DatabaseType.valueOf(config.getDatabaseType().toUpperCase());
 
-        switch (DatabaseType.valueOf(databaseConfig.getDatabaseType().toUpperCase())) {
-            case MYSQL:
-                this.databaseProvider = new MySQLDatabaseProvider(plugin);
-                MySQLDatabaseProvider mySQLDatabaseProvider = (MySQLDatabaseProvider) databaseProvider;
-                databaseProvider.initialize();
-                this.playerDataRepository = new MySQLPlayerDataRepository(mySQLDatabaseProvider.getOrmClient());
-                this.databaseVersionRepository = new MySQLDatabaseVersionRepository(mySQLDatabaseProvider.getOrmClient());
-                break;
-            case MONGODB:
-                this.databaseProvider = new MongoDatabaseProvider(plugin, databaseConfig);
-                MongoDatabaseProvider mongoDatabaseProvider = (MongoDatabaseProvider) databaseProvider;
-                databaseProvider.initialize();
-                this.playerDataRepository = new MongoPlayerDataRepository(mongoDatabaseProvider);
-                this.databaseVersionRepository = new MongoDatabaseVersionRepository(mongoDatabaseProvider);
-                break;
-            default:
-                break;
-        }
-
-        playerDataService = new PlayerDataService(playerDataRepository);
-        databaseVersionService = new DatabaseVersionService(databaseVersionRepository);
+        return switch (type) {
+            case MYSQL -> new MySQLDatabaseProvider(plugin);
+            case MONGODB -> new MongoDatabaseProvider(plugin, config);
+            default -> throw new IllegalArgumentException("Unsupported database type: " + type);
+        };
     }
 }
