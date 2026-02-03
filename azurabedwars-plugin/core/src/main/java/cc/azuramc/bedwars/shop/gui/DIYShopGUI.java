@@ -6,7 +6,11 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
-import cc.azuramc.bedwars.shop.*;
+import cc.azuramc.bedwars.shop.ColorType;
+import cc.azuramc.bedwars.shop.ShopData;
+import cc.azuramc.bedwars.shop.ShopItemType;
+import cc.azuramc.bedwars.shop.ShopManager;
+import cc.azuramc.bedwars.shop.helper.ToolDisplayHelper;
 import cc.azuramc.bedwars.util.ShopUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -253,59 +257,11 @@ public class DIYShopGUI extends CustomGUI {
 
         // 根据物品颜色类型进行特殊处理
         if (shopItemType.getColorType() == ColorType.PICKAXE) {
-            updatePickaxeDisplay(gamePlayer, itemBuilder, shopItemType);
+            ToolDisplayHelper.updatePickaxeDisplay(gamePlayer, itemBuilder, shopItemType);
         } else if (shopItemType.getColorType() == ColorType.AXE) {
-            updateAxeDisplay(gamePlayer, itemBuilder, shopItemType);
+            ToolDisplayHelper.updateAxeDisplay(gamePlayer, itemBuilder, shopItemType);
         }
 
         return itemBuilder;
-    }
-
-    /**
-     * 更新稿子显示
-     */
-    private void updatePickaxeDisplay(GamePlayer gamePlayer, ItemBuilder itemBuilder, ShopItemType shopItemType) {
-        switch (gamePlayer.getPickaxeType()) {
-            case STONE:
-                itemBuilder.setType(XMaterial.STONE_PICKAXE.get());
-                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 20, 20));
-                break;
-            case IRON:
-                itemBuilder.setType(XMaterial.IRON_PICKAXE.get());
-                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 8, 24));
-                break;
-            case DIAMOND:
-                itemBuilder.setType(XMaterial.DIAMOND_PICKAXE.get());
-                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 12, 36));
-                break;
-            default:
-                itemBuilder.setType(XMaterial.WOODEN_PICKAXE.get());
-                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 10, 10));
-                break;
-        }
-    }
-
-    /**
-     * 更新斧头显示
-     */
-    private void updateAxeDisplay(GamePlayer gamePlayer, ItemBuilder itemBuilder, ShopItemType shopItemType) {
-        switch (gamePlayer.getAxeType()) {
-            case STONE:
-                itemBuilder.setType(XMaterial.STONE_AXE.get());
-                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 20, 20));
-                break;
-            case IRON:
-                itemBuilder.setType(XMaterial.IRON_AXE.get());
-                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 8, 24));
-                break;
-            case DIAMOND:
-                itemBuilder.setType(XMaterial.DIAMOND_AXE.get());
-                shopItemType.setPriceCost(new PriceCost(XMaterial.GOLD_INGOT.get(), 12, 36));
-                break;
-            default:
-                itemBuilder.setType(XMaterial.WOODEN_AXE.get());
-                shopItemType.setPriceCost(new PriceCost(XMaterial.IRON_INGOT.get(), 10, 10));
-                break;
-        }
     }
 }

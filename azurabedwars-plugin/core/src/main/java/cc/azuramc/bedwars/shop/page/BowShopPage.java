@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.shop.ShopData;
 import cc.azuramc.bedwars.shop.ShopItemType;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import lombok.Getter;
 import org.bukkit.inventory.ItemFlag;
 
 import java.util.LinkedList;
@@ -15,6 +16,7 @@ import java.util.List;
 /**
  * @author an5w1r@163.com
  */
+@Getter
 public class BowShopPage implements ShopData {
     private final ShopItemType mainShopItem;
     private final List<ShopItemType> shopItems = new LinkedList<>();
@@ -26,15 +28,5 @@ public class BowShopPage implements ShopData {
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.BOW.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "弓", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 12, 30)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.BOW.get()).addEnchant(XEnchantment.POWER.get(), 1).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "弓（力量I）", ColorType.NONE, new PriceCost(XMaterial.GOLD_INGOT.get(), 24, 60)));
         shopItems.add(new ShopItemType(new ItemBuilder().setType(XMaterial.BOW.get()).addEnchant(XEnchantment.POWER.get(), 1).addEnchant(XEnchantment.KNOCKBACK.get(), 1).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem(), "弓（力量I,冲击I）", ColorType.NONE, new PriceCost(XMaterial.EMERALD.get(), 6, 600)));
-    }
-
-    @Override
-    public ShopItemType getMainShopItem() {
-        return mainShopItem;
-    }
-
-    @Override
-    public List<ShopItemType> getShopItems() {
-        return shopItems;
     }
 }

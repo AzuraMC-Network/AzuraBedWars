@@ -33,14 +33,33 @@ public class ShopManager {
         SHOPS.add(shopData);
     }
 
+    /**
+     * 通过简单类名获取商店
+     *
+     * @param simpleName 商店类的简单名称（如 "BlockShopPage"）
+     * @return 商店数据，未找到返回 null
+     */
     @Nullable
-    public static ShopData getShop(@NotNull String name) {
+    public static ShopData getShopBySimpleName(@NotNull String simpleName) {
         for (ShopData shop : SHOPS) {
-            if (shop.getClass().getName().equals(name)) {
+            if (shop.getClass().getSimpleName().equals(simpleName)) {
                 return shop;
             }
         }
-
         return null;
+    }
+
+    /**
+     * 通过索引获取商店
+     *
+     * @param index 商店索引
+     * @return 商店数据，索引无效返回 null
+     */
+    @Nullable
+    public static ShopData getShop(int index) {
+        if (index < 0 || index >= SHOPS.size()) {
+            return null;
+        }
+        return SHOPS.get(index);
     }
 }
