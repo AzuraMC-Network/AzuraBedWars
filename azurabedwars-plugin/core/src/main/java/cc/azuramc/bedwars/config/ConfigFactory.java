@@ -83,7 +83,7 @@ public class ConfigFactory {
             if (defaultInstance != null) {
                 Class<?> configClass = defaultInstance.getClass();
                 ConfigHandler<Object> handler = new ConfigHandler<>(
-                        new File(configManager.getConfigDir(), id + ".json"),
+                        new File(configManager.getConfigDir(), id + ".yml"),
                         (Class<Object>) configClass
                 );
                 configManager.registerConfig(id, handler, defaultInstance);

@@ -1,78 +1,91 @@
 package cc.azuramc.bedwars.config;
 
+import cc.azuramc.bedwars.config.migrate.ConfigMigrator;
+import cc.azuramc.bedwars.config.yaml.YamlDeserializer;
+import cc.azuramc.bedwars.config.yaml.YamlSerializer;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 /**
- * 配置处理器
- * 负责单个配置文件的加载和保存
- *
- * @param <T> 配置对象类型
  * @author an5w1r@163.com
  */
 public class ConfigHandler<T> {
-    private final File file;
-    private final Gson gson;
-    private final Class<T> clazz;
 
-    /**
-     * 创建一个配置处理器
-     *
-     * @param file  配置文件
-     * @param clazz 配置对象类型
-     */
+    private final File file;
+    private final Class<T> clazz;
+    private final String configId;
+    private final File configDir;
+
+    private final YamlSerializer serializer = new YamlSerializer();
+    private final YamlDeserializer deserializer = new YamlDeserializer();
+    private final ConfigMigrator migrator = new ConfigMigrator();
+
     public ConfigHandler(File file, Class<T> clazz) {
         this.file = file;
         this.clazz = clazz;
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.configDir = file.getParentFile();
+
+        String fileName = file.getName();
+        this.configId = fileName.endsWith(".yml")
+                ? fileName.substring(0, fileName.length() - 4)
+                : fileName;
     }
 
-    /**
-     * 加载配置
-     *
-     * @param defaultInstance 默认实例
-     * @return 加载的配置对象
-     */
     public T load(T defaultInstance) {
+        T migratedConfig = migrator.migrateIfNeeded(configDir, configId, clazz);
+        if (migratedConfig != null) {
+            save(migratedConfig);
+            return migratedConfig;
+        }
+
         if (!file.exists()) {
             save(defaultInstance);
             return defaultInstance;
         }
 
-        try (Reader reader = new FileReader(file)) {
-            T loadedConfig = gson.fromJson(reader, clazz);
-            return loadedConfig != null ? loadedConfig : defaultInstance;
-        } catch (JsonSyntaxException | IOException e) {
+        return loadFromYaml(defaultInstance);
+    }
+
+    private T loadFromYaml(T defaultInstance) {
+        try {
+            YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
+            T instance = clazz.getDeclaredConstructor().newInstance();
+            deserializer.deserialize(yaml, instance);
+            return instance;
+        } catch (Exception e) {
+            LoggerUtil.error("加载配置文件失败: " + file.getAbsolutePath());
             e.printStackTrace();
             return defaultInstance;
         }
     }
 
-    /**
-     * 保存配置
-     *
-     * @param instance 要保存的配置对象
-     */
     public void save(Object instance) {
         try {
-            // 确保父目录存在
-            if (!file.getParentFile().exists()) {
-                boolean created = file.getParentFile().mkdirs();
-                if (!created) {
-                    LoggerUtil.error("无法创建配置文件目录：" + file.getParentFile().getAbsolutePath());
-                    return;
-                }
-            }
+            ensureParentDirectoryExists();
 
-            try (Writer writer = new FileWriter(file)) {
-                gson.toJson(instance, writer);
+            String yamlContent = serializer.serialize(instance);
+
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+                writer.write(yamlContent);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
+            LoggerUtil.error("保存配置文件失败: " + file.getAbsolutePath());
             e.printStackTrace();
+        }
+    }
+
+    private void ensureParentDirectoryExists() {
+        if (!configDir.exists()) {
+            boolean created = configDir.mkdirs();
+            if (!created) {
+                LoggerUtil.error("无法创建配置文件目录: " + configDir.getAbsolutePath());
+            }
         }
     }
 }
