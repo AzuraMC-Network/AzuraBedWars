@@ -1,194 +1,61 @@
 package cc.azuramc.bedwars.scoreboard.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
-import fr.mrmicky.fastboard.FastBoard;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import cc.azuramc.bedwars.scoreboard.util.ScoreboardFormatter;
+import cc.azuramc.bedwars.util.MessageUtil;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 /**
- * 游戏计分板管理类
- * 负责创建、更新和删除玩家的计分板
- *
  * @author an5w1r@163.com
  */
-public class GameRunningBoardProvider implements Listener {
+public class GameRunningBoardProvider extends AbstractBoardProvider {
 
-    private static final SettingsConfig.GameScoreboard GAME_BOARD_CONFIG = AzuraBedWars.getInstance().getSettingsConfig().getGameScoreboard();
+    private final SettingsConfig.GameScoreboard config;
 
-    private static GameManager gameManager;
-
-    /**
-     * 日期格式化器缓存
-     */
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yy", Locale.CHINESE);
-
-    /**
-     * 计分板管理器引用
-     */
-    private static ScoreboardManager scoreboardManager;
-
-    /**
-     * 构造函数
-     *
-     * @param gameManager 游戏实例
-     */
     public GameRunningBoardProvider(GameManager gameManager) {
-        GameRunningBoardProvider.gameManager = gameManager;
+        super(gameManager);
+        this.config = AzuraBedWars.getInstance().getSettingsConfig().getGameScoreboard();
     }
 
-    /**
-     * 设置计分板管理器
-     *
-     * @param manager 计分板管理器
-     */
-    public static void setScoreboardManager(ScoreboardManager manager) {
-        GameRunningBoardProvider.scoreboardManager = manager;
+    @Override
+    protected String getTitle() {
+        return config.getTitle();
     }
 
-    /**
-     * 为玩家创建计分板
-     *
-     * @param player 玩家
-     */
-    public static void show(Player player) {
-        if (player == null) {
-            return;
-        }
+    @Override
+    protected List<String> buildLines(GamePlayer gamePlayer) {
+        List<String> teamLines = buildTeamLines(gamePlayer);
 
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-        if (gamePlayer != null && gamePlayer.getBoard() == null) {
-            FastBoard board = new FastBoard(player);
-            board.updateTitle(GAME_BOARD_CONFIG.getTitle());
-            gamePlayer.setBoard(board);
-
-            // 立即更新一次
-            updatePlayerBoard(gamePlayer);
-        }
+        return ScoreboardFormatter.create()
+                .set("date", getFormattedDateRaw())
+                .set("next_event", gameManager.getGameEventManager().formattedNextEvent())
+                .set("time_left", gameManager.getFormattedTime(gameManager.getGameEventManager().getLeftTime()))
+                .set("server", "")
+                .formatLinesWithTeams(config.getLines(), teamLines);
     }
 
-    /**
-     * 更新所有玩家的计分板
-     */
-    public static void updateBoard() {
-        for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
-            updatePlayerBoard(gamePlayer);
-        }
-    }
+    private List<String> buildTeamLines(GamePlayer gamePlayer) {
+        List<String> teamLines = new ArrayList<>();
 
-    /**
-     * 更新单个玩家的计分板
-     *
-     * @param gamePlayer 游戏玩家
-     */
-    private static void updatePlayerBoard(GamePlayer gamePlayer) {
-        FastBoard board = gamePlayer.getBoard();
-        Player player = gamePlayer.getPlayer();
-
-        if (player == null || board == null || !player.isOnline()) {
-            return;
-        }
-
-        List<String> lines = new ArrayList<>();
-
-        // 添加日期行
-        lines.add("§7" + DATE_FORMAT.format(Calendar.getInstance().getTime()));
-        lines.add("");
-        // 添加事件信息
-        lines.add(gameManager.getGameEventManager().formattedNextEvent());
-        lines.add("§a" + gameManager.getFormattedTime(gameManager.getGameEventManager().getLeftTime()));
-        lines.add("");
-        // 添加队伍信息
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            StringBuilder teamLine = new StringBuilder()
-                    .append(gameTeam.getName())
-                    .append(" ")
-                    .append(gameTeam.isDestroyed() ? GAME_BOARD_CONFIG.getBedDestroyed() : GAME_BOARD_CONFIG.getBedAlive())
-                    .append(GAME_BOARD_CONFIG.getSeparator())
-                    .append(gameTeam.getAlivePlayers().size());
+            String bedStatus = gameTeam.isDestroyed() ? config.getBedDestroyed() : config.getBedAlive();
+            String myTeamMark = gameTeam.isInTeam(gamePlayer) ? config.getMyTeamMark() : "";
 
-            if (gameTeam.isInTeam(gamePlayer)) {
-                teamLine.append(GAME_BOARD_CONFIG.getMyTeamMark());
-            }
+            String line = config.getTeamLineFormat()
+                    .replace("{team_name}", gameTeam.getName())
+                    .replace("{bed_status}", bedStatus)
+                    .replace("{alive_count}", String.valueOf(gameTeam.getAlivePlayers().size()))
+                    .replace("{my_team_mark}", myTeamMark);
 
-            lines.add(teamLine.toString());
-        }
-        lines.add("");
-        // 添加服务器信息
-        lines.add(GAME_BOARD_CONFIG.getServerInfo());
-
-        // 更新计分板
-        board.updateLines(lines.toArray(new String[0]));
-    }
-
-    /**
-     * 游戏开始事件处理
-     *
-     * @param event 游戏开始事件
-     */
-    @EventHandler
-    public void onStart(BedwarsGameStartEvent event) {
-        if (scoreboardManager != null) {
-            // 使用计分板管理器切换到游戏模式
-            scoreboardManager.switchBoardMode();
-
-            // 注册计分板更新任务
-            gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> {
-                if (scoreboardManager != null) {
-                    scoreboardManager.updateAllBoards();
-                } else {
-                    updateBoard();
-                }
-            });
-        } else {
-            // 为所有在线玩家显示计分板
-            Bukkit.getOnlinePlayers().forEach(GameRunningBoardProvider::show);
-
-            // 注册计分板更新任务
-            gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> updateBoard());
-        }
-    }
-
-    /**
-     * 清理玩家的计分板
-     *
-     * @param player 玩家
-     */
-    public static void removeBoard(Player player) {
-        if (player == null) {
-            return;
+            teamLines.add(MessageUtil.color(line));
         }
 
-        GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-        if (gamePlayer != null && gamePlayer.getBoard() != null) {
-            FastBoard board = gamePlayer.getBoard();
-            board.delete();
-            gamePlayer.setBoard(null);
-        }
-    }
-
-    /**
-     * 清理所有计分板
-     */
-    public static void removeAllBoards() {
-        for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
-            Player player = gamePlayer.getPlayer();
-            if (player != null) {
-                removeBoard(player);
-            }
-        }
+        return teamLines;
     }
 }

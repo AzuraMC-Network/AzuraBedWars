@@ -1,12 +1,20 @@
 package cc.azuramc.bedwars.scoreboard;
 
+import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.scoreboard.provider.AbstractBoardProvider;
 import cc.azuramc.bedwars.scoreboard.provider.GameEndBoardProvider;
 import cc.azuramc.bedwars.scoreboard.provider.GameRunningBoardProvider;
 import cc.azuramc.bedwars.scoreboard.provider.LobbyBoardProvider;
 import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
 
 /**
  * 计分板管理器
@@ -14,20 +22,14 @@ import org.bukkit.event.Listener;
  *
  * @author an5w1r@163.com
  */
+@Getter
 public class ScoreboardManager implements Listener {
-    private final GameManager gameManager;
-    @Getter
-    private GameEndBoardProvider gameEndBoardProvider;
-    @Getter
-    private GameRunningBoardProvider gameRunningBoardProvider;
-    @Getter
-    private LobbyBoardProvider lobbyBoardProvider;
 
-    /**
-     * 构造函数
-     *
-     * @param gameManager 游戏管理器实例
-     */
+    private final GameManager gameManager;
+    private final GameEndBoardProvider gameEndBoardProvider;
+    private final GameRunningBoardProvider gameRunningBoardProvider;
+    private final LobbyBoardProvider lobbyBoardProvider;
+
     public ScoreboardManager(GameManager gameManager) {
         this.gameManager = gameManager;
 
@@ -35,11 +37,29 @@ public class ScoreboardManager implements Listener {
         this.gameEndBoardProvider = new GameEndBoardProvider(gameManager);
         this.gameRunningBoardProvider = new GameRunningBoardProvider(gameManager);
         this.lobbyBoardProvider = new LobbyBoardProvider(gameManager);
+    }
 
-        // 设置提供者的管理器引用
-        GameEndBoardProvider.setScoreboardManager(this);
-        GameRunningBoardProvider.setScoreboardManager(this);
-        LobbyBoardProvider.setScoreboardManager(this);
+    /**
+     * 初始化计分板系统
+     * 注册监听器
+     *
+     * @param plugin 插件实例
+     */
+    public void initialize(Plugin plugin) {
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    /**
+     * 获取当前状态对应的计分板提供者
+     *
+     * @return 当前状态的计分板提供者
+     */
+    private AbstractBoardProvider getCurrentProvider() {
+        return switch (gameManager.getGameState()) {
+            case RUNNING -> gameRunningBoardProvider;
+            case ENDING -> gameEndBoardProvider;
+            default -> lobbyBoardProvider;
+        };
     }
 
     /**
@@ -48,44 +68,17 @@ public class ScoreboardManager implements Listener {
      * @param gamePlayer 游戏玩家
      */
     public void showBoard(GamePlayer gamePlayer) {
-        if (gamePlayer == null) {
+        if (gamePlayer == null || gamePlayer.getPlayer() == null) {
             return;
         }
-
-        switch (gameManager.getGameState()) {
-            case RUNNING:
-                GameRunningBoardProvider.show(gamePlayer.getPlayer());
-                break;
-            case WAITING:
-                LobbyBoardProvider.show(gamePlayer.getPlayer());
-                break;
-            case ENDING:
-                GameEndBoardProvider.show(gamePlayer.getPlayer());
-                break;
-            default:
-                LobbyBoardProvider.show(gamePlayer.getPlayer());
-                break;
-        }
+        getCurrentProvider().show(gamePlayer.getPlayer());
     }
 
     /**
      * 更新所有玩家的计分板
      */
     public void updateAllBoards() {
-        switch (gameManager.getGameState()) {
-            case RUNNING:
-                GameRunningBoardProvider.updateBoard();
-                break;
-            case WAITING:
-                LobbyBoardProvider.updateBoard();
-                break;
-            case ENDING:
-                GameEndBoardProvider.updateBoard();
-                break;
-            default:
-                LobbyBoardProvider.updateBoard();
-                break;
-        }
+        getCurrentProvider().updateBoard();
     }
 
     /**
@@ -94,22 +87,24 @@ public class ScoreboardManager implements Listener {
      * @param gamePlayer 游戏玩家
      */
     public void removeBoard(GamePlayer gamePlayer) {
-        if (gamePlayer == null) {
+        if (gamePlayer == null || gamePlayer.getPlayer() == null) {
             return;
         }
 
-        GameEndBoardProvider.removeBoard(gamePlayer.getPlayer());
-        GameRunningBoardProvider.removeBoard(gamePlayer.getPlayer());
-        LobbyBoardProvider.removeBoard(gamePlayer.getPlayer());
+        Player player = gamePlayer.getPlayer();
+        // 移除所有提供者的计分板
+        gameEndBoardProvider.removeBoard(player);
+        gameRunningBoardProvider.removeBoard(player);
+        lobbyBoardProvider.removeBoard(player);
     }
 
     /**
      * 移除所有玩家的计分板
      */
     public void removeAllBoards() {
-        GameEndBoardProvider.removeAllBoards();
-        GameRunningBoardProvider.removeAllBoards();
-        LobbyBoardProvider.removeAllBoards();
+        gameEndBoardProvider.removeAllBoards();
+        gameRunningBoardProvider.removeAllBoards();
+        lobbyBoardProvider.removeAllBoards();
     }
 
     /**
@@ -128,17 +123,49 @@ public class ScoreboardManager implements Listener {
     }
 
     /**
-     * 初始化计分板系统
-     * 注册监听器
+     * 玩家加入事件处理
      *
-     * @param plugin 插件实例
+     * @param event 玩家加入事件
      */
-    public void initialize(org.bukkit.plugin.Plugin plugin) {
-        // 注册监听器
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        plugin.getServer().getPluginManager().registerEvents(gameEndBoardProvider, plugin);
-        plugin.getServer().getPluginManager().registerEvents(gameRunningBoardProvider, plugin);
-        plugin.getServer().getPluginManager().registerEvents(lobbyBoardProvider, plugin);
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        GamePlayer gamePlayer = GamePlayer.get(event.getPlayer());
+        if (gamePlayer != null) {
+            showBoard(gamePlayer);
+            updateAllBoards();
+        }
     }
 
+    /**
+     * 玩家退出事件处理
+     *
+     * @param event 玩家退出事件
+     */
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        GamePlayer gamePlayer = GamePlayer.get(event.getPlayer());
+        if (gamePlayer != null) {
+            removeBoard(gamePlayer);
+            updateAllBoards();
+        }
+    }
+
+    /**
+     * 游戏开始事件处理
+     *
+     * @param event 游戏开始事件
+     */
+    @EventHandler
+    public void onGameStart(BedwarsGameStartEvent event) {
+        switchBoardMode();
+
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            GamePlayer gamePlayer = GamePlayer.get(player);
+            if (gamePlayer != null) {
+                showBoard(gamePlayer);
+            }
+        });
+
+        gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> updateAllBoards());
+    }
 }

@@ -76,6 +76,10 @@ public class SettingsConfig {
     @NotNull
     private LobbyScoreboard lobbyScoreboard = new LobbyScoreboard();
 
+    @Comment("游戏结束计分板配置")
+    @NotNull
+    private GameEndScoreboard gameEndScoreboard = new GameEndScoreboard();
+
     @Comment("等待状态 Tab 列表配置")
     @NotNull
     private WaitingState waitingState = new WaitingState();
@@ -149,8 +153,27 @@ public class SettingsConfig {
         @Comment("计分板标题")
         private String title = MessageUtil.color("&e&l起床战争");
 
-        @Comment("服务器信息")
-        private String serverInfo = MessageUtil.color("&bas.azuramc.cc");
+        @Comment({
+                "计分板内容行",
+                "可用变量: {date}, {next_event}, {time_left}, {server}",
+                "特殊标记: {teams} 会被替换为所有队伍状态行"
+        })
+        private List<String> lines = Arrays.asList(
+                "&7{date}",
+                "",
+                "{next_event}",
+                "&a{time_left}",
+                "",
+                "{teams}",
+                "",
+                "&bas.azuramc.cc"
+        );
+
+        @Comment({
+                "队伍行格式",
+                "可用变量: {team_name}, {bed_status}, {alive_count}, {my_team_mark}"
+        })
+        private String teamLineFormat = "{team_name} {bed_status} &f| {alive_count}{my_team_mark}";
 
         @Comment("我的队伍标记")
         private String myTeamMark = MessageUtil.color(" &7(我的队伍)");
@@ -160,12 +183,6 @@ public class SettingsConfig {
 
         @Comment("床存活图标")
         private String bedAlive = MessageUtil.color("&c❤");
-
-        @Comment("分隔符")
-        private String separator = MessageUtil.color("&f | ");
-
-        @Comment("空行")
-        private String emptyLine = MessageUtil.color("");
     }
 
     @Data
@@ -173,20 +190,59 @@ public class SettingsConfig {
         @Comment("计分板标题")
         private String title = MessageUtil.color("&e&l起床战争");
 
-        @Comment("服务器信息")
-        private String serverInfo = MessageUtil.color("&bas.azuramc.cc");
+        @Comment({
+                "计分板内容行",
+                "可用变量: {date}, {map_name}, {team_size}, {team_count}, {author},",
+                "          {players}, {max_players}, {countdown}, {mode}, {version}, {server}"
+        })
+        private List<String> lines = Arrays.asList(
+                "&7{date}",
+                "",
+                "&f地图: &a{map_name}",
+                "&f队伍: &a{team_size}人 {team_count}队",
+                "&f作者: &a{author}",
+                "",
+                "&f玩家: &a{players}/{max_players}",
+                "",
+                "{countdown}",
+                "",
+                "&f你的模式: &a{mode}",
+                "",
+                "&f版本: &a{version}",
+                "",
+                "&bas.azuramc.cc"
+        );
 
         @Comment("等待中消息")
         private String waitingMessage = MessageUtil.color("&f等待中...");
 
-        @Comment("空行")
-        private String emptyLine = MessageUtil.color("");
+        @Comment("倒计时格式")
+        private String countdownFormat = "{seconds}秒后开始";
 
         @Comment("普通模式名称")
-        private String defaultMode = MessageUtil.color("普通模式");
+        private String defaultMode = "普通模式";
 
         @Comment("经验模式名称")
-        private String expMode = MessageUtil.color("经验模式");
+        private String expMode = "经验模式";
+    }
+
+    @Data
+    public static class GameEndScoreboard {
+        @Comment("计分板标题")
+        private String title = MessageUtil.color("&e&l起床战争");
+
+        @Comment({
+                "计分板内容行",
+                "可用变量: {date}, {winner}, {server}"
+        })
+        private List<String> lines = Arrays.asList(
+                "&7{date}",
+                "",
+                "&c游戏结束",
+                "&f胜利者: &a{winner}",
+                "",
+                "&bas.azuramc.cc"
+        );
     }
 
     @Data
