@@ -4,14 +4,9 @@ package cc.azuramc.bedwars.tablist;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import lombok.Getter;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Team;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * TabList主管理类
@@ -19,7 +14,7 @@ import java.util.Map;
  *
  * @author an5w1r@163.com
  */
-public class TabListManager implements Listener {
+public class TabListManager {
 
     @Getter
     private final GameManager gameManager;
@@ -34,7 +29,6 @@ public class TabListManager implements Listener {
     @Getter
     private final GameStateTabListProvider gameStateProvider;
 
-    private final Map<GamePlayer, Team> teamMap = new HashMap<>();
     private BukkitTask updateTask;
 
     public TabListManager(GameManager gameManager) {
@@ -81,7 +75,7 @@ public class TabListManager implements Listener {
      * 添加玩家到TabList
      */
     public void addToTab(GamePlayer gamePlayer) {
-        playerHandler.addPlayerToTab(gamePlayer, teamMap);
+        playerHandler.addPlayerToTab(gamePlayer);
         packetSender.sendCurrentHeaderFooter(gamePlayer.getPlayer(), headerFooterManager);
     }
 
@@ -89,38 +83,14 @@ public class TabListManager implements Listener {
      * 从TabList移除玩家
      */
     public void removePlayerFromTab(GamePlayer gamePlayer) {
-        playerHandler.removePlayerFromTab(gamePlayer, teamMap);
+        playerHandler.removePlayerFromTab(gamePlayer);
     }
 
     /**
      * 更新所有玩家的TabList显示名称
      */
     public void updateAllTabListNames() {
-        // 使用迭代器安全地移除无效条目
-        var iterator = teamMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<GamePlayer, Team> entry = iterator.next();
-            GamePlayer gamePlayer = entry.getKey();
-            Team team = entry.getValue();
-
-            if (gamePlayer == null || gamePlayer.getPlayer() == null || !gamePlayer.getPlayer().isOnline()) {
-                // 清理无效的玩家条目
-                if (team != null) {
-                    team.removeEntry(gamePlayer != null ? gamePlayer.getName() : "");
-                    team.unregister();
-                }
-                iterator.remove();
-                continue;
-            }
-
-            String newTeamName = teamSorter.generateSortedTeamName(gamePlayer);
-
-            if (!team.getName().equals(newTeamName)) {
-                playerHandler.updatePlayerTeam(gamePlayer, team, newTeamName, teamMap);
-            }
-        }
-
-        gameStateProvider.updateHeaderFooterByGameState(gameManager, headerFooterManager);
+        playerHandler.updateAllTabListNames();
     }
 
     /**

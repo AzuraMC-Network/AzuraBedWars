@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -23,6 +25,7 @@ import java.util.Map;
 public class PlayerTabListHandler {
 
     private final TabListManager tabListManager;
+    private final Map<GamePlayer, Team> teamMap = new HashMap<>();
 
     public PlayerTabListHandler(TabListManager tabListManager) {
         this.tabListManager = tabListManager;
@@ -31,7 +34,7 @@ public class PlayerTabListHandler {
     /**
      * 添加玩家到TabList
      */
-    public void addPlayerToTab(GamePlayer gamePlayer, Map<GamePlayer, Team> teamMap) {
+    public void addPlayerToTab(GamePlayer gamePlayer) {
         Player player = gamePlayer.getPlayer();
         Scoreboard scoreboard = player.getScoreboard();
 
@@ -52,18 +55,58 @@ public class PlayerTabListHandler {
     /**
      * 从TabList移除玩家
      */
-    public void removePlayerFromTab(GamePlayer gamePlayer, Map<GamePlayer, Team> teamMap) {
+    public void removePlayerFromTab(GamePlayer gamePlayer) {
         Team team = teamMap.remove(gamePlayer);
         if (team != null) {
             team.removeEntry(gamePlayer.getName());
             team.unregister();
         }
+
+        tabListManager.getTeamSorter().clearPlayerRandomNumber(gamePlayer);
+    }
+
+    /**
+     * 更新所有玩家的TabList显示名称
+     */
+    public void updateAllTabListNames() {
+        TeamSorter teamSorter = tabListManager.getTeamSorter();
+        GameManager gameManager = tabListManager.getGameManager();
+
+        // 使用迭代器安全地移除无效条目
+        Iterator<Map.Entry<GamePlayer, Team>> iterator = teamMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<GamePlayer, Team> entry = iterator.next();
+            GamePlayer gamePlayer = entry.getKey();
+            Team team = entry.getValue();
+
+            if (gamePlayer == null || gamePlayer.getPlayer() == null || !gamePlayer.getPlayer().isOnline()) {
+                // 清理无效的玩家条目
+                if (team != null) {
+                    team.removeEntry(gamePlayer != null ? gamePlayer.getName() : "");
+                    team.unregister();
+                }
+                // 清理TeamSorter中的缓存
+                if (gamePlayer != null) {
+                    teamSorter.clearPlayerRandomNumber(gamePlayer);
+                }
+                iterator.remove();
+                continue;
+            }
+
+            String newTeamName = teamSorter.generateSortedTeamName(gamePlayer);
+
+            if (!team.getName().equals(newTeamName)) {
+                updatePlayerTeam(gamePlayer, team, newTeamName);
+            }
+        }
+
+        tabListManager.getGameStateProvider().updateHeaderFooterByGameState(gameManager, tabListManager.getHeaderFooterManager());
     }
 
     /**
      * 更新玩家队伍
      */
-    public void updatePlayerTeam(GamePlayer gamePlayer, Team oldTeam, String newTeamName, Map<GamePlayer, Team> teamMap) {
+    private void updatePlayerTeam(GamePlayer gamePlayer, Team oldTeam, String newTeamName) {
         // 注销之前的team
         oldTeam.removeEntry(gamePlayer.getName());
         oldTeam.unregister();

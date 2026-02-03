@@ -28,8 +28,8 @@ public class TabListPacketSender {
             return;
         }
 
-        String processedHeader = processHeaderPlaceholders(MessageUtil.parse(player, header), gamePlayer);
-        String processedFooter = processFooterPlaceholders(MessageUtil.parse(player, footer), gamePlayer);
+        String processedHeader = processPlaceholders(MessageUtil.parse(player, header), gamePlayer);
+        String processedFooter = processPlaceholders(MessageUtil.parse(player, footer), gamePlayer);
 
         // 将String转换为Adventure Component
         Component headerComponent = Component.text(processedHeader);
@@ -52,36 +52,18 @@ public class TabListPacketSender {
     }
 
     /**
-     * 处理Header中的占位符
+     * 处理文本中的占位符
      *
-     * @param header     原始Header文本
+     * @param text       原始文本
      * @param gamePlayer 游戏玩家
-     * @return 处理后的Header文本
+     * @return 处理后的文本
      */
-    private String processHeaderPlaceholders(String header, GamePlayer gamePlayer) {
+    private String processPlaceholders(String text, GamePlayer gamePlayer) {
         if (gamePlayer == null) {
-            return header;
+            return text;
         }
 
-        return header
-                .replace("<currentGameKill>", String.valueOf(gamePlayer.getCurrentGameKills()))
-                .replace("<currentGameFinalKill>", String.valueOf(gamePlayer.getCurrentGameFinalKills()))
-                .replace("<currentGameBedBreak>", String.valueOf(gamePlayer.getCurrentGameDestroyedBeds()));
-    }
-
-    /**
-     * 处理Footer中的占位符
-     *
-     * @param footer     原始Footer文本
-     * @param gamePlayer 游戏玩家
-     * @return 处理后的Footer文本
-     */
-    private String processFooterPlaceholders(String footer, GamePlayer gamePlayer) {
-        if (gamePlayer == null) {
-            return footer;
-        }
-
-        return footer
+        return text
                 .replace("<currentGameKill>", String.valueOf(gamePlayer.getCurrentGameKills()))
                 .replace("<currentGameFinalKill>", String.valueOf(gamePlayer.getCurrentGameFinalKills()))
                 .replace("<currentGameBedBreak>", String.valueOf(gamePlayer.getCurrentGameDestroyedBeds()));
