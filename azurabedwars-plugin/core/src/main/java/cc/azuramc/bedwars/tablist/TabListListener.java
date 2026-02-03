@@ -15,11 +15,11 @@ import org.bukkit.event.Listener;
  *
  * @author an5w1r@163.com
  */
-public class TabListEventListener implements Listener {
+public class TabListListener implements Listener {
 
     private final TabListManager tabListManager;
 
-    public TabListEventListener(TabListManager tabListManager) {
+    public TabListListener(TabListManager tabListManager) {
         this.tabListManager = tabListManager;
     }
 

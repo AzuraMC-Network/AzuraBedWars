@@ -1,10 +1,12 @@
-package cc.azuramc.bedwars.tablist;
+package cc.azuramc.bedwars.tablist.display;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.tablist.TabListManager;
+import cc.azuramc.bedwars.tablist.util.TeamSorter;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.hook.LuckPermsUtil;
 import cc.azuramc.bedwars.util.hook.VaultUtil;
@@ -22,12 +24,12 @@ import java.util.Map;
  *
  * @author an5w1r@163.com
  */
-public class PlayerTabListHandler {
+public class PlayerDisplayHandler {
 
     private final TabListManager tabListManager;
     private final Map<GamePlayer, Team> teamMap = new HashMap<>();
 
-    public PlayerTabListHandler(TabListManager tabListManager) {
+    public PlayerDisplayHandler(TabListManager tabListManager) {
         this.tabListManager = tabListManager;
     }
 
@@ -100,7 +102,7 @@ public class PlayerTabListHandler {
             }
         }
 
-        tabListManager.getGameStateProvider().updateHeaderFooterByGameState(gameManager, tabListManager.getHeaderFooterManager());
+        tabListManager.getGameStateProvider().updateHeaderFooterByGameState(gameManager, tabListManager.getHeaderFooter());
     }
 
     /**

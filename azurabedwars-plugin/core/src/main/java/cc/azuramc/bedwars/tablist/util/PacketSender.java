@@ -1,6 +1,7 @@
-package cc.azuramc.bedwars.tablist;
+package cc.azuramc.bedwars.tablist.util;
 
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.tablist.display.HeaderFooter;
 import cc.azuramc.bedwars.util.MessageUtil;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
@@ -13,7 +14,7 @@ import org.bukkit.entity.Player;
  *
  * @author an5w1r@163.com
  */
-public class TabListPacketSender {
+public class PacketSender {
 
     /**
      * 发送Header和Footer数据包给指定玩家
@@ -44,11 +45,11 @@ public class TabListPacketSender {
      * 发送当前设置的Header和Footer给指定玩家
      *
      * @param player              目标玩家
-     * @param headerFooterManager Header/Footer管理器
+     * @param headerFooter Header/Footer管理器
      */
-    public void sendCurrentHeaderFooter(Player player, HeaderFooterManager headerFooterManager) {
+    public void sendCurrentHeaderFooter(Player player, HeaderFooter headerFooter) {
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
-        sendHeaderFooter(player, headerFooterManager.getHeader(), headerFooterManager.getFooter(), gamePlayer);
+        sendHeaderFooter(player, headerFooter.getHeader(), headerFooter.getFooter(), gamePlayer);
     }
 
     /**

@@ -21,7 +21,7 @@ import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
 import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
-import cc.azuramc.bedwars.tablist.TabListEventListener;
+import cc.azuramc.bedwars.tablist.TabListListener;
 import cc.azuramc.bedwars.tablist.TabListManager;
 import cc.azuramc.bedwars.upgrade.task.TeamUpgradeCheckTask;
 import cc.azuramc.bedwars.util.LoadGameUtil;
@@ -117,7 +117,7 @@ public class GameManager {
         initializeConfigs();
 
         this.tabListManager = new TabListManager(this);
-        Bukkit.getPluginManager().registerEvents(new TabListEventListener(tabListManager), plugin);
+        Bukkit.getPluginManager().registerEvents(new TabListListener(tabListManager), plugin);
         this.allInGamePlayers = new ArrayList<>();
     }
 

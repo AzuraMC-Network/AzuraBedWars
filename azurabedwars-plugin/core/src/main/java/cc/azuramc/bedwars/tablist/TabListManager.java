@@ -3,6 +3,11 @@ package cc.azuramc.bedwars.tablist;
 
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.tablist.display.HeaderFooter;
+import cc.azuramc.bedwars.tablist.display.PlayerDisplayHandler;
+import cc.azuramc.bedwars.tablist.display.StateContentProvider;
+import cc.azuramc.bedwars.tablist.util.PacketSender;
+import cc.azuramc.bedwars.tablist.util.TeamSorter;
 import lombok.Getter;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -14,30 +19,25 @@ import org.bukkit.scheduler.BukkitTask;
  *
  * @author an5w1r@163.com
  */
+@Getter
 public class TabListManager {
 
-    @Getter
     private final GameManager gameManager;
-    @Getter
-    private final PlayerTabListHandler playerHandler;
-    @Getter
-    private final HeaderFooterManager headerFooterManager;
-    @Getter
+    private final PlayerDisplayHandler playerHandler;
+    private final HeaderFooter headerFooter;
     private final TeamSorter teamSorter;
-    @Getter
-    private final TabListPacketSender packetSender;
-    @Getter
-    private final GameStateTabListProvider gameStateProvider;
+    private final PacketSender packetSender;
+    private final StateContentProvider gameStateProvider;
 
     private BukkitTask updateTask;
 
     public TabListManager(GameManager gameManager) {
         this.gameManager = gameManager;
-        this.playerHandler = new PlayerTabListHandler(this);
-        this.headerFooterManager = new HeaderFooterManager();
+        this.playerHandler = new PlayerDisplayHandler(this);
+        this.headerFooter = new HeaderFooter();
         this.teamSorter = new TeamSorter();
-        this.packetSender = new TabListPacketSender();
-        this.gameStateProvider = new GameStateTabListProvider();
+        this.packetSender = new PacketSender();
+        this.gameStateProvider = new StateContentProvider();
     }
 
     /**
@@ -76,7 +76,7 @@ public class TabListManager {
      */
     public void addToTab(GamePlayer gamePlayer) {
         playerHandler.addPlayerToTab(gamePlayer);
-        packetSender.sendCurrentHeaderFooter(gamePlayer.getPlayer(), headerFooterManager);
+        packetSender.sendCurrentHeaderFooter(gamePlayer.getPlayer(), headerFooter);
     }
 
     /**
@@ -107,8 +107,8 @@ public class TabListManager {
         for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
             if (gamePlayer.getPlayer() != null && gamePlayer.getPlayer().isOnline()) {
                 packetSender.sendHeaderFooter(gamePlayer.getPlayer(),
-                        headerFooterManager.getHeader(),
-                        headerFooterManager.getFooter(),
+                        headerFooter.getHeader(),
+                        headerFooter.getFooter(),
                         gamePlayer);
             }
         }
@@ -118,7 +118,7 @@ public class TabListManager {
      * 清除Header和Footer
      */
     public void clearHeaderFooter() {
-        headerFooterManager.clear();
+        headerFooter.clear();
         updateHeaderFooter();
     }
 
@@ -126,42 +126,42 @@ public class TabListManager {
      * 获取Header内容
      */
     public String getHeader() {
-        return headerFooterManager.getHeader();
+        return headerFooter.getHeader();
     }
 
     /**
      * 设置Header内容
      */
     public void setHeader(String header) {
-        headerFooterManager.setHeader(header);
+        headerFooter.setHeader(header);
     }
 
     /**
      * 设置Header内容
      */
     public void setHeader(java.util.List<String> lines) {
-        headerFooterManager.setHeader(lines);
+        headerFooter.setHeader(lines);
     }
 
     /**
      * 获取Footer内容
      */
     public String getFooter() {
-        return headerFooterManager.getFooter();
+        return headerFooter.getFooter();
     }
 
     /**
      * 设置Footer内容
      */
     public void setFooter(String footer) {
-        headerFooterManager.setFooter(footer);
+        headerFooter.setFooter(footer);
     }
 
     /**
      * 设置Footer内容
      */
     public void setFooter(java.util.List<String> lines) {
-        headerFooterManager.setFooter(lines);
+        headerFooter.setFooter(lines);
     }
 
     /**
@@ -182,6 +182,6 @@ public class TabListManager {
      * @param player 目标玩家
      */
     public void sendCurrentHeaderFooter(org.bukkit.entity.Player player) {
-        packetSender.sendCurrentHeaderFooter(player, headerFooterManager);
+        packetSender.sendCurrentHeaderFooter(player, headerFooter);
     }
 }

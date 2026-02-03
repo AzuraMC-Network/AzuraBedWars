@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.tablist;
+package cc.azuramc.bedwars.tablist.display;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
@@ -15,18 +15,18 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class GameStateTabListProvider {
+public class StateContentProvider {
 
     private final SettingsConfig settingsConfig;
 
-    public GameStateTabListProvider() {
+    public StateContentProvider() {
         this.settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
     }
 
     /**
      * 根据游戏阶段自动设置Header和Footer
      */
-    public void updateHeaderFooterByGameState(GameManager gameManager, HeaderFooterManager headerFooterManager) {
+    public void updateHeaderFooterByGameState(GameManager gameManager, HeaderFooter headerFooter) {
         if (gameManager == null) {
             return;
         }
@@ -35,13 +35,13 @@ public class GameStateTabListProvider {
 
         switch (gameState) {
             case WAITING:
-                setWaitingStateContent(headerFooterManager);
+                setWaitingStateContent(headerFooter);
                 break;
             case RUNNING:
-                setRunningStateContent(headerFooterManager);
+                setRunningStateContent(headerFooter);
                 break;
             case ENDING:
-                setEndingStateContent(gameManager, headerFooterManager);
+                setEndingStateContent(gameManager, headerFooter);
                 break;
         }
     }
@@ -49,25 +49,25 @@ public class GameStateTabListProvider {
     /**
      * 设置等待状态的内容
      */
-    private void setWaitingStateContent(HeaderFooterManager headerFooterManager) {
+    private void setWaitingStateContent(HeaderFooter headerFooter) {
         SettingsConfig.WaitingState waitingState = settingsConfig.getWaitingState();
-        headerFooterManager.setHeader(waitingState.getHeader());
-        headerFooterManager.setFooter(waitingState.getFooter());
+        headerFooter.setHeader(waitingState.getHeader());
+        headerFooter.setFooter(waitingState.getFooter());
     }
 
     /**
      * 设置运行状态的内容
      */
-    private void setRunningStateContent(HeaderFooterManager headerFooterManager) {
+    private void setRunningStateContent(HeaderFooter headerFooter) {
         SettingsConfig.RunningState runningState = settingsConfig.getRunningState();
-        headerFooterManager.setHeader(runningState.getHeader());
-        headerFooterManager.setFooter(runningState.getFooter());
+        headerFooter.setHeader(runningState.getHeader());
+        headerFooter.setFooter(runningState.getFooter());
     }
 
     /**
      * 设置结束状态的内容
      */
-    private void setEndingStateContent(GameManager gameManager, HeaderFooterManager headerFooterManager) {
+    private void setEndingStateContent(GameManager gameManager, HeaderFooter headerFooter) {
         GameTeam winner = gameManager.getWinner();
         String gameResult;
 
@@ -88,9 +88,9 @@ public class GameStateTabListProvider {
         for (String line : endingState.getHeader()) {
             processedHeader.add(line.replace("<gameResult>", gameResult));
         }
-        headerFooterManager.setHeader(processedHeader);
+        headerFooter.setHeader(processedHeader);
 
         // Footer直接使用配置
-        headerFooterManager.setFooter(endingState.getFooter());
+        headerFooter.setFooter(endingState.getFooter());
     }
 }

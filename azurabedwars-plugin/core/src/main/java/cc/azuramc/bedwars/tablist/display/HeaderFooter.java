@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.tablist;
+package cc.azuramc.bedwars.tablist.display;
 
 import lombok.Getter;
 
@@ -10,11 +10,10 @@ import java.util.List;
  *
  * @author an5w1r@163.com
  */
-public class HeaderFooterManager {
+@Getter
+public class HeaderFooter {
 
-    @Getter
     private String header = "";
-    @Getter
     private String footer = "";
 
     /**

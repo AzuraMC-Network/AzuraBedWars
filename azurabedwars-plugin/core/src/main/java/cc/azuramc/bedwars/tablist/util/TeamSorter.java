@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.tablist;
+package cc.azuramc.bedwars.tablist.util;
 
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
