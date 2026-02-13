@@ -16,9 +16,6 @@ import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.spectator.SpectatorManager;
 import cc.azuramc.bedwars.game.task.GameStartTask;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
-import cc.azuramc.bedwars.jedis.JedisManager;
-import cc.azuramc.bedwars.jedis.event.JedisGameLoadingEvent;
-import cc.azuramc.bedwars.jedis.event.JedisGameStartEvent;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopManager;
 import cc.azuramc.bedwars.tablist.TabListListener;
@@ -182,14 +179,6 @@ public class GameManager {
         this.gameState = GameState.WAITING;
         // 更新MOTD
         updateServerMOTD();
-
-        // 添加JedisManager的空值检查
-        if (JedisManager.getInstance() != null) {
-            JedisManager.getInstance().getExpand().put("map", mapData.getName());
-            Bukkit.getPluginManager().callEvent(new JedisGameLoadingEvent(getMaxPlayers()));
-        } else {
-            plugin.getLogger().warning("JedisManager实例为null，跳过Jedis相关操作");
-        }
     }
 
     /**
@@ -869,9 +858,6 @@ public class GameManager {
      * 开始游戏
      */
     public void start() {
-
-        Bukkit.getPluginManager().callEvent(new JedisGameStartEvent());
-
         gameState = GameState.RUNNING;
         // 更新MOTD
         updateServerMOTD();

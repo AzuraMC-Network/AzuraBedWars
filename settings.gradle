@@ -1,7 +1,6 @@
 rootProject.name = 'AzuraBedWars'
 
 include (
-        'azurabedwars-dashboard',
         'azurabedwars-loader',
         'azurabedwars-plugin',
         'azurabedwars-plugin:core',

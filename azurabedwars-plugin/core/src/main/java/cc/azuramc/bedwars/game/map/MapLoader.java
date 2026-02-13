@@ -2,19 +2,8 @@ package cc.azuramc.bedwars.game.map;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.jedis.JedisManager;
-import cc.azuramc.bedwars.jedis.event.BukkitPubSubMessageEvent;
-import cc.azuramc.bedwars.jedis.util.IPUtil;
-import cc.azuramc.bedwars.jedis.util.JedisUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 地图加载管理器
@@ -25,12 +14,10 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class MapLoader {
     private static final String LOG_PREFIX = "[MapLoader] ";
-    private static final String MAP_CHANNEL = "AZURA.BW." + IPUtil.getLocalIp();
 
     private final AzuraBedWars plugin;
     private final GameManager gameManager;
     private final MapManager mapManager;
-    private final JedisManager jedisManager;
 
     private final boolean isMapLoading = false;
     private final String currentLoadingMap = null;
@@ -41,46 +28,12 @@ public class MapLoader {
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.mapManager = plugin.getMapManager();
-        this.jedisManager = plugin.getJedisManager();
     }
 
     /**
      * 加载指定地图
      */
     public void loadMap() {
-        if (plugin.getSettingsConfig().isEnabledJedisMapFeature()) {
-            CompletableFuture<String> mapLoaderFuture = new CompletableFuture<>();
-
-            Bukkit.getPluginManager().registerEvents(new Listener() {
-                @EventHandler
-                public void onPubSubMessage(BukkitPubSubMessageEvent event) {
-                    if (event.getChannel().equals(MAP_CHANNEL)) {
-                        mapLoaderFuture.complete(event.getMessage());
-                        LoggerUtil.info(LOG_PREFIX + "开始加载地图: " + event.getMessage());
-                        HandlerList.unregisterAll(this);
-                    }
-                }
-            }, plugin);
-
-            LoggerUtil.info("正在通过Jedis请求地图");
-            JedisUtil.publish(MAP_CHANNEL, "requestMap");
-
-            String mapName = null;
-            try {
-                mapName = mapLoaderFuture.get(DEFAULT_WAIT_TIME, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                LoggerUtil.info("请求超时 加载备用方案");
-            }
-
-            if (mapName != null && !mapName.isEmpty()) {
-                plugin.setMapData(mapManager.loadMapAndWorld(mapName));
-                if (plugin.getMapData() != null) {
-                    return;
-                }
-                LoggerUtil.warn("Jedis地图加载失败 尝试加载默认地图");
-            }
-        }
-
         String defaultMapName = plugin.getSettingsConfig().getDefaultMapName();
         if (defaultMapName != null && !defaultMapName.isEmpty()) {
             plugin.setMapData(mapManager.loadMapAndWorld(defaultMapName));

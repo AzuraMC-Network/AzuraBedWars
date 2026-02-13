@@ -13,8 +13,6 @@ import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapLoader;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
-import cc.azuramc.bedwars.jedis.JedisManager;
-import cc.azuramc.bedwars.jedis.listener.PubSubListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
@@ -60,7 +58,6 @@ public final class AzuraBedWars extends JavaPlugin {
     private EventSettingsConfig eventSettingsConfig;
     private GameManager gameManager;
     private ItemConfig itemConfig;
-    private JedisManager jedisManager;
     private LuckPerms luckPermsApi;
     @Setter
     private MapData mapData;
@@ -70,7 +67,6 @@ public final class AzuraBedWars extends JavaPlugin {
     private NMSAccess nmsAccess;
     private NMSProvider nmsProvider;
     private PlayerConfig playerConfig;
-    private PubSubListener pubSubListener;
     private ResourceSpawnConfig resourceSpawnConfig;
     private ScoreboardManager scoreboardManager;
     private SettingsConfig settingsConfig;
@@ -101,10 +97,6 @@ public final class AzuraBedWars extends JavaPlugin {
         initDatabases();
         initMapSystem();
 
-        if (settingsConfig.isEnabledJedisMapFeature()) {
-            intiChannelSystem();
-        }
-
         // 根据配置决定加载游戏模式还是编辑模式
         if (settingsConfig.isEditorMode() || mapManager.getLoadedMaps().isEmpty()) {
             getLogger().info("当前处于编辑模式(editorMode)或未发现可用地图 取消游戏相关特性加载");
@@ -130,14 +122,6 @@ public final class AzuraBedWars extends JavaPlugin {
         // 保存配置
         if (configManager != null) {
             configManager.saveAll();
-        }
-
-        if (pubSubListener != null) {
-            pubSubListener.poison();
-        }
-
-        if (jedisManager != null) {
-            jedisManager.shutdown();
         }
 
         // 关闭数据库服务
@@ -170,22 +154,6 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initCommands() {
         new CommandRegistry(this);
-    }
-
-    /**
-     * 初始化通信频道
-     */
-    private void intiChannelSystem() {
-        jedisManager = new JedisManager(this);
-        pubSubListener = new PubSubListener();
-
-        pubSubListener.run();
-
-        // 主线程Task
-        getServer().getScheduler().runTask(this, pubSubListener);
-
-        JedisManager.getInstance().getServerData().setGameType("AzuraBedWars");
-        JedisManager.getInstance().getExpand().put("ver", getDescription().getVersion());
     }
 
     /**

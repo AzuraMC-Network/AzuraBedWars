@@ -27,9 +27,6 @@ public class SettingsConfig {
     @Comment({"地图存储方式", "可选: JSON, MYSQL"})
     private String mapStorage = "JSON";
 
-    @Comment("Redis Feature (暂时不可用)")
-    private boolean enabledJedisMapFeature = false;
-
     @Comment("默认地图名称")
     private String defaultMapName = "game";
 
