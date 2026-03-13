@@ -11,7 +11,6 @@ dependencies {
     compileOnly "me.clip:placeholderapi:2.11.6"
     compileOnly "net.luckperms:api:5.4"
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
-    compileOnly "org.jetbrains:annotations:26.0.2-1"
 
     implementation "org.apache.commons:commons-lang3:3.18.0"
     implementation "commons-io:commons-io:2.18.0"
@@ -20,6 +19,7 @@ dependencies {
     implementation "com.github.cryptomorin:XSeries:13.6.0"
     implementation "fr.mrmicky:fastboard:2.1.5"
     implementation "org.mongodb:mongodb-driver-sync:5.5.1"
+    compileOnly "com.github.retrooper:packetevents-spigot:2.10.0"
 
     implementation files('libs/AzuraORM-1.1.2-all.jar')
     implementation files('libs/AzuraMobAiController-1.0-SNAPSHOT-all.jar')
