@@ -84,7 +84,7 @@ public class PlayerUtil {
         }
 
         for (GamePlayer targetPlayer : targetList) {
-            if (targetList == gamePlayer) {
+            if (targetPlayer == gamePlayer) {
                 continue;
             }
             hidePlayer(gamePlayer.getPlayer(), targetPlayer.getPlayer());
@@ -97,7 +97,7 @@ public class PlayerUtil {
         }
 
         for (GamePlayer targetPlayer : targetList) {
-            if (targetList == gamePlayer) {
+            if (targetPlayer == gamePlayer) {
                 continue;
             }
             showPlayer(gamePlayer.getPlayer(), targetPlayer.getPlayer());
@@ -138,6 +138,9 @@ public class PlayerUtil {
      */
     @SuppressWarnings("deprecation")
     public static void hidePlayer(Player player, Player target) {
+        if (player == null || target == null) {
+            return;
+        }
         if (VersionUtil.isLessThan1_13()) {
             player.hidePlayer(target);
             return;
@@ -153,6 +156,9 @@ public class PlayerUtil {
      */
     @SuppressWarnings("deprecation")
     public static void showPlayer(Player player, Player target) {
+        if (player == null || target == null) {
+            return;
+        }
         if (VersionUtil.isLessThan1_13()) {
             player.showPlayer(target);
             return;
