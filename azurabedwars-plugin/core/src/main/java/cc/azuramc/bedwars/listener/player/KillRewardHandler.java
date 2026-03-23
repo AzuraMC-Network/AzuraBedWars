@@ -21,7 +21,7 @@ import java.util.Map;
 public class KillRewardHandler {
 
     public static void processKillReward(PlayerDeathEvent event, GamePlayer gamePlayer, GamePlayer gameKiller) {
-        if (gamePlayer == null) {
+        if (gamePlayer == null || gameKiller == null) {
             return;
         }
 
