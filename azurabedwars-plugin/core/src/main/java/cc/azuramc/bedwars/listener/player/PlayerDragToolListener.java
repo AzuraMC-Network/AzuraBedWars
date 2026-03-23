@@ -33,8 +33,8 @@ public class PlayerDragToolListener implements Listener {
             return;
         }
 
-        Inventory targetInventory = event.getInventory();
-        if (!isForbiddenContainer(targetInventory)) {
+        Inventory clickedInventory = event.getClickedInventory();
+        if (clickedInventory == null || !isForbiddenContainer(clickedInventory)) {
             return;
         }
 
