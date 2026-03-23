@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.listener.player;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.spectator.SpectatorManager;
 import cc.azuramc.bedwars.tablist.TabListManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,10 @@ public class PlayerQuitListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(event.getPlayer());
         if (gamePlayer != null) {
             gamePlayer.endInvisibility();
+
+            if (gamePlayer.isSpectator()) {
+                SpectatorManager.remove(gamePlayer);
+            }
 
             tabListManager.removePlayerFromTab(gamePlayer);
             gameManager.removePlayers(gamePlayer);
