@@ -287,16 +287,18 @@ public class GamePlayer {
      * 取消隐身任务
      */
     public void endInvisibility() {
-        ArmorHider.showArmor(this, GamePlayer.getGamePlayers());
         if (this.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
             this.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
         }
 
         this.setInvisible(false);
+
         if (invisibilityWaitingTask != null) {
             invisibilityWaitingTask.cancel();
             invisibilityWaitingTask = null;
         }
+
+        ArmorHider.showArmor(this, GamePlayer.getGamePlayers());
     }
 
     /**
@@ -713,6 +715,7 @@ public class GamePlayer {
                 player.updateInventory();
             }
         }
+
     }
 
     public void giveSword(boolean remove) {

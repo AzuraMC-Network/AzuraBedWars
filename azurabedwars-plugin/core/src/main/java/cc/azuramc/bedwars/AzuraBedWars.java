@@ -14,6 +14,7 @@ import cc.azuramc.bedwars.game.map.MapLoader;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
+import cc.azuramc.bedwars.listener.packet.InvisibilityPacketListener;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
@@ -216,6 +217,8 @@ public final class AzuraBedWars extends JavaPlugin {
         // 创建并初始化计分板管理器
         scoreboardManager = new ScoreboardManager(gameManager);
         scoreboardManager.initialize(this);
+
+        PacketEvents.getAPI().getEventManager().registerListener(new InvisibilityPacketListener());
     }
 
     /**
