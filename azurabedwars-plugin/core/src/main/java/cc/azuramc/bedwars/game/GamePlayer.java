@@ -847,7 +847,7 @@ public class GamePlayer {
     private void clearInventory(Player player) {
         PlayerInventory inv = player.getInventory();
         inv.setArmorContents(new ItemStack[4]);
-        inv.setContents(new ItemStack[]{});
+        inv.clear();
     }
 
     /**
