@@ -1,6 +1,8 @@
 package cc.azuramc.bedwars.scoreboard;
 
+import cc.azuramc.bedwars.api.event.bed.BedwarsDestroyBedEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
+import cc.azuramc.bedwars.api.event.player.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.scoreboard.provider.AbstractBoardProvider;
@@ -167,5 +169,15 @@ public class ScoreboardManager implements Listener {
         });
 
         gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> updateAllBoards());
+    }
+
+    @EventHandler
+    public void onBedDestroy(BedwarsDestroyBedEvent event) {
+        updateAllBoards();
+    }
+
+    @EventHandler
+    public void onPlayerKill(BedwarsPlayerKillEvent event) {
+        updateAllBoards();
     }
 }
