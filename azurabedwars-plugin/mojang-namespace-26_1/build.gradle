@@ -1,0 +1,4 @@
+dependencies {
+    compileOnly project(':azurabedwars-plugin:core')
+    compileOnly "org.spigotmc:spigot:26.1-R0.1-SNAPSHOT"
+}

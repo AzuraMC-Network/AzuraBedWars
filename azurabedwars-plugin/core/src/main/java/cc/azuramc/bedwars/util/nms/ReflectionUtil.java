@@ -1,7 +1,8 @@
 package cc.azuramc.bedwars.util.nms;
 
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import com.cryptomorin.xseries.reflection.XReflection;
+import org.bukkit.Bukkit;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -26,8 +27,13 @@ public class ReflectionUtil {
 
     public static void initializeVersions() {
         try {
-            nmsPackage = XReflection.NMS_PACKAGE;
-            obcPackage = XReflection.CRAFTBUKKIT_PACKAGE;
+            // 1.17+ (含年份版本体系 26.x 等) 统一使用 net.minecraft
+            // 1.17 以下使用 net.minecraft.server.vX_X_RX
+            String nmsVersion = VersionUtil.getNmsVersion();
+            nmsPackage = VersionUtil.isGreaterOrEqual(1, 17)
+                    ? "net.minecraft"
+                    : "net.minecraft.server." + nmsVersion;
+            obcPackage = Bukkit.getServer().getClass().getPackage().getName();
             LoggerUtil.debug("ReflectionUtil$initializeVersions | nmsPackage: " + nmsPackage);
             LoggerUtil.debug("ReflectionUtil$initializeVersions | obcPackage: " + obcPackage);
         } catch (Exception e) {
