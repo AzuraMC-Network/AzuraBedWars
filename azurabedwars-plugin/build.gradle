@@ -41,7 +41,7 @@ allprojects {
     }
 
     group = 'cc.azuramc'
-    version = '1.0.0-beta.10'
+    version = '1.0.0-beta.11'
 }
 
 subprojects {
