@@ -155,7 +155,7 @@ public class SettingsConfig {
                 "可用变量: {date}, {next_event}, {time_left}, {server}",
                 "特殊标记: {teams} 会被替换为所有队伍状态行"
         })
-        private List<String> lines = Arrays.asList(
+        private List<String> lines = MessageUtil.color(Arrays.asList(
                 "&7{date}",
                 "",
                 "{next_event}",
@@ -164,7 +164,7 @@ public class SettingsConfig {
                 "{teams}",
                 "",
                 "&bas.azuramc.cc"
-        );
+        ));
 
         @Comment({
                 "队伍行格式",
@@ -192,7 +192,7 @@ public class SettingsConfig {
                 "可用变量: {date}, {map_name}, {team_size}, {team_count}, {author},",
                 "          {players}, {max_players}, {countdown}, {mode}, {version}, {server}"
         })
-        private List<String> lines = Arrays.asList(
+        private List<String> lines = MessageUtil.color(Arrays.asList(
                 "&7{date}",
                 "",
                 "&f地图: &a{map_name}",
@@ -208,7 +208,7 @@ public class SettingsConfig {
                 "&f版本: &a{version}",
                 "",
                 "&bas.azuramc.cc"
-        );
+        ));
 
         @Comment("等待中消息")
         private String waitingMessage = MessageUtil.color("&f等待中...");
@@ -232,14 +232,14 @@ public class SettingsConfig {
                 "计分板内容行",
                 "可用变量: {date}, {winner}, {server}"
         })
-        private List<String> lines = Arrays.asList(
+        private List<String> lines = MessageUtil.color(Arrays.asList(
                 "&7{date}",
                 "",
                 "&c游戏结束",
                 "&f胜利者: &a{winner}",
                 "",
                 "&bas.azuramc.cc"
-        );
+        ));
     }
 
     @Data

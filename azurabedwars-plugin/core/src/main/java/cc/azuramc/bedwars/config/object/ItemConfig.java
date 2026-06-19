@@ -85,6 +85,6 @@ public class ItemConfig {
         private int eggCooldownSeconds = 3;
 
         @Comment("冷却中提示消息")
-        private String eggCooldownMessage = "&c搭桥蛋冷却中！";
+        private String eggCooldownMessage = MessageUtil.color("&c搭桥蛋冷却中！");
     }
 }
