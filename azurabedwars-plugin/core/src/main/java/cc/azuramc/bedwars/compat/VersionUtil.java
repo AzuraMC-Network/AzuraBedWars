@@ -28,7 +28,7 @@ public class VersionUtil {
         }
         MAJOR_NUMBER = Integer.parseInt(m.group(1));
         MINOR_NUMBER = Integer.parseInt(m.group(2));
-        PATCH_NUMBER = m.groupCount() >= 3 ? Integer.parseInt(m.group(3)) : 0;
+        PATCH_NUMBER = m.group(3) != null ? Integer.parseInt(m.group(3)) : 0;
         PARSED_VERSION = MAJOR_NUMBER + "." + MINOR_NUMBER + "." + PATCH_NUMBER;
 
         NMS_VERSION = findNmsVersion();
