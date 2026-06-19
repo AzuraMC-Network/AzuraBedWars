@@ -61,8 +61,8 @@ public class NMSProvider {
         if (VersionUtil.getMajorNumber() >= 26) {
             return "mojangnamespace26_1";
         }
-        // Paper Mojang Namespace (1.20.5 ~ 25.x)
-        // CraftBukkit 在 25.x 发布后才舍弃 v1_XX_RX 的命名格式 此处用来兼容 Paper 从 1.20.5 到 25.x
+        // Paper Mojang Namespace (1.20.5 ~ 26.x)
+        // CraftBukkit 在 26.x 发布后才舍弃 v1_XX_RX 的命名格式 此处用来兼容 Paper 从 1.20.5 到 26.x
         // https://forums.papermc.io/threads/important-dev-psa-future-removal-of-cb-package-relocation.1106/
         return "mojangnamespace";
     }

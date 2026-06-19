@@ -99,7 +99,7 @@ public class SettingsConfig {
 
     @Data
     public static class DatabaseConfig {
-        @Comment({"数据库类型", "可选: MySQL, SQLite"})
+        @Comment({"数据库类型", "可选: MySQL, MongoDB"})
         private String databaseType = "MySQL";
 
         @Comment("数据库主机地址")
