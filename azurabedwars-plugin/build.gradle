@@ -102,6 +102,7 @@ dependencies {
 }
 
 shadowJar {
+    archiveFileName = 'azurabedwars-plugin-' + version + ".jar"
     archiveVersion.set(version.toString())
 }
 
