@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.nms.v1_8_R3;
 
-import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
@@ -13,11 +13,11 @@ import org.bukkit.entity.LivingEntity;
  */
 public class CustomIronGolem extends AbstractCustomEntity {
 
-    protected CustomIronGolem(EntityInsentient entityInsentient, GameTeam gameTeam) {
+    protected CustomIronGolem(EntityInsentient entityInsentient, IGameTeam gameTeam) {
         super(entityInsentient, gameTeam);
     }
 
-    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health) {
+    public static LivingEntity spawn(Location loc, IGameTeam gameTeam, double speed, double health) {
         Entity bukkitEntity = EntityConverter.spawnBukkitEntity(loc, EntityType.IRON_GOLEM);
         CraftLivingEntity craftLivingEntity = (CraftLivingEntity) bukkitEntity;
         EntityInsentient entityInsentient = EntityConverter.bukkitToNms(bukkitEntity);

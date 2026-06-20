@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.nms.mojangnamespace26_1;
 
-import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
@@ -22,11 +22,11 @@ import java.util.Objects;
  */
 public class CustomSilverfish extends AbstractCustomEntity {
 
-    protected CustomSilverfish(Mob entityInsentient, GameTeam gameTeam) {
+    protected CustomSilverfish(Mob entityInsentient, IGameTeam gameTeam) {
         super(entityInsentient, gameTeam);
     }
 
-    public static LivingEntity spawn(Location loc, GameTeam gameTeam, double speed, double health) {
+    public static LivingEntity spawn(Location loc, IGameTeam gameTeam, double speed, double health) {
         Entity bukkitEntity = EntityConverter.spawnBukkitEntity(loc, EntityType.SILVERFISH);
         CraftLivingEntity craftLivingEntity = (CraftLivingEntity) bukkitEntity;
         Mob mob = EntityConverter.bukkitToNms(bukkitEntity);

@@ -1,5 +1,4 @@
 dependencies {
-    compileOnly project(':azurabedwars-plugin:core')
     compileOnly "io.papermc.paper:paper-server:1.21.10-R0.1-SNAPSHOT"
     compileOnly "io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT"
     // 用CodeMC提供的NMS repo, 对1.20.5~1.21.10中Paper的破坏性更改提供特别支持

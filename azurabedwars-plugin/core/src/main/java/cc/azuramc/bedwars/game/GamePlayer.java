@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent;
+import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
@@ -47,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author an5w1r@163.com
  */
 @Data
-public class GamePlayer {
+public class GamePlayer implements IGamePlayer {
 
     private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
 
@@ -538,6 +539,7 @@ public class GamePlayer {
      *
      * @return 玩家显示名称
      */
+    @NotNull
     public String getNickName() {
         return this.nickName != null ? this.nickName : this.name;
     }
@@ -643,7 +645,7 @@ public class GamePlayer {
         if (gamePlayers.isEmpty()) {
             return null;
         }
-        return gamePlayers.get(gamePlayers.size() - 1);
+        return gamePlayers.getLast();
     }
 
     /**
@@ -873,64 +875,92 @@ public class GamePlayer {
      * 自定义 setSpectator 方法，触发状态变化事件
      */
     public void setSpectator(boolean spectator) {
-        if (this.gameTeam == null) {
+        GameTeam team = this.gameTeam;
+        if (team == null) {
             return;
         }
-        GameManager gameManager = this.getGameTeam().getGameManager();
+        GameManager gameManager = team.getGameManager();
+
+        BedwarsPlayerStateChangeEvent.Pre preEvent = new BedwarsPlayerStateChangeEvent.Pre(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
+            return;
+        }
 
         this.isSpectator = spectator;
-        BedwarsPlayerStateChangeEvent stateEvent = new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR);
-        Bukkit.getPluginManager().callEvent(stateEvent);
 
-
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent.Post(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR));
     }
 
     /**
      * 自定义 setRespawning 方法，触发状态变化事件
      */
     public void setRespawning(boolean respawning) {
-        if (this.gameTeam == null) {
+        GameTeam team = this.gameTeam;
+        if (team == null) {
             return;
         }
-        GameManager gameManager = this.getGameTeam().getGameManager();
+        GameManager gameManager = team.getGameManager();
+
+        BedwarsPlayerStateChangeEvent.Pre preEvent = new BedwarsPlayerStateChangeEvent.Pre(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
+            return;
+        }
 
         this.isRespawning = respawning;
-        BedwarsPlayerStateChangeEvent stateEvent = new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING);
-        Bukkit.getPluginManager().callEvent(stateEvent);
 
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent.Post(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING));
     }
 
     /**
      * 自定义 setInvisible 方法，触发状态变化事件
      */
     public void setInvisible(boolean invisible) {
-        if (this.gameTeam == null) {
+        GameTeam team = this.gameTeam;
+        if (team == null) {
             return;
         }
-        GameManager gameManager = this.getGameTeam().getGameManager();
+        GameManager gameManager = team.getGameManager();
+
+        BedwarsPlayerStateChangeEvent.Pre preEvent = new BedwarsPlayerStateChangeEvent.Pre(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
+            return;
+        }
 
         this.isInvisible = invisible;
-        BedwarsPlayerStateChangeEvent stateEvent = new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE);
-        Bukkit.getPluginManager().callEvent(stateEvent);
 
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent.Post(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE));
     }
 
     /**
      * 自定义 setReconnect 方法，触发状态变化事件
      */
     public void setReconnect(boolean reconnect) {
-        if (this.gameTeam == null) {
+        GameTeam team = this.gameTeam;
+        if (team == null) {
             return;
         }
-        GameManager gameManager = this.getGameTeam().getGameManager();
+        GameManager gameManager = team.getGameManager();
+
+        BedwarsPlayerStateChangeEvent.Pre preEvent = new BedwarsPlayerStateChangeEvent.Pre(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
+            return;
+        }
 
         this.isReconnect = reconnect;
-        BedwarsPlayerStateChangeEvent stateEvent = new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT);
-        Bukkit.getPluginManager().callEvent(stateEvent);
+
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent.Post(
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT));
     }
 
     /**
@@ -967,9 +997,14 @@ public class GamePlayer {
                     return;
                 }
 
+                GameTeam closestTeam = closestPlayer.getGameTeam();
+                if (closestTeam == null) {
+                    return;
+                }
+
                 int distance = (int) targetPlayer.getLocation().distance(player.getLocation());
                 gamePlayer.sendActionBar(String.format("§f玩家 %s%s §f距离您 %dm",
-                        closestPlayer.getGameTeam().getChatColor(),
+                        closestTeam.getChatColor(),
                         closestPlayer.getNickName(),
                         distance));
                 player.setCompassTarget(targetPlayer.getLocation());

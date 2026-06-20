@@ -37,7 +37,7 @@ public class FireballHandler implements Listener {
         }
 
         // 获取火球发射者
-        Object metaData = fireball.getMetadata(FIREBALL_METADATA).get(0).value();
+        Object metaData = fireball.getMetadata(FIREBALL_METADATA).getFirst().value();
         if (metaData == null) {
             return;
         }

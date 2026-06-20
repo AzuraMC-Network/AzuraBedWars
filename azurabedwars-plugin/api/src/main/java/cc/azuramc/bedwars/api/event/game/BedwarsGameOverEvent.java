@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.api.event.game;
 
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.api.game.IGameManager;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.Event;
@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * 游戏分出胜负事件
+ *
  * @author an5w1r@163.com
  */
 @Getter
@@ -21,19 +23,20 @@ public class BedwarsGameOverEvent extends Event {
     /**
      * 游戏管理器
      */
-    private final GameManager gameManager;
+    @NotNull
+    private final IGameManager gameManager;
     /**
      * 获胜队伍（可能为null，表示平局或无获胜者）
      */
     @Nullable
-    private final GameTeam winnerTeam;
+    private final IGameTeam winnerTeam;
 
     /**
      * 构造函数
      *
      * @param gameManager 游戏管理器
      */
-    public BedwarsGameOverEvent(@NotNull GameManager gameManager) {
+    public BedwarsGameOverEvent(@NotNull IGameManager gameManager) {
         this.gameManager = gameManager;
         this.winnerTeam = gameManager.getWinner();
     }
@@ -44,10 +47,11 @@ public class BedwarsGameOverEvent extends Event {
      * @return 游戏管理器
      */
     @NotNull
-    public GameManager getGameManager() {
+    public IGameManager getGameManager() {
         return gameManager;
     }
 
+    @NotNull
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }

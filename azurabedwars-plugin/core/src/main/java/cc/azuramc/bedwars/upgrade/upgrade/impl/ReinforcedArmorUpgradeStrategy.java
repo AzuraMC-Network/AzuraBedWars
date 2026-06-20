@@ -36,7 +36,11 @@ public class ReinforcedArmorUpgradeStrategy extends AbstractTieredUpgradeStrateg
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().getUpgradeManager().getProtectionUpgrade();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return 0;
+        }
+        return gameTeam.getUpgradeManager().getProtectionUpgrade();
     }
 
     @Override
@@ -52,6 +56,9 @@ public class ReinforcedArmorUpgradeStrategy extends AbstractTieredUpgradeStrateg
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
         int currentLevel = gameTeam.getUpgradeManager().getProtectionUpgrade();
         int nextLevel = currentLevel + 1;
 

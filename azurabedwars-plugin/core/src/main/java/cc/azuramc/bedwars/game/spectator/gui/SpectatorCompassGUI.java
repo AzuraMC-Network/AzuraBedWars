@@ -76,6 +76,9 @@ public class SpectatorCompassGUI extends CustomGUI {
      */
     private ItemStack createPlayerItem(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return null;
+        }
         Player targetPlayer = gamePlayer.getPlayer();
 
         return new ItemBuilder()

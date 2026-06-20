@@ -1,11 +1,10 @@
 package cc.azuramc.bedwars.tablist;
 
-import cc.azuramc.bedwars.api.event.bed.BedwarsDestroyBedEvent;
+import cc.azuramc.bedwars.api.event.bed.BedwarsBedDestroyEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent;
-import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -24,11 +23,8 @@ public class TabListListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerStateChange(BedwarsPlayerStateChangeEvent event) {
-        GamePlayer gamePlayer = event.getGamePlayer();
-        if (gamePlayer != null) {
-            tabListManager.updateAllTabListNames();
-        }
+    public void onPlayerStateChange(BedwarsPlayerStateChangeEvent.Post event) {
+        tabListManager.updateAllTabListNames();
     }
 
     @EventHandler
@@ -38,13 +34,13 @@ public class TabListListener implements Listener {
     }
 
     @EventHandler
-    public void onBedDestroy(BedwarsDestroyBedEvent event) {
+    public void onBedDestroy(BedwarsBedDestroyEvent.Post event) {
         tabListManager.updateAllTabListNames();
         tabListManager.updateHeaderFooter();
     }
 
     @EventHandler
-    public void onGameStart(BedwarsGameStartEvent event) {
+    public void onGameStart(BedwarsGameStartEvent.Post event) {
         tabListManager.updateHeaderFooter();
         tabListManager.updateAllTabListNames();
     }

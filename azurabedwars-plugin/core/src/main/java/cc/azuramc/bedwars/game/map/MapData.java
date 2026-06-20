@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.game.map;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.api.game.map.IMapData;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
  * @author an5w1r@163.com
  */
 @Data
-public class MapData {
+public class MapData implements IMapData {
     private final Players players;
     private final Region region;
     private final List<RawLocation> bases;
@@ -211,6 +213,7 @@ public class MapData {
      *
      * @return 地图所有基地位置的列表
      */
+    @NotNull
     public List<Location> getBaseLocations() {
         return bases.stream().map(RawLocation::toLocation).collect(Collectors.toList());
     }
@@ -261,6 +264,7 @@ public class MapData {
      *
      * @return 地图所有掉落点位置的列表
      */
+    @NotNull
     public List<Location> getAllDropLocations() {
         return drops.stream().map(RawLocation::toLocation).collect(Collectors.toList());
     }
@@ -270,6 +274,7 @@ public class MapData {
      *
      * @return 地图所有商店位置的列表
      */
+    @NotNull
     public List<Location> getAllShopLocations() {
         return shops.stream().map(RawLocation::toLocation).collect(Collectors.toList());
     }

@@ -99,7 +99,7 @@ public class PlayerJoinListener implements Listener {
      * 监听游戏加载事件，设置服务器最大玩家数限制
      */
     @EventHandler
-    public void onGameLoading(BedwarsGameLoadEvent event) {
+    public void onGameLoading(BedwarsGameLoadEvent.Post event) {
         // 根据游戏最大玩家数设置服务器人数上限
         serverMaxPlayers = event.getGameManager().getMaxPlayers();
     }

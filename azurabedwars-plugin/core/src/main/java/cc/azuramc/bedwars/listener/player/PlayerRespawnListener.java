@@ -69,6 +69,9 @@ public class PlayerRespawnListener implements Listener {
         }
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
 
         // 游戏未运行时不处理
         if (gameManager.getGameState() != GameState.RUNNING) {
@@ -144,7 +147,7 @@ public class PlayerRespawnListener implements Listener {
     private void sendPlayAgainMessage(GamePlayer gamePlayer) {
         TextComponent textComponent = new TextComponent(messageConfig.getPlayAgainMessage());
         textComponent.addExtra(messageConfig.getPlayAgainButton());
-        textComponent.getExtra().get(0).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, settingsConfig.getPlayAgainCommand()));
+        textComponent.getExtra().getFirst().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, settingsConfig.getPlayAgainCommand()));
         gamePlayer.getPlayer().spigot().sendMessage(textComponent);
     }
 

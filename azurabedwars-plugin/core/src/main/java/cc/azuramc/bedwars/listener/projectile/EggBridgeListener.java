@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
@@ -72,7 +73,11 @@ public class EggBridgeListener implements Listener {
         }
 
         // 存进生效的搭桥蛋列表
-        BRIDGES.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, gamePlayer.getGameTeam().getTeamColor()));
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
+        BRIDGES.put(egg, new EggBridgeHandler(AzuraBedWars.getInstance(), shooter, egg, gameTeam.getTeamColor()));
 
         // 创建冷却
         if (!gamePlayer.isEggBridgeCooldown()) {

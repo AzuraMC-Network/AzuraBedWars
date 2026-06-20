@@ -1,5 +1,8 @@
 package cc.azuramc.bedwars;
 
+import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
+import cc.azuramc.bedwars.api.game.IGamePlayer;
+import cc.azuramc.bedwars.api.nms.NMSAccess;
 import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
@@ -7,6 +10,7 @@ import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import cc.azuramc.bedwars.game.map.MapData;
@@ -16,7 +20,6 @@ import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.packet.InvisibilityPacketListener;
 import cc.azuramc.bedwars.listener.setup.SetupItemListener;
-import cc.azuramc.bedwars.nms.NMSAccess;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.util.LoggerUtil;
@@ -248,6 +251,35 @@ public final class AzuraBedWars extends JavaPlugin {
     }
 
     private void setupNMSSupport() {
+        // 注册 API 门面实现，供 NMS 版本模块与第三方通过 AzuraBedWarsAPI 访问运行时，
+        // 而无需依赖 core 具体类（玩家查找委托 GamePlayer，日志委托 LoggerUtil）
+        AzuraBedWarsAPI.setProvider(new AzuraBedWarsAPI.Provider() {
+            @Override
+            public IGamePlayer getPlayer(java.util.UUID uuid) {
+                return GamePlayer.get(uuid);
+            }
+
+            @Override
+            public void info(String message) {
+                LoggerUtil.info(message);
+            }
+
+            @Override
+            public void warn(String message) {
+                LoggerUtil.warn(message);
+            }
+
+            @Override
+            public void error(String message) {
+                LoggerUtil.error(message);
+            }
+
+            @Override
+            public void debug(String message) {
+                LoggerUtil.debug(message);
+            }
+        });
+
         nmsProvider = new NMSProvider();
         nmsAccess = nmsProvider.setup();
     }

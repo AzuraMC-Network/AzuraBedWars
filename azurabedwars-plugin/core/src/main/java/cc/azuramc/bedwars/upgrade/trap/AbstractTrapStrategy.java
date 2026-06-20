@@ -56,6 +56,9 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     @Override
     public boolean performPurchase(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
         TrapManager trapManager = gameTeam.getTrapManager();
         GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
         int price = getPrice(gamePlayer);
@@ -161,6 +164,9 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     @Override
     public boolean canPurchase(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
         TrapManager trapManager = gameTeam.getTrapManager();
         return !trapManager.isTrapActive(getTrapTypeEnum()) && !trapManager.isReachedActiveLimit();
     }
@@ -174,6 +180,9 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     @Override
     public TrapState getTrapState(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return TrapState.INACTIVE;
+        }
         TrapManager trapManager = gameTeam.getTrapManager();
 
         if (!trapManager.isTrapActive(getTrapTypeEnum())) {

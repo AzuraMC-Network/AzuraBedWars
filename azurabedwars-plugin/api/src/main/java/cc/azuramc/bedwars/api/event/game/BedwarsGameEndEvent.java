@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.api.event.game;
 
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.api.game.IGameManager;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.Event;
@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
+ * 游戏结束事件
+ *
  * @author an5w1r@163.com
  */
 @Getter
@@ -23,27 +25,32 @@ public class BedwarsGameEndEvent extends Event {
     /**
      * 游戏管理器
      */
-    private final GameManager gameManager;
+    @NotNull
+    private final IGameManager gameManager;
     /**
      * 获胜队伍（可能为null，表示平局）
      */
     @Nullable
-    private final GameTeam winner;
+    private final IGameTeam winner;
     /**
      * 存活的队伍列表
      */
-    private final List<GameTeam> aliveTeams;
+    @NotNull
+    private final List<? extends IGameTeam> aliveTeams;
     /**
      * 聊天消息
      */
+    @NotNull
     private String message;
     /**
      * 标题消息
      */
+    @NotNull
     private String title;
     /**
      * 副标题消息
      */
+    @NotNull
     private String subTitle;
 
     /**
@@ -51,7 +58,7 @@ public class BedwarsGameEndEvent extends Event {
      *
      * @param gameManager 游戏管理器
      */
-    public BedwarsGameEndEvent(@NotNull GameManager gameManager) {
+    public BedwarsGameEndEvent(@NotNull IGameManager gameManager) {
         this.gameManager = gameManager;
         this.winner = gameManager.getWinner();
         this.aliveTeams = List.copyOf(gameManager.getAliveTeams());
@@ -66,10 +73,11 @@ public class BedwarsGameEndEvent extends Event {
      * @return 游戏管理器
      */
     @NotNull
-    public GameManager getGameManager() {
+    public IGameManager getGameManager() {
         return gameManager;
     }
 
+    @NotNull
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }

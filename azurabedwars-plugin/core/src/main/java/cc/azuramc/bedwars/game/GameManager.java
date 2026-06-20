@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerReconnectEvent;
+import cc.azuramc.bedwars.api.game.IGameManager;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
@@ -31,6 +32,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -44,7 +46,7 @@ import java.util.*;
  * @author an5w1r@163.com
  */
 @Data
-public class GameManager {
+public class GameManager implements IGameManager {
 
     private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
     private ItemConfig.GameManager itemConfig;
@@ -154,10 +156,10 @@ public class GameManager {
             return;
         }
 
-        // call event
-        BedwarsGameLoadEvent event = new BedwarsGameLoadEvent(this, mapData);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
+        // 触发游戏加载前置事件（可取消以阻止加载）
+        BedwarsGameLoadEvent.Pre preEvent = new BedwarsGameLoadEvent.Pre(this, mapData);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
             return;
         }
 
@@ -179,6 +181,9 @@ public class GameManager {
         this.gameState = GameState.WAITING;
         // 更新MOTD
         updateServerMOTD();
+
+        // 触发游戏加载完成后置事件
+        Bukkit.getPluginManager().callEvent(new BedwarsGameLoadEvent.Post(this, mapData));
     }
 
     /**
@@ -435,13 +440,13 @@ public class GameManager {
         if (gamePlayer.getGameTeam() != null) {
             if (gamePlayer.getGameTeam().isHasBed()) {
                 // 触发玩家重连事件
-                BedwarsPlayerReconnectEvent reconnectEvent = new BedwarsPlayerReconnectEvent(
+                BedwarsPlayerReconnectEvent.Pre preEvent = new BedwarsPlayerReconnectEvent.Pre(
                         gamePlayer, gamePlayer.getGameTeam(), this
                 );
-                Bukkit.getPluginManager().callEvent(reconnectEvent);
+                Bukkit.getPluginManager().callEvent(preEvent);
 
                 // 检查事件是否被取消
-                if (reconnectEvent.isCancelled()) {
+                if (preEvent.isCancelled()) {
                     gamePlayer.getPlayer().kickPlayer("canceled reconnect by event");
                     return;
                 }
@@ -449,6 +454,10 @@ public class GameManager {
                 gamePlayer.setReconnect(true);
                 PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
                 broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
+
+                // 触发玩家重连完成后置事件
+                Bukkit.getPluginManager().callEvent(new BedwarsPlayerReconnectEvent.Post(
+                        gamePlayer, gamePlayer.getGameTeam(), this));
                 return;
             }
         }
@@ -572,7 +581,7 @@ public class GameManager {
         return gameTeams.stream()
                 .filter(team -> !team.isFull())
                 .min(Comparator.comparingInt(team -> team.getGamePlayers().size()))
-                .orElse(gameTeams.get(0));
+                .orElse(gameTeams.getFirst());
     }
 
     /**
@@ -858,6 +867,13 @@ public class GameManager {
      * 开始游戏
      */
     public void start() {
+        // 触发游戏开始前置事件（可取消以阻止开始）
+        BedwarsGameStartEvent.Pre preEvent = new BedwarsGameStartEvent.Pre(this);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
+            return;
+        }
+
         gameState = GameState.RUNNING;
         // 更新MOTD
         updateServerMOTD();
@@ -880,8 +896,8 @@ public class GameManager {
         // 注册团队升级任务
         registerTeamUpgradeCheckTask();
 
-        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent(this);
-        Bukkit.getPluginManager().callEvent(bedwarsGameStartEvent);
+        // 触发游戏开始完成后置事件
+        Bukkit.getPluginManager().callEvent(new BedwarsGameStartEvent.Post(this));
     }
 
     /**
@@ -953,12 +969,13 @@ public class GameManager {
                 .toList();
 
         if (aliveTeams.size() == 1) {
-            return aliveTeams.get(0);
+            return aliveTeams.getFirst();
         }
 
         return null;
     }
 
+    @NotNull
     public List<GameTeam> getAliveTeams() {
         return gameTeams.stream()
                 .filter(team -> !team.isDead())

@@ -7,6 +7,8 @@ processResources {
     }
 }
 dependencies {
+    compileOnly project(':azurabedwars-plugin:api')
+
     compileOnly "org.spigotmc:spigot-api:1.21.11-R0.1-SNAPSHOT"
     compileOnly "me.clip:placeholderapi:2.11.6"
     compileOnly "net.luckperms:api:5.4"

@@ -33,7 +33,11 @@ public class ManicMinerUpgradeStrategy extends AbstractTieredUpgradeStrategy {
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().getUpgradeManager().getMagicMinerUpgrade();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return 0;
+        }
+        return gameTeam.getUpgradeManager().getMagicMinerUpgrade();
     }
 
     @Override
@@ -49,6 +53,9 @@ public class ManicMinerUpgradeStrategy extends AbstractTieredUpgradeStrategy {
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
         int currentLevel = gameTeam.getUpgradeManager().getMagicMinerUpgrade();
         int nextLevel = currentLevel + 1;
 

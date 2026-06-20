@@ -120,7 +120,7 @@ public class SpectatorManager {
     private static void setupSpectatorTarget(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam != null && !gameTeam.getAlivePlayers().isEmpty()) {
-            gamePlayer.getSpectatorTarget().setTarget(gameTeam.getAlivePlayers().get(0));
+            gamePlayer.getSpectatorTarget().setTarget(gameTeam.getAlivePlayers().getFirst());
         }
     }
 }

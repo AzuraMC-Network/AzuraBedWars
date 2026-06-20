@@ -1,7 +1,8 @@
 package cc.azuramc.bedwars.nms;
 
+import cc.azuramc.bedwars.api.game.IGamePlayer;
+import cc.azuramc.bedwars.api.nms.NMSAccess;
 import cc.azuramc.bedwars.compat.VersionUtil;
-import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.util.nms.NMSMapping;
 import cc.azuramc.bedwars.util.nms.ReflectionUtil;
 import org.bukkit.Location;
@@ -46,12 +47,12 @@ public class CompatibilityModeNMS implements NMSAccess {
     }
 
     @Override
-    public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health) {
+    public LivingEntity spawnIronGolem(Location loc, IGamePlayer gamePlayer, double speed, double health) {
         return null;
     }
 
     @Override
-    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health) {
+    public LivingEntity spawnSilverfish(Location loc, IGamePlayer gamePlayer, double speed, double health) {
         return null;
     }
 

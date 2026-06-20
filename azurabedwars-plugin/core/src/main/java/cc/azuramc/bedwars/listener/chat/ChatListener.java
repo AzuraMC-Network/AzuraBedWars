@@ -140,6 +140,9 @@ public class ChatListener implements Listener {
         }
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
         boolean isGlobalChat = message.startsWith(CHAT_CONFIG.getGlobalChatPrefix());
 
         // 构建团队聊天消息

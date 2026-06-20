@@ -1,9 +1,9 @@
 package cc.azuramc.bedwars.nms.v1_9_R2;
 
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.nms.NMSAccess;
-import cc.azuramc.bedwars.util.LoggerUtil;
+import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
+import cc.azuramc.bedwars.api.game.IGamePlayer;
+import cc.azuramc.bedwars.api.game.IGameTeam;
+import cc.azuramc.bedwars.api.nms.NMSAccess;
 import net.minecraft.server.v1_9_R2.EntityFireball;
 import net.minecraft.server.v1_9_R2.NBTTagCompound;
 import org.bukkit.Location;
@@ -37,16 +37,16 @@ public class NMS_v1_9_R2 implements NMSAccess {
     }
 
     @Override
-    public LivingEntity spawnIronGolem(Location loc, GamePlayer gamePlayer, double speed, double health) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        LoggerUtil.debug("NMS_v1_9_R2$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health);
+    public LivingEntity spawnIronGolem(Location loc, IGamePlayer gamePlayer, double speed, double health) {
+        IGameTeam gameTeam = gamePlayer.getGameTeam();
+        AzuraBedWarsAPI.debug("NMS_v1_9_R2$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health);
         return CustomIronGolem.spawn(loc, gameTeam, speed, health);
     }
 
     @Override
-    public LivingEntity spawnSilverfish(Location loc, GamePlayer gamePlayer, double speed, double health) {
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        LoggerUtil.debug("NMS_v1_9_R2$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health);
+    public LivingEntity spawnSilverfish(Location loc, IGamePlayer gamePlayer, double speed, double health) {
+        IGameTeam gameTeam = gamePlayer.getGameTeam();
+        AzuraBedWarsAPI.debug("NMS_v1_9_R2$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health);
         return CustomSilverfish.spawn(loc, gameTeam, speed, health);
     }
 

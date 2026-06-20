@@ -34,7 +34,11 @@ public class ResourceFurnaceUpgradeStrategy extends AbstractTieredUpgradeStrateg
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().getUpgradeManager().getResourceFurnaceUpgrade();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return 0;
+        }
+        return gameTeam.getUpgradeManager().getResourceFurnaceUpgrade();
     }
 
     @Override
@@ -56,6 +60,9 @@ public class ResourceFurnaceUpgradeStrategy extends AbstractTieredUpgradeStrateg
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
         int currentLevel = gameTeam.getUpgradeManager().getResourceFurnaceUpgrade();
         int nextLevel = currentLevel + 1;
 

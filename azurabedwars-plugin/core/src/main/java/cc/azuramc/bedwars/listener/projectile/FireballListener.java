@@ -90,7 +90,7 @@ public class FireballListener implements Listener {
     private long getLastFireballTime(GamePlayer gamePlayer) {
         Player player = gamePlayer.getPlayer();
         if (player.hasMetadata(fireballCooldownMetadata)) {
-            return player.getMetadata(fireballCooldownMetadata).get(0).asLong();
+            return player.getMetadata(fireballCooldownMetadata).getFirst().asLong();
         }
         return 0L;
     }

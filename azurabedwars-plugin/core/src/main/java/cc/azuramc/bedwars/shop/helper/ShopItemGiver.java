@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.shop.helper;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
 import cc.azuramc.bedwars.shop.ColorType;
@@ -188,7 +189,11 @@ public final class ShopItemGiver {
             }
 
             // 添加锋利附魔
-            if (gamePlayer.getGameTeam().getUpgradeManager().hasSharpnessUpgrade()) {
+            GameTeam gameTeam = gamePlayer.getGameTeam();
+            if (gameTeam == null) {
+                return;
+            }
+            if (gameTeam.getUpgradeManager().hasSharpnessUpgrade()) {
                 Enchantment sharpness = XEnchantment.SHARPNESS.get();
                 if (sharpness != null) {
                     itemBuilder.addEnchant(sharpness, 1);
@@ -207,9 +212,14 @@ public final class ShopItemGiver {
 
         String typeName = shopItemType.getItemStack().getType().name();
 
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
+
         if (typeName.contains("WOOL")) {
             // 处理羊毛
-            itemBuilder.setWoolColor(gamePlayer.getGameTeam().getDyeColor());
+            itemBuilder.setWoolColor(gameTeam.getDyeColor());
             itemBuilder.setAmount(shopItemType.getItemStack().getAmount());
 
             // 保留原始附魔（如果有）
@@ -218,11 +228,11 @@ public final class ShopItemGiver {
             }
         } else if (typeName.contains("GLASS")) {
             // 处理玻璃
-            itemBuilder.setGlassColor(gamePlayer.getGameTeam().getDyeColor());
+            itemBuilder.setGlassColor(gameTeam.getDyeColor());
             itemBuilder.setAmount(shopItemType.getItemStack().getAmount());
         } else {
             // 对于其他颜色方块，使用旧方法
-            itemBuilder.setDurability(gamePlayer.getGameTeam().getDyeColor().getDyeData());
+            itemBuilder.setDurability(gameTeam.getDyeColor().getDyeData());
         }
     }
 

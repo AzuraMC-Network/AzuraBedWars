@@ -45,6 +45,9 @@ public class AlarmTrapStrategy extends AbstractTrapStrategy {
     @Override
     public int getPrice(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return 0;
+        }
         TrapManager trapManager = gameTeam.getTrapManager();
         return trapManager.getCurrentTrapPrice();
     }

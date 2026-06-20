@@ -38,6 +38,9 @@ public class BlockBreakListener implements Listener {
             }
 
             GameTeam gameTeam = gamePlayer.getGameTeam();
+            if (gameTeam == null) {
+                return;
+            }
 
             if (gamePlayer.isSpectator()) {
                 event.setCancelled(true);

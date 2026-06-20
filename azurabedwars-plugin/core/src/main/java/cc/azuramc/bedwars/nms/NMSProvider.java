@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.nms;
 
+import cc.azuramc.bedwars.api.nms.NMSAccess;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
