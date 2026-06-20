@@ -65,7 +65,8 @@ public class SpectatorCompassGUI extends CustomGUI {
      * @return 是否有效
      */
     private boolean isValidTarget(GamePlayer gamePlayer) {
-        return gamePlayer != null && gamePlayer.isOnline() && !gamePlayer.isSpectator();
+        return gamePlayer != null && gamePlayer.isOnline() && !gamePlayer.isSpectator()
+                && gamePlayer.getGameTeam() != null;
     }
 
     /**

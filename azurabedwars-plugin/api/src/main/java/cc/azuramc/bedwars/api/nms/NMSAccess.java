@@ -104,7 +104,7 @@ public interface NMSAccess {
             case 5 -> "LIME";
             case 6 -> "PINK";
             case 7 -> "GRAY";
-            case 8 -> "SILVER";
+            case 8 -> "LIGHT_GRAY";
             case 9 -> "CYAN";
             case 10 -> "PURPLE";
             case 11 -> "BLUE";

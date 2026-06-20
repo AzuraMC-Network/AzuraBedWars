@@ -137,7 +137,7 @@ public class BedBreakHandler {
         GAME_MANAGER.broadcastMessage(" ");
 
         // 向受影响的团队发送标题提示
-        GAME_MANAGER.broadcastTeamTitle((GameTeam) event.getGameTeam(), event.getTitle(), event.getSubTitle(), 1, 20, 1);
+        GAME_MANAGER.broadcastTeamTitle(event.getGameTeam(), event.getTitle(), event.getSubTitle(), 1, 20, 1);
     }
 
 

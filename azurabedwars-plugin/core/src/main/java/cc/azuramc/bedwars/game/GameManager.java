@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerReconnectEvent;
 import cc.azuramc.bedwars.api.game.IGameManager;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
@@ -709,7 +710,7 @@ public class GameManager implements IGameManager {
      * @param stay     停留时间
      * @param fadeOut  淡出时间
      */
-    public void broadcastTeamTitle(GameTeam gameTeam, String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
+    public void broadcastTeamTitle(IGameTeam gameTeam, String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
         gameTeam.getAlivePlayers().forEach(gamePlayer ->
                 gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
@@ -720,7 +721,7 @@ public class GameManager implements IGameManager {
      * @param gameTeam 目标团队
      * @param texts    消息文本
      */
-    public void broadcastTeamMessage(GameTeam gameTeam, String... texts) {
+    public void broadcastTeamMessage(IGameTeam gameTeam, String... texts) {
         gameTeam.getAlivePlayers().forEach(gamePlayer -> Arrays.stream(texts).forEach(gamePlayer::sendMessage));
         LoggerUtil.printChat(texts);
     }
@@ -731,7 +732,7 @@ public class GameManager implements IGameManager {
      * @param gameTeam 目标团队
      * @param textList 消息文本
      */
-    public void broadcastTeamMessage(GameTeam gameTeam, List<String> textList) {
+    public void broadcastTeamMessage(IGameTeam gameTeam, List<String> textList) {
         gameTeam.getAlivePlayers().forEach(player -> textList.forEach(player::sendMessage));
         LoggerUtil.printChat(textList);
     }
@@ -744,7 +745,7 @@ public class GameManager implements IGameManager {
      * @param volume   音量
      * @param pitch    音调
      */
-    public void broadcastTeamSound(GameTeam gameTeam, Sound sound, float volume, float pitch) {
+    public void broadcastTeamSound(IGameTeam gameTeam, Sound sound, float volume, float pitch) {
         gameTeam.getAlivePlayers().forEach(gamePlayer -> gamePlayer.playSound(sound, volume, pitch));
     }
 
