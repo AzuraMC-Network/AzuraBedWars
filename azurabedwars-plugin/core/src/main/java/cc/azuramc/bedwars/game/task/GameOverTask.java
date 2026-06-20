@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.ReconnectState;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.util.FireWorkUtil;
 import org.bukkit.Bukkit;
@@ -196,10 +197,10 @@ public class GameOverTask extends BukkitRunnable {
         // 处理胜利者占位符
         processedMessage = processedMessage.replace("<winnerFormat>", winnerText);
 
-        // 获取排行榜数据
-        List<GamePlayer> killRanking = GamePlayer.sortCurrentGameFinalKills();
-        List<GamePlayer> assistRanking = GamePlayer.sortCurrentGameAssists();
-        List<GamePlayer> bedBreakRanking = GamePlayer.sortCurrentGameBedBreaks();
+        // 获取排行榜数据（合并在线玩家与断线未重连玩家的本局统计，避免漏掉赛末前掉线者）
+        List<RankingEntry> killRanking = buildRanking("Kills");
+        List<RankingEntry> assistRanking = buildRanking("Assists");
+        List<RankingEntry> bedBreakRanking = buildRanking("BedBreaks");
 
         // 处理击杀排行占位符
         processedMessage = processRankingPlaceholders(processedMessage, killRanking, "Kills");
@@ -221,20 +222,19 @@ public class GameOverTask extends BukkitRunnable {
      * @param type    排行类型（Kills/Assists/BedBreaks）
      * @return 处理后的消息
      */
-    private String processRankingPlaceholders(String message, List<GamePlayer> ranking, String type) {
+    private String processRankingPlaceholders(String message, List<RankingEntry> ranking, String type) {
         String processedMessage = message;
 
         // 处理前三名占位符
         for (int i = 0; i < Math.min(3, ranking.size()); i++) {
-            GamePlayer player = ranking.get(i);
+            RankingEntry entry = ranking.get(i);
             String rank = getRankName(i);
 
             // 替换名称占位符
-            processedMessage = processedMessage.replace("<" + rank + "Name>", player.getNickName());
+            processedMessage = processedMessage.replace("<" + rank + "Name>", entry.name());
 
             // 替换数值占位符
-            int value = getPlayerValue(player, type);
-            processedMessage = processedMessage.replace("<" + rank + type + ">", String.valueOf(value));
+            processedMessage = processedMessage.replace("<" + rank + type + ">", String.valueOf(entry.value()));
         }
 
         // 如果排行榜不足3人，将剩余占位符替换为空字符串
@@ -269,11 +269,38 @@ public class GameOverTask extends BukkitRunnable {
      * @param type   类型
      * @return 数值
      */
-    private int getPlayerValue(GamePlayer player, String type) {
+    /**
+     * 结算排行榜条目（昵称 + 数值），便于统一表示在线玩家与断线快照
+     */
+    private record RankingEntry(String name, int value) {
+    }
+
+    /**
+     * 构建某类排行榜：合并在线参与者与断线未重连玩家的本局统计，按数值降序
+     *
+     * @param type Kills / Assists / BedBreaks
+     */
+    private List<RankingEntry> buildRanking(String type) {
+        List<RankingEntry> entries = new ArrayList<>();
+
+        for (GamePlayer player : GamePlayer.getOnlinePlayers()) {
+            entries.add(new RankingEntry(player.getNickName(), getValue(type,
+                    player.getCurrentGameFinalKills(), player.getCurrentGameAssists(), player.getCurrentGameDestroyedBeds())));
+        }
+        for (ReconnectState state : gameManager.getReconnectStates().values()) {
+            entries.add(new RankingEntry(state.getName(), getValue(type,
+                    state.getCurrentGameFinalKills(), state.getCurrentGameAssists(), state.getCurrentGameDestroyedBeds())));
+        }
+
+        entries.sort((a, b) -> Integer.compare(b.value(), a.value()));
+        return entries;
+    }
+
+    private int getValue(String type, int kills, int assists, int bedBreaks) {
         return switch (type) {
-            case "Kills" -> player.getCurrentGameFinalKills();
-            case "Assists" -> player.getCurrentGameAssists();
-            case "BedBreaks" -> player.getCurrentGameDestroyedBeds();
+            case "Kills" -> kills;
+            case "Assists" -> assists;
+            case "BedBreaks" -> bedBreaks;
             default -> 0;
         };
     }

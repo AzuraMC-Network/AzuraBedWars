@@ -17,6 +17,7 @@ import java.util.UUID;
 public class ReconnectState {
 
     private final UUID uuid;
+    private final String name;
 
     @Nullable
     private final TeamColor teamColor;
@@ -41,6 +42,7 @@ public class ReconnectState {
      */
     public ReconnectState(@NotNull GamePlayer gamePlayer) {
         this.uuid = gamePlayer.getUuid();
+        this.name = gamePlayer.getNickName();
         this.teamColor = gamePlayer.getGameTeam() != null ? gamePlayer.getGameTeam().getTeamColor() : null;
 
         this.currentGameKills = gamePlayer.getCurrentGameKills();

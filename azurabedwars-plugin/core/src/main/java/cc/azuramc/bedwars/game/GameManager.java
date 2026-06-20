@@ -36,6 +36,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 游戏管理核心类
@@ -96,12 +97,10 @@ public class GameManager implements IGameManager {
 
     private TabListManager tabListManager;
 
-    private List<GamePlayer> allInGamePlayers;
-
     /**
      * 断线玩家的重连快照（按 UUID）。玩家断线时存入、重连时取出并清除、游戏结束时清空。
      */
-    private final Map<UUID, ReconnectState> reconnectStates = new HashMap<>();
+    private final Map<UUID, ReconnectState> reconnectStates = new ConcurrentHashMap<>();
 
     /**
      * 创建一个新的游戏实例
@@ -123,7 +122,6 @@ public class GameManager implements IGameManager {
 
         this.tabListManager = new TabListManager(this);
         Bukkit.getPluginManager().registerEvents(new TabListListener(tabListManager), plugin);
-        this.allInGamePlayers = new ArrayList<>();
     }
 
     private void initializeConfigs() {
@@ -354,7 +352,6 @@ public class GameManager implements IGameManager {
         handlePlayerJoinWaitingGame(gamePlayer);
 
         tabListManager.addToTab(gamePlayer);
-        allInGamePlayers.add(gamePlayer);
     }
 
     /**
@@ -513,7 +510,6 @@ public class GameManager implements IGameManager {
 
         // 处理玩家离开对团队的影响
         handleTeamPlayerLeave(gamePlayer, gameTeam);
-        allInGamePlayers.remove(gamePlayer);
     }
 
     /**

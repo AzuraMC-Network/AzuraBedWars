@@ -74,14 +74,6 @@ public interface IGameManager {
     List<? extends IGameTeam> getGameTeams();
 
     /**
-     * 获取本局全部参与玩家
-     *
-     * @return 玩家列表（不为 null）
-     */
-    @NotNull
-    List<? extends IGamePlayer> getAllInGamePlayers();
-
-    /**
      * 获取地图数据
      *
      * @return 地图数据，未加载时为 null
