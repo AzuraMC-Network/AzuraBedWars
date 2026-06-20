@@ -169,6 +169,9 @@ public class GameManager implements IGameManager {
             return;
         }
 
+        // 新一局加载时清空上一局遗留的重连快照，避免累积与跨局错误恢复
+        reconnectStates.clear();
+
         this.mapData = mapData;
         this.buildLimitHeight = mapData.getHigherY();
         this.blocksLocation = mapData.loadMap();

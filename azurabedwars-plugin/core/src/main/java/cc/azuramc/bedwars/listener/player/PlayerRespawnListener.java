@@ -146,8 +146,9 @@ public class PlayerRespawnListener implements Listener {
      */
     private void sendPlayAgainMessage(GamePlayer gamePlayer) {
         TextComponent textComponent = new TextComponent(messageConfig.getPlayAgainMessage());
-        textComponent.addExtra(messageConfig.getPlayAgainButton());
-        textComponent.getExtra().getFirst().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, settingsConfig.getPlayAgainCommand()));
+        TextComponent button = new TextComponent(messageConfig.getPlayAgainButton());
+        button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, settingsConfig.getPlayAgainCommand()));
+        textComponent.addExtra(button);
         gamePlayer.getPlayer().spigot().sendMessage(textComponent);
     }
 

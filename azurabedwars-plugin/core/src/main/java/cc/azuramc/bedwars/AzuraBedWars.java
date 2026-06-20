@@ -270,8 +270,18 @@ public final class AzuraBedWars extends JavaPlugin {
             }
 
             @Override
+            public void warn(String message, Throwable throwable) {
+                LoggerUtil.warn(message, throwable);
+            }
+
+            @Override
             public void error(String message) {
                 LoggerUtil.error(message);
+            }
+
+            @Override
+            public void error(String message, Throwable throwable) {
+                LoggerUtil.error(message, throwable);
             }
 
             @Override

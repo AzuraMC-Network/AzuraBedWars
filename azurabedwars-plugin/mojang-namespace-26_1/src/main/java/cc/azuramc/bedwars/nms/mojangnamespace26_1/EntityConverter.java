@@ -63,8 +63,7 @@ public class EntityConverter {
             Entity bukkitEntity = spawnBukkitEntity(location, entityType);
             return bukkitToNms(bukkitEntity);
         } catch (Exception e) {
-            AzuraBedWarsAPI.error("生成并转换实体失败: " + e.getMessage());
-            e.printStackTrace();
+            AzuraBedWarsAPI.error("生成并转换实体失败", e);
             return null;
         }
     }

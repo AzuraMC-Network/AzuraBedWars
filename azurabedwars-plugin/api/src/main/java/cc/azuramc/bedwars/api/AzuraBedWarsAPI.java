@@ -57,12 +57,32 @@ public final class AzuraBedWarsAPI {
     }
 
     /**
+     * 输出 warn 级别日志（附带异常堆栈）
+     *
+     * @param message   日志内容
+     * @param throwable 异常
+     */
+    public static void warn(String message, Throwable throwable) {
+        provider().warn(message, throwable);
+    }
+
+    /**
      * 输出 error 级别日志
      *
      * @param message 日志内容
      */
     public static void error(String message) {
         provider().error(message);
+    }
+
+    /**
+     * 输出 error 级别日志（附带异常堆栈）
+     *
+     * @param message   日志内容
+     * @param throwable 异常
+     */
+    public static void error(String message, Throwable throwable) {
+        provider().error(message, throwable);
     }
 
     /**
@@ -92,7 +112,11 @@ public final class AzuraBedWarsAPI {
 
         void warn(String message);
 
+        void warn(String message, Throwable throwable);
+
         void error(String message);
+
+        void error(String message, Throwable throwable);
 
         void debug(String message);
     }
