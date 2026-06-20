@@ -655,8 +655,10 @@ public class GameManager implements IGameManager {
             GameTeam lowest = getLowestTeam();
 
             // 尝试将整个队伍放入同一游戏团队
+            // 按 UUID 重新解析为当前在线实例，避免重连后 party 里残留的陈旧 GamePlayer 实例
             List<GamePlayer> unassignedPlayers = gameParty.getPlayers().stream()
-                    .filter(player -> player.getGameTeam() == null)
+                    .map(player -> GamePlayer.get(player.getUuid()))
+                    .filter(player -> player != null && player.getGameTeam() == null)
                     .toList();
 
             for (GamePlayer gamePlayer : unassignedPlayers) {
