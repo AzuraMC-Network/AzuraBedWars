@@ -23,7 +23,7 @@ public class TabListListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerStateChange(BedwarsPlayerStateChangeEvent.Post event) {
+    public void onPlayerStateChange(BedwarsPlayerStateChangeEvent event) {
         tabListManager.updateAllTabListNames();
     }
 

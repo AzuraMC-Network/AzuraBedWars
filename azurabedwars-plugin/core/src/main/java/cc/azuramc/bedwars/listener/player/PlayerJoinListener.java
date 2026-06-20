@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.ReconnectState;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -29,8 +30,9 @@ public class PlayerJoinListener implements Listener {
             gamePlayer = GamePlayer.create(player);
         }
 
-        // 如果是正在运行的游戏且玩家有团队，允许重连
-        if (gameManager.getGameState() == GameState.RUNNING && gamePlayer.getGameTeam() != null) {
+        // 如果是正在运行的游戏且玩家有团队或有断线快照，允许重连
+        if (gameManager.getGameState() == GameState.RUNNING
+                && (gamePlayer.getGameTeam() != null || gameManager.hasReconnectState(player.getUniqueId()))) {
             event.allow();
             return;
         }
@@ -72,6 +74,12 @@ public class PlayerJoinListener implements Listener {
         if (gamePlayer == null) {
             player.kickPlayer("玩家异常状态");
             return;
+        }
+
+        // 重连：恢复断线快照（队伍 + 本局状态） 使后续重连判定/恢复生效
+        ReconnectState reconnectState = gameManager.takeReconnectState(player.getUniqueId());
+        if (reconnectState != null) {
+            reconnectState.restoreTo(gamePlayer, gameManager);
         }
 
         FastBoard board = new FastBoard(player);

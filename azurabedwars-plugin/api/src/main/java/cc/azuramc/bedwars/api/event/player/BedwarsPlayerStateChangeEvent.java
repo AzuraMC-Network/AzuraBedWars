@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.api.event.player;
 
 import cc.azuramc.bedwars.api.game.IGameManager;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
-import org.bukkit.event.Cancellable;
+import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
@@ -12,10 +12,27 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author an5w1r@163.com
  */
-public abstract class BedwarsPlayerStateChangeEvent extends Event {
+@Getter
+public class BedwarsPlayerStateChangeEvent extends Event {
 
+    private static final HandlerList HANDLERS = new HandlerList();
+
+    /**
+     * 游戏管理器
+     */
+    @NotNull
     private final IGameManager gameManager;
+
+    /**
+     * 状态变化的玩家
+     */
+    @NotNull
     private final IGamePlayer gamePlayer;
+
+    /**
+     * 状态变化类型
+     */
+    @NotNull
     private final StateChangeType stateChangeType;
 
     /**
@@ -23,7 +40,7 @@ public abstract class BedwarsPlayerStateChangeEvent extends Event {
      * @param gamePlayer      状态变化的玩家
      * @param stateChangeType 状态变化类型
      */
-    protected BedwarsPlayerStateChangeEvent(
+    public BedwarsPlayerStateChangeEvent(
             @NotNull IGameManager gameManager,
             @NotNull IGamePlayer gamePlayer,
             @NotNull StateChangeType stateChangeType
@@ -33,98 +50,14 @@ public abstract class BedwarsPlayerStateChangeEvent extends Event {
         this.stateChangeType = stateChangeType;
     }
 
-    /**
-     * 获取游戏管理器
-     *
-     * @return 游戏管理器（不为 null）
-     */
     @NotNull
-    public IGameManager getGameManager() {
-        return gameManager;
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 
-    /**
-     * 获取状态变化的玩家
-     *
-     * @return 玩家（不为 null）
-     */
-    @NotNull
-    public IGamePlayer getGamePlayer() {
-        return gamePlayer;
-    }
-
-    /**
-     * 获取状态变化类型
-     *
-     * @return 状态变化类型（不为 null）
-     */
-    @NotNull
-    public StateChangeType getStateChangeType() {
-        return stateChangeType;
-    }
-
-    /**
-     * 状态变化「之前」触发，可取消以阻止状态变化。
-     */
-    public static final class Pre extends BedwarsPlayerStateChangeEvent implements Cancellable {
-
-        private static final HandlerList HANDLERS = new HandlerList();
-
-        private boolean cancelled = false;
-
-        public Pre(
-                @NotNull IGameManager gameManager,
-                @NotNull IGamePlayer gamePlayer,
-                @NotNull StateChangeType stateChangeType
-        ) {
-            super(gameManager, gamePlayer, stateChangeType);
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return cancelled;
-        }
-
-        @Override
-        public void setCancelled(boolean cancelled) {
-            this.cancelled = cancelled;
-        }
-
-        @NotNull
-        public static HandlerList getHandlerList() {
-            return HANDLERS;
-        }
-
-        @Override
-        public @NotNull HandlerList getHandlers() {
-            return HANDLERS;
-        }
-    }
-
-    /**
-     * 状态变化「之后」触发，用于通知。
-     */
-    public static final class Post extends BedwarsPlayerStateChangeEvent {
-
-        private static final HandlerList HANDLERS = new HandlerList();
-
-        public Post(
-                @NotNull IGameManager gameManager,
-                @NotNull IGamePlayer gamePlayer,
-                @NotNull StateChangeType stateChangeType
-        ) {
-            super(gameManager, gamePlayer, stateChangeType);
-        }
-
-        @NotNull
-        public static HandlerList getHandlerList() {
-            return HANDLERS;
-        }
-
-        @Override
-        public @NotNull HandlerList getHandlers() {
-            return HANDLERS;
-        }
+    @Override
+    public @NotNull HandlerList getHandlers() {
+        return HANDLERS;
     }
 
     /**

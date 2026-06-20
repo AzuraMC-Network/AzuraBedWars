@@ -191,6 +191,18 @@ public class GamePlayer implements IGamePlayer {
     }
 
     /**
+     * 从在线集合中移除指定玩家
+     * <p>玩家退出时调用，使 GamePlayer 的生命周期与「在线」一致——
+     * 任何存活的 GamePlayer 都对应在线玩家，{@link #getPlayer()} 因而恒为非 null。
+     * 重连所需的本局状态由 {@link ReconnectState} 单独保存。
+     *
+     * @param uuid 玩家 UUID
+     */
+    public static void remove(@NotNull UUID uuid) {
+        GAME_PLAYERS.remove(uuid);
+    }
+
+    /**
      * 获取所有游戏玩家
      *
      * @return 游戏玩家列表（不为null）
@@ -881,16 +893,9 @@ public class GamePlayer implements IGamePlayer {
         }
         GameManager gameManager = team.getGameManager();
 
-        BedwarsPlayerStateChangeEvent.Pre preEvent = new BedwarsPlayerStateChangeEvent.Pre(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR);
-        Bukkit.getPluginManager().callEvent(preEvent);
-        if (preEvent.isCancelled()) {
-            return;
-        }
-
         this.isSpectator = spectator;
 
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent.Post(
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
                 gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR));
     }
 
@@ -904,16 +909,9 @@ public class GamePlayer implements IGamePlayer {
         }
         GameManager gameManager = team.getGameManager();
 
-        BedwarsPlayerStateChangeEvent.Pre preEvent = new BedwarsPlayerStateChangeEvent.Pre(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING);
-        Bukkit.getPluginManager().callEvent(preEvent);
-        if (preEvent.isCancelled()) {
-            return;
-        }
-
         this.isRespawning = respawning;
 
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent.Post(
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
                 gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING));
     }
 
@@ -927,16 +925,9 @@ public class GamePlayer implements IGamePlayer {
         }
         GameManager gameManager = team.getGameManager();
 
-        BedwarsPlayerStateChangeEvent.Pre preEvent = new BedwarsPlayerStateChangeEvent.Pre(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE);
-        Bukkit.getPluginManager().callEvent(preEvent);
-        if (preEvent.isCancelled()) {
-            return;
-        }
-
         this.isInvisible = invisible;
 
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent.Post(
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
                 gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE));
     }
 
@@ -950,16 +941,9 @@ public class GamePlayer implements IGamePlayer {
         }
         GameManager gameManager = team.getGameManager();
 
-        BedwarsPlayerStateChangeEvent.Pre preEvent = new BedwarsPlayerStateChangeEvent.Pre(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT);
-        Bukkit.getPluginManager().callEvent(preEvent);
-        if (preEvent.isCancelled()) {
-            return;
-        }
-
         this.isReconnect = reconnect;
 
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent.Post(
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
                 gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT));
     }
 

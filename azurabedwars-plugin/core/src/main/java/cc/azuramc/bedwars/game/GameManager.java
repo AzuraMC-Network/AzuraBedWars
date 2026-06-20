@@ -99,6 +99,11 @@ public class GameManager implements IGameManager {
     private List<GamePlayer> allInGamePlayers;
 
     /**
+     * 断线玩家的重连快照（按 UUID）。玩家断线时存入、重连时取出并清除、游戏结束时清空。
+     */
+    private final Map<UUID, ReconnectState> reconnectStates = new HashMap<>();
+
+    /**
      * 创建一个新的游戏实例
      *
      * @param plugin 插件主类实例
@@ -506,6 +511,49 @@ public class GameManager implements IGameManager {
         // 处理玩家离开对团队的影响
         handleTeamPlayerLeave(gamePlayer, gameTeam);
         allInGamePlayers.remove(gamePlayer);
+    }
+
+    /**
+     * 判断断线玩家是否可重连（游戏进行中、非旁观、且有队伍）。
+     * 床是否仍在由重连时再判定（无床则以旁观者身份回归）。
+     *
+     * @param gamePlayer 游戏玩家
+     * @return 可重连返回 true
+     */
+    public boolean isReconnectable(GamePlayer gamePlayer) {
+        return gameState == GameState.RUNNING
+                && !gamePlayer.isSpectator()
+                && gamePlayer.getGameTeam() != null;
+    }
+
+    /**
+     * 抓取断线玩家的重连快照并暂存
+     *
+     * @param gamePlayer 断线的玩家
+     */
+    public void saveReconnectState(GamePlayer gamePlayer) {
+        reconnectStates.put(gamePlayer.getUuid(), new ReconnectState(gamePlayer));
+    }
+
+    /**
+     * 是否存在指定玩家的重连快照（仅查询，不移除）
+     *
+     * @param uuid 玩家 UUID
+     * @return 存在返回 true
+     */
+    public boolean hasReconnectState(UUID uuid) {
+        return reconnectStates.containsKey(uuid);
+    }
+
+    /**
+     * 取出并移除指定玩家的重连快照
+     *
+     * @param uuid 玩家 UUID
+     * @return 重连快照，不存在时为 null
+     */
+    @org.jetbrains.annotations.Nullable
+    public ReconnectState takeReconnectState(UUID uuid) {
+        return reconnectStates.remove(uuid);
     }
 
     /**
