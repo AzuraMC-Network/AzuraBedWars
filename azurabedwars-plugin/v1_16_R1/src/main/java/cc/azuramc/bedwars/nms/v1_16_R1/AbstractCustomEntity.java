@@ -1,7 +1,9 @@
 package cc.azuramc.bedwars.nms.v1_16_R1;
 
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
+
+import cc.azuramc.bedwars.api.game.IGamePlayer;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import net.minecraft.server.v1_16_R1.*;
@@ -22,9 +24,9 @@ public abstract class AbstractCustomEntity {
 
     protected EntityInsentient entityInsentient;
     protected EntityCreature entityCreature;
-    protected GameTeam gameTeam;
+    protected IGameTeam gameTeam;
 
-    protected AbstractCustomEntity(EntityInsentient entityInsentient, GameTeam gameTeam) {
+    protected AbstractCustomEntity(EntityInsentient entityInsentient, IGameTeam gameTeam) {
         if (entityInsentient == null || gameTeam == null) {
             return;
         }
@@ -72,7 +74,7 @@ public abstract class AbstractCustomEntity {
             return false;
         }
 
-        GamePlayer gamePlayer = GamePlayer.get(human.getBukkitEntity().getUniqueId());
+        IGamePlayer gamePlayer = AzuraBedWarsAPI.getPlayer(human.getBukkitEntity().getUniqueId());
         if (gamePlayer == null) {
             return false;
         }

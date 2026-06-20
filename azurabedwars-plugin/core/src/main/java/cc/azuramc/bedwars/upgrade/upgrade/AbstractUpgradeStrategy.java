@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
@@ -102,7 +103,11 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         }
 
         // 使用UpgradeManager作为同步锁确保升级操作的原子性
-        synchronized (gamePlayer.getGameTeam().getUpgradeManager()) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
+        synchronized (gameTeam.getUpgradeManager()) {
             // 再次检查是否可以升级
             if (!canUpgrade(gamePlayer)) {
                 return false;

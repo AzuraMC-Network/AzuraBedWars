@@ -107,6 +107,9 @@ public class PlayerMiscListener implements Listener {
         player.setMetadata("等待上一次求救", new FixedMetadataValue(AzuraBedWars.getInstance(), ""));
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
 
         new BukkitRunnable() {
             int i = 0;

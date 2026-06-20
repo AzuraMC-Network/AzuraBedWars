@@ -41,31 +41,37 @@ allprojects {
     }
 
     group = 'cc.azuramc'
-    version = '1.0.0-beta.10'
+    version = '1.0.0-beta.11'
 }
 
 subprojects {
     apply plugin: 'java'
 
     def targetJavaVersion = 21
+    def buildJdkVersion = 25
     java {
-        def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-        if (JavaVersion.current() < javaVersion) {
-            toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-        }
+        toolchain.languageVersion = JavaLanguageVersion.of(buildJdkVersion)
+    }
+    tasks.withType(JavaCompile).configureEach {
+        options.release.set(targetJavaVersion)
+        options.fork = true
+        options.forkOptions.memoryMaximumSize = '1536m'
     }
 
     dependencies {
         compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-        compileOnly "org.jetbrains:annotations:26.0.2-1"
-        compileOnly "org.projectlombok:lombok:1.18.34"
-        annotationProcessor "org.projectlombok:lombok:1.18.34"
+        compileOnly "org.jetbrains:annotations:+"
+        compileOnly "org.projectlombok:lombok:1.18.+"
+        annotationProcessor "org.projectlombok:lombok:1.18.+"
+
+        if (project.path != ':azurabedwars-plugin:api') {
+            compileOnly project(':azurabedwars-plugin:api')
+        }
     }
 }
 
 dependencies {
+    implementation project(':azurabedwars-plugin:api')
     implementation project(':azurabedwars-plugin:core')
     implementation project(':azurabedwars-plugin:1_8_R3')
     implementation project(':azurabedwars-plugin:1_9_R1')
@@ -102,6 +108,7 @@ dependencies {
 }
 
 shadowJar {
+    archiveFileName = 'azurabedwars-plugin-' + version + ".jar"
     archiveVersion.set(version.toString())
 }
 

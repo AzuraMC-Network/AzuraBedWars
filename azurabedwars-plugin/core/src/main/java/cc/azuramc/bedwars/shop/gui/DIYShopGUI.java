@@ -111,7 +111,7 @@ public class DIYShopGUI extends CustomGUI {
         Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(playerData);
 
         // 获取DefaultShopPage作为默认物品来源
-        ShopData defaultShopData = ShopManager.getSHOPS().get(0);
+        ShopData defaultShopData = ShopManager.getSHOPS().getFirst();
         List<ShopItemType> defaultItems = defaultShopData.getShopItems();
 
         // 遍历所有可用槽位

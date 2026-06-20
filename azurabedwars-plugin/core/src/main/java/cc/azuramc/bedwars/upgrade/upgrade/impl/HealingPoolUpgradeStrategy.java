@@ -35,12 +35,20 @@ public class HealingPoolUpgradeStrategy extends AbstractUpgradeStrategy {
 
     @Override
     public boolean canUpgrade(GamePlayer gamePlayer) {
-        return !gamePlayer.getGameTeam().getUpgradeManager().hasHealPoolUpgrade();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
+        return !gameTeam.getUpgradeManager().hasHealPoolUpgrade();
     }
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().getUpgradeManager().hasHealPoolUpgrade() ? 1 : 0;
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return 0;
+        }
+        return gameTeam.getUpgradeManager().hasHealPoolUpgrade() ? 1 : 0;
     }
 
     @Override
@@ -57,7 +65,11 @@ public class HealingPoolUpgradeStrategy extends AbstractUpgradeStrategy {
     public List<String> getUpgradeLore(GamePlayer gamePlayer, GameModeType gameModeType) {
         List<String> lore = new ArrayList<>();
 
-        boolean isUnlocked = gamePlayer.getGameTeam().getUpgradeManager().hasHealPoolUpgrade();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return List.of();
+        }
+        boolean isUnlocked = gameTeam.getUpgradeManager().hasHealPoolUpgrade();
 
         if (!isUnlocked) {
             int price = getUpgradePrice(0);
@@ -79,6 +91,9 @@ public class HealingPoolUpgradeStrategy extends AbstractUpgradeStrategy {
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
         gameTeam.getUpgradeManager().setHealPoolUpgrade(true);
 
         return true;

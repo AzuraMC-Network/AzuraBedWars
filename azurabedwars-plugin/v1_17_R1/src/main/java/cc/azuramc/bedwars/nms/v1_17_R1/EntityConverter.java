@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.nms.v1_17_R1;
 
-import cc.azuramc.bedwars.util.LoggerUtil;
+import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
 import net.minecraft.world.entity.EntityInsentient;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -37,14 +37,14 @@ public class EntityConverter {
      */
     public static EntityInsentient bukkitToNms(Entity bukkitEntity) {
         if (!(bukkitEntity instanceof CraftEntity craftEntity)) {
-            LoggerUtil.warn("实体不是CraftEntity类型: " + bukkitEntity.getClass().getSimpleName());
+            AzuraBedWarsAPI.warn("实体不是CraftEntity类型: " + bukkitEntity.getClass().getSimpleName());
             return null;
         }
 
         net.minecraft.world.entity.Entity nmsEntity = craftEntity.getHandle();
 
         if (!(nmsEntity instanceof EntityInsentient)) {
-            LoggerUtil.warn("NMS实体不是EntityInsentient类型: " + nmsEntity.getClass().getSimpleName());
+            AzuraBedWarsAPI.warn("NMS实体不是EntityInsentient类型: " + nmsEntity.getClass().getSimpleName());
             return null;
         }
 
@@ -63,8 +63,7 @@ public class EntityConverter {
             Entity bukkitEntity = spawnBukkitEntity(location, entityType);
             return bukkitToNms(bukkitEntity);
         } catch (Exception e) {
-            LoggerUtil.error("生成并转换实体失败: " + e.getMessage());
-            e.printStackTrace();
+            AzuraBedWarsAPI.error("生成并转换实体失败", e);
             return null;
         }
     }

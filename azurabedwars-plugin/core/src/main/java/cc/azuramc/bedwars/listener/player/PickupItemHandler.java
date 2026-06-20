@@ -2,10 +2,7 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.*;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -85,7 +82,11 @@ public class PickupItemHandler {
         }
 
         // 添加锋利附魔
-        if (gamePlayer.getGameTeam().getUpgradeManager().hasSharpnessUpgrade()) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
+        if (gameTeam.getUpgradeManager().hasSharpnessUpgrade()) {
             if (XEnchantment.SHARPNESS.get() != null) {
                 itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
             }
@@ -189,10 +190,14 @@ public class PickupItemHandler {
      */
     private static void handleTeamIngotPickup(GamePlayer gamePlayer, ItemStack itemStack, int xp) {
         Player player = gamePlayer.getPlayer();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
         for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
             if (entity instanceof Player players) {
                 // 只有队员可以捡起
-                if (!gamePlayer.getGameTeam().getGamePlayers().contains(GamePlayer.get(players))) {
+                if (!gameTeam.getGamePlayers().contains(GamePlayer.get(players))) {
                     return;
                 }
 

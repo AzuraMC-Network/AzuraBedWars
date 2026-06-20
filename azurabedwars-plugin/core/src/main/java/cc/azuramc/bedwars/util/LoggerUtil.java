@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * @author An5w1r
@@ -23,8 +24,16 @@ public class LoggerUtil {
         Bukkit.getLogger().warning(LOGGER_PREFIX + message);
     }
 
+    public static void warn(String message, Throwable throwable) {
+        Bukkit.getLogger().log(Level.WARNING, LOGGER_PREFIX + message, throwable);
+    }
+
     public static void error(String message) {
         Bukkit.getLogger().severe(LOGGER_PREFIX + message);
+    }
+
+    public static void error(String message, Throwable throwable) {
+        Bukkit.getLogger().log(Level.SEVERE, LOGGER_PREFIX + message, throwable);
     }
 
     public static void debug(String message) {

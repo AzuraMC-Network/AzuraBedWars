@@ -107,55 +107,16 @@ public class YamlSerializer {
         if (value == null) {
             return "null";
         }
-        if (value instanceof String str) {
-            if (needsQuotes(str)) {
-                return "\"" + escapeString(str) + "\"";
-            }
-            return str;
-        }
         if (value instanceof Boolean || value instanceof Number) {
             return value.toString();
         }
         String str = value.toString();
-        if (needsQuotes(str)) {
-            return "\"" + escapeString(str) + "\"";
-        }
-        return str;
+        return "\"" + escapeString(str) + "\"";
     }
 
-    private boolean needsQuotes(String str) {
-        if (str.isEmpty()) {
-            return true;
-        }
-        if (str.contains(":") ||
-                str.contains("#") ||
-                str.contains("\"") ||
-                str.contains("'") ||
-                str.contains("\n") ||
-                str.contains("\r") ||
-                str.startsWith(" ") ||
-                str.endsWith(" ") ||
-                str.startsWith("-") ||
-                str.startsWith("[") ||
-                str.startsWith("{") ||
-                str.equals("true") ||
-                str.equals("false") ||
-                str.equals("null") ||
-                str.equals("yes") ||
-                str.equals("no") ||
-                str.equals("on") ||
-                str.equals("off")
-        ) {
-            return true;
-        }
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch (NumberFormatException ignored) {
-        }
-        return false;
-    }
-
+    /**
+     * 转义后的字符串，保存YAML时必须使用双引号解析而不可使用单引号，否则不解析转义
+     */
     private String escapeString(String str) {
         return str.replace("\\", "\\\\")
                 .replace("\"", "\\\"")

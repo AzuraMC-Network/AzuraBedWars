@@ -35,7 +35,11 @@ public class FallingProtectionUpgradeStrategy extends AbstractTieredUpgradeStrat
 
     @Override
     public int getCurrentLevel(GamePlayer gamePlayer) {
-        return gamePlayer.getGameTeam().getUpgradeManager().getFallingProtectionUpgrade();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return 0;
+        }
+        return gameTeam.getUpgradeManager().getFallingProtectionUpgrade();
     }
 
     @Override
@@ -51,6 +55,9 @@ public class FallingProtectionUpgradeStrategy extends AbstractTieredUpgradeStrat
     @Override
     protected boolean doUpgrade(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return false;
+        }
         int currentLevel = gameTeam.getUpgradeManager().getFallingProtectionUpgrade();
         int nextLevel = currentLevel + 1;
 

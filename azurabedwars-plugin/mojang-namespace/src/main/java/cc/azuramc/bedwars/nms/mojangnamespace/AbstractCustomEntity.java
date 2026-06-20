@@ -1,7 +1,9 @@
 package cc.azuramc.bedwars.nms.mojangnamespace;
 
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
+
+import cc.azuramc.bedwars.api.game.IGamePlayer;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import lombok.Getter;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,9 +27,9 @@ public abstract class AbstractCustomEntity {
 
     protected Mob mob;
     protected PathfinderMob pathfinderMob;
-    protected GameTeam gameTeam;
+    protected IGameTeam gameTeam;
 
-    protected AbstractCustomEntity(Mob mob, GameTeam gameTeam) {
+    protected AbstractCustomEntity(Mob mob, IGameTeam gameTeam) {
         if (mob == null || gameTeam == null) {
             return;
         }
@@ -69,7 +71,7 @@ public abstract class AbstractCustomEntity {
             return false;
         }
 
-        GamePlayer gamePlayer = GamePlayer.get(human.getBukkitEntity().getUniqueId());
+        IGamePlayer gamePlayer = AzuraBedWarsAPI.getPlayer(human.getBukkitEntity().getUniqueId());
         return !gameTeam.isInTeam(gamePlayer) && !gamePlayer.isSpectator();
     }
 

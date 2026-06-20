@@ -379,7 +379,11 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 阻止队友伤害
-        if (gamePlayer.getGameTeam().isInTeam(attackPlayer)) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
+        if (gameTeam.isInTeam(attackPlayer)) {
             event.setCancelled(true);
             return;
         }
@@ -438,7 +442,11 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 阻止队友的投掷物伤害
-        if (gamePlayer.getGameTeam().isInTeam(attackerPlayer)) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
+        if (gameTeam.isInTeam(attackerPlayer)) {
             event.setCancelled(true);
             return;
         }

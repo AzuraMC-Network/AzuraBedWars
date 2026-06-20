@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.api.event.bed.BedwarsDestroyBedEvent;
+import cc.azuramc.bedwars.api.event.bed.BedwarsBedDestroyEvent;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -67,6 +67,13 @@ public class BedBreakHandler {
      */
     private static void processBedDestruction(GamePlayer gamePlayer, GameTeam gameTeam, GameTeam targetTeam) {
 
+        // 触发床被破坏前置事件（可取消以阻止破坏）
+        BedwarsBedDestroyEvent.Pre preEvent = new BedwarsBedDestroyEvent.Pre(gamePlayer, targetTeam, GAME_MANAGER);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
+            return;
+        }
+
         // 更新团队状态
         targetTeam.setDestroyPlayer(gamePlayer);
         targetTeam.setDestroyed(true);
@@ -74,18 +81,18 @@ public class BedBreakHandler {
         // 更新玩家统计数据
         gamePlayer.getPlayerData().addDestroyedBeds();
 
-        // 触发床被破坏事件
+        // 触发床被破坏后置事件（通知，含可定制广播文本）
         String message = "&f&l床被破坏 >>> " + targetTeam.getChatColor() + targetTeam.getName() + " 的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + " 破坏";
         String title = "§c§l床被摧毁";
         String subTitle = "§c死亡将无法复活";
-        BedwarsDestroyBedEvent apiEvent = new BedwarsDestroyBedEvent(gamePlayer, targetTeam, GAME_MANAGER, message, title, subTitle);
-        Bukkit.getPluginManager().callEvent(apiEvent);
+        BedwarsBedDestroyEvent.Post postEvent = new BedwarsBedDestroyEvent.Post(gamePlayer, targetTeam, GAME_MANAGER, message, title, subTitle);
+        Bukkit.getPluginManager().callEvent(postEvent);
 
         // 奖励金币
         rewardBedDestruction(gamePlayer);
 
         // 广播消息
-        broadcastBedDestructionMessages(apiEvent);
+        broadcastBedDestructionMessages(postEvent);
     }
 
     /**
@@ -120,7 +127,7 @@ public class BedBreakHandler {
      *
      * @param event 床被破坏事件
      */
-    private static void broadcastBedDestructionMessages(BedwarsDestroyBedEvent event) {
+    private static void broadcastBedDestructionMessages(BedwarsBedDestroyEvent.Post event) {
         // 播放全局音效
         GAME_MANAGER.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 10, 10);
 

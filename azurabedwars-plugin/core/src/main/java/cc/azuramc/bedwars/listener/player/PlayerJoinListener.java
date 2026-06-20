@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.ReconnectState;
 import fr.mrmicky.fastboard.FastBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -24,13 +25,11 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player);
-        if (gamePlayer == null) {
-            gamePlayer = GamePlayer.create(player);
-        }
 
-        // 如果是正在运行的游戏且玩家有团队，允许重连
-        if (gameManager.getGameState() == GameState.RUNNING && gamePlayer.getGameTeam() != null) {
+        // 正在运行的游戏：有断线快照则允许重连。
+        // 注意 登录阶段不创建 GamePlayer 否则被拒登录的玩家不会触发 Quit 事件
+        if (gameManager.getGameState() == GameState.RUNNING
+                && gameManager.hasReconnectState(player.getUniqueId())) {
             event.allow();
             return;
         }
@@ -70,8 +69,14 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
         if (gamePlayer == null) {
-            player.kickPlayer("玩家异常状态");
-            return;
+            // 登录成功后才创建 GamePlayer，保证 GAME_PLAYERS 只含真正进服的在线玩家
+            gamePlayer = GamePlayer.create(player);
+        }
+
+        // 重连：恢复断线快照（队伍 + 本局状态） 使后续重连判定/恢复生效
+        ReconnectState reconnectState = gameManager.takeReconnectState(player.getUniqueId());
+        if (reconnectState != null) {
+            reconnectState.restoreTo(gamePlayer, gameManager);
         }
 
         FastBoard board = new FastBoard(player);
@@ -99,7 +104,7 @@ public class PlayerJoinListener implements Listener {
      * 监听游戏加载事件，设置服务器最大玩家数限制
      */
     @EventHandler
-    public void onGameLoading(BedwarsGameLoadEvent event) {
+    public void onGameLoading(BedwarsGameLoadEvent.Post event) {
         // 根据游戏最大玩家数设置服务器人数上限
         serverMaxPlayers = event.getGameManager().getMaxPlayers();
     }

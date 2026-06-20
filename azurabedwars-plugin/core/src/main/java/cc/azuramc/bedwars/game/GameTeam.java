@@ -1,5 +1,7 @@
 package cc.azuramc.bedwars.game;
 
+import cc.azuramc.bedwars.api.game.IGamePlayer;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.GUIData;
@@ -31,7 +33,7 @@ import java.util.Objects;
 @Data
 // it is preventing stack overflow error
 @ToString(exclude = {"gameManager", "upgradeManager", "trapManager"})
-public class GameTeam {
+public class GameTeam implements IGameTeam {
     /**
      * 搜索床的范围
      */
@@ -202,7 +204,7 @@ public class GameTeam {
      * @param gamePlayer 要检查的玩家
      * @return 如果玩家在团队中返回true，否则返回false
      */
-    public boolean isInTeam(@Nullable GamePlayer gamePlayer) {
+    public boolean isInTeam(@Nullable IGamePlayer gamePlayer) {
         if (gamePlayer == null) {
             return false;
         }

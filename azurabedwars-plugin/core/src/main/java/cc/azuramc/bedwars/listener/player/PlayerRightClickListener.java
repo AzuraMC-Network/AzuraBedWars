@@ -45,6 +45,9 @@ public class PlayerRightClickListener implements Listener {
         }
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
 
         if (event.getAction() == Action.PHYSICAL) {
             event.setCancelled(true);

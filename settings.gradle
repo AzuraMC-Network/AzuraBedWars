@@ -4,6 +4,7 @@ include (
         'azurabedwars-loader',
         'azurabedwars-plugin',
         'azurabedwars-plugin:core',
+        'azurabedwars-plugin:api',
         'azurabedwars-plugin:1_8_R3',
         'azurabedwars-plugin:1_9_R1',
         'azurabedwars-plugin:1_9_R2',

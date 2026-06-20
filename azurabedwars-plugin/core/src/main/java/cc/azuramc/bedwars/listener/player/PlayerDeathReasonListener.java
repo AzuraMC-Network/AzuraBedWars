@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.listener.player;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.util.DamageUtil;
 import lombok.Setter;
 import org.bukkit.entity.Player;
@@ -120,10 +121,14 @@ public class PlayerDeathReasonListener implements Listener {
 
         String finalKillStr = isFinalKill ? "&b&l[最终击杀]" : "";
         String mainColor = isFinalKill ? "&f" : "&7";
+        GameTeam deadTeam = gamePlayer.getGameTeam();
+        if (deadTeam == null) {
+            return;
+        }
         String deadDisplayName =
-                gamePlayer.getGameTeam().getChatColor()
+                deadTeam.getChatColor()
                         + "["
-                        + gamePlayer.getGameTeam().getName()
+                        + deadTeam.getName()
                         + "] "
                         + gamePlayer.getNickName();
 
@@ -139,9 +144,13 @@ public class PlayerDeathReasonListener implements Listener {
             gameManager.broadcastMessage(getRandomBroadcast(cause, null, deadDisplayName, mainColor, finalKillStr));
         } else {
             int killerHeart = Math.round((float) killer.getHealth());
+            GameTeam killerTeam = gameKiller.getGameTeam();
+            if (killerTeam == null) {
+                return;
+            }
             String killerDisplayName =
-                    gameKiller.getGameTeam().getChatColor()
-                            + "[" + gameKiller.getGameTeam().getName() + "] "
+                    killerTeam.getChatColor()
+                            + "[" + killerTeam.getName() + "] "
                             + gameKiller.getNickName()
                             + "&c " + killerHeart + "❤&r";
             gameManager.broadcastMessage(getRandomBroadcast(cause, killerDisplayName, deadDisplayName, mainColor, finalKillStr));

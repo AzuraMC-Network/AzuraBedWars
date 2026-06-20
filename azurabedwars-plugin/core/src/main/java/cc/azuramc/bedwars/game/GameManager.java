@@ -4,6 +4,8 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerReconnectEvent;
+import cc.azuramc.bedwars.api.game.IGameManager;
+import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
@@ -31,8 +33,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 游戏管理核心类
@@ -44,7 +48,7 @@ import java.util.*;
  * @author an5w1r@163.com
  */
 @Data
-public class GameManager {
+public class GameManager implements IGameManager {
 
     private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
     private ItemConfig.GameManager itemConfig;
@@ -93,7 +97,10 @@ public class GameManager {
 
     private TabListManager tabListManager;
 
-    private List<GamePlayer> allInGamePlayers;
+    /**
+     * 断线玩家的重连快照（按 UUID）。玩家断线时存入、重连时取出并清除、游戏结束时清空。
+     */
+    private final Map<UUID, ReconnectState> reconnectStates = new ConcurrentHashMap<>();
 
     /**
      * 创建一个新的游戏实例
@@ -115,7 +122,6 @@ public class GameManager {
 
         this.tabListManager = new TabListManager(this);
         Bukkit.getPluginManager().registerEvents(new TabListListener(tabListManager), plugin);
-        this.allInGamePlayers = new ArrayList<>();
     }
 
     private void initializeConfigs() {
@@ -154,12 +160,15 @@ public class GameManager {
             return;
         }
 
-        // call event
-        BedwarsGameLoadEvent event = new BedwarsGameLoadEvent(this, mapData);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
+        // 触发游戏加载前置事件（可取消以阻止加载）
+        BedwarsGameLoadEvent.Pre preEvent = new BedwarsGameLoadEvent.Pre(this, mapData);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
             return;
         }
+
+        // 新一局加载时清空上一局遗留的重连快照，避免累积与跨局错误恢复
+        reconnectStates.clear();
 
         this.mapData = mapData;
         this.buildLimitHeight = mapData.getHigherY();
@@ -179,6 +188,9 @@ public class GameManager {
         this.gameState = GameState.WAITING;
         // 更新MOTD
         updateServerMOTD();
+
+        // 触发游戏加载完成后置事件
+        Bukkit.getPluginManager().callEvent(new BedwarsGameLoadEvent.Post(this, mapData));
     }
 
     /**
@@ -340,7 +352,6 @@ public class GameManager {
         handlePlayerJoinWaitingGame(gamePlayer);
 
         tabListManager.addToTab(gamePlayer);
-        allInGamePlayers.add(gamePlayer);
     }
 
     /**
@@ -435,13 +446,13 @@ public class GameManager {
         if (gamePlayer.getGameTeam() != null) {
             if (gamePlayer.getGameTeam().isHasBed()) {
                 // 触发玩家重连事件
-                BedwarsPlayerReconnectEvent reconnectEvent = new BedwarsPlayerReconnectEvent(
+                BedwarsPlayerReconnectEvent.Pre preEvent = new BedwarsPlayerReconnectEvent.Pre(
                         gamePlayer, gamePlayer.getGameTeam(), this
                 );
-                Bukkit.getPluginManager().callEvent(reconnectEvent);
+                Bukkit.getPluginManager().callEvent(preEvent);
 
                 // 检查事件是否被取消
-                if (reconnectEvent.isCancelled()) {
+                if (preEvent.isCancelled()) {
                     gamePlayer.getPlayer().kickPlayer("canceled reconnect by event");
                     return;
                 }
@@ -449,6 +460,10 @@ public class GameManager {
                 gamePlayer.setReconnect(true);
                 PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
                 broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
+
+                // 触发玩家重连完成后置事件
+                Bukkit.getPluginManager().callEvent(new BedwarsPlayerReconnectEvent.Post(
+                        gamePlayer, gamePlayer.getGameTeam(), this));
                 return;
             }
         }
@@ -495,7 +510,49 @@ public class GameManager {
 
         // 处理玩家离开对团队的影响
         handleTeamPlayerLeave(gamePlayer, gameTeam);
-        allInGamePlayers.remove(gamePlayer);
+    }
+
+    /**
+     * 判断断线玩家是否可重连（游戏进行中、非旁观、且有队伍）。
+     * 床是否仍在由重连时再判定（无床则以旁观者身份回归）。
+     *
+     * @param gamePlayer 游戏玩家
+     * @return 可重连返回 true
+     */
+    public boolean isReconnectable(GamePlayer gamePlayer) {
+        return gameState == GameState.RUNNING
+                && !gamePlayer.isSpectator()
+                && gamePlayer.getGameTeam() != null;
+    }
+
+    /**
+     * 抓取断线玩家的重连快照并暂存
+     *
+     * @param gamePlayer 断线的玩家
+     */
+    public void saveReconnectState(GamePlayer gamePlayer) {
+        reconnectStates.put(gamePlayer.getUuid(), new ReconnectState(gamePlayer));
+    }
+
+    /**
+     * 是否存在指定玩家的重连快照（仅查询，不移除）
+     *
+     * @param uuid 玩家 UUID
+     * @return 存在返回 true
+     */
+    public boolean hasReconnectState(UUID uuid) {
+        return reconnectStates.containsKey(uuid);
+    }
+
+    /**
+     * 取出并移除指定玩家的重连快照
+     *
+     * @param uuid 玩家 UUID
+     * @return 重连快照，不存在时为 null
+     */
+    @org.jetbrains.annotations.Nullable
+    public ReconnectState takeReconnectState(UUID uuid) {
+        return reconnectStates.remove(uuid);
     }
 
     /**
@@ -572,7 +629,7 @@ public class GameManager {
         return gameTeams.stream()
                 .filter(team -> !team.isFull())
                 .min(Comparator.comparingInt(team -> team.getGamePlayers().size()))
-                .orElse(gameTeams.get(0));
+                .orElse(gameTeams.getFirst());
     }
 
     /**
@@ -594,8 +651,10 @@ public class GameManager {
             GameTeam lowest = getLowestTeam();
 
             // 尝试将整个队伍放入同一游戏团队
+            // 按 UUID 重新解析为当前在线实例，避免重连后 party 里残留的陈旧 GamePlayer 实例
             List<GamePlayer> unassignedPlayers = gameParty.getPlayers().stream()
-                    .filter(player -> player.getGameTeam() == null)
+                    .map(player -> GamePlayer.get(player.getUuid()))
+                    .filter(player -> player != null && player.getGameTeam() == null)
                     .toList();
 
             for (GamePlayer gamePlayer : unassignedPlayers) {
@@ -700,7 +759,7 @@ public class GameManager {
      * @param stay     停留时间
      * @param fadeOut  淡出时间
      */
-    public void broadcastTeamTitle(GameTeam gameTeam, String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
+    public void broadcastTeamTitle(IGameTeam gameTeam, String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
         gameTeam.getAlivePlayers().forEach(gamePlayer ->
                 gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
@@ -711,7 +770,7 @@ public class GameManager {
      * @param gameTeam 目标团队
      * @param texts    消息文本
      */
-    public void broadcastTeamMessage(GameTeam gameTeam, String... texts) {
+    public void broadcastTeamMessage(IGameTeam gameTeam, String... texts) {
         gameTeam.getAlivePlayers().forEach(gamePlayer -> Arrays.stream(texts).forEach(gamePlayer::sendMessage));
         LoggerUtil.printChat(texts);
     }
@@ -722,7 +781,7 @@ public class GameManager {
      * @param gameTeam 目标团队
      * @param textList 消息文本
      */
-    public void broadcastTeamMessage(GameTeam gameTeam, List<String> textList) {
+    public void broadcastTeamMessage(IGameTeam gameTeam, List<String> textList) {
         gameTeam.getAlivePlayers().forEach(player -> textList.forEach(player::sendMessage));
         LoggerUtil.printChat(textList);
     }
@@ -735,7 +794,7 @@ public class GameManager {
      * @param volume   音量
      * @param pitch    音调
      */
-    public void broadcastTeamSound(GameTeam gameTeam, Sound sound, float volume, float pitch) {
+    public void broadcastTeamSound(IGameTeam gameTeam, Sound sound, float volume, float pitch) {
         gameTeam.getAlivePlayers().forEach(gamePlayer -> gamePlayer.playSound(sound, volume, pitch));
     }
 
@@ -858,6 +917,13 @@ public class GameManager {
      * 开始游戏
      */
     public void start() {
+        // 触发游戏开始前置事件（可取消以阻止开始）
+        BedwarsGameStartEvent.Pre preEvent = new BedwarsGameStartEvent.Pre(this);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
+            return;
+        }
+
         gameState = GameState.RUNNING;
         // 更新MOTD
         updateServerMOTD();
@@ -880,8 +946,8 @@ public class GameManager {
         // 注册团队升级任务
         registerTeamUpgradeCheckTask();
 
-        BedwarsGameStartEvent bedwarsGameStartEvent = new BedwarsGameStartEvent(this);
-        Bukkit.getPluginManager().callEvent(bedwarsGameStartEvent);
+        // 触发游戏开始完成后置事件
+        Bukkit.getPluginManager().callEvent(new BedwarsGameStartEvent.Post(this));
     }
 
     /**
@@ -953,12 +1019,13 @@ public class GameManager {
                 .toList();
 
         if (aliveTeams.size() == 1) {
-            return aliveTeams.get(0);
+            return aliveTeams.getFirst();
         }
 
         return null;
     }
 
+    @NotNull
     public List<GameTeam> getAliveTeams() {
         return gameTeams.stream()
                 .filter(team -> !team.isDead())

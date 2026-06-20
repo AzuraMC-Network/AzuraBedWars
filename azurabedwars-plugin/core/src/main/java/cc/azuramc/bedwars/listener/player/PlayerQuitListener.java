@@ -28,8 +28,16 @@ public class PlayerQuitListener implements Listener {
                 SpectatorManager.remove(gamePlayer);
             }
 
+            // 可重连则先抓断线快照
+            if (gameManager.isReconnectable(gamePlayer)) {
+                gameManager.saveReconnectState(gamePlayer);
+            }
+
             tabListManager.removePlayerFromTab(gamePlayer);
             gameManager.removePlayers(gamePlayer);
+
+            // 使 GamePlayer 生命周期与在线一致 退出即从在线集合移除
+            GamePlayer.remove(gamePlayer.getUuid());
         }
         AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
     }

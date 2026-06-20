@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.scoreboard;
 
-import cc.azuramc.bedwars.api.event.bed.BedwarsDestroyBedEvent;
+import cc.azuramc.bedwars.api.event.bed.BedwarsBedDestroyEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.game.GameManager;
@@ -158,7 +158,7 @@ public class ScoreboardManager implements Listener {
      * @param event 游戏开始事件
      */
     @EventHandler
-    public void onGameStart(BedwarsGameStartEvent event) {
+    public void onGameStart(BedwarsGameStartEvent.Post event) {
         switchBoardMode();
 
         Bukkit.getOnlinePlayers().forEach(player -> {
@@ -172,7 +172,7 @@ public class ScoreboardManager implements Listener {
     }
 
     @EventHandler
-    public void onBedDestroy(BedwarsDestroyBedEvent event) {
+    public void onBedDestroy(BedwarsBedDestroyEvent.Post event) {
         updateAllBoards();
     }
 

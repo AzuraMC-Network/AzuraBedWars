@@ -2,10 +2,7 @@ package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.TeamColor;
+import cc.azuramc.bedwars.game.*;
 import cc.azuramc.bedwars.popuptower.impl.TowerEast;
 import cc.azuramc.bedwars.popuptower.impl.TowerNorth;
 import cc.azuramc.bedwars.popuptower.impl.TowerSouth;
@@ -135,7 +132,11 @@ public class PlacementListener implements Listener {
         if (gamePlayer == null) {
             return;
         }
-        TeamColor color = gamePlayer.getGameTeam().getTeamColor();
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
+        TeamColor color = gameTeam.getTeamColor();
         double rotation = (player.getLocation().getYaw() - 90.0F) % 360.0F;
         if (rotation < 0.0D) {
             rotation += 360.0D;

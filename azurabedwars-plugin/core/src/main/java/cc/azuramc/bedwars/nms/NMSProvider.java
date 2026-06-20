@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.nms;
 
+import cc.azuramc.bedwars.api.nms.NMSAccess;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
@@ -61,9 +62,13 @@ public class NMSProvider {
         if (VersionUtil.getMajorNumber() >= 26) {
             return "mojangnamespace26_1";
         }
-        // Paper Mojang Namespace (1.20.5 ~ 25.x)
-        // CraftBukkit 在 25.x 发布后才舍弃 v1_XX_RX 的命名格式 此处用来兼容 Paper 从 1.20.5 到 25.x
+        // Paper Mojang Namespace (1.20.5 ~ 26.x)
+        // CraftBukkit 在 26.x 发布后才舍弃 v1_XX_RX 的命名格式 此处用来兼容 Paper 从 1.20.5 到 26.x
         // https://forums.papermc.io/threads/important-dev-psa-future-removal-of-cb-package-relocation.1106/
+        // 对于 Paper 1.21.11, 此时CraftBukkit还没有舍弃版本号包名, 但 Mojang 重构了 NMS, 特例处理
+        if (VersionUtil.getParsedVersion().equals("1.21.11")) {
+            return "mojangnamespace26_1";
+        }
         return "mojangnamespace";
     }
 }
