@@ -39,6 +39,8 @@ public class BlockBreakListener implements Listener {
 
             GameTeam gameTeam = gamePlayer.getGameTeam();
             if (gameTeam == null) {
+                // 无队伍的玩家（旁观/过渡态）不允许破坏方块，防止破坏世界
+                event.setCancelled(true);
                 return;
             }
 

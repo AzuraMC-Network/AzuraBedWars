@@ -25,14 +25,11 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player);
-        if (gamePlayer == null) {
-            gamePlayer = GamePlayer.create(player);
-        }
 
-        // 如果是正在运行的游戏且玩家有团队或有断线快照，允许重连
+        // 正在运行的游戏：有断线快照则允许重连。
+        // 注意 登录阶段不创建 GamePlayer 否则被拒登录的玩家不会触发 Quit 事件
         if (gameManager.getGameState() == GameState.RUNNING
-                && (gamePlayer.getGameTeam() != null || gameManager.hasReconnectState(player.getUniqueId()))) {
+                && gameManager.hasReconnectState(player.getUniqueId())) {
             event.allow();
             return;
         }
@@ -72,8 +69,8 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = GamePlayer.get(player);
         if (gamePlayer == null) {
-            player.kickPlayer("玩家异常状态");
-            return;
+            // 登录成功后才创建 GamePlayer，保证 GAME_PLAYERS 只含真正进服的在线玩家
+            gamePlayer = GamePlayer.create(player);
         }
 
         // 重连：恢复断线快照（队伍 + 本局状态） 使后续重连判定/恢复生效

@@ -54,7 +54,9 @@ public class ReconnectState {
         this.axeType = gamePlayer.getAxeType();
         this.shear = gamePlayer.isShear();
 
-        this.experienceSources = new HashMap<>(gamePlayer.getExperienceSources());
+        this.experienceSources = gamePlayer.getExperienceSources() != null
+                ? new HashMap<>(gamePlayer.getExperienceSources())
+                : new HashMap<>();
     }
 
     /**
@@ -82,6 +84,9 @@ public class ReconnectState {
         gamePlayer.setAxeType(axeType);
         gamePlayer.setShear(shear);
 
-        gamePlayer.setExperienceSources(new HashMap<>(experienceSources));
+        gamePlayer.setExperienceSources(experienceSources != null
+                ? new HashMap<>(experienceSources)
+                : new HashMap<>()
+        );
     }
 }
