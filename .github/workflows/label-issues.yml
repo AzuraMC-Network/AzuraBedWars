@@ -1,0 +1,72 @@
+name: Label Issues
+
+# Only fires on the actions we actually react to. NOT on labeled/unlabeled,
+# so the workflow no longer fights maintainers who manually edit labels
+# (and no longer re-triggers itself when it adds a label).
+on:
+  issues:
+    types: [ opened, edited, reopened, closed ]
+
+permissions:
+  issues: write
+  contents: read
+
+# Serialize work on the same issue so concurrent events don't race on labels.
+concurrency:
+  group: label-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Content labels & commit references
+        if: github.event.action != 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const current = new Set(issue.labels.map(l => l.name));
+            const text = `${issue.title || ''}\n${issue.body || ''}`.toLowerCase();
+            const toAdd = new Set();
+
+            // Word-boundary matching avoids false hits inside longer words.
+            if (/\b(bug|error|crash)\b/.test(text)) toAdd.add('🐛 Bug');
+            if (/\b(feature|enhancement|request)\b/.test(text)) toAdd.add('✨ Feature Request');
+            if (/\b(docs?|documentation)\b/.test(text)) toAdd.add('📚 Documentation');
+            if (/\b(urgent|critical|high priority)\b/.test(text)) toAdd.add('🚨 High Priority');
+
+            // Commit reference -> In Progress. Precise: a full 40-char SHA, or a
+            // 7-40 char hex preceded by /commit/ or the word "commit". The old
+            // /\b[a-f0-9]{7,40}\b/ flagged any 7-digit number or words like
+            // "deadbeef" / "feedface".
+            const commitRef = /(?:\/commit\/|\bcommit[:\s]+)[a-f0-9]{7,40}\b|\b[a-f0-9]{40}\b/i;
+            if (commitRef.test(issue.body || '')) toAdd.add('🔄 In Progress');
+
+            // A reopened issue should not keep a stale Done label.
+            if (issue.state === 'open' && current.has('✅ Done')) {
+              await github.rest.issues.removeLabel({ ...context.repo, issue_number: issue.number, name: '✅ Done' }).catch(() => {});
+              console.log('Removed stale ✅ Done');
+            }
+
+            const labels = [...toAdd].filter(l => !current.has(l));
+            if (labels.length) {
+              await github.rest.issues.addLabels({ ...context.repo, issue_number: issue.number, labels });
+              console.log('Added:', labels.join(', '));
+            }
+
+      - name: Handle closed issue
+        if: github.event.action == 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const current = new Set(issue.labels.map(l => l.name));
+            if (current.has('🔄 In Progress')) {
+              await github.rest.issues.removeLabel({ ...context.repo, issue_number: issue.number, name: '🔄 In Progress' }).catch(() => {});
+              console.log('Removed 🔄 In Progress');
+            }
+            if (!current.has('✅ Done')) {
+              await github.rest.issues.addLabels({ ...context.repo, issue_number: issue.number, labels: ['✅ Done'] });
+              console.log('Added ✅ Done');
+            }

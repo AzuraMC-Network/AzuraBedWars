@@ -1,0 +1,50 @@
+name: Link Commits to Issues
+
+on:
+  push:
+
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  group: link-commits-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  link:
+    runs-on: ubuntu-latest
+    # Skip tag pushes / branch deletions that carry no commits.
+    if: github.event.commits != null && github.event.commits[0] != null
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner, repo = context.repo.repo;
+            const RESPONSE_LABELS = ['⏰ No Response 24h', '⏰ No Response 72h', '⏰ No Response 1w', '⏰ No Response 2w', '⏰ No Response 1m'];
+
+            // Collect every #123 referenced across all pushed commits, de-duped.
+            const refs = new Set();
+            for (const c of context.payload.commits || []) {
+              for (const m of (c.message || '').matchAll(/#(\d+)/g)) refs.add(parseInt(m[1], 10));
+            }
+            console.log('Referenced issues:', [...refs].join(', ') || 'none');
+
+            for (const number of refs) {
+              try {
+                const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number: number });
+                if (issue.state === 'closed' || issue.pull_request) continue;
+                const current = new Set(issue.labels.map(l => l.name));
+
+                if (!current.has('🔄 In Progress')) {
+                  await github.rest.issues.addLabels({ owner, repo, issue_number: number, labels: ['🔄 In Progress'] });
+                  console.log(`#${number}: added 🔄 In Progress`);
+                }
+                // Activity means it's not stale anymore.
+                for (const name of RESPONSE_LABELS) {
+                  if (current.has(name)) await github.rest.issues.removeLabel({ owner, repo, issue_number: number, name }).catch(() => {});
+                }
+              } catch (e) {
+                console.error(`#${number}:`, e.status || e.message);
+              }
+            }

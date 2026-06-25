@@ -1,0 +1,70 @@
+name: Stale Issue Sweep
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours
+  workflow_dispatch:          # now actually declared, so manual runs work
+
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  group: stale-sweep
+  cancel-in-progress: true
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner, repo = context.repo.repo;
+            const TIERS = [
+              { label: '⏰ No Response 24h', hours: 24 },
+              { label: '⏰ No Response 72h', hours: 72 },
+              { label: '⏰ No Response 1w', hours: 168 },
+              { label: '⏰ No Response 2w', hours: 336 },
+              { label: '⏰ No Response 1m', hours: 720 },
+            ];
+            const ALL = TIERS.map(t => t.label);
+            // Only these timeline events count as "real activity". Crucially this
+            // EXCLUDES labeled/unlabeled/renamed, so the workflow adding its own
+            // stale label can't reset the clock and prevent escalation.
+            const ACTIVITY = new Set(['commented', 'committed', 'referenced', 'cross-referenced', 'reviewed', 'reopened', 'merged']);
+
+            // Paginate — the old code only saw the first 100 issues / 30 comments.
+            const issues = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: 'open', per_page: 100 });
+            console.log(`Scanning ${issues.length} open issues`);
+
+            for (const issue of issues) {
+              if (issue.pull_request) continue;
+              const number = issue.number;
+              const current = new Set(issue.labels.map(l => l.name));
+
+              let last = new Date(issue.created_at).getTime();
+              const timeline = await github.paginate(github.rest.issues.listEventsForTimeline, { owner, repo, issue_number: number, per_page: 100 });
+              for (const ev of timeline) {
+                if (!ACTIVITY.has(ev.event)) continue;
+                const ts = ev.created_at || ev.committer?.date || ev.author?.date;
+                if (ts) last = Math.max(last, new Date(ts).getTime());
+              }
+
+              const hours = (Date.now() - last) / 3.6e6;
+
+              // Highest tier whose threshold is exceeded (single label at a time).
+              let target = null;
+              for (const t of TIERS) if (hours >= t.hours) target = t.label;
+
+              const toAdd = target && !current.has(target) ? [target] : [];
+              const toRemove = ALL.filter(l => l !== target && current.has(l));
+
+              for (const name of toRemove) {
+                await github.rest.issues.removeLabel({ owner, repo, issue_number: number, name }).catch(() => {});
+              }
+              if (toAdd.length) {
+                await github.rest.issues.addLabels({ owner, repo, issue_number: number, labels: toAdd }).catch(e => console.error('add', number, e.status));
+              }
+              if (toAdd.length || toRemove.length) console.log(`#${number}: ${hours.toFixed(1)}h -> ${target || 'none'}`);
+            }

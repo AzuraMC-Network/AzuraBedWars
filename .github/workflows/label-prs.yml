@@ -1,0 +1,124 @@
+name: Label Pull Requests
+
+# pull_request_target runs in the BASE repo context with a write token, so
+# labels work for PRs from forks too (plain pull_request gives forks a
+# read-only token and addLabels silently 403s). We never check out or run the
+# PR's code here, only read its metadata and set labels, so this is safe.
+on:
+  pull_request_target:
+    types: [ opened, edited, reopened, closed ]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+concurrency:
+  group: label-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reconcile labels
+        if: github.event.action != 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner, repo = context.repo.repo, num = pr.number;
+
+            // Read labels fresh — context.payload is a snapshot from event time
+            // and may be stale after earlier API writes.
+            const { data: fresh } = await github.rest.issues.get({ owner, repo, issue_number: num });
+            const current = new Set(fresh.labels.map(l => l.name));
+
+            const branch = (pr.head.ref || '').toLowerCase();
+            const base = (pr.base.ref || '').toLowerCase();
+            const title = (pr.title || '').toLowerCase();
+            const body = pr.body || '';
+
+            // Every label this workflow owns. Anything in here that we no longer
+            // "want" gets removed — fixes the old never-remove leak (e.g. stale
+            // integration labels after a branch rename).
+            const MANAGED = new Set([
+              '🐛 Bug Fix', '✨ New Feature', '💥 Breaking Change', '♻️ Refactor', '⚡ Performance',
+              '🔧 Chore', '👷 CI', '📚 Documentation', '🧪 Test', '💄 Style',
+              '🚑 Hot Fix', '🚀 Release', '🔄 Integration',
+              '✨ Feature Integration', '🐛 Bug Fix Integration', '🚑 Hotfix Integration', '📚 Documentation Integration',
+              '✅ Ready for Review', '🚧 Work in Progress',
+            ]);
+
+            const want = new Set();
+
+            // Branch-based
+            if (/(^|\/)(fix|bugfix)\//.test(branch)) want.add('🐛 Bug Fix');
+            if (/(^|\/)(feat|feature)\//.test(branch)) want.add('✨ New Feature');
+            if (branch.includes('hotfix/')) want.add('🚑 Hot Fix');
+            if (/(^|\/)(docs|documentation)\//.test(branch)) want.add('📚 Documentation');
+
+            // Title-based ("breaking change" is already covered by "breaking")
+            if (title.includes('breaking')) want.add('💥 Breaking Change');
+
+            // Release / integration
+            if (branch.includes('release/')) want.add('🚀 Release');
+            if (base === 'main' || base === 'master' || base === 'develop') {
+              if (/(^|\/)(feat|feature)\//.test(branch)) want.add('✨ Feature Integration');
+              else if (/(^|\/)(fix|bugfix)\//.test(branch)) want.add('🐛 Bug Fix Integration');
+              else if (branch.includes('hotfix/')) want.add('🚑 Hotfix Integration');
+              else if (/(^|\/)(docs|documentation)\//.test(branch)) want.add('📚 Documentation Integration');
+            }
+            if (base === 'develop' && (branch === 'main' || branch === 'master')) want.add('🔄 Integration');
+
+            // Template "Type of Change (select one)" — take the FIRST checked box
+            // so multiple accidental checks can't add several mutually-exclusive labels.
+            const TYPE_MAP = {
+              bugfix: '🐛 Bug Fix', feature: '✨ New Feature', 'breaking-change': '💥 Breaking Change',
+              refactor: '♻️ Refactor', performance: '⚡ Performance', chore: '🔧 Chore', ci: '👷 CI',
+              docs: '📚 Documentation', test: '🧪 Test', style: '💄 Style',
+            };
+            const typeMatch = body.match(/- \[x\] (bugfix|feature|breaking-change|refactor|performance|chore|ci|docs|test|style)\b/i);
+            if (typeMatch) want.add(TYPE_MAP[typeMatch[1].toLowerCase()]);
+
+            // Ready/WIP: count ONLY the "Checklist" section. The old code counted
+            // every checkbox in the body, including the 10 "Type of Change" boxes
+            // (which are select-one), so completion was never reachable -> stuck WIP.
+            const section = body.match(/##[^\n]*Checklist[^\n]*\n([\s\S]*?)(?:\n---|\n##|$)/i);
+            if (section) {
+              const done = (section[1].match(/- \[x\]/gi) || []).length;
+              const todo = (section[1].match(/- \[ \]/gi) || []).length;
+              const total = done + todo;
+              if (total > 0) want.add(done === total ? '✅ Ready for Review' : '🚧 Work in Progress');
+            }
+
+            // Reconcile: add what's missing, remove managed labels we no longer want.
+            const toAdd = [...want].filter(l => !current.has(l));
+            const toRemove = [...current].filter(l => MANAGED.has(l) && !want.has(l));
+
+            for (const name of toRemove) {
+              await github.rest.issues.removeLabel({ owner, repo, issue_number: num, name }).catch(e => console.error('remove', name, e.status));
+              console.log('Removed', name);
+            }
+            if (toAdd.length) {
+              await github.rest.issues.addLabels({ owner, repo, issue_number: num, labels: toAdd });
+              console.log('Added', toAdd.join(', '));
+            }
+
+      - name: Handle closed PR
+        if: github.event.action == 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner, repo = context.repo.repo, num = pr.number;
+            const { data: fresh } = await github.rest.issues.get({ owner, repo, issue_number: num });
+            const current = new Set(fresh.labels.map(l => l.name));
+
+            for (const name of ['🔄 In Progress', '🚧 Work in Progress', '✅ Ready for Review']) {
+              if (current.has(name)) await github.rest.issues.removeLabel({ owner, repo, issue_number: num, name }).catch(() => {});
+            }
+            const add = pr.merged ? '✅ Merged' : '❌ Cancelled';
+            if (!current.has(add)) {
+              await github.rest.issues.addLabels({ owner, repo, issue_number: num, labels: [add] });
+            }
+            console.log(pr.merged ? 'Merged' : 'Cancelled');
