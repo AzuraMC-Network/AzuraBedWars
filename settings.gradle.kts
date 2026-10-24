@@ -44,7 +44,7 @@ dependencyResolutionManagement {
     }
 }
 
-include("api", "core", "plugin", "loader")
+include("api", "bootstrap", "core", "plugin", "loader")
 
 rootDir.resolve("nms").listFiles()!!
     .filter { it.resolve("build.gradle.kts").isFile }
