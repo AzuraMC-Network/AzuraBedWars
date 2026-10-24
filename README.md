@@ -36,15 +36,20 @@ AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project 
 
 ### Project Structure
 
-- `azurabedwars-loader` — A auto downloader/updater for the azurabedwars-plugin.
-- `azurabedwars-plugin` — The core Minecraft BedWars plugin running on the server.
+- `api` — Public API, events and the NMS SPI
+- `core` — Game logic running on the server
+- `nms` — Per-version NMS implementations
+- `plugin` — Packages everything into the final plugin jar
+- `loader` — Auto downloader and updater for the plugin
+
+Build with `./gradlew build`. The plugin jar is written to `plugin/build/libs/`.
 
 ## Performance Showcase
 
 - This is the spark profiler result after a 16-player game completion. Perhaps this is what can attract you to choose
   our project (the censored parts are anti-cheat plugins)
 
-![Performance Test Results](image/spark.png)
+![Performance Test Results](docs/images/spark.png)
 
 ## Quick Start
 

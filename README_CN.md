@@ -32,14 +32,19 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 
 ### 结构解释
 
-- `azurabedwars-loader` — 自动下载更新azurabedwars-plugin的插件
-- `azurabedwars-plugin` — Minecraft BedWars 插件
+- `api` — 对外 API、事件与 NMS SPI
+- `core` — 服务端运行的游戏逻辑
+- `nms` — 各版本的 NMS 实现
+- `plugin` — 打包生成最终插件 jar
+- `loader` — 自动下载更新插件的加载器
+
+使用 `./gradlew build` 构建，插件 jar 输出在 `plugin/build/libs/`。
 
 ## 性能展示
 
 - 这是在16人对局完成后的spark profiler结果，或许这是能吸引您选择我们项目的原因(打码的都是反作弊插件)
 
-![性能测试结果](image/spark.png)
+![性能测试结果](docs/images/spark.png)
 
 ## 快速开始
 
