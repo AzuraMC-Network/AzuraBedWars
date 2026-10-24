@@ -197,7 +197,7 @@ public class LoadGameUtil {
             villager.setProfession(profession);
         }
 
-        villager.setMetadata(metadataKey, new FixedMetadataValue(plugin, metadataKey));
+        villager.setMetadata(metadataKey, new FixedMetadataValue(plugin.getPlugin(), metadataKey));
     }
 
     /**

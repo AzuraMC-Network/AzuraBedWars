@@ -240,7 +240,7 @@ public class PlayerDamageListener implements Listener {
         // 处理火球落地伤害修改
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL && gamePlayer.getPlayer().hasMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA)) {
             event.setDamage(event.getFinalDamage() * FIREBALL_FALLEN_DAMAGE_RATE);
-            gamePlayer.getPlayer().removeMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA, plugin);
+            gamePlayer.getPlayer().removeMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA, plugin.getPlugin());
             return;
         }
 
@@ -279,7 +279,7 @@ public class PlayerDamageListener implements Listener {
                 gamePlayer.sendActionBar(messageConfig.getNormalKillRewardsMessage());
                 i++;
             }
-        }.runTaskTimerAsynchronously(plugin, 0, ACTIONBAR_PERIOD);
+        }.runTaskTimerAsynchronously(plugin.getPlugin(), 0, ACTIONBAR_PERIOD);
         gamePlayer.sendMessage(messageConfig.getFinalKillRewardsMessage());
     }
 
@@ -342,7 +342,7 @@ public class PlayerDamageListener implements Listener {
         if (gamePlayer == null) return;
         Player player = gamePlayer.getPlayer();
         // PlayerRespawnListener处理复活后的相关事宜 (清除不可见等等)
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(plugin.getPlugin(), () -> {
             gamePlayer.getPlayer().spigot().respawn();
 
             // 使用PlayerUtil隐藏玩家

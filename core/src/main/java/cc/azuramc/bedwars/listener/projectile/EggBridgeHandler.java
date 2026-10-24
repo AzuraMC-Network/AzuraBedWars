@@ -35,7 +35,7 @@ public class EggBridgeHandler implements Runnable {
         this.projectile = projectile;
         this.teamColor = teamColor;
         this.player = player;
-        task = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), this, 0, 1);
+        task = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), this, 0, 1);
     }
 
     @Override

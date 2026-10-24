@@ -218,6 +218,6 @@ public class GeneratorManager {
             LoggerUtil.warn("无法找到生成器: " + resourceName);
             return;
         }
-        Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> updateResourceDisplay(safeArmorStands, generator, resourceDisplayName), 0L, 20L);
+        Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), () -> updateResourceDisplay(safeArmorStands, generator, resourceDisplayName), 0L, 20L);
     }
 }

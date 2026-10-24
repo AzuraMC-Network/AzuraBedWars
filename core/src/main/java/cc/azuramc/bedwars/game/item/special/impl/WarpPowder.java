@@ -300,7 +300,7 @@ public class WarpPowder extends AbstractSpecialItem {
                     WarpPowder.this.cancelTeleport(true, true);
                 }
             }
-        }.runTaskTimer(AzuraBedWars.getInstance(), 0L,
+        }.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0L,
                 (long) Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((this.fullTeleportingTime * 20) / CIRCLE_COUNT)));
 
         // 添加到游戏中的特殊物品列表

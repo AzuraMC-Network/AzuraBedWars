@@ -66,7 +66,7 @@ public class GeneratorTask {
      * 启动盔甲架位置更新任务
      */
     private void startArmorStandUpdateTask() {
-        taskId = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance(), () -> {
+        taskId = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), () -> {
             try {
                 List<ArmorStand> allArmor = new ArrayList<>();
 
@@ -160,7 +160,7 @@ public class GeneratorTask {
         final Set<ArmorStand> safeArmorStands = new HashSet<>(armorStands);
 
         gameManager.getGameEventManager().registerRunnable(displayName, (seconds, currentEventLevel) ->
-                Bukkit.getScheduler().runTask(AzuraBedWars.getInstance(), () -> {
+                Bukkit.getScheduler().runTask(AzuraBedWars.getInstance().getPlugin(), () -> {
                     try {
                         Iterator<ArmorStand> iterator = safeArmorStands.iterator();
                         while (iterator.hasNext()) {

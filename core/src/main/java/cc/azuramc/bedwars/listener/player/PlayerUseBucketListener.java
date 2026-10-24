@@ -34,7 +34,7 @@ public class PlayerUseBucketListener implements Listener {
             return;
         }
 
-        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> player.getInventory().removeItem(XMaterial.BUCKET.parseItem()), 2L);
+        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), () -> player.getInventory().removeItem(XMaterial.BUCKET.parseItem()), 2L);
     }
 
 }

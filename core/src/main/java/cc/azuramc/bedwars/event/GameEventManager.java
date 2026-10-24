@@ -154,7 +154,7 @@ public class GameEventManager implements Runnable {
             // 设置GameState
             gameManager.setGameState(GameState.ENDING);
 
-            Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> {
+            Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), () -> {
                 setCurrentEvent(OVER_EVENT_PRIORITY);
                 currentEvent().execute(gameManager);
             }, GAME_OVER_DELAY_TICKS);

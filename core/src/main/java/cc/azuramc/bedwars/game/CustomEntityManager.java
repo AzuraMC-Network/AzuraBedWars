@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Silverfish;
@@ -101,8 +102,8 @@ public class CustomEntityManager {
      * 启动自己的刷新任务
      */
     private void startRefreshTask() {
-        refreshTask = AzuraBedWars.getInstance().getServer().getScheduler().runTaskTimer(
-                AzuraBedWars.getInstance(),
+        refreshTask = Bukkit.getScheduler().runTaskTimer(
+                AzuraBedWars.getInstance().getPlugin(),
                 this::refresh,
                 0,
                 20L

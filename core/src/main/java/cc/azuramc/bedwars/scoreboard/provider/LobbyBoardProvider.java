@@ -46,7 +46,7 @@ public class LobbyBoardProvider extends AbstractBoardProvider {
                 .set("max_players", gameManager.getMaxPlayers())
                 .set("countdown", getCountdown())
                 .set("mode", modeText)
-                .set("version", plugin.getDescription().getVersion())
+                .set("version", plugin.getPlugin().getDescription().getVersion())
                 .set("server", "")
                 .formatLines(config.getLines());
     }

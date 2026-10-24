@@ -28,7 +28,7 @@ public class GUIListener implements Listener {
 
     public GUIListener(AzuraBedWars main) {
         this.main = main;
-        main.getServer().getPluginManager().registerEvents(this, main);
+        Bukkit.getPluginManager().registerEvents(this, main.getPlugin());
     }
 
     /**
@@ -88,7 +88,7 @@ public class GUIListener implements Listener {
                 }
 
                 if ((guiAction == null ? newGUIAction.getDelay() : guiAction.getDelay()) > 0) {
-                    Bukkit.getScheduler().runTaskLater(main, () -> {
+                    Bukkit.getScheduler().runTaskLater(main.getPlugin(), () -> {
                         if (guiAction == null) {
                             newGUIAction.getRunnable().run(event);
                         } else {

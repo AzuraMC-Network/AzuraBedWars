@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     compileOnly(project(":api"))
+    compileOnly(project(":bootstrap"))
 
     compileOnly(libs.spigot.api)
     compileOnly(libs.placeholderapi)

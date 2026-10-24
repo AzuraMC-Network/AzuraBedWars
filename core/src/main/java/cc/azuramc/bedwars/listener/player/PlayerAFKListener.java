@@ -42,7 +42,7 @@ public class PlayerAFKListener implements Listener {
      * 开始挂机状态检测
      */
     public static void startCheckAFKTask() {
-        checkAFKTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AzuraBedWars.getInstance(), () -> {
+        checkAFKTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AzuraBedWars.getInstance().getPlugin(), () -> {
             long currentTime = System.currentTimeMillis();
 
             for (Player player : Bukkit.getOnlinePlayers()) {

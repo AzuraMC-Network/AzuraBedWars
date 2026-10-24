@@ -200,7 +200,7 @@ public class MapManager {
         }
 
         // 获取地图文件URL
-        String mapUrl = mapData.getProcessedFileUrl(AzuraBedWars.getInstance());
+        String mapUrl = mapData.getProcessedFileUrl(AzuraBedWars.getInstance().getPlugin());
         if (mapUrl == null || mapUrl.isEmpty()) {
             LoggerUtil.warn("地图 " + mapName + " 没有设置物理路径(URL)");
             return null;

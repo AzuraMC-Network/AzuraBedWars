@@ -67,7 +67,7 @@ public class PlayerDropListener implements Listener {
                 }
 
                 if (size == 0) {
-                    Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> gamePlayer.giveSword(false), 8);
+                    Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), () -> gamePlayer.giveSword(false), 8);
                 }
             }
         }

@@ -103,7 +103,7 @@ public class FireballHandler implements Listener {
         gamePlayer.setLastDamage(ownerPlayer);
 
         // 设置元数据以防止掉落伤害
-        player.setMetadata(NO_FALL_DAMAGE_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), ownerPlayer.getUuid()));
+        player.setMetadata(NO_FALL_DAMAGE_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance().getPlugin(), ownerPlayer.getUuid()));
 
         // 应用击退效果
         Vector knockbackVector = calculateKnockback(

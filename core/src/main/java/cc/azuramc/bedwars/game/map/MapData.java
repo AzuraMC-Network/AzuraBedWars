@@ -67,7 +67,7 @@ public class MapData implements IMapData {
         if (fileUrl == null || fileUrl.isEmpty()) {
             return null;
         }
-        Plugin plugin = AzuraBedWars.getInstance();
+        Plugin plugin = AzuraBedWars.getInstance().getPlugin();
         return processPathVariables(fileUrl, plugin);
     }
 

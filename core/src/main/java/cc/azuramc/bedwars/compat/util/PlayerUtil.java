@@ -8,12 +8,13 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
 public class PlayerUtil {
 
-    private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
+    private static final JavaPlugin PLUGIN = AzuraBedWars.getInstance().getPlugin();
 
     /**
      * 获取玩家手中的物品

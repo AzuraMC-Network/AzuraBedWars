@@ -117,7 +117,7 @@ public class PrivateResourceGenerator {
         if (currentTask != null) {
             currentTask.cancel();
         }
-        currentTask = new GeneratorTask().runTaskTimer(cc.azuramc.bedwars.AzuraBedWars.getInstance(), 0L, interval);
+        currentTask = new GeneratorTask().runTaskTimer(cc.azuramc.bedwars.AzuraBedWars.getInstance().getPlugin(), 0L, interval);
     }
 
     /**
@@ -127,7 +127,7 @@ public class PrivateResourceGenerator {
         if (currentTask != null) {
             currentTask.cancel();
         }
-        currentTask = new GeneratorTask().runTaskTimer(cc.azuramc.bedwars.AzuraBedWars.getInstance(), 0L, interval);
+        currentTask = new GeneratorTask().runTaskTimer(cc.azuramc.bedwars.AzuraBedWars.getInstance().getPlugin(), 0L, interval);
     }
 
     /**

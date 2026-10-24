@@ -60,7 +60,7 @@ public abstract class AbstractTower {
         final int totalBlocks = coordinates.size();
 
         this.buildTask = Bukkit.getScheduler().runTaskTimer(
-                AzuraBedWars.getInstance(),
+                AzuraBedWars.getInstance().getPlugin(),
                 () -> {
                     if (XSound.ENTITY_CHICKEN_EGG.get() != null) {
                         gamePlayer.playSound(XSound.ENTITY_CHICKEN_EGG.get(), 1.0F, 0.5F);
