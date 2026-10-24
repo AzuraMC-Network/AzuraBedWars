@@ -129,7 +129,7 @@ public class PlayerRespawnListener implements Listener {
                 // 设置为观察者
                 SpectatorManager.toSpectator(gamePlayer, messageConfig.getDeathPermanentTitle(), messageConfig.getDeathPermanentSubTitle());
             }
-        }.runTaskLater(AzuraBedWars.getInstance(), RESPAWN_DELAY_TICKS);
+        }.runTaskLater(AzuraBedWars.getInstance().getPlugin(), RESPAWN_DELAY_TICKS);
 
         gamePlayer.getPlayerData().addLosses();
 
@@ -214,7 +214,7 @@ public class PlayerRespawnListener implements Listener {
                 resetPlayerState(gamePlayer, gameTeam);
                 cancel();
             }
-        }.runTaskTimer(AzuraBedWars.getInstance(), RESPAWN_TIMER_PERIOD, RESPAWN_TIMER_PERIOD);
+        }.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), RESPAWN_TIMER_PERIOD, RESPAWN_TIMER_PERIOD);
     }
 
     /**
@@ -292,7 +292,7 @@ public class PlayerRespawnListener implements Listener {
     private void applyDamageProtection(GamePlayer gamePlayer) {
         RESPAWN_PROTECT.add(gamePlayer);
         Bukkit.getScheduler().runTaskLater(
-                AzuraBedWars.getInstance(),
+                AzuraBedWars.getInstance().getPlugin(),
                 () -> RESPAWN_PROTECT.remove(gamePlayer),
                 RESPAWN_PROTECTION_TICKS
         );

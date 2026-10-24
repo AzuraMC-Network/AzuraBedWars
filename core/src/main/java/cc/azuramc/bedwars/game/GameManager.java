@@ -121,7 +121,7 @@ public class GameManager implements IGameManager {
         initializeConfigs();
 
         this.tabListManager = new TabListManager(this);
-        Bukkit.getPluginManager().registerEvents(new TabListListener(tabListManager), plugin);
+        Bukkit.getPluginManager().registerEvents(new TabListListener(tabListManager), plugin.getPlugin());
     }
 
     private void initializeConfigs() {
@@ -180,7 +180,7 @@ public class GameManager implements IGameManager {
 
         // 在初始化团队前检查必要的队伍配置
         if (mapData.getPlayers().getTeam() == null) {
-            plugin.getLogger().warning("地图 " + mapData.getName() + " 的每个队伍玩家数未设置，使用默认值1");
+            plugin.getPlugin().getLogger().warning("地图 " + mapData.getName() + " 的每个队伍玩家数未设置，使用默认值1");
             mapData.getPlayers().setTeam(1);
         }
 
@@ -478,7 +478,7 @@ public class GameManager implements IGameManager {
     private void checkGameStart() {
         if (canStart() && gameState == GameState.WAITING && getGameStartTask() == null) {
             GameStartTask lobbyCountdown = new GameStartTask(this);
-            lobbyCountdown.runTaskTimer(plugin, COUNTDOWN_TICK_PERIOD, COUNTDOWN_TICK_PERIOD);
+            lobbyCountdown.runTaskTimer(plugin.getPlugin(), COUNTDOWN_TICK_PERIOD, COUNTDOWN_TICK_PERIOD);
             setGameStartTask(lobbyCountdown);
         }
     }

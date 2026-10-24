@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.listener.setup;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,7 +24,7 @@ public class SetupItemListener implements Listener {
 
     public SetupItemListener(AzuraBedWars plugin) {
         this.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(this, plugin.getPlugin());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

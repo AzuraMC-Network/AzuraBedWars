@@ -3,6 +3,7 @@ package cc.azuramc.bedwars;
 import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.api.nms.NMSAccess;
+import cc.azuramc.bedwars.bootstrap.PluginEntrypoint;
 import cc.azuramc.bedwars.command.CommandRegistry;
 import cc.azuramc.bedwars.config.ConfigFactory;
 import cc.azuramc.bedwars.config.ConfigManager;
@@ -48,12 +49,13 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author an5w1r@163.com
  */
 @Getter
-public final class AzuraBedWars extends JavaPlugin {
+public final class AzuraBedWars implements PluginEntrypoint {
     private static final String PLUGIN_PREFIX = "[AzuraBedWars] ";
 
     @Getter
     private static AzuraBedWars instance;
 
+    private final JavaPlugin plugin;
     private Chat chat = null;
     private ConfigManager configManager;
     private String databaseName;
@@ -77,9 +79,13 @@ public final class AzuraBedWars extends JavaPlugin {
     private SetupItemManager setupItemManager;
     private TeamUpgradeConfig teamUpgradeConfig;
 
+    public AzuraBedWars(JavaPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public void onLoad() {
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(plugin));
         PacketEvents.getAPI().load();
     }
 
@@ -103,7 +109,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 根据配置决定加载游戏模式还是编辑模式
         if (settingsConfig.isEditorMode() || mapManager.getLoadedMaps().isEmpty()) {
-            getLogger().info("当前处于编辑模式(editorMode)或未发现可用地图 取消游戏相关特性加载");
+            plugin.getLogger().info("当前处于编辑模式(editorMode)或未发现可用地图 取消游戏相关特性加载");
             initEditorFeatures();
         } else {
             initGameFeatures();
@@ -169,7 +175,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         new SetupItemListener(this);
 
-        getLogger().info("地图编辑工具已加载");
+        plugin.getLogger().info("地图编辑工具已加载");
     }
 
     /**
@@ -219,7 +225,7 @@ public final class AzuraBedWars extends JavaPlugin {
 
         // 创建并初始化计分板管理器
         scoreboardManager = new ScoreboardManager(gameManager);
-        scoreboardManager.initialize(this);
+        scoreboardManager.initialize(plugin);
 
         PacketEvents.getAPI().getEventManager().registerListener(new InvisibilityPacketListener());
     }
@@ -228,7 +234,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 注册BungeeCord通信频道
      */
     private void registerBungeeChannel() {
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, "BungeeCord");
     }
 
     /**
@@ -247,7 +253,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * @param runnable 要执行的任务
      */
     public void mainThreadRunnable(Runnable runnable) {
-        Bukkit.getScheduler().runTask(this, runnable);
+        Bukkit.getScheduler().runTask(plugin, runnable);
     }
 
     private void setupNMSSupport() {
@@ -295,13 +301,13 @@ public final class AzuraBedWars extends JavaPlugin {
     }
 
     private void hookLuckPerms() {
-        if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
+        if (plugin.getServer().getPluginManager().getPlugin("LuckPerms") != null) {
             luckPermsApi = LuckPermsProvider.get();
         }
     }
 
     private void hookVault() {
-        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+        if (plugin.getServer().getPluginManager().getPlugin("Vault") != null) {
             setupEconomy();
             setupChat();
         }
@@ -311,7 +317,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 设置经济系统
      */
     private void setupEconomy() {
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        RegisteredServiceProvider<Economy> rsp = plugin.getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp != null) {
             econ = rsp.getProvider();
         }
@@ -321,7 +327,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * 设置聊天系统
      */
     private void setupChat() {
-        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
+        RegisteredServiceProvider<Chat> rsp = plugin.getServer().getServicesManager().getRegistration(Chat.class);
         if (rsp != null) {
             chat = rsp.getProvider();
         }
@@ -333,7 +339,7 @@ public final class AzuraBedWars extends JavaPlugin {
      * @param event 要调用的事件
      */
     public void callEvent(Event event) {
-        getServer().getPluginManager().callEvent(event);
+        plugin.getServer().getPluginManager().callEvent(event);
     }
 
     /**
@@ -345,7 +351,7 @@ public final class AzuraBedWars extends JavaPlugin {
         MapStorageFactory.getDefaultStorage();
 
         String storageType = settingsConfig.getMapStorage();
-        getLogger().info("地图存储系统已初始化，使用 " + storageType + " 作为默认存储方式");
+        plugin.getLogger().info("地图存储系统已初始化，使用 " + storageType + " 作为默认存储方式");
     }
 
     /**
@@ -353,7 +359,7 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     private void initConfigSystem() {
         // 创建配置管理器
-        configManager = new ConfigManager(this);
+        configManager = new ConfigManager(plugin);
 
         // 创建配置工厂
         ConfigFactory configFactory = new ConfigFactory();
@@ -388,6 +394,6 @@ public final class AzuraBedWars extends JavaPlugin {
      */
     public void loadBStats() {
         int pluginId = 26773;
-        Metrics metrics = new Metrics(this, pluginId);
+        Metrics metrics = new Metrics(plugin, pluginId);
     }
 }

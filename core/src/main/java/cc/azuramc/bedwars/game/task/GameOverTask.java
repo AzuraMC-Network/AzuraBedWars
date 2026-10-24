@@ -36,7 +36,7 @@ public class GameOverTask extends BukkitRunnable {
      */
     public GameOverTask(GameManager gameManager) {
         this.gameManager = gameManager;
-        this.runTaskTimer(AzuraBedWars.getInstance(), 0L, 20L);
+        this.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0L, 20L);
     }
 
     @Override
@@ -360,6 +360,6 @@ public class GameOverTask extends BukkitRunnable {
             public void run() {
                 Bukkit.shutdown();
             }
-        }.runTaskLater(AzuraBedWars.getInstance(), gameOverConfig.getShutdownDelay());
+        }.runTaskLater(AzuraBedWars.getInstance().getPlugin(), gameOverConfig.getShutdownDelay());
     }
 }

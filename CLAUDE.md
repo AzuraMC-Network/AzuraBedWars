@@ -7,15 +7,35 @@ BedWars plugin for Spigot and Paper, supporting Minecraft 1.8.8 through 26.x fro
 | Module | Purpose |
 | --- | --- |
 | `api/` | Public API, events and the `NMSAccess` SPI |
-| `core/` | Game logic, commands, listeners, storage, `plugin.yml` |
+| `bootstrap/` | `plugin.yml` main, loads core and libraries in an isolated class loader |
+| `core/` | Game logic, commands, listeners, storage |
 | `nms/v1_X_RY/` | `NMSAccess` implementations for CraftBukkit versioned packages |
 | `nms/mojang/` | Paper 1.20.5 to 1.21.10 with Mojang mappings |
 | `nms/mojang_26/` | Paper 1.21.11 and every 26.x server |
-| `plugin/` | Shades everything into `AzuraBedWars-<version>.jar` |
+| `plugin/` | Assembles the regular and offline plugin jars |
 | `loader/` | Standalone plugin that downloads and loads the latest release |
-| `build-logic/` | Convention plugins shared by all modules |
+| `build-logic/` | Convention plugins and `RuntimeLibrariesTask` |
+| `libs/` | In-house jars in a Maven layout, group `cc.azuramc` |
 
 Dependency versions live in `gradle/libs.versions.toml`. Repositories are declared once in `settings.gradle.kts`.
+
+# Runtime layout
+
+Bukkit loads only `bootstrap` and `api`. Everything else runs inside `IsolatedClassLoader`, which is child first:
+
+- `core` and every `nms/` module are merged into one inner jar
+- Third-party libraries from `core`'s runtime classpath are listed with their sha256 in `META-INF/azurabedwars/libraries.txt`
+- The regular jar embeds only the inner jar and `cc.azuramc` libraries, and downloads the rest into `plugins/AzuraBedWars/libraries/` from `libraries.repositories` in `config.yml`
+- `-offline.jar` embeds every library
+
+Rules that follow from this:
+
+- `bootstrap` has no dependencies besides the Bukkit API, compiles with `--release 8` against the 1.8.8 API, and must stay Java
+- `api` stays Java because other plugins compile against it
+- `cc.azuramc.bedwars.AzuraBedWars` is not a `JavaPlugin`. Anything handed to Bukkit, such as the scheduler, events, metadata or plugin channels, takes `AzuraBedWars.getInstance().getPlugin()`
+- APIs that look up the plugin from the calling class, such as `JavaPlugin.getProvidingPlugin`, cannot find it from inside the isolated loader
+- An `implementation` dependency of `core` must be resolvable from Maven Central or JitPack, or be added under `libs/`
+- Kotlin can be added to `core` with a convention plugin. `kotlin-stdlib` then becomes one more runtime library
 
 `core` never depends on `nms`. At runtime `NMSProvider` loads `cc.azuramc.bedwars.nms.<version>.NMS_<version>` by reflection, where `<version>` is the CraftBukkit package such as `v1_8_R3`. Servers without a versioned package fall back to the Mojang namespace modules.
 
@@ -33,7 +53,7 @@ To support a new CraftBukkit version:
 ./gradlew build
 ```
 
-The plugin jar is written to `plugin/build/libs/`. Builds use a JDK 25 toolchain, downloaded automatically when missing, because 26.x server jars are Java 25 bytecode. Output targets Java 21, so every supported server must run on Java 21 or newer.
+`AzuraBedWars-<version>.jar` and `AzuraBedWars-<version>-offline.jar` are written to `plugin/build/libs/`. Builds use a JDK 25 toolchain, downloaded automatically when missing, because 26.x server jars are Java 25 bytecode. Output targets Java 21, so every supported server must run on Java 21 or newer.
 
 # Comments
 

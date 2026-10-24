@@ -91,6 +91,6 @@ public class ListenerRegistry {
     }
 
     private void register(Listener listener) {
-        Bukkit.getPluginManager().registerEvents(listener, plugin);
+        Bukkit.getPluginManager().registerEvents(listener, plugin.getPlugin());
     }
 }

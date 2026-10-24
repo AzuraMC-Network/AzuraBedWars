@@ -79,7 +79,7 @@ public class MapCommand {
 
         List<String> messageList = MessageUtil.color(List.of(
                 MessageUtil.CHAT_BAR,
-                "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 地图设置",
+                "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 地图设置",
                 "",
                 "&7 • &f/map create <mapName> &7创建新的地图",
                 "&7 • &f/map setWaiting <mapName> &7设置等待大厅位置",

@@ -74,7 +74,7 @@ public class FireballListener implements Listener {
             player.addPotionEffect(slowness);
 
             // 设置冷却时间
-            gamePlayer.getPlayer().setMetadata(fireballCooldownMetadata, new FixedMetadataValue(AzuraBedWars.getInstance(), currentTime));
+            gamePlayer.getPlayer().setMetadata(fireballCooldownMetadata, new FixedMetadataValue(AzuraBedWars.getInstance().getPlugin(), currentTime));
 
             // 发射火球
             launchFireball(gamePlayer);
@@ -106,7 +106,7 @@ public class FireballListener implements Listener {
         fireball.setYield(2.5F);
         fireball.setBounce(false);
         fireball.setIsIncendiary(false);
-        fireball.setMetadata(FireballHandler.FIREBALL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), gamePlayer.getUuid()));
+        fireball.setMetadata(FireballHandler.FIREBALL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance().getPlugin(), gamePlayer.getUuid()));
     }
 
     /**

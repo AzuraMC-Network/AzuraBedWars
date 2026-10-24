@@ -92,7 +92,7 @@ public class ChatListener implements Listener {
 
         // 启动倒计时
         gamePlayer.setShoutCooldown(true);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> gamePlayer.setShoutCooldown(false), CHAT_CONFIG.getGlobalChatCooldown() * 20L);
+        Bukkit.getScheduler().runTaskLater(plugin.getPlugin(), () -> gamePlayer.setShoutCooldown(false), CHAT_CONFIG.getGlobalChatCooldown() * 20L);
     }
 
     /**

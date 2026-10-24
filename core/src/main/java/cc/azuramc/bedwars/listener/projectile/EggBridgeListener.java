@@ -82,7 +82,7 @@ public class EggBridgeListener implements Listener {
         // 创建冷却
         if (!gamePlayer.isEggBridgeCooldown()) {
             gamePlayer.setEggBridgeCooldown(true);
-            Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance(), () -> gamePlayer.setEggBridgeCooldown(false), EGG_COOLDOWN_SECONDS * 20L);
+            Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), () -> gamePlayer.setEggBridgeCooldown(false), EGG_COOLDOWN_SECONDS * 20L);
         }
     }
 

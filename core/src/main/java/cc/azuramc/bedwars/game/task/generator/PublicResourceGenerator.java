@@ -59,7 +59,7 @@ public class PublicResourceGenerator {
         if (currentTask != null) {
             currentTask.cancel();
         }
-        currentTask = new GeneratorTask().runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
+        currentTask = new GeneratorTask().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0L, interval);
     }
 
     /**
@@ -145,7 +145,7 @@ public class PublicResourceGenerator {
         }
         // 重置最后掉落时间，确保倒计时从新间隔开始
         lastDropTime = System.currentTimeMillis();
-        currentTask = new GeneratorTask().runTaskTimer(AzuraBedWars.getInstance(), 0L, interval);
+        currentTask = new GeneratorTask().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0L, interval);
     }
 
     /**

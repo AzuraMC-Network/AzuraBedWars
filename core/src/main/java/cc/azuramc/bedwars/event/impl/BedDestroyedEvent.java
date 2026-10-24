@@ -35,7 +35,7 @@ public class BedDestroyedEvent extends AbstractGameEvent {
     @Override
     public void execute(GameManager gameManager) {
         if (gameManager == null) {
-            AzuraBedWars.getInstance().getLogger().log(Level.WARNING, "无法执行床自毁事件：游戏实例为null");
+            AzuraBedWars.getInstance().getPlugin().getLogger().log(Level.WARNING, "无法执行床自毁事件：游戏实例为null");
             return;
         }
 
@@ -44,7 +44,7 @@ public class BedDestroyedEvent extends AbstractGameEvent {
             try {
                 destroyAllBeds(gameManager);
             } catch (Exception e) {
-                AzuraBedWars.getInstance().getLogger().log(Level.SEVERE, "床自毁事件执行异常", e);
+                AzuraBedWars.getInstance().getPlugin().getLogger().log(Level.SEVERE, "床自毁事件执行异常", e);
             }
         });
 

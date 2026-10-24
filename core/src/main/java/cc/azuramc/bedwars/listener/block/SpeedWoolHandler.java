@@ -62,7 +62,7 @@ public class SpeedWoolHandler {
                     }
 
                     // 为火速羊毛放置的方块添加元数据标记
-                    relativeBlock.setMetadata(SPEED_WOOL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance(), taskId.toString()));
+                    relativeBlock.setMetadata(SPEED_WOOL_METADATA, new FixedMetadataValue(AzuraBedWars.getInstance().getPlugin(), taskId.toString()));
 
                     // 播放羊毛放置声音
                     if (XSound.BLOCK_WOOL_STEP.get() != null) {
@@ -73,7 +73,7 @@ public class SpeedWoolHandler {
                 i++;
             }
             // 每2刻生成一格
-        }.runTaskTimer(AzuraBedWars.getInstance(), 0, 2L);
+        }.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0, 2L);
     }
 
 }

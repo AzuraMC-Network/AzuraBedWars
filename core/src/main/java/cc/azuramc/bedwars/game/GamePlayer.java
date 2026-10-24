@@ -283,7 +283,7 @@ public class GamePlayer implements IGamePlayer {
                     }
                 }
             };
-            invisibilityFootStepTask.runTaskTimer(AzuraBedWars.getInstance(), 1L, 5L);
+            invisibilityFootStepTask.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 1L, 5L);
         }
 
         invisibilityWaitingTask = new BukkitRunnable() {
@@ -293,7 +293,7 @@ public class GamePlayer implements IGamePlayer {
                 endInvisibility();
             }
         };
-        invisibilityWaitingTask.runTaskLater(AzuraBedWars.getInstance(), 30 * 20);
+        invisibilityWaitingTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), 30 * 20);
     }
 
     /**
@@ -328,7 +328,7 @@ public class GamePlayer implements IGamePlayer {
                 endTrapProtection();
             }
         };
-        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance(), 30 * 20);
+        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), 30 * 20);
     }
 
     /**
@@ -354,7 +354,7 @@ public class GamePlayer implements IGamePlayer {
                 endTrapTriggerCooldownTask();
             }
         };
-        trapTriggerTask.runTaskLater(AzuraBedWars.getInstance(), 8 * 20);
+        trapTriggerTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), 8 * 20);
     }
 
     /**

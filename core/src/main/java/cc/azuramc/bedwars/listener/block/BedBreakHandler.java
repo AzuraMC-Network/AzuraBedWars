@@ -114,7 +114,7 @@ public class BedBreakHandler {
                 gamePlayer.sendActionBar("§6+" + settingsConfig.getBedDestroyReward() + "个金币");
                 i++;
             }
-        }.runTaskTimerAsynchronously(PLUGIN, 0, 10);
+        }.runTaskTimerAsynchronously(PLUGIN.getPlugin(), 0, 10);
 
         if (!VaultUtil.ecoIsNull) {
             gamePlayer.sendMessage("§6+" + settingsConfig.getBedDestroyReward() + "个金币 (破坏床)");

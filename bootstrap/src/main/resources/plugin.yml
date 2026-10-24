@@ -1,6 +1,6 @@
 name: AzuraBedWars
 version: ${version}
-main: cc.azuramc.bedwars.AzuraBedWars
+main: cc.azuramc.bedwars.bootstrap.AzuraBedWarsBootstrap
 authors:
   - An5w1r_
   - Ant1Aura

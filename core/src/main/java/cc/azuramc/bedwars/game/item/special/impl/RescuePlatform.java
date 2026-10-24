@@ -307,7 +307,7 @@ public class RescuePlatform extends AbstractSpecialItem {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(AzuraBedWars.getInstance(), 20L, 20L);
+        }.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 20L, 20L);
     }
 
     /**

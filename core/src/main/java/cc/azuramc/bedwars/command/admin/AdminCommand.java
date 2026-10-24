@@ -31,7 +31,7 @@ public class AdminCommand {
     public void getHelpCommand(BukkitCommandActor actor) {
         List<String> helpMessages = MessageUtil.color(List.of(
                 MessageUtil.CHAT_BAR,
-                "&b&lAzuraBedWars &8- &7v" + plugin.getDescription().getVersion() + " &8- &b起床战争 - 指令帮助",
+                "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 指令帮助",
                 "",
                 "&7 • &f/bw reload &7重新加载配置文件",
                 "&7 • &f/map &7查看地图相关指令帮助 &3&o[仅EditMode]",

@@ -72,7 +72,7 @@ public class PlayerMiscListener implements Listener {
                     PlayerUtil.setItemInHand(player, new ItemStack(Material.AIR));
                 }
             }
-        }.runTaskLater(AzuraBedWars.getInstance(), 0);
+        }.runTaskLater(AzuraBedWars.getInstance().getPlugin(), 0);
     }
 
 
@@ -104,7 +104,7 @@ public class PlayerMiscListener implements Listener {
             return;
         }
 
-        player.setMetadata("等待上一次求救", new FixedMetadataValue(AzuraBedWars.getInstance(), ""));
+        player.setMetadata("等待上一次求救", new FixedMetadataValue(AzuraBedWars.getInstance().getPlugin(), ""));
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam == null) {
@@ -117,7 +117,7 @@ public class PlayerMiscListener implements Listener {
             @Override
             public void run() {
                 if (i > 5) {
-                    player.removeMetadata("等待上一次求救", AzuraBedWars.getInstance());
+                    player.removeMetadata("等待上一次求救", AzuraBedWars.getInstance().getPlugin());
                     cancel();
                     return;
                 }
@@ -126,6 +126,6 @@ public class PlayerMiscListener implements Listener {
                 gameManager.broadcastTeamSound(gameTeam, XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
                 i++;
             }
-        }.runTaskTimer(AzuraBedWars.getInstance(), 0, 10L);
+        }.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0, 10L);
     }
 }

@@ -13,6 +13,9 @@ dependencies {
     compileOnly(libs.findLibrary("jetbrains-annotations").get())
     compileOnly(libs.findLibrary("lombok").get())
     annotationProcessor(libs.findLibrary("lombok").get())
+    testImplementation(platform(libs.findLibrary("junit-bom").get()))
+    testImplementation(libs.findLibrary("junit-jupiter").get())
+    testRuntimeOnly(libs.findLibrary("junit-platform-launcher").get())
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -20,6 +23,10 @@ tasks.withType<JavaCompile>().configureEach {
     options.release = 21
     options.isFork = true
     options.forkOptions.memoryMaximumSize = "1536m"
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 tasks.processResources {
