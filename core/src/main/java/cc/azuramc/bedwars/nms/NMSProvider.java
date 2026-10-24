@@ -51,6 +51,7 @@ public class NMSProvider {
         MODULES.put(version(1, 21, 9), "v1_21_R6");
         MODULES.put(version(1, 21, 11), "v1_21_R7");
         MODULES.put(version(26, 1, 0), "v26_1");
+        MODULES.put(version(26, 2, 0), "v26_2");
     }
 
     /** First Minecraft version the modules were not run on */
