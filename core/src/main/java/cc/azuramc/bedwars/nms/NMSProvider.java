@@ -6,37 +6,80 @@ import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Getter;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 /**
  * @author an5w1r@163.com
  */
 @Getter
 public class NMSProvider {
+
+    /** First Minecraft version of each nms directory */
+    private static final NavigableMap<Integer, String> MODULES = new TreeMap<>();
+
+    static {
+        MODULES.put(version(1, 8, 4), "v1_8_R3");
+        MODULES.put(version(1, 9, 0), "v1_9_R1");
+        MODULES.put(version(1, 9, 4), "v1_9_R2");
+        MODULES.put(version(1, 10, 0), "v1_10_R1");
+        MODULES.put(version(1, 11, 0), "v1_11_R1");
+        MODULES.put(version(1, 12, 0), "v1_12_R1");
+        MODULES.put(version(1, 13, 0), "v1_13_R1");
+        MODULES.put(version(1, 13, 1), "v1_13_R2");
+        MODULES.put(version(1, 14, 0), "v1_14_R1");
+        MODULES.put(version(1, 15, 0), "v1_15_R1");
+        MODULES.put(version(1, 16, 0), "v1_16_R1");
+        MODULES.put(version(1, 16, 2), "v1_16_R2");
+        MODULES.put(version(1, 16, 4), "v1_16_R3");
+        MODULES.put(version(1, 17, 0), "v1_17_R1");
+        MODULES.put(version(1, 18, 0), "v1_18_R1");
+        MODULES.put(version(1, 18, 2), "v1_18_R2");
+        MODULES.put(version(1, 19, 0), "v1_19_R1");
+        MODULES.put(version(1, 19, 3), "v1_19_R2");
+        MODULES.put(version(1, 19, 4), "v1_19_R3");
+        MODULES.put(version(1, 20, 0), "v1_20_R1");
+        MODULES.put(version(1, 20, 2), "v1_20_R2");
+        MODULES.put(version(1, 20, 3), "v1_20_R3");
+        MODULES.put(version(1, 20, 5), "v1_20_R4");
+        MODULES.put(version(1, 21, 0), "v1_21_R1");
+        MODULES.put(version(1, 21, 2), "v1_21_R2");
+        MODULES.put(version(1, 21, 4), "v1_21_R3");
+        MODULES.put(version(1, 21, 5), "v1_21_R4");
+        MODULES.put(version(1, 21, 6), "v1_21_R5");
+        MODULES.put(version(1, 21, 9), "v1_21_R6");
+        MODULES.put(version(1, 21, 11), "v1_21_R7");
+        MODULES.put(version(26, 1, 0), "v26_1");
+    }
+
+    /** First Minecraft version the modules were not run on */
+    private static final int UNTESTED = version(26, 4, 0);
+
     private NMSAccess access;
-    private String nmsVersion;
+    private String module;
 
     public NMSAccess setup() {
-        this.nmsVersion = VersionUtil.getNmsVersion();
-        this.access = createNMSAccess(nmsVersion);
+        int version = version(VersionUtil.getMajorNumber(), VersionUtil.getMinorNumber(), VersionUtil.getPatchNumber());
+        Map.Entry<Integer, String> entry = MODULES.floorEntry(version);
+        this.module = entry == null ? null : entry.getValue();
+        this.access = module == null ? null : createNMSAccess(module);
 
-        if (this.access == null) {
-            LoggerUtil.warn("NMS支持未找到 (" + this.nmsVersion + ")! 启用兼容模式 可能存在意外问题!");
+        if (access == null) {
+            LoggerUtil.warn("NMS支持未找到 (" + VersionUtil.getParsedVersion() + ")! 启用兼容模式 可能存在意外问题!");
             access = new CompatibilityModeNMS();
-        } else if (nmsVersion == null) {
-            LoggerUtil.info("正在使用 Mojang Namespace 运行时 (" + VersionUtil.getParsedVersion() + ")");
+        } else if (version >= UNTESTED) {
+            LoggerUtil.warn("服务端版本 " + VersionUtil.getParsedVersion() + " 尚未经过测试, 正在使用 " + module);
         } else {
-            LoggerUtil.info("正在使用受支持的版本! (" + this.nmsVersion + ")");
+            LoggerUtil.info("正在使用受支持的版本! (" + module + ")");
         }
 
         return access;
     }
 
-    private NMSAccess createNMSAccess(String version) {
+    private NMSAccess createNMSAccess(String module) {
         try {
-            if (version == null) {
-                return createMojangNamespaceAccess();
-            }
-            return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + "." + version + ".NMS_" + version).getDeclaredConstructor().newInstance();
+            return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + "." + module + ".NMS_" + module).getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             LoggerUtil.warn("未受支持的版本: " + e.getMessage());
         } catch (InstantiationException | IllegalAccessException e) {
@@ -47,28 +90,7 @@ public class NMSProvider {
         return null;
     }
 
-    private NMSAccess createMojangNamespaceAccess() throws
-            ClassNotFoundException,
-            NoSuchMethodException,
-            InstantiationException,
-            IllegalAccessException,
-            InvocationTargetException {
-        String pkg = resolveMojangNamespacePackage();
-        return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + "." + pkg + ".NMS_MojangNamespace").getDeclaredConstructor().newInstance();
-    }
-
-    private String resolveMojangNamespacePackage() {
-        // 年份版本体系 (26.x.x+)
-        if (VersionUtil.getMajorNumber() >= 26) {
-            return "mojangnamespace26_1";
-        }
-        // Paper Mojang Namespace (1.20.5 ~ 26.x)
-        // CraftBukkit 在 26.x 发布后才舍弃 v1_XX_RX 的命名格式 此处用来兼容 Paper 从 1.20.5 到 26.x
-        // https://forums.papermc.io/threads/important-dev-psa-future-removal-of-cb-package-relocation.1106/
-        // 对于 Paper 1.21.11, 此时CraftBukkit还没有舍弃版本号包名, 但 Mojang 重构了 NMS, 特例处理
-        if (VersionUtil.getParsedVersion().equals("1.21.11")) {
-            return "mojangnamespace26_1";
-        }
-        return "mojangnamespace";
+    private static int version(int major, int minor, int patch) {
+        return major * 10_000 + minor * 100 + patch;
     }
 }
