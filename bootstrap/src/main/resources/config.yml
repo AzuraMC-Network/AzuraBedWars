@@ -9,3 +9,11 @@ libraries:
     - https://repo1.maven.org/maven2/
     - https://maven.aliyun.com/repository/public/
     - https://jitpack.io/
+
+updater:
+  # Checks GitHub releases on startup and downloads a newer jar of the same kind, regular or offline,
+  # into the update folder, plugins/update/ by default. The server installs it on the next restart
+  # The downloaded jar keeps the file name of the current one
+  enabled: true
+  # Also accept beta releases
+  include-prereleases: true

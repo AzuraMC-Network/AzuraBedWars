@@ -86,6 +86,15 @@ final class LibraryResolver {
         return libraries;
     }
 
+    static boolean bundlesAll(@NotNull List<Library> libraries) {
+        for (Library library : libraries) {
+            if (LibraryResolver.class.getResource(BUNDLE_DIRECTORY + library.getBundledName()) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @NotNull
     URL[] resolveAll(@NotNull List<Library> libraries) throws IOException {
         URL[] urls = new URL[libraries.size()];
@@ -105,7 +114,7 @@ final class LibraryResolver {
         InputStream bundled = LibraryResolver.class.getResourceAsStream(BUNDLE_DIRECTORY + library.getBundledName());
         if (bundled != null) {
             try (InputStream in = bundled) {
-                install(in, library, target);
+                install(in, library.getSha256(), library.getCoordinate(), target);
             }
             return target;
         }
@@ -113,7 +122,7 @@ final class LibraryResolver {
         IOException last = null;
         for (String repository : repositories) {
             try (InputStream in = open(new URL(repository + library.getRepositoryPath()))) {
-                install(in, library, target);
+                install(in, library.getSha256(), library.getCoordinate(), target);
                 return target;
             } catch (IOException e) {
                 logger.warning("Failed to download " + library.getCoordinate() + " from " + repository + ": " + e.getMessage());
@@ -123,14 +132,14 @@ final class LibraryResolver {
         throw new IOException("all repositories failed for " + library.getCoordinate(), last);
     }
 
-    private static void install(@NotNull InputStream in, @NotNull Library library, @NotNull Path target) throws IOException {
+    static void install(@NotNull InputStream in, @NotNull String sha256, @NotNull String name, @NotNull Path target) throws IOException {
         Path temp = Files.createTempFile(target.getParent(), target.getFileName().toString(), ".part");
         try {
             MessageDigest digest = newDigest();
             Files.copy(new DigestInputStream(in, digest), temp, StandardCopyOption.REPLACE_EXISTING);
             String actual = hex(digest.digest());
-            if (!library.getSha256().equals(actual)) {
-                throw new IOException("sha256 mismatch for " + library.getCoordinate() + ": " + actual);
+            if (!sha256.equals(actual)) {
+                throw new IOException("sha256 mismatch for " + name + ": " + actual);
             }
             Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING);
         } finally {
@@ -140,7 +149,7 @@ final class LibraryResolver {
 
     /** Repositories may also be local file URLs */
     @NotNull
-    private static InputStream open(@NotNull URL url) throws IOException {
+    static InputStream open(@NotNull URL url) throws IOException {
         URLConnection connection = url.openConnection();
         connection.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
         connection.setReadTimeout(READ_TIMEOUT_MILLIS);
@@ -156,7 +165,7 @@ final class LibraryResolver {
     }
 
     @NotNull
-    private static String sha256(@NotNull Path file) throws IOException {
+    static String sha256(@NotNull Path file) throws IOException {
         MessageDigest digest = newDigest();
         try (InputStream in = Files.newInputStream(file)) {
             byte[] buffer = new byte[8192];

@@ -37,12 +37,13 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 - `core` — 服务端运行的游戏逻辑
 - `nms` — 各版本的 NMS 实现
 - `plugin` — 打包常规版与离线版插件 jar
-- `loader` — 自动下载更新插件的加载器
 
 使用 `./gradlew build` 构建，`plugin/build/libs/` 下输出两个 jar：
 
 - `AzuraBedWars-<version>.jar` 首次启动时把依赖下载到 `plugins/AzuraBedWars/libraries/`，下载仓库在 `config.yml` 里配置
 - `AzuraBedWars-<version>-offline.jar` 内置全部依赖，适合无法联网的服务器
+
+两种 jar 启动时都会检查 GitHub release，把同类型的新版本下载到 `plugins/update/`，服务器下次重启时自动替换。在 `config.yml` 里把 `updater.enabled` 设为 `false` 可以关闭。
 
 ## 性能展示
 

@@ -13,7 +13,6 @@ BedWars plugin for Spigot and Paper, supporting Minecraft 1.8.8 through 26.x fro
 | `nms/mojang/` | Paper 1.20.5 to 1.21.10 with Mojang mappings |
 | `nms/mojang_26/` | Paper 1.21.11 and every 26.x server |
 | `plugin/` | Assembles the regular and offline plugin jars |
-| `loader/` | Standalone plugin that downloads and loads the latest release |
 | `build-logic/` | Convention plugins and `RuntimeLibrariesTask` |
 | `libs/` | In-house jars in a Maven layout, group `cc.azuramc` |
 
@@ -27,6 +26,7 @@ Bukkit loads only `bootstrap` and `api`. Everything else runs inside `IsolatedCl
 - Third-party libraries from `core`'s runtime classpath are listed with their sha256 in `META-INF/azurabedwars/libraries.txt`
 - The regular jar embeds only the inner jar and `cc.azuramc` libraries, and downloads the rest into `plugins/AzuraBedWars/libraries/` from `libraries.repositories` in `config.yml`
 - `-offline.jar` embeds every library
+- On startup `Updater` downloads a newer GitHub release of the same kind into Bukkit's update folder, so it is installed on the next restart. Release assets are attached by the build workflow
 
 Rules that follow from this:
 
@@ -139,7 +139,7 @@ These files already meet the target. Match their feel when writing new code:
 Format: `type(scope): summary`, with no body and no trailers.
 
 - type: feat / fix / perf / refactor / chore
-- scope: the affected module or area such as build, core, nms, loader, game, shop; omit when it spans many areas
+- scope: the affected module or area such as build, bootstrap, core, nms, game, shop; omit when it spans many areas
 - The summary states the result, not the mechanism
 - Keep it short and plain. When a second clause is needed, separate it with a space rather than expanding into sentences
 - One commit does one thing. Unrelated changes go into separate commits

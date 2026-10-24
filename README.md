@@ -41,12 +41,13 @@ AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project 
 - `core` — Game logic running on the server
 - `nms` — Per-version NMS implementations
 - `plugin` — Packages the regular and offline plugin jars
-- `loader` — Auto downloader and updater for the plugin
 
 Build with `./gradlew build`. Two jars are written to `plugin/build/libs/`:
 
 - `AzuraBedWars-<version>.jar` downloads its libraries on first start into `plugins/AzuraBedWars/libraries/`, repositories are set in `config.yml`
 - `AzuraBedWars-<version>-offline.jar` embeds every library for servers without internet access
+
+Both jars check GitHub releases on startup and download a newer version of the same jar into `plugins/update/`, which the server installs on the next restart. Set `updater.enabled` to `false` in `config.yml` to turn this off.
 
 ## Performance Showcase
 
