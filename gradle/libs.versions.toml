@@ -12,6 +12,8 @@ lamp = "3.2.1"
 xseries = "13.6.0"
 fastboard = "2.1.5"
 mongodb = "5.5.1"
+azura-orm = "1.1.2"
+azura-mobaicontroller = "1.0-SNAPSHOT"
 jetbrains-annotations = "26.1.0"
 lombok = "1.18.48"
 junit = "5.14.4"
@@ -33,6 +35,8 @@ lamp-bukkit = { module = "com.github.Revxrsal.Lamp:bukkit", version.ref = "lamp"
 xseries = { module = "com.github.cryptomorin:XSeries", version.ref = "xseries" }
 fastboard = { module = "fr.mrmicky:fastboard", version.ref = "fastboard" }
 mongodb-driver-sync = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodb" }
+azura-orm = { module = "cc.azuramc:AzuraORM", version.ref = "azura-orm" }
+azura-mobaicontroller = { module = "cc.azuramc:AzuraMobAiController", version.ref = "azura-mobaicontroller" }
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }

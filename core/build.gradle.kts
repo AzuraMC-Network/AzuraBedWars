@@ -19,7 +19,6 @@ dependencies {
     implementation(libs.xseries)
     implementation(libs.fastboard)
     implementation(libs.mongodb.driver.sync)
-
-    implementation(files("libs/AzuraORM-1.1.2-all.jar"))
-    implementation(files("libs/AzuraMobAiController-1.0-SNAPSHOT-all.jar"))
+    implementation(libs.azura.orm)
+    implementation(libs.azura.mobaicontroller)
 }
