@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.4.0'
+}
+
+dependencies {
+    implementation project(':api')
+    implementation project(':core')
+    implementation project(':nms:v1_8_R3')
+    implementation project(':nms:v1_9_R1')
+    implementation project(':nms:v1_9_R2')
+    implementation project(':nms:v1_10_R1')
+    implementation project(':nms:v1_11_R1')
+    implementation project(':nms:v1_12_R1')
+    implementation project(':nms:v1_13_R1')
+    implementation project(':nms:v1_13_R2')
+    implementation project(':nms:v1_14_R1')
+    implementation project(':nms:v1_15_R1')
+    implementation project(':nms:v1_16_R1')
+    implementation project(':nms:v1_16_R2')
+    implementation project(':nms:v1_17_R1')
+    implementation project(':nms:v1_16_R3')
+    implementation project(':nms:v1_18_R1')
+    implementation project(':nms:v1_18_R2')
+    implementation project(':nms:v1_19_R1')
+    implementation project(':nms:v1_19_R2')
+    implementation project(':nms:v1_19_R3')
+    implementation project(':nms:v1_20_R1')
+    implementation project(':nms:v1_20_R2')
+    implementation project(':nms:v1_20_R3')
+    implementation project(':nms:v1_20_R4')
+    implementation project(':nms:v1_21_R1')
+    implementation project(':nms:v1_21_R2')
+    implementation project(':nms:v1_21_R3')
+    implementation project(':nms:v1_21_R4')
+    implementation project(':nms:v1_21_R5')
+    implementation project(':nms:v1_21_R6')
+    implementation project(':nms:v1_21_R7')
+    implementation project(':nms:mojang')
+    implementation project(':nms:mojang_26')
+}
+
+shadowJar {
+    archiveFileName = 'azurabedwars-plugin-' + version + ".jar"
+    archiveVersion.set(version.toString())
+}
+
+build.dependsOn shadowJar
