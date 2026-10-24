@@ -37,8 +37,8 @@ fun projectJars(paths: Set<String>, outer: Boolean) = runtimeArtifacts.map { art
     }.map { it.file }
 }
 
-// loaded by Bukkit so other plugins share the API classes
-val outerProjects = setOf(":bootstrap", ":api")
+// loaded by Bukkit so other plugins share the API classes and Paper remaps the NMS classes
+val outerProjects = setOf(":bootstrap", ":api") + rootProject.project(":nms").subprojects.map { it.path }
 val outerProjectJars = projectJars(outerProjects, true)
 val innerProjectJars = projectJars(outerProjects, false)
 
