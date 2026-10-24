@@ -17,7 +17,6 @@ azura-mobaicontroller = "1.0-SNAPSHOT"
 jetbrains-annotations = "26.1.0"
 lombok = "1.18.48"
 junit = "5.14.4"
-shadow = "9.6.1"
 
 [libraries]
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot-api" }
@@ -42,6 +41,3 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-
-[plugins]
-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
