@@ -5,6 +5,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -42,7 +44,16 @@ public final class AzuraBedWarsBootstrap extends JavaPlugin {
         );
         URL[] classpath;
         try {
-            classpath = resolver.resolveAll(LibraryResolver.readManifest());
+            List<Library> libraries = LibraryResolver.readManifest();
+            if (getConfig().getBoolean("updater.enabled")) {
+                Path target = getServer().getUpdateFolderFile().toPath().resolve(getFile().getName());
+                Thread updater = new Thread(new Updater(getLogger(), getDescription().getVersion(),
+                        LibraryResolver.bundlesAll(libraries), getConfig().getBoolean("updater.include-prereleases"), target),
+                        "AzuraBedWars Updater");
+                updater.setDaemon(true);
+                updater.start();
+            }
+            classpath = resolver.resolveAll(libraries);
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Failed to prepare runtime libraries, point libraries.repositories in config.yml"
                     + " at reachable repositories or use the offline jar", e);
