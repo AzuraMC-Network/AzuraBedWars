@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.game.map;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.game.map.IMapData;
+import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import lombok.Getter;
@@ -429,9 +430,7 @@ public class MapData implements IMapData {
             return true;
         }
 
-        // 检查BED_BLOCK（床方块）
-        // 在1.13+版本中变为BED、RED_BED等
-        if (materialName.contains("BED")) {
+        if (MapUtil.isBed(material)) {
             return true;
         }
 

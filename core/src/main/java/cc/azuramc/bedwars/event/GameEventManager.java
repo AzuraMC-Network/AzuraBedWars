@@ -161,8 +161,7 @@ public class GameEventManager implements Runnable {
             over = true;
 
             // 触发游戏结束事件
-            BedwarsGameEndEvent gameEndEvent = new BedwarsGameEndEvent(gameManager);
-            Bukkit.getPluginManager().callEvent(gameEndEvent);
+            AzuraBedWars.getInstance().mainThreadRunnable(() -> Bukkit.getPluginManager().callEvent(new BedwarsGameEndEvent(gameManager)));
         }
     }
 
