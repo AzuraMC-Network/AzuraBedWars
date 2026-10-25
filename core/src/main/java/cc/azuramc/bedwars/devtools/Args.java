@@ -54,6 +54,9 @@ public final class Args {
         if (!value.isJsonPrimitive() || !((JsonPrimitive) value).isNumber()) {
             throw new ToolError("Argument " + key + " must be a number");
         }
+        if (value.getAsDouble() != value.getAsInt()) {
+            throw new ToolError("Argument " + key + " must be a whole number");
+        }
         return value.getAsInt();
     }
 
