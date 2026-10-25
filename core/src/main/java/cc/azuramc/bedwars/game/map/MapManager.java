@@ -92,10 +92,7 @@ public class MapManager {
 
         for (String name : names) {
             MapData map = maps.get(name);
-            MapCheck check = MapCheck.of(map);
-            if (!check.getErrors().isEmpty()) {
-                LoggerUtil.warn("地图 " + name + " 配置不完整 无法使用");
-                check.getErrors().forEach(error -> LoggerUtil.warn("  " + error));
+            if (hasErrors(map, false)) {
                 continue;
             }
             World world = copyWorld(map);
@@ -103,13 +100,30 @@ public class MapManager {
                 continue;
             }
             map.bindWorld(world.getName());
-            MapCheck.of(map).getWarnings().forEach(warning -> LoggerUtil.warn("地图 " + name + " " + warning));
+            // beds and wool are only checked once the copied world is loaded
+            if (hasErrors(map, true)) {
+                Bukkit.unloadWorld(world, false);
+                continue;
+            }
             if (!name.equals(preferred)) {
                 LoggerUtil.warn("改用地图 " + name);
             }
             return map;
         }
         return null;
+    }
+
+    private static boolean hasErrors(MapData map, boolean logWarnings) {
+        MapCheck check = MapCheck.of(map);
+        if (check.getErrors().isEmpty()) {
+            if (logWarnings) {
+                check.getWarnings().forEach(warning -> LoggerUtil.warn("地图 " + map.getName() + " " + warning));
+            }
+            return false;
+        }
+        LoggerUtil.warn("地图 " + map.getName() + " 配置不完整 无法使用");
+        check.getErrors().forEach(error -> LoggerUtil.warn("  " + error));
+        return true;
     }
 
     @Nullable
