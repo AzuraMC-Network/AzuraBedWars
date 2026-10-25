@@ -114,10 +114,13 @@ class ConfigServiceTest {
     }
 
     @Test
-    void nextGameDocumentsReportTheRunningGame() throws IOException {
+    void nextGameDocumentsWaitForTheNextGame() throws IOException {
         gameRunning.set(true);
         edit("nested/gameplay.yml", "max-health: 20", "max-health: 40");
         assertEquals(ApplyResult.Status.NEXT_GAME, service.reload("gameplay").getStatus());
+        assertEquals(20, service.get(GameplayConfig.class).getMaxHealth());
+
+        service.applyPending();
         assertEquals(40, service.get(GameplayConfig.class).getMaxHealth());
     }
 

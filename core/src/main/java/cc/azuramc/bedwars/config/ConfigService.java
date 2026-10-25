@@ -50,6 +50,7 @@ public final class ConfigService {
     private final BooleanSupplier gameRunning;
     private final Map<String, ConfigDocument<?>> documents = new LinkedHashMap<>();
     private final Map<Class<?>, Object> values = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Object> pending = new ConcurrentHashMap<>();
 
     public ConfigService(File dataFolder, BooleanSupplier gameRunning) {
         this.dataFolder = dataFolder;
@@ -162,6 +163,14 @@ public final class ConfigService {
         }
     }
 
+    /**
+     * Swaps in {@link ApplyMode#NEXT_GAME} documents that were reloaded during a game
+     */
+    public void applyPending() {
+        values.putAll(pending);
+        pending.clear();
+    }
+
     public List<ApplyResult> reloadAll() {
         List<ApplyResult> results = new ArrayList<>();
         for (String id : documents.keySet()) {
@@ -260,15 +269,13 @@ public final class ConfigService {
         if (current != null) {
             keepRestartRequired(current, loaded.value, "", restartPaths);
         }
-        values.put(document.getType(), loaded.value);
-        ApplyResult.Status status;
-        if (!restartPaths.isEmpty()) {
-            status = ApplyResult.Status.RESTART_REQUIRED;
-        } else if (document.getApplyMode() == ApplyMode.NEXT_GAME && gameRunning.getAsBoolean()) {
-            status = ApplyResult.Status.NEXT_GAME;
-        } else {
-            status = ApplyResult.Status.APPLIED;
+        if (document.getApplyMode() == ApplyMode.NEXT_GAME && gameRunning.getAsBoolean()) {
+            pending.put(document.getType(), loaded.value);
+            return new ApplyResult(document.getId(), ApplyResult.Status.NEXT_GAME, loaded.problems, restartPaths);
         }
+        pending.remove(document.getType());
+        values.put(document.getType(), loaded.value);
+        ApplyResult.Status status = restartPaths.isEmpty() ? ApplyResult.Status.APPLIED : ApplyResult.Status.RESTART_REQUIRED;
         return new ApplyResult(document.getId(), status, loaded.problems, restartPaths);
     }
 

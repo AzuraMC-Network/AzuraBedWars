@@ -348,7 +348,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
 
     private void initConfigSystem() {
         configService = new ConfigService(plugin.getDataFolder(),
-                () -> gameManager != null && gameManager.getGameState() == GameState.RUNNING);
+                () -> gameManager != null && gameManager.getGameState() != GameState.WAITING);
         configService.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 1);
         configService.register("database", "database.yml", DatabaseConfig.class, ApplyMode.RESTART, 1);
         configService.register("gameplay", "gameplay.yml", GameplayConfig.class, ApplyMode.LIVE, 1);

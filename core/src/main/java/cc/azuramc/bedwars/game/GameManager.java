@@ -893,6 +893,7 @@ public class GameManager implements IGameManager {
             return;
         }
 
+        plugin.getConfigService().applyPending();
         gameState = GameState.RUNNING;
         // 更新MOTD
         updateServerMOTD();
