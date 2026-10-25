@@ -37,6 +37,7 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 - `core` — 服务端运行的游戏逻辑
 - `nms` — 各版本的 NMS 实现
 - `plugin` — 打包常规版与离线版插件 jar
+- `examples/grapple` — 扩展插件示例，见 [Writing extensions](docs/extensions.md)
 
 使用 `./gradlew build` 构建，`plugin/build/libs/` 下输出两个 jar：
 

@@ -41,6 +41,7 @@ AzuraBedWars is a Minecraft bed wars plugin based on Spigot/Paper. This project 
 - `core` — Game logic running on the server
 - `nms` — Per-version NMS implementations
 - `plugin` — Packages the regular and offline plugin jars
+- `examples/grapple` — Sample extension plugin, see [Writing extensions](docs/extensions.md)
 
 Build with `./gradlew build`. Two jars are written to `plugin/build/libs/`:
 
