@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game.task.generator;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.ResourceSpawnConfig;
+import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.map.MapData;
@@ -20,7 +20,11 @@ import java.util.*;
  */
 public class GeneratorManager {
 
-    private static final ResourceSpawnConfig resourceSpawnConfig = AzuraBedWars.getInstance().getResourceSpawnConfig();
+    /** Must match the fall distances that LoadGameUtil gives each hologram line */
+    private static final float TIME_LINE = 6.0F;
+    private static final float NAME_LINE = 5.0F;
+    private static final float LEVEL_LINE = 4.0F;
+
     private final GameManager gameManager;
     private final Map<String, PublicResourceGenerator> publicResourceGeneratorMap;
     private final Map<String, PrivateResourceGenerator> privateResourceGeneratorMap;
@@ -32,6 +36,7 @@ public class GeneratorManager {
     }
 
     public void initGeneratorTasks() {
+        GeneratorConfig config = config();
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
             PrivateResourceGenerator iron = null;
             if (XMaterial.IRON_INGOT.get() != null) {
@@ -40,10 +45,10 @@ public class GeneratorManager {
                         "铁锭" + gameTeam.getName(),
                         gameTeam.getResourceDropLocation(),
                         XMaterial.IRON_INGOT.get(),
-                        48
+                        config.getIronMaxStack()
                 );
             }
-            addPrivateResourceTask(iron, 20L);
+            addPrivateResourceTask(iron, ticks(config.getIronInterval()));
 
             PrivateResourceGenerator gold = null;
             if (XMaterial.GOLD_INGOT.get() != null) {
@@ -52,10 +57,10 @@ public class GeneratorManager {
                         "金锭" + gameTeam.getName(),
                         gameTeam.getResourceDropLocation(),
                         XMaterial.GOLD_INGOT.get(),
-                        8
+                        config.getGoldMaxStack()
                 );
             }
-            addPrivateResourceTask(gold, 20L * 3);
+            addPrivateResourceTask(gold, ticks(config.getGoldInterval()));
         }
 
         PublicResourceGenerator diamond = null;
@@ -65,10 +70,10 @@ public class GeneratorManager {
                     "钻石",
                     XMaterial.DIAMOND.get(),
                     MapData.DropType.DIAMOND,
-                    4
+                    config.getMaxDiamondStackLevel1()
             );
         }
-        addPublicResourceTask(diamond, 20L * 35);
+        addPublicResourceTask(diamond, ticks(config.getDiamondInterval()));
 
         PublicResourceGenerator emerald = null;
         if (XMaterial.EMERALD.get() != null) {
@@ -77,10 +82,18 @@ public class GeneratorManager {
                     "绿宝石",
                     XMaterial.EMERALD.get(),
                     MapData.DropType.EMERALD,
-                    2
+                    config.getMaxEmeraldStackLevel1()
             );
         }
-        addPublicResourceTask(emerald, 20L * 60);
+        addPublicResourceTask(emerald, ticks(config.getEmeraldInterval()));
+    }
+
+    private static long ticks(double seconds) {
+        return Math.max(1L, Math.round(seconds * 20));
+    }
+
+    private static GeneratorConfig config() {
+        return AzuraBedWars.getInstance().getGeneratorConfig();
     }
 
     /**
@@ -142,27 +155,30 @@ public class GeneratorManager {
     }
 
     public int getMaxStackForResource(String resource, int level) {
+        GeneratorConfig config = config();
         switch (resource) {
             case "钻石":
-                if (level == 1) return resourceSpawnConfig.getMaxDiamondStackLevel1();
-                if (level == 2) return resourceSpawnConfig.getMaxDiamondStackLevel2();
-                if (level == 3) return resourceSpawnConfig.getMaxDiamondStackLevel3();
+                if (level == 1) return config.getMaxDiamondStackLevel1();
+                if (level == 2) return config.getMaxDiamondStackLevel2();
+                if (level == 3) return config.getMaxDiamondStackLevel3();
                 break;
             case "绿宝石":
-                if (level == 1) return resourceSpawnConfig.getMaxEmeraldStackLevel1();
-                if (level == 2) return resourceSpawnConfig.getMaxEmeraldStackLevel2();
-                if (level == 3) return resourceSpawnConfig.getMaxEmeraldStackLevel3();
+                if (level == 1) return config.getMaxEmeraldStackLevel1();
+                if (level == 2) return config.getMaxEmeraldStackLevel2();
+                if (level == 3) return config.getMaxEmeraldStackLevel3();
                 break;
         }
         return 0;
     }
 
     public void initDisplayUpdaters() {
-        initResourceDisplayUpdater("钻石", resourceSpawnConfig.getDiamondGeneratorName(), gameManager.getArmorStand(), resourceSpawnConfig.getDiamondName());
-        initResourceDisplayUpdater("绿宝石", resourceSpawnConfig.getEmeraldGeneratorName(), gameManager.getArmorSande(), resourceSpawnConfig.getEmeraldName());
+        initResourceDisplayUpdater("钻石", gameManager.getArmorStand());
+        initResourceDisplayUpdater("绿宝石", gameManager.getArmorSande());
     }
 
-    private void updateResourceDisplay(Set<ArmorStand> armorStands, PublicResourceGenerator generator, String resourceDisplayName) {
+    private void updateResourceDisplay(Set<ArmorStand> armorStands, PublicResourceGenerator generator) {
+        GeneratorConfig config = config();
+        String resourceDisplayName = "钻石".equals(generator.getTaskName()) ? config.getDiamondName() : config.getEmeraldName();
         Iterator<ArmorStand> iterator = armorStands.iterator();
         while (iterator.hasNext()) {
             ArmorStand armorStand = iterator.next();
@@ -174,17 +190,17 @@ public class GeneratorManager {
             if (location.getWorld() == null || !location.getChunk().isLoaded()) {
                 continue;
             }
-            if (armorStand.getFallDistance() == resourceSpawnConfig.getNameDisplayHeight()) {
+            if (armorStand.getFallDistance() == TIME_LINE) {
                 int timeRemaining = generator.getSecondsToNextDrop();
-                String displayText = String.format(resourceSpawnConfig.getTimeRemainingFormat(), timeRemaining);
+                String displayText = String.format(config.getTimeRemainingFormat(), timeRemaining);
                 armorStand.setCustomName(displayText);
             }
-            if (armorStand.getFallDistance() == resourceSpawnConfig.getResourceTypeHeight()) {
+            if (armorStand.getFallDistance() == NAME_LINE) {
                 armorStand.setCustomName(resourceDisplayName);
             }
-            if (armorStand.getFallDistance() == resourceSpawnConfig.getLevelDisplayHeight()) {
+            if (armorStand.getFallDistance() == LEVEL_LINE) {
                 int level = generator.getLevel();
-                String levelDisplay = level <= 1 ? resourceSpawnConfig.getLevelI() : (level == 2 ? resourceSpawnConfig.getLevelII() : resourceSpawnConfig.getLevelIII());
+                String levelDisplay = level <= 1 ? config.getLevelI() : (level == 2 ? config.getLevelII() : config.getLevelIII());
                 armorStand.setCustomName(levelDisplay);
             }
         }
@@ -193,23 +209,13 @@ public class GeneratorManager {
     public void immediateUpdateDisplay(String generatorName) {
         PublicResourceGenerator generator = getPublicResourceGenerator(generatorName);
         if (generator == null) return;
-        Set<ArmorStand> armorStands;
-        String resourceDisplayName;
-        if (generatorName.equals(resourceSpawnConfig.getDiamondGeneratorName())) {
-            armorStands = new HashSet<>(gameManager.getArmorStand());
-            resourceDisplayName = resourceSpawnConfig.getDiamondName();
-        } else if (generatorName.equals(resourceSpawnConfig.getEmeraldGeneratorName())) {
-            armorStands = new HashSet<>(gameManager.getArmorSande());
-            resourceDisplayName = resourceSpawnConfig.getEmeraldName();
-        } else {
-            return;
-        }
-        updateResourceDisplay(armorStands, generator, resourceDisplayName);
+        Set<ArmorStand> armorStands = "钻石".equals(generatorName) ? gameManager.getArmorStand() : gameManager.getArmorSande();
+        updateResourceDisplay(new HashSet<>(armorStands), generator);
     }
 
-    private void initResourceDisplayUpdater(String resourceName, String generatorName, Set<ArmorStand> armorStands, String resourceDisplayName) {
+    private void initResourceDisplayUpdater(String resourceName, Set<ArmorStand> armorStands) {
         if (armorStands == null || armorStands.isEmpty()) {
-            LoggerUtil.warn("尝试初始化资源显示更新，但盔甲架集合为空: " + generatorName);
+            LoggerUtil.warn("尝试初始化资源显示更新，但盔甲架集合为空: " + resourceName);
             return;
         }
         final Set<ArmorStand> safeArmorStands = new HashSet<>(armorStands);
@@ -218,6 +224,6 @@ public class GeneratorManager {
             LoggerUtil.warn("无法找到生成器: " + resourceName);
             return;
         }
-        Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), () -> updateResourceDisplay(safeArmorStands, generator, resourceDisplayName), 0L, 20L);
+        Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), () -> updateResourceDisplay(safeArmorStands, generator), 0L, 20L);
     }
 }

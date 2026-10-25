@@ -24,4 +24,6 @@ dependencies {
         // only the X DevAPI needs it
         exclude(group = "com.google.protobuf")
     }
+
+    testImplementation(libs.spigot.api)
 }

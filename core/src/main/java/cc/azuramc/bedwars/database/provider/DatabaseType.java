@@ -11,9 +11,5 @@ public enum DatabaseType {
     /**
      * MongoDB数据库
      */
-    MONGODB,
-    /**
-     * 未知 异常处理使用
-     */
-    UNKNOWN
+    MONGODB
 }

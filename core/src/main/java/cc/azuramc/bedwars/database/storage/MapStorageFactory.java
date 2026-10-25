@@ -21,21 +21,15 @@ public class MapStorageFactory {
     private static MySQLMapStorage mysqlMapStorage;
 
     /**
-     * Falls back to JSON when the configured type is unknown or unavailable
+     * Falls back to JSON when MySQL is not the database
      */
     public static MapStorageType getDefaultType() {
-        String configured = AzuraBedWars.getInstance().getSettingsConfig().getMapStorage();
-        try {
-            MapStorageType type = MapStorageType.valueOf(configured.toUpperCase());
-            if (type == MapStorageType.MYSQL && !isMysqlAvailable()) {
-                LoggerUtil.error("mapStorage 为 MYSQL 但 database.databaseType 不是 MySQL 改用 JSON 存储地图");
-                return MapStorageType.JSON;
-            }
-            return type;
-        } catch (IllegalArgumentException e) {
-            LoggerUtil.error("未知的 mapStorage " + configured + " 改用 JSON 存储地图");
+        MapStorageType type = AzuraBedWars.getInstance().getSettingsConfig().getMapStorage();
+        if (type == MapStorageType.MYSQL && !isMysqlAvailable()) {
+            LoggerUtil.error("map-storage 为 MYSQL 但 database.yml 的 database-type 不是 MySQL 改用 JSON 存储地图");
             return MapStorageType.JSON;
         }
+        return type;
     }
 
     public static IMapStorage getDefaultStorage() {

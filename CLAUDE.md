@@ -120,7 +120,7 @@ Commented-out dead code is deleted as a whole block.
 
 These files already meet the target. Match their feel when writing new code:
 
-- `core/src/main/java/cc/azuramc/bedwars/config/yaml/YamlDeserializer.java`
+- `core/src/main/java/cc/azuramc/bedwars/config/yaml/YamlBinder.java`
 - `core/src/main/java/cc/azuramc/bedwars/database/repository/mongodb/MongoDatabaseVersionRepository.java`
 - `build-logic/src/main/kotlin/azurabedwars.java-conventions.gradle.kts`
 

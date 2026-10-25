@@ -29,7 +29,7 @@ public class GameTeamBedHandler {
     }
 
     private Block findBedBlock() {
-        int radius = AzuraBedWars.getInstance().getSettingsConfig().getBedSearchRadius();
+        int radius = AzuraBedWars.getInstance().getGameplayConfig().getBedSearchRadius();
         Block center = gameTeam.getSpawnLocation().getBlock();
         Block nearest = null;
         int nearestDistance = Integer.MAX_VALUE;

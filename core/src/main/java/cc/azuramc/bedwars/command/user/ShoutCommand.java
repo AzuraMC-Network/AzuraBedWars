@@ -42,6 +42,6 @@ public class ShoutCommand {
         }
 
         // 发全局消息
-        ChatListener.handleInGameChat(gamePlayer, AzuraBedWars.getInstance().getSettingsConfig().getChatConfig().getGlobalChatPrefix() + message);
+        ChatListener.handleInGameChat(gamePlayer, AzuraBedWars.getInstance().getGameplayConfig().getChat().getGlobalChatPrefix() + message);
     }
 }

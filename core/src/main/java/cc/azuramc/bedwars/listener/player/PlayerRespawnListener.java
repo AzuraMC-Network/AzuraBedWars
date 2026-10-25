@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -24,8 +23,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
  */
 public class PlayerRespawnListener implements Listener {
 
-    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
-    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
 
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
@@ -47,7 +44,7 @@ public class PlayerRespawnListener implements Listener {
             // spectator setup does not stick during the respawn event
             Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), () -> {
                 sendPlayAgainMessage(gamePlayer);
-                SpectatorManager.toSpectator(gamePlayer, messageConfig.getDeathPermanentTitle(), messageConfig.getDeathPermanentSubTitle());
+                SpectatorManager.toSpectator(gamePlayer, messages().getDeathPermanentTitle(), messages().getDeathPermanentSubTitle());
             }, 1L);
             return;
         }
@@ -67,10 +64,14 @@ public class PlayerRespawnListener implements Listener {
     }
 
     private void sendPlayAgainMessage(GamePlayer gamePlayer) {
-        TextComponent textComponent = new TextComponent(messageConfig.getPlayAgainMessage());
-        TextComponent button = new TextComponent(messageConfig.getPlayAgainButton());
-        button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, settingsConfig.getPlayAgainCommand()));
+        TextComponent textComponent = new TextComponent(messages().getPlayAgainMessage());
+        TextComponent button = new TextComponent(messages().getPlayAgainButton());
+        button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, AzuraBedWars.getInstance().getSettingsConfig().getPlayAgainCommand()));
         textComponent.addExtra(button);
         gamePlayer.getPlayer().spigot().sendMessage(textComponent);
+    }
+
+    private static MessageConfig messages() {
+        return AzuraBedWars.getInstance().getMessageConfig();
     }
 }

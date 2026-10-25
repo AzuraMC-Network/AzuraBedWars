@@ -20,9 +20,6 @@ import java.util.UUID;
  */
 public class SpeedWoolHandler {
 
-    private static final ItemConfig.SpeedWoolHandler CONFIG = AzuraBedWars.getInstance().getItemConfig().getSpeedWoolHandler();
-
-    private static final int MAX_SPEED_WOOL_LENGTH = CONFIG.getMaxSpeedWoolLength();
     private static final String SPEED_WOOL_METADATA = "SPEED_WOOL";
 
     /**
@@ -40,7 +37,7 @@ public class SpeedWoolHandler {
 
             @Override
             public void run() {
-                if (i > MAX_SPEED_WOOL_LENGTH) {
+                if (i > config().getMaxSpeedWoolLength()) {
                     cancel();
                     return;
                 }
@@ -76,4 +73,7 @@ public class SpeedWoolHandler {
         }.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0, 2L);
     }
 
+    private static ItemConfig.SpeedWoolHandler config() {
+        return AzuraBedWars.getInstance().getItemConfig().getSpeedWoolHandler();
+    }
 }

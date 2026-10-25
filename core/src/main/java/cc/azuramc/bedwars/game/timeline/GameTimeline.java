@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.game.timeline;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameEndEvent;
-import cc.azuramc.bedwars.config.object.EventSettingsConfig;
+import cc.azuramc.bedwars.config.object.TimelineConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.spectator.task.SpectatorCompassTask;
@@ -30,7 +30,8 @@ public class GameTimeline {
     private static final long RESULTS_DELAY_TICKS = 40L;
 
     private final GameManager gameManager;
-    private final EventSettingsConfig config;
+    /** Captured when the game starts, so a reload never shifts a running game */
+    private TimelineConfig config;
     private final List<TimelineEvent> events = new ArrayList<>();
 
     private BukkitTask task;
@@ -44,10 +45,16 @@ public class GameTimeline {
 
     public GameTimeline(GameManager gameManager) {
         this.gameManager = gameManager;
-        this.config = AzuraBedWars.getInstance().getEventSettingsConfig();
+    }
 
-        EventSettingsConfig.DiamondUpdateEvent diamond = config.getDiamondUpdateEvent();
-        EventSettingsConfig.EmeraldUpdateEvent emerald = config.getEmeraldUpdateEvent();
+    public void start() {
+        if (task != null) {
+            return;
+        }
+        config = AzuraBedWars.getInstance().getTimelineConfig();
+        TimelineConfig.DiamondUpdateEvent diamond = config.getDiamondUpdateEvent();
+        TimelineConfig.EmeraldUpdateEvent emerald = config.getEmeraldUpdateEvent();
+        events.clear();
         events.add(new TimelineEvent("开始游戏", config.getGameStartEvent().getCountDown(), this::showStartCountdown, this::startGenerators));
         events.add(new TimelineEvent("钻石资源点升级到II级", 360, () -> upgradeGenerator("钻石", 2, diamond.getLevel2RefreshSecond())));
         events.add(new TimelineEvent("绿宝石升级到II级", 360, () -> upgradeGenerator("绿宝石", 2, emerald.getLevel2RefreshSecond())));
@@ -55,12 +62,7 @@ public class GameTimeline {
         events.add(new TimelineEvent("绿宝石升级到III级", 360, () -> upgradeGenerator("绿宝石", 3, emerald.getLevel3RefreshSecond())));
         events.add(new TimelineEvent("床自毁", config.getBedDestroyedEvent().getExecuteSeconds(), this::destroyAllBeds));
         events.add(new TimelineEvent("游戏结束", config.getGameOverEvent().getExecuteSeconds(), this::endWithoutWinner));
-    }
-
-    public void start() {
-        if (task == null) {
-            task = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), this::tick, 0L, 20L);
-        }
+        task = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), this::tick, 0L, 20L);
     }
 
     public void stop() {
@@ -71,6 +73,9 @@ public class GameTimeline {
     }
 
     public String getCurrentEventName() {
+        if (events.isEmpty()) {
+            return "";
+        }
         return events.get(Math.min(index, events.size() - 1)).getName();
     }
 
@@ -123,7 +128,7 @@ public class GameTimeline {
     }
 
     private void showStartCountdown(int secondsLeft) {
-        EventSettingsConfig.GameStartEvent start = config.getGameStartEvent();
+        TimelineConfig.GameStartEvent start = config.getGameStartEvent();
         gameManager.broadcastSound(XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
         gameManager.broadcastTitleToAll(start.getTitleString(), start.getSubtitle() + secondsLeft,
                 start.getFadeIn(), start.getTitleStay(), start.getFadeOut());
@@ -153,7 +158,7 @@ public class GameTimeline {
             }
         }
 
-        EventSettingsConfig.BedDestroyedEvent bedDestroyed = config.getBedDestroyedEvent();
+        TimelineConfig.BedDestroyedEvent bedDestroyed = config.getBedDestroyedEvent();
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 1, 1);
         gameManager.broadcastTitleToAll(bedDestroyed.getTitle(), bedDestroyed.getSubtitle(),
                 bedDestroyed.getFadeIn(), bedDestroyed.getTitleStay(), bedDestroyed.getFadeOut());

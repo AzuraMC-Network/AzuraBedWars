@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.bed.BedwarsBedDestroyEvent;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -20,7 +19,6 @@ public class BedBreakHandler {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
     private static final GameManager GAME_MANAGER = PLUGIN.getGameManager();
-    private static final SettingsConfig settingsConfig = PLUGIN.getSettingsConfig();
 
     public static void handleBedBreak(BlockBreakEvent event, Block block, GamePlayer gamePlayer, GameTeam gameTeam) {
         event.setCancelled(true);
@@ -72,8 +70,8 @@ public class BedBreakHandler {
         if (VaultUtil.ecoIsNull) {
             return;
         }
-        gamePlayer.sendMessage("§6+" + settingsConfig.getBedDestroyReward() + "个金币 (破坏床)");
-        VaultUtil.depositPlayer(gamePlayer, settingsConfig.getBedDestroyReward());
+        gamePlayer.sendMessage("§6+" + PLUGIN.getGameplayConfig().getBedDestroyReward() + "个金币 (破坏床)");
+        VaultUtil.depositPlayer(gamePlayer, PLUGIN.getGameplayConfig().getBedDestroyReward());
         new BukkitRunnable() {
             int i = 0;
 
@@ -83,7 +81,7 @@ public class BedBreakHandler {
                     cancel();
                     return;
                 }
-                gamePlayer.sendActionBar("§6+" + settingsConfig.getBedDestroyReward() + "个金币");
+                gamePlayer.sendActionBar("§6+" + PLUGIN.getGameplayConfig().getBedDestroyReward() + "个金币");
                 i++;
             }
         }.runTaskTimer(PLUGIN.getPlugin(), 0, 10);

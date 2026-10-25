@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.EventSettingsConfig;
+import cc.azuramc.bedwars.config.object.TimelineConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.GameManager;
@@ -32,14 +32,13 @@ import java.util.stream.Collectors;
  */
 public class GameOverTask extends BukkitRunnable {
 
-    private static final EventSettingsConfig.GameOverEvent gameOverConfig = AzuraBedWars.getInstance().getEventSettingsConfig().getGameOverEvent();
 
     private static final String[] RANKS = {"first", "second", "third"};
 
     private final GameManager gameManager;
     private final GameTeam winner;
     private final boolean tie;
-    private int countdown = gameOverConfig.getDefaultCountdown();
+    private int countdown = gameOver().getDefaultCountdown();
 
     public GameOverTask(GameManager gameManager) {
         this.gameManager = gameManager;
@@ -63,7 +62,7 @@ public class GameOverTask extends BukkitRunnable {
         }
         cancel();
         GamePlayer.getOnlinePlayers().forEach(BungeeUtil::connectToLobby);
-        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), Bukkit::shutdown, gameOverConfig.getShutdownDelay());
+        Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), Bukkit::shutdown, gameOver().getShutdownDelay());
     }
 
     private List<GamePlayer> celebratingPlayers() {
@@ -80,23 +79,23 @@ public class GameOverTask extends BukkitRunnable {
             String title;
             String subtitle;
             if (isTied(team)) {
-                title = gameOverConfig.getTieTitle();
-                subtitle = gameOverConfig.getTieSubtitle();
+                title = gameOver().getTieTitle();
+                subtitle = gameOver().getTieSubtitle();
             } else if (team == winner) {
-                title = gameOverConfig.getVictoryTitle();
-                subtitle = gameOverConfig.getVictorySubtitle();
+                title = gameOver().getVictoryTitle();
+                subtitle = gameOver().getVictorySubtitle();
             } else {
-                title = gameOverConfig.getDefeatTitle();
-                subtitle = gameOverConfig.getDefeatSubtitle();
+                title = gameOver().getDefeatTitle();
+                subtitle = gameOver().getDefeatSubtitle();
             }
             team.getGamePlayers().forEach(gamePlayer -> gamePlayer.sendTitle(title, subtitle,
-                    gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()));
+                    gameOver().getTitleFadeIn(), gameOver().getTitleStay(), gameOver().getTitleFadeOut()));
         }
     }
 
     private String buildWinnerText() {
         if (winner == null) {
-            return gameOverConfig.getNoWinner();
+            return gameOver().getNoWinner();
         }
         return winner.getGamePlayers().stream().map(GamePlayer::getNickName).collect(Collectors.joining(", "));
     }
@@ -108,7 +107,7 @@ public class GameOverTask extends BukkitRunnable {
         rankings.put("BedBreaks", buildRanking(GameStats::getBedBreaks));
 
         List<String> messages = new ArrayList<>();
-        for (String line : gameOverConfig.getCustomLeaderboardMessages()) {
+        for (String line : gameOver().getCustomLeaderboardMessages()) {
             line = line.replace("<winnerFormat>", winnerText);
             for (Map.Entry<String, List<RankingEntry>> ranking : rankings.entrySet()) {
                 line = fillRanking(line, ranking.getKey(), ranking.getValue());
@@ -203,12 +202,16 @@ public class GameOverTask extends BukkitRunnable {
     }
 
     private void spawnVictoryFireworks() {
-        if (tie && !gameOverConfig.isTieFireworkEnabled()) {
+        if (tie && !gameOver().isTieFireworkEnabled()) {
             return;
         }
         for (GamePlayer gamePlayer : celebratingPlayers()) {
             Location location = gamePlayer.getPlayer().getLocation();
-            FireWorkUtil.spawnFireWork(location.clone().add(0.0D, gameOverConfig.getFireworkHeight(), 0.0D), location.getWorld());
+            FireWorkUtil.spawnFireWork(location.clone().add(0.0D, gameOver().getFireworkHeight(), 0.0D), location.getWorld());
         }
+    }
+
+    private static TimelineConfig.GameOverEvent gameOver() {
+        return AzuraBedWars.getInstance().getTimelineConfig().getGameOverEvent();
     }
 }

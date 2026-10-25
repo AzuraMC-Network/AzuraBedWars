@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.tablist.display;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.DisplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -16,12 +16,6 @@ import java.util.List;
  * @author an5w1r@163.com
  */
 public class StateContentProvider {
-
-    private final SettingsConfig settingsConfig;
-
-    public StateContentProvider() {
-        this.settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
-    }
 
     /**
      * 根据游戏阶段自动设置Header和Footer
@@ -50,7 +44,7 @@ public class StateContentProvider {
      * 设置等待状态的内容
      */
     private void setWaitingStateContent(HeaderFooter headerFooter) {
-        SettingsConfig.WaitingState waitingState = settingsConfig.getWaitingState();
+        DisplayConfig.TabList waitingState = tabLists().getWaiting();
         headerFooter.setHeader(waitingState.getHeader());
         headerFooter.setFooter(waitingState.getFooter());
     }
@@ -59,7 +53,7 @@ public class StateContentProvider {
      * 设置运行状态的内容
      */
     private void setRunningStateContent(HeaderFooter headerFooter) {
-        SettingsConfig.RunningState runningState = settingsConfig.getRunningState();
+        DisplayConfig.TabList runningState = tabLists().getRunning();
         headerFooter.setHeader(runningState.getHeader());
         headerFooter.setFooter(runningState.getFooter());
     }
@@ -81,7 +75,7 @@ public class StateContentProvider {
             gameResult = winner.getName() + " Won";
         }
 
-        SettingsConfig.EndingState endingState = settingsConfig.getEndingState();
+        DisplayConfig.TabList endingState = tabLists().getEnding();
 
         // 处理Header中的占位符
         List<String> processedHeader = new ArrayList<>();
@@ -92,5 +86,9 @@ public class StateContentProvider {
 
         // Footer直接使用配置
         headerFooter.setFooter(endingState.getFooter());
+    }
+
+    private static DisplayConfig.TabLists tabLists() {
+        return AzuraBedWars.getInstance().getDisplayConfig().getTabList();
     }
 }

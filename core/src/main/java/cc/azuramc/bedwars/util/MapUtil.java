@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.map.MapData;
@@ -13,8 +13,6 @@ import org.bukkit.block.Block;
  * @author an5w1r@163.com
  */
 public class MapUtil {
-
-    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
 
     /** Looked up per call since map checks load this class before the game exists */
     private static GameManager gameManager() {
@@ -30,7 +28,7 @@ public class MapUtil {
     public static boolean isProtectedRelativeLocation(Block block) {
         // 检查团队出生点保护
         for (GameTeam gameTeam : gameManager().getGameTeams()) {
-            if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getTeamSpawnProtectionRadius()) {
+            if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= gameplay().getTeamSpawnProtectionRadius()) {
                 return true;
             }
         }
@@ -42,14 +40,14 @@ public class MapUtil {
 
         // 检查钻石资源点保护
         for (Location location : gameManager().getMapData().getDropLocations(MapData.DropType.DIAMOND)) {
-            if (location.distance(block.getLocation()) <= settingsConfig.getResourceSpawnProtectionRadius()) {
+            if (location.distance(block.getLocation()) <= gameplay().getResourceSpawnProtectionRadius()) {
                 return true;
             }
         }
 
         // 检查绿宝石资源点保护
         for (Location location : gameManager().getMapData().getDropLocations(MapData.DropType.EMERALD)) {
-            if (location.distance(block.getLocation()) <= settingsConfig.getResourceSpawnProtectionRadius()) {
+            if (location.distance(block.getLocation()) <= gameplay().getResourceSpawnProtectionRadius()) {
                 return true;
             }
         }
@@ -71,14 +69,14 @@ public class MapUtil {
 
         // 检查团队出生点保护
         for (GameTeam gameTeam : gameManager().getGameTeams()) {
-            if (gameTeam.getSpawnLocation().distance(location) <= settingsConfig.getTeamSpawnProtectionRadius()) {
+            if (gameTeam.getSpawnLocation().distance(location) <= gameplay().getTeamSpawnProtectionRadius()) {
                 return true;
             }
         }
 
         // 检查资源点保护
         for (MapData.RawLocation rawLocation : gameManager().getMapData().getDrops()) {
-            if (rawLocation.toLocation().distance(location) <= settingsConfig.getResourceSpawnProtectionRadius()) {
+            if (rawLocation.toLocation().distance(location) <= gameplay().getResourceSpawnProtectionRadius()) {
                 return true;
             }
         }
@@ -128,5 +126,9 @@ public class MapUtil {
      */
     private static boolean isStainedGlass(Block block) {
         return block.getType().name().contains("STAINED_GLASS");
+    }
+
+    private static GameplayConfig gameplay() {
+        return AzuraBedWars.getInstance().getGameplayConfig();
     }
 }

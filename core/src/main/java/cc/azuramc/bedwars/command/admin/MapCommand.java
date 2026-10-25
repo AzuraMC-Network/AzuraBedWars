@@ -134,7 +134,7 @@ public class MapCommand {
     @AutoComplete("@mapNames")
     public void addBase(Player player, String mapName) {
         edit(player, mapName, map -> map.addBase(player.getLocation()), map -> {
-            int radius = plugin.getSettingsConfig().getTeamBlockSearchRadius();
+            int radius = plugin.getGameplayConfig().getTeamBlockSearchRadius();
             Object color = MapData.findWoolColor(player.getLocation(), radius);
             return "基地 #" + map.getBases().size() + " 已添加 " + (color == null ? "&e附近 " + radius + " 格内没有羊毛 开局将自动分配颜色" : "附近羊毛 " + color);
         });

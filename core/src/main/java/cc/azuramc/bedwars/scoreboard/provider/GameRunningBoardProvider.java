@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.scoreboard.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.DisplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -16,16 +16,13 @@ import java.util.List;
  */
 public class GameRunningBoardProvider extends AbstractBoardProvider {
 
-    private final SettingsConfig.GameScoreboard config;
-
     public GameRunningBoardProvider(GameManager gameManager) {
         super(gameManager);
-        this.config = AzuraBedWars.getInstance().getSettingsConfig().getGameScoreboard();
     }
 
     @Override
     protected String getTitle() {
-        return config.getTitle();
+        return config().getTitle();
     }
 
     @Override
@@ -37,17 +34,17 @@ public class GameRunningBoardProvider extends AbstractBoardProvider {
                 .set("next_event", gameManager.getTimeline().getCurrentEventName())
                 .set("time_left", gameManager.getFormattedTime(gameManager.getTimeline().getSecondsLeft()))
                 .set("server", "")
-                .formatLinesWithTeams(config.getLines(), teamLines);
+                .formatLinesWithTeams(config().getLines(), teamLines);
     }
 
     private List<String> buildTeamLines(GamePlayer gamePlayer) {
         List<String> teamLines = new ArrayList<>();
 
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            String bedStatus = gameTeam.isDestroyed() ? config.getBedDestroyed() : config.getBedAlive();
-            String myTeamMark = gameTeam.isInTeam(gamePlayer) ? config.getMyTeamMark() : "";
+            String bedStatus = gameTeam.isDestroyed() ? config().getBedDestroyed() : config().getBedAlive();
+            String myTeamMark = gameTeam.isInTeam(gamePlayer) ? config().getMyTeamMark() : "";
 
-            String line = config.getTeamLineFormat()
+            String line = config().getTeamLineFormat()
                     .replace("{team_name}", gameTeam.getName())
                     .replace("{bed_status}", bedStatus)
                     .replace("{alive_count}", String.valueOf(gameTeam.getAlivePlayers().size()))
@@ -57,5 +54,9 @@ public class GameRunningBoardProvider extends AbstractBoardProvider {
         }
 
         return teamLines;
+    }
+
+    private static DisplayConfig.GameScoreboard config() {
+        return AzuraBedWars.getInstance().getDisplayConfig().getGameScoreboard();
     }
 }

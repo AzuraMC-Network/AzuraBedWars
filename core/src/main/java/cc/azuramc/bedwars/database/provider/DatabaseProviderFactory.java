@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.database.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.DatabaseConfig;
 import cc.azuramc.bedwars.database.provider.mongodb.MongoDatabaseProvider;
 import cc.azuramc.bedwars.database.provider.mysql.MySQLDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
@@ -47,8 +47,8 @@ public class DatabaseProviderFactory {
      * @return 数据库提供者
      */
     private IDatabaseProvider createProvider(AzuraBedWars plugin) {
-        SettingsConfig.DatabaseConfig config = plugin.getSettingsConfig().getDatabase();
-        DatabaseType type = DatabaseType.valueOf(config.getDatabaseType().toUpperCase());
+        DatabaseConfig config = plugin.getDatabaseConfig();
+        DatabaseType type = config.getDatabaseType();
 
         switch (type) {
             case MYSQL:

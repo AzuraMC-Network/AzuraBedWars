@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game.map;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.TeamColor;
 import cc.azuramc.bedwars.util.MapUtil;
 import lombok.Getter;
@@ -152,7 +152,7 @@ public final class MapCheck {
     }
 
     private void checkBlocks(MapData map) {
-        SettingsConfig settings = AzuraBedWars.getInstance().getSettingsConfig();
+        GameplayConfig gameplay = AzuraBedWars.getInstance().getGameplayConfig();
         List<TeamColor> colors = new ArrayList<>();
         List<Location> baseDrops = new ArrayList<>();
         List<Block> claimedBeds = new ArrayList<>();
@@ -163,18 +163,18 @@ public final class MapCheck {
             }
             String name = "基地 #" + (i + 1);
 
-            TeamColor color = MapData.findWoolColor(base, settings.getTeamBlockSearchRadius());
+            TeamColor color = MapData.findWoolColor(base, gameplay.getTeamBlockSearchRadius());
             if (color == null) {
-                warnings.add(name + " 附近 " + settings.getTeamBlockSearchRadius() + " 格内没有羊毛 将自动分配颜色");
+                warnings.add(name + " 附近 " + gameplay.getTeamBlockSearchRadius() + " 格内没有羊毛 将自动分配颜色");
             } else if (colors.contains(color)) {
                 warnings.add(name + " 与其它基地都识别为 " + color.name() + " 将自动换一个颜色");
             }
             colors.add(color);
 
-            List<Block> beds = findBedBlocks(base, settings.getBedSearchRadius());
+            List<Block> beds = findBedBlocks(base, gameplay.getBedSearchRadius());
             List<Block> teamBed = pickTeamBed(base, beds);
             if (teamBed.isEmpty()) {
-                errors.add(name + " 附近 " + settings.getBedSearchRadius() + " 格内没有床");
+                errors.add(name + " 附近 " + gameplay.getBedSearchRadius() + " 格内没有床");
             } else if (teamBed.stream().anyMatch(claimedBeds::contains)) {
                 errors.add(name + " 与其它基地识别到同一张床");
             } else if (beds.size() > 2) {

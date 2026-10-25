@@ -9,10 +9,7 @@ import cc.azuramc.bedwars.api.game.IGameManager;
 import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.config.object.ItemConfig;
-import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
@@ -55,23 +52,11 @@ import java.util.stream.Collectors;
 @Data
 public class GameManager implements IGameManager {
 
-    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
-    private ItemConfig.GameManager itemConfig;
-    private SettingsConfig settingsConfig;
-
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
     private static final int RECONNECT_RESPAWN_SECONDS = 10;
 
-    private String msgPlayerReconnect;
-    private String msgPlayerLeave;
-
     private Material teamSelectorMaterial;
-    private String teamSelectorName;
     private Material leaveGameMaterial;
-    private String leaveGameName;
-
-    private boolean arrowDisplayEnabled;
-    private boolean attackDisplayEnabled;
 
     private AzuraBedWars plugin;
     private EconomyType economyType;
@@ -106,11 +91,12 @@ public class GameManager implements IGameManager {
         this.armorSande = new HashSet<>();
         this.armorStand = new HashSet<>();
         this.abstractSpecialItems = new ArrayList<>();
-        this.economyType = EconomyType.fromConfig(plugin.getSettingsConfig().getEconomyMode());
+        this.economyType = plugin.getSettingsConfig().getEconomyMode();
         ShopCatalog.init(economyType);
         this.generatorManager = new GeneratorManager(this);
         this.timeline = new GameTimeline(this);
-        initializeConfigs();
+        this.teamSelectorMaterial = XMaterial.WHITE_WOOL.get();
+        this.leaveGameMaterial = XMaterial.SLIME_BALL.get();
 
         this.tabListManager = new TabListManager(this);
         Bukkit.getPluginManager().registerEvents(new TabListListener(tabListManager), plugin.getPlugin());
@@ -120,20 +106,12 @@ public class GameManager implements IGameManager {
         return economyType.getMode();
     }
 
-    private void initializeConfigs() {
-        this.itemConfig = plugin.getItemConfig().getGameManager();
-        this.settingsConfig = plugin.getSettingsConfig();
+    public boolean isArrowDisplayEnabled() {
+        return plugin.getDisplayConfig().getDisplayDamage().isArrowDisplayEnabled();
+    }
 
-        this.msgPlayerReconnect = messageConfig.getPlayerReconnectMessage();
-        this.msgPlayerLeave = messageConfig.getPlayerLeaveMessage();
-
-        this.teamSelectorMaterial = XMaterial.WHITE_WOOL.get();
-        this.teamSelectorName = itemConfig.getTeamSelectorName();
-        this.leaveGameMaterial = XMaterial.SLIME_BALL.get();
-        this.leaveGameName = itemConfig.getLeaveGameName();
-
-        this.arrowDisplayEnabled = settingsConfig.getDisplayDamage().isArrowDisplayEnabled();
-        this.attackDisplayEnabled = settingsConfig.getDisplayDamage().isAttackDisplayEnabled();
+    public boolean isAttackDisplayEnabled() {
+        return plugin.getDisplayConfig().getDisplayDamage().isAttackDisplayEnabled();
     }
 
     /**
@@ -167,7 +145,7 @@ public class GameManager implements IGameManager {
 
         LoadGameUtil.spawnAll(plugin);
 
-        List<TeamColor> colors = mapData.getTeamColors(settingsConfig.getTeamBlockSearchRadius());
+        List<TeamColor> colors = mapData.getTeamColors(plugin.getGameplayConfig().getTeamBlockSearchRadius());
         for (int i = 0; i < mapData.getBases().size(); i++) {
             Location base = mapData.getBases().get(i).toLocation();
             gameTeams.add(new GameTeam(this, colors.get(i), base, mapData.getClosestDrop(base, MapData.DropType.BASE), mapData.getPlayers().getTeam()));
@@ -204,10 +182,10 @@ public class GameManager implements IGameManager {
         gamePlayer.cleanState();
         player.teleport(waitingLocation);
 
-        if (settingsConfig.isEnableTeamSelection()) {
-            player.getInventory().setItem(2, new ItemBuilder().setType(teamSelectorMaterial).setDisplayName(teamSelectorName).getItem());
+        if (plugin.getSettingsConfig().isEnableTeamSelection()) {
+            player.getInventory().setItem(2, new ItemBuilder().setType(teamSelectorMaterial).setDisplayName(plugin.getItemConfig().getGameManager().getTeamSelectorName()).getItem());
         }
-        player.getInventory().setItem(8, new ItemBuilder().setType(leaveGameMaterial).setDisplayName(leaveGameName).getItem());
+        player.getInventory().setItem(8, new ItemBuilder().setType(leaveGameMaterial).setDisplayName(plugin.getItemConfig().getGameManager().getLeaveGameName()).getItem());
 
         if (gameStartTask == null && canStart()) {
             gameStartTask = new GameStartTask(this);
@@ -232,7 +210,7 @@ public class GameManager implements IGameManager {
         gamePlayer.setReconnect(true);
         gamePlayer.cleanState();
         new RespawnTask(this, gamePlayer, RECONNECT_RESPAWN_SECONDS).start();
-        broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
+        broadcastMessage(String.format(plugin.getMessageConfig().getPlayerReconnectMessage(), gamePlayer.getNickName()));
         Bukkit.getPluginManager().callEvent(new BedwarsPlayerReconnectEvent.Post(gamePlayer, gameTeam, this));
     }
 
@@ -242,7 +220,7 @@ public class GameManager implements IGameManager {
     public void removePlayer(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameState == GameState.WAITING) {
-            broadcastMessage(String.format(msgPlayerLeave, gamePlayer.getNickName()));
+            broadcastMessage(String.format(plugin.getMessageConfig().getPlayerLeaveMessage(), gamePlayer.getNickName()));
         } else if (gameState == GameState.RUNNING && gameTeam != null) {
             if (gameTeam.isDestroyed() && !gamePlayer.isSpectator()) {
                 handlePlayerDeath(gamePlayer, null);
@@ -299,9 +277,9 @@ public class GameManager implements IGameManager {
     }
 
     private void rewardFinalKillCoins(GamePlayer killer) {
-        PlayerConfig.PlayerDeath config = plugin.getPlayerConfig().getPlayerDeath();
+        GameplayConfig.PlayerDeath config = plugin.getGameplayConfig().getPlayerDeath();
         VaultUtil.depositPlayer(killer, config.getCoinsReward());
-        killer.sendMessage(messageConfig.getFinalKillRewardsMessage());
+        killer.sendMessage(plugin.getMessageConfig().getFinalKillRewardsMessage());
         new BukkitRunnable() {
             int shown = 0;
 
@@ -311,7 +289,7 @@ public class GameManager implements IGameManager {
                     cancel();
                     return;
                 }
-                killer.sendActionBar(messageConfig.getNormalKillRewardsMessage());
+                killer.sendActionBar(plugin.getMessageConfig().getNormalKillRewardsMessage());
             }
         }.runTaskTimer(plugin.getPlugin(), 0, config.getActionBarPeriod());
     }
@@ -319,10 +297,10 @@ public class GameManager implements IGameManager {
     private void eliminateTeam(GameTeam gameTeam) {
         GamePlayer destroyer = gameTeam.getDestroyPlayer();
         broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
-        broadcastMessage(messageConfig.getTeamEliminatedFormat(), " ",
-                String.format(messageConfig.getTeamEliminatedMessage(), gameTeam.getChatColor() + gameTeam.getName(),
+        broadcastMessage(plugin.getMessageConfig().getTeamEliminatedFormat(), " ",
+                String.format(plugin.getMessageConfig().getTeamEliminatedMessage(), gameTeam.getChatColor() + gameTeam.getName(),
                         destroyer != null ? destroyer.getNickName() : "null"),
-                " ", messageConfig.getTeamEliminatedFormat());
+                " ", plugin.getMessageConfig().getTeamEliminatedFormat());
     }
 
     public int getMaxPlayers() {
@@ -421,6 +399,7 @@ public class GameManager implements IGameManager {
             gameStartTask.cancel();
             gameStartTask = null;
         }
+        plugin.getConfigService().applyPending();
         gameState = GameState.RUNNING;
         updateServerMOTD();
 

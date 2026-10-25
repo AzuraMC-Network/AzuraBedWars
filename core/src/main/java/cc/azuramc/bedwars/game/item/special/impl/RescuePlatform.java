@@ -29,25 +29,10 @@ import java.util.stream.Collectors;
  */
 public class RescuePlatform extends AbstractSpecialItem {
 
-    private static final ItemConfig CONFIG = AzuraBedWars.getInstance().getItemConfig();
-
-    /**
-     * 默认平台存在时间（秒）
-     */
-    private static final int DEFAULT_BREAK_TIME = CONFIG.getRescuePlatform().getDefaultBreakTime();
-    /**
-     * 默认使用冷却时间（秒）
-     */
-    private static final int DEFAULT_WAIT_TIME = CONFIG.getRescuePlatform().getDefaultWaitTime();
-    /**
-     * 跳跃提升力度
-     */
-    private static final double JUMP_BOOST = CONFIG.getRescuePlatform().getJumpBoost();
     /**
      * 平台方块材质
      */
     private static final Material PLATFORM_MATERIAL = XMaterial.SLIME_BLOCK.get();
-
 
     @Getter
     private GameManager gameManager;
@@ -56,8 +41,8 @@ public class RescuePlatform extends AbstractSpecialItem {
     private GamePlayer ownerPlayer;
     private final List<Block> platformBlocks;
 
-    private int breakTime = DEFAULT_BREAK_TIME;
-    private int waitTime = DEFAULT_WAIT_TIME;
+    private int breakTime = config().getRescuePlatform().getDefaultBreakTime();
+    private int waitTime = config().getRescuePlatform().getDefaultWaitTime();
 
     /**
      * 构造函数
@@ -219,7 +204,7 @@ public class RescuePlatform extends AbstractSpecialItem {
      */
     private void boostPlayerUp(Player player) {
         Vector vector = player.getLocation().getDirection();
-        vector.setY(vector.getY() + JUMP_BOOST);
+        vector.setY(vector.getY() + config().getRescuePlatform().getJumpBoost());
         player.getLocation().setDirection(vector);
     }
 
@@ -330,5 +315,9 @@ public class RescuePlatform extends AbstractSpecialItem {
         if (this.gameManager != null) {
             this.gameManager.removeSpecialItem(this);
         }
+    }
+
+    private static ItemConfig config() {
+        return AzuraBedWars.getInstance().getItemConfig();
     }
 }

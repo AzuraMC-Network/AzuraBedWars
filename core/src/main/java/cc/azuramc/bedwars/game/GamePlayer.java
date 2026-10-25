@@ -6,7 +6,6 @@ import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent.StateCh
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
@@ -50,10 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class GamePlayer implements IGamePlayer {
 
-    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
-
     private static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
-    private static final int MAX_HEALTH = settingsConfig.getMaxHealth();
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
     private static final long INVISIBILITY_TICKS = 30 * 20L;
@@ -454,7 +450,7 @@ public class GamePlayer implements IGamePlayer {
         player.setFoodLevel(MAX_FOOD_LEVEL);
         player.setSaturation(MAX_SATURATION);
         player.setExhaustion(0.0f);
-        player.setHealth(MAX_HEALTH);
+        player.setHealth(AzuraBedWars.getInstance().getGameplayConfig().getMaxHealth());
         player.setFireTicks(0);
         if (gameTeam != null) {
             endInvisibility();

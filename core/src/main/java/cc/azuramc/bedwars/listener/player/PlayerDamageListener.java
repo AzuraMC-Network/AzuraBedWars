@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -27,7 +27,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
  */
 public class PlayerDamageListener implements Listener {
 
-    private static final PlayerConfig.PlayerDeath CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
 
     private static final long AUTO_RESPAWN_DELAY_TICKS = 10L;
     private static final double VOID_DAMAGE = 100.0D;
@@ -79,14 +78,14 @@ public class PlayerDamageListener implements Listener {
             case FALL:
                 if (player.hasMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA)) {
                     player.removeMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA, plugin.getPlugin());
-                    event.setDamage(event.getFinalDamage() * CONFIG.getFireballFallenDamageRate());
+                    event.setDamage(event.getFinalDamage() * playerDeath().getFireballFallenDamageRate());
                 } else {
-                    event.setDamage(event.getFinalDamage() * CONFIG.getNormalFallenDamageRate());
+                    event.setDamage(event.getFinalDamage() * playerDeath().getNormalFallenDamageRate());
                 }
                 return;
             case BLOCK_EXPLOSION:
             case ENTITY_EXPLOSION:
-                event.setDamage(event.getFinalDamage() * CONFIG.getExplosionDamageRate());
+                event.setDamage(event.getFinalDamage() * playerDeath().getExplosionDamageRate());
                 break;
             default:
                 break;
@@ -209,5 +208,9 @@ public class PlayerDamageListener implements Listener {
             attackerPlayer.sendMessage("&e&l目标玩家 &c&l" + gamePlayer.getPlayer().getName() + " &e&l剩余血量: &c&l"
                     + String.format("%.1f", gamePlayer.getPlayer().getHealth()) + " &c&l❤");
         }
+    }
+
+    private static GameplayConfig.PlayerDeath playerDeath() {
+        return AzuraBedWars.getInstance().getGameplayConfig().getPlayerDeath();
     }
 }

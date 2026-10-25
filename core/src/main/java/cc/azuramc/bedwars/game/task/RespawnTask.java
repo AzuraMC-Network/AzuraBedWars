@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.game.task;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -20,8 +20,6 @@ import org.bukkit.util.Vector;
  */
 public class RespawnTask extends BukkitRunnable {
 
-    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
-    private static final PlayerConfig.PlayerRespawn CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerRespawn();
 
     private final GameManager gameManager;
     private final GamePlayer gamePlayer;
@@ -34,7 +32,7 @@ public class RespawnTask extends BukkitRunnable {
     }
 
     public static int defaultSeconds() {
-        return CONFIG.getRespawnCountdownSeconds();
+        return config().getRespawnCountdownSeconds();
     }
 
     public void start() {
@@ -55,8 +53,8 @@ public class RespawnTask extends BukkitRunnable {
             return;
         }
         if (secondsLeft > 0) {
-            gamePlayer.sendTitle(String.format(messageConfig.getRespawnCountdownTitle(), secondsLeft), messageConfig.getRespawnCountdownSubTitle(),
-                    1, CONFIG.getTitleStay(), 1);
+            gamePlayer.sendTitle(String.format(messages().getRespawnCountdownTitle(), secondsLeft), messages().getRespawnCountdownSubTitle(),
+                    1, config().getTitleStay(), 1);
             secondsLeft--;
             return;
         }
@@ -79,9 +77,9 @@ public class RespawnTask extends BukkitRunnable {
         PlayerUtil.showPlayer(GamePlayer.getOnlinePlayers(), gamePlayer);
         player.teleport(gamePlayer.getGameTeam().getSpawnLocation());
         player.setGameMode(GameMode.SURVIVAL);
-        gamePlayer.protectAfterRespawn(CONFIG.getRespawnProtectionTicks());
+        gamePlayer.protectAfterRespawn(config().getRespawnProtectionTicks());
 
-        gamePlayer.sendTitle(messageConfig.getRespawnCompleteTitle(), messageConfig.getRespawnCompleteSubTitle(), 1, CONFIG.getTitleStay(), 1);
+        gamePlayer.sendTitle(messages().getRespawnCompleteTitle(), messages().getRespawnCompleteSubTitle(), 1, config().getTitleStay(), 1);
     }
 
     private static ToolType downgrade(ToolType type) {
@@ -95,5 +93,13 @@ public class RespawnTask extends BukkitRunnable {
             default:
                 return type;
         }
+    }
+
+    private static GameplayConfig.PlayerRespawn config() {
+        return AzuraBedWars.getInstance().getGameplayConfig().getPlayerRespawn();
+    }
+
+    private static MessageConfig messages() {
+        return AzuraBedWars.getInstance().getMessageConfig();
     }
 }

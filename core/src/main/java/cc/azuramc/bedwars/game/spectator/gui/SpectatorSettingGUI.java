@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.game.spectator.gui;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.spectator.SpectatorSettings;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
@@ -24,24 +24,7 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class SpectatorSettingGUI extends CustomGUI {
 
-    private static final MessageConfig.Spectator spectatorConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator();
-
-    private static final PlayerConfig.Spectator.SettingGUI CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getSettingGUI();
-
-    private static final int INVENTORY_SIZE = CONFIG.getInventorySize();
     private static final int MAX_POTION_DURATION = Integer.MAX_VALUE;
-
-    private static final int SPEED_NONE_SLOT = CONFIG.getSpeedNoneSlot();
-    private static final int SPEED_I_SLOT = CONFIG.getSpeedISlot();
-    private static final int SPEED_II_SLOT = CONFIG.getSpeedIISlot();
-    private static final int SPEED_III_SLOT = CONFIG.getSpeedIIISlot();
-    private static final int SPEED_IV_SLOT = CONFIG.getSpeedIVSlot();
-
-    private static final int AUTO_TP_SLOT = CONFIG.getAutoTPSlot();
-    private static final int NIGHT_VISION_SLOT = CONFIG.getNightVersionSlot();
-    private static final int FIRST_PERSON_SLOT = CONFIG.getFirstPersonSlot();
-    private static final int HIDE_OTHERS_SLOT = CONFIG.getHideOthersSlot();
-    private static final int FLY_SLOT = CONFIG.getFlySlot();
 
     /**
      * 构造函数
@@ -49,7 +32,7 @@ public class SpectatorSettingGUI extends CustomGUI {
      * @param gamePlayer 打开GUI的玩家
      */
     public SpectatorSettingGUI(GamePlayer gamePlayer) {
-        super(gamePlayer, spectatorConfig.getSpectatorSettingsGuiTitle(), INVENTORY_SIZE);
+        super(gamePlayer, spectatorMessages().getSpectatorSettingsGuiTitle(), config().getInventorySize());
         SpectatorSettings spectatorSettings = SpectatorSettings.get(gamePlayer);
 
         initializeSpeedItems(gamePlayer, spectatorSettings);
@@ -64,23 +47,23 @@ public class SpectatorSettingGUI extends CustomGUI {
      */
     private void initializeSpeedItems(GamePlayer gamePlayer, SpectatorSettings settings) {
         // 无速度效果
-        setItem(SPEED_NONE_SLOT, createSpeedItem(XMaterial.LEATHER_BOOTS.get(), "§a没有速度效果"),
+        setItem(config().getSpeedNoneSlot(), createSpeedItem(XMaterial.LEATHER_BOOTS.get(), "§a没有速度效果"),
                 createSpeedAction(gamePlayer, settings, 0));
 
         // 速度 I
-        setItem(SPEED_I_SLOT, createSpeedItem(XMaterial.CHAINMAIL_BOOTS.get(), "§a速度 I"),
+        setItem(config().getSpeedISlot(), createSpeedItem(XMaterial.CHAINMAIL_BOOTS.get(), "§a速度 I"),
                 createSpeedAction(gamePlayer, settings, 1));
 
         // 速度 II
-        setItem(SPEED_II_SLOT, createSpeedItem(XMaterial.IRON_BOOTS.get(), "§a速度 II"),
+        setItem(config().getSpeedIISlot(), createSpeedItem(XMaterial.IRON_BOOTS.get(), "§a速度 II"),
                 createSpeedAction(gamePlayer, settings, 2));
 
         // 速度 III
-        setItem(SPEED_III_SLOT, createSpeedItem(XMaterial.GOLDEN_BOOTS.get(), "§a速度 III"),
+        setItem(config().getSpeedIIISlot(), createSpeedItem(XMaterial.GOLDEN_BOOTS.get(), "§a速度 III"),
                 createSpeedAction(gamePlayer, settings, 3));
 
         // 速度 IV
-        setItem(SPEED_IV_SLOT, createSpeedItem(XMaterial.DIAMOND_BOOTS.get(), "§a速度 IV"),
+        setItem(config().getSpeedIVSlot(), createSpeedItem(XMaterial.DIAMOND_BOOTS.get(), "§a速度 IV"),
                 createSpeedAction(gamePlayer, settings, 4));
     }
 
@@ -118,9 +101,9 @@ public class SpectatorSettingGUI extends CustomGUI {
             removeSpeedEffect(gamePlayer);
             if (level > 0) {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, MAX_POTION_DURATION, level - 1));
-                player.sendMessage(String.format(spectatorConfig.getSpeedAdded(), level));
+                player.sendMessage(String.format(spectatorMessages().getSpeedAdded(), level));
             } else {
-                player.sendMessage(spectatorConfig.getSpeedRemoved());
+                player.sendMessage(spectatorMessages().getSpeedRemoved());
             }
             settings.setSpeed(level);
         }, true);
@@ -148,21 +131,21 @@ public class SpectatorSettingGUI extends CustomGUI {
     private void initializeOptionItems(GamePlayer gamePlayer, SpectatorSettings settings) {
         Player player = gamePlayer.getPlayer();
         // 自动传送
-        setItem(AUTO_TP_SLOT, createOptionItem(
+        setItem(config().getAutoTpSlot(), createOptionItem(
                 XMaterial.COMPASS.get(),
                 settings.getOption(SpectatorSettings.Option.AUTO_TP) ? "§c停用自动传送" : "§a启动自动传送",
                 settings.getOption(SpectatorSettings.Option.AUTO_TP) ? "§7点击停用自动传送" : "§7点击启用自动传送"
         ), createAutoTpAction(gamePlayer, settings));
 
         // 夜视
-        setItem(NIGHT_VISION_SLOT, createOptionItem(
+        setItem(config().getNightVisionSlot(), createOptionItem(
                 XMaterial.ENDER_EYE.get(),
                 settings.getOption(SpectatorSettings.Option.NIGHT_VISION) ? "§c停用夜视" : "§a启动夜视",
                 settings.getOption(SpectatorSettings.Option.NIGHT_VISION) ? "§7点击停用夜视" : "§7点击启用夜视"
         ), createNightVisionAction(player, settings));
 
         // 第一人称
-        setItem(FIRST_PERSON_SLOT, createOptionItem(
+        setItem(config().getFirstPersonSlot(), createOptionItem(
                 XMaterial.CLOCK.get(),
                 settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ? "§c停用第一人称旁观" : "§a启动第一人称旁观",
                 settings.getOption(SpectatorSettings.Option.FIRST_PERSON) ?
@@ -171,7 +154,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         ), createFirstPersonAction(gamePlayer, settings));
 
         // 隐藏其他旁观者
-        setItem(HIDE_OTHERS_SLOT, createOptionItem(
+        setItem(config().getHideOthersSlot(), createOptionItem(
                 settings.getOption(SpectatorSettings.Option.HIDE_OTHER) ?
                         XMaterial.REDSTONE.get() :
                         XMaterial.GLOWSTONE_DUST.get(),
@@ -181,7 +164,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         ), createHideOthersAction(gamePlayer, settings));
 
         // 飞行
-        setItem(FLY_SLOT, createOptionItem(
+        setItem(config().getFlySlot(), createOptionItem(
                 XMaterial.FEATHER.get(),
                 settings.getOption(SpectatorSettings.Option.FLY) ? "§c停用持续飞行" : "§a启动持续飞行",
                 settings.getOption(SpectatorSettings.Option.FLY) ? "§7点击停用飞行" : "§7点击启用飞行"
@@ -214,7 +197,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.AUTO_TP);
             settings.setOption(SpectatorSettings.Option.AUTO_TP, newValue);
-            gamePlayer.sendMessage(newValue ? spectatorConfig.getAutoTPEnabled() : spectatorConfig.getAutoTPDisabled());
+            gamePlayer.sendMessage(newValue ? spectatorMessages().getAutoTPEnabled() : spectatorMessages().getAutoTPDisabled());
         }, true);
     }
 
@@ -235,7 +218,7 @@ public class SpectatorSettingGUI extends CustomGUI {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, MAX_POTION_DURATION, 1));
             }
             settings.setOption(SpectatorSettings.Option.NIGHT_VISION, newValue);
-            player.sendMessage(newValue ? spectatorConfig.getNightVersionEnabled() : spectatorConfig.getNightVersionDisabled());
+            player.sendMessage(newValue ? spectatorMessages().getNightVisionEnabled() : spectatorMessages().getNightVisionDisabled());
         }, true);
     }
 
@@ -252,7 +235,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.FIRST_PERSON);
             settings.setOption(SpectatorSettings.Option.FIRST_PERSON, newValue);
-            gamePlayer.sendMessage(newValue ? spectatorConfig.getFirstPersonEnabled() : spectatorConfig.getFirstPersonDisabled());
+            gamePlayer.sendMessage(newValue ? spectatorMessages().getFirstPersonEnabled() : spectatorMessages().getFirstPersonDisabled());
 
             if (!newValue && gamePlayer.isSpectator() && player.getGameMode() == GameMode.SPECTATOR) {
                 gamePlayer.sendTitle("§e退出旁观模式", null, 0, 20, 0);
@@ -273,7 +256,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.HIDE_OTHER);
             settings.setOption(SpectatorSettings.Option.HIDE_OTHER, newValue);
-            gamePlayer.sendMessage(newValue ? spectatorConfig.getHideOthersEnabled() : spectatorConfig.getHideOthersDisabled());
+            gamePlayer.sendMessage(newValue ? spectatorMessages().getHideOthersEnabled() : spectatorMessages().getHideOthersDisabled());
         }, true);
     }
 
@@ -290,7 +273,7 @@ public class SpectatorSettingGUI extends CustomGUI {
         return new GUIAction(0, () -> {
             boolean newValue = !settings.getOption(SpectatorSettings.Option.FLY);
             settings.setOption(SpectatorSettings.Option.FLY, newValue);
-            gamePlayer.sendMessage(newValue ? spectatorConfig.getFlyEnabled() : spectatorConfig.getFlyDisabled());
+            gamePlayer.sendMessage(newValue ? spectatorMessages().getFlyEnabled() : spectatorMessages().getFlyDisabled());
 
             if (newValue) {
                 if (player.isOnGround()) {
@@ -300,5 +283,13 @@ public class SpectatorSettingGUI extends CustomGUI {
                 player.setFlying(true);
             }
         }, true);
+    }
+
+    private static MessageConfig.Spectator spectatorMessages() {
+        return AzuraBedWars.getInstance().getMessageConfig().getSpectator();
+    }
+
+    private static GameplayConfig.Spectator.SettingGui config() {
+        return AzuraBedWars.getInstance().getGameplayConfig().getSpectator().getSettingGui();
     }
 }

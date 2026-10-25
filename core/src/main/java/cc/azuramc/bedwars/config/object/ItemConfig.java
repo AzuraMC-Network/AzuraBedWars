@@ -1,16 +1,13 @@
 package cc.azuramc.bedwars.config.object;
 
 import cc.azuramc.bedwars.config.annotation.Comment;
-import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * @author ant1aura@qq.com
  */
 @Data
-@EqualsAndHashCode
-@Comment("物品配置文件")
+@Comment("特殊道具配置")
 public class ItemConfig {
 
     @Comment("救援平台配置")
@@ -64,16 +61,16 @@ public class ItemConfig {
         private double circleCount = 15.0;
 
         @Comment("取消传送物品名称")
-        private String cancelItemName = MessageUtil.color("&4取消传送");
+        private String cancelItemName = "&4取消传送";
     }
 
     @Data
     public static class GameManager {
         @Comment("队伍选择器物品名称")
-        private String teamSelectorName = MessageUtil.color("&e队伍选择 &7(右键选择)");
+        private String teamSelectorName = "&e队伍选择 &7(右键选择)";
 
         @Comment("离开游戏物品名称")
-        private String leaveGameName = MessageUtil.color("&c离开游戏 &7(右键离开)");
+        private String leaveGameName = "&c离开游戏 &7(右键离开)";
     }
 
     @Data
