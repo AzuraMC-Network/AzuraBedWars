@@ -130,7 +130,14 @@ public class AdminCommand {
     @Subcommand("devtools off")
     public void devtoolsOff(BukkitCommandActor actor) {
         plugin.getDevtools().stop();
-        plugin.getConfigService().setValue(Devtools.DOCUMENT_ID, "enabled", false);
+        ApplyResult result = plugin.getConfigService().setValue(Devtools.DOCUMENT_ID, "enabled", false);
+        if (result.getStatus() == ApplyResult.Status.REJECTED) {
+            List<String> lines = new ArrayList<>();
+            lines.add("&eMCP 已关闭 但 devtools.yml 未能保存 重启后会再次开启");
+            addProblems(lines, result.getProblems());
+            CommandUtil.sendLayout(actor, lines);
+            return;
+        }
         CommandUtil.sendLayout(actor, "&aMCP 已关闭 端口已释放");
     }
 
