@@ -8,6 +8,7 @@ import com.cryptomorin.xseries.XEntityType;
 import com.cryptomorin.xseries.XItemFlag;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XPotion;
+import com.cryptomorin.xseries.XSound;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -28,7 +29,7 @@ import java.util.Map;
  */
 public final class ItemSpecs {
 
-    public static final ShopValidator.Names NAMES = new ShopValidator.Names() {
+    public static final SpecChecks.Names NAMES = new SpecChecks.Names() {
         @Override
         public boolean material(String name) {
             return ItemSpecs.material(name) != null;
@@ -52,6 +53,11 @@ public final class ItemSpecs {
         @Override
         public boolean entity(String name) {
             return XEntityType.of(name).map(XEntityType::get).isPresent();
+        }
+
+        @Override
+        public boolean sound(String name) {
+            return XSound.of(name).map(XSound::get).isPresent();
         }
     };
 

@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.config.object.shop.ShopCategoryConfig;
 import cc.azuramc.bedwars.config.object.shop.ShopMenuConfig;
 import cc.azuramc.bedwars.config.object.shop.TierChains;
 import cc.azuramc.bedwars.shop.ShopValidator;
+import cc.azuramc.bedwars.shop.SpecChecks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ShopConfigTest {
 
-    private static final ShopValidator.Names ANY_NAME = new ShopValidator.Names() {
+    static final SpecChecks.Names ANY_NAME = new SpecChecks.Names() {
         @Override
         public boolean material(String name) {
             return !name.startsWith("NOT_");
@@ -42,6 +43,11 @@ class ShopConfigTest {
 
         @Override
         public boolean entity(String name) {
+            return true;
+        }
+
+        @Override
+        public boolean sound(String name) {
             return true;
         }
     };
