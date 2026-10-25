@@ -1,14 +1,16 @@
 package cc.azuramc.bedwars.database.storage;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
+import cc.azuramc.bedwars.database.provider.mysql.MySQLDatabaseProvider;
 import cc.azuramc.bedwars.database.storage.provider.JsonMapStorage;
 import cc.azuramc.bedwars.database.storage.provider.MySQLMapStorage;
+import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.util.LoggerUtil;
 
+import java.util.Collections;
+
 /**
- * 地图存储工厂类
- * 用于创建和获取不同类型的存储实现
- *
  * @author an5w1r@163.com
  */
 public class MapStorageFactory {
@@ -19,79 +21,58 @@ public class MapStorageFactory {
     private static MySQLMapStorage mysqlMapStorage;
 
     /**
-     * 获取JSON存储实现
-     *
-     * @return JSON存储实现
+     * Falls back to JSON when the configured type is unknown or unavailable
      */
-    public static JsonMapStorage getJsonStorage() {
-        if (jsonMapStorage == null) {
-            jsonMapStorage = new JsonMapStorage();
+    public static MapStorageType getDefaultType() {
+        String configured = AzuraBedWars.getInstance().getSettingsConfig().getMapStorage();
+        try {
+            MapStorageType type = MapStorageType.valueOf(configured.toUpperCase());
+            if (type == MapStorageType.MYSQL && !isMysqlAvailable()) {
+                LoggerUtil.error("mapStorage 为 MYSQL 但 database.databaseType 不是 MySQL 改用 JSON 存储地图");
+                return MapStorageType.JSON;
+            }
+            return type;
+        } catch (IllegalArgumentException e) {
+            LoggerUtil.error("未知的 mapStorage " + configured + " 改用 JSON 存储地图");
+            return MapStorageType.JSON;
         }
-        return jsonMapStorage;
     }
 
-    /**
-     * 获取MySQL存储实现
-     *
-     * @return MySQL存储实现
-     */
-    public static MySQLMapStorage getMysqlStorage() {
+    public static IMapStorage getDefaultStorage() {
+        return getStorage(getDefaultType());
+    }
+
+    public static boolean isMysqlAvailable() {
+        return AzuraBedWars.getInstance().getDatabaseProviderFactory().getDatabaseProvider() instanceof MySQLDatabaseProvider;
+    }
+
+    public static IMapStorage getStorage(MapStorageType type) {
+        if (type == MapStorageType.JSON) {
+            if (jsonMapStorage == null) {
+                jsonMapStorage = new JsonMapStorage();
+            }
+            return jsonMapStorage;
+        }
         if (mysqlMapStorage == null) {
-            mysqlMapStorage = new MySQLMapStorage(AzuraBedWars.getInstance(), MAP_TABLE_NAME);
+            IDatabaseProvider provider = AzuraBedWars.getInstance().getDatabaseProviderFactory().getDatabaseProvider();
+            mysqlMapStorage = new MySQLMapStorage(((MySQLDatabaseProvider) provider).getDataSource(), MAP_TABLE_NAME);
         }
         return mysqlMapStorage;
     }
 
     /**
-     * 获取默认存储实现
-     * 根据配置文件中的设置返回相应的存储实现
-     *
-     * @return 默认存储实现
+     * @param mapName null copies every map
+     * @return false when any map failed to copy
      */
-    public static IMapStorage getDefaultStorage() {
-        try {
-            MapStorageType mapStorageType = MapStorageType.valueOf(AzuraBedWars.getInstance().getSettingsConfig().getMapStorage().toUpperCase());
-            return getStorage(mapStorageType);
-        } catch (IllegalArgumentException e) {
-            // 配置错误，默认使用JSON
-            return getJsonStorage();
+    public static boolean migrate(IMapStorage source, IMapStorage target, String mapName) {
+        boolean success = true;
+        for (String name : mapName != null ? Collections.singletonList(mapName) : source.getAllMapNames()) {
+            MapData map = source.loadMap(name);
+            if (map == null || !target.saveMap(name, map)) {
+                LoggerUtil.warn("迁移地图 " + name + " 失败");
+                success = false;
+            }
         }
-    }
-
-    /**
-     * 根据存储类型获取相应的存储实现
-     *
-     * @param mapStorageType 存储类型
-     * @return 存储实现
-     */
-    public static IMapStorage getStorage(MapStorageType mapStorageType) {
-        switch (mapStorageType) {
-            case JSON:
-                LoggerUtil.debug("MapStorageFactory$getStorage | input storageType is json");
-                return getJsonStorage();
-            default:
-                LoggerUtil.debug("MapStorageFactory$getStorage | input storageType is MySQL");
-                return getMysqlStorage();
-        }
-    }
-
-    /**
-     * 将地图数据从一种存储方式迁移到另一种
-     *
-     * @param sourceType 源存储类型
-     * @param targetType 目标存储类型
-     * @param mapName    地图名称，如果为null则迁移所有地图
-     * @return 是否迁移成功
-     */
-    public static boolean migrateStorage(MapStorageType sourceType, MapStorageType targetType, String mapName) {
-        if (sourceType == targetType) {
-            // 相同类型无需迁移
-            return true;
-        }
-
-        IMapStorage source = getStorage(sourceType);
-        IMapStorage target = getStorage(targetType);
-
-        return source.migrateTo(target, mapName);
+        return success;
     }
 }

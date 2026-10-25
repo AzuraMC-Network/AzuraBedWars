@@ -37,7 +37,7 @@ public class CommandRegistry {
         registerAutoCompletions();
         registerCommonCommands();
 
-        if (plugin.getSettingsConfig().isEditorMode()) {
+        if (plugin.isEditing()) {
             registerEditorCommands();
         } else {
             registerGameCommands();
@@ -56,7 +56,7 @@ public class CommandRegistry {
      */
     private void registerEditorCommands() {
         handler.register(new MapCommand());
-        handler.register(new SetupCommand(plugin));
+        handler.register(new SetupCommand(plugin.getSetupItemListener()));
     }
 
     /**
@@ -75,7 +75,7 @@ public class CommandRegistry {
 
     private void registerAutoCompletions() {
         handler.getAutoCompleter().registerSuggestion("mapNames", (args, sender, command) ->
-                new ArrayList<>(plugin.getMapManager().getLoadedMaps().keySet()));
+                new ArrayList<>(plugin.getMapManager().getMapNames()));
 
         handler.getAutoCompleter().registerSuggestion("storageTypes", (args, sender, command) ->
                 Arrays.stream(MapStorageType.values()).map(Enum::name).collect(Collectors.toList()));

@@ -1,76 +1,63 @@
 package cc.azuramc.bedwars.listener.setup;
 
-import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.game.GamePlayer;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import cc.azuramc.bedwars.command.admin.MapCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
- * 地图设置物品监听器
- *
  * @author an5w1r@163.com
  */
 public class SetupItemListener implements Listener {
 
-    private final AzuraBedWars plugin;
+    private final MapCommand mapCommand = new MapCommand();
+    private final Map<UUID, String> editingMaps = new HashMap<>();
 
-    public SetupItemListener(AzuraBedWars plugin) {
-        this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(this, plugin.getPlugin());
+    public void start(Player player, String mapName) {
+        editingMaps.put(player.getUniqueId(), mapName);
+        player.getInventory().clear();
+        for (SetupItem item : SetupItem.values()) {
+            player.getInventory().setItem(item.ordinal(), item.createItem());
+        }
+    }
+
+    /**
+     * @return false when the player was not editing a map
+     */
+    public boolean stop(Player player) {
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (SetupItem.of(item) != null) {
+                player.getInventory().remove(item);
+            }
+        }
+        return editingMaps.remove(player.getUniqueId()) != null;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player);
-
-        // 检查玩家是否有权限
-        if (!player.hasPermission("azurabedwars.admin")) {
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
-
-        // 检查互动类型
-        if (!event.getAction().equals(Action.RIGHT_CLICK_AIR) && !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+        String mapName = editingMaps.get(event.getPlayer().getUniqueId());
+        SetupItem item = SetupItem.of(event.getItem());
+        if (mapName == null || item == null) {
             return;
         }
+        event.setCancelled(true);
+        item.run(mapCommand, event.getPlayer(), mapName);
+    }
 
-        // 获取物品
-        ItemStack item = event.getItem();
-        if (item == null) {
-            return;
-        }
-
-        if (!item.hasItemMeta()) {
-            return;
-        }
-
-        // 获取物品名称
-        ItemMeta meta = item.getItemMeta();
-        String itemName;
-        if (meta != null) {
-            itemName = meta.getDisplayName();
-            itemName = ChatColor.stripColor(itemName);
-        } else {
-            return;
-        }
-
-        // 获取地图上下文
-        String mapName = plugin.getSetupItemManager().getPlayerMapContext(player.getName());
-
-        if (mapName == null || mapName.isEmpty()) {
-            return;
-        }
-
-        if (plugin.getSetupItemManager().handleItemClick(player, itemName, mapName)) {
-            event.setCancelled(true);
-        }
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        editingMaps.remove(event.getPlayer().getUniqueId());
     }
 }

@@ -8,7 +8,6 @@ import cc.azuramc.bedwars.api.game.IGameManager;
 import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.compat.util.WoolUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
@@ -30,7 +29,6 @@ import cc.azuramc.bedwars.util.ServerMOTD;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Data;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -84,7 +82,7 @@ public class GameManager implements IGameManager {
     private Location waitingLocation;
     private Location respawnLocation;
 
-    private List<Location> blocksLocation;
+    private Set<Location> blocksLocation;
     private GameStartTask gameStartTask = null;
     private List<GameTeam> gameTeams;
     private List<GameParty> gameParties;
@@ -93,8 +91,6 @@ public class GameManager implements IGameManager {
     private Set<ArmorStand> armorStand;
 
     private List<AbstractSpecialItem> abstractSpecialItems;
-
-    private int teamBlockSearchRadius;
 
     private TabListManager tabListManager;
 
@@ -144,7 +140,6 @@ public class GameManager implements IGameManager {
 
         this.arrowDisplayEnabled = settingsConfig.getDisplayDamage().isArrowDisplayEnabled();
         this.attackDisplayEnabled = settingsConfig.getDisplayDamage().isAttackDisplayEnabled();
-        this.teamBlockSearchRadius = settingsConfig.getTeamBlockSearchRadius();
     }
 
     /**
@@ -157,13 +152,9 @@ public class GameManager implements IGameManager {
     /**
      * 加载游戏地图和相关设置
      *
-     * @param mapData 地图数据
+     * @param mapData a map that passed MapCheck, with its world loaded
      */
     public void loadGame(MapData mapData) {
-        if (mapData == null) {
-            return;
-        }
-
         // 触发游戏加载前置事件（可取消以阻止加载）
         BedwarsGameLoadEvent.Pre preEvent = new BedwarsGameLoadEvent.Pre(this, mapData);
         Bukkit.getPluginManager().callEvent(preEvent);
@@ -176,168 +167,24 @@ public class GameManager implements IGameManager {
 
         this.mapData = mapData;
         this.buildLimitHeight = mapData.getHigherY();
-        this.blocksLocation = mapData.loadMap();
+        this.blocksLocation = mapData.scanMapBlocks();
         this.respawnLocation = mapData.getRespawnLocation().toLocation();
         this.waitingLocation = mapData.getWaitingLocation().toLocation();
 
         LoadGameUtil.spawnAll(plugin);
 
-        // 在初始化团队前检查必要的队伍配置
-        if (mapData.getPlayers().getTeam() == null) {
-            plugin.getPlugin().getLogger().warning("地图 " + mapData.getName() + " 的每个队伍玩家数未设置，使用默认值1");
-            mapData.getPlayers().setTeam(1);
+        List<TeamColor> colors = mapData.getTeamColors(settingsConfig.getTeamBlockSearchRadius());
+        for (int i = 0; i < mapData.getBases().size(); i++) {
+            Location base = mapData.getBases().get(i).toLocation();
+            gameTeams.add(new GameTeam(this, colors.get(i), base, mapData.getClosestDrop(base, MapData.DropType.BASE), mapData.getPlayers().getTeam()));
         }
 
-        initializeTeams(mapData);
         this.gameState = GameState.WAITING;
         // 更新MOTD
         updateServerMOTD();
 
         // 触发游戏加载完成后置事件
         Bukkit.getPluginManager().callEvent(new BedwarsGameLoadEvent.Post(this, mapData));
-    }
-
-    /**
-     * 初始化游戏团队
-     *
-     * @param mapData 地图数据
-     */
-    private void initializeTeams(MapData mapData) {
-        // 旧的方法是按顺序分配颜色
-        // for (int i = 0; i < mapData.getBases().size(); i++) {
-        //     gameTeams.add(new GameTeam(
-        //         TeamColor.values()[i],
-        //         mapData.getBases().get(i).toLocation(),
-        //         mapData.getPlayers().getTeam()
-        //     ));
-        // }
-
-        // 新 检测基地附近的羊毛颜色来确定队伍颜色
-        for (int i = 0; i < mapData.getBases().size(); i++) {
-            Location baseLocation = mapData.getBases().get(i).toLocation();
-            Location resourceDropLocation = getClosestBaseLocationDropLocation(baseLocation);
-            LoggerUtil.debug("GameManager$initializeTeams | baseLocation is " + baseLocation +
-                    ", resourceDropLocation is " + resourceDropLocation);
-            TeamColor teamColor = detectTeamColorFromWool(baseLocation);
-            LoggerUtil.debug("GameManager$initializeTeams | detectTeamColorFromWool is " + teamColor);
-
-            // 如果无法检测到羊毛颜色，则使用默认顺序
-            if (teamColor == null) {
-                teamColor = TeamColor.values()[i % TeamColor.values().length];
-                LoggerUtil.debug("GameManager$initializeTeams | team color is null so we used the order " + teamColor);
-            }
-
-            // 获取每个队伍的玩家数量，添加空值检查防止NPE
-            Integer teamSize = mapData.getPlayers().getTeam();
-            if (teamSize == null) {
-                // 设置默认值为1
-                teamSize = 1;
-            }
-
-            gameTeams.add(new GameTeam(
-                    this,
-                    teamColor,
-                    baseLocation,
-                    resourceDropLocation,
-                    teamSize
-            ));
-        }
-    }
-
-    /**
-     * 根据BaseLocation获得最近的BaseType DropLocation
-     *
-     * @param baseLocation base location
-     * @return 最近的BaseType DropLocation
-     */
-    private Location getClosestBaseLocationDropLocation(Location baseLocation) {
-        List<Location> baseDropLocations = mapData.getDropLocations(MapData.DropType.BASE);
-
-        Location resourceDropLocation = null;
-        double minDistanceSquared = Double.MAX_VALUE;
-
-        for (Location dropLocation : baseDropLocations) {
-            double distanceSquared = baseLocation.distanceSquared(dropLocation);
-            if (distanceSquared < minDistanceSquared) {
-                minDistanceSquared = distanceSquared;
-                resourceDropLocation = dropLocation;
-            }
-        }
-
-        if (resourceDropLocation == null) {
-            LoggerUtil.debug("No BASE drop location found for base at " + baseLocation);
-        }
-
-        return resourceDropLocation;
-    }
-
-    /**
-     * 从基地位置附近检测羊毛颜色来确定队伍颜色
-     *
-     * @param location 基地位置
-     * @return 检测到的队伍颜色，如果没有检测到则返回null
-     */
-    private TeamColor detectTeamColorFromWool(Location location) {
-        // 搜索范围，可以根据实际情况调整
-        int radius = teamBlockSearchRadius;
-        World world = location.getWorld();
-        LoggerUtil.debug("GameManager$detectTeamColorFromWool | world is " + world);
-        LoggerUtil.debug("GameManager$detectTeamColorFromWool | location is " + location);
-        LoggerUtil.debug("GameManager$detectTeamColorFromWool | radius is " + radius);
-
-        // 检查基础条件
-        if (world == null) {
-            LoggerUtil.debug("GameManager$detectTeamColorFromWool | world is null, returning null");
-            return null;
-        }
-
-        if (radius <= 0) {
-            LoggerUtil.debug("GameManager$detectTeamColorFromWool | radius is <= 0, returning null");
-            return null;
-        }
-
-        LoggerUtil.debug("GameManager$detectTeamColorFromWool | starting search in radius " + radius);
-
-        // 遍历位置周围的方块（正方形区域，中心点优先）
-        int checkedBlocks = 0;
-
-        // 检查中心点本身
-        Block centerBlock = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        checkedBlocks++;
-        LoggerUtil.debug("GameManager$detectTeamColorFromWool | Checking center block first (x:0, y:0, z:0)");
-        if (centerBlock.getType().name().contains("WOOL")) {
-            LoggerUtil.debug("GameManager$detectTeamColorFromWool | Found WOOL block at center! Type: " + centerBlock.getType().name());
-            return WoolUtil.getTeamColorFromWoolBlock(centerBlock);
-        }
-
-        // 然后按距离从近到远扫描周围区域
-        for (int distance = 1; distance <= radius; distance++) {
-            for (int x = -distance; x <= distance; x++) {
-                for (int y = -distance; y <= distance; y++) {
-                    for (int z = -distance; z <= distance; z++) {
-                        // 只检查当前距离层的边界方块 避免重复检查内层
-                        if (Math.abs(x) == distance || Math.abs(y) == distance || Math.abs(z) == distance) {
-                            checkedBlocks++;
-                            Block block = world.getBlockAt(
-                                    location.getBlockX() + x,
-                                    location.getBlockY() + y,
-                                    location.getBlockZ() + z
-                            );
-
-                            // 检查方块是否为羊毛
-                            if (block.getType().name().contains("WOOL")) {
-                                // 根据羊毛颜色确定队伍颜色
-                                LoggerUtil.debug("GameManager$detectTeamColorFromWool | Found WOOL block! Type: " + block.getType().name() + " at layer: " + distance + " (x:" + x + ", y:" + y + ", z:" + z + ")");
-                                return WoolUtil.getTeamColorFromWoolBlock(block);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        LoggerUtil.debug("GameManager$detectTeamColorFromWool | Checked " + checkedBlocks + " blocks, no wool found");
-        return null;
     }
 
     /**
