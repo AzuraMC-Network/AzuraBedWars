@@ -21,7 +21,7 @@ public class VersionUtil {
         //   "26.1.1-R0.1-SNAPSHOT"  → MAJOR=26, MINOR=1,  PATCH=1
         Matcher m = Pattern.compile("^(\\d+)\\.(\\d+)(?:\\.(\\d+))?").matcher(Bukkit.getBukkitVersion());
         if (!m.find()) {
-            throw new IllegalStateException("无法解析服务端版本: \"" + Bukkit.getBukkitVersion() + '"');
+            throw new IllegalStateException("Cannot parse the server version: \"" + Bukkit.getBukkitVersion() + '"');
         }
         MAJOR_NUMBER = Integer.parseInt(m.group(1));
         MINOR_NUMBER = Integer.parseInt(m.group(2));

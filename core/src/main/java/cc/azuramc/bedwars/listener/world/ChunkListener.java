@@ -23,7 +23,7 @@ public class ChunkListener implements Listener {
             try {
                 setCancelMethod = ChunkUnloadEvent.class.getMethod("setCancelled", boolean.class);
             } catch (NoSuchMethodException e) {
-                AzuraBedWars.getInstance().getPlugin().getLogger().warning("无法找到 ChunkUnloadEvent.setCancelled 方法");
+                AzuraBedWars.getInstance().getPlugin().getLogger().warning("ChunkUnloadEvent.setCancelled is missing");
             }
         }
     }

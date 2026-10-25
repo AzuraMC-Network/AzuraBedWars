@@ -55,16 +55,16 @@ public class DatabaseVersionService {
             if (currentVersion == -1) {
                 // 首次安装，插入初始版本
                 databaseVersionRepository.insertVersion(CURRENT_VERSION);
-                LoggerUtil.info("数据库版本管理初始化完成，当前版本: " + CURRENT_VERSION);
+                LoggerUtil.info("Database version table created, version " + CURRENT_VERSION);
             } else if (currentVersion != CURRENT_VERSION) {
                 // 需要升级
                 performVersionUpgrade(currentVersion, CURRENT_VERSION);
             } else {
-                LoggerUtil.info("数据库版本检查完成，当前版本: " + currentVersion);
+                LoggerUtil.info("Database version " + currentVersion);
             }
 
         } catch (SQLException e) {
-            LoggerUtil.error("数据库版本管理初始化失败: " + e.getMessage());
+            LoggerUtil.error("Cannot check the database version: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -77,7 +77,7 @@ public class DatabaseVersionService {
      */
     private void performVersionUpgrade(int fromVersion, int toVersion) {
         try {
-            LoggerUtil.info("开始数据库版本升级: " + fromVersion + " -> " + toVersion);
+            LoggerUtil.info("Upgrading the database from " + fromVersion + " to " + toVersion);
 
             // 执行升级逻辑
             Runnable upgradeTask = versionUpgrades.get(fromVersion);
@@ -92,10 +92,10 @@ public class DatabaseVersionService {
                 databaseVersionRepository.insertVersion(toVersion);
             }
 
-            LoggerUtil.info("数据库版本升级完成: " + fromVersion + " -> " + toVersion);
+            LoggerUtil.info("Upgraded the database from " + fromVersion + " to " + toVersion);
 
         } catch (SQLException e) {
-            LoggerUtil.error("数据库版本升级失败: " + e.getMessage());
+            LoggerUtil.error("Cannot upgrade the database: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -109,7 +109,7 @@ public class DatabaseVersionService {
         try {
             return databaseVersionRepository.getCurrentVersion();
         } catch (SQLException e) {
-            LoggerUtil.error("获取数据库版本失败: " + e.getMessage());
+            LoggerUtil.error("Cannot read the database version: " + e.getMessage());
             return -1;
         }
     }
@@ -132,7 +132,7 @@ public class DatabaseVersionService {
         if (currentVersion != -1 && currentVersion != CURRENT_VERSION) {
             performVersionUpgrade(currentVersion, CURRENT_VERSION);
         } else {
-            LoggerUtil.info("数据库版本已是最新，无需升级");
+            LoggerUtil.info("The database is up to date");
         }
     }
 }

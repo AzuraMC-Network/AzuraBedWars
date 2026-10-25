@@ -54,10 +54,10 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
             config.setRegisterMbeans(true);
             dataSource = new HikariDataSource(config);
 
-            LoggerUtil.info("MySQL数据库连接初始化成功");
+            LoggerUtil.info("Connected to MySQL");
             return true;
         } catch (Exception e) {
-            LoggerUtil.error("MySQL数据库连接初始化失败: " + e.getMessage());
+            LoggerUtil.error("Cannot connect to MySQL: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -68,9 +68,9 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
         if (dataSource != null) {
             try {
                 dataSource.close();
-                LoggerUtil.info("MySQL数据库连接已关闭");
+                LoggerUtil.info("Closed the MySQL connection");
             } catch (Exception e) {
-                LoggerUtil.error("关闭MySQL数据库连接时出错: " + e.getMessage());
+                LoggerUtil.error("Error while closing the MySQL connection: " + e.getMessage());
             }
         }
     }

@@ -62,10 +62,10 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
             mongoDatabase = mongoClient.getDatabase(databaseConfig.getDatabase());
 
             initialized = true;
-            LoggerUtil.info("MongoDB 数据库连接初始化成功");
+            LoggerUtil.info("Connected to MongoDB");
             return true;
         } catch (Exception e) {
-            LoggerUtil.error("MongoDB 数据库连接初始化失败: " + e.getMessage());
+            LoggerUtil.error("Cannot connect to MongoDB: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -97,9 +97,9 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
         if (mongoClient == null) return;
         try {
             mongoClient.close();
-            LoggerUtil.info("MongoDB 数据库连接关闭成功");
+            LoggerUtil.info("Closed the MongoDB connection");
         } catch (Exception e) {
-            LoggerUtil.error("MongoDB 数据库连接在关闭时出现了一项错误: " + e.getMessage());
+            LoggerUtil.error("Error while closing the MongoDB connection: " + e.getMessage());
             e.printStackTrace();
         }
     }

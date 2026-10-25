@@ -95,13 +95,13 @@ public class GeneratorTask {
                         ArmorStandUtil.moveArmorStand(as, as.getLocation().getY());
                     } catch (Exception e) {
                         // 记录异常但继续处理其他盔甲架
-                        LoggerUtil.warn("处理盔甲架时出错: " + e.getMessage());
+                        LoggerUtil.warn("Error while updating a hologram: " + e.getMessage());
                         iterator.remove(); // 移除有问题的盔甲架
                     }
                 }
             } catch (Exception e) {
                 // 捕获总体异常，确保任务不会终止
-                LoggerUtil.warn("盔甲架更新任务出错: " + e.getMessage());
+                LoggerUtil.warn("Error in the hologram task: " + e.getMessage());
             }
         }, 0L, 1L).getTaskId();
     }
