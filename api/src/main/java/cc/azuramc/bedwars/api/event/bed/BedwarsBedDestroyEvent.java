@@ -6,39 +6,31 @@ import cc.azuramc.bedwars.api.game.IGameTeam;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 床被破坏事件
+ * A player breaks another team's bed. Listen to {@link Pre} or {@link Post}, both are called on the main thread.
  *
  * @author an5w1r@163.com
  */
+@ApiStatus.NonExtendable
 public abstract class BedwarsBedDestroyEvent extends Event {
 
     private final IGamePlayer gamePlayer;
     private final IGameTeam gameTeam;
     private final IGameManager gameManager;
 
-    /**
-     * @param gamePlayer  破坏床的玩家
-     * @param gameTeam    被破坏床所属的队伍
-     * @param gameManager 游戏管理器
-     */
-    protected BedwarsBedDestroyEvent(
-            @NotNull IGamePlayer gamePlayer,
-            @NotNull IGameTeam gameTeam,
-            @NotNull IGameManager gameManager
-    ) {
+    @ApiStatus.Internal
+    protected BedwarsBedDestroyEvent(@NotNull IGamePlayer gamePlayer, @NotNull IGameTeam gameTeam, @NotNull IGameManager gameManager) {
         this.gamePlayer = gamePlayer;
         this.gameTeam = gameTeam;
         this.gameManager = gameManager;
     }
 
     /**
-     * 获取破坏床的玩家
-     *
-     * @return 破坏者（不为 null）
+     * @return the player who broke the bed
      */
     @NotNull
     public IGamePlayer getGamePlayer() {
@@ -46,39 +38,29 @@ public abstract class BedwarsBedDestroyEvent extends Event {
     }
 
     /**
-     * 获取被破坏床所属的队伍
-     *
-     * @return 队伍（不为 null）
+     * @return the team that owned the bed
      */
     @NotNull
     public IGameTeam getGameTeam() {
         return gameTeam;
     }
 
-    /**
-     * 获取游戏管理器
-     *
-     * @return 游戏管理器（不为 null）
-     */
     @NotNull
     public IGameManager getGameManager() {
         return gameManager;
     }
 
     /**
-     * 床被破坏「之前」触发，可取消以阻止床被破坏。
+     * Called before the bed is removed. Cancelling keeps the bed in place.
      */
     public static final class Pre extends BedwarsBedDestroyEvent implements Cancellable {
 
         private static final HandlerList HANDLERS = new HandlerList();
 
-        private boolean cancelled = false;
+        private boolean cancelled;
 
-        public Pre(
-                @NotNull IGamePlayer gamePlayer,
-                @NotNull IGameTeam gameTeam,
-                @NotNull IGameManager gameManager
-        ) {
+        @ApiStatus.Internal
+        public Pre(@NotNull IGamePlayer gamePlayer, @NotNull IGameTeam gameTeam, @NotNull IGameManager gameManager) {
             super(gamePlayer, gameTeam, gameManager);
         }
 
@@ -97,14 +79,16 @@ public abstract class BedwarsBedDestroyEvent extends Event {
             return HANDLERS;
         }
 
+        @NotNull
         @Override
-        public @NotNull HandlerList getHandlers() {
+        public HandlerList getHandlers() {
             return HANDLERS;
         }
     }
 
     /**
-     * 床被破坏「之后」触发，用于通知。广播用的聊天/标题文本可在此修改。
+     * Called after the bed is removed and before the announcement is sent.
+     * The texts can be changed here, null skips that part of the announcement.
      */
     public static final class Post extends BedwarsBedDestroyEvent {
 
@@ -117,14 +101,9 @@ public abstract class BedwarsBedDestroyEvent extends Event {
         @Nullable
         private String subTitle;
 
-        public Post(
-                @NotNull IGamePlayer gamePlayer,
-                @NotNull IGameTeam gameTeam,
-                @NotNull IGameManager gameManager,
-                @Nullable String message,
-                @Nullable String title,
-                @Nullable String subTitle
-        ) {
+        @ApiStatus.Internal
+        public Post(@NotNull IGamePlayer gamePlayer, @NotNull IGameTeam gameTeam, @NotNull IGameManager gameManager,
+                    @Nullable String message, @Nullable String title, @Nullable String subTitle) {
             super(gamePlayer, gameTeam, gameManager);
             this.message = message;
             this.title = title;
@@ -132,9 +111,7 @@ public abstract class BedwarsBedDestroyEvent extends Event {
         }
 
         /**
-         * 获取广播聊天消息
-         *
-         * @return 聊天消息，可能为 null
+         * @return the chat message broadcast to every player
          */
         @Nullable
         public String getMessage() {
@@ -146,9 +123,7 @@ public abstract class BedwarsBedDestroyEvent extends Event {
         }
 
         /**
-         * 获取标题消息
-         *
-         * @return 标题，可能为 null
+         * @return the title shown to the team that lost its bed
          */
         @Nullable
         public String getTitle() {
@@ -159,11 +134,6 @@ public abstract class BedwarsBedDestroyEvent extends Event {
             this.title = title;
         }
 
-        /**
-         * 获取副标题消息
-         *
-         * @return 副标题，可能为 null
-         */
         @Nullable
         public String getSubTitle() {
             return subTitle;
@@ -178,8 +148,9 @@ public abstract class BedwarsBedDestroyEvent extends Event {
             return HANDLERS;
         }
 
+        @NotNull
         @Override
-        public @NotNull HandlerList getHandlers() {
+        public HandlerList getHandlers() {
             return HANDLERS;
         }
     }

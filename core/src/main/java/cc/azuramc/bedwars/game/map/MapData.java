@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -216,7 +217,7 @@ public class MapData implements IMapData {
      */
     @NotNull
     public List<Location> getBaseLocations() {
-        return bases.stream().map(RawLocation::toLocation).collect(Collectors.toList());
+        return bases.stream().map(RawLocation::toLocation).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     /**
@@ -267,7 +268,7 @@ public class MapData implements IMapData {
      */
     @NotNull
     public List<Location> getAllDropLocations() {
-        return drops.stream().map(RawLocation::toLocation).collect(Collectors.toList());
+        return drops.stream().map(RawLocation::toLocation).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     /**
@@ -277,7 +278,7 @@ public class MapData implements IMapData {
      */
     @NotNull
     public List<Location> getAllShopLocations() {
-        return shops.stream().map(RawLocation::toLocation).collect(Collectors.toList());
+        return shops.stream().map(RawLocation::toLocation).collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     /**

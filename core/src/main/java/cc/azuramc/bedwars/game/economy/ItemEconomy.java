@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.game.economy;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.shop.PriceCost;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;

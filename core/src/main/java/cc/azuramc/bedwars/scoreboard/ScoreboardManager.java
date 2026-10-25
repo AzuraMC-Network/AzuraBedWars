@@ -170,8 +170,6 @@ public class ScoreboardManager implements Listener {
                 showBoard(gamePlayer);
             }
         });
-
-        gameManager.getGameEventManager().registerRunnable("计分板", (s, c) -> updateAllBoards());
     }
 
     @EventHandler

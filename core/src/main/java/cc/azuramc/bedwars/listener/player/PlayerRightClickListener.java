@@ -165,7 +165,7 @@ public class PlayerRightClickListener implements Listener {
 
         // 更新队伍状态
         gameTeam.setDestroyed(false);
-        gameTeam.setHasBed(true);
+        gameTeam.setRejuvenated(true);
 
         // 广播消息
         announceRejuvenationBedUsed(gamePlayer, gameTeam);
@@ -201,17 +201,12 @@ public class PlayerRightClickListener implements Listener {
      * 检查玩家是否可以使用回春床
      */
     private boolean canUseRejuvenationBed(GamePlayer gamePlayer, GameTeam gameTeam) {
-        int priority = gameManager.getGameEventManager().currentEvent().getPriority();
-        int leftTime = gameManager.getGameEventManager().getLeftTime();
-
-        // 检查游戏时间是否已超过10分钟
-        boolean isTimeExceeded = priority > 2 || (priority == 2 && leftTime <= 120);
-        if (isTimeExceeded) {
+        if (gameManager.getTimeline().getGameSeconds() >= 600) {
             gamePlayer.sendMessage("§c开局已超过10分钟.");
             return false;
         }
 
-        if (gameTeam.isHasBed()) {
+        if (gameTeam.isRejuvenated()) {
             gamePlayer.sendMessage("§c已使用过回春床了");
             return false;
         }

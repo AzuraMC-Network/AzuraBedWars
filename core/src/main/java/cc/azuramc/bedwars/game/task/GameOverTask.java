@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.ReconnectState;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
+import cc.azuramc.bedwars.util.BungeeUtil;
 import cc.azuramc.bedwars.util.FireWorkUtil;
 import lombok.Value;
 import lombok.experimental.Accessors;
@@ -365,10 +366,9 @@ public class GameOverTask extends BukkitRunnable {
      * 执行服务器关闭前的清理工作
      */
     private void performShutdown() {
-        // 取消当前任务
         cancel();
+        GamePlayer.getOnlinePlayers().forEach(BungeeUtil::connectToLobby);
 
-        // 延迟关闭服务器
         new BukkitRunnable() {
             @Override
             public void run() {

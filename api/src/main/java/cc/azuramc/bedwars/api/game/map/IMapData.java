@@ -1,76 +1,53 @@
 package cc.azuramc.bedwars.api.game.map;
 
 import org.bukkit.Location;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 
 /**
- * 地图数据 API
+ * The map of the game. The location lists are fresh snapshots on each call.
  *
  * @author an5w1r@163.com
  */
+@ApiStatus.NonExtendable
 public interface IMapData {
 
     /**
-     * 获取地图最大玩家数
-     *
-     * @return 最大玩家数
+     * @return bases times players per team
      */
+    @Range(from = 0, to = Integer.MAX_VALUE)
     int getMaxPlayers();
 
     /**
-     * 地图数据是否有效（配置完整）
-     *
-     * @return 有效返回 true
+     * @return true when the map has everything a game needs
      */
     boolean isValid();
 
     /**
-     * 获取地图建筑高度上限对应的 Y 坐标
-     *
-     * @return 高位 Y 坐标
+     * @return the higher Y of the two region corners, 80 when neither is set
      */
     double getHigherY();
 
-    /**
-     * 获取区域边界点 1
-     *
-     * @return 边界点 1，未设置时为 null
-     */
     @Nullable
     Location getPos1Location();
 
-    /**
-     * 获取区域边界点 2
-     *
-     * @return 边界点 2，未设置时为 null
-     */
     @Nullable
     Location getPos2Location();
 
-    /**
-     * 获取所有队伍基地位置
-     *
-     * @return 基地位置列表（不为 null）
-     */
     @NotNull
+    @Unmodifiable
     List<Location> getBaseLocations();
 
-    /**
-     * 获取所有资源点位置
-     *
-     * @return 资源点位置列表（不为 null）
-     */
     @NotNull
+    @Unmodifiable
     List<Location> getAllDropLocations();
 
-    /**
-     * 获取所有商店位置
-     *
-     * @return 商店位置列表（不为 null）
-     */
     @NotNull
+    @Unmodifiable
     List<Location> getAllShopLocations();
 }

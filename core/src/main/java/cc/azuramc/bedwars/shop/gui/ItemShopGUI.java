@@ -4,304 +4,129 @@ import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.bedwars.game.item.armor.ArmorType;
-import cc.azuramc.bedwars.game.item.tool.ToolType;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.gui.base.action.NewGUIAction;
-import cc.azuramc.bedwars.shop.ColorType;
-import cc.azuramc.bedwars.shop.ShopData;
-import cc.azuramc.bedwars.shop.ShopItemType;
-import cc.azuramc.bedwars.shop.ShopManager;
-import cc.azuramc.bedwars.shop.helper.ShopItemGiver;
-import cc.azuramc.bedwars.shop.helper.ShopPaymentHandler;
-import cc.azuramc.bedwars.shop.helper.ToolDisplayHelper;
-import cc.azuramc.bedwars.shop.page.DefaultShopPage;
-import cc.azuramc.bedwars.util.MessageUtil;
-import cc.azuramc.bedwars.util.ShopUtil;
+import cc.azuramc.bedwars.shop.QuickBuy;
+import cc.azuramc.bedwars.shop.ShopCatalog;
+import cc.azuramc.bedwars.shop.ShopCategory;
+import cc.azuramc.bedwars.shop.ShopItem;
+import cc.azuramc.bedwars.shop.ShopPurchase;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 道具商店GUI类
- * 用于展示和处理各种可购买道具
- *
  * @author an5w1r@163.com
  */
 public class ItemShopGUI extends CustomGUI {
 
-    /**
-     * 创建道具商店GUI
-     *
-     * @param gamePlayer  游戏玩家
-     * @param slot        商店槽位
-     * @param gameManager 游戏实例
-     */
-    public ItemShopGUI(GamePlayer gamePlayer, int slot, GameManager gameManager) {
-        super(gamePlayer, "§8道具商店 - " + ChatColor.stripColor(ShopManager.getSHOPS().get(slot).getMainShopItem().getDisplayName()), 54);
+    private final GamePlayer gamePlayer;
+    private final int categoryIndex;
+    private final GameManager gameManager;
 
-        initializeShopNavbar(gamePlayer, slot, gameManager);
-        initializeShopSeparator(slot);
+    public ItemShopGUI(GamePlayer gamePlayer, int categoryIndex, GameManager gameManager) {
+        super(gamePlayer, "§8道具商店 - " + ChatColor.stripColor(ShopCatalog.getCategories().get(categoryIndex).getName()), 54);
+        this.gamePlayer = gamePlayer;
+        this.categoryIndex = categoryIndex;
+        this.gameManager = gameManager;
 
-        ShopData shopData = ShopManager.getSHOPS().get(slot);
-        if (shopData instanceof DefaultShopPage) {
-            initializeQuickBuyShop(gamePlayer, slot, gameManager);
+        List<ShopCategory> categories = ShopCatalog.getCategories();
+        for (int i = 0; i < categories.size(); i++) {
+            ShopCategory category = categories.get(i);
+            int target = i;
+            setItem(i, new ItemBuilder().setItemStack(category.getIcon().clone()).setDisplayName(category.getName()).getItem(),
+                    new GUIAction(0, () -> {
+                        if (target != categoryIndex) {
+                            new ItemShopGUI(gamePlayer, target, gameManager).open();
+                        }
+                    }, false));
+            setItem(i + 9, (i == categoryIndex ? XMaterial.LIME_STAINED_GLASS_PANE : XMaterial.GRAY_STAINED_GLASS_PANE).parseItem(),
+                    new GUIAction(0, () -> {
+                    }, false));
+        }
+        for (int i = categories.size(); i < 9; i++) {
+            setItem(i + 9, XMaterial.GRAY_STAINED_GLASS_PANE.parseItem(), new GUIAction(0, () -> {
+            }, false));
+        }
+
+        if (categoryIndex == 0) {
+            setupQuickBuy();
         } else {
-            initializeRegularShop(gamePlayer, shopData, slot, gameManager);
+            ShopCategory category = categories.get(categoryIndex);
+            for (int i = 0; i < category.getItems().size(); i++) {
+                String key = QuickBuy.keyOf(category, i);
+                setShopItem(QuickBuy.SLOTS[i], category.getItems().get(i), null,
+                        () -> new QuickBuyEditGUI(gamePlayer, gameManager, key).open());
+            }
         }
     }
 
-    /**
-     * 初始化商店导航栏
-     */
-    private void initializeShopNavbar(GamePlayer gamePlayer, int slot, GameManager gameManager) {
-        int i = 0;
-        for (ShopData shopData : ShopManager.getSHOPS()) {
-            if (i > 9) {
+    private void setupQuickBuy() {
+        PlayerData playerData = gamePlayer.getPlayerData();
+        Map<Integer, String> layout = QuickBuy.load(playerData);
+        ShopCategory quickBuy = ShopCatalog.getQuickBuy();
+
+        for (int i = 0; i < QuickBuy.SLOTS.length; i++) {
+            int slot = i;
+            ShopItem custom = QuickBuy.customItem(layout, slot);
+            if (custom != null) {
+                setShopItem(QuickBuy.SLOTS[slot], custom, "§7Shift+左键从快捷购买中移除", () -> {
+                    QuickBuy.remove(playerData, slot);
+                    new ItemShopGUI(gamePlayer, categoryIndex, gameManager).open();
+                });
                 continue;
             }
 
-            int finalI = i;
-            setItem(i, new ItemBuilder()
-                            .setItemStack(shopData.getMainShopItem().getItemStack().clone())
-                            .setDisplayName(shopData.getMainShopItem().getDisplayName())
+            ShopItem fallback = QuickBuy.defaultItem(slot);
+            if (fallback != null) {
+                String key = QuickBuy.keyOf(quickBuy, slot);
+                setShopItem(QuickBuy.SLOTS[slot], fallback, "§7Shift+左键添加到快捷购买",
+                        () -> new QuickBuyEditGUI(gamePlayer, gameManager, key).open());
+                continue;
+            }
+
+            setItem(QuickBuy.SLOTS[slot], new ItemBuilder()
+                            .setItemStack(XMaterial.RED_STAINED_GLASS_PANE.parseItem())
+                            .setDisplayName("§c空闲的槽位")
+                            .setLores("§7这是一个快捷购买槽位!§bShift+左键", "§7将任意物品放到这里~")
                             .getItem(),
-                    new GUIAction(0, () -> {
-                        if (finalI != slot) {
-                            new ItemShopGUI(gamePlayer, finalI, gameManager).open();
+                    new NewGUIAction(0, event -> {
+                        if (event.isShiftClick()) {
+                            gamePlayer.sendMessage("§c这是个空的槽位!请使用Shift+左键添加物品到这里~");
                         }
                     }, false));
-            ++i;
         }
     }
 
-    /**
-     * 初始化商店分隔条
-     */
-    private void initializeShopSeparator(int currentShopSlot) {
-        for (int i = 9; i < 18; i++) {
-            if (i == (currentShopSlot + 9)) {
-                setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:5").orElse(XMaterial.GLASS_PANE).parseItem(),
-                        new GUIAction(0, () -> {
-                        }, false));
-            } else {
-                setItem(i, XMaterial.matchXMaterial("STAINED_GLASS_PANE:7").orElse(XMaterial.GLASS_PANE).parseItem(),
-                        new GUIAction(0, () -> {
-                        }, false));
-            }
-        }
-    }
-
-    /**
-     * 初始化快捷购买商店
-     */
-    private void initializeQuickBuyShop(GamePlayer gamePlayer, int slot, GameManager gameManager) {
-        Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(gamePlayer.getPlayerData());
-        ShopData defaultShopData = ShopManager.getSHOPS().get(slot);
-        List<ShopItemType> defaultItems = defaultShopData.getShopItems();
-
-        for (int slotIndex = 0; slotIndex < ShopUtil.SHOP_SLOTS.length; slotIndex++) {
-            int actualSlotPosition = ShopUtil.SHOP_SLOTS[slotIndex];
-            String itemData = shopDataMap.get(slotIndex);
-
-            if (itemData != null && !"AIR".equals(itemData)) {
-                String[] itemInfo = itemData.split("#");
-                ShopItemType shopItemType = ShopUtil.findItemType(itemInfo);
-
-                if (shopItemType != null) {
-                    setItem(gamePlayer, slot, actualSlotPosition, gameManager, shopItemType, -1,
-                            Arrays.asList("§7Shift+左键从快捷购买中移除", " "));
-                    continue;
-                }
-            }
-
-            if (slotIndex < defaultItems.size()) {
-                ShopItemType defaultItemType = defaultItems.get(slotIndex);
-                setItem(gamePlayer, slot, actualSlotPosition, gameManager, defaultItemType, slotIndex,
-                        Arrays.asList("§7Shift+左键添加到快捷购买", " "));
-            } else {
-                setEmptySlot(gamePlayer.getPlayer(), actualSlotPosition, slot, gameManager);
-            }
-        }
-    }
-
-    /**
-     * 初始化常规商店
-     */
-    private void initializeRegularShop(GamePlayer gamePlayer, ShopData shopData, int shopSlot, GameManager gameManager) {
-        int itemIndex = -1;
-        for (ShopItemType shopItemType : shopData.getShopItems()) {
-            itemIndex++;
-            setItem(gamePlayer, shopSlot, ShopUtil.SHOP_SLOTS[itemIndex], gameManager, shopItemType, itemIndex, null);
-        }
-    }
-
-    /**
-     * 设置空槽位
-     */
-    private void setEmptySlot(Player player, int slotPosition, int shopSlot, GameManager gameManager) {
-        setItem(slotPosition,
-                new ItemBuilder()
-                        .setItemStack(Objects.requireNonNull(XMaterial.matchXMaterial("STAINED_GLASS_PANE:14").orElse(XMaterial.GLASS_PANE).parseItem()))
-                        .setDisplayName("§c空闲的槽位")
-                        .setLores("§7这是一个快捷购买槽位!§bShift+左键", "§7将任意物品放到这里~")
-                        .getItem(),
-                new NewGUIAction(0, event -> {
-                    if (!event.getClick().isShiftClick()) {
-                        return;
-                    }
-                    player.sendMessage("§c这是个空的槽位!请使用Shift+左键添加物品到这里~");
-                }, false));
-    }
-
-    /**
-     * 设置商店物品
-     */
-    public void setItem(GamePlayer gamePlayer, int shopSlot, int displaySlot, GameManager gameManager,
-                        ShopItemType shopItemType, int itemSlot, List<String> moreLore) {
-        PlayerData playerData = gamePlayer.getPlayerData();
-        ItemBuilder itemBuilder = prepareItemDisplay(gamePlayer, shopItemType);
-        List<String> lore = createItemLore(shopItemType, gameManager, moreLore);
-
-        super.setItem(displaySlot,
-                itemBuilder.setDisplayName("§c" + shopItemType.getDisplayName())
-                        .setLores(lore)
-                        .getItem(),
-                new NewGUIAction(0, event -> handleItemClick(event, gamePlayer, shopSlot, displaySlot,
-                        shopItemType, itemBuilder, itemSlot, playerData, gameManager), false));
-    }
-
-    /**
-     * 准备物品显示
-     */
-    private ItemBuilder prepareItemDisplay(GamePlayer gamePlayer, ShopItemType shopItemType) {
-        ItemBuilder itemBuilder = new ItemBuilder();
-        itemBuilder.setItemStack(shopItemType.getItemStack().clone());
-
-        if (shopItemType.getColorType() == ColorType.PICKAXE) {
-            ToolDisplayHelper.updatePickaxeDisplay(gamePlayer, itemBuilder, shopItemType);
-        } else if (shopItemType.getColorType() == ColorType.AXE) {
-            ToolDisplayHelper.updateAxeDisplay(gamePlayer, itemBuilder, shopItemType);
-        }
-
-        return itemBuilder;
-    }
-
-    /**
-     * 创建物品说明
-     */
-    private List<String> createItemLore(ShopItemType shopItemType, GameManager gameManager, List<String> moreLore) {
+    private void setShopItem(int displaySlot, ShopItem item, @Nullable String shiftHint, Runnable onShiftClick) {
         List<String> lore = new ArrayList<>();
         lore.add("§7物品:");
-        lore.add("§8•" + shopItemType.getDisplayName());
+        lore.add("§8•" + item.getName());
         lore.add(" ");
-
-        if (moreLore != null && !moreLore.isEmpty()) {
-            lore.addAll(moreLore);
+        if (shiftHint != null) {
+            lore.add(shiftHint);
+            lore.add(" ");
         }
+        lore.add("§7花费: §3§l" + gameManager.getEconomy().formatPrice(ShopPurchase.priceFor(gamePlayer, item)));
 
-        lore.add("§7花费: §3§l" + gameManager.getEconomy().formatPrice(shopItemType.getPriceCost()));
-
-        return lore;
-    }
-
-    /**
-     * 处理物品点击
-     */
-    private void handleItemClick(InventoryClickEvent event, GamePlayer gamePlayer,
-                                 int shopSlot, int displaySlot, ShopItemType shopItemType, ItemBuilder itemBuilder,
-                                 int itemSlot, PlayerData playerData, GameManager gameManager) {
-        if (event.isShiftClick() || event.getClick().isShiftClick()) {
-            handleShiftClick(gamePlayer, shopSlot, displaySlot, itemBuilder, itemSlot, playerData, gameManager);
-            return;
-        }
-
-        if (!canPurchaseItem(gamePlayer, shopItemType, itemBuilder.getItem().getType())) {
-            return;
-        }
-
-        if (!ShopPaymentHandler.processPayment(gamePlayer, shopItemType.getPriceCost())) {
-            return;
-        }
-
-        ShopItemGiver.handleItemGiving(gamePlayer, shopSlot, shopItemType, itemBuilder, gameManager);
-    }
-
-    /**
-     * 处理Shift+点击
-     */
-    private void handleShiftClick(GamePlayer gamePlayer, int shopSlot, int displaySlot,
-                                  ItemBuilder itemBuilder, int itemSlot, PlayerData playerData, GameManager gameManager) {
-        if (shopSlot == 0) {
-            int slotIndex = Arrays.asList(ShopUtil.SHOP_SLOTS).indexOf(displaySlot);
-            if (slotIndex == -1) {
-                return;
-            }
-
-            Map<Integer, String> shopDataMap = ShopUtil.loadShopDataFromJson(playerData);
-            shopDataMap.remove(slotIndex);
-            ShopUtil.saveShopDataToJson(playerData, shopDataMap);
-
-            new ItemShopGUI(gamePlayer, shopSlot, gameManager).open();
-        } else {
-            new DIYShopGUI(gamePlayer, gameManager, itemBuilder.getItem().clone(),
-                    ShopManager.getSHOPS().get(shopSlot).getClass().getSimpleName()
-                            + "#" + (itemSlot + 1)).open();
-        }
-    }
-
-    /**
-     * 检查是否可以购买物品
-     */
-    private boolean canPurchaseItem(GamePlayer gamePlayer, ShopItemType shopItemType, Material itemMaterial) {
-        // 工具已满级检查
-        if (shopItemType.getColorType() == ColorType.PICKAXE && gamePlayer.getPickaxeType() == ToolType.DIAMOND) {
-            return false;
-        }
-        if (shopItemType.getColorType() == ColorType.AXE && gamePlayer.getAxeType() == ToolType.DIAMOND) {
-            return false;
-        }
-
-        // 剪刀检查
-        if (XMaterial.SHEARS.get() != null && XMaterial.SHEARS.get().equals(itemMaterial) && gamePlayer.isShear()) {
-            return false;
-        }
-
-        // 护甲检查
-        if (itemMaterial == XMaterial.CHAINMAIL_BOOTS.get() && gamePlayer.getArmorType() != ArmorType.DEFAULT) {
-            return false;
-        }
-        if (itemMaterial == XMaterial.IRON_BOOTS.get() &&
-                (gamePlayer.getArmorType() == ArmorType.IRON || gamePlayer.getArmorType() == ArmorType.DIAMOND)) {
-            return false;
-        }
-        if (itemMaterial == XMaterial.DIAMOND_BOOTS.get() && gamePlayer.getArmorType() == ArmorType.DIAMOND) {
-            return false;
-        }
-
-        // 首次购买工具检查
-        if ((itemMaterial == XMaterial.WOODEN_PICKAXE.get() && gamePlayer.getPickaxeType() == ToolType.NONE) && hasEmptySlot(gamePlayer)) {
-            return true;
-        }
-        if ((itemMaterial == XMaterial.WOODEN_AXE.get() && gamePlayer.getAxeType() == ToolType.NONE) && hasEmptySlot(gamePlayer)) {
-            return true;
-        }
-
-        // 背包空间检查
-        if (!hasEmptySlot(gamePlayer)) {
-            gamePlayer.sendMessage(MessageUtil.color("&c背包已满！"));
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean hasEmptySlot(GamePlayer gamePlayer) {
-        return gamePlayer.getPlayer().getInventory().firstEmpty() != -1;
+        setItem(displaySlot,
+                new ItemBuilder().setItemStack(ShopPurchase.displayIcon(gamePlayer, item))
+                        .setDisplayName("§c" + item.getName())
+                        .setLores(lore)
+                        .getItem(),
+                new NewGUIAction(0, event -> {
+                    if (event.isShiftClick()) {
+                        onShiftClick.run();
+                        return;
+                    }
+                    if (ShopPurchase.buy(gamePlayer, item) && item.getKind().isEquipment()) {
+                        new ItemShopGUI(gamePlayer, categoryIndex, gameManager).open();
+                    }
+                }, false));
     }
 }

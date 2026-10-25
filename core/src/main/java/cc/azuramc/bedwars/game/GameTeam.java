@@ -3,11 +3,7 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
-import cc.azuramc.bedwars.gui.base.CustomGUI;
-import cc.azuramc.bedwars.gui.base.GUIData;
-import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
-import cc.azuramc.bedwars.upgrade.trap.TrapManager;
-import cc.azuramc.bedwars.upgrade.upgrade.UpgradeManager;
+import cc.azuramc.bedwars.upgrade.TeamUpgrades;
 import lombok.Data;
 import lombok.ToString;
 import org.bukkit.ChatColor;
@@ -16,11 +12,11 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +28,7 @@ import java.util.Objects;
  */
 @Data
 // it is preventing stack overflow error
-@ToString(exclude = {"gameManager", "upgradeManager", "trapManager"})
+@ToString(exclude = {"gameManager", "upgrades"})
 public class GameTeam implements IGameTeam {
     /**
      * 搜索床的范围
@@ -60,15 +56,13 @@ public class GameTeam implements IGameTeam {
     private Block bedHead;
     @Nullable
     private BlockFace bedFace;
-    private boolean hasBed;
+    private boolean rejuvenated;
     private boolean isDestroyed;
     @Nullable
     private GamePlayer destroyPlayer;
 
     @NotNull
-    private TrapManager trapManager;
-    @NotNull
-    private UpgradeManager upgradeManager;
+    private TeamUpgrades upgrades;
 
     /**
      * 创建一个游戏团队
@@ -99,11 +93,10 @@ public class GameTeam implements IGameTeam {
      */
     private void initializeDefaults() {
         // 床状态初始化
-        this.hasBed = false;
+        this.rejuvenated = false;
         this.isDestroyed = false;
 
-        this.trapManager = new TrapManager();
-        this.upgradeManager = new UpgradeManager(this);
+        this.upgrades = new TeamUpgrades(this);
     }
 
     /**
@@ -177,7 +170,7 @@ public class GameTeam implements IGameTeam {
             }
         }
 
-        return teamPlayers;
+        return Collections.unmodifiableList(teamPlayers);
     }
 
     /**
@@ -195,7 +188,7 @@ public class GameTeam implements IGameTeam {
             }
         }
 
-        return alivePlayers;
+        return Collections.unmodifiableList(alivePlayers);
     }
 
     /**
@@ -268,7 +261,9 @@ public class GameTeam implements IGameTeam {
 
     public void setDestroyed(boolean destroyed) {
         this.isDestroyed = destroyed;
-        GameTeamBedHandler.destroyBed(this);
+        if (destroyed) {
+            GameTeamBedHandler.destroyBed(this);
+        }
     }
 
     /**
@@ -278,53 +273,5 @@ public class GameTeam implements IGameTeam {
      */
     public int getActivePlayerCount() {
         return getAlivePlayers().size();
-    }
-
-    /**
-     * 检查床是否被摧毁
-     *
-     * @return 如果床被摧毁返回true，否则返回false
-     */
-    public boolean isBedDestroyed() {
-        return isDestroyed || hasBed;
-    }
-
-    /**
-     * 设置床被摧毁状态
-     *
-     * @param destroyed 床被摧毁状态
-     * @param destroyer 摧毁床的玩家，可以为null
-     */
-    public void setBedDestroyed(boolean destroyed, @Nullable GamePlayer destroyer) {
-        this.isDestroyed = destroyed;
-
-        if (destroyed) {
-            this.destroyPlayer = destroyer;
-        }
-    }
-
-    /**
-     * 通知所有打开TeamShopGUI的团队成员刷新界面
-     */
-    public void notifyTeamShopGUIRefresh() {
-        // 确保GUI刷新操作在主线程中执行，避免CancelledPacketHandleException
-        cc.azuramc.bedwars.AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            for (GamePlayer gamePlayer : getAlivePlayers()) {
-                // 检查玩家是否在线
-                Player player = gamePlayer.getPlayer();
-                if (player == null) {
-                    continue;
-                }
-
-                // 检查玩家是否打开了TeamShopGUI
-                if (GUIData.getCURRENT_GUI().containsKey(player)) {
-                    CustomGUI currentGUI = GUIData.getCURRENT_GUI().get(player);
-                    if (currentGUI instanceof TeamShopGUI) {
-                        // 重新打开TeamShopGUI以刷新内容
-                        new TeamShopGUI(gamePlayer, gameManager).open();
-                    }
-                }
-            }
-        });
     }
 }

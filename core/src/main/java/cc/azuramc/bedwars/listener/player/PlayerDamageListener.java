@@ -211,7 +211,7 @@ public class PlayerDamageListener implements Listener {
      */
     private void handleRunningStateDamage(EntityDamageEvent event, GamePlayer gamePlayer) {
         // 游戏结束时取消所有伤害
-        if (gameManager.getGameEventManager().isOver()) {
+        if (gameManager.getTimeline().isEnded()) {
             event.setCancelled(true);
             return;
         }
