@@ -260,7 +260,9 @@ public class GameTeam implements IGameTeam {
 
     public void setDestroyed(boolean destroyed) {
         this.isDestroyed = destroyed;
-        GameTeamBedHandler.destroyBed(this);
+        if (destroyed) {
+            GameTeamBedHandler.destroyBed(this);
+        }
     }
 
     /**

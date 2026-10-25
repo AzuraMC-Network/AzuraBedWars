@@ -438,7 +438,7 @@ public class GameManager implements IGameManager {
 
         // 检查玩家团队状态
         if (gamePlayer.getGameTeam() != null) {
-            if (gamePlayer.getGameTeam().isHasBed()) {
+            if (!gamePlayer.getGameTeam().isDestroyed()) {
                 // 触发玩家重连事件
                 BedwarsPlayerReconnectEvent.Pre preEvent = new BedwarsPlayerReconnectEvent.Pre(
                         gamePlayer, gamePlayer.getGameTeam(), this
