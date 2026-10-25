@@ -88,7 +88,7 @@ class ConfigServiceTest {
     @Test
     void reloadWithErrorsKeepsCurrentValues() throws IOException {
         edit("settings.yml", "debug-mode: false", "debug-mode: maybe");
-        ApplyResult result = service.reload("settings");
+        ApplyResult result = service.reload("settings").get(0);
         assertEquals(ApplyResult.Status.REJECTED, result.getStatus());
         assertEquals(1, result.getProblems().size());
         assertFalse(service.get(SettingsConfig.class).isDebugMode());
@@ -98,7 +98,7 @@ class ConfigServiceTest {
     void restartRequiredFieldsKeepTheirRunningValue() throws IOException {
         edit("settings.yml", "editor-mode: false", "editor-mode: true");
         edit("settings.yml", "debug-mode: false", "debug-mode: true");
-        ApplyResult result = service.reload("settings");
+        ApplyResult result = service.reload("settings").get(0);
         assertEquals(ApplyResult.Status.RESTART_REQUIRED, result.getStatus());
         assertEquals(Collections.singletonList("editor-mode"), result.getRestartPaths());
         assertFalse(service.get(SettingsConfig.class).isEditorMode());
@@ -108,7 +108,7 @@ class ConfigServiceTest {
     @Test
     void restartDocumentsAreNotApplied() throws IOException {
         edit("database.yml", "port: 3306", "port: 3307");
-        ApplyResult result = service.reload("database");
+        ApplyResult result = service.reload("database").get(0);
         assertEquals(ApplyResult.Status.RESTART_REQUIRED, result.getStatus());
         assertEquals(3306, service.get(DatabaseConfig.class).getPort());
     }
@@ -117,7 +117,7 @@ class ConfigServiceTest {
     void nextGameDocumentsWaitForTheNextGame() throws IOException {
         gameRunning.set(true);
         edit("nested/gameplay.yml", "max-health: 20", "max-health: 40");
-        assertEquals(ApplyResult.Status.NEXT_GAME, service.reload("gameplay").getStatus());
+        assertEquals(ApplyResult.Status.NEXT_GAME, service.reload("gameplay").get(0).getStatus());
         assertEquals(20, service.get(GameplayConfig.class).getMaxHealth());
 
         service.applyPending();

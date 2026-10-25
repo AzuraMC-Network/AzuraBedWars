@@ -9,12 +9,18 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.Mark;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -27,16 +33,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.BooleanSupplier;
+import java.util.function.UnaryOperator;
 
 /**
  * Owns every config document: creates missing files, binds them, keeps the current values and applies changes.
- * Files are only written by {@link #write} and {@link #setValue}, never on startup or shutdown
+ * Files are only written by {@link #write}, {@link #setValue} and layout migrations, never on startup or shutdown
  *
  * @author an5w1r@163.com
  */
@@ -44,13 +54,17 @@ public final class ConfigService {
 
     public static final String SCHEMA_DIR = "schema";
     public static final String HISTORY_DIR = ".history";
+    private static final String TEMPLATE_ROOT = "/config-templates/";
     private static final int HISTORY_LIMIT = 10;
 
     private final File dataFolder;
     private final BooleanSupplier gameRunning;
     private final Map<String, ConfigDocument<?>> documents = new LinkedHashMap<>();
-    private final Map<Class<?>, Object> values = new ConcurrentHashMap<>();
-    private final Map<Class<?>, Object> pending = new ConcurrentHashMap<>();
+    private final Map<String, Directory> directories = new LinkedHashMap<>();
+    private final Map<String, Object> values = new HashMap<>();
+    private final Map<String, Object> pending = new HashMap<>();
+    private final Map<String, TreeMap<Integer, UnaryOperator<Map<String, Object>>>> migrations = new HashMap<>();
+    private final List<ConfigValidator> validators = new ArrayList<>();
 
     public ConfigService(File dataFolder, BooleanSupplier gameRunning) {
         this.dataFolder = dataFolder;
@@ -58,7 +72,33 @@ public final class ConfigService {
     }
 
     public <T> void register(String id, String path, Class<T> type, ApplyMode applyMode, int version) {
-        documents.put(id, new ConfigDocument<>(id, path, type, applyMode, version));
+        documents.put(id, new ConfigDocument<>(id, path, type, applyMode, version, id, null));
+    }
+
+    /**
+     * A document whose missing file is copied from {@code config-templates/<path>} in the jar
+     */
+    public <T> void registerTemplate(String id, String path, Class<T> type, ApplyMode applyMode, int version, String kind) {
+        documents.put(id, new ConfigDocument<>(id, path, type, applyMode, version, kind, TEMPLATE_ROOT + path));
+    }
+
+    /**
+     * Every {@code .yml} file in a directory is one document with the id {@code <directory>/<file name>}.
+     * When the directory is missing the bundled files are copied into it
+     */
+    public <T> void registerDirectory(String directory, Class<T> type, ApplyMode applyMode, int version, String kind, String... bundled) {
+        directories.put(directory, new Directory(directory, type, applyMode, version, kind, Arrays.asList(bundled)));
+    }
+
+    /**
+     * @param step turns the raw content of {@code fromVersion} into {@code fromVersion + 1}
+     */
+    public void addMigration(String kind, int fromVersion, UnaryOperator<Map<String, Object>> step) {
+        migrations.computeIfAbsent(kind, k -> new TreeMap<>()).put(fromVersion, step);
+    }
+
+    public void addValidator(ConfigValidator validator) {
+        validators.add(validator);
     }
 
     public List<ConfigDocument<?>> documents() {
@@ -72,7 +112,34 @@ public final class ConfigService {
 
     @NotNull
     public <T> T get(Class<T> type) {
-        return type.cast(Objects.requireNonNull(values.get(type), () -> type.getSimpleName() + " is not loaded"));
+        return get(idOf(type), type);
+    }
+
+    @NotNull
+    public <T> T get(String id, Class<T> type) {
+        return type.cast(Objects.requireNonNull(values.get(id), () -> id + " is not loaded"));
+    }
+
+    /**
+     * Every loaded document of a type in file order, keyed by document id
+     */
+    @NotNull
+    public <T> Map<String, T> all(Class<T> type) {
+        Map<String, T> all = new LinkedHashMap<>();
+        for (ConfigDocument<?> document : documents.values()) {
+            Object value = values.get(document.getId());
+            if (document.getType() == type && value != null) {
+                all.put(document.getId(), type.cast(value));
+            }
+        }
+        return all;
+    }
+
+    /**
+     * {@code shop/categories/blocks} becomes {@code blocks}
+     */
+    public static String name(String documentId) {
+        return documentId.substring(documentId.lastIndexOf('/') + 1);
     }
 
     public File file(ConfigDocument<?> document) {
@@ -84,29 +151,48 @@ public final class ConfigService {
      */
     public List<ConfigProblem> loadAll() {
         List<ConfigProblem> problems = new ArrayList<>();
-        for (ConfigDocument<?> document : documents.values()) {
-            File file = file(document);
-            try {
-                if (!file.exists()) {
-                    writeAtomically(file, template(document));
-                }
-                Loaded<?> loaded = bind(document, read(file));
-                values.put(document.getType(), loaded.value);
-                problems.addAll(loaded.problems);
-            } catch (IOException e) {
-                values.put(document.getType(), ConfigKeys.newInstance(document.getType()));
-                problems.add(fileProblem(document, "Cannot read or create the file, defaults are used: " + e.getMessage()));
-            }
+        for (Directory directory : directories.values()) {
+            problems.addAll(scan(directory));
         }
+        for (ConfigDocument<?> document : documents.values()) {
+            problems.addAll(load(document));
+        }
+        problems.addAll(validate(Collections.<String, Object>emptyMap(), Collections.<String, String>emptyMap()));
         exportSchemas();
         return problems;
     }
 
+    private List<ConfigProblem> load(ConfigDocument<?> document) {
+        File file = file(document);
+        try {
+            if (!file.exists()) {
+                writeAtomically(file, template(document));
+            }
+            String text = read(file);
+            Loaded<?> loaded = bind(document, text);
+            if (loaded.upgraded != null) {
+                persistMigration(document, file, loaded.upgraded);
+            }
+            values.put(document.getId(), loaded.value);
+            return loaded.problems;
+        } catch (IOException e) {
+            values.put(document.getId(), new YamlBinder(document.getPath(), true).bind(null, document.getType()));
+            return Collections.singletonList(fileProblem(document, "Cannot read or create the file, defaults are used: " + e.getMessage()));
+        }
+    }
+
     /**
-     * Template of a missing file, written from the defaults in the config class
+     * Template of a missing file, the bundled one or the defaults of the config class
      */
-    public String template(ConfigDocument<?> document) {
-        return render(document, ConfigKeys.newInstance(document.getType()));
+    public String template(ConfigDocument<?> document) throws IOException {
+        if (document.getTemplate() == null) {
+            return render(document, ConfigKeys.newInstance(document.getType()));
+        }
+        String bundled = resource(document.getTemplate());
+        if (bundled == null) {
+            throw new IOException("Missing bundled template " + document.getTemplate());
+        }
+        return bundled;
     }
 
     public String render(ConfigDocument<?> document, Object value) {
@@ -115,12 +201,16 @@ public final class ConfigService {
 
     public JsonObject schema(String id) {
         ConfigDocument<?> document = require(id);
-        return SchemaExporter.export(document.getType(), document.getPath());
+        return SchemaExporter.export(document.getType(), document.getKind());
     }
 
     public void exportSchemas() {
+        Set<String> written = new HashSet<>();
         for (ConfigDocument<?> document : documents.values()) {
-            File file = new File(new File(dataFolder, SCHEMA_DIR), document.getId() + ".json");
+            if (!written.add(document.getKind())) {
+                continue;
+            }
+            File file = new File(new File(dataFolder, SCHEMA_DIR), document.getKind().replace('/', '-') + ".json");
             try {
                 writeAtomically(file, new GsonBuilder().setPrettyPrinting().create().toJson(schema(document.getId())));
             } catch (IOException ignored) {
@@ -133,7 +223,11 @@ public final class ConfigService {
      * Checks text as if it were the content of a document, without touching the file
      */
     public List<ConfigProblem> validate(String id, String text) {
-        return bind(require(id), text).problems;
+        ConfigDocument<?> document = require(id);
+        Loaded<?> loaded = bind(document, text);
+        List<ConfigProblem> problems = new ArrayList<>(loaded.problems);
+        problems.addAll(validate(Collections.<String, Object>singletonMap(id, loaded.value), Collections.singletonMap(id, text)));
+        return problems;
     }
 
     /**
@@ -141,26 +235,89 @@ public final class ConfigService {
      */
     public List<ConfigProblem> check() {
         List<ConfigProblem> problems = new ArrayList<>();
+        Map<String, Object> candidates = new HashMap<>();
+        Map<String, String> texts = new HashMap<>();
         for (ConfigDocument<?> document : documents.values()) {
             try {
-                problems.addAll(bind(document, read(file(document))).problems);
+                String text = read(file(document));
+                Loaded<?> loaded = bind(document, text);
+                problems.addAll(loaded.problems);
+                candidates.put(document.getId(), loaded.value);
+                texts.put(document.getId(), text);
             } catch (IOException e) {
                 problems.add(fileProblem(document, "Cannot read the file: " + e.getMessage()));
             }
         }
+        problems.addAll(validate(candidates, texts));
         return problems;
     }
 
     /**
-     * Rereads one document from disk. Rejected when the file has any error, the current values stay then
+     * Rereads one document, or every document of a registered directory, from disk.
+     * Rejected when the file has any error, the current values stay then
      */
-    public ApplyResult reload(String id) {
-        ConfigDocument<?> document = require(id);
+    public List<ApplyResult> reload(String id) {
+        Directory directory = directories.get(id);
+        if (directory != null) {
+            return reloadDirectory(directory);
+        }
+        return Collections.singletonList(reloadDocument(require(id)));
+    }
+
+    public boolean isReloadable(String id) {
+        return documents.containsKey(id) || directories.containsKey(id);
+    }
+
+    public List<String> reloadableIds() {
+        List<String> ids = new ArrayList<>(directories.keySet());
+        ids.addAll(documents.keySet());
+        return ids;
+    }
+
+    private ApplyResult reloadDocument(ConfigDocument<?> document) {
         try {
             return apply(document, read(file(document)));
         } catch (IOException e) {
-            return ApplyResult.rejected(id, Collections.singletonList(fileProblem(document, "Cannot read the file: " + e.getMessage())));
+            return ApplyResult.rejected(document.getId(), Collections.singletonList(fileProblem(document, "Cannot read the file: " + e.getMessage())));
         }
+    }
+
+    private List<ApplyResult> reloadDirectory(Directory directory) {
+        List<ApplyResult> results = new ArrayList<>();
+        Set<String> before = new HashSet<>(documentsIn(directory));
+        List<ConfigProblem> scanProblems = scan(directory);
+        for (String id : documentsIn(directory)) {
+            ConfigDocument<?> document = documents.get(id);
+            if (!before.contains(id)) {
+                List<ConfigProblem> problems = new ArrayList<>(scanProblems);
+                scanProblems = Collections.emptyList();
+                problems.addAll(load(document));
+                results.add(new ApplyResult(id, ApplyResult.Status.APPLIED, problems, Collections.<String>emptyList()));
+            } else {
+                results.add(reloadDocument(document));
+            }
+        }
+        for (String id : before) {
+            if (!documents.containsKey(id)) {
+                values.remove(id);
+                pending.remove(id);
+                results.add(new ApplyResult(id, ApplyResult.Status.APPLIED, Collections.<ConfigProblem>emptyList(), Collections.<String>emptyList()));
+            }
+        }
+        return results;
+    }
+
+    public List<ApplyResult> reloadAll() {
+        List<ApplyResult> results = new ArrayList<>();
+        for (String directory : new ArrayList<>(directories.keySet())) {
+            results.addAll(reloadDirectory(directories.get(directory)));
+        }
+        for (ConfigDocument<?> document : new ArrayList<>(documents.values())) {
+            if (directoryOf(document) == null) {
+                results.add(reloadDocument(document));
+            }
+        }
+        return results;
     }
 
     /**
@@ -169,14 +326,6 @@ public final class ConfigService {
     public void applyPending() {
         values.putAll(pending);
         pending.clear();
-    }
-
-    public List<ApplyResult> reloadAll() {
-        List<ApplyResult> results = new ArrayList<>();
-        for (String id : documents.keySet()) {
-            results.add(reload(id));
-        }
-        return results;
     }
 
     /**
@@ -193,8 +342,10 @@ public final class ConfigService {
                         "The file changed on disk since it was read, read it again before writing")));
             }
             Loaded<?> loaded = bind(document, text);
-            if (hasError(loaded.problems)) {
-                return ApplyResult.rejected(id, loaded.problems);
+            List<ConfigProblem> problems = new ArrayList<>(loaded.problems);
+            problems.addAll(newErrors(document, loaded.value, text));
+            if (hasError(problems)) {
+                return ApplyResult.rejected(id, problems);
             }
             backup(document, file);
             writeAtomically(file, text);
@@ -254,32 +405,136 @@ public final class ConfigService {
 
     private <T> ApplyResult apply(ConfigDocument<T> document, String text) {
         Loaded<T> loaded = bind(document, text);
-        if (hasError(loaded.problems)) {
-            return ApplyResult.rejected(document.getId(), loaded.problems);
+        List<ConfigProblem> problems = new ArrayList<>(loaded.problems);
+        problems.addAll(newErrors(document, loaded.value, text));
+        if (hasError(problems)) {
+            return ApplyResult.rejected(document.getId(), problems);
         }
-        T current = document.getType().cast(values.get(document.getType()));
+        if (loaded.upgraded != null) {
+            try {
+                persistMigration(document, file(document), loaded.upgraded);
+            } catch (IOException e) {
+                problems.add(fileProblem(document, "Cannot write the upgraded layout: " + e.getMessage()));
+            }
+        }
+        T current = document.getType().cast(values.get(document.getId()));
         List<String> restartPaths = new ArrayList<>();
         if (document.getApplyMode() == ApplyMode.RESTART) {
-            restartPaths.addAll(changedKeys(current, loaded.value));
-            if (!restartPaths.isEmpty()) {
-                return new ApplyResult(document.getId(), ApplyResult.Status.RESTART_REQUIRED, loaded.problems, restartPaths);
+            if (current != null) {
+                restartPaths.addAll(changedKeys(current, loaded.value));
             }
-            return new ApplyResult(document.getId(), ApplyResult.Status.APPLIED, loaded.problems, restartPaths);
+            ApplyResult.Status status = restartPaths.isEmpty() ? ApplyResult.Status.APPLIED : ApplyResult.Status.RESTART_REQUIRED;
+            return new ApplyResult(document.getId(), status, problems, restartPaths);
         }
         if (current != null) {
             keepRestartRequired(current, loaded.value, "", restartPaths);
         }
         if (document.getApplyMode() == ApplyMode.NEXT_GAME && gameRunning.getAsBoolean()) {
-            pending.put(document.getType(), loaded.value);
-            return new ApplyResult(document.getId(), ApplyResult.Status.NEXT_GAME, loaded.problems, restartPaths);
+            pending.put(document.getId(), loaded.value);
+            return new ApplyResult(document.getId(), ApplyResult.Status.NEXT_GAME, problems, restartPaths);
         }
-        pending.remove(document.getType());
-        values.put(document.getType(), loaded.value);
+        pending.remove(document.getId());
+        values.put(document.getId(), loaded.value);
         ApplyResult.Status status = restartPaths.isEmpty() ? ApplyResult.Status.APPLIED : ApplyResult.Status.RESTART_REQUIRED;
-        return new ApplyResult(document.getId(), status, loaded.problems, restartPaths);
+        return new ApplyResult(document.getId(), status, problems, restartPaths);
+    }
+
+    /**
+     * Reference errors the candidate adds, so an error elsewhere never blocks an unrelated reload
+     */
+    private List<ConfigProblem> newErrors(ConfigDocument<?> document, Object candidate, String text) {
+        if (validators.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Set<String> existing = new HashSet<>();
+        for (ConfigProblem problem : validate(Collections.<String, Object>emptyMap(), Collections.<String, String>emptyMap())) {
+            existing.add(problem.getFile() + "|" + problem.getPath() + "|" + problem.getMessage());
+        }
+        List<ConfigProblem> added = new ArrayList<>();
+        for (ConfigProblem problem : validate(Collections.singletonMap(document.getId(), candidate), Collections.singletonMap(document.getId(), text))) {
+            if (!existing.contains(problem.getFile() + "|" + problem.getPath() + "|" + problem.getMessage())) {
+                added.add(problem);
+            }
+        }
+        return added;
+    }
+
+    private List<ConfigProblem> validate(Map<String, Object> candidates, Map<String, String> texts) {
+        List<ConfigProblem> problems = new ArrayList<>();
+        if (validators.isEmpty()) {
+            return problems;
+        }
+        Map<String, Object> view = new HashMap<>(values);
+        view.putAll(candidates);
+        Map<String, Node> roots = new HashMap<>();
+        ConfigValidator.View lookup = new ConfigValidator.View() {
+            @NotNull
+            @Override
+            public <T> T get(Class<T> type) {
+                return type.cast(Objects.requireNonNull(view.get(idOf(type)), () -> type.getSimpleName() + " is not loaded"));
+            }
+
+            @NotNull
+            @Override
+            public <T> Map<String, T> all(Class<T> type) {
+                Map<String, T> all = new LinkedHashMap<>();
+                for (ConfigDocument<?> document : documents.values()) {
+                    Object value = view.get(document.getId());
+                    if (document.getType() == type && value != null) {
+                        all.put(document.getId(), type.cast(value));
+                    }
+                }
+                return all;
+            }
+
+            @NotNull
+            @Override
+            public String idOf(Class<?> type) {
+                return ConfigService.this.idOf(type);
+            }
+        };
+        ConfigValidator.Sink sink = new ConfigValidator.Sink() {
+            @Override
+            public void error(String documentId, String path, String message) {
+                problems.add(located(ConfigProblem.Severity.ERROR, documentId, path, message, texts, roots));
+            }
+
+            @Override
+            public void warn(String documentId, String path, String message) {
+                problems.add(located(ConfigProblem.Severity.WARNING, documentId, path, message, texts, roots));
+            }
+        };
+        for (ConfigValidator validator : validators) {
+            validator.validate(lookup, sink);
+        }
+        return problems;
+    }
+
+    private ConfigProblem located(ConfigProblem.Severity severity, String documentId, String path, String message,
+                                  Map<String, String> texts, Map<String, Node> roots) {
+        ConfigDocument<?> document = documents.get(documentId);
+        String file = document != null ? document.getPath() : documentId;
+        Node root = roots.computeIfAbsent(documentId, id -> {
+            try {
+                String text = texts.containsKey(id) ? texts.get(id) : document != null ? read(file(document)) : null;
+                return text != null ? new YamlBinder(file, false).parse(text) : null;
+            } catch (IOException e) {
+                return null;
+            }
+        });
+        Node node = null;
+        // shorthand values have no node for the nested path
+        for (String at = path; node == null && !at.isEmpty(); at = at.contains(".") ? at.substring(0, at.lastIndexOf('.')) : "") {
+            node = YamlBinder.find(root, at);
+        }
+        Mark mark = node != null ? node.getStartMark() : null;
+        return new ConfigProblem(severity, file, mark != null ? mark.getLine() + 1 : 0, mark != null ? mark.getColumn() + 1 : 0, path, message);
     }
 
     private static void keepRestartRequired(Object current, Object updated, String path, List<String> restartPaths) {
+        if (current instanceof Map) {
+            return;
+        }
         for (Map.Entry<String, Field> entry : ConfigKeys.fields(current.getClass()).entrySet()) {
             Field field = entry.getValue();
             String childPath = path.isEmpty() ? entry.getKey() : path + "." + entry.getKey();
@@ -292,7 +547,7 @@ public final class ConfigService {
                 }
             } else if (oldValue != null && newValue != null && !ConfigKeys.isScalar(field.getType())
                     && !field.getType().isArray() && !List.class.isAssignableFrom(field.getType())
-                    && !Map.class.isAssignableFrom(field.getType())) {
+                    && !Map.class.isAssignableFrom(field.getType()) && !Node.class.isAssignableFrom(field.getType())) {
                 keepRestartRequired(oldValue, newValue, childPath, restartPaths);
             }
         }
@@ -314,8 +569,168 @@ public final class ConfigService {
 
     private <T> Loaded<T> bind(ConfigDocument<T> document, String text) {
         YamlBinder binder = new YamlBinder(document.getPath(), true);
-        T value = binder.bind(binder.parse(text), document.getType());
-        return new Loaded<>(value, binder.getProblems());
+        Node root = binder.parse(text);
+        int version = version(root, document.getVersion());
+        if (version < document.getVersion() && binder.getProblems().isEmpty()) {
+            String upgraded = upgrade(document, text, version);
+            if (upgraded != null) {
+                YamlBinder upgradedBinder = new YamlBinder(document.getPath(), true);
+                T value = upgradedBinder.bind(upgradedBinder.parse(upgraded), document.getType());
+                return new Loaded<>(value, upgradedBinder.getProblems(), upgraded);
+            }
+        }
+        T value = binder.bind(root, document.getType());
+        return new Loaded<>(value, binder.getProblems(), null);
+    }
+
+    /**
+     * Content of an older layout run through the migration steps, null when no step applies
+     */
+    @Nullable
+    private String upgrade(ConfigDocument<?> document, String text, int version) {
+        TreeMap<Integer, UnaryOperator<Map<String, Object>>> steps = migrations.get(document.getKind());
+        if (steps == null || steps.isEmpty()) {
+            return null;
+        }
+        Map<String, Object> content;
+        try {
+            Object loaded = new Yaml().load(text);
+            content = loaded instanceof Map ? castMap(loaded) : new LinkedHashMap<String, Object>();
+        } catch (YAMLException e) {
+            return null;
+        }
+        content = upgrade(document.getKind(), content, version, document.getVersion());
+        return dump(content);
+    }
+
+    /**
+     * Runs the migration steps of a kind on raw content
+     */
+    public Map<String, Object> upgrade(String kind, Map<String, Object> content, int fromVersion, int toVersion) {
+        Map<String, Object> upgraded = new LinkedHashMap<>(content);
+        TreeMap<Integer, UnaryOperator<Map<String, Object>>> steps = migrations.get(kind);
+        for (int version = fromVersion; version < toVersion; version++) {
+            UnaryOperator<Map<String, Object>> step = steps != null ? steps.get(version) : null;
+            if (step != null) {
+                upgraded = step.apply(upgraded);
+            }
+        }
+        upgraded.remove(ConfigKeys.VERSION_KEY);
+        return upgraded;
+    }
+
+    public static String dump(Map<String, Object> content) {
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setAllowUnicode(true);
+        return new Yaml(options).dump(content);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> castMap(Object map) {
+        return (Map<String, Object>) map;
+    }
+
+    /**
+     * Upgraded files lose their comments, the old file stays in {@value #HISTORY_DIR}
+     */
+    private void persistMigration(ConfigDocument<?> document, File file, String upgraded) throws IOException {
+        backup(document, file);
+        if (document.getTemplate() == null) {
+            YamlBinder binder = new YamlBinder(document.getPath(), false);
+            writeAtomically(file, render(document, binder.bind(binder.parse(upgraded), document.getType())));
+        } else {
+            writeAtomically(file, "# yaml-language-server: $schema=" + schemaPath(document) + "\n"
+                    + ConfigKeys.VERSION_KEY + ": " + document.getVersion() + "\n" + upgraded);
+        }
+    }
+
+    private static int version(@Nullable Node root, int fallback) {
+        Node node = root instanceof MappingNode ? YamlBinder.find(root, ConfigKeys.VERSION_KEY) : null;
+        if (node instanceof ScalarNode) {
+            try {
+                return Integer.parseInt(((ScalarNode) node).getValue().trim());
+            } catch (NumberFormatException ignored) {
+                return fallback;
+            }
+        }
+        return fallback;
+    }
+
+    private List<ConfigProblem> scan(Directory directory) {
+        File folder = new File(dataFolder, directory.path);
+        List<ConfigProblem> problems = new ArrayList<>();
+        if (!folder.exists()) {
+            for (String name : directory.bundled) {
+                String text = resource(TEMPLATE_ROOT + directory.path + "/" + name);
+                try {
+                    if (text != null) {
+                        writeAtomically(new File(folder, name), text);
+                    }
+                } catch (IOException e) {
+                    problems.add(new ConfigProblem(ConfigProblem.Severity.ERROR, directory.path + "/" + name, 0, 0, "",
+                            "Cannot create the file: " + e.getMessage()));
+                }
+            }
+        }
+        for (String id : documentsIn(directory)) {
+            documents.remove(id);
+        }
+        File[] files = folder.listFiles((dir, name) -> name.endsWith(".yml") && !name.startsWith("."));
+        if (files == null) {
+            return problems;
+        }
+        Arrays.sort(files);
+        for (File file : files) {
+            String name = file.getName().substring(0, file.getName().length() - ".yml".length());
+            String id = directory.path + "/" + name;
+            documents.put(id, new ConfigDocument<>(id, directory.path + "/" + file.getName(), directory.type,
+                    directory.applyMode, directory.version, directory.kind, null));
+        }
+        return problems;
+    }
+
+    private List<String> documentsIn(Directory directory) {
+        List<String> ids = new ArrayList<>();
+        for (ConfigDocument<?> document : documents.values()) {
+            if (directory == directoryOf(document)) {
+                ids.add(document.getId());
+            }
+        }
+        return ids;
+    }
+
+    @Nullable
+    private Directory directoryOf(ConfigDocument<?> document) {
+        int slash = document.getId().lastIndexOf('/');
+        return slash < 0 ? null : directories.get(document.getId().substring(0, slash));
+    }
+
+    private String idOf(Class<?> type) {
+        for (ConfigDocument<?> document : documents.values()) {
+            if (document.getType() == type) {
+                return document.getId();
+            }
+        }
+        throw new IllegalArgumentException(type.getSimpleName() + " is not a registered config document");
+    }
+
+    @Nullable
+    private static String resource(String path) {
+        try (InputStream in = ConfigService.class.getResourceAsStream(path)) {
+            if (in == null) {
+                return null;
+            }
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            return new String(out.toByteArray(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     private void backup(ConfigDocument<?> document, File file) throws IOException {
@@ -372,7 +787,7 @@ public final class ConfigService {
                 up.append("../");
             }
         }
-        return up + SCHEMA_DIR + "/" + document.getId() + ".json";
+        return up + SCHEMA_DIR + "/" + document.getKind().replace('/', '-') + ".json";
     }
 
     private ConfigDocument<?> require(String id) {
@@ -415,10 +830,32 @@ public final class ConfigService {
     private static final class Loaded<T> {
         final T value;
         final List<ConfigProblem> problems;
+        /** Content after the migration steps, null when the file already had the current layout */
+        @Nullable
+        final String upgraded;
 
-        Loaded(T value, List<ConfigProblem> problems) {
+        Loaded(T value, List<ConfigProblem> problems, @Nullable String upgraded) {
             this.value = value;
             this.problems = problems;
+            this.upgraded = upgraded;
+        }
+    }
+
+    private static final class Directory {
+        final String path;
+        final Class<?> type;
+        final ApplyMode applyMode;
+        final int version;
+        final String kind;
+        final List<String> bundled;
+
+        Directory(String path, Class<?> type, ApplyMode applyMode, int version, String kind, List<String> bundled) {
+            this.path = path;
+            this.type = type;
+            this.applyMode = applyMode;
+            this.version = version;
+            this.kind = kind;
+            this.bundled = bundled;
         }
     }
 }

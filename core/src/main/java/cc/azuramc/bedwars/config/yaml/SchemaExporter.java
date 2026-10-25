@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.nodes.Node;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -25,7 +26,10 @@ public final class SchemaExporter {
     }
 
     public static JsonObject export(Class<?> type, String title) {
-        JsonObject schema = object(type, ConfigKeys.newInstance(type));
+        JsonObject schema = Map.class.isAssignableFrom(type) ? forType(type, null) : object(type, ConfigKeys.newInstance(type));
+        if (!schema.has("properties")) {
+            schema.add("properties", new JsonObject());
+        }
         schema.addProperty("$schema", "http://json-schema.org/draft-07/schema#");
         schema.addProperty("title", title);
         JsonObject version = new JsonObject();
@@ -67,6 +71,9 @@ public final class SchemaExporter {
     private static JsonObject forType(Type type, @Nullable Object value) {
         Class<?> raw = ConfigKeys.rawType(type);
         JsonObject schema = new JsonObject();
+        if (Node.class.isAssignableFrom(raw)) {
+            return schema;
+        }
         if (ConfigKeys.isScalar(raw)) {
             schema.addProperty("type", scalarType(raw));
             if (raw.isEnum()) {
@@ -100,7 +107,17 @@ public final class SchemaExporter {
             schema.add("additionalProperties", forType(ConfigKeys.typeArgument(type, 1), null));
             return schema;
         }
-        return object(raw, value != null ? value : ConfigKeys.newInstance(raw));
+        JsonObject object = object(raw, value != null ? value : ConfigKeys.newInstance(raw));
+        if (ConfigKeys.fromString(raw) == null) {
+            return object;
+        }
+        JsonObject shorthand = new JsonObject();
+        shorthand.addProperty("type", "string");
+        JsonArray anyOf = new JsonArray();
+        anyOf.add(shorthand);
+        anyOf.add(object);
+        schema.add("anyOf", anyOf);
+        return schema;
     }
 
     private static String scalarType(Class<?> type) {
