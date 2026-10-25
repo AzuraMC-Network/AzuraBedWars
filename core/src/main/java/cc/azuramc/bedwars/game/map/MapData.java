@@ -450,21 +450,11 @@ public class MapData implements IMapData {
                 || location.getBlockZ() < Math.min(pos1.getBlockZ(), pos2.getBlockZ()) || location.getBlockZ() > Math.max(pos1.getBlockZ(), pos2.getBlockZ());
     }
 
-    public boolean chunkIsInRegion(double x, double z) {
+    public boolean containsChunk(int chunkX, int chunkZ) {
         Location pos1 = region.getPos1().toLocation();
         Location pos2 = region.getPos2().toLocation();
-
-        int x1 = pos1.getBlockX();
-        int x2 = pos2.getBlockX();
-        int z1 = pos1.getBlockZ();
-        int z2 = pos2.getBlockZ();
-
-        int minZ = Math.min(z1, z2) - 1;
-        int maxZ = Math.max(z1, z2) + 1;
-        int minX = Math.min(x1, x2) - 1;
-        int maxX = Math.max(x1, x2) + 1;
-
-        return (x >= minX && x <= maxX && z >= minZ && z <= maxZ);
+        return chunkX >= Math.min(pos1.getBlockX(), pos2.getBlockX()) >> 4 && chunkX <= Math.max(pos1.getBlockX(), pos2.getBlockX()) >> 4
+                && chunkZ >= Math.min(pos1.getBlockZ(), pos2.getBlockZ()) >> 4 && chunkZ <= Math.max(pos1.getBlockZ(), pos2.getBlockZ()) >> 4;
     }
 
     public enum DropType {
