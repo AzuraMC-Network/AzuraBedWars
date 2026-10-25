@@ -31,7 +31,7 @@ public class GameplayConfig {
     @Range(min = 1)
     private int teamBlockSearchRadius = 15;
 
-    @Comment("床搜索半径(用于检测床是否被破坏)")
+    @Comment("床搜索半径(以队伍出生点为中心查找该队的床)")
     @Range(min = 1)
     private int bedSearchRadius = 18;
 

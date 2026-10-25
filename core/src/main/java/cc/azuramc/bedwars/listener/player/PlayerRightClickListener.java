@@ -45,11 +45,6 @@ public class PlayerRightClickListener implements Listener {
             return;
         }
 
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        if (gameTeam == null) {
-            return;
-        }
-
         if (event.getAction() == Action.PHYSICAL) {
             event.setCancelled(true);
             return;
@@ -60,27 +55,20 @@ public class PlayerRightClickListener implements Listener {
         }
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
-            handleRightClickAction(event, gamePlayer, gameTeam);
+            handleRightClickAction(event, gamePlayer);
         }
     }
 
-    /**
-     * 处理右键点击方块的情况
-     *
-     * @return 如果事件被处理并应该结束，返回true
-     */
     private boolean handleRightClickBlock(PlayerInteractEvent event, GamePlayer gamePlayer) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return false;
         }
 
-        // 如果是旁观者点击方块
         if (gamePlayer.isSpectator() && event.getClickedBlock() != null) {
             event.setCancelled(true);
             return true;
         }
 
-        // 处理床方块的特殊点击
         if (event.getClickedBlock() != null && MapUtil.isBedBlock(event.getClickedBlock())) {
             if (event.getPlayer().isSneaking()) {
                 ItemStack item = PlayerUtil.getItemInHand(event.getPlayer());
@@ -96,10 +84,7 @@ public class PlayerRightClickListener implements Listener {
         return false;
     }
 
-    /**
-     * 处理右键点击动作
-     */
-    private void handleRightClickAction(PlayerInteractEvent event, GamePlayer gamePlayer, GameTeam gameTeam) {
+    private void handleRightClickAction(PlayerInteractEvent event, GamePlayer gamePlayer) {
 
         Material material = event.getMaterial();
 
@@ -111,14 +96,11 @@ public class PlayerRightClickListener implements Listener {
             handlePaperInteraction(event, gamePlayer);
         } else if (material == XMaterial.SLIME_BALL.get()) {
             handleSlimeBallInteraction(event);
-        } else if (MapUtil.isBed(material)) {
-            handleBedInteraction(event, gamePlayer, gameTeam);
+        } else if (MapUtil.isBed(material) && gamePlayer.getGameTeam() != null) {
+            handleBedInteraction(event, gamePlayer, gamePlayer.getGameTeam());
         }
     }
 
-    /**
-     * 处理指南针交互
-     */
     private void handleCompassInteraction(PlayerInteractEvent event, GamePlayer gamePlayer) {
         event.setCancelled(true);
         if (!gamePlayer.isSpectator()) {
@@ -127,53 +109,37 @@ public class PlayerRightClickListener implements Listener {
         new SpectatorCompassGUI(gamePlayer).open();
     }
 
-    /**
-     * 处理纸交互
-     */
     private void handlePaperInteraction(PlayerInteractEvent event, GamePlayer gamePlayer) {
         event.setCancelled(true);
-        Bukkit.dispatchCommand(gamePlayer.getPlayer(), "azurabedwars nextgame");
+        String command = AzuraBedWars.getInstance().getSettingsConfig().getPlayAgainCommand();
+        Bukkit.dispatchCommand(gamePlayer.getPlayer(), command.startsWith("/") ? command.substring(1) : command);
     }
 
-    /**
-     * 处理史莱姆球交互
-     */
     private void handleSlimeBallInteraction(PlayerInteractEvent event) {
         event.setCancelled(true);
         BungeeUtil.connectToLobby(GamePlayer.get(event.getPlayer()));
     }
 
-    /**
-     * 处理床交互（回春床功能）
-     */
     private void handleBedInteraction(PlayerInteractEvent event, GamePlayer gamePlayer, GameTeam gameTeam) {
         event.setCancelled(true);
         if (gamePlayer.isSpectator()) {
             return;
         }
 
-        // 验证能否使用回春床
         if (!canUseRejuvenationBed(gamePlayer, gameTeam)) {
             return;
         }
 
-        // 放置床
         placeBedForTeam(gameTeam);
 
-        // 减少物品
         reduceItemInHand(gamePlayer);
 
-        // 更新队伍状态
         gameTeam.setDestroyed(false);
         gameTeam.setRejuvenated(true);
 
-        // 广播消息
         announceRejuvenationBedUsed(gamePlayer, gameTeam);
     }
 
-    /**
-     * 减少玩家手中的物品数量
-     */
     private void reduceItemInHand(GamePlayer gamePlayer) {
         Player player = gamePlayer.getPlayer();
         if (PlayerUtil.getItemInHand(player).getAmount() == 1) {
@@ -183,9 +149,6 @@ public class PlayerRightClickListener implements Listener {
         }
     }
 
-    /**
-     * 广播使用回春床的消息
-     */
     private void announceRejuvenationBedUsed(GamePlayer gamePlayer, GameTeam gameTeam) {
         gamePlayer.sendMessage("§a使用回春床成功!");
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
@@ -197,9 +160,6 @@ public class PlayerRightClickListener implements Listener {
     }
 
 
-    /**
-     * 检查玩家是否可以使用回春床
-     */
     private boolean canUseRejuvenationBed(GamePlayer gamePlayer, GameTeam gameTeam) {
         if (gameManager.getTimeline().getGameSeconds() >= 600) {
             gamePlayer.sendMessage("§c开局已超过10分钟.");
@@ -216,6 +176,11 @@ public class PlayerRightClickListener implements Listener {
             return false;
         }
 
+        if (gameTeam.getBedHead() == null) {
+            gamePlayer.sendMessage("§c地图没有为你的队伍设置床");
+            return false;
+        }
+
         if (gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation()) > 18) {
             gamePlayer.sendMessage("§c请靠近出生点使用!");
             return false;
@@ -224,9 +189,6 @@ public class PlayerRightClickListener implements Listener {
         return true;
     }
 
-    /**
-     * 根据队伍的床朝向放置床
-     */
     @SuppressWarnings("deprecation")
     private void placeBedForTeam(GameTeam gameTeam) {
         BlockFace face = gameTeam.getBedFace();

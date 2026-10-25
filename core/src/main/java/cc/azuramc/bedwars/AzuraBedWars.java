@@ -11,15 +11,12 @@ import cc.azuramc.bedwars.config.ConfigService;
 import cc.azuramc.bedwars.config.migrate.LegacyConfigMigrator;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
-import cc.azuramc.bedwars.database.storage.MapStorageFactory;
-import cc.azuramc.bedwars.database.storage.MapStorageType;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import cc.azuramc.bedwars.game.map.MapData;
-import cc.azuramc.bedwars.game.map.MapLoader;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
@@ -28,14 +25,12 @@ import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import cc.azuramc.bedwars.util.SetupItemManager;
 import cc.azuramc.bedwars.util.bstats.Metrics;
 import cc.azuramc.bedwars.util.nms.NMSMapping;
 import cc.azuramc.bedwars.util.nms.ReflectionUtil;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
-import lombok.Setter;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.milkbowl.vault.chat.Chat;
@@ -68,14 +63,13 @@ public final class AzuraBedWars implements PluginEntrypoint {
     private Economy econ = null;
     private GameManager gameManager;
     private LuckPerms luckPermsApi;
-    @Setter
-    private MapData mapData;
-    private MapLoader mapLoader;
+    /** True when editorMode is on or no map can run */
+    private boolean editing;
     private MapManager mapManager;
     private NMSAccess nmsAccess;
     private NMSProvider nmsProvider;
     private ScoreboardManager scoreboardManager;
-    private SetupItemManager setupItemManager;
+    private SetupItemListener setupItemListener;
 
     public AzuraBedWars(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -103,14 +97,16 @@ public final class AzuraBedWars implements PluginEntrypoint {
 
         // 初始化基础服务
         initDatabases();
-        initMapSystem();
+        mapManager = new MapManager();
 
-        // 根据配置决定加载游戏模式还是编辑模式
-        if (getSettingsConfig().isEditorMode() || mapManager.getLoadedMaps().isEmpty()) {
-            plugin.getLogger().info("当前处于编辑模式(editorMode)或未发现可用地图 取消游戏相关特性加载");
+        SettingsConfig settings = getSettingsConfig();
+        MapData mapData = settings.isEditorMode() ? null : mapManager.loadGameMap(settings.getDefaultMapName());
+        editing = mapData == null;
+        if (editing) {
+            LoggerUtil.warn(settings.isEditorMode() ? "当前处于编辑模式 /map 设置地图" : "没有可以运行的地图 已进入编辑模式 用 /map 设置地图后重启");
             initEditorFeatures();
         } else {
-            initGameFeatures();
+            initGameFeatures(mapData);
         }
 
         initCommands();
@@ -144,14 +140,6 @@ public final class AzuraBedWars implements PluginEntrypoint {
     }
 
     /**
-     * 初始化地图系统
-     */
-    private void initMapSystem() {
-        mapManager = new MapManager();
-        mapManager.preloadAllMaps();
-    }
-
-    /**
      * 初始化命令处理器
      */
     private void initCommands() {
@@ -162,18 +150,14 @@ public final class AzuraBedWars implements PluginEntrypoint {
      * 初始化编辑模式下的功能
      */
     private void initEditorFeatures() {
-        // 初始化地图编辑工具
-        setupItemManager = new SetupItemManager();
-
-        new SetupItemListener(this);
-
-        plugin.getLogger().info("地图编辑工具已加载");
+        setupItemListener = new SetupItemListener();
+        Bukkit.getPluginManager().registerEvents(setupItemListener, plugin);
     }
 
     /**
      * 初始化游戏相关功能
      */
-    private void initGameFeatures() {
+    private void initGameFeatures(MapData mapData) {
         LoggerUtil.info("开始加载游戏相关特性...");
         // 注册GUI监听器
         new GUIListener(this);
@@ -182,17 +166,8 @@ public final class AzuraBedWars implements PluginEntrypoint {
         hookVault();
         hookLuckPerms();
 
-        // 初始化地图存储
-        initMapStorage();
-
-        // 初始化地图加载管理器
-        mapLoader = new MapLoader(this);
-
         // 创建游戏管理器
         gameManager = new GameManager(this);
-
-        // 加载地图
-        mapLoader.loadMap();
         gameManager.loadGame(mapData);
 
         // 注册各种事件监听器
@@ -332,18 +307,6 @@ public final class AzuraBedWars implements PluginEntrypoint {
      */
     public void callEvent(Event event) {
         plugin.getServer().getPluginManager().callEvent(event);
-    }
-
-    /**
-     * 初始化地图存储系统
-     */
-    private void initMapStorage() {
-
-        // 初始化默认存储
-        MapStorageFactory.getDefaultStorage();
-
-        MapStorageType storageType = getSettingsConfig().getMapStorage();
-        plugin.getLogger().info("地图存储系统已初始化，使用 " + storageType + " 作为默认存储方式");
     }
 
     private void initConfigSystem() {

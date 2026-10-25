@@ -8,14 +8,16 @@ import cc.azuramc.bedwars.game.map.MapData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 
 /**
  * @author an5w1r@163.com
  */
 public class MapUtil {
 
-    private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
+    /** Looked up per call since map checks load this class before the game exists */
+    private static GameManager gameManager() {
+        return AzuraBedWars.getInstance().getGameManager();
+    }
 
     /**
      * 检查相对位置是否受保护
@@ -25,26 +27,26 @@ public class MapUtil {
      */
     public static boolean isProtectedRelativeLocation(Block block) {
         // 检查团队出生点保护
-        for (GameTeam gameTeam : GAME_MANAGER.getGameTeams()) {
+        for (GameTeam gameTeam : gameManager().getGameTeams()) {
             if (gameTeam.getSpawnLocation().distance(block.getLocation()) <= gameplay().getTeamSpawnProtectionRadius()) {
                 return true;
             }
         }
 
         // 检查地图区域保护
-        if (GAME_MANAGER.getMapData().hasRegion(block.getLocation())) {
+        if (gameManager().getMapData().isOutsideRegion(block.getLocation())) {
             return true;
         }
 
         // 检查钻石资源点保护
-        for (Location location : GAME_MANAGER.getMapData().getDropLocations(MapData.DropType.DIAMOND)) {
+        for (Location location : gameManager().getMapData().getDropLocations(MapData.DropType.DIAMOND)) {
             if (location.distance(block.getLocation()) <= gameplay().getResourceSpawnProtectionRadius()) {
                 return true;
             }
         }
 
         // 检查绿宝石资源点保护
-        for (Location location : GAME_MANAGER.getMapData().getDropLocations(MapData.DropType.EMERALD)) {
+        for (Location location : gameManager().getMapData().getDropLocations(MapData.DropType.EMERALD)) {
             if (location.distance(block.getLocation()) <= gameplay().getResourceSpawnProtectionRadius()) {
                 return true;
             }
@@ -61,26 +63,26 @@ public class MapUtil {
      */
     public static boolean isProtectedArea(Location location) {
         // 检查地图区域保护
-        if (GAME_MANAGER.getMapData().hasRegion(location)) {
+        if (gameManager().getMapData().isOutsideRegion(location)) {
             return true;
         }
 
         // 检查团队出生点保护
-        for (GameTeam gameTeam : GAME_MANAGER.getGameTeams()) {
+        for (GameTeam gameTeam : gameManager().getGameTeams()) {
             if (gameTeam.getSpawnLocation().distance(location) <= gameplay().getTeamSpawnProtectionRadius()) {
                 return true;
             }
         }
 
         // 检查资源点保护
-        for (MapData.RawLocation rawLocation : GAME_MANAGER.getMapData().getDrops()) {
+        for (MapData.RawLocation rawLocation : gameManager().getMapData().getDrops()) {
             if (rawLocation.toLocation().distance(location) <= gameplay().getResourceSpawnProtectionRadius()) {
                 return true;
             }
         }
 
         // 商人位置保护
-        for (MapData.RawLocation rawLocation : GAME_MANAGER.getMapData().getShops()) {
+        for (MapData.RawLocation rawLocation : gameManager().getMapData().getShops()) {
             if (rawLocation.toLocation().distance(location) <= 3) {
                 return true;
             }
@@ -124,32 +126,6 @@ public class MapUtil {
      */
     private static boolean isStainedGlass(Block block) {
         return block.getType().name().contains("STAINED_GLASS");
-    }
-
-    /**
-     * 将旧版本的数据值转换为BlockFace方向
-     *
-     * @param data 旧版本的数据值
-     * @return 对应的BlockFace方向，如果无法转换则返回null
-     */
-    private static BlockFace convertDataToBlockFace(byte data) {
-        // 此映射基于大多数方向性方块的通用规则，可能需要根据特定方块调整
-        switch (data & 0x7) { // 只使用低3位
-            case 0:
-                return BlockFace.DOWN;
-            case 1:
-                return BlockFace.UP;
-            case 2:
-                return BlockFace.NORTH;
-            case 3:
-                return BlockFace.SOUTH;
-            case 4:
-                return BlockFace.WEST;
-            case 5:
-                return BlockFace.EAST;
-            default:
-                return null;
-        }
     }
 
     private static GameplayConfig gameplay() {

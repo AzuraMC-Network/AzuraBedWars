@@ -81,7 +81,7 @@ public final class LegacyConfigMigrator {
         Map<String, Map<String, Object>> target = new LinkedHashMap<>();
 
         target.put("settings", pick(settings, "editor-mode", "debug-mode", "economy-mode", "map-storage",
-                "default-map-name", "enable-team-selection", "play-again-command"));
+                "default-map-name", "enable-team-selection", "play-again-command", "lobby-server"));
         target.put("database", section(settings, "database"));
 
         Map<String, Object> gameplay = pick(settings, "max-health", "max-no-movement-time", "team-spawn-protection-radius",

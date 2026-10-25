@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
 import cc.azuramc.bedwars.upgrade.TeamUpgrades;
+import cc.azuramc.bedwars.util.LoggerUtil;
 import lombok.Data;
 import lombok.ToString;
 import org.bukkit.ChatColor;
@@ -21,23 +22,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 游戏团队管理类
- * 负责管理游戏中的队伍，包括队伍颜色、出生点、床位置和队伍升级等信息
- *
  * @author an5w1r@163.com
  */
 @Data
-// it is preventing stack overflow error
 @ToString(exclude = {"gameManager", "upgrades"})
 public class GameTeam implements IGameTeam {
-    /**
-     * 搜索床的范围
-     */
-    public static final int BED_SEARCH_RADIUS = 18;
-    /**
-     * 默认床朝向
-     */
-    public static final BlockFace DEFAULT_BED_FACE = BlockFace.NORTH;
 
     @NotNull
     private final GameManager gameManager;
@@ -64,102 +53,53 @@ public class GameTeam implements IGameTeam {
     @NotNull
     private TeamUpgrades upgrades;
 
-    /**
-     * 创建一个游戏团队
-     *
-     * @param gameManager          游戏管理器
-     * @param teamColor            团队颜色
-     * @param location             出生点位置
-     * @param resourceDropLocation 资源掉落位置
-     * @param maxPlayers           最大玩家数
-     */
     public GameTeam(@NotNull GameManager gameManager, @NotNull TeamColor teamColor, @NotNull Location location, @NotNull Location resourceDropLocation, int maxPlayers) {
         this.gameManager = gameManager;
-
-        this.teamColor = Objects.requireNonNull(teamColor, "团队颜色不能为空");
-        this.spawnLocation = Objects.requireNonNull(location, "出生点位置不能为空");
-        this.resourceDropLocation = Objects.requireNonNull(resourceDropLocation, "资源掉落位置不能为空");
+        this.teamColor = Objects.requireNonNull(teamColor, "teamColor");
+        this.spawnLocation = Objects.requireNonNull(location, "spawnLocation");
+        this.resourceDropLocation = Objects.requireNonNull(resourceDropLocation, "resourceDropLocation");
         this.maxPlayers = maxPlayers;
-
-        // 初始化默认值
-        initializeDefaults();
-
-        // 初始化床相关字段
-        new GameTeamBedHandler(this);
-    }
-
-    /**
-     * 初始化团队默认属性值
-     */
-    private void initializeDefaults() {
-        // 床状态初始化
-        this.rejuvenated = false;
-        this.isDestroyed = false;
-
         this.upgrades = new TeamUpgrades(this);
+
+        new GameTeamBedHandler(this);
+        if (bedHead == null) {
+            LoggerUtil.warn("No bed found near the " + teamColor.name() + " team spawn " + location + ", the team starts without a bed");
+            this.isDestroyed = true;
+        }
     }
 
-    /**
-     * 获取团队聊天颜色
-     *
-     * @return 团队对应的聊天颜色（不为null）
-     */
+    public boolean isBedBlock(@NotNull Block block) {
+        Location location = block.getLocation();
+        return (bedHead != null && bedHead.getLocation().equals(location))
+                || (bedFeet != null && bedFeet.getLocation().equals(location));
+    }
+
     @NotNull
     public ChatColor getChatColor() {
         return teamColor.getChatColor();
     }
 
-    /**
-     * 获取团队染料颜色
-     *
-     * @return 团队对应的染料颜色（不为null）
-     */
     @NotNull
     public DyeColor getDyeColor() {
         return teamColor.getDyeColor();
     }
 
-    /**
-     * 获取团队颜色对象
-     *
-     * @return 团队对应的颜色对象（不为null）
-     */
     @NotNull
     public Color getColor() {
         return teamColor.getColor();
     }
 
-    /**
-     * 获取团队名称
-     *
-     * @return 团队名称（不为null）
-     */
     @NotNull
     public String getName() {
         return teamColor.getName();
     }
 
-    /**
-     * 获取团队名称 (移除前边的颜色符号)
-     *
-     * @return 团队名称（不为null）
-     */
     @NotNull
     public String getNameWithoutColor() {
         String teamName = teamColor.getName();
-
-        if (teamName == null || teamName.length() < 2) {
-            return "error";
-        }
-
-        return teamName.substring(2);
+        return teamName.length() < 2 ? teamName : teamName.substring(2);
     }
 
-    /**
-     * 获取团队中所有玩家
-     *
-     * @return 团队玩家列表（不为null）
-     */
     @NotNull
     public List<GamePlayer> getGamePlayers() {
         List<GamePlayer> teamPlayers = new ArrayList<>();
@@ -173,11 +113,6 @@ public class GameTeam implements IGameTeam {
         return Collections.unmodifiableList(teamPlayers);
     }
 
-    /**
-     * 获取团队中所有存活的玩家
-     *
-     * @return 存活玩家列表（不为null）
-     */
     @NotNull
     public List<GamePlayer> getAlivePlayers() {
         List<GamePlayer> alivePlayers = new ArrayList<>();
@@ -191,12 +126,6 @@ public class GameTeam implements IGameTeam {
         return Collections.unmodifiableList(alivePlayers);
     }
 
-    /**
-     * 检查指定玩家是否在团队中
-     *
-     * @param gamePlayer 要检查的玩家
-     * @return 如果玩家在团队中返回true，否则返回false
-     */
     public boolean isInTeam(@Nullable IGamePlayer gamePlayer) {
         if (gamePlayer == null) {
             return false;
@@ -205,13 +134,6 @@ public class GameTeam implements IGameTeam {
         return gamePlayer.getGameTeam() == this;
     }
 
-    /**
-     * 检查指定玩家是否在团队中，排除特定玩家
-     *
-     * @param excludedPlayer 要排除的玩家
-     * @param targetPlayer   要检查的玩家
-     * @return 如果玩家在团队中且不是排除的玩家，返回true，否则返回false
-     */
     public boolean isInTeam(@Nullable GamePlayer excludedPlayer, @Nullable GamePlayer targetPlayer) {
         if (targetPlayer == null || excludedPlayer == null) {
             return false;
@@ -220,12 +142,6 @@ public class GameTeam implements IGameTeam {
         return targetPlayer.getGameTeam() == this && !targetPlayer.equals(excludedPlayer);
     }
 
-    /**
-     * 将玩家添加到团队
-     *
-     * @param gamePlayer 要添加的玩家
-     * @return 如果添加成功返回true，否则返回false
-     */
     public boolean addPlayer(@Nullable GamePlayer gamePlayer) {
         if (gamePlayer == null || isFull() || isInTeam(gamePlayer)) {
             return false;
@@ -236,27 +152,12 @@ public class GameTeam implements IGameTeam {
         return true;
     }
 
-    /**
-     * 检查团队是否已满
-     *
-     * @return 如果团队已满返回true，否则返回false
-     */
     public boolean isFull() {
         return getGamePlayers().size() >= maxPlayers;
     }
 
-    /**
-     * 检查团队是否已经全灭
-     *
-     * @return 如果团队没有存活玩家返回true，否则返回false
-     */
     public boolean isDead() {
-        for (GamePlayer gamePlayer : getGamePlayers()) {
-            if (gamePlayer.isOnline() && !gamePlayer.isSpectator()) {
-                return false;
-            }
-        }
-        return true;
+        return getAlivePlayers().isEmpty();
     }
 
     public void setDestroyed(boolean destroyed) {
@@ -266,11 +167,6 @@ public class GameTeam implements IGameTeam {
         }
     }
 
-    /**
-     * 获取团队当前的活跃玩家数量
-     *
-     * @return 活跃玩家数量
-     */
     public int getActivePlayerCount() {
         return getAlivePlayers().size();
     }

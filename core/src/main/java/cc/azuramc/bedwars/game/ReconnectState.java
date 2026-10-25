@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 /**
+ * What a player keeps when they rejoin the running game
+ *
  * @author an5w1r@163.com
  */
 @Getter
@@ -31,11 +33,6 @@ public class ReconnectState {
     private final ToolType axeType;
     private final boolean shear;
 
-    /**
-     * 从在线的 GamePlayer 抓取断线快照
-     *
-     * @param gamePlayer 断线的玩家
-     */
     public ReconnectState(@NotNull GamePlayer gamePlayer) {
         this.uuid = gamePlayer.getUuid();
         this.name = gamePlayer.getNickName();
@@ -53,12 +50,6 @@ public class ReconnectState {
         this.shear = gamePlayer.isShear();
     }
 
-    /**
-     * 将快照恢复到重连后新建的 GamePlayer
-     *
-     * @param gamePlayer  重连后新建的玩家
-     * @param gameManager 游戏管理器（用于按颜色解析队伍）
-     */
     public void restoreTo(@NotNull GamePlayer gamePlayer, @NotNull GameManager gameManager) {
         if (teamColor != null) {
             GameTeam team = gameManager.getTeam(teamColor);

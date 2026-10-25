@@ -40,4 +40,8 @@ public class SettingsConfig {
     @Comment("再来一局命令")
     @Raw
     private String playAgainCommand = "/not impl now";
+
+    @Comment({"离开游戏和游戏结束时前往的 BungeeCord 子服", "留空则直接踢出玩家"})
+    @Raw
+    private String lobbyServer = "G_BedwarsLobby#1";
 }

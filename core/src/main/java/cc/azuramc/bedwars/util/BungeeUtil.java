@@ -12,18 +12,11 @@ import java.io.DataOutputStream;
  */
 public class BungeeUtil {
 
-    /**
-     * 将玩家连接到指定的 BungeeCord 子服务器
-     *
-     * @param player 玩家对象
-     * @param server 要连接的目标服务器名称
-     */
     public static void connect(Player player, String server) {
         if (player == null || server == null || server.isEmpty()) {
             return;
         }
 
-        // 发送跳服指令
         try (ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
              DataOutputStream out = new DataOutputStream(byteArray)) {
 
@@ -44,6 +37,11 @@ public class BungeeUtil {
     }
 
     public static void connectToLobby(GamePlayer gamePlayer) {
-        connect(gamePlayer, "G_BedwarsLobby#1");
+        String lobbyServer = AzuraBedWars.getInstance().getSettingsConfig().getLobbyServer();
+        if (lobbyServer == null || lobbyServer.isEmpty()) {
+            gamePlayer.getPlayer().kickPlayer("");
+            return;
+        }
+        connect(gamePlayer, lobbyServer);
     }
 }

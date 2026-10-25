@@ -20,11 +20,11 @@ import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author an5w1r@163.com
@@ -147,17 +147,26 @@ public class AdminCommand {
 
     @Subcommand("toWorld")
     public void toWorld(Player player, String worldName) {
-        player.teleport(Objects.requireNonNull(Bukkit.getWorld(worldName)).getSpawnLocation());
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            player.sendMessage(MessageUtil.color("&c世界 " + worldName + " 未加载 先用 /bw loadWorld " + worldName));
+            return;
+        }
+        player.teleport(world.getSpawnLocation());
     }
 
     @Subcommand("loadWorld")
     public void loadWorld(BukkitCommandActor actor, String worldName) {
-        WorldCreator creator = new WorldCreator(worldName);
-        creator.environment(World.Environment.NORMAL);
-        World mapWorld = Bukkit.createWorld(creator);
-
-        if (mapWorld != null) {
-            WorldUtil.setWorldRules(mapWorld);
+        if (!new File(Bukkit.getWorldContainer(), worldName + "/level.dat").isFile()) {
+            CommandUtil.sendLayout(actor, "&c服务器目录下没有世界存档 " + worldName);
+            return;
         }
+        World world = Bukkit.createWorld(new WorldCreator(worldName).environment(World.Environment.NORMAL));
+        if (world == null) {
+            CommandUtil.sendLayout(actor, "&c无法加载世界 " + worldName);
+            return;
+        }
+        WorldUtil.setWorldRules(world);
+        CommandUtil.sendLayout(actor, "&a世界 " + worldName + " 已加载 /bw toWorld " + worldName + " 前往");
     }
 }

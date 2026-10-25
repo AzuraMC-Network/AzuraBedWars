@@ -4,11 +4,8 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MapUtil;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -23,43 +20,21 @@ public class BlockBreakListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        if (GAME_MANAGER.getGameState() == GameState.WAITING) {
+        GamePlayer gamePlayer = GamePlayer.get(event.getPlayer());
+        if (GAME_MANAGER.getGameState() != GameState.RUNNING || gamePlayer == null
+                || gamePlayer.getGameTeam() == null || gamePlayer.isSpectator()) {
             event.setCancelled(true);
             return;
         }
 
-        if (GAME_MANAGER.getGameState() == GameState.RUNNING) {
-            Player player = event.getPlayer();
-            Block block = event.getBlock();
-            GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+        Block block = event.getBlock();
+        if (MapUtil.isBedBlock(block)) {
+            BedBreakHandler.handleBedBreak(event, block, gamePlayer, gamePlayer.getGameTeam());
+            return;
+        }
 
-            if (gamePlayer == null) {
-                return;
-            }
-
-            GameTeam gameTeam = gamePlayer.getGameTeam();
-            if (gameTeam == null) {
-                // 无队伍的玩家（旁观/过渡态）不允许破坏方块，防止破坏世界
-                event.setCancelled(true);
-                return;
-            }
-
-            if (gamePlayer.isSpectator()) {
-                event.setCancelled(true);
-                return;
-            }
-
-            // 处理床方块破坏
-            if (MapUtil.isBedBlock(block)) {
-                BedBreakHandler.handleBedBreak(event, block, gamePlayer, gameTeam);
-                LoggerUtil.debug("BlockBreakListener$onBreak | is bed block then handleBedBreak");
-                return;
-            }
-
-            // 检查区域保护和玩家放置的方块
-            if (GAME_MANAGER.getMapData().hasRegion(block.getLocation()) || GAME_MANAGER.getBlocksLocation().contains(block.getLocation())) {
-                event.setCancelled(true);
-            }
+        if (GAME_MANAGER.getMapData().isOutsideRegion(block.getLocation()) || GAME_MANAGER.getBlocksLocation().contains(block.getLocation())) {
+            event.setCancelled(true);
         }
     }
 }

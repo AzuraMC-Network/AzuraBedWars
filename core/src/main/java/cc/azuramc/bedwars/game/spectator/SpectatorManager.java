@@ -13,49 +13,23 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author an5w1r@163.com
  */
 public class SpectatorManager {
 
-    private static final List<GamePlayer> spectators = new ArrayList<>();
-
     public static void add(GamePlayer gamePlayer) {
         gamePlayer.setSpectator(true);
-        spectators.add(gamePlayer);
-        // 对所有玩家隐藏新的旁观者
         PlayerUtil.hidePlayer(GamePlayer.getOnlinePlayers(), gamePlayer);
-        // 对所有旁观者显示所有玩家
-        for (GamePlayer spectator : spectators) {
+        for (GamePlayer spectator : GamePlayer.getSpectators()) {
             PlayerUtil.showPlayer(spectator, GamePlayer.getOnlinePlayers());
         }
     }
 
-    public static void remove(GamePlayer gamePlayer) {
-        if (!spectators.contains(gamePlayer)) {
-            return;
-        }
-        gamePlayer.setSpectator(false);
-        spectators.remove(gamePlayer);
-    }
-
-    public static void clearSpectators() {
-        spectators.clear();
-    }
-
-    /**
-     * 将玩家转换为观察者
-     */
     public static void toSpectator(GamePlayer gamePlayer) {
         toSpectator(gamePlayer, null, null);
     }
 
-    /**
-     * 将玩家转换为观察者
-     */
     public static void toSpectator(GamePlayer gamePlayer, String title, String subTitle) {
         SpectatorManager.add(gamePlayer);
         gamePlayer.setSpectatorTarget(new SpectatorTarget(gamePlayer, null));
@@ -67,9 +41,6 @@ public class SpectatorManager {
         setupSpectatorTarget(gamePlayer);
     }
 
-    /**
-     * 设置观察者玩家状态
-     */
     private static void setupSpectatorPlayer(GamePlayer gamePlayer, String title, String subTitle) {
         gamePlayer.sendTitle(title, subTitle, 10, 20, 10);
 
@@ -80,9 +51,6 @@ public class SpectatorManager {
         player.teleport(AzuraBedWars.getInstance().getGameManager().getMapData().getRespawnLocation().toLocation());
     }
 
-    /**
-     * 设置观察者物品栏
-     */
     private static void setupSpectatorInventory(Player player) {
         player.getInventory().setItem(0, createSpectatorItem(XMaterial.COMPASS.get(), "§a§l传送器 §7(右键打开)"));
         player.getInventory().setItem(4, createSpectatorItem(XMaterial.COMPARATOR.get(), "§c§l旁观者设置 §7(右键打开)"));
@@ -90,9 +58,6 @@ public class SpectatorManager {
         player.getInventory().setItem(8, createSpectatorItem(XMaterial.SLIME_BALL.get(), "§c§l离开游戏 §7(右键离开)"));
     }
 
-    /**
-     * 创建观察者物品
-     */
     private static ItemStack createSpectatorItem(Material material, String name) {
         return new ItemBuilder()
                 .setType(material)
@@ -100,9 +65,6 @@ public class SpectatorManager {
                 .getItem();
     }
 
-    /**
-     * 设置观察者效果
-     */
     private static void setupSpectatorEffects(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
         SpectatorSettings spectatorSettings = SpectatorSettings.get(GamePlayer.get(player));
@@ -114,9 +76,6 @@ public class SpectatorManager {
         }
     }
 
-    /**
-     * 设置观察者目标
-     */
     private static void setupSpectatorTarget(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam != null && !gameTeam.getAlivePlayers().isEmpty()) {

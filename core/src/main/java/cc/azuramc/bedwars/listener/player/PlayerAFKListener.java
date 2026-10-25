@@ -24,21 +24,14 @@ public class PlayerAFKListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        GamePlayer gamePlayer = GamePlayer.get(player);
-        // 记录玩家上次移动的时间
-        AFK_LAST_MOVEMENT.put(player.getUniqueId(), System.currentTimeMillis());
+        AFK_LAST_MOVEMENT.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        // 退出时清理挂机状态检测遗留
         clearAfk(event.getPlayer().getUniqueId());
     }
 
-    /**
-     * 开始挂机状态检测
-     */
     public static void startCheckAFKTask() {
         checkAFKTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AzuraBedWars.getInstance().getPlugin(), () -> {
             long currentTime = System.currentTimeMillis();
@@ -48,7 +41,6 @@ public class PlayerAFKListener implements Listener {
                 GamePlayer gamePlayer = GamePlayer.get(uuid);
                 long lastMove = AFK_LAST_MOVEMENT.getOrDefault(uuid, currentTime);
 
-                // 大于时间未移动
                 if (gamePlayer != null) {
                     gamePlayer.setAfk(currentTime - lastMove >= gameplay().getMaxNoMovementTime() * 1000L);
                 }

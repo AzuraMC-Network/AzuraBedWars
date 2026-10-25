@@ -1,0 +1,30 @@
+name: Sync Labels
+
+on:
+  push:
+    branches: [ master, develop ]
+    paths: [ .github/labels.json ]
+  workflow_dispatch:
+    inputs:
+      prune:
+        description: Delete repository labels that labels.json does not define
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: sync-labels
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+      - uses: actions/github-script@v7
+        with:
+          script: await require('./.github/scripts/sync-labels.js')({ github, context, core }, ${{ inputs.prune == true }})

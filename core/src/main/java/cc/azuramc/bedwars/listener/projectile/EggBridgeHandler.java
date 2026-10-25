@@ -81,7 +81,7 @@ public class EggBridgeHandler implements Runnable {
 
     private void buildEggBridgeBlock(Block block) {
         // 检查为地图方块
-        if (gameManager.getMapData().hasRegion(block.getLocation())) {
+        if (gameManager.getMapData().isOutsideRegion(block.getLocation())) {
             return;
         }
 

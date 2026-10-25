@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.config.object.TimelineConfig;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.game.task.GameOverTask;
@@ -115,7 +114,7 @@ public class GameTimeline {
     private void end() {
         ended = true;
         index = events.size();
-        gameManager.setGameState(GameState.ENDING);
+        gameManager.end();
         Bukkit.getPluginManager().callEvent(new BedwarsGameEndEvent(gameManager));
     }
 

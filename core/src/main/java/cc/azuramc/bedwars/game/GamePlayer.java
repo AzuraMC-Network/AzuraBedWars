@@ -1,28 +1,28 @@
 package cc.azuramc.bedwars.game;
 
-import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent;
+import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent.StateChangeType;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
-import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
-import cc.azuramc.bedwars.game.spectator.SpectatorManager;
+import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import cc.azuramc.bedwars.game.spectator.SpectatorTarget;
-import cc.azuramc.bedwars.util.LoggerUtil;
+import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.packet.ArmorHider;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import fr.mrmicky.fastboard.FastBoard;
+import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -35,25 +35,30 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 游戏玩家类
- * <p>
- * 管理玩家在游戏中的状态、装备、数据等
- * 提供玩家相关的各种操作方法
- * <b>业务层统一只用GamePlayer，Player仅用于与Bukkit API交互</b>
- * </p>
+ * A player who is online on this server. Created on join and dropped on quit, so {@link #getPlayer()} is never stale.
+ * State that must survive a reconnect lives in {@link ReconnectState}
  *
  * @author an5w1r@163.com
  */
 @Data
 public class GamePlayer implements IGamePlayer {
 
-    public static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
+    private static final long INVISIBILITY_TICKS = 30 * 20L;
+    private static final long TRAP_PROTECTION_TICKS = 30 * 20L;
+    private static final long TRAP_TRIGGER_COOLDOWN_TICKS = 8 * 20L;
+
+    /** Indexed by {@link ToolType#ordinal()} */
+    private static final XMaterial[] PICKAXES = {null, XMaterial.WOODEN_PICKAXE, XMaterial.STONE_PICKAXE, XMaterial.IRON_PICKAXE, XMaterial.DIAMOND_PICKAXE};
+    private static final XMaterial[] AXES = {null, XMaterial.WOODEN_AXE, XMaterial.STONE_AXE, XMaterial.IRON_AXE, XMaterial.DIAMOND_AXE};
 
     private final Player player;
     private final UUID uuid;
@@ -64,165 +69,79 @@ public class GamePlayer implements IGamePlayer {
 
     private String nickName;
     private FastBoard board;
+    @Setter(AccessLevel.NONE)
     private boolean isSpectator;
     private SpectatorTarget spectatorTarget;
     private GameTeam gameTeam;
     private boolean isAfk;
+    @Setter(AccessLevel.NONE)
     private boolean isRespawning;
     private boolean isShoutCooldown;
     private boolean isEggBridgeCooldown;
-    private boolean isViewingArrowDamage;
-    private boolean isViewingAttackDamage;
+    private boolean isViewingArrowDamage = true;
+    private boolean isViewingAttackDamage = true;
 
-    // 隐身相关
+    @Setter(AccessLevel.NONE)
     private boolean isInvisible;
     private BukkitRunnable invisibilityWaitingTask;
     private BukkitRunnable invisibilityFootStepTask;
 
-    // 装备状态
-    private ArmorType armorType;
-    private ToolType pickaxeType;
-    private ToolType axeType;
+    private ArmorType armorType = ArmorType.DEFAULT;
+    private ToolType pickaxeType = ToolType.NONE;
+    private ToolType axeType = ToolType.NONE;
     private boolean shear;
 
+    @Setter(AccessLevel.NONE)
     private boolean isReconnect;
 
-    // 本局游戏数据
     private int currentGameKills;
     private int currentGameFinalKills;
     private int currentGameAssists;
     private int currentGameDeaths;
     private int currentGameDestroyedBeds;
 
-    // 陷阱免疫相关
     private boolean hasTrapProtection;
     private BukkitRunnable trapProtectionTask;
 
-    // 陷阱触发冷却相关
     private boolean isTrapTriggerCooldown;
     private BukkitRunnable trapTriggerTask;
 
-    /**
-     * 构造方法
-     *
-     * @param player Bukkit Player
-     */
-    public GamePlayer(@NotNull Player player) {
+    @Setter(AccessLevel.NONE)
+    private long respawnProtectionEnd;
+
+    private GamePlayer(@NotNull Player player) {
         this.player = player;
         this.uuid = player.getUniqueId();
         this.name = player.getName();
-
-        // 初始化管理器
         this.assistsManager = new AssistsManager(this);
-        this.playerData = loadPlayerData(this);
+        this.playerData = AzuraBedWars.getInstance().getDatabaseProviderFactory().getPlayerDataService().selectPlayerData(this);
         this.playerCompass = new PlayerCompass(this);
-
-        // 初始化游戏状态
-        this.isAfk = false;
-        this.isShoutCooldown = false;
-        this.isEggBridgeCooldown = false;
-        this.isViewingArrowDamage = true;
-        this.isViewingAttackDamage = true;
-        this.isInvisible = false;
-
-        // 初始化装备状态
-        this.armorType = ArmorType.DEFAULT;
-        this.pickaxeType = ToolType.NONE;
-        this.axeType = ToolType.NONE;
-
-        this.isReconnect = false;
-
-        // 初始化本局游戏数据
-        this.currentGameKills = 0;
-        this.currentGameFinalKills = 0;
-        this.currentGameAssists = 0;
-        this.currentGameDeaths = 0;
-        this.currentGameDestroyedBeds = 0;
-
-        this.hasTrapProtection = false;
-
-        this.isTrapTriggerCooldown = false;
     }
 
-    /**
-     * 创建或获取游戏玩家实例
-     *
-     * @param player Bukkit Player
-     * @return 游戏玩家实例
-     */
     @NotNull
     public static GamePlayer create(@NotNull Player player) {
         return GAME_PLAYERS.computeIfAbsent(player.getUniqueId(), k -> new GamePlayer(player));
     }
 
-    /**
-     * 获取游戏玩家实例
-     *
-     * @param uuid 玩家UUID
-     * @return 游戏玩家实例，如果不存在则返回null
-     */
     @Nullable
     public static GamePlayer get(@NotNull UUID uuid) {
-        return GAME_PLAYERS.getOrDefault(uuid, null);
+        return GAME_PLAYERS.get(uuid);
     }
 
-    /**
-     * 通过Bukkit Player对象获取GamePlayer实例
-     *
-     * @param player Bukkit Player对象
-     * @return GamePlayer实例，如果玩家为null或不存在则返回null
-     */
     @Nullable
     public static GamePlayer get(@Nullable Player player) {
-        if (player == null) {
-            return null;
-        }
-        return get(player.getUniqueId());
+        return player == null ? null : get(player.getUniqueId());
     }
 
-    /**
-     * 从在线集合中移除指定玩家
-     * <p>玩家退出时调用，使 GamePlayer 的生命周期与「在线」一致——
-     * 任何存活的 GamePlayer 都对应在线玩家，{@link #getPlayer()} 因而恒为非 null。
-     * 重连所需的本局状态由 {@link ReconnectState} 单独保存。
-     *
-     * @param uuid 玩家 UUID
-     */
     public static void remove(@NotNull UUID uuid) {
         GAME_PLAYERS.remove(uuid);
     }
 
-    /**
-     * 获取所有游戏玩家
-     *
-     * @return 游戏玩家列表（不为null）
-     */
     @NotNull
     public static List<GamePlayer> getGamePlayers() {
         return new ArrayList<>(GAME_PLAYERS.values());
     }
 
-    /**
-     * 获取所有团队玩家
-     *
-     * @return 团队玩家列表（不为null）
-     */
-    @NotNull
-    public static List<GamePlayer> getTeamPlayers() {
-        List<GamePlayer> teamPlayers = new ArrayList<>();
-        for (GamePlayer player : GAME_PLAYERS.values()) {
-            if (player.getGameTeam() != null) {
-                teamPlayers.add(player);
-            }
-        }
-        return teamPlayers;
-    }
-
-    /**
-     * 获取所有在线玩家
-     *
-     * @return 在线玩家列表（不为null）
-     */
     @NotNull
     public static List<GamePlayer> getOnlinePlayers() {
         List<GamePlayer> onlinePlayers = new ArrayList<>();
@@ -234,42 +153,36 @@ public class GamePlayer implements IGamePlayer {
         return onlinePlayers;
     }
 
-    /**
-     * 从数据库加载玩家数据
-     *
-     * @return PlayerData实例
-     */
     @NotNull
-    private PlayerData loadPlayerData(@NotNull GamePlayer gamePlayer) {
-        PlayerDataService playerDataService = AzuraBedWars.getInstance().getDatabaseProviderFactory().getPlayerDataService();
-        return playerDataService.selectPlayerData(gamePlayer);
+    public static List<GamePlayer> getSpectators() {
+        List<GamePlayer> spectators = new ArrayList<>();
+        for (GamePlayer gamePlayer : GAME_PLAYERS.values()) {
+            if (gamePlayer.isSpectator()) {
+                spectators.add(gamePlayer);
+            }
+        }
+        return spectators;
     }
 
-    /**
-     * 开始隐身任务
-     */
     public void startInvisibilityTask() {
         endInvisibility();
 
         ArmorHider.hideArmor(this, GamePlayer.getGamePlayers());
-        this.setInvisible(true);
+        setInvisible(true);
 
-        // 如果脚印线程不存在则创建, 存在则沿用之前的避免堆积 (个人理解较为简便)
         if (invisibilityFootStepTask == null) {
             invisibilityFootStepTask = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!GamePlayer.this.isInvisible) {
-                        this.cancel();
-                        GamePlayer.this.invisibilityFootStepTask = null;
+                    if (!isInvisible) {
+                        cancel();
+                        invisibilityFootStepTask = null;
                         return;
                     }
-                    Player p = GamePlayer.this.getPlayer();
-                    // versions...
                     if (VersionUtil.isVersion1_8()) {
-                        p.getWorld().playEffect(p.getLocation().add(0, 0.1, 0), Effect.valueOf("FOOTSTEP"), 0);
+                        player.getWorld().playEffect(player.getLocation().add(0, 0.1, 0), Effect.valueOf("FOOTSTEP"), 0);
                     } else if (VersionUtil.isLessThan1_13()) {
-                        p.getWorld().spawnParticle(Particle.valueOf("FOOTSTEP"), p.getLocation().add(0, 0.1, 0), 1);
+                        player.getWorld().spawnParticle(Particle.valueOf("FOOTSTEP"), player.getLocation().add(0, 0.1, 0), 1);
                     }
                 }
             };
@@ -283,18 +196,15 @@ public class GamePlayer implements IGamePlayer {
                 endInvisibility();
             }
         };
-        invisibilityWaitingTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), 30 * 20);
+        invisibilityWaitingTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), INVISIBILITY_TICKS);
     }
 
-    /**
-     * 取消隐身任务
-     */
     public void endInvisibility() {
-        if (this.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-            this.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
+        if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+            player.removePotionEffect(PotionEffectType.INVISIBILITY);
         }
 
-        this.setInvisible(false);
+        setInvisible(false);
 
         if (invisibilityWaitingTask != null) {
             invisibilityWaitingTask.cancel();
@@ -304,13 +214,10 @@ public class GamePlayer implements IGamePlayer {
         ArmorHider.showArmor(this, GamePlayer.getGamePlayers());
     }
 
-    /**
-     * 开始陷阱免疫任务
-     */
     public void startTrapProtectionTask() {
         endTrapProtection();
 
-        this.setHasTrapProtection(true);
+        hasTrapProtection = true;
         trapProtectionTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -318,445 +225,222 @@ public class GamePlayer implements IGamePlayer {
                 endTrapProtection();
             }
         };
-        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), 30 * 20);
+        trapProtectionTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), TRAP_PROTECTION_TICKS);
     }
 
-    /**
-     * 取消陷阱免疫任务
-     */
     public void endTrapProtection() {
-        this.setHasTrapProtection(false);
+        hasTrapProtection = false;
         if (trapProtectionTask != null) {
             trapProtectionTask.cancel();
         }
     }
 
-    /**
-     * 开始陷阱触发冷却任务
-     */
     public void startTrapTriggerCooldownTask() {
         endTrapTriggerCooldownTask();
 
-        this.setTrapTriggerCooldown(true);
+        isTrapTriggerCooldown = true;
         trapTriggerTask = new BukkitRunnable() {
             @Override
             public void run() {
                 endTrapTriggerCooldownTask();
             }
         };
-        trapTriggerTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), 8 * 20);
+        trapTriggerTask.runTaskLater(AzuraBedWars.getInstance().getPlugin(), TRAP_TRIGGER_COOLDOWN_TICKS);
     }
 
-    /**
-     * 取消陷阱触发冷却
-     */
     public void endTrapTriggerCooldownTask() {
-        this.setTrapTriggerCooldown(false);
+        isTrapTriggerCooldown = false;
         if (trapTriggerTask != null) {
             trapTriggerTask.cancel();
         }
     }
 
-    /**
-     * 按最终击杀数排序玩家 (总数居)
-     *
-     * @return 排序后的玩家列表
-     */
-    public static List<GamePlayer> sortFinalKills() {
-        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> Integer.compare(player2.getPlayerData().getFinalKills(), player1.getPlayerData().getFinalKills()));
-        return list;
+    public void protectAfterRespawn(long ticks) {
+        respawnProtectionEnd = System.currentTimeMillis() + ticks * 50;
     }
 
-    /**
-     * 按本局最终击杀数排序玩家
-     *
-     * @return 排序后的玩家列表
-     */
-    public static List<GamePlayer> sortCurrentGameFinalKills() {
-        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameFinalKills(), player1.getCurrentGameFinalKills()));
-        return list;
+    public boolean isRespawnProtected() {
+        return System.currentTimeMillis() < respawnProtectionEnd;
     }
 
-    /**
-     * 按本局助攻数排序玩家
-     *
-     * @return 排序后的玩家列表
-     */
-    public static List<GamePlayer> sortCurrentGameAssists() {
-        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameAssists(), player1.getCurrentGameAssists()));
-        return list;
+    public void endRespawnProtection() {
+        respawnProtectionEnd = 0;
     }
 
-    /**
-     * 按本局拆床数排序玩家
-     *
-     * @return 排序后的玩家列表
-     */
-    public static List<GamePlayer> sortCurrentGameBedBreaks() {
-        List<GamePlayer> list = new ArrayList<>(getOnlinePlayers());
-        list.sort((player1, player2) -> Integer.compare(player2.getCurrentGameDestroyedBeds(), player1.getCurrentGameDestroyedBeds()));
-        return list;
-    }
-
-    /**
-     * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addKills等方法会触发一次这个方法)
-     */
-    public void addCurrentGameKills() {
-        this.currentGameKills++;
-    }
-
-    /**
-     * 增加玩家本局最终击杀数据 (不建议直接调用它增加，playerData类的addFinalKills等方法会触发一次这个方法)
-     */
-    public void addCurrentGameFinalKills() {
-        this.currentGameFinalKills++;
-    }
-
-    /**
-     * 增加玩家本局助攻数据 (不建议直接调用它增加，playerData类的addAssists等方法会触发一次这个方法)
-     */
-    public void addCurrentGameAssists() {
-        this.currentGameAssists++;
-    }
-
-    /**
-     * 增加玩家本局死亡数据 (不建议直接调用它增加，playerData类的addDeaths等方法会触发一次这个方法)
-     */
-    public void addCurrentGameDeaths() {
-        this.currentGameDeaths++;
-    }
-
-    /**
-     * 增加玩家本局拆床数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
-     */
-    public void addCurrentGameDestroyedBeds() {
-        this.currentGameDestroyedBeds++;
-    }
-
-    /**
-     * 增加玩家本局击杀数据 (不建议直接调用它增加，playerData类的addKills等方法会触发一次这个方法)
-     */
-    public void addCurrentGameKills(int currentGameKills) {
-        this.currentGameKills += currentGameKills;
-    }
-
-    /**
-     * 增加玩家本局最终击杀数据 (不建议直接调用它增加，playerData类的addFinalKills等方法会触发一次这个方法)
-     */
-    public void addCurrentGameFinalKills(int currentGameFinalKills) {
-        this.currentGameFinalKills += currentGameFinalKills;
-    }
-
-    /**
-     * 增加玩家本局助攻数据 (不建议直接调用它增加，playerData类的addAssists等方法会触发一次这个方法)
-     */
-    public void addCurrentGameAssists(int currentGameAssists) {
-        this.currentGameAssists += currentGameAssists;
-    }
-
-    /**
-     * 增加玩家本局死亡数据 (不建议直接调用它增加，playerData类的addDeaths等方法会触发一次这个方法)
-     */
-    public void addCurrentGameDeaths(int currentGameDeaths) {
-        this.currentGameDeaths += currentGameDeaths;
-    }
-
-    /**
-     * 增加玩家本局破坏床数据 (不建议直接调用它增加，playerData类的addDestroyedBeds等方法会触发一次这个方法)
-     */
-    public void addCurrentGameDestroyedBeds(int currentGameDestroyedBeds) {
-        this.currentGameDestroyedBeds += currentGameDestroyedBeds;
-    }
-
-    /**
-     * 获取所有观察者
-     *
-     * @return 观察者列表
-     */
-    public static List<GamePlayer> getSpectators() {
-        List<GamePlayer> spectators = new ArrayList<>();
-        for (GamePlayer gamePlayer : GAME_PLAYERS.values()) {
-            if (gamePlayer.isSpectator()) {
-                spectators.add(gamePlayer);
-            }
+    public void recordKill(boolean finalKill) {
+        if (finalKill) {
+            currentGameFinalKills++;
+            playerData.addFinalKills();
+            PlayerLevelManager.addExperience(this, 2);
+        } else {
+            currentGameKills++;
+            playerData.addKills();
+            PlayerLevelManager.addExperience(this, 1);
         }
-        return spectators;
     }
 
-    /**
-     * 获取玩家显示名称
-     *
-     * @return 玩家显示名称
-     */
+    public void recordDeath(boolean finalDeath) {
+        currentGameDeaths++;
+        if (finalDeath) {
+            playerData.addFinalDeaths();
+        } else {
+            playerData.addDeaths();
+        }
+    }
+
+    public void recordAssist() {
+        currentGameAssists++;
+        playerData.addAssists();
+        PlayerLevelManager.addExperience(this, 0.5);
+    }
+
+    public void recordBedBreak() {
+        currentGameDestroyedBeds++;
+        playerData.addDestroyedBeds();
+        PlayerLevelManager.addExperience(this, 3);
+    }
+
+    public void recordWin() {
+        playerData.addWins();
+        PlayerLevelManager.addExperience(this, 5);
+    }
+
+    public void recordGamePlayed() {
+        currentGameKills = 0;
+        currentGameFinalKills = 0;
+        currentGameAssists = 0;
+        currentGameDeaths = 0;
+        currentGameDestroyedBeds = 0;
+        playerData.addGames();
+        PlayerLevelManager.addExperience(this, 0.1);
+    }
+
     @NotNull
     public String getNickName() {
-        return this.nickName != null ? this.nickName : this.name;
+        return nickName != null ? nickName : name;
     }
 
-    /**
-     * 检查玩家是否在线
-     *
-     * @return 是否在线
-     */
     public boolean isOnline() {
         return Bukkit.getPlayer(uuid) != null;
     }
 
-    /**
-     * 发送动作栏消息
-     *
-     * @param message 消息内容
-     */
     public void sendActionBar(@NotNull String message) {
-        if (!isOnline()) {
-            return;
+        if (isOnline()) {
+            MessageUtil.sendActionBar(player, message);
         }
-        MessageUtil.sendActionBar(getPlayer(), message);
     }
 
-    /**
-     * 发送标题消息
-     *
-     * @param title    主标题
-     * @param subTitle 副标题
-     * @param fadeIn   淡入时间
-     * @param stay     停留时间
-     * @param fadeOut  淡出时间
-     */
     public void sendTitle(@Nullable String title, @Nullable String subTitle, int fadeIn, int stay, int fadeOut) {
-        if (!isOnline()) {
-            return;
+        if (isOnline()) {
+            MessageUtil.sendTitle(player, title, subTitle, fadeIn, stay, fadeOut);
         }
-        MessageUtil.sendTitle(getPlayer(), title, subTitle, fadeIn, stay, fadeOut);
     }
 
-    /**
-     * 发送聊天消息
-     *
-     * @param message 消息内容
-     */
     public void sendMessage(@NotNull String message) {
-        if (!isOnline()) {
-            return;
+        if (isOnline()) {
+            player.sendMessage(MessageUtil.color(message));
         }
-        getPlayer().sendMessage(MessageUtil.color(message));
     }
 
-    /**
-     * 播放音效
-     *
-     * @param sound  音效类型
-     * @param volume 音量
-     * @param pitch  音调
-     */
     public void playSound(@NotNull Sound sound, float volume, float pitch) {
-        if (!isOnline()) {
-            return;
+        if (isOnline()) {
+            player.playSound(player.getLocation(), sound, volume, pitch);
         }
-        getPlayer().playSound(getPlayer().getLocation(), sound, volume, pitch);
     }
 
-    /**
-     * 设置玩家为观察者
-     */
-    public void setSpectator() {
-        SpectatorManager.add(this);
-    }
-
-    /**
-     * 设置最后伤害来源玩家
-     *
-     * @param damager 伤害来源玩家
-     */
     public void setLastDamage(@NotNull GamePlayer damager) {
         assistsManager.setLastDamage(damager, System.currentTimeMillis());
     }
 
-    /**
-     * 设置最后伤害来源玩家
-     *
-     * @param damager 伤害来源玩家
-     * @param time    时间戳
-     */
-    public void setLastDamage(@NotNull GamePlayer damager, long time) {
-        assistsManager.setLastDamage(damager, time);
-    }
-
-    /**
-     * 获取最后伤害来源玩家
-     *
-     * @return 伤害来源玩家，如果没有则返回null
-     */
     @Nullable
     public GamePlayer getLastDamager() {
-        List<GamePlayer> gamePlayers = assistsManager.getAssists();
-        if (gamePlayers.isEmpty()) {
-            return null;
-        }
-        return gamePlayers.get(gamePlayers.size() - 1);
+        return assistsManager.getLastDamager(System.currentTimeMillis());
     }
 
-    /**
-     * 获取最后伤害来源玩家列表
-     *
-     * @return 伤害来源玩家列表（不为null）
-     */
-    @NotNull
-    public List<GamePlayer> getLastDamagerList() {
-        return assistsManager.getAssists();
-    }
-
-    /**
-     * 给予玩家初始装备
-     */
     public void giveInventory() {
-        Player player = getPlayer();
-        player.getInventory().setHelmet(new ItemBuilder().setType(XMaterial.LEATHER_HELMET.get()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-        player.getInventory().setChestplate(new ItemBuilder().setType(XMaterial.LEATHER_CHESTPLATE.get()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+        PlayerInventory inventory = player.getInventory();
+        inventory.setHelmet(armorPiece(XMaterial.LEATHER_HELMET, true));
+        inventory.setChestplate(armorPiece(XMaterial.LEATHER_CHESTPLATE, true));
         giveArmor();
         giveSword(false);
         givePickaxe(false);
         giveAxe(false);
         giveShear();
-
         player.updateInventory();
     }
 
     public void giveArmor() {
-        Player player = getPlayer();
-
+        PlayerInventory inventory = player.getInventory();
         switch (armorType) {
             case CHAINMAIL:
-                player.getInventory().setLeggings(new ItemBuilder().setType(XMaterial.CHAINMAIL_LEGGINGS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilder().setType(XMaterial.CHAINMAIL_BOOTS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                inventory.setLeggings(armorPiece(XMaterial.CHAINMAIL_LEGGINGS, false));
+                inventory.setBoots(armorPiece(XMaterial.CHAINMAIL_BOOTS, false));
                 break;
             case IRON:
-                player.getInventory().setLeggings(new ItemBuilder().setType(XMaterial.IRON_LEGGINGS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilder().setType(XMaterial.IRON_BOOTS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                inventory.setLeggings(armorPiece(XMaterial.IRON_LEGGINGS, false));
+                inventory.setBoots(armorPiece(XMaterial.IRON_BOOTS, false));
                 break;
             case DIAMOND:
-                player.getInventory().setLeggings(new ItemBuilder().setType(XMaterial.DIAMOND_LEGGINGS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilder().setType(XMaterial.DIAMOND_BOOTS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                inventory.setLeggings(armorPiece(XMaterial.DIAMOND_LEGGINGS, false));
+                inventory.setBoots(armorPiece(XMaterial.DIAMOND_BOOTS, false));
                 break;
             default:
-                player.getInventory().setLeggings(new ItemBuilder().setType(XMaterial.LEATHER_LEGGINGS.get()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-                player.getInventory().setBoots(new ItemBuilder().setType(XMaterial.LEATHER_BOOTS.get()).setColor(gameTeam.getColor()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
+                inventory.setLeggings(armorPiece(XMaterial.LEATHER_LEGGINGS, true));
+                inventory.setBoots(armorPiece(XMaterial.LEATHER_BOOTS, true));
                 break;
         }
-
         UpgradeEffects.enchantArmor(this);
     }
 
-    public void giveSword(boolean remove) {
-        Player player = getPlayer();
-
-        if (remove) {
-            if (XMaterial.WOODEN_SWORD.get() != null) {
-                player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
-            }
+    private ItemStack armorPiece(XMaterial material, boolean teamColored) {
+        ItemBuilder builder = new ItemBuilder().setType(material.get());
+        if (teamColored) {
+            builder.setColor(gameTeam.getColor());
         }
-        ItemStack sword = new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem();
+        return builder.setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem();
+    }
+
+    public void giveSword(boolean replace) {
+        Material woodenSword = XMaterial.WOODEN_SWORD.get();
+        if (replace) {
+            player.getInventory().remove(woodenSword);
+        }
+        ItemStack sword = new ItemBuilder().setType(woodenSword).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem();
         UpgradeEffects.enchantSword(gameTeam, sword);
         player.getInventory().addItem(sword);
     }
 
-    public void givePickaxe(boolean remove) {
-        Player player = getPlayer();
-
-        switch (pickaxeType) {
-            case WOOD:
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
-                break;
-            case STONE:
-                if (remove) {
-                    if (XMaterial.WOODEN_PICKAXE.get() != null) {
-                        player.getInventory().remove(XMaterial.WOODEN_PICKAXE.get());
-                    }
-                }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.STONE_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
-                break;
-            case IRON:
-                if (remove) {
-                    if (XMaterial.STONE_PICKAXE.get() != null) {
-                        player.getInventory().remove(XMaterial.STONE_PICKAXE.get());
-                    }
-                }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.IRON_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
-                break;
-            case DIAMOND:
-                if (remove) {
-                    if (XMaterial.IRON_PICKAXE.get() != null) {
-                        player.getInventory().remove(XMaterial.IRON_PICKAXE.get());
-                    }
-                }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.DIAMOND_PICKAXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
-                break;
-            default:
-                break;
-        }
+    public void givePickaxe(boolean replacePrevious) {
+        giveTool(PICKAXES, pickaxeType, replacePrevious);
     }
 
-    public void giveAxe(boolean remove) {
-        Player player = getPlayer();
+    public void giveAxe(boolean replacePrevious) {
+        giveTool(AXES, axeType, replacePrevious);
+    }
 
-        switch (axeType) {
-            case WOOD:
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
-                break;
-            case STONE:
-                if (remove) {
-                    if (XMaterial.WOODEN_AXE.get() != null) {
-                        player.getInventory().remove(XMaterial.WOODEN_AXE.get());
-                    }
-                }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.STONE_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
-                break;
-            case IRON:
-                if (remove) {
-                    if (XMaterial.STONE_AXE.get() != null) {
-                        player.getInventory().remove(XMaterial.STONE_AXE.get());
-                    }
-                }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.IRON_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
-                break;
-            case DIAMOND:
-                if (remove) {
-                    if (XMaterial.IRON_AXE.get() != null) {
-                        player.getInventory().remove(XMaterial.IRON_AXE.get());
-                    }
-                }
-                player.getInventory().addItem(new ItemBuilder().setType(XMaterial.DIAMOND_AXE.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).addEnchant(XEnchantment.EFFICIENCY.get(), 1).getItem());
-                break;
-            default:
-                break;
+    private void giveTool(XMaterial[] tiers, ToolType type, boolean replacePrevious) {
+        if (type == ToolType.NONE) {
+            return;
         }
+        XMaterial previous = tiers[type.ordinal() - 1];
+        if (replacePrevious && previous != null) {
+            player.getInventory().remove(previous.get());
+        }
+        player.getInventory().addItem(new ItemBuilder()
+                .setType(tiers[type.ordinal()].get())
+                .setUnbreakable(true, true)
+                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
+                .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
+                .getItem());
     }
 
     public void giveShear() {
-        Player player = getPlayer();
-
         if (shear) {
             player.getInventory().addItem(new ItemBuilder().setType(XMaterial.SHEARS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
         }
     }
 
-    /**
-     * 清理玩家状态
-     */
     public void cleanState() {
-        Player player = getPlayer();
-        resetPlayerState(player);
-        clearInventory(player);
-        clearEffects(player);
-    }
-
-    /**
-     * 重置玩家状态
-     */
-    private void resetPlayerState(Player player) {
         player.setAllowFlight(false);
         player.setFlying(false);
         player.setExp(0.0F);
@@ -766,107 +450,51 @@ public class GamePlayer implements IGamePlayer {
         player.setFoodLevel(MAX_FOOD_LEVEL);
         player.setSaturation(MAX_SATURATION);
         player.setExhaustion(0.0f);
-        player.setHealth(gameplay().getMaxHealth());
+        player.setHealth(AzuraBedWars.getInstance().getGameplayConfig().getMaxHealth());
         player.setFireTicks(0);
-        if (this.gameTeam != null) {
-            this.endInvisibility();
-            this.endTrapProtection();
+        if (gameTeam != null) {
+            endInvisibility();
+            endTrapProtection();
         }
-    }
 
-    /**
-     * 清空物品栏
-     */
-    private void clearInventory(Player player) {
-        PlayerInventory inv = player.getInventory();
-        inv.setArmorContents(new ItemStack[4]);
-        inv.clear();
-    }
+        PlayerInventory inventory = player.getInventory();
+        inventory.setArmorContents(new ItemStack[4]);
+        inventory.clear();
 
-    /**
-     * 刷新背包
-     */
-    public void updateInventory() {
-        this.getPlayer().updateInventory();
-    }
-
-    /**
-     * 清除效果
-     */
-    private void clearEffects(Player player) {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
         }
     }
 
-    /**
-     * 自定义 setSpectator 方法，触发状态变化事件
-     */
+    public void updateInventory() {
+        player.updateInventory();
+    }
+
     public void setSpectator(boolean spectator) {
-        GameTeam team = this.gameTeam;
-        if (team == null) {
-            return;
-        }
-        GameManager gameManager = team.getGameManager();
-
-        this.isSpectator = spectator;
-
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR, spectator));
+        isSpectator = spectator;
+        callStateChange(StateChangeType.SPECTATOR, spectator);
     }
 
-    /**
-     * 自定义 setRespawning 方法，触发状态变化事件
-     */
     public void setRespawning(boolean respawning) {
-        GameTeam team = this.gameTeam;
-        if (team == null) {
-            return;
-        }
-        GameManager gameManager = team.getGameManager();
-
-        this.isRespawning = respawning;
-
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING, respawning));
+        isRespawning = respawning;
+        callStateChange(StateChangeType.RESPAWNING, respawning);
     }
 
-    /**
-     * 自定义 setInvisible 方法，触发状态变化事件
-     */
     public void setInvisible(boolean invisible) {
-        GameTeam team = this.gameTeam;
-        if (team == null) {
-            return;
-        }
-        GameManager gameManager = team.getGameManager();
-
-        this.isInvisible = invisible;
-
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE, invisible));
+        isInvisible = invisible;
+        callStateChange(StateChangeType.INVISIBLE, invisible);
     }
 
-    /**
-     * 自定义 setReconnect 方法，触发状态变化事件
-     */
     public void setReconnect(boolean reconnect) {
-        GameTeam team = this.gameTeam;
-        if (team == null) {
-            return;
-        }
-        GameManager gameManager = team.getGameManager();
-
-        this.isReconnect = reconnect;
-
-        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT, reconnect));
+        isReconnect = reconnect;
+        callStateChange(StateChangeType.RECONNECT, reconnect);
     }
 
-    /**
-     * 玩家指南针内部类
-     */
-    @Getter
+    private void callStateChange(StateChangeType type, boolean enabled) {
+        GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(gameManager, this, type, enabled));
+    }
+
     public static class PlayerCompass {
         private final GamePlayer gamePlayer;
 
@@ -874,43 +502,19 @@ public class GamePlayer implements IGamePlayer {
             this.gamePlayer = gamePlayer;
         }
 
-        /**
-         * 发送最近玩家信息
-         */
         public void sendClosestPlayer() {
             GamePlayer closestPlayer = AzuraBedWars.getInstance().getGameManager().findTargetPlayer(gamePlayer);
-
-            if (closestPlayer != null) {
-                LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | closest player is " + closestPlayer);
-
-                // 动态获取 Player 对象
-                Player player = gamePlayer.getPlayer();
-                if (player == null) {
-                    LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | player is null");
-                    return;
-                }
-
-                // 获取目标玩家的 Player 对象
-                Player targetPlayer = closestPlayer.getPlayer();
-                if (targetPlayer == null) {
-                    LoggerUtil.debug("GamePlayer.PlayerCompass$sendClosestPlayer | target player is null");
-                    return;
-                }
-
-                GameTeam closestTeam = closestPlayer.getGameTeam();
-                if (closestTeam == null) {
-                    return;
-                }
-
-                int distance = (int) targetPlayer.getLocation().distance(player.getLocation());
-                gamePlayer.sendActionBar(String.format("§f玩家 %s%s §f距离您 %dm",
-                        closestTeam.getChatColor(),
-                        closestPlayer.getNickName(),
-                        distance));
-                player.setCompassTarget(targetPlayer.getLocation());
-            } else {
+            if (closestPlayer == null || closestPlayer.getGameTeam() == null) {
                 gamePlayer.sendActionBar("§c没有目标");
+                return;
             }
+
+            Player player = gamePlayer.getPlayer();
+            Player targetPlayer = closestPlayer.getPlayer();
+            int distance = (int) targetPlayer.getLocation().distance(player.getLocation());
+            gamePlayer.sendActionBar(String.format("§f玩家 %s%s §f距离您 %dm",
+                    closestPlayer.getGameTeam().getChatColor(), closestPlayer.getNickName(), distance));
+            player.setCompassTarget(targetPlayer.getLocation());
         }
     }
 
@@ -921,13 +525,11 @@ public class GamePlayer implements IGamePlayer {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof GamePlayer)) {
-            return false;
-        }
-        return uuid.equals(((GamePlayer) obj).getUuid());
+        return obj instanceof GamePlayer && uuid.equals(((GamePlayer) obj).getUuid());
     }
 
-    private static GameplayConfig gameplay() {
-        return AzuraBedWars.getInstance().getGameplayConfig();
+    @Override
+    public String toString() {
+        return "GamePlayer(" + name + ")";
     }
 }

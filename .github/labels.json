@@ -1,0 +1,20 @@
+{
+  "feat": { "name": "✨ New Feature", "color": "a2eeef", "description": "New feature" },
+  "fix": { "name": "🐛 Bug Fix", "color": "d73a4a", "description": "Fix a bug" },
+  "refactor": { "name": "♻️ Refactor", "color": "F9C74F", "description": "Code refactoring without functional changes" },
+  "perf": { "name": "⚡ Performance", "color": "F8AD9D", "description": "Performance improvement or optimization" },
+  "docs": { "name": "📚 Documentation", "color": "f9d72c", "description": "Improvements or issues related to documentation" },
+  "test": { "name": "🧪 Test", "color": "C7F0DB", "description": "Adding or updating tests" },
+  "ci": { "name": "👷 CI", "color": "D4D4D8", "description": "Changes to CI/CD configuration or scripts" },
+  "chore": { "name": "🔧 Chore", "color": "FEF3C7", "description": "Maintenance tasks and routine updates" },
+  "style": { "name": "💄 Style", "color": "FECACA", "description": "Code style changes (formatting, linting)" },
+  "breaking": { "name": "💥 Breaking Change", "color": "8e44ad", "description": "Changes that break backward compatibility" },
+  "release": { "name": "🚀 Release", "color": "1d76db", "description": "Merges develop into master for a version release" },
+  "wip": { "name": "🚧 Work in Progress", "color": "FBCA04", "description": "Draft pull request, still being developed" },
+  "bug": { "name": "🐛 Bug", "color": "d73a4a", "description": "Something isn't working" },
+  "featureRequest": { "name": "✨ Feature Request", "color": "a2eeef", "description": "New feature or request" },
+  "highPriority": { "name": "🚨 High Priority", "color": "e11d21", "description": "Needs to be addressed urgently" },
+  "inProgress": { "name": "🔄 In Progress", "color": "fbca04", "description": "A pull request will close this issue" },
+  "done": { "name": "✅ Done", "color": "0e8a16", "description": "Closed as completed" },
+  "stale": { "name": "⏰ Stale", "color": "FED7AA", "description": "No activity for 14 days" }
+}
