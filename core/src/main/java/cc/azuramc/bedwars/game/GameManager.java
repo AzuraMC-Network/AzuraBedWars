@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameLoadEvent;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameStartEvent;
+import cc.azuramc.bedwars.api.event.player.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerReconnectEvent;
 import cc.azuramc.bedwars.api.game.IGameManager;
 import cc.azuramc.bedwars.api.game.IGameTeam;
@@ -10,41 +11,45 @@ import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.database.entity.PlayerData;
+import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.spectator.SpectatorManager;
 import cc.azuramc.bedwars.game.task.GameStartTask;
+import cc.azuramc.bedwars.game.task.RespawnTask;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.game.timeline.GameTimeline;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopCatalog;
 import cc.azuramc.bedwars.tablist.TabListListener;
 import cc.azuramc.bedwars.tablist.TabListManager;
+import cc.azuramc.bedwars.util.DamageUtil;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.ServerMOTD;
+import cc.azuramc.bedwars.util.hook.VaultUtil;
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
 import lombok.Data;
 import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * 游戏管理核心类
- * <p>
- * 负责管理整个起床战争游戏的生命周期、玩家、团队以及游戏状态。
- * 包含游戏开始、运行和结束的逻辑，以及玩家加入、离开和重新连接的处理。
- * </p>
- *
  * @author an5w1r@163.com
  */
 @Data
@@ -55,7 +60,7 @@ public class GameManager implements IGameManager {
     private SettingsConfig settingsConfig;
 
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
-    private static final int ASSIST_TIME_WINDOW_MS = 10000;
+    private static final int RECONNECT_RESPAWN_SECONDS = 10;
 
     private String msgPlayerReconnect;
     private String msgPlayerLeave;
@@ -77,7 +82,6 @@ public class GameManager implements IGameManager {
     private double buildLimitHeight;
 
     private GameState gameState;
-    private boolean isForceStarted;
 
     private Location waitingLocation;
     private Location respawnLocation;
@@ -85,7 +89,6 @@ public class GameManager implements IGameManager {
     private Set<Location> blocksLocation;
     private GameStartTask gameStartTask = null;
     private List<GameTeam> gameTeams;
-    private List<GameParty> gameParties;
 
     private Set<ArmorStand> armorSande;
     private Set<ArmorStand> armorStand;
@@ -94,21 +97,12 @@ public class GameManager implements IGameManager {
 
     private TabListManager tabListManager;
 
-    /**
-     * 断线玩家的重连快照（按 UUID）。玩家断线时存入、重连时取出并清除、游戏结束时清空。
-     */
     private final Map<UUID, ReconnectState> reconnectStates = new ConcurrentHashMap<>();
+    private List<GameTeam> aliveTeamsAtEnd;
 
-    /**
-     * 创建一个新的游戏实例
-     *
-     * @param plugin 插件主类实例
-     */
     public GameManager(AzuraBedWars plugin) {
         this.plugin = plugin;
-        this.isForceStarted = false;
         this.gameTeams = new ArrayList<>();
-        this.gameParties = new ArrayList<>();
         this.armorSande = new HashSet<>();
         this.armorStand = new HashSet<>();
         this.abstractSpecialItems = new ArrayList<>();
@@ -187,285 +181,167 @@ public class GameManager implements IGameManager {
         Bukkit.getPluginManager().callEvent(new BedwarsGameLoadEvent.Post(this, mapData));
     }
 
-    /**
-     * 玩家加入游戏处理
-     *
-     * @param gamePlayer 游戏玩家
-     */
     public void addPlayer(GamePlayer gamePlayer) {
+        plugin.getScoreboardManager().showBoard(gamePlayer);
+        plugin.getScoreboardManager().updateAllBoards();
 
-        if (gameState == GameState.RUNNING) {
-            handlePlayerJoinRunningGame(gamePlayer);
-            tabListManager.addToTab(gamePlayer);
-            return;
+        if (gameState == GameState.WAITING) {
+            joinWaitingGame(gamePlayer);
+        } else {
+            joinRunningGame(gamePlayer);
         }
-
-        handlePlayerJoinWaitingGame(gamePlayer);
-
         tabListManager.addToTab(gamePlayer);
     }
 
-    /**
-     * 处理玩家加入等待状态的游戏
-     *
-     * @param gamePlayer 游戏玩家
-     */
-    private void handlePlayerJoinWaitingGame(GamePlayer gamePlayer) {
+    private void joinWaitingGame(GamePlayer gamePlayer) {
         Player player = gamePlayer.getPlayer();
-        // 处理玩家可见性
-        showAllPlayers(gamePlayer);
+        PlayerUtil.showPlayer(gamePlayer, GamePlayer.getOnlinePlayers());
+        PlayerUtil.showPlayer(GamePlayer.getOnlinePlayers(), gamePlayer);
 
-        // 设置玩家基本状态
         player.spigot().respawn();
         player.setGameMode(GameMode.ADVENTURE);
         player.getEnderChest().clear();
         gamePlayer.cleanState();
-
-        // 传送到等待区域
         player.teleport(waitingLocation);
 
-        // 设置记分板
-        plugin.getScoreboardManager().showBoard(gamePlayer);
-        plugin.getScoreboardManager().updateAllBoards();
-
-        // 给予物品
-        giveWaitingItems(gamePlayer);
-
-        // 检查是否可以开始游戏
-        checkGameStart();
-    }
-
-    /**
-     * 更新玩家可见性设置
-     *
-     * @param gamePlayer 游戏玩家
-     */
-    private void showAllPlayers(GamePlayer gamePlayer) {
-        for (GamePlayer onlinePlayer : GamePlayer.getOnlinePlayers()) {
-            PlayerUtil.showPlayer(onlinePlayer, GamePlayer.getOnlinePlayers());
-        }
-    }
-
-    /**
-     * 给予玩家等待时的物品
-     *
-     * @param gamePlayer 玩家
-     */
-    private void giveWaitingItems(GamePlayer gamePlayer) {
-        Player player = gamePlayer.getPlayer();
-
-        // Team Selection
         if (settingsConfig.isEnableTeamSelection()) {
-            player.getInventory().setItem(2,
-                    new ItemBuilder()
-                            .setType(teamSelectorMaterial)
-                            .setDisplayName(teamSelectorName)
-                            .getItem()
-            );
+            player.getInventory().setItem(2, new ItemBuilder().setType(teamSelectorMaterial).setDisplayName(teamSelectorName).getItem());
         }
+        player.getInventory().setItem(8, new ItemBuilder().setType(leaveGameMaterial).setDisplayName(leaveGameName).getItem());
 
-        // Leave Game
-        player.getInventory().setItem(8,
-                new ItemBuilder()
-                        .setType(leaveGameMaterial)
-                        .setDisplayName(leaveGameName)
-                        .getItem()
-        );
-    }
-
-    /**
-     * 处理玩家加入正在运行的游戏
-     *
-     * @param gamePlayer 游戏玩家
-     */
-    private void handlePlayerJoinRunningGame(GamePlayer gamePlayer) {
-        // 设置记分板
-        plugin.getScoreboardManager().showBoard(gamePlayer);
-        plugin.getScoreboardManager().updateAllBoards();
-
-        // 检查玩家团队状态
-        if (gamePlayer.getGameTeam() != null) {
-            if (!gamePlayer.getGameTeam().isDestroyed()) {
-                // 触发玩家重连事件
-                BedwarsPlayerReconnectEvent.Pre preEvent = new BedwarsPlayerReconnectEvent.Pre(
-                        gamePlayer, gamePlayer.getGameTeam(), this
-                );
-                Bukkit.getPluginManager().callEvent(preEvent);
-
-                // 检查事件是否被取消
-                if (preEvent.isCancelled()) {
-                    gamePlayer.getPlayer().kickPlayer("canceled reconnect by event");
-                    return;
-                }
-
-                gamePlayer.setReconnect(true);
-                PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
-                broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
-
-                // 触发玩家重连完成后置事件
-                Bukkit.getPluginManager().callEvent(new BedwarsPlayerReconnectEvent.Post(
-                        gamePlayer, gamePlayer.getGameTeam(), this));
-                return;
-            }
-        }
-
-        // 如果没有有效团队，设为观察者
-        SpectatorManager.toSpectator(gamePlayer);
-    }
-
-    /**
-     * 检查是否可以开始游戏倒计时
-     */
-    private void checkGameStart() {
-        if (canStart() && gameState == GameState.WAITING && getGameStartTask() == null) {
-            GameStartTask lobbyCountdown = new GameStartTask(this);
-            lobbyCountdown.runTaskTimer(plugin.getPlugin(), COUNTDOWN_TICK_PERIOD, COUNTDOWN_TICK_PERIOD);
-            setGameStartTask(lobbyCountdown);
+        if (gameStartTask == null && canStart()) {
+            gameStartTask = new GameStartTask(this);
+            gameStartTask.runTaskTimer(plugin.getPlugin(), COUNTDOWN_TICK_PERIOD, COUNTDOWN_TICK_PERIOD);
         }
     }
 
-    /**
-     * 处理玩家离开游戏
-     *
-     * @param gamePlayer 游戏玩家
-     */
-    public void removePlayers(GamePlayer gamePlayer) {
-        if (gamePlayer == null) {
+    private void joinRunningGame(GamePlayer gamePlayer) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameState != GameState.RUNNING || gameTeam == null || gameTeam.isDestroyed()) {
+            SpectatorManager.toSpectator(gamePlayer);
             return;
         }
 
+        BedwarsPlayerReconnectEvent.Pre preEvent = new BedwarsPlayerReconnectEvent.Pre(gamePlayer, gameTeam, this);
+        Bukkit.getPluginManager().callEvent(preEvent);
+        if (preEvent.isCancelled()) {
+            gamePlayer.getPlayer().kickPlayer("canceled reconnect by event");
+            return;
+        }
+
+        gamePlayer.setReconnect(true);
+        gamePlayer.cleanState();
+        new RespawnTask(this, gamePlayer, RECONNECT_RESPAWN_SECONDS).start();
+        broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
+        Bukkit.getPluginManager().callEvent(new BedwarsPlayerReconnectEvent.Post(gamePlayer, gameTeam, this));
+    }
+
+    /**
+     * Must run while the player is still online, since quitting counts as a final death once the bed is gone
+     */
+    public void removePlayer(GamePlayer gamePlayer) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameState == GameState.WAITING) {
             broadcastMessage(String.format(msgPlayerLeave, gamePlayer.getNickName()));
+        } else if (gameState == GameState.RUNNING && gameTeam != null) {
+            if (gameTeam.isDestroyed() && !gamePlayer.isSpectator()) {
+                handlePlayerDeath(gamePlayer, null);
+            }
+            reconnectStates.put(gamePlayer.getUuid(), new ReconnectState(gamePlayer));
         }
-
-        if (gameState == GameState.RUNNING && gamePlayer.isSpectator()) {
-            return;
-        }
-
-        AzuraBedWars.getInstance().getDatabaseProviderFactory().getPlayerDataService().updatePlayerData(gamePlayer);
-
-        GameTeam gameTeam = gamePlayer.getGameTeam();
-        if (gameTeam == null) {
-            return;
-        }
-
-        // 处理玩家离开对团队的影响
-        handleTeamPlayerLeave(gamePlayer, gameTeam);
+        plugin.getDatabaseProviderFactory().getPlayerDataService().updatePlayerData(gamePlayer);
     }
 
-    /**
-     * 判断断线玩家是否可重连（游戏进行中、非旁观、且有队伍）。
-     * 床是否仍在由重连时再判定（无床则以旁观者身份回归）。
-     *
-     * @param gamePlayer 游戏玩家
-     * @return 可重连返回 true
-     */
-    public boolean isReconnectable(GamePlayer gamePlayer) {
-        return gameState == GameState.RUNNING
-                && !gamePlayer.isSpectator()
-                && gamePlayer.getGameTeam() != null;
-    }
-
-    /**
-     * 抓取断线玩家的重连快照并暂存
-     *
-     * @param gamePlayer 断线的玩家
-     */
-    public void saveReconnectState(GamePlayer gamePlayer) {
-        reconnectStates.put(gamePlayer.getUuid(), new ReconnectState(gamePlayer));
-    }
-
-    /**
-     * 是否存在指定玩家的重连快照（仅查询，不移除）
-     *
-     * @param uuid 玩家 UUID
-     * @return 存在返回 true
-     */
     public boolean hasReconnectState(UUID uuid) {
         return reconnectStates.containsKey(uuid);
     }
 
-    /**
-     * 取出并移除指定玩家的重连快照
-     *
-     * @param uuid 玩家 UUID
-     * @return 重连快照，不存在时为 null
-     */
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     public ReconnectState takeReconnectState(UUID uuid) {
         return reconnectStates.remove(uuid);
     }
 
     /**
-     * 处理玩家离开对团队的影响
-     *
-     * @param gamePlayer 游戏玩家
-     * @param gameTeam   玩家所在团队
+     * @param cause null when the player quit
      */
-    private void handleTeamPlayerLeave(GamePlayer gamePlayer, GameTeam gameTeam) {
-        if (gameTeam.isDestroyed()) {
-            gamePlayer.setGameTeam(null);
+    public void handlePlayerDeath(GamePlayer victim, @Nullable DamageCause cause) {
+        GameTeam team = victim.getGameTeam();
+        boolean finalKill = team.isDestroyed();
+        GamePlayer killer = DamageUtil.findKiller(victim);
+        List<GamePlayer> assists = victim.getAssistsManager().getAssists(System.currentTimeMillis());
+        victim.getAssistsManager().clear();
+
+        victim.recordDeath(finalKill);
+        if (killer != null) {
+            if (!killer.isSpectator() && !killer.isRespawning()) {
+                getEconomy().rewardKill(victim, killer);
+            }
+            killer.recordKill(finalKill);
+            if (finalKill && !VaultUtil.ecoIsNull) {
+                rewardFinalKillCoins(killer);
+            }
+            for (GamePlayer assist : assists) {
+                GamePlayer online = GamePlayer.get(assist.getUuid());
+                if (online != null && !online.equals(killer)) {
+                    online.recordAssist();
+                }
+            }
+            Bukkit.getPluginManager().callEvent(new BedwarsPlayerKillEvent(victim, killer, finalKill));
         }
 
-        if (gameTeam.getAlivePlayers().isEmpty() && !gameTeam.isDestroyed()) {
-            gameTeam.setDestroyed(true);
+        DeathMessages.broadcast(this, victim, killer, finalKill, cause);
+        if (victim.isInvisible()) {
+            victim.endInvisibility();
+        }
+        if (finalKill && team.getAlivePlayers().size() == 1) {
+            eliminateTeam(team);
         }
     }
 
-    /**
-     * 获取玩家所在的队伍
-     *
-     * @param gamePlayer 游戏玩家
-     * @return 玩家所在队伍，如果不在队伍中则返回null
-     */
-    public GameParty getPlayerParty(GamePlayer gamePlayer) {
-        return gameParties.stream()
-                .filter(party -> party.isInTeam(gamePlayer))
-                .findFirst()
-                .orElse(null);
+    private void rewardFinalKillCoins(GamePlayer killer) {
+        PlayerConfig.PlayerDeath config = plugin.getPlayerConfig().getPlayerDeath();
+        VaultUtil.depositPlayer(killer, config.getCoinsReward());
+        killer.sendMessage(messageConfig.getFinalKillRewardsMessage());
+        new BukkitRunnable() {
+            int shown = 0;
+
+            @Override
+            public void run() {
+                if (shown++ == config.getCoinsActionBarTimes()) {
+                    cancel();
+                    return;
+                }
+                killer.sendActionBar(messageConfig.getNormalKillRewardsMessage());
+            }
+        }.runTaskTimer(plugin.getPlugin(), 0, config.getActionBarPeriod());
     }
 
-    /**
-     * 添加一个队伍到游戏中
-     *
-     * @param gameParty 游戏队伍
-     */
-    public void addParty(GameParty gameParty) {
-        gameParties.add(gameParty);
+    private void eliminateTeam(GameTeam gameTeam) {
+        GamePlayer destroyer = gameTeam.getDestroyPlayer();
+        broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
+        broadcastMessage(messageConfig.getTeamEliminatedFormat(), " ",
+                String.format(messageConfig.getTeamEliminatedMessage(), gameTeam.getChatColor() + gameTeam.getName(),
+                        destroyer != null ? destroyer.getNickName() : "null"),
+                " ", messageConfig.getTeamEliminatedFormat());
     }
 
-    /**
-     * 从游戏中移除一个队伍
-     *
-     * @param gameParty 游戏队伍
-     */
-    public void removeParty(GameParty gameParty) {
-        gameParties.remove(gameParty);
-    }
-
-    /**
-     * 获取游戏最大玩家数量
-     *
-     * @return 最大玩家数量
-     */
     public int getMaxPlayers() {
-        return this.mapData.getMaxPlayers();
+        return mapData.getMaxPlayers();
     }
 
-    /**
-     * 检查是否有足够的玩家开始游戏
-     *
-     * @return 是否有足够玩家
-     */
     public boolean hasEnoughPlayers() {
         return GamePlayer.getOnlinePlayers().size() >= mapData.getPlayers().getMin();
     }
 
-    /**
-     * 获取人数最少的团队
-     *
-     * @return 人数最少的团队
-     */
+    public boolean canStart() {
+        if (!hasEnoughPlayers()) {
+            return false;
+        }
+        long teamsWithPlayers = gameTeams.stream().filter(team -> !team.getGamePlayers().isEmpty()).count();
+        long freePlayers = GamePlayer.getOnlinePlayers().stream().filter(player -> player.getGameTeam() == null).count();
+        return teamsWithPlayers + freePlayers >= 2;
+    }
+
     public GameTeam getLowestTeam() {
         return gameTeams.stream()
                 .filter(team -> !team.isFull())
@@ -473,84 +349,7 @@ public class GameManager implements IGameManager {
                 .orElse(gameTeams.get(0));
     }
 
-    /**
-     * 将无团队玩家分配到团队中
-     */
-    public void moveFreePlayersToTeam() {
-        // 先处理队伍内的玩家
-        assignPartyPlayersToTeams();
-
-        // 再处理独立玩家
-        assignIndividualPlayersToTeams();
-    }
-
-    /**
-     * 将队伍玩家分配到游戏团队中
-     */
-    private void assignPartyPlayersToTeams() {
-        for (GameParty gameParty : gameParties) {
-            GameTeam lowest = getLowestTeam();
-
-            // 尝试将整个队伍放入同一游戏团队
-            // 按 UUID 重新解析为当前在线实例，避免重连后 party 里残留的陈旧 GamePlayer 实例
-            List<GamePlayer> unassignedPlayers = gameParty.getPlayers().stream()
-                    .map(player -> GamePlayer.get(player.getUuid()))
-                    .filter(player -> player != null && player.getGameTeam() == null)
-                    .collect(Collectors.toList());
-
-            for (GamePlayer gamePlayer : unassignedPlayers) {
-                if (!lowest.addPlayer(gamePlayer)) {
-                    lowest = getLowestTeam();
-                    lowest.addPlayer(gamePlayer);
-                }
-            }
-        }
-    }
-
-    /**
-     * 将独立玩家分配到游戏团队中
-     */
-    private void assignIndividualPlayersToTeams() {
-        List<GamePlayer> freePlayers = GamePlayer.getOnlinePlayers().stream()
-                .filter(player -> player.getGameTeam() == null)
-                .collect(Collectors.toList());
-
-        for (GamePlayer gamePlayer : freePlayers) {
-            GameTeam lowest = getLowestTeam();
-            lowest.addPlayer(gamePlayer);
-        }
-    }
-
-    /**
-     * 将所有玩家传送到各自团队的出生点
-     */
-    public void teleportPlayersToTeamSpawn() {
-        for (GameTeam gameTeam : this.gameTeams) {
-            for (GamePlayer gamePlayer : gameTeam.getAlivePlayers()) {
-                Player player = gamePlayer.getPlayer();
-                teleportPlayerSafely(player, gameTeam.getSpawnLocation());
-            }
-        }
-    }
-
-    /**
-     * 安全地传送玩家到指定位置
-     *
-     * @param player   玩家
-     * @param location 目标位置
-     */
-    private void teleportPlayerSafely(Player player, Location location) {
-        player.setVelocity(new Vector(0, 0, 0));
-        player.setFallDistance(0.0F);
-        player.teleport(location);
-    }
-
-    /**
-     * 根据团队颜色获取团队
-     *
-     * @param teamColor 团队颜色
-     * @return 对应的团队，如果不存在则返回null
-     */
+    @Nullable
     public GameTeam getTeam(TeamColor teamColor) {
         return gameTeams.stream()
                 .filter(team -> team.getTeamColor() == teamColor)
@@ -558,301 +357,168 @@ public class GameManager implements IGameManager {
                 .orElse(null);
     }
 
-    /**
-     * 添加特殊物品到游戏中
-     *
-     * @param abstractSpecialItem 特殊物品
-     */
     public void addSpecialItem(AbstractSpecialItem abstractSpecialItem) {
-        this.abstractSpecialItems.add(abstractSpecialItem);
+        abstractSpecialItems.add(abstractSpecialItem);
     }
 
-    /**
-     * 从游戏中移除特殊物品
-     *
-     * @param abstractSpecialItem 特殊物品
-     */
     public void removeSpecialItem(AbstractSpecialItem abstractSpecialItem) {
-        this.abstractSpecialItems.remove(abstractSpecialItem);
+        abstractSpecialItems.remove(abstractSpecialItem);
     }
 
-    /**
-     * 向所有玩家广播标题
-     *
-     * @param title    主标题
-     * @param subTitle 副标题
-     * @param fadeIn   淡入时间
-     * @param stay     停留时间
-     * @param fadeOut  淡出时间
-     */
     public void broadcastTitleToAll(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-        GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
-                gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
+        GamePlayer.getOnlinePlayers().forEach(gamePlayer -> gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
 
-    /**
-     * 向特定团队广播标题
-     *
-     * @param gameTeam 目标团队
-     * @param title    主标题
-     * @param subTitle 副标题
-     * @param fadeIn   淡入时间
-     * @param stay     停留时间
-     * @param fadeOut  淡出时间
-     */
-    public void broadcastTeamTitle(IGameTeam gameTeam, String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
-        gameTeam.getAlivePlayers().forEach(gamePlayer ->
-                gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
+    public void broadcastTeamTitle(IGameTeam gameTeam, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+        gameTeam.getAlivePlayers().forEach(gamePlayer -> gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
 
-    /**
-     * 向特定团队广播消息
-     *
-     * @param gameTeam 目标团队
-     * @param texts    消息文本
-     */
     public void broadcastTeamMessage(IGameTeam gameTeam, String... texts) {
         gameTeam.getAlivePlayers().forEach(gamePlayer -> Arrays.stream(texts).forEach(gamePlayer::sendMessage));
         LoggerUtil.printChat(texts);
     }
 
-    /**
-     * 向特定团队广播消息
-     *
-     * @param gameTeam 目标团队
-     * @param textList 消息文本
-     */
     public void broadcastTeamMessage(IGameTeam gameTeam, List<String> textList) {
         gameTeam.getAlivePlayers().forEach(player -> textList.forEach(player::sendMessage));
         LoggerUtil.printChat(textList);
     }
 
-    /**
-     * 向特定团队播放声音
-     *
-     * @param gameTeam 目标团队
-     * @param sound    声音类型
-     * @param volume   音量
-     * @param pitch    音调
-     */
     public void broadcastTeamSound(IGameTeam gameTeam, Sound sound, float volume, float pitch) {
         gameTeam.getAlivePlayers().forEach(gamePlayer -> gamePlayer.playSound(sound, volume, pitch));
     }
 
-    /**
-     * 向所有观察者广播消息
-     *
-     * @param texts 消息文本
-     */
     public void broadcastSpectatorMessage(String... texts) {
         GamePlayer.getSpectators().forEach(gamePlayer -> Arrays.stream(texts).forEach(gamePlayer::sendMessage));
         LoggerUtil.printChat(texts);
     }
 
-    /**
-     * 向所有观察者广播消息
-     *
-     * @param textList 消息文本
-     */
-    public void broadcastSpectatorMessage(List<String> textList) {
-        GamePlayer.getSpectators().forEach(gamePlayer -> textList.forEach(gamePlayer::sendMessage));
-        LoggerUtil.printChat(textList);
-    }
-
-    /**
-     * 向所有玩家广播消息
-     *
-     * @param texts 消息文本
-     */
     public void broadcastMessage(String... texts) {
         GamePlayer.getOnlinePlayers().forEach(gamePlayer -> Arrays.stream(texts).forEach(gamePlayer::sendMessage));
         LoggerUtil.printChat(texts);
     }
 
-    /**
-     * 向所有玩家广播消息
-     *
-     * @param textList 消息文本
-     */
     public void broadcastMessage(List<String> textList) {
-        GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
-                textList.forEach(gamePlayer::sendMessage)
-        );
+        GamePlayer.getOnlinePlayers().forEach(gamePlayer -> textList.forEach(gamePlayer::sendMessage));
         LoggerUtil.printChat(textList);
     }
 
-    /**
-     * 向所有玩家播放声音
-     *
-     * @param sound  声音类型
-     * @param volume 音量
-     * @param pitch  音调
-     */
     public void broadcastSound(Sound sound, float volume, float pitch) {
-        GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
-                gamePlayer.playSound(sound, volume, pitch));
+        GamePlayer.getOnlinePlayers().forEach(gamePlayer -> gamePlayer.playSound(sound, volume, pitch));
     }
 
-    /**
-     * 检查游戏是否可以开始
-     *
-     * @return 是否可以开始
-     */
-    public boolean canStart() {
-        return (this.hasEnoughPlayers() && this.hasEnoughTeams());
-    }
-
-    /**
-     * 检查是否有足够的团队开始游戏
-     *
-     * @return 是否有足够的团队
-     */
-    public boolean hasEnoughTeams() {
-        int teamsWithPlayers = countTeamsWithPlayers();
-        List<GamePlayer> freePlayers = getFreePlayers();
-
-        return (teamsWithPlayers > 1 ||
-                (teamsWithPlayers == 1 && !freePlayers.isEmpty()) ||
-                (teamsWithPlayers == 0 && freePlayers.size() >= 2));
-    }
-
-    /**
-     * 获取没有加入团队的玩家列表
-     *
-     * @return 无团队玩家列表
-     */
-    private List<GamePlayer> getFreePlayers() {
-        List<GamePlayer> freePlayers = new ArrayList<>(GamePlayer.getGamePlayers());
-        freePlayers.removeAll(GamePlayer.getTeamPlayers());
-        return freePlayers;
-    }
-
-    /**
-     * 计算有玩家的团队数量
-     *
-     * @return 有玩家的团队数量
-     */
-    private int countTeamsWithPlayers() {
-        return (int) gameTeams.stream()
-                .filter(team -> !team.getGamePlayers().isEmpty())
-                .count();
-    }
-
-    /**
-     * 获取格式化的时间字符串
-     *
-     * @param seconds 总秒数
-     * @return 格式化的时间字符串 (mm:ss)
-     */
     public String getFormattedTime(int seconds) {
-        int minutes = seconds / 60;
-        int remainingSeconds = seconds % 60;
-
-        String minutesStr = (minutes < 10 ? "0" : "") + minutes;
-        String secondsStr = (remainingSeconds < 10 ? "0" : "") + remainingSeconds;
-
-        return minutesStr + ":" + secondsStr;
+        return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
-    /**
-     * 开始游戏
-     */
     public void start() {
-        // 触发游戏开始前置事件（可取消以阻止开始）
         BedwarsGameStartEvent.Pre preEvent = new BedwarsGameStartEvent.Pre(this);
         Bukkit.getPluginManager().callEvent(preEvent);
         if (preEvent.isCancelled()) {
             return;
         }
 
+        if (gameStartTask != null) {
+            gameStartTask.cancel();
+            gameStartTask = null;
+        }
         gameState = GameState.RUNNING;
-        // 更新MOTD
         updateServerMOTD();
 
-        moveFreePlayersToTeam();
+        for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
+            if (gamePlayer.getGameTeam() == null) {
+                getLowestTeam().addPlayer(gamePlayer);
+            }
+        }
         timeline.start();
 
-        preparePlayersForGame();
-        teleportPlayersToTeamSpawn();
-        markEmptyTeams();
-
-        // 更新所有玩家的TabList显示名称
-        tabListManager.updateAllTabListNames();
-
-        GamePlayer.getOnlinePlayers().forEach(GamePlayer::giveInventory);
-
-        // 开始挂机状态检测
-        PlayerAFKListener.startCheckAFKTask();
-
-        // 触发游戏开始完成后置事件
-        Bukkit.getPluginManager().callEvent(new BedwarsGameStartEvent.Post(this));
-    }
-
-    /**
-     * 准备玩家开始游戏
-     */
-    private void preparePlayersForGame() {
         for (GamePlayer gamePlayer : GamePlayer.getOnlinePlayers()) {
             Player player = gamePlayer.getPlayer();
-
-            if (gamePlayer.getGameTeam() == null) {
+            GameTeam gameTeam = gamePlayer.getGameTeam();
+            if (gameTeam == null) {
                 player.kickPlayer("");
                 continue;
             }
-
-            player.setAllowFlight(false);
-            player.setFlying(false);
             player.setGameMode(GameMode.SURVIVAL);
             gamePlayer.cleanState();
-            gamePlayer.getPlayerData().addGames();
-
-            // 重置本局游戏数据
-            gamePlayer.setCurrentGameKills(0);
-            gamePlayer.setCurrentGameFinalKills(0);
-            gamePlayer.setCurrentGameAssists(0);
-            gamePlayer.setCurrentGameDeaths(0);
-            gamePlayer.setCurrentGameDestroyedBeds(0);
+            gamePlayer.recordGamePlayed();
+            player.setVelocity(new Vector(0, 0, 0));
+            player.setFallDistance(0.0F);
+            player.teleport(gameTeam.getSpawnLocation());
+            gamePlayer.giveInventory();
         }
-    }
-
-    /**
-     * 标记没有玩家的队伍为床已被摧毁
-     */
-    private void markEmptyTeams() {
-        getGameTeams().forEach(team -> {
-            if (team.getGamePlayers().isEmpty()) {
-                team.setDestroyed(true);
+        for (GameTeam gameTeam : gameTeams) {
+            if (gameTeam.getGamePlayers().isEmpty()) {
+                gameTeam.setDestroyed(true);
             }
-        });
+        }
+
+        tabListManager.updateAllTabListNames();
+        PlayerAFKListener.startCheckAFKTask();
+        Bukkit.getPluginManager().callEvent(new BedwarsGameStartEvent.Post(this));
+    }
+
+    public void end() {
+        aliveTeamsAtEnd = getAliveTeams();
+        gameState = GameState.ENDING;
+        updateServerMOTD();
     }
 
     /**
-     * 检查游戏是否结束
-     *
-     * @return 游戏是否结束
+     * Teams whose players all left wait while their bed stands, except when only two teams remain
      */
     public boolean isOver() {
-        long aliveTeams = gameTeams.stream()
-                .filter(team -> !team.isDead())
-                .count();
-        return aliveTeams <= 1;
+        int alive = getAliveTeams().size();
+        long waiting = gameTeams.stream().filter(this::isWaitingForReconnect).count();
+        return alive <= 1 && alive + waiting <= 2;
+    }
+
+    public boolean isWaitingForReconnect(GameTeam gameTeam) {
+        return gameTeam.isDead() && !gameTeam.isDestroyed()
+                && reconnectStates.values().stream().anyMatch(state -> state.getTeamColor() == gameTeam.getTeamColor());
     }
 
     /**
-     * 获取获胜的团队
-     *
-     * @return 获胜团队，如果没有则返回null
+     * The bed breaker takes a final kill for every player of a team that left
      */
-    public GameTeam getWinner() {
-        List<GameTeam> aliveTeams = gameTeams.stream()
-                .filter(team -> !team.isDead())
-                .collect(Collectors.toList());
-
-        if (aliveTeams.size() == 1) {
-            return aliveTeams.get(0);
+    public void eliminateOfflineTeam(GameTeam gameTeam, GamePlayer bedBreaker) {
+        PlayerDataService playerDataService = plugin.getDatabaseProviderFactory().getPlayerDataService();
+        for (ReconnectState state : reconnectStates.values()) {
+            if (state.getTeamColor() != gameTeam.getTeamColor()) {
+                continue;
+            }
+            PlayerData playerData = playerDataService.getCachedPlayerData(state.getUuid());
+            if (playerData != null) {
+                playerData.addFinalDeaths();
+            }
+            bedBreaker.recordKill(true);
+            if (!VaultUtil.ecoIsNull) {
+                rewardFinalKillCoins(bedBreaker);
+            }
         }
+        eliminateTeam(gameTeam);
+    }
 
-        return null;
+    /**
+     * Frozen when the game ends, so players leaving afterwards do not change the result
+     */
+    @NotNull
+    public List<GameTeam> getAliveTeams() {
+        if (aliveTeamsAtEnd != null) {
+            return aliveTeamsAtEnd;
+        }
+        return gameTeams.stream()
+                .filter(team -> !team.isDead())
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+    }
+
+    @Nullable
+    public GameTeam getWinner() {
+        List<GameTeam> aliveTeams = getAliveTeams();
+        return aliveTeams.size() == 1 ? aliveTeams.get(0) : null;
+    }
+
+    public boolean isTie() {
+        return getAliveTeams().size() > 1;
     }
 
     @NotNull
@@ -860,62 +526,24 @@ public class GameManager implements IGameManager {
         return Collections.unmodifiableList(gameTeams);
     }
 
-    @NotNull
-    public List<GameTeam> getAliveTeams() {
-        return gameTeams.stream()
-                .filter(team -> !team.isDead())
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
-    }
-
-    public boolean isTie() {
-        List<GameTeam> aliveTeams = getAliveTeams();
-        return aliveTeams.size() > 1;
-    }
-
-    /**
-     * 寻找最近的敌方玩家
-     *
-     * @param gamePlayer 当前玩家
-     * @return 最近的敌方玩家，如果没有则返回null
-     */
+    @Nullable
     public GamePlayer findTargetPlayer(GamePlayer gamePlayer) {
-        List<GamePlayer> possibleTargets = getPossibleTargets(gamePlayer);
-
+        Location location = gamePlayer.getPlayer().getLocation();
         GamePlayer closestPlayer = null;
         double closestDistance = Double.MAX_VALUE;
 
-        for (GamePlayer target : possibleTargets) {
-            if (gamePlayer.getPlayer().getWorld() != target.getPlayer().getWorld()) {
+        for (GamePlayer target : GamePlayer.getOnlinePlayers()) {
+            if (target.getGameTeam() == null || target.getGameTeam() == gamePlayer.getGameTeam()
+                    || target.isSpectator() || target.isRespawning()
+                    || target.getPlayer().getWorld() != location.getWorld()) {
                 continue;
             }
-
-            double distance = gamePlayer.getPlayer().getLocation().distance(target.getPlayer().getLocation());
+            double distance = target.getPlayer().getLocation().distanceSquared(location);
             if (distance < closestDistance) {
                 closestPlayer = target;
                 closestDistance = distance;
             }
         }
-
         return closestPlayer;
-    }
-
-    /**
-     * 获取可能的目标玩家列表
-     *
-     * @param gamePlayer 当前玩家
-     * @return 可能的目标玩家列表
-     */
-    private List<GamePlayer> getPossibleTargets(GamePlayer gamePlayer) {
-        List<GamePlayer> targets = new ArrayList<>(GamePlayer.getOnlinePlayers());
-
-        // 移除同队玩家
-        if (gamePlayer.getGameTeam() != null) {
-            targets.removeAll(gamePlayer.getGameTeam().getGamePlayers());
-        }
-
-        // 移除观察者
-        targets.removeIf(GamePlayer::isSpectator);
-
-        return targets;
     }
 }

@@ -2,7 +2,6 @@ package cc.azuramc.bedwars.command.user;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.MessageUtil;
 import revxrsal.commands.annotation.Command;
@@ -24,13 +23,12 @@ public class StartCommand {
             return;
         }
 
-        int min = gameManager.getMapData().getPlayers().getMin();
-        if (GamePlayer.getOnlinePlayers().size() < min) {
-            actor.getSender().sendMessage(MessageUtil.color("&c游戏人数不足! 最少需要" + min + "人才能&n开始游戏&c."));
+        if (!gameManager.canStart()) {
+            int min = gameManager.getMapData().getPlayers().getMin();
+            actor.getSender().sendMessage(MessageUtil.color("&c游戏人数不足! 至少需要" + min + "人且分属两支队伍才能&n开始游戏&c."));
             return;
         }
 
-        gameManager.setForceStarted(true);
         gameManager.start();
     }
 }

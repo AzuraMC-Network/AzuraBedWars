@@ -30,7 +30,7 @@ public class SettingsConfig {
     @Comment("默认地图名称")
     private String defaultMapName = "game";
 
-    @Comment("床搜索半径(用于检测床是否被破坏)")
+    @Comment("床搜索半径(以队伍出生点为中心查找该队的床)")
     private int bedSearchRadius = 18;
 
     @Comment("破坏床奖励金币数量")
@@ -38,6 +38,9 @@ public class SettingsConfig {
 
     @Comment("再来一局命令")
     private String playAgainCommand = "/not impl now";
+
+    @Comment({"离开游戏和游戏结束时前往的 BungeeCord 子服", "留空则直接踢出玩家"})
+    private String lobbyServer = "G_BedwarsLobby#1";
 
     @Comment("玩家最大生命值")
     private int maxHealth = 20;
