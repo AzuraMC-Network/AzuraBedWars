@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -32,6 +33,13 @@ public interface NMSAccess {
      * @return null when the server version has no nms module
      */
     MobGoals getGoals(Creature creature);
+
+    /**
+     * Bukkit only added {@link LivingEntity#setAI} in 1.9
+     */
+    default void setAI(LivingEntity entity, boolean ai) {
+        entity.setAI(ai);
+    }
 
     /**
      * 设置物品是否无法破坏（含是否隐藏无法破坏标签）
