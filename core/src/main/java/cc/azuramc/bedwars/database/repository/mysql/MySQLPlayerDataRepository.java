@@ -5,8 +5,8 @@ import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.mapper.EntityMapper;
 import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
 import cc.azuramc.bedwars.game.GamePlayer;
-import cc.azuramc.orm.AzuraOrmClient;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.UUID;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
-    private final AzuraOrmClient ormClient;
+    private final DataSource dataSource;
 
     private static final SqlGenerator SQL = SqlGenerator.mysql();
 
@@ -29,13 +29,13 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
     private static final String UPDATE_SQL = SQL.generateUpdateSql(PlayerData.class);
     private static final String SELECT_BY_UUID_SQL = SQL.generateSelectByQueryKeySql(PlayerData.class, PlayerData.Query.BY_UUID.name());
 
-    public MySQLPlayerDataRepository(AzuraOrmClient ormClient) {
-        this.ormClient = ormClient;
+    public MySQLPlayerDataRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
     public void createTable() {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(CREATE_TABLE_SQL);
         } catch (SQLException e) {
@@ -45,7 +45,7 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
     @Override
     public PlayerData insertPlayerData(PlayerData playerData) {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
             EntityMapper.setInsertParameters(ps, playerData);
@@ -64,7 +64,7 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
     @Override
     public void updatePlayerData(PlayerData playerData) {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
 
             EntityMapper.setUpdateParameters(ps, playerData);
@@ -76,7 +76,7 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
 
     @Override
     public PlayerData selectPlayerDataByUuid(UUID uuid, GamePlayer gamePlayer) {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_BY_UUID_SQL)) {
 
             ps.setString(1, uuid.toString());

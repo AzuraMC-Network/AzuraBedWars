@@ -19,6 +19,9 @@ dependencies {
     implementation(libs.xseries)
     implementation(libs.fastboard)
     implementation(libs.mongodb.driver.sync)
-    implementation(libs.azura.orm)
-    implementation(libs.azura.mobaicontroller)
+    implementation(libs.hikaricp)
+    implementation(libs.mysql.connector) {
+        // only the X DevAPI needs it
+        exclude(group = "com.google.protobuf")
+    }
 }

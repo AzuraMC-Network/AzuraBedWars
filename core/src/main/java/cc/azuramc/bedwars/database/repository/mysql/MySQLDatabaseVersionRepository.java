@@ -4,8 +4,8 @@ import cc.azuramc.bedwars.database.dialect.SqlGenerator;
 import cc.azuramc.bedwars.database.entity.DatabaseVersion;
 import cc.azuramc.bedwars.database.mapper.EntityMapper;
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
-import cc.azuramc.orm.AzuraOrmClient;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 /**
@@ -13,7 +13,7 @@ import java.sql.*;
  */
 public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepository {
 
-    private final AzuraOrmClient ormClient;
+    private final DataSource dataSource;
 
     private static final SqlGenerator SQL = SqlGenerator.mysql();
 
@@ -25,13 +25,13 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     private static final String COL_VERSION = EntityMapper.getQueryColumn(DatabaseVersion.class, DatabaseVersion.Query.BY_VERSION.name());
 
-    public MySQLDatabaseVersionRepository(AzuraOrmClient ormClient) {
-        this.ormClient = ormClient;
+    public MySQLDatabaseVersionRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
     public void createTable() {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(CREATE_TABLE_SQL);
         } catch (SQLException e) {
@@ -41,7 +41,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public int getCurrentVersion() throws SQLException {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_SQL);
              ResultSet rs = ps.executeQuery()) {
 
@@ -54,7 +54,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public DatabaseVersion selectDatabaseVersion() {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_SQL);
              ResultSet rs = ps.executeQuery()) {
 
@@ -71,7 +71,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void insertVersion(int version) throws SQLException {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
 
             ps.setInt(1, version);
@@ -81,7 +81,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void insertDatabaseVersion(DatabaseVersion databaseVersion) {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
 
             ps.setInt(1, databaseVersion.getVersion());
@@ -93,7 +93,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void updateVersion(int version) throws SQLException {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
 
             ps.setInt(1, version);
@@ -103,7 +103,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public void updateDatabaseVersion(DatabaseVersion databaseVersion) {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
 
             ps.setInt(1, databaseVersion.getVersion());
@@ -115,7 +115,7 @@ public class MySQLDatabaseVersionRepository implements IDatabaseVersionRepositor
 
     @Override
     public boolean hasVersionRecord() throws SQLException {
-        try (Connection conn = ormClient.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(EXISTS_SQL);
              ResultSet rs = ps.executeQuery()) {
 

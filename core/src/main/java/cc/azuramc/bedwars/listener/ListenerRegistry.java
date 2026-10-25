@@ -75,6 +75,7 @@ public class ListenerRegistry {
         // special package
         register(new EntityDeathListener());
         register(new CustomEntityDamageListener());
+        register(new CustomEntityTargetListener());
         register(new IronGolemSpawnListener());
         register(new MobDropsListener());
         register(new RescuePlatformListener());

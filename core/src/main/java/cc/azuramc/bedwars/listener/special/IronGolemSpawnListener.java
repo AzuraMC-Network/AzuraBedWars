@@ -65,8 +65,7 @@ public class IronGolemSpawnListener implements Listener {
             return;
         }
 
-        new CustomEntityManager(AzuraBedWars.getInstance().getNmsAccess().spawnIronGolem(spawnLocation, gamePlayer,
-                0.25, 100), gamePlayer, despawn);
+        CustomEntityManager.spawnIronGolem(spawnLocation, gamePlayer, despawn);
         event.setCancelled(true);
     }
 

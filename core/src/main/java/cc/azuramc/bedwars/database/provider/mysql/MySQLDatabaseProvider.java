@@ -9,9 +9,8 @@ import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
 import cc.azuramc.bedwars.database.repository.mysql.MySQLDatabaseVersionRepository;
 import cc.azuramc.bedwars.database.repository.mysql.MySQLPlayerDataRepository;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import cc.azuramc.orm.AzuraORM;
-import cc.azuramc.orm.AzuraOrmClient;
-import cc.azuramc.orm.config.DatabaseConfig;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
 
 /**
@@ -20,10 +19,10 @@ import lombok.Getter;
 @Getter
 public class MySQLDatabaseProvider implements IDatabaseProvider {
 
-    private static final String JDBC_URL_TEMPLATE = "jdbc:mysql://%s:%s/%s";
+    private static final String JDBC_URL_TEMPLATE = "jdbc:mysql://%s:%s/%s?useSSL=false&createDatabaseIfNotExist=true";
 
     private final AzuraBedWars plugin;
-    private AzuraOrmClient ormClient;
+    private HikariDataSource dataSource;
 
     public MySQLDatabaseProvider(AzuraBedWars plugin) {
         this.plugin = plugin;
@@ -39,23 +38,21 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
                     database.getDatabase()
             );
 
-            DatabaseConfig config = new DatabaseConfig()
-                    .setUrl(jdbcUrl)
-                    .setUsername(database.getUsername())
-                    .setPassword(database.getPassword())
-                    .setMaximumPoolSize(25)
-                    .setMinimumIdle(5)
-                    .setConnectionTimeout(10000L)
-                    .setIdleTimeout(300000L)
-                    .setMaxLifetime(900000L)
-                    .setLeakDetectionThreshold(30000L)
-                    .setPoolName("AzuraBedWars-MySQL-Pool")
-                    .setRegisterMbeans(true)
-                    .setUseSSL(false)
-                    .setAutoCommit(true);
-
-            AzuraORM.initialize(config, true);
-            ormClient = AzuraORM.getClient();
+            HikariConfig config = new HikariConfig();
+            // DriverManager cannot see drivers inside the isolated class loader
+            config.setDataSourceClassName("com.mysql.cj.jdbc.MysqlDataSource");
+            config.addDataSourceProperty("url", jdbcUrl);
+            config.setUsername(database.getUsername());
+            config.setPassword(database.getPassword());
+            config.setMaximumPoolSize(25);
+            config.setMinimumIdle(5);
+            config.setConnectionTimeout(10000L);
+            config.setIdleTimeout(300000L);
+            config.setMaxLifetime(900000L);
+            config.setLeakDetectionThreshold(30000L);
+            config.setPoolName("AzuraBedWars-MySQL-Pool");
+            config.setRegisterMbeans(true);
+            dataSource = new HikariDataSource(config);
 
             LoggerUtil.info("MySQL数据库连接初始化成功");
             return true;
@@ -68,9 +65,9 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
 
     @Override
     public void shutdown() {
-        if (ormClient != null) {
+        if (dataSource != null) {
             try {
-                ormClient.close();
+                dataSource.close();
                 LoggerUtil.info("MySQL数据库连接已关闭");
             } catch (Exception e) {
                 LoggerUtil.error("关闭MySQL数据库连接时出错: " + e.getMessage());
@@ -85,11 +82,11 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
 
     @Override
     public IPlayerDataRepository createPlayerDataRepository() {
-        return new MySQLPlayerDataRepository(ormClient);
+        return new MySQLPlayerDataRepository(dataSource);
     }
 
     @Override
     public IDatabaseVersionRepository createDatabaseVersionRepository() {
-        return new MySQLDatabaseVersionRepository(ormClient);
+        return new MySQLDatabaseVersionRepository(dataSource);
     }
 }

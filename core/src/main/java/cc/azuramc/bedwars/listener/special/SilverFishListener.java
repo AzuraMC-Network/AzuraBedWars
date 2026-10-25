@@ -21,9 +21,6 @@ public class SilverFishListener implements Listener {
 
     @EventHandler
     public void onThrown(ProjectileHitEvent event) {
-        Location location = event.getEntity().getLocation();
-
-
         if (gameManager.getGameState() != GameState.RUNNING) {
             return;
         }
@@ -33,9 +30,12 @@ public class SilverFishListener implements Listener {
         }
 
         GamePlayer gamePlayer = GamePlayer.get(shooter);
+        if (gamePlayer == null || gamePlayer.isSpectator() || gamePlayer.getGameTeam() == null) {
+            return;
+        }
 
         int despawn = 15;
-        new CustomEntityManager(AzuraBedWars.getInstance().getNmsAccess().spawnSilverfish(location.add(0, 0.5, 0), gamePlayer,
-                0.25, 8), gamePlayer, despawn);
+        Location location = event.getEntity().getLocation();
+        CustomEntityManager.spawnSilverfish(location.add(0, 0.5, 0), gamePlayer, despawn);
     }
 }

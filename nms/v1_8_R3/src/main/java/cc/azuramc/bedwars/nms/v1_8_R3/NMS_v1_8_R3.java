@@ -1,15 +1,16 @@
 package cc.azuramc.bedwars.nms.v1_8_R3;
 
-import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
-import cc.azuramc.bedwars.api.game.IGamePlayer;
-import cc.azuramc.bedwars.api.game.IGameTeam;
+import cc.azuramc.bedwars.api.nms.MobGoals;
 import cc.azuramc.bedwars.api.nms.NMSAccess;
 import net.minecraft.server.v1_8_R3.EntityFireball;
+import net.minecraft.server.v1_8_R3.EntityInsentient;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftFireball;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -21,10 +22,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class NMS_v1_8_R3 implements NMSAccess {
 
-    public NMS_v1_8_R3() {
-        AbstractCustomEntity.initializeReflection();
-    }
-
     @Override
     public Fireball setFireballDirection(@NotNull Fireball fireball, @NotNull Vector vector) {
         EntityFireball fb = ((CraftFireball) fireball).getHandle();
@@ -35,17 +32,15 @@ public class NMS_v1_8_R3 implements NMSAccess {
     }
 
     @Override
-    public LivingEntity spawnIronGolem(Location loc, IGamePlayer gamePlayer, double speed, double health) {
-        IGameTeam gameTeam = gamePlayer.getGameTeam();
-        AzuraBedWarsAPI.debug("NMS_v1_8_R3$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health);
-        return CustomIronGolem.spawn(loc, gameTeam, speed, health);
+    public MobGoals getGoals(Creature creature) {
+        return new MobGoalsImpl(((CraftCreature) creature).getHandle());
     }
 
     @Override
-    public LivingEntity spawnSilverfish(Location loc, IGamePlayer gamePlayer, double speed, double health) {
-        IGameTeam gameTeam = gamePlayer.getGameTeam();
-        AzuraBedWarsAPI.debug("NMS_v1_8_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health);
-        return CustomSilverfish.spawn(loc, gameTeam, speed, health);
+    public void setAI(LivingEntity entity, boolean ai) {
+        if (((CraftLivingEntity) entity).getHandle() instanceof EntityInsentient insentient) {
+            insentient.k(!ai);
+        }
     }
 
     @Override

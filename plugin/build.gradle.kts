@@ -81,7 +81,7 @@ fun Jar.pluginContents(archives: ArchiveOperations) {
 
 val pluginJar = tasks.register<Jar>("pluginJar") {
     pluginContents(archives)
-    // in-house jars are not in public repositories
+    // the core jar is not in public repositories
     from(runtimeLibraries.flatMap { it.bundle }) {
         include("cc.azuramc/**")
         into("META-INF/azurabedwars/libraries")

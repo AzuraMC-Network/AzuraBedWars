@@ -159,22 +159,18 @@ public class LoadGameUtil {
             String displayName) {
 
         Location spawnLocation = location.clone();
-        Location standLocation = spawnLocation.clone().add(0.0D, VILLAGER_STAND_Y_OFFSET, 0.0D);
-
-        // 创建盔甲架作为村民的底座
-        ArmorStand armorStand = Objects.requireNonNull(spawnLocation.getWorld())
-                .spawn(standLocation, ArmorStand.class);
-        configureInvisibleArmorStand(armorStand);
 
         // 创建村民
-        Villager villager = spawnLocation.getWorld().spawn(spawnLocation, Villager.class);
+        Villager villager = Objects.requireNonNull(spawnLocation.getWorld()).spawn(spawnLocation, Villager.class);
         configureShopVillager(villager, profession, plugin, metadataKey);
+        plugin.getNmsAccess().setAI(villager, false);
 
-        //TODO: WE ARE MAKING A NEW PROJECT TO SOLVE THIS PROBLEM
+        // 1.8 still moves mobs without AI by gravity and pushing
         if (VersionUtil.isVersion1_8()) {
+            Location standLocation = spawnLocation.clone().add(0.0D, VILLAGER_STAND_Y_OFFSET, 0.0D);
+            ArmorStand armorStand = spawnLocation.getWorld().spawn(standLocation, ArmorStand.class);
+            configureInvisibleArmorStand(armorStand);
             mountVillagerOnArmorStand(armorStand, villager);
-        } else {
-            villager.setAI(false);
         }
 
         // 创建名称标签

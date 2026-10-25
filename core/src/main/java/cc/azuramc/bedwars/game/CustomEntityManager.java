@@ -1,10 +1,15 @@
 package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.api.nms.MobGoals;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -68,6 +73,38 @@ public class CustomEntityManager {
         updateEntityName();
 
         startRefreshTask();
+    }
+
+    public static void spawnIronGolem(Location location, GamePlayer summoner, int liveLeftTime) {
+        IronGolem golem = location.getWorld().spawn(location, IronGolem.class);
+        setupGoals(golem, new CustomEntityManager(golem, summoner, liveLeftTime), 1.5D, 1.0D);
+    }
+
+    public static void spawnSilverfish(Location location, GamePlayer summoner, int liveLeftTime) {
+        Silverfish silverfish = location.getWorld().spawn(location, Silverfish.class);
+        setupGoals(silverfish, new CustomEntityManager(silverfish, summoner, liveLeftTime), 1.9D, 1.5D);
+    }
+
+    private static void setupGoals(Creature creature, CustomEntityManager manager, double attackSpeed, double strollSpeed) {
+        creature.setCustomNameVisible(true);
+        creature.setRemoveWhenFarAway(false);
+
+        MobGoals goals = AzuraBedWars.getInstance().getNmsAccess().getGoals(creature);
+        if (goals == null) {
+            return;
+        }
+
+        goals.clearGoals()
+                .floatInWater(1)
+                .meleeAttack(2, attackSpeed)
+                .moveTowardsTarget(3, 1.0D, 20.0F)
+                .randomStroll(4, strollSpeed)
+                .randomLookAround(5)
+                .clearTargets()
+                .hurtByTarget(1)
+                .nearestTarget(2, Player.class, manager::isEnemy)
+                .nearestTarget(3, IronGolem.class, manager::isEnemy)
+                .nearestTarget(4, Silverfish.class, manager::isEnemy);
     }
 
     /**
@@ -230,6 +267,23 @@ public class CustomEntityManager {
      */
     public int getRemainingTime() {
         return liveLeftTime;
+    }
+
+    /**
+     * Enemy players and custom entities of other teams
+     */
+    public boolean isEnemy(Entity target) {
+        if (gameTeam == null) {
+            return false;
+        }
+
+        if (target instanceof Player player) {
+            GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+            return gamePlayer != null && !gamePlayer.isSpectator() && gamePlayer.getGameTeam() != gameTeam;
+        }
+
+        CustomEntityManager other = customEntityMap.get(target.getUniqueId());
+        return other != null && other.gameTeam != null && other.gameTeam != gameTeam;
     }
 
     /**
