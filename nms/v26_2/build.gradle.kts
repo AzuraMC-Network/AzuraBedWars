@@ -7,7 +7,7 @@ dependencies {
 }
 
 // Paper changes member access on the same Minecraft version
-val paperClasspath by configurations.creating
+val paperClasspath = configurations.create("paperClasspath")
 
 dependencies {
     paperClasspath(libs.paper.server)
