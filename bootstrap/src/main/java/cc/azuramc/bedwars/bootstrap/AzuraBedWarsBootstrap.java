@@ -21,9 +21,6 @@ public final class AzuraBedWarsBootstrap extends JavaPlugin {
     /** Constructed by reflection through its (JavaPlugin) constructor */
     private static final String ENTRYPOINT = "cc.azuramc.bedwars.AzuraBedWars";
 
-    /** Must match options.release in build-logic */
-    private static final int REQUIRED_JAVA = 21;
-
     @Nullable
     private IsolatedClassLoader classLoader;
     @Nullable
@@ -31,11 +28,6 @@ public final class AzuraBedWarsBootstrap extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        int java = javaVersion();
-        if (java < REQUIRED_JAVA) {
-            getLogger().severe("AzuraBedWars requires Java " + REQUIRED_JAVA + " or newer, this server runs Java " + java);
-            return;
-        }
         saveDefaultConfig();
         LibraryResolver resolver = new LibraryResolver(
                 getDataFolder().toPath().resolve("libraries"),
@@ -100,10 +92,5 @@ public final class AzuraBedWarsBootstrap extends JavaPlugin {
             }
             classLoader = null;
         }
-    }
-
-    private static int javaVersion() {
-        String version = System.getProperty("java.specification.version");
-        return Integer.parseInt(version.startsWith("1.") ? version.substring(2) : version);
     }
 }

@@ -20,7 +20,9 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release = 21
+    // Minecraft 1.8 to 1.16 servers still run on Java 8
+    options.release = 8
+    options.compilerArgs.add("-Xlint:-options")
     options.isFork = true
     options.forkOptions.memoryMaximumSize = "1536m"
 }

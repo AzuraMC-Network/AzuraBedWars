@@ -17,6 +17,11 @@ base {
     archivesName = "AzuraBedWars"
 }
 
+// nms modules for newer Minecraft target newer Java
+java {
+    disableAutoTargetJvm()
+}
+
 tasks.jar {
     enabled = false
 }
