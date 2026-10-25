@@ -9,10 +9,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -153,7 +155,7 @@ public final class MapCheck {
         SettingsConfig settings = AzuraBedWars.getInstance().getSettingsConfig();
         List<TeamColor> colors = new ArrayList<>();
         List<Location> baseDrops = new ArrayList<>();
-        List<Block> firstBeds = new ArrayList<>();
+        List<Block> claimedBeds = new ArrayList<>();
         for (int i = 0; i < map.getBases().size(); i++) {
             Location base = map.getBases().get(i).toLocation();
             if (base.getWorld() == null) {
@@ -170,14 +172,15 @@ public final class MapCheck {
             colors.add(color);
 
             List<Block> beds = findBedBlocks(base, settings.getBedSearchRadius());
-            if (beds.isEmpty()) {
+            List<Block> teamBed = pickTeamBed(base, beds);
+            if (teamBed.isEmpty()) {
                 errors.add(name + " 附近 " + settings.getBedSearchRadius() + " 格内没有床");
-            } else if (firstBeds.contains(beds.get(0))) {
+            } else if (teamBed.stream().anyMatch(claimedBeds::contains)) {
                 errors.add(name + " 与其它基地识别到同一张床");
             } else if (beds.size() > 2) {
-                warnings.add(name + " 附近有不止一张床 可能识别到别队的床");
+                warnings.add(name + " 附近有不止一张床 将使用离出生点最近的一张");
             }
-            firstBeds.add(beds.isEmpty() ? null : beds.get(0));
+            claimedBeds.addAll(teamBed);
 
             Location drop = map.getClosestDrop(base, MapData.DropType.BASE);
             if (drop != null && baseDrops.contains(drop)) {
@@ -190,13 +193,12 @@ public final class MapCheck {
         }
     }
 
-    /** Same scan order as GameTeamBedHandler so the first block is the bed the team gets */
     private static List<Block> findBedBlocks(Location center, int radius) {
         World world = center.getWorld();
         List<Block> beds = new ArrayList<>();
-        for (int x = -radius; x < radius; x++) {
-            for (int y = -radius; y < radius; y++) {
-                for (int z = -radius; z < radius; z++) {
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
                     Block block = world.getBlockAt(center.getBlockX() + x, center.getBlockY() + y, center.getBlockZ() + z);
                     if (MapUtil.isBed(block.getType())) {
                         beds.add(block);
@@ -205,5 +207,26 @@ public final class MapCheck {
             }
         }
         return beds;
+    }
+
+    /** Must match the bed choice in GameTeamBedHandler */
+    private static List<Block> pickTeamBed(Location spawn, List<Block> beds) {
+        Block spawnBlock = spawn.getBlock();
+        Block nearest = beds.stream()
+                .min(Comparator.comparingDouble(bed -> bed.getLocation().distanceSquared(spawnBlock.getLocation())))
+                .orElse(null);
+        List<Block> teamBed = new ArrayList<>();
+        if (nearest == null) {
+            return teamBed;
+        }
+        teamBed.add(nearest);
+        for (BlockFace face : new BlockFace[]{BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST}) {
+            Block other = nearest.getRelative(face);
+            if (MapUtil.isBed(other.getType())) {
+                teamBed.add(other);
+                break;
+            }
+        }
+        return teamBed;
     }
 }
