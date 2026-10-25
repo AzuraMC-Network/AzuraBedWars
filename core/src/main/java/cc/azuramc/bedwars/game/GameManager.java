@@ -486,6 +486,7 @@ public class GameManager implements IGameManager {
             if (state.getTeamColor() != gameTeam.getTeamColor()) {
                 continue;
             }
+            state.addDeath();
             PlayerData playerData = playerDataService.getCachedPlayerData(state.getUuid());
             if (playerData != null) {
                 playerData.addFinalDeaths();
