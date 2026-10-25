@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.api.nms;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Fireball;
@@ -8,6 +9,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
  */
 @ApiStatus.Internal
 public interface NMSAccess {
+
+    String TAG_NAMESPACE = "azurabedwars";
 
     @NotNull
     Fireball setFireballDirection(@NotNull Fireball fireball, @NotNull Vector vector);
@@ -55,6 +59,28 @@ public interface NMSAccess {
             itemStack.setItemMeta(meta);
         }
         return itemStack;
+    }
+
+    /**
+     * Stores a string under {@code azurabedwars:<key>}, legacy modules write it to NBT
+     */
+    @NotNull
+    default ItemStack setItemTag(@NotNull ItemStack itemStack, @NotNull String key, @NotNull String value) {
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null) {
+            meta.getPersistentDataContainer().set(new NamespacedKey(TAG_NAMESPACE, key), PersistentDataType.STRING, value);
+            itemStack.setItemMeta(meta);
+        }
+        return itemStack;
+    }
+
+    @Nullable
+    default String getItemTag(@Nullable ItemStack itemStack, @NotNull String key) {
+        if (itemStack == null || !itemStack.hasItemMeta()) {
+            return null;
+        }
+        ItemMeta meta = itemStack.getItemMeta();
+        return meta != null ? meta.getPersistentDataContainer().get(new NamespacedKey(TAG_NAMESPACE, key), PersistentDataType.STRING) : null;
     }
 
     /**
