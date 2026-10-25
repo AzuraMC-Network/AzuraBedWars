@@ -62,12 +62,12 @@ public class TeamUpgradeGUI extends CustomGUI {
             lore.add("§7价格: §b" + nextTrapPrice);
             lore.add("");
             boolean active = upgrades.hasTrap(trap);
-            if (!active) {
-                lore.add("§e点击购买");
+            if (active) {
+                lore.add("§a已激活");
             } else if (upgrades.isTrapQueueFull()) {
                 lore.add("§c陷阱已满");
             } else {
-                lore.add("§a已激活");
+                lore.add("§e点击购买");
             }
 
             ItemBuilder icon = new ItemBuilder().setType(trap.getIcon().get())

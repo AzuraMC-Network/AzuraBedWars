@@ -177,7 +177,8 @@ public final class UpgradeEffects {
             }
         }
 
-        String subtitle = trap == TrapType.ALARM ? "&e触发者 " + gameTeam.getName() + " 队伍" : null;
+        GameTeam intruderTeam = intruder.getGameTeam();
+        String subtitle = trap == TrapType.ALARM && intruderTeam != null ? "§e触发者 " + intruderTeam.getName() + " 队伍" : null;
         for (GamePlayer member : gameTeam.getAlivePlayers()) {
             member.sendTitle("§c§l陷阱触发！", subtitle, 0, 40, 0);
             if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
