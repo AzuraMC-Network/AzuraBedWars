@@ -22,4 +22,6 @@ public interface EconomyMode {
      * @return false to leave the resource to vanilla pickup
      */
     boolean deposit(GamePlayer gamePlayer, ItemStack resource);
+
+    void rewardKill(GamePlayer victim, GamePlayer killer);
 }

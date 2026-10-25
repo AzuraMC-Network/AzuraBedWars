@@ -76,6 +76,24 @@ public class ItemEconomy implements EconomyMode {
         return true;
     }
 
+    @Override
+    public void rewardKill(GamePlayer victim, GamePlayer killer) {
+        Inventory victimInventory = victim.getPlayer().getInventory();
+        Player killerPlayer = killer.getPlayer();
+
+        for (Map.Entry<Material, String> resource : RESOURCE_NAMES.entrySet()) {
+            int amount = countItems(victimInventory, resource.getKey());
+            if (amount == 0) {
+                continue;
+            }
+
+            for (ItemStack leftover : killerPlayer.getInventory().addItem(new ItemStack(resource.getKey(), amount)).values()) {
+                killerPlayer.getWorld().dropItemNaturally(killerPlayer.getLocation(), leftover);
+            }
+            killer.sendMessage("§e+" + amount + " " + resource.getValue());
+        }
+    }
+
     private static int countItems(Inventory inventory, Material material) {
         int total = 0;
         for (ItemStack item : inventory.getContents()) {

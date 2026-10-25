@@ -60,4 +60,24 @@ public class ExperienceEconomy implements EconomyMode {
         }
         return true;
     }
+
+    @Override
+    public void rewardKill(GamePlayer victim, GamePlayer killer) {
+        Player victimPlayer = victim.getPlayer();
+        int levels = victimPlayer.getLevel();
+        // resources bought back from the convert shop
+        for (ItemStack item : victimPlayer.getInventory().getContents()) {
+            if (item != null && RESOURCE_LEVELS.containsKey(item.getType())) {
+                levels += RESOURCE_LEVELS.get(item.getType()) * item.getAmount();
+            }
+        }
+        if (levels == 0) {
+            return;
+        }
+
+        Player killerPlayer = killer.getPlayer();
+        killerPlayer.setLevel(killerPlayer.getLevel() + levels);
+        victimPlayer.setLevel(0);
+        killer.sendMessage("§e+" + levels + "级");
+    }
 }

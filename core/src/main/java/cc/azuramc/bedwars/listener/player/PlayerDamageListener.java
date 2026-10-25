@@ -96,9 +96,16 @@ public class PlayerDamageListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
+        Player killer = DamageUtil.findKiller(player);
 
         GamePlayer gamePlayer = GamePlayer.get(player);
         GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
+
+        GamePlayer gameKiller = killer == null ? null : GamePlayer.get(killer);
+        if (gamePlayer != null && gameKiller != null && gameKiller != gamePlayer
+                && !gameKiller.isSpectator() && !gameKiller.isRespawning()) {
+            gameManager.getEconomy().rewardKill(gamePlayer, gameKiller);
+        }
 
         // 清理掉落物
         cleanDeathDrops(event);
