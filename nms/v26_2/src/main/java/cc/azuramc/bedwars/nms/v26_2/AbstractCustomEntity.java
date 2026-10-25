@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.nms.mojangnamespace;
+package cc.azuramc.bedwars.nms.v26_2;
 
 import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
 
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.GoalSelector;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
@@ -117,7 +117,8 @@ public abstract class AbstractCustomEntity {
         return mob.targetSelector;
     }
 
+    /** Paper hides the goalSelector field */
     protected GoalSelector getGoalSelector(@NotNull Mob mob) {
-        return mob.goalSelector;
+        return mob.getGoalSelector();
     }
 }

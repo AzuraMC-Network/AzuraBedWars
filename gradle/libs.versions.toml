@@ -1,7 +1,9 @@
 [versions]
 spigot-api = "1.21.11-R0.1-SNAPSHOT"
 spigot-api-legacy = "1.8.8-R0.1-SNAPSHOT"
-paper = "1.21.10-R0.1-SNAPSHOT"
+paper-api = "26.3.build.222-stable"
+paper-server = "26.3.build.1396-stable"
+datafixerupper = "10.0.21"
 placeholderapi = "2.11.6"
 luckperms = "5.4"
 vault = "1.7"
@@ -21,8 +23,9 @@ junit = "5.14.4"
 [libraries]
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot-api" }
 spigot-api-legacy = { module = "org.spigotmc:spigot-api", version.ref = "spigot-api-legacy" }
-paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
-paper-server = { module = "io.papermc.paper:paper-server", version.ref = "paper" }
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+paper-server = { module = "io.papermc.paper:paper-server", version.ref = "paper-server" }
+datafixerupper = { module = "com.mojang:datafixerupper", version.ref = "datafixerupper" }
 placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }
 luckperms-api = { module = "net.luckperms:api", version.ref = "luckperms" }
 vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }

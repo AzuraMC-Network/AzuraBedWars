@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.nms.mojangnamespace26_1;
+package cc.azuramc.bedwars.nms.v26_2;
 
 import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
 import net.minecraft.world.entity.Mob;

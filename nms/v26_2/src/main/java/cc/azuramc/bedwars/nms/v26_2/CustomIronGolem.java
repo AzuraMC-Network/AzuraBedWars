@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.nms.mojangnamespace26_1;
+package cc.azuramc.bedwars.nms.v26_2;
 
 import cc.azuramc.bedwars.api.game.IGameTeam;
 import net.minecraft.world.entity.Mob;
@@ -20,14 +20,14 @@ import java.util.Objects;
 /**
  * @author an5w1r@163.com
  */
-public class CustomSilverfish extends AbstractCustomEntity {
+public class CustomIronGolem extends AbstractCustomEntity {
 
-    protected CustomSilverfish(Mob entityInsentient, IGameTeam gameTeam) {
+    protected CustomIronGolem(Mob entityInsentient, IGameTeam gameTeam) {
         super(entityInsentient, gameTeam);
     }
 
     public static LivingEntity spawn(Location loc, IGameTeam gameTeam, double speed, double health) {
-        Entity bukkitEntity = EntityConverter.spawnBukkitEntity(loc, EntityType.SILVERFISH);
+        Entity bukkitEntity = EntityConverter.spawnBukkitEntity(loc, EntityType.IRON_GOLEM);
         CraftLivingEntity craftLivingEntity = (CraftLivingEntity) bukkitEntity;
         Mob mob = EntityConverter.bukkitToNms(bukkitEntity);
 
@@ -35,11 +35,11 @@ public class CustomSilverfish extends AbstractCustomEntity {
             return null;
         }
 
-        getCustomEntityMap().put(mob, new CustomSilverfish(mob, gameTeam));
+        getCustomEntityMap().put(mob, new CustomIronGolem(mob, gameTeam));
 
         LivingEntity bukkitLivingEntity = (LivingEntity) bukkitEntity;
-        Objects.requireNonNull(bukkitLivingEntity.getAttribute(Attribute.MOVEMENT_SPEED), "Spawn Silverfish speed parameter is null").setBaseValue(speed);
-        Objects.requireNonNull(bukkitLivingEntity.getAttribute(Attribute.MAX_HEALTH), "Spawn Silverfish health parameter is null").setBaseValue(health);
+        Objects.requireNonNull(bukkitLivingEntity.getAttribute(Attribute.MOVEMENT_SPEED), "Spawn IronGolem speed parameter is null").setBaseValue(speed);
+        Objects.requireNonNull(bukkitLivingEntity.getAttribute(Attribute.MAX_HEALTH), "Spawn IronGolem health parameter is null").setBaseValue(health);
         mob.getBukkitEntity().setCustomNameVisible(true);
         craftLivingEntity.setRemoveWhenFarAway(false);
         return craftLivingEntity;
@@ -48,9 +48,9 @@ public class CustomSilverfish extends AbstractCustomEntity {
     @Override
     protected void setupGoals() {
         getGoalSelector(mob).addGoal(1, new FloatGoal(mob));
-        getGoalSelector(mob).addGoal(2, new MeleeAttackGoal(pathfinderMob, 1.9D, false));
+        getGoalSelector(mob).addGoal(2, new MeleeAttackGoal(pathfinderMob, 1.5D, false));
         getGoalSelector(mob).addGoal(3, new MoveTowardsTargetGoal(pathfinderMob, 1.0D, 20.0F));
-        getGoalSelector(mob).addGoal(4, new RandomStrollGoal(pathfinderMob, 1.5D));
+        getGoalSelector(mob).addGoal(4, new RandomStrollGoal(pathfinderMob, 1D));
         getGoalSelector(mob).addGoal(5, new RandomLookAroundGoal(pathfinderMob));
     }
 
@@ -67,4 +67,5 @@ public class CustomSilverfish extends AbstractCustomEntity {
         getTargetSelector(mob).addGoal(4, new NearestAttackableTargetGoal<>(pathfinderMob, Silverfish.class, 20, true, false,
                 this::isValidSilverfishTarget));
     }
+
 }

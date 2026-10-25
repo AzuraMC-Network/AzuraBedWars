@@ -12,10 +12,7 @@ public class VersionUtil {
     private static final int PATCH_NUMBER;
     private static final String PARSED_VERSION;
 
-    /**
-     * CraftBukkit NMS 版本字符串，例如 v1_20_R3。
-     * Modern Paper (1.20.6+) 和年份版本体系服务端移除了版本前缀，此时为 null（Mojang Namespace 模式）
-     */
+    /** Null on Paper 1.20.5+ and 26.x, which drop the versioned CraftBukkit package */
     private static final String NMS_VERSION;
 
     static {
@@ -31,28 +28,9 @@ public class VersionUtil {
         PATCH_NUMBER = m.group(3) != null ? Integer.parseInt(m.group(3)) : 0;
         PARSED_VERSION = MAJOR_NUMBER + "." + MINOR_NUMBER + "." + PATCH_NUMBER;
 
-        NMS_VERSION = findNmsVersion();
-    }
-
-    /**
-     * 扫描已加载的 Package，查找 CraftBukkit NMS 版本字符串（如 v1_20_R3）。
-     * 若未找到（Paper 1.20.6+ / 年份版本体系），返回 null，表示 Mojang Namespace 模式。
-     */
-    private static String findNmsVersion() {
-        for (Package pack : Package.getPackages()) {
-            String name = pack.getName();
-            if (name.startsWith("org.bukkit.craftbukkit.v")) {
-                String version = name.split("\\.")[3];
-                // 验证 CraftPlayer 存在，排除 Forge+Bukkit 混合端干扰
-                try {
-                    Class.forName("org.bukkit.craftbukkit." + version + ".entity.CraftPlayer");
-                    return version;
-                } catch (ClassNotFoundException ignored) {
-                    // 此 package 并非真正的 CraftBukkit，继续扫描
-                }
-            }
-        }
-        return null;
+        String craftBukkitPackage = Bukkit.getServer().getClass().getPackage().getName();
+        String lastSegment = craftBukkitPackage.substring(craftBukkitPackage.lastIndexOf('.') + 1);
+        NMS_VERSION = lastSegment.startsWith("v") ? lastSegment : null;
     }
 
     /**
@@ -83,10 +61,6 @@ public class VersionUtil {
         return PARSED_VERSION;
     }
 
-    /**
-     * 获取 CraftBukkit NMS 版本字符串 (e.g. v1_20_R3)。
-     * Mojang Namespace 服务端返回 null。
-     */
     public static String getNmsVersion() {
         return NMS_VERSION;
     }

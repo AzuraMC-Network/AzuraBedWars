@@ -9,9 +9,8 @@ BedWars plugin for Spigot and Paper, supporting Minecraft 1.8.8 through 26.x fro
 | `api/` | Public API, events and the `NMSAccess` SPI |
 | `bootstrap/` | `plugin.yml` main, loads core and libraries in an isolated class loader |
 | `core/` | Game logic, commands, listeners, storage |
-| `nms/v1_X_RY/` | `NMSAccess` implementations for CraftBukkit versioned packages |
-| `nms/mojang/` | Paper 1.20.5 to 1.21.10 with Mojang mappings |
-| `nms/mojang_26/` | Paper 1.21.11 and every 26.x server |
+| `nms/v1_X_RY/` | `NMSAccess` for one CraftBukkit revision, shared by Spigot and Paper |
+| `nms/v26_X/` | `NMSAccess` for 26.x servers, shared by Spigot and Paper |
 | `plugin/` | Assembles the regular and offline plugin jars |
 | `build-logic/` | Convention plugins and `RuntimeLibrariesTask` |
 | `libs/` | In-house jars in a Maven layout, group `cc.azuramc` |
@@ -20,9 +19,9 @@ Dependency versions live in `gradle/libs.versions.toml`. Repositories are declar
 
 # Runtime layout
 
-Bukkit loads only `bootstrap` and `api`. Everything else runs inside `IsolatedClassLoader`, which is child first:
+Bukkit loads `bootstrap`, `api` and every `nms/` module. Everything else runs inside `IsolatedClassLoader`, which is child first:
 
-- `core` and every `nms/` module are merged into one inner jar
+- `core` is packed into one inner jar
 - Third-party libraries from `core`'s runtime classpath are listed with their sha256 in `META-INF/azurabedwars/libraries.txt`
 - The regular jar embeds only the inner jar and `cc.azuramc` libraries, and downloads the rest into `plugins/AzuraBedWars/libraries/` from `libraries.repositories` in `config.yml`
 - `-offline.jar` embeds every library
@@ -37,13 +36,18 @@ Rules that follow from this:
 - An `implementation` dependency of `core` must be resolvable from Maven Central or JitPack, or be added under `libs/`
 - Kotlin can be added to `core` with a convention plugin. `kotlin-stdlib` then becomes one more runtime library
 
-`core` never depends on `nms`. At runtime `NMSProvider` loads `cc.azuramc.bedwars.nms.<version>.NMS_<version>` by reflection, where `<version>` is the CraftBukkit package such as `v1_8_R3`. Servers without a versioned package fall back to the Mojang namespace modules.
+`core` never depends on `nms`. At runtime `NMSProvider` looks up the Minecraft version in its module table and loads `cc.azuramc.bedwars.nms.<module>.NMS_<module>` by reflection, such as `v1_8_R3` or `v26_2`. The `nms/` modules are compiled against Spigot:
 
-To support a new CraftBukkit version:
+- Spigot up to 1.21.11 and Paper up to 1.20.4 run them as compiled
+- Paper 1.20.5 to 1.21.11 runs Mojang mappings and remaps the Spigot names in the outer jar when loading the plugin, which is why `nms/` stays out of the inner jar
+- 26.x servers are not obfuscated on either side, but Paper changes member access, such as `Mob.goalSelector`. 26.x modules use only members both sides share, and `compilePaperJava` checks them against a Paper server jar during `check`
 
-1. Copy the closest `nms/v1_X_RY/` directory and rename both the directory and the Java package
-2. Point its `build.gradle.kts` at the matching `org.spigotmc:spigot` jar from the CodeMC NMS repository
-3. Fix the compile errors against the new server jar
+To support a new Minecraft version:
+
+1. Copy the closest `nms/` directory and rename both the directory and the Java package, `v1_X_RY` after the CraftBukkit revision or `v26_X` after the first 26.x release it serves
+2. Point its `build.gradle.kts` at the matching `org.spigotmc:spigot` jar from the CodeMC NMS repository, and for 26.x keep `compilePaperJava` on a matching `paper-server`
+3. Fix the compile errors against the new server jars
+4. Add the first Minecraft version it serves to `NMSProvider`, and move `UNTESTED` past the newest version it was run on
 
 `settings.gradle.kts` and `plugin/` pick up new `nms/` directories automatically.
 
