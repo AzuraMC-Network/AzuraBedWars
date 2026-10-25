@@ -30,7 +30,7 @@ public class SettingsConfig {
     @Comment("默认地图名称")
     private String defaultMapName = "game";
 
-    @Comment("床搜索半径(用于检测床是否被破坏)")
+    @Comment("床搜索半径(以队伍出生点为中心查找该队的床)")
     private int bedSearchRadius = 18;
 
     @Comment("破坏床奖励金币数量")
