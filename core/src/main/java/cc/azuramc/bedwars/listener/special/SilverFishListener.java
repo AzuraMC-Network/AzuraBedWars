@@ -5,9 +5,9 @@ import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -25,7 +25,7 @@ public class SilverFishListener implements Listener {
             return;
         }
 
-        if (!(event.getEntity().getShooter() instanceof Player) || !(event.getEntity() instanceof Snowball)) {
+        if (!(event.getEntity().getShooter() instanceof Player) || !SpecialItems.isProjectile(event.getEntity(), SpecialItems.SILVERFISH)) {
             return;
         }
         Player shooter = (Player) event.getEntity().getShooter();

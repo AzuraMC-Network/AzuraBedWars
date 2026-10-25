@@ -4,8 +4,8 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,7 +42,7 @@ public class PlayerDrinkMilkListener implements Listener {
             return;
         }
 
-        if (itemStack.getType() != XMaterial.MILK_BUCKET.get()) {
+        if (!SpecialItems.is(itemStack, SpecialItems.MAGIC_MILK)) {
             return;
         }
 

@@ -7,8 +7,8 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import cc.azuramc.bedwars.util.MessageUtil;
-import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Player;
@@ -36,8 +36,7 @@ public class EggBridgeListener implements Listener {
             return;
         }
 
-        // 投掷物是否为鸡蛋判断
-        if (!(event.getEntity() instanceof Egg)) {
+        if (!(event.getEntity() instanceof Egg) || !SpecialItems.isProjectile(event.getEntity(), SpecialItems.BRIDGE_EGG)) {
             return;
         }
         Egg egg = (Egg) event.getEntity();
@@ -59,7 +58,7 @@ public class EggBridgeListener implements Listener {
             shooter.sendMessage(MessageUtil.color(config().getEggCooldownMessage()));
             event.setCancelled(true);
             if (VersionUtil.isLessThan1_13()) {
-                gamePlayer.getPlayer().getInventory().addItem(XMaterial.EGG.parseItem());
+                gamePlayer.getPlayer().getInventory().addItem(SpecialItems.thrownItem(egg));
             }
             return;
         }

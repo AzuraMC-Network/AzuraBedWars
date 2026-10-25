@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import cc.azuramc.bedwars.game.item.special.impl.RescuePlatform;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.entity.Player;
@@ -42,11 +43,10 @@ public class RescuePlatformListener implements Listener {
             return;
         }
 
-        // 创建一个临时平台实例以获取物品材质
-        RescuePlatform platform = new RescuePlatform();
-        if (!event.getMaterial().equals(platform.getItemMaterial())) {
+        if (!SpecialItems.is(event.getItem(), SpecialItems.RESCUE_PLATFORM)) {
             return;
         }
+        RescuePlatform platform = new RescuePlatform();
 
         // 创建并激活救援平台
         boolean success = platform.create(gamePlayer, gameManager);

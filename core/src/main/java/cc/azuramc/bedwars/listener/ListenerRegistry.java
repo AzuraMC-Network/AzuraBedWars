@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.listener;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import cc.azuramc.bedwars.listener.block.BlockBreakListener;
 import cc.azuramc.bedwars.listener.block.PlacementListener;
 import cc.azuramc.bedwars.listener.chat.ChatListener;
@@ -59,6 +60,7 @@ public class ListenerRegistry {
         register(new PlayerUseBucketListener());
 
         // projectile package
+        register(new SpecialItems());
         register(new EggBridgeListener());
         register(new FireballListener());
 

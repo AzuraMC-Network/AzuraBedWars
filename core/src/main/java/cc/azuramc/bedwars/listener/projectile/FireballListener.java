@@ -5,9 +5,8 @@ import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import com.cryptomorin.xseries.XMaterial;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import com.cryptomorin.xseries.XPotion;
-import org.bukkit.Material;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +33,6 @@ public class FireballListener implements Listener {
         if (gamePlayer == null) {
             return;
         }
-        Material material = event.getMaterial();
 
         if (gameManager.getGameState() != GameState.RUNNING) {
             return;
@@ -47,7 +45,7 @@ public class FireballListener implements Listener {
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
 
-            if (material != XMaterial.FIRE_CHARGE.get()) {
+            if (!SpecialItems.is(event.getItem(), SpecialItems.FIREBALL)) {
                 return;
             }
 

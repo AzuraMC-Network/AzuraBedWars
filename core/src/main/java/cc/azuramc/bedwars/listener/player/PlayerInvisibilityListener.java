@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.listener.player;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -40,13 +41,7 @@ public class PlayerInvisibilityListener implements Listener {
             return;
         }
 
-        String itemName = itemStack.getItemMeta().getDisplayName();
-        // don't remove this null check (its useful for low version bukkit api)
-        if (itemName == null || itemName.isEmpty()) {
-            return;
-        }
-
-        if (itemName.contains("隐身")) {
+        if (SpecialItems.is(itemStack, SpecialItems.INVISIBILITY)) {
             LoggerUtil.debug("PlayerInvisibilityListener$onDrink | invisible player is " + player.getName());
 
             gamePlayer.startInvisibilityTask();
