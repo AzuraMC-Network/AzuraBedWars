@@ -3,11 +3,7 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
-import cc.azuramc.bedwars.gui.base.CustomGUI;
-import cc.azuramc.bedwars.gui.base.GUIData;
-import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
-import cc.azuramc.bedwars.upgrade.trap.TrapManager;
-import cc.azuramc.bedwars.upgrade.upgrade.UpgradeManager;
+import cc.azuramc.bedwars.upgrade.TeamUpgrades;
 import lombok.Data;
 import lombok.ToString;
 import org.bukkit.ChatColor;
@@ -16,7 +12,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +27,7 @@ import java.util.Objects;
  */
 @Data
 // it is preventing stack overflow error
-@ToString(exclude = {"gameManager", "upgradeManager", "trapManager"})
+@ToString(exclude = {"gameManager", "upgrades"})
 public class GameTeam implements IGameTeam {
     /**
      * 搜索床的范围
@@ -66,9 +61,7 @@ public class GameTeam implements IGameTeam {
     private GamePlayer destroyPlayer;
 
     @NotNull
-    private TrapManager trapManager;
-    @NotNull
-    private UpgradeManager upgradeManager;
+    private TeamUpgrades upgrades;
 
     /**
      * 创建一个游戏团队
@@ -102,8 +95,7 @@ public class GameTeam implements IGameTeam {
         this.hasBed = false;
         this.isDestroyed = false;
 
-        this.trapManager = new TrapManager();
-        this.upgradeManager = new UpgradeManager(this);
+        this.upgrades = new TeamUpgrades(this);
     }
 
     /**
@@ -301,30 +293,5 @@ public class GameTeam implements IGameTeam {
         if (destroyed) {
             this.destroyPlayer = destroyer;
         }
-    }
-
-    /**
-     * 通知所有打开TeamShopGUI的团队成员刷新界面
-     */
-    public void notifyTeamShopGUIRefresh() {
-        // 确保GUI刷新操作在主线程中执行，避免CancelledPacketHandleException
-        cc.azuramc.bedwars.AzuraBedWars.getInstance().mainThreadRunnable(() -> {
-            for (GamePlayer gamePlayer : getAlivePlayers()) {
-                // 检查玩家是否在线
-                Player player = gamePlayer.getPlayer();
-                if (player == null) {
-                    continue;
-                }
-
-                // 检查玩家是否打开了TeamShopGUI
-                if (GUIData.getCURRENT_GUI().containsKey(player)) {
-                    CustomGUI currentGUI = GUIData.getCURRENT_GUI().get(player);
-                    if (currentGUI instanceof TeamShopGUI) {
-                        // 重新打开TeamShopGUI以刷新内容
-                        new TeamShopGUI(gamePlayer, gameManager).open();
-                    }
-                }
-            }
-        });
     }
 }

@@ -13,7 +13,7 @@ import cc.azuramc.bedwars.game.task.GameOverTask;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.game.task.generator.PublicResourceGenerator;
-import cc.azuramc.bedwars.upgrade.task.TeamUpgradeCheckTask;
+import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -34,7 +34,6 @@ public class GameTimeline {
 
     private final GameManager gameManager;
     private final EventSettingsConfig config;
-    private final TeamUpgradeCheckTask teamUpgradeTask;
     private final List<TimelineEvent> events = new ArrayList<>();
 
     private BukkitTask task;
@@ -49,7 +48,6 @@ public class GameTimeline {
     public GameTimeline(GameManager gameManager) {
         this.gameManager = gameManager;
         this.config = AzuraBedWars.getInstance().getEventSettingsConfig();
-        this.teamUpgradeTask = new TeamUpgradeCheckTask(gameManager);
 
         EventSettingsConfig.DiamondUpdateEvent diamond = config.getDiamondUpdateEvent();
         EventSettingsConfig.EmeraldUpdateEvent emerald = config.getEmeraldUpdateEvent();
@@ -102,7 +100,7 @@ public class GameTimeline {
         }
 
         AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
-        teamUpgradeTask.execute();
+        UpgradeEffects.tick(gameManager);
         showBaseDistance();
 
         secondsIntoEvent++;

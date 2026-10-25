@@ -6,11 +6,10 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.economy.PriceCost;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
-import com.cryptomorin.xseries.XEnchantment;
+import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -125,12 +124,10 @@ public final class ShopPurchase {
         }
 
         if (item.getKind() == ShopItemKind.SWORD) {
-            Player player = gamePlayer.getPlayer();
-            player.getInventory().remove(Objects.requireNonNull(XMaterial.WOODEN_SWORD.get()));
-            Enchantment sharpness = XEnchantment.SHARPNESS.get();
-            if (gameTeam.getUpgradeManager().hasSharpnessUpgrade() && sharpness != null) {
-                builder.addEnchant(sharpness, 1);
-            }
+            gamePlayer.getPlayer().getInventory().remove(Objects.requireNonNull(XMaterial.WOODEN_SWORD.get()));
+            ItemStack sword = builder.getItem();
+            UpgradeEffects.enchantSword(gameTeam, sword);
+            return sword;
         } else if (item.getKind() == ShopItemKind.TEAM_COLORED) {
             String type = icon.getType().name();
             if (type.contains("WOOL")) {

@@ -1,10 +1,10 @@
 package cc.azuramc.bedwars.listener.player;
 
+import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.*;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
 import cc.azuramc.bedwars.util.MapUtil;
-import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -86,11 +86,7 @@ public class PickupItemHandler {
         if (gameTeam == null) {
             return;
         }
-        if (gameTeam.getUpgradeManager().hasSharpnessUpgrade()) {
-            if (XEnchantment.SHARPNESS.get() != null) {
-                itemStack.addEnchantment(XEnchantment.SHARPNESS.get(), 1);
-            }
-        }
+        UpgradeEffects.enchantSword(gameTeam, itemStack);
 
         // 移除木剑
         removeWoodenSwordFromInventory(player);

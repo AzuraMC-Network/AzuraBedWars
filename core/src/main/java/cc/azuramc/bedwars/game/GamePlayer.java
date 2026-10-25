@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.game;
 
+import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
@@ -650,28 +651,7 @@ public class GamePlayer implements IGamePlayer {
                 break;
         }
 
-        if (gameTeam.getUpgradeManager().getProtectionUpgrade() > 0) {
-            for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
-                ItemStack armor = player.getInventory().getArmorContents()[i];
-                if (armor != null) {
-                    if (XEnchantment.PROTECTION.get() != null) {
-                        armor.addEnchantment(XEnchantment.PROTECTION.get(), gameTeam.getUpgradeManager().getProtectionUpgrade());
-                    }
-                    player.updateInventory();
-                }
-            }
-        }
-
-        if (gameTeam.getUpgradeManager().getFallingProtectionUpgrade() > 0) {
-            ItemStack boots = player.getInventory().getArmorContents()[0];
-            if (boots != null) {
-                if (XEnchantment.FEATHER_FALLING.get() != null) {
-                    boots.addEnchantment(XEnchantment.FEATHER_FALLING.get(), gameTeam.getUpgradeManager().getFallingProtectionUpgrade());
-                }
-                player.updateInventory();
-            }
-        }
-
+        UpgradeEffects.enchantArmor(this);
     }
 
     public void giveSword(boolean remove) {
@@ -682,11 +662,9 @@ public class GamePlayer implements IGamePlayer {
                 player.getInventory().remove(XMaterial.WOODEN_SWORD.get());
             }
         }
-        if (gameTeam.getUpgradeManager().hasSharpnessUpgrade()) {
-            player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addEnchant(XEnchantment.SHARPNESS.get(), 1).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
-        } else {
-            player.getInventory().addItem(new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem());
-        }
+        ItemStack sword = new ItemBuilder().setType(XMaterial.WOODEN_SWORD.get()).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).setUnbreakable(true, true).getItem();
+        UpgradeEffects.enchantSword(gameTeam, sword);
+        player.getInventory().addItem(sword);
     }
 
     public void givePickaxe(boolean remove) {

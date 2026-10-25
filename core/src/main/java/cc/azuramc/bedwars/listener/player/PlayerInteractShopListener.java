@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.shop.gui.ItemShopGUI;
-import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
+import cc.azuramc.bedwars.upgrade.gui.TeamUpgradeGUI;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,6 +55,6 @@ public class PlayerInteractShopListener implements Listener {
         if (gamePlayer.isSpectator()) {
             return;
         }
-        new TeamShopGUI(gamePlayer, gameManager).open();
+        new TeamUpgradeGUI(gamePlayer, gameManager).open();
     }
 }
