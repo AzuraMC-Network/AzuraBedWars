@@ -20,5 +20,4 @@ dependencies {
     implementation(libs.fastboard)
     implementation(libs.mongodb.driver.sync)
     implementation(libs.azura.orm)
-    implementation(libs.azura.mobaicontroller)
 }
