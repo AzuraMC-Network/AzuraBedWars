@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.config.object.TimelineConfig;
+import cc.azuramc.bedwars.config.object.UpgradeConfig;
 import cc.azuramc.bedwars.database.storage.MapStorageType;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,7 @@ class LegacyConfigMigratorTest {
         ConfigService.writeAtomically(new File(legacy, "message.yml"), "spectator:\n  nightVersionEnabled: \"§aNV\"\n");
         ConfigService.writeAtomically(new File(legacy, "eventSettings.yml"),
                 "diamondUpdateEvent:\n  level2RefreshSecond: 20\nbedDestroyedEvent:\n  executeSeconds: 100\n");
+        ConfigService.writeAtomically(new File(legacy, "teamUpgrade.yml"), "healingPoolRange: 18.0\nhasteEffectDuration: 60\n");
 
         ConfigService service = new ConfigService(dataFolder, () -> false);
         service.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 1);
@@ -51,6 +53,8 @@ class LegacyConfigMigratorTest {
         service.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, service.content("timeline.yml")));
         service.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 2);
         service.addMigration("timeline", 1, TimelineConfig::fromVersion1);
+        service.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
+        service.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, ConfigService.bundled("upgrades.yml")));
         service.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
 
         LegacyConfigMigrator.migrateIfPresent(dataFolder, service);
@@ -80,6 +84,7 @@ class LegacyConfigMigratorTest {
         assertEquals(7, generators.resource("diamond").level(2).getMaxStack());
         assertEquals(20, generators.resource("diamond").level(2).getInterval());
         assertEquals(100, service.get(TimelineConfig.class).getBedDestroyedEvent().getExecuteSeconds());
+        assertEquals(3, service.get(UpgradeConfig.class).getUpgrades().get("M").getLevels().get(0).getEffects().get(0).getSeconds());
         assertEquals("§aNV", service.get(MessageConfig.class).getSpectator().getNightVisionEnabled());
 
         String written = ConfigService.read(new File(dataFolder, "gameplay.yml"));

@@ -13,8 +13,4 @@ public class PriceCost {
     String currency;
     int amount;
     int xp;
-
-    public static PriceCost teamUpgrade(int diamonds) {
-        return new PriceCost("diamond", diamonds, diamonds * 100);
-    }
 }

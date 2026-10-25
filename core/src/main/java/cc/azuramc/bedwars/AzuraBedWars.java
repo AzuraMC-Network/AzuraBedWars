@@ -30,6 +30,7 @@ import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.shop.ItemSpecs;
 import cc.azuramc.bedwars.shop.ShopValidator;
+import cc.azuramc.bedwars.upgrade.UpgradeValidator;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.bstats.Metrics;
 import cc.azuramc.bedwars.util.nms.NMSMapping;
@@ -345,13 +346,15 @@ public final class AzuraBedWars implements PluginEntrypoint {
         configService.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 2);
         configService.addMigration("timeline", 1, TimelineConfig::fromVersion1);
         configService.register("items", "items.yml", ItemConfig.class, ApplyMode.LIVE, 1);
-        configService.register("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.LIVE, 1);
+        configService.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
+        configService.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, ConfigService.bundled("upgrades.yml")));
         configService.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
         configService.registerTemplate("shop/menu", "shop/menu.yml", ShopMenuConfig.class, ApplyMode.LIVE, 1, "shop/menu");
         configService.registerTemplate("shop/tiers", "shop/tiers.yml", TierChains.class, ApplyMode.NEXT_GAME, 1, "shop/tiers");
         configService.registerDirectory("shop/categories", ShopCategoryConfig.class, ApplyMode.LIVE, 1, "shop/category",
                 "blocks.yml", "melee.yml", "armor.yml", "tools.yml", "ranged.yml", "potions.yml", "utility.yml", "convert.yml");
         configService.addValidator(new ShopValidator(ItemSpecs.NAMES));
+        configService.addValidator(new UpgradeValidator(ItemSpecs.NAMES));
         configService.register(Devtools.DOCUMENT_ID, "devtools.yml", DevtoolsConfig.class, ApplyMode.LIVE, 1);
 
         LegacyConfigMigrator.migrateIfPresent(plugin.getDataFolder(), configService);
