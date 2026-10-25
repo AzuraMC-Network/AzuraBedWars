@@ -25,10 +25,12 @@ public class GameOverEvent extends AbstractGameEvent {
 
     @Override
     public void execute(GameManager gameManager) {
-        BedwarsGameOverEvent bedwarsGameOverEvent = new BedwarsGameOverEvent(gameManager);
-        Bukkit.getPluginManager().callEvent(bedwarsGameOverEvent);
+        // also reached from the event timer thread
+        PLUGIN.mainThreadRunnable(() -> {
+            Bukkit.getPluginManager().callEvent(new BedwarsGameOverEvent(gameManager));
 
-        gameManager.getGameEventManager().setCurrentEvent(7);
-        new GameOverTask(gameManager);
+            gameManager.getGameEventManager().setCurrentEvent(7);
+            new GameOverTask(gameManager);
+        });
     }
 }
