@@ -96,19 +96,9 @@ public class PlayerDamageListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        Player killer = DamageUtil.findKiller(player);
 
         GamePlayer gamePlayer = GamePlayer.get(player);
         GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
-
-        // 如果没有击杀者，直接清理掉落物并继续处理
-        if (killer == null) {
-            LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer is null");
-        } else {
-            LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer isn't null");
-            // 处理击杀奖励
-            KillRewardHandler.processKillReward(event, gamePlayer, GamePlayer.get(killer));
-        }
 
         // 清理掉落物
         cleanDeathDrops(event);

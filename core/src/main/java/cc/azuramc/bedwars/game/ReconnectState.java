@@ -6,8 +6,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -33,8 +31,6 @@ public class ReconnectState {
     private final ToolType axeType;
     private final boolean shear;
 
-    private final Map<String, Integer> experienceSources;
-
     /**
      * 从在线的 GamePlayer 抓取断线快照
      *
@@ -55,10 +51,6 @@ public class ReconnectState {
         this.pickaxeType = gamePlayer.getPickaxeType();
         this.axeType = gamePlayer.getAxeType();
         this.shear = gamePlayer.isShear();
-
-        this.experienceSources = gamePlayer.getExperienceSources() != null
-                ? new HashMap<>(gamePlayer.getExperienceSources())
-                : new HashMap<>();
     }
 
     /**
@@ -85,10 +77,5 @@ public class ReconnectState {
         gamePlayer.setPickaxeType(pickaxeType);
         gamePlayer.setAxeType(axeType);
         gamePlayer.setShear(shear);
-
-        gamePlayer.setExperienceSources(experienceSources != null
-                ? new HashMap<>(experienceSources)
-                : new HashMap<>()
-        );
     }
 }

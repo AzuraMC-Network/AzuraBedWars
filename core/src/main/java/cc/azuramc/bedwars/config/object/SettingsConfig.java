@@ -51,8 +51,8 @@ public class SettingsConfig {
     @Comment("资源点保护半径")
     private int resourceSpawnProtectionRadius = 2;
 
-    @Comment("是否启用游戏模式选择")
-    private boolean enableGameModeSelection = true;
+    @Comment({"资源模式", "ITEM: 资源以物品形式拾取和消费", "EXPERIENCE: 资源拾取后转为经验等级 商品按经验定价"})
+    private String economyMode = "ITEM";
 
     @Comment("是否启用队伍选择")
     private boolean enableTeamSelection = true;
@@ -203,7 +203,7 @@ public class SettingsConfig {
                 "",
                 "{countdown}",
                 "",
-                "&f你的模式: &a{mode}",
+                "&f模式: &a{mode}",
                 "",
                 "&f版本: &a{version}",
                 "",

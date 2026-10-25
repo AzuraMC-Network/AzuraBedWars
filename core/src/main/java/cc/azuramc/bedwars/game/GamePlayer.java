@@ -64,11 +64,6 @@ public class GamePlayer implements IGamePlayer {
     private final PlayerData playerData;
     private final PlayerCompass playerCompass;
 
-    /**
-     * 使用 HashMap 存储经验来源，键是资源名(String)，值是经验数量(Integer)
-     */
-    private Map<String, Integer> experienceSources;
-
     private String nickName;
     private FastBoard board;
     private boolean isSpectator;
@@ -145,9 +140,6 @@ public class GamePlayer implements IGamePlayer {
         this.currentGameAssists = 0;
         this.currentGameDeaths = 0;
         this.currentGameDestroyedBeds = 0;
-
-        // 游戏模式
-        this.experienceSources = new HashMap<>();
 
         this.hasTrapProtection = false;
 
@@ -368,46 +360,6 @@ public class GamePlayer implements IGamePlayer {
     }
 
     /**
-     * 增加指定资源来源的经验值
-     *
-     * @param resourceType 资源类型 (e.g., "iron")
-     * @param amount       增加的数量
-     */
-    public void addResourceExperience(@NotNull String resourceType, int amount) {
-        if (amount <= 0) {
-            LoggerUtil.warn("addResourceExperience 应该输入大于0的数值");
-            return;
-        }
-
-        int currentXp = this.experienceSources.getOrDefault(resourceType, 0);
-        this.experienceSources.put(resourceType, currentXp + amount);
-    }
-
-    /**
-     * 消耗指定资源来源的经验值
-     *
-     * @param resourceType 资源类型
-     * @param amount       消耗的数量
-     * @return true 如果消耗成功，否则返回 false
-     */
-    public boolean spendResourceExperience(@NotNull String resourceType, int amount) {
-        if (amount <= 0) {
-            LoggerUtil.warn("spendResourceExperience 应该输入大于0的数值");
-            return false;
-        }
-
-        int currentXp = this.experienceSources.getOrDefault(resourceType, 0);
-
-        // 检查扣除的经验是否大于本有的经验
-        if (currentXp >= amount) {
-            this.experienceSources.put(resourceType, currentXp - amount);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * 按最终击杀数排序玩家 (总数居)
      *
      * @return 排序后的玩家列表
@@ -519,16 +471,6 @@ public class GamePlayer implements IGamePlayer {
      */
     public void addCurrentGameDestroyedBeds(int currentGameDestroyedBeds) {
         this.currentGameDestroyedBeds += currentGameDestroyedBeds;
-    }
-
-    /**
-     * 获取指定资源来源的经验值
-     *
-     * @param resourceType 资源类型
-     * @return 经验数量，如果该类型不存在则返回 -1
-     */
-    public int getExperience(String resourceType) {
-        return this.experienceSources.getOrDefault(resourceType, -1);
     }
 
     /**

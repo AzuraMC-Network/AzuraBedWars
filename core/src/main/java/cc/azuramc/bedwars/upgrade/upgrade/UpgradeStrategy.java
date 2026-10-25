@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.upgrade.upgrade;
 
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -80,18 +79,16 @@ public interface UpgradeStrategy {
     /**
      * 创建升级物品
      *
-     * @param gamePlayer   游戏玩家
-     * @param gameModeType 游戏模式
+     * @param gamePlayer 游戏玩家
      * @return 升级物品
      */
-    ItemStack createUpgradeItem(GamePlayer gamePlayer, GameModeType gameModeType);
+    ItemStack createUpgradeItem(GamePlayer gamePlayer);
 
     /**
      * 获取升级Lore
      *
-     * @param gamePlayer   游戏玩家
-     * @param gameModeType 游戏模式
+     * @param gamePlayer 游戏玩家
      * @return Lore列表
      */
-    List<String> getUpgradeLore(GamePlayer gamePlayer, GameModeType gameModeType);
+    List<String> getUpgradeLore(GamePlayer gamePlayer);
 }

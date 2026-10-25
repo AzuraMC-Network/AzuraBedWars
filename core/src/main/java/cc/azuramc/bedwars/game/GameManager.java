@@ -13,6 +13,8 @@ import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.event.GameEventManager;
+import cc.azuramc.bedwars.game.economy.EconomyMode;
+import cc.azuramc.bedwars.game.economy.EconomyType;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.spectator.SpectatorManager;
@@ -61,8 +63,6 @@ public class GameManager implements IGameManager {
     private String msgPlayerReconnect;
     private String msgPlayerLeave;
 
-    private Material resourceSelectorMaterial;
-    private String resourceSelectorName;
     private Material teamSelectorMaterial;
     private String teamSelectorName;
     private Material leaveGameMaterial;
@@ -72,6 +72,7 @@ public class GameManager implements IGameManager {
     private boolean attackDisplayEnabled;
 
     private AzuraBedWars plugin;
+    private EconomyType economyType;
     private GeneratorManager generatorManager;
     private GameEventManager gameEventManager;
 
@@ -116,6 +117,7 @@ public class GameManager implements IGameManager {
         this.armorSande = new HashSet<>();
         this.armorStand = new HashSet<>();
         this.abstractSpecialItems = new ArrayList<>();
+        this.economyType = EconomyType.fromConfig(plugin.getSettingsConfig().getEconomyMode());
         ShopManager.init(this);
         this.generatorManager = new GeneratorManager(this);
         this.gameEventManager = new GameEventManager(this);
@@ -125,6 +127,10 @@ public class GameManager implements IGameManager {
         Bukkit.getPluginManager().registerEvents(new TabListListener(tabListManager), plugin.getPlugin());
     }
 
+    public EconomyMode getEconomy() {
+        return economyType.getMode();
+    }
+
     private void initializeConfigs() {
         this.itemConfig = plugin.getItemConfig().getGameManager();
         this.settingsConfig = plugin.getSettingsConfig();
@@ -132,8 +138,6 @@ public class GameManager implements IGameManager {
         this.msgPlayerReconnect = messageConfig.getPlayerReconnectMessage();
         this.msgPlayerLeave = messageConfig.getPlayerLeaveMessage();
 
-        this.resourceSelectorMaterial = XMaterial.PAPER.get();
-        this.resourceSelectorName = itemConfig.getResourceSelectorName();
         this.teamSelectorMaterial = XMaterial.WHITE_WOOL.get();
         this.teamSelectorName = itemConfig.getTeamSelectorName();
         this.leaveGameMaterial = XMaterial.SLIME_BALL.get();
@@ -403,16 +407,6 @@ public class GameManager implements IGameManager {
      */
     private void giveWaitingItems(GamePlayer gamePlayer) {
         Player player = gamePlayer.getPlayer();
-
-        // Game Mode Selection
-        if (settingsConfig.isEnableTeamSelection()) {
-            player.getInventory().addItem(
-                    new ItemBuilder()
-                            .setType(resourceSelectorMaterial)
-                            .setDisplayName(resourceSelectorName)
-                            .getItem()
-            );
-        }
 
         // Team Selection
         if (settingsConfig.isEnableTeamSelection()) {

@@ -1,11 +1,10 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.*;
+import cc.azuramc.bedwars.game.economy.EconomyMode;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
-import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -128,179 +127,31 @@ public class PickupItemHandler {
     }
 
     /**
-     * 处理金铁锭的拾取
-     *
-     * @param itemStack  物品堆
-     * @param gamePlayer 游戏玩家对象
-     * @param item       物品实体
-     * @return 如果已处理返回true
+     * @return true when the economy took the resource
      */
-    public static boolean handleIngotPickup(ItemStack itemStack, GamePlayer gamePlayer, Item item) {
+    public static boolean handleResourcePickup(ItemStack itemStack, GamePlayer gamePlayer, Item item) {
+        EconomyMode economy = GAME_MANAGER.getEconomy();
+        if (!economy.deposit(gamePlayer, itemStack)) {
+            return false;
+        }
+        item.remove();
+
         boolean isIngot = itemStack.getType() == XMaterial.IRON_INGOT.get() || itemStack.getType() == XMaterial.GOLD_INGOT.get();
-
-        if (!isIngot) {
-            return false;
-        }
-
-        Player player = gamePlayer.getPlayer();
-        int xp = calculateIngotXp(itemStack, gamePlayer);
-
-        // 根据游戏模式处理拾取效果
-        if (gamePlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
-            item.remove();
-            if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
-                gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
-            }
-            player.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
-        } else if (gamePlayer.getPlayerData().getMode() == GameModeType.EXPERIENCE) {
-            item.remove();
-            if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
-                gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
-            }
-            player.setLevel(player.getLevel() + xp);
-        }
-
-        // 处理团队拾取效果
-        handleTeamIngotPickup(gamePlayer, itemStack, xp);
-
-        return true;
-    }
-
-    /**
-     * 计算锭的经验值
-     */
-    private static int calculateIngotXp(ItemStack itemStack, GamePlayer gamePlayer) {
-        int xp = itemStack.getAmount();
-
-        if (itemStack.getType() == XMaterial.IRON_INGOT.get()) {
-            gamePlayer.addResourceExperience("IRON", xp);
-            return xp;
-        }
-
-        if (itemStack.getType() == XMaterial.GOLD_INGOT.get()) {
-            gamePlayer.addResourceExperience("GOLD", xp);
-            return xp * 3;
-        }
-
-        return xp;
-    }
-
-    /**
-     * 处理团队锭拾取
-     */
-    private static void handleTeamIngotPickup(GamePlayer gamePlayer, ItemStack itemStack, int xp) {
-        Player player = gamePlayer.getPlayer();
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        if (gameTeam == null) {
-            return;
+        if (!isIngot || gameTeam == null) {
+            return true;
         }
-        for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
-            if (entity instanceof Player) {
-                Player players = (Player) entity;
-                // 只有队员可以捡起
-                if (!gameTeam.getGamePlayers().contains(GamePlayer.get(players))) {
-                    return;
-                }
 
-                if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
-                    gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
-                }
-
-                GamePlayer nearbyPlayer = GamePlayer.get(players.getUniqueId());
-                if (nearbyPlayer != null) {
-                    if (nearbyPlayer.getPlayerData().getMode() == GameModeType.DEFAULT) {
-                        players.getInventory().addItem(new ItemStack(itemStack.getType(), itemStack.getAmount()));
-                    } else {
-                        players.setLevel(players.getLevel() + xp);
-                    }
-                }
+        // nearby teammates get a copy
+        for (Entity entity : gamePlayer.getPlayer().getNearbyEntities(2, 2, 2)) {
+            if (!(entity instanceof Player)) {
+                continue;
+            }
+            GamePlayer nearbyPlayer = GamePlayer.get(entity.getUniqueId());
+            if (nearbyPlayer != null && gameTeam.getGamePlayers().contains(nearbyPlayer)) {
+                economy.deposit(nearbyPlayer, itemStack);
             }
         }
-    }
-
-    /**
-     * 处理钻石的拾取
-     *
-     * @param itemStack  物品堆
-     * @param gamePlayer 游戏玩家对象
-     * @param item       物品实体
-     * @return 如果已处理返回true
-     */
-    public static boolean handleDiamondPickup(ItemStack itemStack, GamePlayer gamePlayer, Item item) {
-        if (itemStack.getType() != XMaterial.DIAMOND.get()) {
-            return false;
-        }
-
-        Player player = gamePlayer.getPlayer();
-        PlayerData playerData = gamePlayer.getPlayerData();
-
-        // 默认模式下不做特殊处理
-        if (playerData.getMode() == GameModeType.DEFAULT) {
-            return false;
-        }
-
-        // 经验模式下处理成经验值
-        double xp = itemStack.getAmount() * 40;
-        xp = applyVipBonus(player, xp);
-
-        item.remove();
-        player.setLevel((int) (player.getLevel() + xp));
-        gamePlayer.addResourceExperience("DIAMOND", (int) xp);
-        if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
-            gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
-        }
-
         return true;
-    }
-
-    /**
-     * 处理绿宝石的拾取
-     *
-     * @param itemStack  物品堆
-     * @param gamePlayer 游戏玩家对象
-     * @param item       物品实体
-     * @return 如果已处理返回true
-     */
-    public static boolean handleEmeraldPickup(ItemStack itemStack, GamePlayer gamePlayer, Item item) {
-        if (itemStack.getType() != XMaterial.EMERALD.get()) {
-            return false;
-        }
-
-        Player player = gamePlayer.getPlayer();
-        PlayerData playerData = gamePlayer.getPlayerData();
-
-        // 默认模式下不做特殊处理
-        if (playerData.getMode() == GameModeType.DEFAULT) {
-            return false;
-        }
-
-        // 经验模式下处理成经验值
-        double xp = itemStack.getAmount() * 80;
-        xp = applyVipBonus(player, xp);
-
-        item.remove();
-        player.setLevel((int) (player.getLevel() + xp));
-        gamePlayer.addResourceExperience("EMERALD", (int) xp);
-        if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
-            gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
-        }
-
-        return true;
-    }
-
-    /**
-     * 应用VIP经验加成
-     */
-    private static double applyVipBonus(Player player, double xp) {
-//        if (player.hasPermission("azurabedwars.xp.vip1")) {
-//            xp = xp + (xp * 1.1);
-//        } else if (player.hasPermission("azurabedwars.xp.vip2")) {
-//            xp = xp + (xp * 1.2);
-//        } else if (player.hasPermission("azurabedwars.xp.vip3")) {
-//            xp = xp + (xp * 1.4);
-//        } else if (player.hasPermission("azurabedwars.xp.vip4")) {
-//            xp = xp + (xp * 1.8);
-//        }
-        return xp;
     }
 }
