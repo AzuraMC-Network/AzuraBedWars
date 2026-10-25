@@ -2,109 +2,78 @@ package cc.azuramc.bedwars.api.game;
 
 import cc.azuramc.bedwars.api.game.map.IMapData;
 import org.bukkit.Sound;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.List;
 
 /**
- * 游戏管理器 API 接口
+ * The single running game of this server. Call it on the main thread only.
  *
  * @author an5w1r@163.com
  */
+@ApiStatus.NonExtendable
 public interface IGameManager {
 
-    /**
-     * 获取本局最大玩家数
-     *
-     * @return 最大玩家数
-     */
+    @Range(from = 0, to = Integer.MAX_VALUE)
     int getMaxPlayers();
 
     /**
-     * 是否已有足够玩家开始游戏
-     *
-     * @return 满足返回 true
+     * @return true when the online players reach the minimum of the map
      */
     boolean hasEnoughPlayers();
 
     /**
-     * 当前是否满足开始条件
-     *
-     * @return 满足返回 true
+     * @return true when there are enough players and at least two teams can be filled
      */
     boolean canStart();
 
     /**
-     * 游戏是否已结束
-     *
-     * @return 已结束返回 true
+     * @return true when at most one team has players left
      */
     boolean isOver();
 
     /**
-     * 是否为平局
-     *
-     * @return 平局返回 true
+     * @return true when more than one team is still alive
      */
     boolean isTie();
 
     /**
-     * 获取获胜队伍
-     *
-     * @return 获胜队伍，平局或无获胜者时为 null
+     * @return the only team left, or null while several teams are alive or none is
      */
     @Nullable
     IGameTeam getWinner();
 
     /**
-     * 获取存活队伍列表
-     *
-     * @return 存活队伍列表（不为 null）
+     * @return a snapshot of the teams that have players left
      */
     @NotNull
+    @Unmodifiable
     List<? extends IGameTeam> getAliveTeams();
 
     /**
-     * 获取全部队伍列表
-     *
-     * @return 队伍列表（不为 null）
+     * @return every team of the map, including empty ones
      */
     @NotNull
+    @UnmodifiableView
     List<? extends IGameTeam> getGameTeams();
 
     /**
-     * 获取地图数据
-     *
-     * @return 地图数据，未加载时为 null
+     * @return null before a map is loaded
      */
     @Nullable
     IMapData getMapData();
 
-    /**
-     * 向所有玩家广播聊天消息
-     *
-     * @param texts 消息内容
-     */
-    void broadcastMessage(String... texts);
+    void broadcastMessage(@NotNull String... texts);
 
     /**
-     * 向所有玩家广播标题
-     *
-     * @param title    主标题
-     * @param subTitle 副标题
-     * @param fadeIn   淡入时间（tick）
-     * @param stay     停留时间（tick）
-     * @param fadeOut  淡出时间（tick）
+     * Times are in ticks.
      */
-    void broadcastTitleToAll(String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut);
+    void broadcastTitleToAll(@Nullable String title, @Nullable String subTitle, int fadeIn, int stay, int fadeOut);
 
-    /**
-     * 向所有玩家广播音效
-     *
-     * @param sound  音效
-     * @param volume 音量
-     * @param pitch  音调
-     */
-    void broadcastSound(Sound sound, float volume, float pitch);
+    void broadcastSound(@NotNull Sound sound, float volume, float pitch);
 }

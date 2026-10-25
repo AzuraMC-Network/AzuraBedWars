@@ -2,8 +2,6 @@ package cc.azuramc.bedwars.game.timeline;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameEndEvent;
-import cc.azuramc.bedwars.api.event.game.BedwarsGameOverEvent;
-import cc.azuramc.bedwars.compat.util.GameTeamBedHandler;
 import cc.azuramc.bedwars.config.object.EventSettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameState;
@@ -122,7 +120,6 @@ public class GameTimeline {
     }
 
     private void showResults() {
-        Bukkit.getPluginManager().callEvent(new BedwarsGameOverEvent(gameManager));
         new GameOverTask(gameManager);
     }
 
@@ -153,7 +150,6 @@ public class GameTimeline {
     private void destroyAllBeds() {
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
             if (!gameTeam.isDestroyed()) {
-                GameTeamBedHandler.destroyBed(gameTeam);
                 gameTeam.setDestroyed(true);
             }
         }

@@ -131,13 +131,12 @@ public class BedBreakHandler {
         // 播放全局音效
         GAME_MANAGER.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 10, 10);
 
-        // 发送全局消息
-        GAME_MANAGER.broadcastMessage(" ");
-        GAME_MANAGER.broadcastMessage(event.getMessage());
-        GAME_MANAGER.broadcastMessage(" ");
-
-        // 向受影响的团队发送标题提示
-        GAME_MANAGER.broadcastTeamTitle(event.getGameTeam(), event.getTitle(), event.getSubTitle(), 1, 20, 1);
+        if (event.getMessage() != null) {
+            GAME_MANAGER.broadcastMessage(" ", event.getMessage(), " ");
+        }
+        if (event.getTitle() != null || event.getSubTitle() != null) {
+            GAME_MANAGER.broadcastTeamTitle(event.getGameTeam(), event.getTitle(), event.getSubTitle(), 1, 20, 1);
+        }
     }
 
 

@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,7 +56,7 @@ public class GameTeam implements IGameTeam {
     private Block bedHead;
     @Nullable
     private BlockFace bedFace;
-    private boolean hasBed;
+    private boolean rejuvenated;
     private boolean isDestroyed;
     @Nullable
     private GamePlayer destroyPlayer;
@@ -92,7 +93,7 @@ public class GameTeam implements IGameTeam {
      */
     private void initializeDefaults() {
         // 床状态初始化
-        this.hasBed = false;
+        this.rejuvenated = false;
         this.isDestroyed = false;
 
         this.upgrades = new TeamUpgrades(this);
@@ -169,7 +170,7 @@ public class GameTeam implements IGameTeam {
             }
         }
 
-        return teamPlayers;
+        return Collections.unmodifiableList(teamPlayers);
     }
 
     /**
@@ -187,7 +188,7 @@ public class GameTeam implements IGameTeam {
             }
         }
 
-        return alivePlayers;
+        return Collections.unmodifiableList(alivePlayers);
     }
 
     /**
@@ -272,28 +273,5 @@ public class GameTeam implements IGameTeam {
      */
     public int getActivePlayerCount() {
         return getAlivePlayers().size();
-    }
-
-    /**
-     * 检查床是否被摧毁
-     *
-     * @return 如果床被摧毁返回true，否则返回false
-     */
-    public boolean isBedDestroyed() {
-        return isDestroyed || hasBed;
-    }
-
-    /**
-     * 设置床被摧毁状态
-     *
-     * @param destroyed 床被摧毁状态
-     * @param destroyer 摧毁床的玩家，可以为null
-     */
-    public void setBedDestroyed(boolean destroyed, @Nullable GamePlayer destroyer) {
-        this.isDestroyed = destroyed;
-
-        if (destroyed) {
-            this.destroyPlayer = destroyer;
-        }
     }
 }

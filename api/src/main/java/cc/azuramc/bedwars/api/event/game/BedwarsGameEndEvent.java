@@ -2,81 +2,57 @@ package cc.azuramc.bedwars.api.event.game;
 
 import cc.azuramc.bedwars.api.game.IGameManager;
 import cc.azuramc.bedwars.api.game.IGameTeam;
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * 游戏结束事件
+ * Called once on the main thread when the game ends, either because one team is left or because time ran out.
  *
  * @author an5w1r@163.com
  */
-@Getter
-@Setter
-public class BedwarsGameEndEvent extends Event {
+public final class BedwarsGameEndEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    /**
-     * 游戏管理器
-     */
-    @NotNull
     private final IGameManager gameManager;
-    /**
-     * 获胜队伍（可能为null，表示平局）
-     */
-    @Nullable
     private final IGameTeam winner;
-    /**
-     * 存活的队伍列表
-     */
-    @NotNull
-    private final List<? extends IGameTeam> aliveTeams;
-    /**
-     * 聊天消息
-     */
-    @NotNull
-    private String message;
-    /**
-     * 标题消息
-     */
-    @NotNull
-    private String title;
-    /**
-     * 副标题消息
-     */
-    @NotNull
-    private String subTitle;
+    private final List<IGameTeam> aliveTeams;
 
-    /**
-     * 构造函数
-     *
-     * @param gameManager 游戏管理器
-     */
+    @ApiStatus.Internal
     public BedwarsGameEndEvent(@NotNull IGameManager gameManager) {
         this.gameManager = gameManager;
         this.winner = gameManager.getWinner();
         this.aliveTeams = Collections.unmodifiableList(new ArrayList<>(gameManager.getAliveTeams()));
-        this.message = winner != null ? "§a游戏结束！获胜队伍：" + winner.getName() : "§e游戏结束！平局！";
-        this.title = "§6游戏结束";
-        this.subTitle = winner != null ? "§a获胜队伍：" + winner.getName() : "§e平局！";
     }
 
-    /**
-     * 获取游戏管理器
-     *
-     * @return 游戏管理器
-     */
     @NotNull
     public IGameManager getGameManager() {
         return gameManager;
+    }
+
+    /**
+     * @return the winning team, null on a draw
+     */
+    @Nullable
+    public IGameTeam getWinner() {
+        return winner;
+    }
+
+    /**
+     * @return the teams still in the game when it ended
+     */
+    @NotNull
+    @Unmodifiable
+    public List<IGameTeam> getAliveTeams() {
+        return aliveTeams;
     }
 
     @NotNull
@@ -84,9 +60,9 @@ public class BedwarsGameEndEvent extends Event {
         return HANDLERS;
     }
 
+    @NotNull
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public HandlerList getHandlers() {
         return HANDLERS;
     }
-
 }

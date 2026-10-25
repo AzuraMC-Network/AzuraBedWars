@@ -9,22 +9,19 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * NMS 版本适配的服务提供接口
+ * Version specific code, implemented once per nms module
  *
  * @author an5w1r@163.com
  */
+@ApiStatus.Internal
 public interface NMSAccess {
 
-    /**
-     * 设置火球的飞行方向
-     *
-     * @param fireball 火球实体
-     * @param vector   方向向量
-     * @return 处理后的火球实体
-     */
+    @NotNull
     Fireball setFireballDirection(@NotNull Fireball fireball, @NotNull Vector vector);
 
     /**
@@ -32,25 +29,21 @@ public interface NMSAccess {
      *
      * @return null when the server version has no nms module
      */
-    MobGoals getGoals(Creature creature);
+    @Nullable
+    MobGoals getGoals(@NotNull Creature creature);
 
     /**
      * Bukkit only added {@link LivingEntity#setAI} in 1.9
      */
-    default void setAI(LivingEntity entity, boolean ai) {
+    default void setAI(@NotNull LivingEntity entity, boolean ai) {
         entity.setAI(ai);
     }
 
     /**
-     * 设置物品是否无法破坏（含是否隐藏无法破坏标签）
-     * <p>默认实现使用 Bukkit API，必要时版本模块可覆盖。
-     *
-     * @param itemStack   物品
-     * @param unbreakable 是否无法破坏
-     * @param hide        是否隐藏标签
-     * @return 处理后的物品
+     * @param hide whether to hide the unbreakable tooltip
      */
-    default ItemStack setItemUnbreakable(ItemStack itemStack, boolean unbreakable, boolean hide) {
+    @NotNull
+    default ItemStack setItemUnbreakable(@NotNull ItemStack itemStack, boolean unbreakable, boolean hide) {
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
             meta.setUnbreakable(unbreakable);
@@ -65,13 +58,9 @@ public interface NMSAccess {
     }
 
     /**
-     * 按旧版羊毛数据值设置方块颜色
-     * <p>默认实现按低 4 位映射颜色名再设置方块类型；低版本模块通常覆盖为直接 {@code setData}。
-     *
-     * @param block 方块
-     * @param data  羊毛数据值
+     * Recolors a wool block by its legacy data value, legacy modules call {@code setData} instead
      */
-    default void setWoolBlockData(Block block, byte data) {
+    default void setWoolBlockData(@NotNull Block block, byte data) {
         Material type = block.getType();
         if (type.name().toUpperCase().contains("WOOL")) {
             Material newType = Material.getMaterial(woolColorName(data) + "_WOOL");
@@ -82,11 +71,9 @@ public interface NMSAccess {
     }
 
     /**
-     * 将旧版羊毛数据值（低 4 位）映射为颜色名
-     *
-     * @param data 数据值
-     * @return 颜色名
+     * @return the color name of the low 4 bits of a legacy wool data value
      */
+    @NotNull
     static String woolColorName(byte data) {
         switch (data & 0xF) {
             case 1:

@@ -2,52 +2,54 @@ package cc.azuramc.bedwars.api.event.player;
 
 import cc.azuramc.bedwars.api.game.IGameManager;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
-import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 玩家状态变化事件
+ * Called on the main thread right after one of the player's {@link StateChangeType} flags is set.
  *
  * @author an5w1r@163.com
  */
-@Getter
-public class BedwarsPlayerStateChangeEvent extends Event {
+public final class BedwarsPlayerStateChangeEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    /**
-     * 游戏管理器
-     */
-    @NotNull
     private final IGameManager gameManager;
-
-    /**
-     * 状态变化的玩家
-     */
-    @NotNull
     private final IGamePlayer gamePlayer;
-
-    /**
-     * 状态变化类型
-     */
-    @NotNull
     private final StateChangeType stateChangeType;
+    private final boolean enabled;
 
-    /**
-     * @param gameManager     游戏管理器
-     * @param gamePlayer      状态变化的玩家
-     * @param stateChangeType 状态变化类型
-     */
-    public BedwarsPlayerStateChangeEvent(
-            @NotNull IGameManager gameManager,
-            @NotNull IGamePlayer gamePlayer,
-            @NotNull StateChangeType stateChangeType
-    ) {
+    @ApiStatus.Internal
+    public BedwarsPlayerStateChangeEvent(@NotNull IGameManager gameManager, @NotNull IGamePlayer gamePlayer,
+                                         @NotNull StateChangeType stateChangeType, boolean enabled) {
         this.gameManager = gameManager;
         this.gamePlayer = gamePlayer;
         this.stateChangeType = stateChangeType;
+        this.enabled = enabled;
+    }
+
+    @NotNull
+    public IGameManager getGameManager() {
+        return gameManager;
+    }
+
+    @NotNull
+    public IGamePlayer getGamePlayer() {
+        return gamePlayer;
+    }
+
+    @NotNull
+    public StateChangeType getStateChangeType() {
+        return stateChangeType;
+    }
+
+    /**
+     * @return the new value of the flag, it may equal the old one
+     */
+    public boolean isEnabled() {
+        return enabled;
     }
 
     @NotNull
@@ -55,33 +57,16 @@ public class BedwarsPlayerStateChangeEvent extends Event {
         return HANDLERS;
     }
 
+    @NotNull
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    /**
-     * 状态变化类型枚举
-     */
     public enum StateChangeType {
-        /**
-         * 旁观者状态变化
-         */
         SPECTATOR,
-
-        /**
-         * 复活状态变化
-         */
         RESPAWNING,
-
-        /**
-         * 隐身状态变化
-         */
         INVISIBLE,
-
-        /**
-         * 重连状态变化
-         */
         RECONNECT
     }
 }

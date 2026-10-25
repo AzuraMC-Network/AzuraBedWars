@@ -165,7 +165,7 @@ public class PlayerRightClickListener implements Listener {
 
         // 更新队伍状态
         gameTeam.setDestroyed(false);
-        gameTeam.setHasBed(true);
+        gameTeam.setRejuvenated(true);
 
         // 广播消息
         announceRejuvenationBedUsed(gamePlayer, gameTeam);
@@ -206,7 +206,7 @@ public class PlayerRightClickListener implements Listener {
             return false;
         }
 
-        if (gameTeam.isHasBed()) {
+        if (gameTeam.isRejuvenated()) {
             gamePlayer.sendMessage("§c已使用过回春床了");
             return false;
         }

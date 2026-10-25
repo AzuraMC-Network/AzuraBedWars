@@ -1,52 +1,56 @@
 package cc.azuramc.bedwars.api.event.player;
 
 import cc.azuramc.bedwars.api.game.IGamePlayer;
-import lombok.Getter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 玩家击杀事件
+ * Called on the main thread after a player is killed by another player.
  *
  * @author an5w1r@163.com
  */
-@Getter
-public class BedwarsPlayerKillEvent extends Event {
+public final class BedwarsPlayerKillEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    /**
-     * 被击杀的玩家
-     */
+    private final IGamePlayer victim;
+    private final IGamePlayer killer;
+    private final boolean finalKill;
+
+    @ApiStatus.Internal
+    public BedwarsPlayerKillEvent(@NotNull IGamePlayer victim, @NotNull IGamePlayer killer, boolean finalKill) {
+        this.victim = victim;
+        this.killer = killer;
+        this.finalKill = finalKill;
+    }
+
     @NotNull
-    private final IGamePlayer gamePlayer;
+    public IGamePlayer getVictim() {
+        return victim;
+    }
+
+    @NotNull
+    public IGamePlayer getKiller() {
+        return killer;
+    }
 
     /**
-     * 击杀者
+     * @return true when the victim's bed is gone, so the victim will not respawn
      */
-    @NotNull
-    private final IGamePlayer gameKiller;
-
-    /**
-     * 是否为最终击杀（被击杀者所在队伍已无床）
-     */
-    private final boolean last;
+    public boolean isFinalKill() {
+        return finalKill;
+    }
 
     @NotNull
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
-    public BedwarsPlayerKillEvent(@NotNull IGamePlayer gamePlayer, @NotNull IGamePlayer gameKiller, boolean last) {
-        this.gamePlayer = gamePlayer;
-        this.gameKiller = gameKiller;
-        this.last = last;
-    }
-
+    @NotNull
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public HandlerList getHandlers() {
         return HANDLERS;
     }
-
 }

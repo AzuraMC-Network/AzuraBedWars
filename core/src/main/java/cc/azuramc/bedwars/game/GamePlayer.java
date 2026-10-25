@@ -816,7 +816,7 @@ public class GamePlayer implements IGamePlayer {
         this.isSpectator = spectator;
 
         Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR));
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.SPECTATOR, spectator));
     }
 
     /**
@@ -832,7 +832,7 @@ public class GamePlayer implements IGamePlayer {
         this.isRespawning = respawning;
 
         Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING));
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RESPAWNING, respawning));
     }
 
     /**
@@ -848,7 +848,7 @@ public class GamePlayer implements IGamePlayer {
         this.isInvisible = invisible;
 
         Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE));
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.INVISIBLE, invisible));
     }
 
     /**
@@ -864,7 +864,7 @@ public class GamePlayer implements IGamePlayer {
         this.isReconnect = reconnect;
 
         Bukkit.getPluginManager().callEvent(new BedwarsPlayerStateChangeEvent(
-                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT));
+                gameManager, this, BedwarsPlayerStateChangeEvent.StateChangeType.RECONNECT, reconnect));
     }
 
     /**

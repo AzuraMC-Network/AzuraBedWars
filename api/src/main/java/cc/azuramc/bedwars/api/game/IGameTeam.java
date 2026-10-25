@@ -4,144 +4,90 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 
 /**
- * 游戏队伍 API 接口
+ * One team of the map. Empty teams exist too and count as dead.
  *
  * @author an5w1r@163.com
  */
+@ApiStatus.NonExtendable
 public interface IGameTeam {
 
     /**
-     * 获取队伍名称（含颜色符号）
-     *
-     * @return 队伍名称（不为 null）
+     * @return the name with its color code
      */
     @NotNull
     String getName();
 
-    /**
-     * 获取队伍名称（移除前缀颜色符号）
-     *
-     * @return 队伍名称（不为 null）
-     */
     @NotNull
     String getNameWithoutColor();
 
-    /**
-     * 获取队伍聊天颜色
-     *
-     * @return 聊天颜色（不为 null）
-     */
     @NotNull
     ChatColor getChatColor();
 
-    /**
-     * 获取队伍染料颜色
-     *
-     * @return 染料颜色（不为 null）
-     */
     @NotNull
     DyeColor getDyeColor();
 
-    /**
-     * 获取队伍颜色对象
-     *
-     * @return 颜色对象（不为 null）
-     */
     @NotNull
     Color getColor();
 
-    /**
-     * 获取队伍出生点
-     *
-     * @return 出生点位置（不为 null）
-     */
     @NotNull
     Location getSpawnLocation();
 
-    /**
-     * 获取队伍最大玩家数
-     *
-     * @return 最大玩家数
-     */
+    @Range(from = 0, to = Integer.MAX_VALUE)
     int getMaxPlayers();
 
     /**
-     * 队伍是否拥有床
-     *
-     * @return 拥有床返回 true
-     */
-    boolean isHasBed();
-
-    /**
-     * 队伍床是否已被摧毁
-     *
-     * @return 已摧毁返回 true
+     * @return true when the bed is gone, so dead members will not respawn
      */
     boolean isDestroyed();
 
     /**
-     * 队伍床是否被摧毁（综合判定）
-     *
-     * @return 被摧毁返回 true
+     * @return true when the team already used its rejuvenation bed
      */
-    boolean isBedDestroyed();
+    boolean isRejuvenated();
 
     /**
-     * 队伍是否已全员淘汰
-     *
-     * @return 全员淘汰返回 true
+     * @return true when no member is online and playing
      */
     boolean isDead();
 
-    /**
-     * 队伍是否已满员
-     *
-     * @return 满员返回 true
-     */
     boolean isFull();
 
     /**
-     * 获取队伍当前存活玩家数量
-     *
-     * @return 存活玩家数量
+     * @return the number of members that are online and playing
      */
+    @Range(from = 0, to = Integer.MAX_VALUE)
     int getActivePlayerCount();
 
-    /**
-     * 判断指定玩家是否属于本队伍
-     *
-     * @param gamePlayer 待判断的玩家，可为 null
-     * @return 属于本队伍返回 true
-     */
+    @Contract("null -> false")
     boolean isInTeam(@Nullable IGamePlayer gamePlayer);
 
     /**
-     * 获取摧毁本队床的玩家
-     *
-     * @return 摧毁者，未被摧毁时为 null
+     * @return null when the bed is intact or was not broken by a player
      */
     @Nullable
     IGamePlayer getDestroyPlayer();
 
     /**
-     * 获取队伍全部玩家
-     *
-     * @return 玩家列表（不为 null）
+     * @return a snapshot of every member, including offline ones
      */
     @NotNull
+    @Unmodifiable
     List<? extends IGamePlayer> getGamePlayers();
 
     /**
-     * 获取队伍存活玩家
-     *
-     * @return 存活玩家列表（不为 null）
+     * @return a snapshot of the members that are online and playing
      */
     @NotNull
+    @Unmodifiable
     List<? extends IGamePlayer> getAlivePlayers();
 }

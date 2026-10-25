@@ -738,7 +738,7 @@ public class GameManager implements IGameManager {
      * @param stay     停留时间
      * @param fadeOut  淡出时间
      */
-    public void broadcastTitleToAll(String title, String subTitle, Integer fadeIn, Integer stay, Integer fadeOut) {
+    public void broadcastTitleToAll(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         GamePlayer.getOnlinePlayers().forEach(gamePlayer ->
                 gamePlayer.sendTitle(title, subTitle, fadeIn, stay, fadeOut));
     }
@@ -1009,10 +1009,15 @@ public class GameManager implements IGameManager {
     }
 
     @NotNull
+    public List<GameTeam> getGameTeams() {
+        return Collections.unmodifiableList(gameTeams);
+    }
+
+    @NotNull
     public List<GameTeam> getAliveTeams() {
         return gameTeams.stream()
                 .filter(team -> !team.isDead())
-                .collect(Collectors.toList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     public boolean isTie() {
