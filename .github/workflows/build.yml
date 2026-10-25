@@ -26,6 +26,9 @@ jobs:
           distribution: temurin
           java-version: 25
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          # Only writes the cache on the default branch by default, but builds run on develop and PRs into it
+          cache-read-only: ${{ github.event_name != 'push' }}
       # release jars take their version from the tag for the bootstrap updater
       - run: ./gradlew build ${TAG:+-Pversion=${TAG#v}}
       - uses: actions/upload-artifact@v4
