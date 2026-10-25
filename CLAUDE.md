@@ -13,7 +13,6 @@ BedWars plugin for Spigot and Paper, supporting Minecraft 1.8.8 through 26.x fro
 | `nms/v26_X/` | `NMSAccess` for 26.x servers, shared by Spigot and Paper |
 | `plugin/` | Assembles the regular and offline plugin jars |
 | `build-logic/` | Convention plugins and `RuntimeLibrariesTask` |
-| `libs/` | In-house jars in a Maven layout, group `cc.azuramc` |
 
 Dependency versions live in `gradle/libs.versions.toml`. Repositories are declared once in `settings.gradle.kts`.
 
@@ -23,7 +22,7 @@ Bukkit loads `bootstrap`, `api` and every `nms/` module. Everything else runs in
 
 - `core` is packed into one inner jar
 - Third-party libraries from `core`'s runtime classpath are listed with their sha256 in `META-INF/azurabedwars/libraries.txt`
-- The regular jar embeds only the inner jar and `cc.azuramc` libraries, and downloads the rest into `plugins/AzuraBedWars/libraries/` from `libraries.repositories` in `config.yml`
+- The regular jar embeds only the inner jar, and downloads the rest into `plugins/AzuraBedWars/libraries/` from `libraries.repositories` in `config.yml`
 - `-offline.jar` embeds every library
 - On startup `Updater` downloads a newer GitHub release of the same kind into Bukkit's update folder, so it is installed on the next restart. Release assets are attached by the build workflow
 
@@ -33,7 +32,7 @@ Rules that follow from this:
 - `api` stays Java because other plugins compile against it
 - `cc.azuramc.bedwars.AzuraBedWars` is not a `JavaPlugin`. Anything handed to Bukkit, such as the scheduler, events, metadata or plugin channels, takes `AzuraBedWars.getInstance().getPlugin()`
 - APIs that look up the plugin from the calling class, such as `JavaPlugin.getProvidingPlugin`, cannot find it from inside the isolated loader
-- An `implementation` dependency of `core` must be resolvable from Maven Central or JitPack, or be added under `libs/`
+- An `implementation` dependency of `core` must be resolvable from Maven Central or JitPack, because the regular jar downloads it
 - Kotlin can be added to `core` with a convention plugin. `kotlin-stdlib` then becomes one more runtime library
 
 `core` never depends on `nms`. At runtime `NMSProvider` looks up the Minecraft version in its module table and loads `cc.azuramc.bedwars.nms.<module>.NMS_<module>` by reflection, such as `v1_8_R3` or `v26_2`. The `nms/` modules are compiled against Spigot:

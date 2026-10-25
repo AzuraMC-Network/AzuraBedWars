@@ -5,18 +5,17 @@ import cc.azuramc.bedwars.database.provider.mysql.MySQLDatabaseProvider;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.util.LoggerUtil;
-import cc.azuramc.orm.AzuraOrmClient;
-import cc.azuramc.orm.builder.ColumnDefinitionBuilder;
-import cc.azuramc.orm.builder.DataType;
-import cc.azuramc.orm.builder.PreparedStatementBuildManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * MySQL存储实现
@@ -29,7 +28,7 @@ public class MySQLMapStorage implements IMapStorage {
     private static final String mapKey = "map_name";
     private final String tableName;
     private static final String mapDataKey = "json_data";
-    private final AzuraOrmClient ormClient;
+    private final DataSource dataSource;
 
     /**
      * 创建一个MySQL存储实现
@@ -40,7 +39,7 @@ public class MySQLMapStorage implements IMapStorage {
     public MySQLMapStorage(AzuraBedWars plugin, String tableName) {
         this.gson = new GsonBuilder().create();
         MySQLDatabaseProvider mySQLDatabaseProvider = (MySQLDatabaseProvider) plugin.getDatabaseProviderFactory().getDatabaseProvider();
-        this.ormClient = mySQLDatabaseProvider.getOrmClient();
+        this.dataSource = mySQLDatabaseProvider.getDataSource();
         this.tableName = tableName;
 
         try {
@@ -55,20 +54,13 @@ public class MySQLMapStorage implements IMapStorage {
      * 设置数据库表结构
      */
     private void setupDatabase() throws SQLException {
-        try (Connection conn = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(conn, false);
-            PreparedStatement createTableStmt = buildManager.createTable(tableName)
-                    .ifNotExists()
-                    .addIdColumn()
-                    .column(mapKey, ColumnDefinitionBuilder.of(DataType.Type.VARCHAR).size(255).notNull().build())
-                    .column(mapDataKey, ColumnDefinitionBuilder.of(DataType.Type.TEXT).build())
-                    .engine("InnoDB")
-                    .charset("utf8mb4")
-                    .collate("utf8mb4_unicode_ci")
-                    .index(mapKey)
-                    .prepare();
-
-            buildManager.execute(createTableStmt);
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName + " (\n"
+                    + "  `id` INT PRIMARY KEY AUTO_INCREMENT,\n"
+                    + "  `" + mapKey + "` VARCHAR(255) NOT NULL,\n"
+                    + "  `" + mapDataKey + "` TEXT\n"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
         }
     }
 
@@ -78,23 +70,14 @@ public class MySQLMapStorage implements IMapStorage {
             return false;
         }
         String jsonData = gson.toJson(mapData);
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
-            if (exists(mapName)) {
-                PreparedStatement updateStmt = buildManager.update(tableName)
-                        .set(mapDataKey, jsonData)
-                        .whereEquals(mapKey, mapName)
-                        .prepare();
-
-                buildManager.execute(updateStmt);
-            } else {
-                PreparedStatement insertStmt = buildManager.insertInto(tableName)
-                        .values(mapKey, mapName)
-                        .values(mapDataKey, jsonData)
-                        .prepare();
-
-                buildManager.execute(insertStmt);
-            }
+        String sql = exists(mapName)
+                ? "UPDATE " + tableName + " SET `" + mapDataKey + "` = ? WHERE `" + mapKey + "` = ?"
+                : "INSERT INTO " + tableName + " (`" + mapDataKey + "`, `" + mapKey + "`) VALUES (?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, jsonData);
+            ps.setString(2, mapName);
+            ps.executeUpdate();
             return true;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to save map: " + mapName, e);
@@ -103,19 +86,12 @@ public class MySQLMapStorage implements IMapStorage {
 
     @Override
     public MapData loadMap(String mapName) {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
-
-            Optional<MapData> result = buildManager.select()
-                    .from(tableName)
-                    .select(mapDataKey)
-                    .whereEquals(mapKey, mapName)
-                    .executeQueryForObject(rs -> {
-                        String jsonData = rs.getString(mapDataKey);
-                        return gson.fromJson(jsonData, MapData.class);
-                    });
-
-            return result.orElse(null);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT `" + mapDataKey + "` FROM " + tableName + " WHERE `" + mapKey + "` = ?")) {
+            ps.setString(1, mapName);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? gson.fromJson(rs.getString(mapDataKey), MapData.class) : null;
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to load map: " + mapName, e);
         }
@@ -123,14 +99,10 @@ public class MySQLMapStorage implements IMapStorage {
 
     @Override
     public boolean deleteMap(String mapName) {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
-            PreparedStatement deleteStmt = buildManager.deleteFrom(tableName)
-                    .whereEquals(mapKey, mapName)
-                    .prepare();
-
-            int rowsAffected = buildManager.execute(deleteStmt);
-            return rowsAffected > 0;
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement("DELETE FROM " + tableName + " WHERE `" + mapKey + "` = ?")) {
+            ps.setString(1, mapName);
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete map: " + mapName, e);
         }
@@ -138,14 +110,12 @@ public class MySQLMapStorage implements IMapStorage {
 
     @Override
     public boolean exists(String mapName) {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
-
-            return buildManager.select()
-                    .from(tableName)
-                    .select(mapKey)
-                    .whereEquals(mapKey, mapName)
-                    .executeQueryForExists();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT 1 FROM " + tableName + " WHERE `" + mapKey + "` = ? LIMIT 1")) {
+            ps.setString(1, mapName);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to check if map exists: " + mapName, e);
         }
@@ -153,13 +123,14 @@ public class MySQLMapStorage implements IMapStorage {
 
     @Override
     public List<String> getAllMapNames() {
-        try (Connection connection = ormClient.getConnection()) {
-            PreparedStatementBuildManager buildManager = new PreparedStatementBuildManager(connection, false);
-
-            return buildManager.select()
-                    .from(tableName)
-                    .select(mapKey)
-                    .executeQueryForList(rs -> rs.getString(mapKey));
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT `" + mapKey + "` FROM " + tableName);
+             ResultSet rs = ps.executeQuery()) {
+            List<String> names = new ArrayList<>();
+            while (rs.next()) {
+                names.add(rs.getString(mapKey));
+            }
+            return names;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to get all map names", e);
         }

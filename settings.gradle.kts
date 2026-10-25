@@ -11,16 +11,6 @@ plugins {
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
-        exclusiveContent {
-            // in-house jars not published to any repository
-            forRepository {
-                maven(rootDir.resolve("libs")) {
-                    name = "bundledLibs"
-                    metadataSources { artifact() }
-                }
-            }
-            filter { includeGroup("cc.azuramc") }
-        }
         mavenCentral()
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
             content {
