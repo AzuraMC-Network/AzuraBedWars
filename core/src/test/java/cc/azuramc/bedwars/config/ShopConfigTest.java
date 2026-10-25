@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ShopConfigTest {
@@ -118,6 +119,17 @@ class ShopConfigTest {
         edit("generators.yml", "  gold:", "  copper:\n    material: COPPER_INGOT\n    levels:\n      - interval: 2\n  gold:");
         service.reload("generators");
         assertEquals(ApplyResult.Status.APPLIED, service.reload("shop/categories/tools").get(0).getStatus());
+    }
+
+    @Test
+    void addedCategoryFileIsCheckedBeforeItIsUsed() throws IOException {
+        service.loadAll();
+        ConfigService.writeAtomically(new File(dataFolder, "shop/categories/extra.yml"), "config-version: 1\n"
+                + "items:\n  pick:\n    tier: pickaxe\n    level: 9\n");
+        ApplyResult result = service.reload("shop/categories").stream()
+                .filter(applied -> applied.getDocumentId().equals("shop/categories/extra")).findFirst().get();
+        assertEquals(ApplyResult.Status.REJECTED, result.getStatus());
+        assertFalse(service.all(ShopCategoryConfig.class).containsKey("shop/categories/extra"));
     }
 
     @Test

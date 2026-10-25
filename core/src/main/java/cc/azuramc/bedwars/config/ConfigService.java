@@ -287,15 +287,14 @@ public final class ConfigService {
         Set<String> before = new HashSet<>(documentsIn(directory));
         List<ConfigProblem> scanProblems = scan(directory);
         for (String id : documentsIn(directory)) {
-            ConfigDocument<?> document = documents.get(id);
-            if (!before.contains(id)) {
+            ApplyResult result = reloadDocument(documents.get(id));
+            if (!scanProblems.isEmpty()) {
                 List<ConfigProblem> problems = new ArrayList<>(scanProblems);
+                problems.addAll(result.getProblems());
+                result = new ApplyResult(id, result.getStatus(), problems, result.getRestartPaths());
                 scanProblems = Collections.emptyList();
-                problems.addAll(load(document));
-                results.add(new ApplyResult(id, ApplyResult.Status.APPLIED, problems, Collections.<String>emptyList()));
-            } else {
-                results.add(reloadDocument(document));
             }
+            results.add(result);
         }
         for (String id : before) {
             if (!documents.containsKey(id)) {
