@@ -1,10 +1,9 @@
 package cc.azuramc.bedwars.api.nms;
 
-import cc.azuramc.bedwars.api.game.IGamePlayer;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Fireball;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,26 +27,11 @@ public interface NMSAccess {
     Fireball setFireballDirection(@NotNull Fireball fireball, @NotNull Vector vector);
 
     /**
-     * 在指定位置生成归属某玩家队伍的铁傀儡
+     * Goals of a mob, used to replace its vanilla AI
      *
-     * @param loc        生成位置
-     * @param gamePlayer 归属玩家（用于确定队伍）
-     * @param speed      移动速度
-     * @param health     生命值
-     * @return 生成的实体，失败时为 null
+     * @return null when the server version has no nms module
      */
-    LivingEntity spawnIronGolem(org.bukkit.Location loc, IGamePlayer gamePlayer, double speed, double health);
-
-    /**
-     * 在指定位置生成归属某玩家队伍的蠹虫
-     *
-     * @param loc        生成位置
-     * @param gamePlayer 归属玩家（用于确定队伍）
-     * @param speed      移动速度
-     * @param health     生命值
-     * @return 生成的实体，失败时为 null
-     */
-    LivingEntity spawnSilverfish(org.bukkit.Location loc, IGamePlayer gamePlayer, double speed, double health);
+    MobGoals getGoals(Creature creature);
 
     /**
      * 设置物品是否无法破坏（含是否隐藏无法破坏标签）

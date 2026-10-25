@@ -1,14 +1,12 @@
 package cc.azuramc.bedwars.nms.v1_19_R3;
 
-import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
-import cc.azuramc.bedwars.api.game.IGamePlayer;
-import cc.azuramc.bedwars.api.game.IGameTeam;
+import cc.azuramc.bedwars.api.nms.MobGoals;
 import cc.azuramc.bedwars.api.nms.NMSAccess;
 import net.minecraft.world.entity.projectile.EntityFireball;
-import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftCreature;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftFireball;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Fireball;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,16 +25,7 @@ public class NMS_v1_19_R3 implements NMSAccess {
     }
 
     @Override
-    public LivingEntity spawnIronGolem(Location loc, IGamePlayer gamePlayer, double speed, double health) {
-        IGameTeam gameTeam = gamePlayer.getGameTeam();
-        AzuraBedWarsAPI.debug("NMS_v1_19_R3$spawnIronGolem | loc: " + loc + ", gameTeam: " + gamePlayer.getName() + ", speed: " + speed + ", health: " + health);
-        return CustomIronGolem.spawn(loc, gameTeam, speed, health);
-    }
-
-    @Override
-    public LivingEntity spawnSilverfish(Location loc, IGamePlayer gamePlayer, double speed, double health) {
-        IGameTeam gameTeam = gamePlayer.getGameTeam();
-        AzuraBedWarsAPI.debug("NMS_v1_19_R3$spawnSilverfish | loc: " + loc + ", gameTeam: " + gameTeam.getName() + ", speed: " + speed + ", health: " + health);
-        return CustomSilverfish.spawn(loc, gameTeam, speed, health);
+    public MobGoals getGoals(Creature creature) {
+        return new MobGoalsImpl(((CraftCreature) creature).getHandle());
     }
 }
