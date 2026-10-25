@@ -42,6 +42,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 /**
@@ -65,6 +66,7 @@ public final class ConfigService {
     private final Map<String, Object> pending = new HashMap<>();
     private final Map<String, TreeMap<Integer, UnaryOperator<Map<String, Object>>>> migrations = new HashMap<>();
     private final List<ConfigValidator> validators = new ArrayList<>();
+    private Supplier<String> language = () -> null;
 
     public ConfigService(File dataFolder, BooleanSupplier gameRunning) {
         this.dataFolder = dataFolder;
@@ -99,6 +101,17 @@ public final class ConfigService {
 
     public void addValidator(ConfigValidator validator) {
         validators.add(validator);
+    }
+
+    /**
+     * Picks {@code config-templates/<language>/<path>} over {@code config-templates/<path>} for missing files and migrations
+     */
+    public void setLanguage(Supplier<String> language) {
+        this.language = language;
+    }
+
+    public Supplier<String> getLanguage() {
+        return language;
     }
 
     public List<ConfigDocument<?>> documents() {
@@ -151,11 +164,16 @@ public final class ConfigService {
      */
     public List<ConfigProblem> loadAll() {
         List<ConfigProblem> problems = new ArrayList<>();
+        for (ConfigDocument<?> document : new ArrayList<>(documents.values())) {
+            if (directoryOf(document) == null) {
+                problems.addAll(load(document));
+            }
+        }
         for (Directory directory : directories.values()) {
             problems.addAll(scan(directory));
-        }
-        for (ConfigDocument<?> document : documents.values()) {
-            problems.addAll(load(document));
+            for (String id : documentsIn(directory)) {
+                problems.addAll(load(documents.get(id)));
+            }
         }
         problems.addAll(validate(Collections.<String, Object>emptyMap(), Collections.<String, String>emptyMap()));
         exportSchemas();
@@ -185,14 +203,14 @@ public final class ConfigService {
      * Template of a missing file, the bundled one or the defaults of the config class
      */
     public String template(ConfigDocument<?> document) throws IOException {
+        String bundled = localized(document.getPath());
+        if (bundled != null) {
+            return bundled;
+        }
         if (document.getTemplate() == null) {
             return render(document, ConfigKeys.newInstance(document.getType()));
         }
-        String bundled = resource(document.getTemplate());
-        if (bundled == null) {
-            throw new IOException("Missing bundled template " + document.getTemplate());
-        }
-        return bundled;
+        throw new IOException("Missing bundled template " + document.getTemplate());
     }
 
     public String render(ConfigDocument<?> document, Object value) {
@@ -683,18 +701,64 @@ public final class ConfigService {
     }
 
     /**
-     * File text of migrated content, the commented template when nothing differs from it
+     * File text of migrated content, the commented template with the changed values when only values differ from it
      */
     public String migrated(ConfigDocument<?> document, String upgraded) throws IOException {
+        Map<String, Object> bundled = bundled(document.getPath());
+        Object content = new Yaml().load(upgraded);
+        Map<String, Object> changes = new LinkedHashMap<>();
+        if (!bundled.isEmpty() && content instanceof Map && scalarChanges("", bundled, castMap(content), changes)) {
+            String patched = patch(template(document), document.getPath(), changes);
+            if (patched != null) {
+                return patched;
+            }
+        }
         if (document.getTemplate() == null) {
             YamlBinder binder = new YamlBinder(document.getPath(), false);
             return render(document, binder.bind(binder.parse(upgraded), document.getType()));
         }
-        if (new Yaml().load(upgraded).equals(bundled(document.getPath()))) {
-            return template(document);
-        }
         return "# yaml-language-server: $schema=" + schemaPath(document) + "\n"
                 + ConfigKeys.VERSION_KEY + ": " + document.getVersion() + "\n" + upgraded;
+    }
+
+    /**
+     * Keys missing from the content keep the bundled value
+     *
+     * @return false when the two differ in more than scalar values
+     */
+    private static boolean scalarChanges(String prefix, Map<String, Object> bundled, Map<String, Object> content, Map<String, Object> changes) {
+        if (!bundled.keySet().containsAll(content.keySet())) {
+            return false;
+        }
+        for (Map.Entry<String, Object> entry : content.entrySet()) {
+            Object original = bundled.get(entry.getKey());
+            Object value = entry.getValue();
+            String path = prefix + entry.getKey();
+            if (original instanceof Map && value instanceof Map) {
+                if (!scalarChanges(path + ".", castMap(original), castMap(value), changes)) {
+                    return false;
+                }
+            } else if (!Objects.equals(original, value)) {
+                if (value instanceof Map || value instanceof List || original instanceof Map || original instanceof List) {
+                    return false;
+                }
+                changes.put(path, value);
+            }
+        }
+        return true;
+    }
+
+    @Nullable
+    private static String patch(String text, String file, Map<String, Object> changes) {
+        for (Map.Entry<String, Object> change : changes.entrySet()) {
+            Node node = YamlBinder.find(new YamlBinder(file, true).parse(text), change.getKey());
+            if (!(node instanceof ScalarNode)) {
+                return null;
+            }
+            text = text.substring(0, offset(text, node.getStartMark())) + YamlWriter.scalar(change.getValue())
+                    + text.substring(offset(text, node.getEndMark()));
+        }
+        return text;
     }
 
     private static int version(@Nullable Node root, int fallback) {
@@ -714,7 +778,7 @@ public final class ConfigService {
         List<ConfigProblem> problems = new ArrayList<>();
         if (!folder.exists()) {
             for (String name : directory.bundled) {
-                String text = resource(TEMPLATE_ROOT + directory.path + "/" + name);
+                String text = localized(directory.path + "/" + name);
                 try {
                     if (text != null) {
                         writeAtomically(new File(folder, name), text);
@@ -770,12 +834,31 @@ public final class ConfigService {
     /**
      * Content of a bundled template without its version, for migrations that fill in a new layout
      */
-    public static Map<String, Object> bundled(String path) {
-        String text = resource(TEMPLATE_ROOT + path);
+    public Map<String, Object> bundled(String path) {
+        String text = localized(path);
         Object loaded = text == null ? null : new Yaml().load(text);
         Map<String, Object> content = loaded instanceof Map ? castMap(loaded) : new LinkedHashMap<String, Object>();
         content.remove(ConfigKeys.VERSION_KEY);
         return content;
+    }
+
+    /**
+     * Bundled template bound to its type with {@code &} codes kept, the class defaults when there is none
+     */
+    public <T> T bundled(String path, Class<T> type) {
+        String text = localized(path);
+        if (text == null) {
+            return type.cast(ConfigKeys.newInstance(type));
+        }
+        YamlBinder binder = new YamlBinder(path, false);
+        return binder.bind(binder.parse(text), type);
+    }
+
+    @Nullable
+    private String localized(String path) {
+        String language = this.language.get();
+        String text = language == null ? null : resource(TEMPLATE_ROOT + language + "/" + path);
+        return text != null ? text : resource(TEMPLATE_ROOT + path);
     }
 
     @Nullable

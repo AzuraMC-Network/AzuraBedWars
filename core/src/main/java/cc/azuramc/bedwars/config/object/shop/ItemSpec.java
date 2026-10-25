@@ -18,36 +18,36 @@ import java.util.List;
 @NoArgsConstructor
 public class ItemSpec {
 
-    @Comment("材质，使用 XSeries 新版名称")
+    @Comment("Material, a modern XSeries name")
     @Raw
     private String material = "STONE";
 
     @Range(min = 1, max = 64)
     private int amount = 1;
 
-    @Comment("显示名称，不写时商品用商品名")
+    @Comment("Display name, the shop item name when left out")
     @Nullable
     private String name;
 
     private List<String> lore = new ArrayList<>();
 
-    @Comment("附魔名称和等级")
+    @Comment("Enchantment names and levels")
     @Raw
     private LinkedHashMap<String, Integer> enchants = new LinkedHashMap<>();
 
-    @Comment("隐藏的提示，例如 HIDE_ATTRIBUTES, HIDE_ENCHANTS")
+    @Comment("Hidden tooltips, such as HIDE_ATTRIBUTES, HIDE_ENCHANTS")
     @Raw
     private List<String> flags = new ArrayList<>();
 
     private boolean unbreakable;
 
-    @Comment("羊毛、玻璃、陶瓦、皮革染成队伍颜色")
+    @Comment("Dye wool, glass, terracotta and leather in the team color")
     private boolean teamColor;
 
     @Nullable
     private Potion potion;
 
-    @Comment("刷怪蛋生成的生物")
+    @Comment("Mob of a spawn egg")
     @Nullable
     @Raw
     private String spawnEgg;
@@ -62,15 +62,15 @@ public class ItemSpec {
 
     @Data
     public static class Potion {
-        @Comment("药水效果名称")
+        @Comment("Potion effect name")
         @Raw
         private String effect = "SPEED";
 
-        @Comment("持续秒数")
+        @Comment("Seconds")
         @Range(min = 0)
         private double seconds = 30;
 
-        @Comment("效果等级，1 是 I 级")
+        @Comment("Effect level, 1 is I")
         @Range(min = 1, max = 256)
         private int level = 1;
     }

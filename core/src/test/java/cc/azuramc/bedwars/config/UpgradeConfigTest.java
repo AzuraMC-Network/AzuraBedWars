@@ -26,7 +26,7 @@ class UpgradeConfigTest {
         service = new ConfigService(dataFolder, () -> false);
         service.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
         service.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
-        service.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, ConfigService.bundled("upgrades.yml")));
+        service.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, service.bundled("upgrades.yml")));
         service.addValidator(new UpgradeValidator(ShopConfigTest.ANY_NAME));
     }
 
@@ -48,7 +48,7 @@ class UpgradeConfigTest {
         assertEquals("emerald", config.getUpgrades().get("R").getLevels().get(2).getEffects().get(2).getResource());
         assertEquals("reveal", config.getTraps().getTypes().get("L").getEffects().get(0).getType());
         assertEquals(2, config.getTraps().getTypes().get("L").getAlert().size());
-        assertEquals("§c§l陷阱触发！", config.getTraps().getAlert().get(0).getTitle());
+        assertEquals("§c§lTRAP TRIGGERED!", config.getTraps().getAlert().get(0).getTitle());
     }
 
     @Test

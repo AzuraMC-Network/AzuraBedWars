@@ -1,18 +1,18 @@
 # yaml-language-server: $schema=../../schema/shop-category.json
 config-version: 1
 
-name: "&a工具"
+name: "&aTools"
 icon: STONE_PICKAXE
 items:
-  # 升级链商品的图标和价格随玩家当前等级变化
+  # The icon and price of a tier item follow the tier of the player
   pickaxe:
-    name: "镐子"
+    name: "Pickaxe"
     tier: pickaxe
   axe:
-    name: "斧子"
+    name: "Axe"
     tier: axe
   shears:
-    name: "剪刀"
+    name: "Permanent Shears"
     item: { material: SHEARS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
     price: 30 iron
     xp: 30

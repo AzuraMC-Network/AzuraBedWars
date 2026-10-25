@@ -18,136 +18,136 @@ import java.util.Map;
  * @author an5w1r@163.com
  */
 @Data
-@Comment({"对局阶段配置", "阶段时间在开局时读取, 进行中的对局不受重载影响"})
+@Comment({"Game stages", "Stage times are read when a game starts, a running game keeps its own"})
 public class TimelineConfig {
 
-    @Comment("游戏开始配置")
+    @Comment("Game start")
     private GameStartEvent gameStartEvent = new GameStartEvent();
 
-    @Comment({"开始游戏之后的阶段，after 是距离上一个阶段的秒数", "计分板显示下一个阶段的 name"})
+    @Comment({"Stages after the start, after is the seconds since the previous stage", "The scoreboard shows the name of the next stage"})
     private List<Stage> stages = new ArrayList<>(Arrays.asList(
-            new Stage("钻石资源点升级到II级", 360, Action.generatorLevel("diamond", 2)),
-            new Stage("绿宝石升级到II级", 360, Action.generatorLevel("emerald", 2)),
-            new Stage("钻石资源点升级到III级", 360, Action.generatorLevel("diamond", 3)),
-            new Stage("绿宝石升级到III级", 360, Action.generatorLevel("emerald", 3)),
-            new Stage("床自毁", 360, new Action(Action.DESTROY_BEDS),
-                    Action.title("&c&l床自毁", "&e所有队伍床消失", 10, 20, 10), Action.sound("ENTITY_ENDER_DRAGON_GROWL")),
-            new Stage("游戏结束", 360, new Action(Action.END_GAME))));
+            new Stage("Diamond II", 360, Action.generatorLevel("diamond", 2)),
+            new Stage("Emerald II", 360, Action.generatorLevel("emerald", 2)),
+            new Stage("Diamond III", 360, Action.generatorLevel("diamond", 3)),
+            new Stage("Emerald III", 360, Action.generatorLevel("emerald", 3)),
+            new Stage("Bed gone", 360, new Action(Action.DESTROY_BEDS),
+                    Action.title("&c&lBED DESTRUCTION", "&eAll beds have been destroyed", 10, 20, 10), Action.sound("ENTITY_ENDER_DRAGON_GROWL")),
+            new Stage("Game over", 360, new Action(Action.END_GAME))));
 
-    @Comment("游戏结束事件配置")
+    @Comment("Game end")
     private GameOverEvent gameOverEvent = new GameOverEvent();
 
     @Data
     public static class GameStartEvent {
-        @Comment("开始倒计时时间(秒)")
+        @Comment("Start countdown in seconds")
         @Range(min = 0)
         private int countDown = 5;
 
-        @Comment("倒计时标题")
-        private String titleString = "&c&l游戏即将开始";
+        @Comment("Countdown title")
+        private String titleString = "&c&lGame starting";
 
-        @Comment("倒计时副标题")
+        @Comment("Countdown subtitle")
         private String subtitle = "&e&l";
 
-        @Comment("标题淡入时间(tick)")
+        @Comment("Title fade in in ticks")
         @Range(min = 0)
         private int fadeIn = 1;
 
-        @Comment("标题停留时间(tick)")
+        @Comment("Title stay time in ticks")
         @Range(min = 0)
         private int titleStay = 20;
 
-        @Comment("标题淡出时间(tick)")
+        @Comment("Title fade out in ticks")
         @Range(min = 0)
         private int fadeOut = 1;
 
-        @Comment({"倒计时数字标题", "变量: %d 为倒计时秒数"})
+        @Comment({"Countdown number title", "Placeholders: %d seconds left"})
         private String titleCountdown = "&c&l%d";
 
-        @Comment("倒计时副标题文本")
-        private String subtitleText = "&e&l准备战斗吧！";
+        @Comment("Countdown subtitle text")
+        private String subtitleText = "&e&lGet ready to fight!";
 
-        @Comment("默认等待倒计时(秒)")
+        @Comment("Waiting countdown in seconds")
         @Range(min = 1)
         private int defaultCountdown = 120;
 
-        @Comment("快速开始倒计时(秒)")
+        @Comment("Countdown when the game is full in seconds")
         @Range(min = 1)
         private int quickStartCountdown = 10;
 
-        @Comment("公告时间点(秒)")
+        @Comment("Seconds that are announced")
         private int[] announcementTimes = {60, 30, 5, 4, 3, 2, 1};
 
-        @Comment({"倒计时消息", "变量: %d 为剩余秒数"})
-        private String msgCountdown = "&e游戏将在&c%d&e秒后开始！";
+        @Comment({"Countdown message", "Placeholders: %d seconds left"})
+        private String msgCountdown = "&eThe game starts in &c%d &eseconds!";
 
-        @Comment("人数不足消息")
-        private String msgNotEnoughPlayers = "&c人数不足，取消倒计时！";
+        @Comment("Not enough players message")
+        private String msgNotEnoughPlayers = "&cNot enough players, countdown cancelled!";
 
-        @Comment("游戏人满消息")
-        private String msgGameFull = "&e游戏人数已满,10秒后开始游戏！";
+        @Comment("Game full message")
+        private String msgGameFull = "&eThe game is full, starting in 10 seconds!";
     }
 
     @Data
     public static class GameOverEvent {
-        @Comment("游戏结束倒计时时间(秒)")
+        @Comment("Game end countdown in seconds")
         @Range(min = 0)
         private int defaultCountdown = 15;
 
-        @Comment("标题淡入时间(tick)")
+        @Comment("Title fade in in ticks")
         @Range(min = 0)
         private int titleFadeIn = 0;
 
-        @Comment("标题停留时间(tick)")
+        @Comment("Title stay time in ticks")
         @Range(min = 0)
         private int titleStay = 40;
 
-        @Comment("标题淡出时间(tick)")
+        @Comment("Title fade out in ticks")
         @Range(min = 0)
         private int titleFadeOut = 0;
 
-        @Comment("服务器关闭延迟(tick)")
+        @Comment("Server shutdown delay in ticks")
         @Range(min = 0)
         private long shutdownDelay = 40L;
 
-        @Comment("烟花生成高度(方块)")
+        @Comment("Firework height in blocks")
         private double fireworkHeight = 2.0D;
 
-        @Comment("胜利标题")
-        private String victoryTitle = "&6&l获胜！";
+        @Comment("Victory title")
+        private String victoryTitle = "&6&lVICTORY!";
 
-        @Comment("胜利副标题")
-        private String victorySubtitle = "&7你获得了最终的胜利";
+        @Comment("Victory subtitle")
+        private String victorySubtitle = "&7You won the game";
 
-        @Comment("失败标题")
-        private String defeatTitle = "&c&l失败！";
+        @Comment("Defeat title")
+        private String defeatTitle = "&c&lGAME OVER!";
 
-        @Comment("失败副标题")
-        private String defeatSubtitle = "&7你输掉了这场游戏";
+        @Comment("Defeat subtitle")
+        private String defeatSubtitle = "&7You lost this game";
 
-        @Comment("平局标题")
-        private String tieTitle = "&e&lTies！";
+        @Comment("Draw title")
+        private String tieTitle = "&e&lDRAW!";
 
-        @Comment("平局副标题")
+        @Comment("Draw subtitle")
         private String tieSubtitle = "&7No team has won";
 
-        @Comment("无胜者消息")
+        @Comment("No winner message")
         private String noWinner = "&eTie! No team has won";
 
-        @Comment("平局时是否发射烟花")
+        @Comment("Launch fireworks on a draw")
         private boolean tieFireworkEnabled = true;
 
-        @Comment({"自定义排行榜消息", "可用变量: <winnerFormat>, <firstName>, <firstKills>, <secondName>, <secondKills>, <thirdName>, <thirdKills>"})
+        @Comment({"Leaderboard message", "Placeholders: <winnerFormat>, <firstName>, <firstKills>, <secondName>, <secondKills>, <thirdName>, <thirdKills>"})
         private List<String> customLeaderboardMessages = new ArrayList<>(Arrays.asList(
                 "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-                "&f                                   &l起床战争",
+                "&f                                   &lBed Wars",
                 "",
                 "&f          <winnerFormat>",
                 "",
                 "",
-                "&e                          &l击杀数第一名 &7- <firstName> - <firstKills>",
-                "&6                          &l击杀数第二名 &7- <secondName> - <secondKills>",
-                "&c                          &l击杀数第三名 &7- <thirdName> - <thirdKills>",
+                "&e                          &l1st Killer &7- <firstName> - <firstKills>",
+                "&6                          &l2nd Killer &7- <secondName> - <secondKills>",
+                "&c                          &l3rd Killer &7- <thirdName> - <thirdKills>",
                 "",
                 "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
         ));
@@ -158,7 +158,7 @@ public class TimelineConfig {
     public static class Stage {
         private String name = "";
 
-        @Comment("距离上一个阶段的秒数")
+        @Comment("Seconds since the previous stage")
         @Range(min = 0)
         private int after = 360;
 
@@ -191,12 +191,12 @@ public class TimelineConfig {
         @Raw
         private String type = END_GAME;
 
-        @Comment("generator-level 的资源 id")
+        @Comment("Resource id of generator-level")
         @Nullable
         @Raw
         private String resource;
 
-        @Comment("generator-level 的等级，1 是第一级")
+        @Comment("Level of generator-level, 1 is the first")
         @Nullable
         @Range(min = 1)
         private Integer level;
@@ -207,7 +207,7 @@ public class TimelineConfig {
         @Nullable
         private String subtitle;
 
-        @Comment("title 的淡入、停留、淡出(tick)，默认 10 40 10")
+        @Comment("Fade in, stay and fade out of title in ticks, 10 40 10 by default")
         @Nullable
         @Range(min = 0)
         private Integer fadeIn;
@@ -220,7 +220,7 @@ public class TimelineConfig {
         @Range(min = 0)
         private Integer fadeOut;
 
-        @Comment("sound 的声音，使用 XSeries 名称")
+        @Comment("Sound of sound, an XSeries name")
         @Nullable
         @Raw
         private String sound;
@@ -233,11 +233,11 @@ public class TimelineConfig {
         @Range(min = 0, max = 2)
         private Float pitch;
 
-        @Comment("message 发给所有玩家的文字")
+        @Comment("Text of message, sent to every player")
         @Nullable
         private List<String> message;
 
-        @Comment("以控制台执行的命令")
+        @Comment("Command run by the console")
         @Nullable
         @Raw
         private List<String> commands;
@@ -304,8 +304,8 @@ public class TimelineConfig {
 
         Map<String, Object> title = new LinkedHashMap<>();
         title.put("type", Action.TITLE);
-        title.put("title", bed.getOrDefault("title", "&c&l床自毁"));
-        title.put("subtitle", bed.getOrDefault("subtitle", "&e所有队伍床消失"));
+        title.put("title", bed.getOrDefault("title", "&c&lBED DESTRUCTION"));
+        title.put("subtitle", bed.getOrDefault("subtitle", "&eAll beds have been destroyed"));
         title.put("fade-in", bed.getOrDefault("fade-in", 10));
         title.put("stay", bed.getOrDefault("title-stay", 20));
         title.put("fade-out", bed.getOrDefault("fade-out", 10));
@@ -314,12 +314,12 @@ public class TimelineConfig {
         sound.put("sound", "ENTITY_ENDER_DRAGON_GROWL");
 
         List<Object> stages = new ArrayList<>();
-        stages.add(stage("钻石资源点升级到II级", 360, generatorLevel("diamond", 2)));
-        stages.add(stage("绿宝石升级到II级", 360, generatorLevel("emerald", 2)));
-        stages.add(stage("钻石资源点升级到III级", 360, generatorLevel("diamond", 3)));
-        stages.add(stage("绿宝石升级到III级", 360, generatorLevel("emerald", 3)));
-        stages.add(stage("床自毁", bed.getOrDefault("execute-seconds", 360), Action.DESTROY_BEDS, title, sound));
-        stages.add(stage("游戏结束", endSeconds != null ? endSeconds : 360, Action.END_GAME));
+        stages.add(stage("Diamond II", 360, generatorLevel("diamond", 2)));
+        stages.add(stage("Emerald II", 360, generatorLevel("emerald", 2)));
+        stages.add(stage("Diamond III", 360, generatorLevel("diamond", 3)));
+        stages.add(stage("Emerald III", 360, generatorLevel("emerald", 3)));
+        stages.add(stage("Bed gone", bed.getOrDefault("execute-seconds", 360), Action.DESTROY_BEDS, title, sound));
+        stages.add(stage("Game over", endSeconds != null ? endSeconds : 360, Action.END_GAME));
         upgraded.put("stages", stages);
         return upgraded;
     }

@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Moves the files of {@code plugins/AzuraBedWars/config/}, written by versions before the current layout,
@@ -28,6 +29,8 @@ import java.util.Map;
 public final class LegacyConfigMigrator {
 
     private static final String LEGACY_DIR = "config";
+    /** The old layout only shipped Chinese texts */
+    private static final String LEGACY_LANGUAGE = "zh_CN";
     /** File names used by the old layout */
     private static final List<String> LEGACY_IDS = Arrays.asList(
             "settings", "eventSettings", "tasks", "message", "items", "player", "teamUpgrade");
@@ -46,31 +49,37 @@ public final class LegacyConfigMigrator {
         }
 
         int migrated = 0;
-        for (Map.Entry<String, Map<String, Object>> entry : convert(legacy).entrySet()) {
-            ConfigDocument<?> document = service.document(entry.getKey());
-            if (entry.getKey().equals("messages") && !entry.getValue().isEmpty()) {
-                // picked up by MessagesMigrator once lang/ exists
-                writeMessages(dataFolder, entry.getValue());
-                continue;
-            }
-            if (document == null || entry.getValue().isEmpty() || service.file(document).exists()) {
-                continue;
-            }
-            String content = ConfigService.dump(service.upgrade(document.getKind(), entry.getValue(), 1, document.getVersion()));
-            YamlBinder binder = new YamlBinder(document.getPath(), false);
-            binder.bind(binder.parse(content), document.getType());
-            for (ConfigProblem problem : binder.getProblems()) {
-                if (problem.isError()) {
-                    LoggerUtil.warn("Old config value not migrated, the default is used: " + problem);
+        Supplier<String> language = service.getLanguage();
+        service.setLanguage(() -> LEGACY_LANGUAGE);
+        try {
+            for (Map.Entry<String, Map<String, Object>> entry : convert(legacy).entrySet()) {
+                ConfigDocument<?> document = service.document(entry.getKey());
+                if (entry.getKey().equals("messages") && !entry.getValue().isEmpty()) {
+                    // picked up by MessagesMigrator once lang/ exists
+                    writeMessages(dataFolder, entry.getValue());
+                    continue;
+                }
+                if (document == null || entry.getValue().isEmpty() || service.file(document).exists()) {
+                    continue;
+                }
+                String content = ConfigService.dump(service.upgrade(document.getKind(), entry.getValue(), 1, document.getVersion()));
+                YamlBinder binder = new YamlBinder(document.getPath(), false);
+                binder.bind(binder.parse(content), document.getType());
+                for (ConfigProblem problem : binder.getProblems()) {
+                    if (problem.isError()) {
+                        LoggerUtil.warn("Old config value not migrated, the default is used: " + problem);
+                    }
+                }
+                try {
+                    ConfigService.writeAtomically(service.file(document), service.migrated(document, content));
+                    migrated++;
+                } catch (IOException e) {
+                    LoggerUtil.error("Cannot write " + document.getPath() + " while migrating the old config", e);
+                    return;
                 }
             }
-            try {
-                ConfigService.writeAtomically(service.file(document), service.migrated(document, content));
-                migrated++;
-            } catch (IOException e) {
-                LoggerUtil.error("Cannot write " + document.getPath() + " while migrating the old config", e);
-                return;
-            }
+        } finally {
+            service.setLanguage(language);
         }
 
         File backup = new File(dataFolder, "config-backup-" + new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()));

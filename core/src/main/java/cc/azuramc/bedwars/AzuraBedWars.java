@@ -344,19 +344,24 @@ public final class AzuraBedWars implements PluginEntrypoint {
     private void initConfigSystem() {
         configService = new ConfigService(plugin.getDataFolder(),
                 () -> gameManager != null && gameManager.getGameState() != GameState.WAITING);
+        configService.setLanguage(() -> {
+            SettingsConfig settings = configService.all(SettingsConfig.class).get("settings");
+            return settings == null ? null : settings.getLanguage();
+        });
         configService.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 2);
         configService.addMigration("settings", 1, SettingsConfig::fromVersion1);
         configService.register("database", "database.yml", DatabaseConfig.class, ApplyMode.RESTART, 1);
         configService.register("gameplay", "gameplay.yml", GameplayConfig.class, ApplyMode.LIVE, 1);
         configService.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
         configService.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
-        configService.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, configService.content("timeline.yml")));
+        configService.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, configService.content("timeline.yml"),
+                configService.bundled("generators.yml", GeneratorConfig.class)));
         configService.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 3);
         configService.addMigration("timeline", 1, TimelineConfig::fromVersion1);
         configService.addMigration("timeline", 2, TimelineConfig::fromVersion2);
         configService.register("items", "items.yml", ItemConfig.class, ApplyMode.LIVE, 1);
         configService.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
-        configService.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, ConfigService.bundled("upgrades.yml")));
+        configService.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, configService.bundled("upgrades.yml")));
         configService.registerDirectory("lang", LangConfig.class, ApplyMode.LIVE, 1, "lang", "en_US.yml", "zh_CN.yml");
         configService.registerTemplate("shop/menu", "shop/menu.yml", ShopMenuConfig.class, ApplyMode.LIVE, 1, "shop/menu");
         configService.registerTemplate("shop/tiers", "shop/tiers.yml", TierChains.class, ApplyMode.NEXT_GAME, 1, "shop/tiers");

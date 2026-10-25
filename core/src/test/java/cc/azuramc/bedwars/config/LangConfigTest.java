@@ -52,7 +52,7 @@ class LangConfigTest {
     void bothLanguagesLoadWithTheSameKeys() {
         List<ConfigProblem> problems = service.loadAll();
         assertTrue(problems.isEmpty(), problems::toString);
-        assertEquals(paths("", ConfigService.bundled("lang/en_US.yml")), paths("", ConfigService.bundled("lang/zh_CN.yml")));
+        assertEquals(paths("", service.bundled("lang/en_US.yml")), paths("", service.bundled("lang/zh_CN.yml")));
         LangConfig chinese = service.get("lang/zh_CN", LangConfig.class);
         assertEquals("§c红", chinese.getTeams().get("RED"));
         assertEquals(4, chinese.getDeath().getSelf().get("VOID").size());
@@ -88,7 +88,7 @@ class LangConfigTest {
         assertFalse(new File(dataFolder, MessagesMigrator.FILE).exists());
     }
 
-    private static Set<String> paths(String prefix, Map<String, Object> section) {
+    static Set<String> paths(String prefix, Map<String, Object> section) {
         Set<String> paths = new TreeSet<>();
         for (Map.Entry<String, Object> entry : section.entrySet()) {
             String path = prefix + entry.getKey();

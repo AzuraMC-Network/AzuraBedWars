@@ -1,22 +1,22 @@
 # yaml-language-server: $schema=../../schema/shop-category.json
 config-version: 1
 
-name: "&a盔甲"
+name: "&aArmor"
 icon: CHAINMAIL_BOOTS
-# tier 商品的价格来自 shop/tiers.yml，item 只是商店里的图标
+# Prices of tier items come from shop/tiers.yml, item is only the shop icon
 items:
   chainmail:
-    name: "锁链装备&7（死亡不掉落）"
+    name: "Permanent Chainmail Armor"
     item: { material: CHAINMAIL_BOOTS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
     tier: armor
     level: 2
   iron:
-    name: "铁装备&7（死亡不掉落）"
+    name: "Permanent Iron Armor"
     item: { material: IRON_BOOTS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
     tier: armor
     level: 3
   diamond:
-    name: "钻石装备&7（死亡不掉落）"
+    name: "Permanent Diamond Armor"
     item: { material: DIAMOND_BOOTS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
     tier: armor
     level: 4

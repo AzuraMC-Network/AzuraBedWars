@@ -1,14 +1,14 @@
 # yaml-language-server: $schema=schema/upgrades.json
 config-version: 2
-# 团队升级与陷阱，开局时读取，进行中的对局不受重载影响
+# Team upgrades and traps, read when a game starts, a running game keeps its own
 
-title: "&8团队升级"
-# base 目标的范围(方块)，从队伍出生点算起
+title: "&8Upgrades & Traps"
+# Range of the base target in blocks, from the team spawn
 base-range: 18
-# 敌人离出生点多近时触发陷阱(方块)
+# How close to the spawn an enemy triggers a trap in blocks
 trap-trigger-range: 20
 
-# 字符对应 upgrades、traps.types、decor 的键，Q 是陷阱队列
+# Each character is a key of upgrades, traps.types or decor, Q is the trap queue
 layout:
   - "         "
   - " SAM BFL "
@@ -19,64 +19,64 @@ layout:
 decor:
   "-": { material: GRAY_STAINED_GLASS_PANE, name: " " }
 
-# 效果类型
-#   enchant  target: sword armor boots，enchant，level
-#   potion   target: team base intruder，effect，level，seconds；团队升级的药水每秒重新给一次
-#   generator  resource，interval(秒)，max-stack；队伍没有这个资源点时新建一个
-#   reveal   让隐身的入侵者现形
+# Effect types
+#   enchant  target: sword armor boots, enchant, level
+#   potion   target: team base intruder, effect, level, seconds, potions of team upgrades are given again every second
+#   generator  resource, interval in seconds, max-stack, a team without this generator gets a new one
+#   reveal   shows invisible intruders
 #   title sound message command  target: team base intruder
 upgrades:
   S:
     id: sharpened_swords
-    name: "&a磨刀石"
+    name: "&aSharpened Swords"
     icon: IRON_SWORD
-    description: ["&7你方所有成员的剑将永久获得锋利I附魔！"]
+    description: ["&7Your team permanently gains", "&7Sharpness I on all swords!"]
     levels:
-      - { name: "锋利 I", price: 8 diamond, xp: 800, effects: [{ type: enchant, target: sword, enchant: SHARPNESS, level: 1 }] }
+      - { name: "Sharpness I", price: 8 diamond, xp: 800, effects: [{ type: enchant, target: sword, enchant: SHARPNESS, level: 1 }] }
   A:
     id: reinforced_armor
-    name: "&a精制护甲"
+    name: "&aReinforced Armor"
     icon: IRON_CHESTPLATE
-    description: ["&7己方所有成员的盔甲将获得永久保护附魔！"]
+    description: ["&7Your team permanently gains", "&7Protection on all armor pieces!"]
     levels:
-      - { name: "保护 I", price: 5 diamond, xp: 500, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 1 }] }
-      - { name: "保护 II", price: 10 diamond, xp: 1000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 2 }] }
-      - { name: "保护 III", price: 20 diamond, xp: 2000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 3 }] }
-      - { name: "保护 IV", price: 30 diamond, xp: 3000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 4 }] }
+      - { name: "Protection I", price: 5 diamond, xp: 500, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 1 }] }
+      - { name: "Protection II", price: 10 diamond, xp: 1000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 2 }] }
+      - { name: "Protection III", price: 20 diamond, xp: 2000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 3 }] }
+      - { name: "Protection IV", price: 30 diamond, xp: 3000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 4 }] }
   M:
     id: manic_miner
-    name: "&a疯狂矿工"
+    name: "&aManiac Miner"
     icon: GOLDEN_PICKAXE
-    description: ["&7己方所有成员获得急迫效果。"]
+    description: ["&7All players on your team", "&7permanently gain Haste."]
     levels:
-      - { name: "急迫 I", price: 4 diamond, xp: 400, effects: [{ type: potion, target: team, effect: HASTE, level: 1, seconds: 2 }] }
-      - { name: "急迫 II", price: 6 diamond, xp: 600, effects: [{ type: potion, target: team, effect: HASTE, level: 2, seconds: 2 }] }
+      - { name: "Haste I", price: 4 diamond, xp: 400, effects: [{ type: potion, target: team, effect: HASTE, level: 1, seconds: 2 }] }
+      - { name: "Haste II", price: 6 diamond, xp: 600, effects: [{ type: potion, target: team, effect: HASTE, level: 2, seconds: 2 }] }
   R:
     id: resource_furnace
-    name: "&a铁锻炉"
+    name: "&aIron Forge"
     icon: FURNACE
-    description: ["&7升级你岛屿资源池的生成速度和和最大容量."]
+    description: ["&7Upgrade resource spawning", "&7on your island."]
     levels:
-      - name: "+50%资源"
+      - name: "+50% Resources"
         price: 4 diamond
         xp: 400
         effects:
           - { type: generator, resource: iron, interval: 1, max-stack: 48 }
           - { type: generator, resource: gold, interval: 3, max-stack: 8 }
-      - name: "+100%资源"
+      - name: "+100% Resources"
         price: 8 diamond
         xp: 800
         effects:
           - { type: generator, resource: iron, interval: 0.8, max-stack: 72 }
           - { type: generator, resource: gold, interval: 2.4, max-stack: 12 }
-      - name: "生成绿宝石"
+      - name: "Spawn emeralds"
         price: 12 diamond
         xp: 1200
         effects:
           - { type: generator, resource: iron, interval: 0.6, max-stack: 96 }
           - { type: generator, resource: gold, interval: 2, max-stack: 16 }
           - { type: generator, resource: emerald, interval: 60, max-stack: 2 }
-      - name: "+200%资源"
+      - name: "+200% Resources"
         price: 16 diamond
         xp: 1600
         effects:
@@ -85,86 +85,86 @@ upgrades:
           - { type: generator, resource: emerald, interval: 30 }
   H:
     id: healing_pool
-    name: "&a治愈池"
+    name: "&aHeal Pool"
     icon: BEACON
-    description: ["&7基地附近的队伍成员将获得生命恢复效果！"]
+    description: ["&7Creates a Regeneration field", "&7around your base!"]
     levels:
-      - { name: "生命恢复", price: 3 diamond, xp: 300, effects: [{ type: potion, target: base, effect: REGENERATION, level: 1, seconds: 3 }] }
+      - { name: "Regeneration", price: 3 diamond, xp: 300, effects: [{ type: potion, target: base, effect: REGENERATION, level: 1, seconds: 3 }] }
   C:
     id: cushioned_boots
-    name: "&a缓冲靴子"
+    name: "&aCushioned Boots"
     icon: DIAMOND_BOOTS
-    description: ["&7你队伍的靴子获得了永久摔落保护！"]
+    description: ["&7Your team permanently gains", "&7Feather Falling on boots!"]
     levels:
-      - { name: "缓冲靴子 I", price: 2 diamond, xp: 200, effects: [{ type: enchant, target: boots, enchant: FEATHER_FALLING, level: 1 }] }
-      - { name: "缓冲靴子 II", price: 4 diamond, xp: 400, effects: [{ type: enchant, target: boots, enchant: FEATHER_FALLING, level: 2 }] }
+      - { name: "Feather Falling I", price: 2 diamond, xp: 200, effects: [{ type: enchant, target: boots, enchant: FEATHER_FALLING, level: 1 }] }
+      - { name: "Feather Falling II", price: 4 diamond, xp: 400, effects: [{ type: enchant, target: boots, enchant: FEATHER_FALLING, level: 2 }] }
 
 traps:
   queue-size: 3
-  # 队列里第 1、2、3 个陷阱的价格
+  # Price of the 1st, 2nd and 3rd trap in the queue
   prices: [1 diamond, 2 diamond, 3 diamond]
   xp: [100, 200, 300]
-  # 任意陷阱触发时对己方队伍生效，陷阱自己写了 alert 时用它的
+  # Effects on your own team when any trap triggers, a trap with its own alert uses that
   alert:
-    - { type: title, target: team, title: "&c&l陷阱触发！", fade-in: 0, stay: 40, fade-out: 0 }
+    - { type: title, target: team, title: "&c&lTRAP TRIGGERED!", fade-in: 0, stay: 40, fade-out: 0 }
     - { type: sound, target: team, sound: ENTITY_ENDERMAN_TELEPORT, volume: 30 }
   types:
     B:
       id: blindness
-      name: "&a致盲陷阱"
+      name: "&aIt's a trap!"
       icon: TRIPWIRE_HOOK
-      description: ["&7造成失明与缓慢效果，持续8秒。"]
+      description: ["&7Inflicts Blindness and Slowness", "&7for 8 seconds."]
       effects:
         - { type: potion, target: intruder, effect: BLINDNESS, seconds: 8 }
         - { type: potion, target: intruder, effect: SLOWNESS, seconds: 8 }
     F:
       id: fight_back
-      name: "&a反击陷阱"
+      name: "&aCounter-Offensive Trap"
       icon: FEATHER
-      description: ["&7赋予基地附近的队友速度 II 与跳跃提升 II", "&7效果，持续15秒。"]
+      description: ["&7Grants Speed II and Jump Boost II", "&7for 15 seconds to allied players", "&7near your base."]
       effects:
         - { type: potion, target: team, effect: SPEED, level: 2, seconds: 15 }
         - { type: potion, target: team, effect: JUMP_BOOST, level: 2, seconds: 15 }
     L:
       id: alarm
-      name: "&a警报陷阱"
+      name: "&aAlarm Trap"
       icon: REDSTONE_TORCH
-      description: ["&7显示隐身的玩家，", "&7及其名称与队伍名。"]
+      description: ["&7Reveals invisible players as", "&7well as their name and team."]
       effects:
         - reveal
       alert:
-        - { type: title, target: team, title: "&c&l陷阱触发！", subtitle: "&e触发者 {intruder-team} 队伍", fade-in: 0, stay: 40, fade-out: 0 }
+        - { type: title, target: team, title: "&c&lALARM!!!", subtitle: "&eAlarm set off by {intruder-team} &eteam", fade-in: 0, stay: 40, fade-out: 0 }
         - { type: sound, target: team, sound: ENTITY_ENDERMAN_TELEPORT, volume: 30 }
     N:
       id: miner
-      name: "&a挖掘疲劳陷阱"
+      name: "&aMiner Fatigue Trap"
       icon: IRON_PICKAXE
-      description: ["&7造成挖掘疲劳效果，持续8秒。"]
+      description: ["&7Inflicts Mining Fatigue", "&7for 8 seconds."]
       effects:
         - { type: potion, target: intruder, effect: MINING_FATIGUE, seconds: 8 }
 
 text:
-  tier-owned: "&a等级 {level}：{name}，&b{price}"
-  tier-next: "&e等级 {level}：{name}，&b{price}"
-  tier-locked: "&7等级 {level}：{name}，&b{price}"
-  # 只有一级的升级
-  buy: "&e点击购买"
-  bought: "&a已购买"
-  # {level} 是罗马数字
-  upgrade: "&e点击升级到等级 {level}"
-  maxed: "&a已达到最高等级"
-  trap-price: "&7价格: &b{price}"
-  trap-active: "&a已激活"
-  trap-full: "&c陷阱已满"
-  queue-name: "&a陷阱#{index}: {name}"
-  queue-empty-name: "&c陷阱#{index}: 没有陷阱！"
+  tier-owned: "&aTier {level}: {name}, &b{price}"
+  tier-next: "&eTier {level}: {name}, &b{price}"
+  tier-locked: "&7Tier {level}: {name}, &b{price}"
+  # Upgrades with one level
+  buy: "&eClick to purchase!"
+  bought: "&aPurchased"
+  # {level} is a roman number
+  upgrade: "&eClick to upgrade to tier {level}"
+  maxed: "&aMaxed out"
+  trap-price: "&7Cost: &b{price}"
+  trap-active: "&aActive"
+  trap-full: "&cTrap queue full"
+  queue-name: "&aTrap #{index}: {name}"
+  queue-empty-name: "&cTrap #{index}: No Trap!"
   queue-empty: GRAY_STAINED_GLASS
   queue-lore:
-    - "&7第{ordinal}个敌人进入己方基地后"
-    - "&7会触发该陷阱！"
+    - "&7The {ordinal} enemy to walk into"
+    - "&7your base will trigger this trap!"
     - ""
-    - "&7购买的陷阱会再次排列，具体"
-    - "&7费用取决已排列的陷阱数量。"
+    - "&7Purchasing traps will queue them"
+    - "&7here, the cost scales with the queue."
     - ""
-    - "&7下一个陷阱: &b{price}"
-  ordinals: ["一", "二", "三"]
+    - "&7Next trap: &b{price}"
+  ordinals: ["first", "second", "third"]

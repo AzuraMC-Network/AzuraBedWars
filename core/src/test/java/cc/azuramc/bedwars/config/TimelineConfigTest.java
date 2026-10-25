@@ -45,7 +45,7 @@ class TimelineConfigTest {
         assertTrue(problems.isEmpty(), () -> messages(problems));
         List<TimelineConfig.Stage> stages = service.get(TimelineConfig.class).getStages();
         assertEquals(6, stages.size());
-        assertEquals("§c§l床自毁", stages.get(4).getActions().get(1).getTitle());
+        assertEquals("§c§lBED DESTRUCTION", stages.get(4).getActions().get(1).getTitle());
     }
 
     @Test

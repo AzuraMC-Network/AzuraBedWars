@@ -20,37 +20,37 @@ import java.util.Map;
  * @author an5w1r@163.com
  */
 @Data
-@Comment({"团队升级与陷阱", "开局时读取, 进行中的对局不受重载影响"})
+@Comment({"Team upgrades and traps", "Read when a game starts, a running game keeps its own"})
 public class UpgradeConfig {
 
-    @Comment("界面标题")
-    private String title = "&8团队升级";
+    @Comment("Menu title")
+    private String title = "&8Upgrades & Traps";
 
-    @Comment("base 目标的范围(方块)，从队伍出生点算起")
+    @Comment("Range of the base target in blocks, from the team spawn")
     @Range(min = 0)
     private double baseRange = 18.0;
 
-    @Comment("敌人离出生点多近时触发陷阱(方块)")
+    @Comment("How close to the spawn an enemy triggers a trap in blocks")
     @Range(min = 0)
     private double trapTriggerRange = 20.0;
 
-    @Comment({"6 行 9 列的字符画，字符对应 upgrades、traps.types、decor 的键", "Q 是陷阱队列"})
+    @Comment({"6 rows of 9 characters, each one a key of upgrades, traps.types or decor", "Q is the trap queue"})
     private List<String> layout = new ArrayList<>();
 
-    @Comment("装饰格子")
+    @Comment("Decoration slots")
     private LinkedHashMap<String, ItemSpec> decor = new LinkedHashMap<>();
 
-    @Comment("团队升级，键是 layout 里的字符")
+    @Comment("Team upgrades, keyed by their layout character")
     private LinkedHashMap<String, Upgrade> upgrades = new LinkedHashMap<>();
 
     private Traps traps = new Traps();
 
-    @Comment("界面文字")
+    @Comment("Menu text")
     private Text text = new Text();
 
     @Data
     public static class Upgrade {
-        @Comment("id，不写时用键")
+        @Comment("Id, the key when left out")
         @Nullable
         @Raw
         private String id;
@@ -61,7 +61,7 @@ public class UpgradeConfig {
 
         private List<String> description = new ArrayList<>();
 
-        @Comment("各级，第一项是 1 级")
+        @Comment("Levels, the first entry is level 1")
         private List<Level> levels = new ArrayList<>();
     }
 
@@ -71,38 +71,38 @@ public class UpgradeConfig {
 
         private Price price = new Price(1, "diamond");
 
-        @Comment("经验模式的价格(级)，不写时按资源的 xp-value 换算")
+        @Comment("Price in levels for experience mode, converted from the xp-value of the resource when left out")
         @Nullable
         @Range(min = 0)
         private Integer xp;
 
-        @Comment("买下这一级时生效的效果，同类效果高等级覆盖低等级")
+        @Comment("Effects of this level, a higher level of the same effect replaces a lower one")
         private List<Effect> effects = new ArrayList<>();
     }
 
     @Data
     public static class Traps {
-        @Comment("队列最多几个陷阱")
+        @Comment("Most traps in the queue")
         @Range(min = 1, max = 9)
         private int queueSize = 3;
 
-        @Comment("队列里第 1、2、3 个陷阱的价格")
+        @Comment("Price of the 1st, 2nd and 3rd trap in the queue")
         private List<Price> prices = new ArrayList<>(Arrays.asList(
                 new Price(1, "diamond"), new Price(2, "diamond"), new Price(3, "diamond")));
 
-        @Comment("经验模式的价格(级)，按队列位置")
+        @Comment("Price in levels for experience mode, by queue position")
         private List<Integer> xp = new ArrayList<>(Arrays.asList(100, 200, 300));
 
-        @Comment("任意陷阱触发时对己方队伍生效")
+        @Comment("Effects on your own team when any trap triggers")
         private List<Effect> alert = new ArrayList<>();
 
-        @Comment("陷阱种类，键是 layout 里的字符")
+        @Comment("Trap types, keyed by their layout character")
         private LinkedHashMap<String, Trap> types = new LinkedHashMap<>();
     }
 
     @Data
     public static class Trap {
-        @Comment("id，不写时用键")
+        @Comment("Id, the key when left out")
         @Nullable
         @Raw
         private String id;
@@ -113,10 +113,10 @@ public class UpgradeConfig {
 
         private List<String> description = new ArrayList<>();
 
-        @Comment("入侵者有陷阱保护时不生效")
+        @Comment("Skipped when the intruder is protected from traps")
         private List<Effect> effects = new ArrayList<>();
 
-        @Comment("触发时对己方队伍生效，不写时用 traps.alert")
+        @Comment("Effects on your own team when triggered, traps.alert when left out")
         @Nullable
         private List<Effect> alert;
     }
@@ -157,35 +157,35 @@ public class UpgradeConfig {
         @Raw
         private String target;
 
-        @Comment("enchant 的附魔")
+        @Comment("Enchantment of enchant")
         @Nullable
         @Raw
         private String enchant;
 
-        @Comment("potion 的药水效果")
+        @Comment("Effect of potion")
         @Nullable
         @Raw
         private String effect;
 
-        @Comment("附魔或药水等级，1 是 I 级")
+        @Comment("Enchantment or potion level, 1 is I")
         @Range(min = 1, max = 256)
         private int level = 1;
 
-        @Comment({"potion 的持续秒数", "团队升级的药水每秒重新给一次"})
+        @Comment({"Seconds of potion", "Potions of team upgrades are given again every second"})
         @Range(min = 0)
         private double seconds = 3;
 
-        @Comment("generator 的资源 id，队伍没有这个资源点时新建一个")
+        @Comment("Resource id of generator, a team without this generator gets a new one")
         @Nullable
         @Raw
         private String resource;
 
-        @Comment("generator 的刷新间隔(秒)，不写时不变")
+        @Comment("Spawn interval of generator in seconds, unchanged when left out")
         @Nullable
         @Range(min = 0.05)
         private Double interval;
 
-        @Comment("generator 的最大堆叠，不写时不变")
+        @Comment("Max stack of generator, unchanged when left out")
         @Nullable
         @Range(min = 1)
         private Integer maxStack;
@@ -196,7 +196,7 @@ public class UpgradeConfig {
         @Nullable
         private String subtitle;
 
-        @Comment("title 的淡入、停留、淡出(tick)")
+        @Comment("Fade in, stay and fade out of title in ticks")
         @Range(min = 0)
         private int fadeIn = 10;
 
@@ -206,7 +206,7 @@ public class UpgradeConfig {
         @Range(min = 0)
         private int fadeOut = 10;
 
-        @Comment("sound 的声音，使用 XSeries 名称")
+        @Comment("Sound of sound, an XSeries name")
         @Nullable
         @Raw
         private String sound;
@@ -217,10 +217,10 @@ public class UpgradeConfig {
         @Range(min = 0, max = 2)
         private float pitch = 1;
 
-        @Comment("message 的文字")
+        @Comment("Text of message")
         private List<String> message = new ArrayList<>();
 
-        @Comment({"以控制台执行的命令", "变量: {team} {intruder} {intruder-team}"})
+        @Comment({"Command run by the console", "Placeholders: {team} {intruder} {intruder-team}"})
         @Raw
         private List<String> commands = new ArrayList<>();
 
@@ -235,39 +235,39 @@ public class UpgradeConfig {
 
     @Data
     public static class Text {
-        private String tierOwned = "&a等级 {level}：{name}，&b{price}";
-        private String tierNext = "&e等级 {level}：{name}，&b{price}";
-        private String tierLocked = "&7等级 {level}：{name}，&b{price}";
+        private String tierOwned = "&aTier {level}: {name}, &b{price}";
+        private String tierNext = "&eTier {level}: {name}, &b{price}";
+        private String tierLocked = "&7Tier {level}: {name}, &b{price}";
 
-        @Comment("只有一级的升级")
-        private String buy = "&e点击购买";
-        private String bought = "&a已购买";
+        @Comment("Upgrades with one level")
+        private String buy = "&eClick to purchase!";
+        private String bought = "&aPurchased";
 
-        @Comment("变量: {level} 罗马数字")
-        private String upgrade = "&e点击升级到等级 {level}";
-        private String maxed = "&a已达到最高等级";
+        @Comment("Placeholders: {level} roman level")
+        private String upgrade = "&eClick to upgrade to tier {level}";
+        private String maxed = "&aMaxed out";
 
-        private String trapPrice = "&7价格: &b{price}";
-        private String trapActive = "&a已激活";
-        private String trapFull = "&c陷阱已满";
+        private String trapPrice = "&7Cost: &b{price}";
+        private String trapActive = "&aActive";
+        private String trapFull = "&cTrap queue full";
 
-        @Comment("变量: {index} {name}")
-        private String queueName = "&a陷阱#{index}: {name}";
-        private String queueEmptyName = "&c陷阱#{index}: 没有陷阱！";
+        @Comment("Placeholders: {index} {name}")
+        private String queueName = "&aTrap #{index}: {name}";
+        private String queueEmptyName = "&cTrap #{index}: No Trap!";
         private ItemSpec queueEmpty = new ItemSpec("GRAY_STAINED_GLASS");
 
-        @Comment("变量: {ordinal} {price}")
+        @Comment("Placeholders: {ordinal} {price}")
         private List<String> queueLore = new ArrayList<>(Arrays.asList(
-                "&7第{ordinal}个敌人进入己方基地后",
-                "&7会触发该陷阱！",
+                "&7The {ordinal} enemy to walk into",
+                "&7your base will trigger this trap!",
                 "",
-                "&7购买的陷阱会再次排列，具体",
-                "&7费用取决已排列的陷阱数量。",
+                "&7Purchasing traps will queue them",
+                "&7here, the cost scales with the queue.",
                 "",
-                "&7下一个陷阱: &b{price}"));
+                "&7Next trap: &b{price}"));
 
-        @Comment("队列位置的序数词")
-        private List<String> ordinals = new ArrayList<>(Arrays.asList("一", "二", "三"));
+        @Comment("Ordinals of the queue positions")
+        private List<String> ordinals = new ArrayList<>(Arrays.asList("first", "second", "third"));
     }
 
     /**

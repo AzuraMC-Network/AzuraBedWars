@@ -1,38 +1,38 @@
 # yaml-language-server: $schema=../schema/shop-menu.json
 config-version: 1
-# 商店外框：分类顺序、说明文字、快速购买
+# Shop frame: category order, lore and quick buy
 
-title: "&8道具商店 - {category}"
-# 分类顺序，最多 8 个，写 shop/categories 里的文件名，删掉一个就是隐藏这个分类
+title: "&8Item Shop - {category}"
+# Category order, up to 8 file names from shop/categories, remove one to hide that category
 categories: [blocks, melee, armor, tools, ranged, potions, utility, convert]
 
 navigation:
   selected: LIME_STAINED_GLASS_PANE
   unselected: GRAY_STAINED_GLASS_PANE
-  category-lore: ["&e点击查看！"]
+  category-lore: ["&eClick to view!"]
 
 item-name: "&c{name}"
-# 单独一行的 {tiers} {hint} {status} 没有内容时这一行去掉
+# A line holding only {tiers} {hint} or {status} is dropped when empty
 lore:
-  - "&7物品:"
+  - "&7Item:"
   - "&8•{name}"
   - "{tiers}"
   - " "
   - "{hint}"
-  - "&7花费: &3&l{price}"
+  - "&7Cost: &3&l{price}"
   - "{status}"
 
 status:
-  can-buy: "&e点击购买"
-  too-poor: "&c资源不足"
-  owned: "&a已拥有"
-  maxed: "&a已满级"
-  locked: "&c需要先购买上一级"
+  can-buy: "&eClick to purchase!"
+  too-poor: "&cYou don't have enough resources!"
+  owned: "&aUNLOCKED"
+  maxed: "&aMAXED"
+  locked: "&cBuy the previous tier first"
 
 quick-buy:
   icon: NETHER_STAR
-  name: "&b快速购买"
-  # Q 是玩家可以自定义的格子
+  name: "&bQuick Buy"
+  # Q marks the slots players can customize
   layout:
     - "         "
     - "         "
@@ -43,14 +43,14 @@ quick-buy:
   defaults: [blocks.wool, melee.stone_sword, armor.chainmail, utility.golden_apple,
              ranged.bow, potions.speed, utility.tnt, blocks.planks, melee.iron_sword,
              armor.iron, utility.fireball, ranged.arrows, potions.jump, utility.water]
-  add-hint: "&7Shift+左键添加到快捷购买"
-  remove-hint: "&7Shift+左键从快捷购买中移除"
+  add-hint: "&7Shift Click to add to Quick Buy"
+  remove-hint: "&7Shift Click to remove from Quick Buy"
 
 tier-lore:
-  header: "&7等级 {current}/{max}"
+  header: "&7Tier {current}/{max}"
   owned: "&a✔ {name}"
   next: "&e➜ {name} &7- {price}"
   locked: "&8✖ {name} - {price}"
   keep: ""
-  downgrade: "&7死亡后降一级"
-  reset: "&7死亡后回到初始"
+  downgrade: "&7Goes down a tier on death"
+  reset: "&7Resets on death"

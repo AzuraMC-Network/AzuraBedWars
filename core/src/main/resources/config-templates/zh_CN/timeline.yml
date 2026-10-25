@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=schema/timeline.json
+# 对局阶段配置
+# 阶段时间在开局时读取, 进行中的对局不受重载影响
+config-version: 3
+
+# 游戏开始配置
+game-start-event:
+  # 开始倒计时时间(秒)
+  count-down: 5
+
+  # 倒计时标题
+  title-string: "&c&l游戏即将开始"
+
+  # 倒计时副标题
+  subtitle: "&e&l"
+
+  # 标题淡入时间(tick)
+  fade-in: 1
+
+  # 标题停留时间(tick)
+  title-stay: 20
+
+  # 标题淡出时间(tick)
+  fade-out: 1
+
+  # 倒计时数字标题
+  # 变量: %d 为倒计时秒数
+  title-countdown: "&c&l%d"
+
+  # 倒计时副标题文本
+  subtitle-text: "&e&l准备战斗吧！"
+
+  # 默认等待倒计时(秒)
+  default-countdown: 120
+
+  # 快速开始倒计时(秒)
+  quick-start-countdown: 10
+
+  # 公告时间点(秒)
+  announcement-times:
+    - 60
+    - 30
+    - 5
+    - 4
+    - 3
+    - 2
+    - 1
+
+  # 倒计时消息
+  # 变量: %d 为剩余秒数
+  msg-countdown: "&e游戏将在&c%d&e秒后开始！"
+
+  # 人数不足消息
+  msg-not-enough-players: "&c人数不足，取消倒计时！"
+
+  # 游戏人满消息
+  msg-game-full: "&e游戏人数已满,10秒后开始游戏！"
+
+# 开始游戏之后的阶段，after 是距离上一个阶段的秒数
+# 计分板显示下一个阶段的 name
+stages:
+  - name: "钻石资源点升级到II级"
+    after: 360
+    actions:
+      - type: "generator-level"
+        resource: "diamond"
+        level: 2
+  - name: "绿宝石升级到II级"
+    after: 360
+    actions:
+      - type: "generator-level"
+        resource: "emerald"
+        level: 2
+  - name: "钻石资源点升级到III级"
+    after: 360
+    actions:
+      - type: "generator-level"
+        resource: "diamond"
+        level: 3
+  - name: "绿宝石升级到III级"
+    after: 360
+    actions:
+      - type: "generator-level"
+        resource: "emerald"
+        level: 3
+  - name: "床自毁"
+    after: 360
+    actions:
+      - type: "destroy-beds"
+      - type: "title"
+        title: "&c&l床自毁"
+        subtitle: "&e所有队伍床消失"
+        fade-in: 10
+        stay: 20
+        fade-out: 10
+      - type: "sound"
+        sound: "ENTITY_ENDER_DRAGON_GROWL"
+  - name: "游戏结束"
+    after: 360
+    actions:
+      - type: "end-game"
+
+# 游戏结束事件配置
+game-over-event:
+  # 游戏结束倒计时时间(秒)
+  default-countdown: 15
+
+  # 标题淡入时间(tick)
+  title-fade-in: 0
+
+  # 标题停留时间(tick)
+  title-stay: 40
+
+  # 标题淡出时间(tick)
+  title-fade-out: 0
+
+  # 服务器关闭延迟(tick)
+  shutdown-delay: 40
+
+  # 烟花生成高度(方块)
+  firework-height: 2.0
+
+  # 胜利标题
+  victory-title: "&6&l获胜！"
+
+  # 胜利副标题
+  victory-subtitle: "&7你获得了最终的胜利"
+
+  # 失败标题
+  defeat-title: "&c&l失败！"
+
+  # 失败副标题
+  defeat-subtitle: "&7你输掉了这场游戏"
+
+  # 平局标题
+  tie-title: "&e&lTies！"
+
+  # 平局副标题
+  tie-subtitle: "&7No team has won"
+
+  # 无胜者消息
+  no-winner: "&eTie! No team has won"
+
+  # 平局时是否发射烟花
+  tie-firework-enabled: true
+
+  # 自定义排行榜消息
+  # 可用变量: <winnerFormat>, <firstName>, <firstKills>, <secondName>, <secondKills>, <thirdName>, <thirdKills>
+  custom-leaderboard-messages:
+    - "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+    - "&f                                   &l起床战争"
+    - ""
+    - "&f          <winnerFormat>"
+    - ""
+    - ""
+    - "&e                          &l击杀数第一名 &7- <firstName> - <firstKills>"
+    - "&6                          &l击杀数第二名 &7- <secondName> - <secondKills>"
+    - "&c                          &l击杀数第三名 &7- <thirdName> - <thirdKills>"
+    - ""
+    - "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"

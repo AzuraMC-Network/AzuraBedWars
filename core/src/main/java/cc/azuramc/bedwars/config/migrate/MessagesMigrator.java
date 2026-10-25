@@ -79,7 +79,7 @@ public final class MessagesMigrator {
         }
         try {
             Map<String, Object> old = map(new Yaml().load(ConfigService.read(file)));
-            Map<String, Object> bundled = ConfigService.bundled(TARGET + ".yml");
+            Map<String, Object> bundled = service.bundled(TARGET + ".yml");
             Map<String, Object> changes = new LinkedHashMap<>();
             for (String[] key : KEYS) {
                 put(changes, bundled, key[1], convert(get(old, key[0]), key));

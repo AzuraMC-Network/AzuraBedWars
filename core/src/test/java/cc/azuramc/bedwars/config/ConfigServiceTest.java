@@ -52,7 +52,7 @@ class ConfigServiceTest {
         String settings = ConfigService.read(file("settings.yml"));
         assertTrue(settings.startsWith("# yaml-language-server: $schema=schema/settings.json\n"));
         assertTrue(settings.contains("config-version: 1\n"));
-        assertTrue(settings.contains("# 是否启用调试模式(输出详细日志)\ndebug-mode: false\n"));
+        assertTrue(settings.contains("# Debug logging\ndebug-mode: false\n"));
         assertTrue(ConfigService.read(file("nested/gameplay.yml")).startsWith("# yaml-language-server: $schema=../schema/gameplay.json"));
         assertTrue(file("schema/gameplay.json").isFile());
     }

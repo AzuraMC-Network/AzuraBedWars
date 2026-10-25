@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Price {
 
-    @Comment("数量")
+    @Comment("Amount")
     @Range(min = 0)
     private int amount;
 
-    @Comment("generators.yml 里的资源 id")
+    @Comment("Resource id from generators.yml")
     @Raw
     private String currency = "iron";
 

@@ -1,12 +1,12 @@
 # yaml-language-server: $schema=../../schema/shop-category.json
 config-version: 1
 
-name: "&a实用道具"
+name: "&aUtility"
 icon: TNT
-# special 道具的参数在 items.yml
+# Settings of special items are in items.yml
 items:
   fireball:
-    name: "火球"
+    name: "Fireball"
     item: FIRE_CHARGE
     special: fireball
     price: 50 iron
@@ -18,52 +18,52 @@ items:
     price: 4 gold
     xp: 40
   ender_pearl:
-    name: "末影珍珠"
+    name: "Ender Pearl"
     item: ENDER_PEARL
     price: 4 emerald
     xp: 400
   water:
-    name: "水桶"
+    name: "Water Bucket"
     item: WATER_BUCKET
     price: 1 emerald
     xp: 100
   rescue_platform:
-    name: "救援平台"
-    item: { material: BLAZE_ROD, lore: [" ", "&f在空中使用该平台", "&f将在脚下生成一块临时史莱姆方块平台救生!"] }
+    name: "Rescue Platform"
+    item: { material: BLAZE_ROD, lore: [" ", "&fUse it in the air to spawn", "&fa temporary slime platform below you!"] }
     special: rescue_platform
     price: 1 emerald
     xp: 80
   golden_apple:
-    name: "金苹果"
+    name: "Golden Apple"
     item: GOLDEN_APPLE
     price: 3 gold
     xp: 15
   bridge_egg:
-    name: "搭桥蛋"
+    name: "Bridge Egg"
     item: EGG
     special: bridge_egg
     price: 1 emerald
     xp: 100
   silverfish:
-    name: "蠹虫"
+    name: "Bedbug"
     item: SNOWBALL
     special: silverfish
     price: 40 iron
     xp: 40
   dream_defender:
-    name: "梦幻守护者"
+    name: "Dream Defender"
     item: { material: WOLF_SPAWN_EGG, spawn-egg: WOLF }
     special: dream_defender
     price: 128 iron
     xp: 128
   popup_tower:
-    name: "速建防御塔"
+    name: "Compact Pop-up Tower"
     item: CHEST
     special: popup_tower
     price: 64 iron
     xp: 64
   magic_milk:
-    name: "魔法牛奶"
+    name: "Magic Milk"
     item: MILK_BUCKET
     special: magic_milk
     price: 8 gold

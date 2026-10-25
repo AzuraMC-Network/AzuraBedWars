@@ -10,29 +10,29 @@ import lombok.Data;
  * @author an5w1r@163.com
  */
 @Data
-@Comment({"数据库配置", "用于存储玩家数据和统计信息, 修改后需要重启服务器"})
+@Comment({"Database", "Stores player data and statistics, changes apply after a restart"})
 public class DatabaseConfig {
 
-    @Comment({"数据库类型", "可选: MYSQL, MONGODB"})
+    @Comment({"Database type", "Options: MYSQL, MONGODB"})
     private DatabaseType databaseType = DatabaseType.MYSQL;
 
-    @Comment("数据库主机地址")
+    @Comment("Host")
     @Raw
     private String host = "localhost";
 
-    @Comment("数据库端口")
+    @Comment("Port")
     @Range(min = 1, max = 65535)
     private int port = 3306;
 
-    @Comment("数据库用户名")
+    @Comment("User name")
     @Raw
     private String username = "root";
 
-    @Comment("数据库密码")
+    @Comment("Password")
     @Raw
     private String password = "123456";
 
-    @Comment("数据库名称")
+    @Comment("Database name")
     @Raw
     private String database = "azurabw";
 }
