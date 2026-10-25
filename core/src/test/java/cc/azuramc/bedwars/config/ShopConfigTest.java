@@ -55,7 +55,7 @@ class ShopConfigTest {
     void setUp() {
         service = new ConfigService(dataFolder, () -> false);
         service.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
-        service.addMigration("generators", 1, GeneratorConfig::fromVersion1);
+        service.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, service.content("timeline.yml")));
         service.registerTemplate("shop/menu", "shop/menu.yml", ShopMenuConfig.class, ApplyMode.LIVE, 1, "shop/menu");
         service.registerTemplate("shop/tiers", "shop/tiers.yml", TierChains.class, ApplyMode.NEXT_GAME, 1, "shop/tiers");
         service.registerDirectory("shop/categories", ShopCategoryConfig.class, ApplyMode.LIVE, 1, "shop/category",
@@ -137,12 +137,15 @@ class ShopConfigTest {
         ConfigService.writeAtomically(new File(dataFolder, "generators.yml"), "config-version: 1\n"
                 + "iron-interval: 2\nmax-emerald-stack-level3: 9\ndiamond-name: \"&3Dia\"\nlevel-i: \"&eTier &cI\"\n"
                 + "time-remaining-format: \"&e%d s\"\n");
+        ConfigService.writeAtomically(new File(dataFolder, "timeline.yml"), "config-version: 1\n"
+                + "diamond-update-event:\n  level2-refresh-second: 20\n");
         List<ConfigProblem> problems = service.loadAll();
         assertTrue(problems.isEmpty(), () -> messages(problems));
 
         GeneratorConfig generators = service.get(GeneratorConfig.class);
         assertEquals(2, generators.resource("iron").level(1).getInterval());
         assertEquals(9, generators.resource("emerald").level(3).getMaxStack());
+        assertEquals(20, generators.resource("diamond").level(2).getInterval());
         assertEquals("§eTier §c{level}", generators.resource("diamond").getHologram().get(0));
         assertEquals("§3Dia", generators.resource("diamond").getHologram().get(1));
         assertEquals("§e{seconds} s", generators.resource("diamond").getHologram().get(2));

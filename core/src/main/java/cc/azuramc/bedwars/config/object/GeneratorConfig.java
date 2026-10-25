@@ -119,8 +119,20 @@ public class GeneratorConfig {
 
     /**
      * Version 1 kept every value in its own flat key and the level 2 and 3 intervals in timeline.yml
+     *
+     * @param timeline content of a version 1 timeline.yml
      */
-    public static Map<String, Object> fromVersion1(Map<String, Object> old) {
+    public static Map<String, Object> fromVersion1(Map<String, Object> generators, Map<String, Object> timeline) {
+        Map<String, Object> old = new LinkedHashMap<>(generators);
+        for (String id : Arrays.asList("diamond", "emerald")) {
+            Object event = timeline.get(id + "-update-event");
+            for (int level = 2; level <= 3 && event instanceof Map; level++) {
+                Object seconds = ((Map<?, ?>) event).get("level" + level + "-refresh-second");
+                if (seconds != null) {
+                    old.putIfAbsent(id + "-level" + level + "-interval", seconds);
+                }
+            }
+        }
         GeneratorConfig defaults = new GeneratorConfig();
         Map<String, Object> resources = new LinkedHashMap<>();
         for (Map.Entry<String, Resource> entry : defaults.getResources().entrySet()) {

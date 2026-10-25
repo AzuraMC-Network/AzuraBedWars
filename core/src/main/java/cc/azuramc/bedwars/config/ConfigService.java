@@ -618,6 +618,18 @@ public final class ConfigService {
         return upgraded;
     }
 
+    /**
+     * Content of a file in the data folder as written, empty when it is missing or unreadable
+     */
+    public Map<String, Object> content(String path) {
+        try {
+            Object loaded = new Yaml().load(read(new File(dataFolder, path)));
+            return loaded instanceof Map ? castMap(loaded) : new LinkedHashMap<String, Object>();
+        } catch (IOException | YAMLException e) {
+            return new LinkedHashMap<>();
+        }
+    }
+
     public static String dump(Map<String, Object> content) {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);

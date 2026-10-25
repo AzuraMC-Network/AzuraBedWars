@@ -322,7 +322,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         configService.register("gameplay", "gameplay.yml", GameplayConfig.class, ApplyMode.LIVE, 1);
         configService.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
         configService.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
-        configService.addMigration("generators", 1, GeneratorConfig::fromVersion1);
+        configService.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, configService.content("timeline.yml")));
         configService.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 2);
         configService.addMigration("timeline", 1, TimelineConfig::fromVersion1);
         configService.register("items", "items.yml", ItemConfig.class, ApplyMode.LIVE, 1);

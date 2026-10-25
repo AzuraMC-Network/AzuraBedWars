@@ -48,7 +48,7 @@ class LegacyConfigMigratorTest {
         service.register("gameplay", "gameplay.yml", GameplayConfig.class, ApplyMode.LIVE, 1);
         service.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
         service.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
-        service.addMigration("generators", 1, GeneratorConfig::fromVersion1);
+        service.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, service.content("timeline.yml")));
         service.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 2);
         service.addMigration("timeline", 1, TimelineConfig::fromVersion1);
         service.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
