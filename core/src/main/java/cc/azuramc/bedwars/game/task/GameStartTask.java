@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.EventSettingsConfig;
+import cc.azuramc.bedwars.config.object.TimelineConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -18,12 +18,10 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class GameStartTask extends BukkitRunnable {
 
-    private static final EventSettingsConfig.GameStartEvent gameStartConfig = AzuraBedWars.getInstance().getEventSettingsConfig().getGameStartEvent();
-
     private final GameManager gameManager;
 
     @Getter
-    private int countdown = gameStartConfig.getDefaultCountdown();
+    private int countdown = gameStart().getDefaultCountdown();
 
     /**
      * 是否处于快速开始状态
@@ -81,7 +79,7 @@ public class GameStartTask extends BukkitRunnable {
      * @return 是否需要公告
      */
     private boolean isAnnouncementTime(int time) {
-        for (int announcementTime : gameStartConfig.getAnnouncementTimes()) {
+        for (int announcementTime : gameStart().getAnnouncementTimes()) {
             if (time == announcementTime) {
                 return true;
             }
@@ -94,8 +92,8 @@ public class GameStartTask extends BukkitRunnable {
      */
     private void handleNotEnoughPlayers() {
         isQuickStartMode = false;
-        gameManager.broadcastMessage(gameStartConfig.getMsgNotEnoughPlayers());
-        countdown = gameStartConfig.getDefaultCountdown();
+        gameManager.broadcastMessage(gameStart().getMsgNotEnoughPlayers());
+        countdown = gameStart().getDefaultCountdown();
         gameManager.setGameState(GameState.WAITING);
         gameManager.setGameStartTask(null);
         AzuraBedWars.getInstance().getScoreboardManager().updateAllBoards();
@@ -107,9 +105,9 @@ public class GameStartTask extends BukkitRunnable {
      */
     private void sendCountdownAnnouncement() {
         for (GamePlayer player : GamePlayer.getOnlinePlayers()) {
-            player.sendMessage(String.format(gameStartConfig.getMsgCountdown(), countdown));
-            player.sendTitle(String.format(gameStartConfig.getTitleCountdown(), countdown), gameStartConfig.getSubtitleText(),
-                    gameStartConfig.getFadeIn(), gameStartConfig.getTitleStay(), gameStartConfig.getFadeOut());
+            player.sendMessage(String.format(gameStart().getMsgCountdown(), countdown));
+            player.sendTitle(String.format(gameStart().getTitleCountdown(), countdown), gameStart().getSubtitleText(),
+                    gameStart().getFadeIn(), gameStart().getTitleStay(), gameStart().getFadeOut());
             if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
                 player.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 1F, 10F);
             }
@@ -122,10 +120,10 @@ public class GameStartTask extends BukkitRunnable {
     private void checkForQuickStart() {
         boolean isFull = GamePlayer.getOnlinePlayers().size() >= gameManager.getMaxPlayers();
 
-        if (!isQuickStartMode && isFull && countdown > gameStartConfig.getDefaultCountdown()) {
+        if (!isQuickStartMode && isFull && countdown > gameStart().getDefaultCountdown()) {
             isQuickStartMode = true;
-            countdown = gameStartConfig.getQuickStartCountdown();
-            gameManager.broadcastMessage(gameStartConfig.getMsgGameFull());
+            countdown = gameStart().getQuickStartCountdown();
+            gameManager.broadcastMessage(gameStart().getMsgGameFull());
         }
     }
 
@@ -164,10 +162,14 @@ public class GameStartTask extends BukkitRunnable {
      * @return 进度百分比 (0.0-1.0)
      */
     private float calculateProgress() {
-        if (countdown >= gameStartConfig.getDefaultCountdown()) {
+        if (countdown >= gameStart().getDefaultCountdown()) {
             return 1.0F;
         } else {
-            return (float) countdown / gameStartConfig.getDefaultCountdown();
+            return (float) countdown / gameStart().getDefaultCountdown();
         }
+    }
+
+    private static TimelineConfig.GameStartEvent gameStart() {
+        return AzuraBedWars.getInstance().getTimelineConfig().getGameStartEvent();
     }
 }

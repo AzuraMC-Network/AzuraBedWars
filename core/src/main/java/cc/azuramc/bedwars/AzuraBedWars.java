@@ -5,13 +5,17 @@ import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.api.nms.NMSAccess;
 import cc.azuramc.bedwars.bootstrap.PluginEntrypoint;
 import cc.azuramc.bedwars.command.CommandRegistry;
-import cc.azuramc.bedwars.config.ConfigFactory;
-import cc.azuramc.bedwars.config.ConfigManager;
+import cc.azuramc.bedwars.config.ApplyMode;
+import cc.azuramc.bedwars.config.ConfigProblem;
+import cc.azuramc.bedwars.config.ConfigService;
+import cc.azuramc.bedwars.config.migrate.LegacyConfigMigrator;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
+import cc.azuramc.bedwars.database.storage.MapStorageType;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import cc.azuramc.bedwars.game.map.MapData;
@@ -42,6 +46,8 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
+
 /**
  * AzuraBedWars插件主类
  * 负责插件的初始化、配置加载、事件注册等核心功能
@@ -57,27 +63,19 @@ public final class AzuraBedWars implements PluginEntrypoint {
 
     private final JavaPlugin plugin;
     private Chat chat = null;
-    private ConfigManager configManager;
-    private String databaseName;
+    private ConfigService configService;
     private DatabaseProviderFactory databaseProviderFactory;
     private Economy econ = null;
-    private EventSettingsConfig eventSettingsConfig;
     private GameManager gameManager;
-    private ItemConfig itemConfig;
     private LuckPerms luckPermsApi;
     @Setter
     private MapData mapData;
     private MapLoader mapLoader;
     private MapManager mapManager;
-    private MessageConfig messageConfig;
     private NMSAccess nmsAccess;
     private NMSProvider nmsProvider;
-    private PlayerConfig playerConfig;
-    private ResourceSpawnConfig resourceSpawnConfig;
     private ScoreboardManager scoreboardManager;
-    private SettingsConfig settingsConfig;
     private SetupItemManager setupItemManager;
-    private TeamUpgradeConfig teamUpgradeConfig;
 
     public AzuraBedWars(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -108,7 +106,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         initMapSystem();
 
         // 根据配置决定加载游戏模式还是编辑模式
-        if (settingsConfig.isEditorMode() || mapManager.getLoadedMaps().isEmpty()) {
+        if (getSettingsConfig().isEditorMode() || mapManager.getLoadedMaps().isEmpty()) {
             plugin.getLogger().info("当前处于编辑模式(editorMode)或未发现可用地图 取消游戏相关特性加载");
             initEditorFeatures();
         } else {
@@ -129,11 +127,6 @@ public final class AzuraBedWars implements PluginEntrypoint {
             gameManager.getTimeline().stop();
         }
 
-        // 保存配置
-        if (configManager != null) {
-            configManager.saveAll();
-        }
-
         // 关闭数据库服务
         if (databaseProviderFactory != null) {
             databaseProviderFactory.getPlayerDataService().shutdown();
@@ -147,7 +140,6 @@ public final class AzuraBedWars implements PluginEntrypoint {
      * 初始化数据库连接
      */
     private void initDatabases() {
-        databaseName = settingsConfig.getDatabase().getDatabase();
         databaseProviderFactory = new DatabaseProviderFactory(this);
     }
 
@@ -350,46 +342,77 @@ public final class AzuraBedWars implements PluginEntrypoint {
         // 初始化默认存储
         MapStorageFactory.getDefaultStorage();
 
-        String storageType = settingsConfig.getMapStorage();
+        MapStorageType storageType = getSettingsConfig().getMapStorage();
         plugin.getLogger().info("地图存储系统已初始化，使用 " + storageType + " 作为默认存储方式");
     }
 
-    /**
-     * 初始化配置系统
-     */
     private void initConfigSystem() {
-        // 创建配置管理器
-        configManager = new ConfigManager(plugin);
+        configService = new ConfigService(plugin.getDataFolder(),
+                () -> gameManager != null && gameManager.getGameState() == GameState.RUNNING);
+        configService.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 1);
+        configService.register("database", "database.yml", DatabaseConfig.class, ApplyMode.RESTART, 1);
+        configService.register("gameplay", "gameplay.yml", GameplayConfig.class, ApplyMode.LIVE, 1);
+        configService.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
+        configService.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 1);
+        configService.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 1);
+        configService.register("items", "items.yml", ItemConfig.class, ApplyMode.LIVE, 1);
+        configService.register("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.LIVE, 1);
+        configService.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
 
-        // 创建配置工厂
-        ConfigFactory configFactory = new ConfigFactory();
+        LegacyConfigMigrator.migrateIfPresent(plugin.getDataFolder(), configService);
+        logProblems(configService.loadAll());
+    }
 
-        // 注册配置对象供应商
-        configFactory.registerSupplier("settings", SettingsConfig::new);
-        configFactory.registerSupplier("eventSettings", EventSettingsConfig::new);
-        configFactory.registerSupplier("tasks", ResourceSpawnConfig::new);
-        configFactory.registerSupplier("message", MessageConfig::new);
-        configFactory.registerSupplier("items", ItemConfig::new);
-        configFactory.registerSupplier("player", PlayerConfig::new);
-        configFactory.registerSupplier("teamUpgrade", TeamUpgradeConfig::new);
+    public static void logProblems(List<ConfigProblem> problems) {
+        int errors = 0;
+        for (ConfigProblem problem : problems) {
+            if (problem.isError()) {
+                errors++;
+                LoggerUtil.error("Config " + problem);
+            } else {
+                LoggerUtil.warn("Config " + problem);
+            }
+        }
+        if (!problems.isEmpty()) {
+            LoggerUtil.warn("Config check found " + errors + " errors and " + (problems.size() - errors)
+                    + " warnings, values with errors use their defaults. Run /bw config check after fixing them");
+        }
+    }
 
-        // 初始化默认配置
-        configFactory.initializeDefaults(configManager);
+    public SettingsConfig getSettingsConfig() {
+        return configService.get(SettingsConfig.class);
+    }
 
-        // 获取配置对象
-        settingsConfig = configManager.getConfig("settings", SettingsConfig.class);
-        eventSettingsConfig = configManager.getConfig("eventSettings", EventSettingsConfig.class);
-        resourceSpawnConfig = configManager.getConfig("tasks", ResourceSpawnConfig.class);
-        messageConfig = configManager.getConfig("message", MessageConfig.class);
-        itemConfig = configManager.getConfig("items", ItemConfig.class);
-        playerConfig = configManager.getConfig("player", PlayerConfig.class);
-        teamUpgradeConfig = configManager.getConfig("teamUpgrade", TeamUpgradeConfig.class);
+    public DatabaseConfig getDatabaseConfig() {
+        return configService.get(DatabaseConfig.class);
+    }
 
-        // lobby line written by versions with a per-player economy
-        settingsConfig.getLobbyScoreboard().getLines().replaceAll(line -> line.equals("&f你的模式: &a{mode}") ? "&f模式: &a{mode}" : line);
+    public GameplayConfig getGameplayConfig() {
+        return configService.get(GameplayConfig.class);
+    }
 
-        // 保存配置
-        configManager.saveAll();
+    public DisplayConfig getDisplayConfig() {
+        return configService.get(DisplayConfig.class);
+    }
+
+    public GeneratorConfig getGeneratorConfig() {
+        return configService.get(GeneratorConfig.class);
+    }
+
+    public TimelineConfig getTimelineConfig() {
+        return configService.get(TimelineConfig.class);
+    }
+
+    public ItemConfig getItemConfig() {
+        return configService.get(ItemConfig.class);
+    }
+
+    public UpgradeConfig getUpgradeConfig() {
+        return configService.get(UpgradeConfig.class);
+    }
+
+    public MessageConfig getMessageConfig() {
+        return configService.get(MessageConfig.class);
     }
 
     /**

@@ -31,10 +31,7 @@ import java.util.Objects;
  */
 public class WarpPowderListener implements Listener {
 
-    private static final ItemConfig.WarpPowder CONFIG = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
-
-    private static final String CANCEL_ITEM_NAME = CONFIG.getCancelItemName();
 
     /**
      * 获取玩家当前使用的传送粉末
@@ -102,7 +99,7 @@ public class WarpPowderListener implements Listener {
         ItemMeta meta = item.getItemMeta();
 
         // 检查是否为取消传送物品
-        if (meta != null && CANCEL_ITEM_NAME.equals(meta.getDisplayName())) {
+        if (meta != null && config().getCancelItemName().equals(meta.getDisplayName())) {
             event.setCancelled(true);
         }
     }
@@ -165,7 +162,7 @@ public class WarpPowderListener implements Listener {
      */
     private void handleCancelItem(PlayerInteractEvent event, ItemStack item, GamePlayer gamePlayer, WarpPowder activePowder) {
         ItemMeta meta = item.getItemMeta();
-        if (meta == null || !CANCEL_ITEM_NAME.equals(meta.getDisplayName())) {
+        if (meta == null || !config().getCancelItemName().equals(meta.getDisplayName())) {
             return;
         }
 
@@ -245,5 +242,9 @@ public class WarpPowderListener implements Listener {
      */
     private boolean isLeftClick(Action action) {
         return action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK;
+    }
+
+    private static ItemConfig.WarpPowder config() {
+        return AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
     }
 }

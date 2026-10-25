@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.listener.player;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -40,14 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class PlayerRespawnListener implements Listener {
 
-    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
-    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
-    private final static PlayerConfig.PlayerRespawn CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerRespawn();
-
-    private static final int RESPAWN_COUNTDOWN_SECONDS = CONFIG.getRespawnCountdownSeconds();
-    private static final int RESPAWN_PROTECTION_TICKS = CONFIG.getRespawnProtectionTicks();
     private static final int TITLE_FADE_IN = 1;
-    private static final int TITLE_STAY = CONFIG.getTitleStay();
     private static final int TITLE_FADE_OUT = 1;
     private static final long RESPAWN_DELAY_TICKS = 1L;
     private static final long RESPAWN_TIMER_PERIOD = 20L;
@@ -128,7 +121,7 @@ public class PlayerRespawnListener implements Listener {
                 teleportToRespawnLocation(event);
 
                 // 设置为观察者
-                SpectatorManager.toSpectator(gamePlayer, messageConfig.getDeathPermanentTitle(), messageConfig.getDeathPermanentSubTitle());
+                SpectatorManager.toSpectator(gamePlayer, messages().getDeathPermanentTitle(), messages().getDeathPermanentSubTitle());
             }
         }.runTaskLater(AzuraBedWars.getInstance().getPlugin(), RESPAWN_DELAY_TICKS);
 
@@ -146,9 +139,9 @@ public class PlayerRespawnListener implements Listener {
      * @param gamePlayer 游戏玩家
      */
     private void sendPlayAgainMessage(GamePlayer gamePlayer) {
-        TextComponent textComponent = new TextComponent(messageConfig.getPlayAgainMessage());
-        TextComponent button = new TextComponent(messageConfig.getPlayAgainButton());
-        button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, settingsConfig.getPlayAgainCommand()));
+        TextComponent textComponent = new TextComponent(messages().getPlayAgainMessage());
+        TextComponent button = new TextComponent(messages().getPlayAgainButton());
+        button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, settings().getPlayAgainCommand()));
         textComponent.addExtra(button);
         gamePlayer.getPlayer().spigot().sendMessage(textComponent);
     }
@@ -162,11 +155,11 @@ public class PlayerRespawnListener implements Listener {
         String destroyerName = gameTeam.getDestroyPlayer() != null ? gameTeam.getDestroyPlayer().getNickName() : "null";
 
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
-        gameManager.broadcastMessage(messageConfig.getTeamEliminatedFormat());
+        gameManager.broadcastMessage(messages().getTeamEliminatedFormat());
         gameManager.broadcastMessage(" ");
-        gameManager.broadcastMessage(String.format(messageConfig.getTeamEliminatedMessage(), gameTeam.getChatColor() + gameTeam.getName(), destroyerName));
+        gameManager.broadcastMessage(String.format(messages().getTeamEliminatedMessage(), gameTeam.getChatColor() + gameTeam.getName(), destroyerName));
         gameManager.broadcastMessage(" ");
-        gameManager.broadcastMessage(messageConfig.getTeamEliminatedFormat());
+        gameManager.broadcastMessage(messages().getTeamEliminatedFormat());
     }
 
     /**
@@ -187,7 +180,7 @@ public class PlayerRespawnListener implements Listener {
         gamePlayer.setRespawning(true);
 
         // 使用AtomicInteger以便可以重新赋值在Runnable里使用
-        AtomicInteger delay = new AtomicInteger(RESPAWN_COUNTDOWN_SECONDS);
+        AtomicInteger delay = new AtomicInteger(config().getRespawnCountdownSeconds());
 
         // 如果是重连的 复活时间为10s
         if (gamePlayer.isReconnect()) {
@@ -205,8 +198,8 @@ public class PlayerRespawnListener implements Listener {
                 }
                 if (delay.get() > 0) {
                     // 显示倒计时
-                    gamePlayer.sendTitle(String.format(messageConfig.getRespawnCountdownTitle(), delay.get()), messageConfig.getRespawnCountdownSubTitle(),
-                            TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
+                    gamePlayer.sendTitle(String.format(messages().getRespawnCountdownTitle(), delay.get()), messages().getRespawnCountdownSubTitle(),
+                            TITLE_FADE_IN, config().getTitleStay(), TITLE_FADE_OUT);
                     delay.decrementAndGet();
                     return;
                 }
@@ -250,7 +243,7 @@ public class PlayerRespawnListener implements Listener {
         applyDamageProtection(gamePlayer);
 
         // 显示重生成功标题
-        gamePlayer.sendTitle(messageConfig.getRespawnCompleteTitle(), messageConfig.getRespawnCompleteSubTitle(), TITLE_FADE_IN, TITLE_STAY, TITLE_FADE_OUT);
+        gamePlayer.sendTitle(messages().getRespawnCompleteTitle(), messages().getRespawnCompleteSubTitle(), TITLE_FADE_IN, config().getTitleStay(), TITLE_FADE_OUT);
     }
 
     /**
@@ -299,7 +292,7 @@ public class PlayerRespawnListener implements Listener {
         Bukkit.getScheduler().runTaskLater(
                 AzuraBedWars.getInstance().getPlugin(),
                 () -> RESPAWN_PROTECT.remove(gamePlayer),
-                RESPAWN_PROTECTION_TICKS
+                config().getRespawnProtectionTicks()
         );
     }
 
@@ -314,5 +307,17 @@ public class PlayerRespawnListener implements Listener {
         player.setVelocity(new Vector(0, 0, 0));
         player.setFallDistance(0.0F);
         player.teleport(gameManager.getRespawnLocation());
+    }
+
+    private static MessageConfig messages() {
+        return AzuraBedWars.getInstance().getMessageConfig();
+    }
+
+    private static SettingsConfig settings() {
+        return AzuraBedWars.getInstance().getSettingsConfig();
+    }
+
+    private static GameplayConfig.PlayerRespawn config() {
+        return AzuraBedWars.getInstance().getGameplayConfig().getPlayerRespawn();
     }
 }

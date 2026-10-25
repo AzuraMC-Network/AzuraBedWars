@@ -18,8 +18,6 @@ import org.bukkit.inventory.ItemStack;
  */
 public class SpectatorCompassGUI extends CustomGUI {
 
-    private static final MessageConfig.Spectator spectatorConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator();
-
     private static final int SMALL_INVENTORY_SIZE = 27;
     private static final int LARGE_INVENTORY_SIZE = 54;
 
@@ -29,7 +27,7 @@ public class SpectatorCompassGUI extends CustomGUI {
      * @param gamePlayer 打开GUI的玩家
      */
     public SpectatorCompassGUI(GamePlayer gamePlayer) {
-        super(gamePlayer, spectatorConfig.getSpectatorCompassGuiTitle(), calculateInventorySize());
+        super(gamePlayer, spectatorMessages().getSpectatorCompassGuiTitle(), calculateInventorySize());
         initializeItems();
     }
 
@@ -87,10 +85,10 @@ public class SpectatorCompassGUI extends CustomGUI {
                 .setDisplayName(gameTeam.getName() + " " + gamePlayer.getNickName())
                 .setLores(
                         " ",
-                        String.format(spectatorConfig.getHealthFormat(), (int) targetPlayer.getHealth()),
-                        String.format(spectatorConfig.getFoodFormat(), targetPlayer.getFoodLevel()),
-                        String.format(spectatorConfig.getLevelFormat(), targetPlayer.getLevel()),
-                        String.format(spectatorConfig.getDistanceFormat(), (int) targetPlayer.getLocation().distance(gamePlayer.getPlayer().getLocation()))
+                        String.format(spectatorMessages().getHealthFormat(), (int) targetPlayer.getHealth()),
+                        String.format(spectatorMessages().getFoodFormat(), targetPlayer.getFoodLevel()),
+                        String.format(spectatorMessages().getLevelFormat(), targetPlayer.getLevel()),
+                        String.format(spectatorMessages().getDistanceFormat(), (int) targetPlayer.getLocation().distance(gamePlayer.getPlayer().getLocation()))
                 )
                 .getItem();
     }
@@ -107,5 +105,9 @@ public class SpectatorCompassGUI extends CustomGUI {
                 gamePlayer.getPlayer().teleport(gamePlayer.getPlayer());
             }
         }, true);
+    }
+
+    private static MessageConfig.Spectator spectatorMessages() {
+        return AzuraBedWars.getInstance().getMessageConfig().getSpectator();
     }
 }

@@ -28,7 +28,7 @@ public class ItemEconomy implements EconomyMode {
 
     @Override
     public String getDisplayName() {
-        return AzuraBedWars.getInstance().getSettingsConfig().getLobbyScoreboard().getDefaultMode();
+        return AzuraBedWars.getInstance().getDisplayConfig().getLobbyScoreboard().getDefaultMode();
     }
 
     @Override

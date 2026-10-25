@@ -27,7 +27,7 @@ public class ExperienceEconomy implements EconomyMode {
 
     @Override
     public String getDisplayName() {
-        return AzuraBedWars.getInstance().getSettingsConfig().getLobbyScoreboard().getExpMode();
+        return AzuraBedWars.getInstance().getDisplayConfig().getLobbyScoreboard().getExpMode();
     }
 
     @Override

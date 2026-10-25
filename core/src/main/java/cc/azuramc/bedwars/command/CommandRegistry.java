@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.command.exception.CommandExceptionHandler;
 import cc.azuramc.bedwars.command.user.ShoutCommand;
 import cc.azuramc.bedwars.command.user.StartCommand;
 import cc.azuramc.bedwars.command.user.ToggleDamageDisplayCommand;
+import cc.azuramc.bedwars.config.ConfigDocument;
 import cc.azuramc.bedwars.database.storage.MapStorageType;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.map.MapData;
@@ -91,6 +92,9 @@ public class CommandRegistry {
 
         handler.getAutoCompleter().registerSuggestion("booleanValues", (args, sender, command) ->
                 Arrays.asList("true", "false"));
+
+        handler.getAutoCompleter().registerSuggestion("configDocuments", (args, sender, command) ->
+                plugin.getConfigService().documents().stream().map(ConfigDocument::getId).collect(Collectors.toList()));
     }
 
 }

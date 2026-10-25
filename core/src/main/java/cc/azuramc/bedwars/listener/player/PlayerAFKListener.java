@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,8 +18,6 @@ import java.util.UUID;
  * @author ant1aura@qq.com
  */
 public class PlayerAFKListener implements Listener {
-
-    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
 
     private static final Map<UUID, Long> AFK_LAST_MOVEMENT = new HashMap<>();
     private static int checkAFKTask;
@@ -52,7 +50,7 @@ public class PlayerAFKListener implements Listener {
 
                 // 大于时间未移动
                 if (gamePlayer != null) {
-                    gamePlayer.setAfk(currentTime - lastMove >= settingsConfig.getMaxNoMovementTime() * 1000L);
+                    gamePlayer.setAfk(currentTime - lastMove >= gameplay().getMaxNoMovementTime() * 1000L);
                 }
             }
         }, 0L, 20L);
@@ -70,5 +68,9 @@ public class PlayerAFKListener implements Listener {
         GamePlayer.getGamePlayers().forEach(a -> a.setAfk(false));
         AFK_LAST_MOVEMENT.clear();
         Bukkit.getScheduler().cancelTask(checkAFKTask);
+    }
+
+    private static GameplayConfig gameplay() {
+        return AzuraBedWars.getInstance().getGameplayConfig();
     }
 }

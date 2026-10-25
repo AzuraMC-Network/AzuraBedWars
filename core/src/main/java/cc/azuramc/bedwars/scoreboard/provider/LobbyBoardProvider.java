@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.scoreboard.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.DisplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -15,16 +15,13 @@ import java.util.List;
  */
 public class LobbyBoardProvider extends AbstractBoardProvider {
 
-    private final SettingsConfig.LobbyScoreboard config;
-
     public LobbyBoardProvider(GameManager gameManager) {
         super(gameManager);
-        this.config = AzuraBedWars.getInstance().getSettingsConfig().getLobbyScoreboard();
     }
 
     @Override
     protected String getTitle() {
-        return config.getTitle();
+        return config().getTitle();
     }
 
     @Override
@@ -43,16 +40,20 @@ public class LobbyBoardProvider extends AbstractBoardProvider {
                 .set("mode", gameManager.getEconomy().getDisplayName())
                 .set("version", plugin.getPlugin().getDescription().getVersion())
                 .set("server", "")
-                .formatLines(config.getLines());
+                .formatLines(config().getLines());
     }
 
     private String getCountdown() {
         GameStartTask gameStartTask = gameManager.getGameStartTask();
         if (gameStartTask != null) {
-            return config.getCountdownFormat().replace("{seconds}", String.valueOf(gameStartTask.getCountdown()));
+            return config().getCountdownFormat().replace("{seconds}", String.valueOf(gameStartTask.getCountdown()));
         } else if (gameManager.getGameState() == GameState.WAITING) {
-            return config.getWaitingMessage();
+            return config().getWaitingMessage();
         }
         return "";
+    }
+
+    private static DisplayConfig.LobbyScoreboard config() {
+        return AzuraBedWars.getInstance().getDisplayConfig().getLobbyScoreboard();
     }
 }

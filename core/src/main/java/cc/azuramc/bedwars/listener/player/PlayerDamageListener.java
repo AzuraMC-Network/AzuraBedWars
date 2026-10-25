@@ -4,7 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.player.BedwarsPlayerKillEvent;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -36,20 +36,9 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class PlayerDamageListener implements Listener {
 
-    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
-    private final static PlayerConfig.PlayerDeath CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getPlayerDeath();
-
-    private static final int COINS_ACTIONBAR_TIMES = CONFIG.getCoinsActionBarTimes();
-    private static final int ACTIONBAR_PERIOD = CONFIG.getActionBarPeriod();
     private static final int RESPAWN_DELAY = 10;
     private static final double VOID_DAMAGE = 100.0D;
-    private static final double COINS_REWARD = CONFIG.getCoinsReward();
     private static final int ATTACK_DISPLAY_TITLE_TICKS = 10;
-    private final boolean ARROW_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isArrowDisplayEnabled();
-    private final boolean ATTACK_DISPLAY_ENABLED = AzuraBedWars.getInstance().getGameManager().isAttackDisplayEnabled();
-    private final double FIREBALL_FALLEN_DAMAGE_RATE = CONFIG.getFireballFallenDamageRate();
-    private final double NORMAL_FALLEN_DAMAGE_RATE = CONFIG.getNormalFallenDamageRate();
-    private final double EXPLOSION_DAMAGE_RATE = CONFIG.getExplosionDamageRate();
 
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
@@ -185,7 +174,6 @@ public class PlayerDamageListener implements Listener {
         }
     }
 
-
     /**
      * 处理等待状态的伤害
      *
@@ -237,20 +225,20 @@ public class PlayerDamageListener implements Listener {
 
         // 处理火球落地伤害修改
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL && gamePlayer.getPlayer().hasMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA)) {
-            event.setDamage(event.getFinalDamage() * FIREBALL_FALLEN_DAMAGE_RATE);
+            event.setDamage(event.getFinalDamage() * config().getFireballFallenDamageRate());
             gamePlayer.getPlayer().removeMetadata(FireballHandler.NO_FALL_DAMAGE_METADATA, plugin.getPlugin());
             return;
         }
 
         // 处理普通摔落伤害修改
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-            event.setDamage(event.getFinalDamage() * NORMAL_FALLEN_DAMAGE_RATE);
+            event.setDamage(event.getFinalDamage() * config().getNormalFallenDamageRate());
             return;
         }
 
         // 处理爆炸伤害修改
         if ((event.getCause() == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
-            event.setDamage(event.getFinalDamage() * EXPLOSION_DAMAGE_RATE);
+            event.setDamage(event.getFinalDamage() * config().getExplosionDamageRate());
         }
 
         // 玩家攻击移除隐身
@@ -270,15 +258,15 @@ public class PlayerDamageListener implements Listener {
 
             @Override
             public void run() {
-                if (i == COINS_ACTIONBAR_TIMES) {
+                if (i == config().getCoinsActionBarTimes()) {
                     cancel();
                     return;
                 }
-                gamePlayer.sendActionBar(messageConfig.getNormalKillRewardsMessage());
+                gamePlayer.sendActionBar(messages().getNormalKillRewardsMessage());
                 i++;
             }
-        }.runTaskTimerAsynchronously(plugin.getPlugin(), 0, ACTIONBAR_PERIOD);
-        gamePlayer.sendMessage(messageConfig.getFinalKillRewardsMessage());
+        }.runTaskTimerAsynchronously(plugin.getPlugin(), 0, config().getActionBarPeriod());
+        gamePlayer.sendMessage(messages().getFinalKillRewardsMessage());
     }
 
     /**
@@ -318,7 +306,7 @@ public class PlayerDamageListener implements Listener {
             PlayerDeathReasonListener.setFinalKill(true);
             if (!VaultUtil.ecoIsNull) {
                 showCoinsReward(gameKiller);
-                VaultUtil.depositPlayer(gameKiller, COINS_REWARD);
+                VaultUtil.depositPlayer(gameKiller, config().getCoinsReward());
             }
             gameKiller.getPlayerData().addFinalKills();
             gamePlayer.getPlayerData().addFinalDeaths();
@@ -399,7 +387,7 @@ public class PlayerDamageListener implements Listener {
         gamePlayer.setLastDamage(attackPlayer);
 
         // 普通攻击伤害显示
-        if (ATTACK_DISPLAY_ENABLED && attackPlayer.isViewingArrowDamage()) {
+        if (gameManager.isAttackDisplayEnabled() && attackPlayer.isViewingArrowDamage()) {
             int finalDamage = Math.round((float) event.getFinalDamage());
             int currentHealth = Math.round((float) gamePlayer.getPlayer().getHealth());
             int remainingHealth = Math.max(currentHealth - finalDamage, 0);
@@ -454,7 +442,7 @@ public class PlayerDamageListener implements Listener {
 
             gamePlayer.setLastDamage(attackerPlayer);
 
-            if (!ARROW_DISPLAY_ENABLED) {
+            if (!gameManager.isArrowDisplayEnabled()) {
                 return;
             }
 
@@ -468,5 +456,11 @@ public class PlayerDamageListener implements Listener {
 
     }
 
+    private static MessageConfig messages() {
+        return AzuraBedWars.getInstance().getMessageConfig();
+    }
 
+    private static GameplayConfig.PlayerDeath config() {
+        return AzuraBedWars.getInstance().getGameplayConfig().getPlayerDeath();
+    }
 }

@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.database.provider.mysql;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.DatabaseConfig;
 import cc.azuramc.bedwars.database.provider.DatabaseType;
 import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
@@ -31,7 +31,7 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
     @Override
     public boolean initialize() {
         try {
-            SettingsConfig.DatabaseConfig database = plugin.getSettingsConfig().getDatabase();
+            DatabaseConfig database = plugin.getDatabaseConfig();
             String jdbcUrl = String.format(JDBC_URL_TEMPLATE,
                     database.getHost(),
                     database.getPort(),

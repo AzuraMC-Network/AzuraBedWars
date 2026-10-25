@@ -49,13 +49,7 @@ public class MapStorageFactory {
      * @return 默认存储实现
      */
     public static IMapStorage getDefaultStorage() {
-        try {
-            MapStorageType mapStorageType = MapStorageType.valueOf(AzuraBedWars.getInstance().getSettingsConfig().getMapStorage().toUpperCase());
-            return getStorage(mapStorageType);
-        } catch (IllegalArgumentException e) {
-            // 配置错误，默认使用JSON
-            return getJsonStorage();
-        }
+        return getStorage(AzuraBedWars.getInstance().getSettingsConfig().getMapStorage());
     }
 
     /**

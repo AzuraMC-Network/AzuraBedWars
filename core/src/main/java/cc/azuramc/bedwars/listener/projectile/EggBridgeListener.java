@@ -25,11 +25,6 @@ import java.util.Map;
  */
 public class EggBridgeListener implements Listener {
 
-    private static final ItemConfig.EggBridge CONFIG = AzuraBedWars.getInstance().getItemConfig().getEggBridge();
-
-    private static final int EGG_COOLDOWN_SECONDS = CONFIG.getEggCooldownSeconds();
-    private static final String EGG_COOLDOWN_MESSAGE = CONFIG.getEggCooldownMessage();
-
     private static final Map<Egg, EggBridgeHandler> BRIDGES = new HashMap<>();
 
     private static final GameManager GAME_MANAGER = AzuraBedWars.getInstance().getGameManager();
@@ -61,7 +56,7 @@ public class EggBridgeListener implements Listener {
 
         // 搭桥蛋冷却中
         if (gamePlayer.isEggBridgeCooldown()) {
-            shooter.sendMessage(MessageUtil.color(EGG_COOLDOWN_MESSAGE));
+            shooter.sendMessage(MessageUtil.color(config().getEggCooldownMessage()));
             event.setCancelled(true);
             if (VersionUtil.isLessThan1_13()) {
                 gamePlayer.getPlayer().getInventory().addItem(XMaterial.EGG.parseItem());
@@ -84,7 +79,7 @@ public class EggBridgeListener implements Listener {
         // 创建冷却
         if (!gamePlayer.isEggBridgeCooldown()) {
             gamePlayer.setEggBridgeCooldown(true);
-            Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), () -> gamePlayer.setEggBridgeCooldown(false), EGG_COOLDOWN_SECONDS * 20L);
+            Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), () -> gamePlayer.setEggBridgeCooldown(false), config().getEggCooldownSeconds() * 20L);
         }
     }
 
@@ -106,5 +101,9 @@ public class EggBridgeListener implements Listener {
             }
             BRIDGES.remove(egg);
         }
+    }
+
+    private static ItemConfig.EggBridge config() {
+        return AzuraBedWars.getInstance().getItemConfig().getEggBridge();
     }
 }

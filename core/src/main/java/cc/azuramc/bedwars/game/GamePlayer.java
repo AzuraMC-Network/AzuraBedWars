@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
@@ -51,10 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class GamePlayer implements IGamePlayer {
 
-    private static final SettingsConfig settingsConfig = AzuraBedWars.getInstance().getSettingsConfig();
-
     public static final ConcurrentHashMap<UUID, GamePlayer> GAME_PLAYERS = new ConcurrentHashMap<>();
-    private static final int MAX_HEALTH = settingsConfig.getMaxHealth();
     private static final float MAX_SATURATION = 5.0f;
     private static final int MAX_FOOD_LEVEL = 20;
 
@@ -578,7 +575,6 @@ public class GamePlayer implements IGamePlayer {
         assistsManager.setLastDamage(damager, System.currentTimeMillis());
     }
 
-
     /**
      * 设置最后伤害来源玩家
      *
@@ -770,7 +766,7 @@ public class GamePlayer implements IGamePlayer {
         player.setFoodLevel(MAX_FOOD_LEVEL);
         player.setSaturation(MAX_SATURATION);
         player.setExhaustion(0.0f);
-        player.setHealth(MAX_HEALTH);
+        player.setHealth(gameplay().getMaxHealth());
         player.setFireTicks(0);
         if (this.gameTeam != null) {
             this.endInvisibility();
@@ -929,5 +925,9 @@ public class GamePlayer implements IGamePlayer {
             return false;
         }
         return uuid.equals(((GamePlayer) obj).getUuid());
+    }
+
+    private static GameplayConfig gameplay() {
+        return AzuraBedWars.getInstance().getGameplayConfig();
     }
 }

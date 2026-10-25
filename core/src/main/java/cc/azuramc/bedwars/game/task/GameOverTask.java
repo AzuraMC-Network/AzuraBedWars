@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.EventSettingsConfig;
+import cc.azuramc.bedwars.config.object.TimelineConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -26,10 +26,8 @@ import java.util.Objects;
  */
 public class GameOverTask extends BukkitRunnable {
 
-    private static final EventSettingsConfig.GameOverEvent gameOverConfig = AzuraBedWars.getInstance().getEventSettingsConfig().getGameOverEvent();
-
     private final GameManager gameManager;
-    private int countdown = gameOverConfig.getDefaultCountdown();
+    private int countdown = gameOver().getDefaultCountdown();
     private boolean isFirstRun = true;
 
     /**
@@ -111,25 +109,25 @@ public class GameOverTask extends BukkitRunnable {
 
             if (isTie) {
                 if (!team.isDead()) {
-                    title = gameOverConfig.getTieTitle();
-                    subtitle = gameOverConfig.getTieSubtitle();
+                    title = gameOver().getTieTitle();
+                    subtitle = gameOver().getTieSubtitle();
                 } else {
-                    title = gameOverConfig.getDefeatTitle();
-                    subtitle = gameOverConfig.getDefeatSubtitle();
+                    title = gameOver().getDefeatTitle();
+                    subtitle = gameOver().getDefeatSubtitle();
                 }
             } else {
                 boolean isWinner = winner != null && winner.getName().equals(team.getName());
                 if (isWinner) {
-                    title = gameOverConfig.getVictoryTitle();
-                    subtitle = gameOverConfig.getVictorySubtitle();
+                    title = gameOver().getVictoryTitle();
+                    subtitle = gameOver().getVictorySubtitle();
                 } else {
-                    title = gameOverConfig.getDefeatTitle();
-                    subtitle = gameOverConfig.getDefeatSubtitle();
+                    title = gameOver().getDefeatTitle();
+                    subtitle = gameOver().getDefeatSubtitle();
                 }
             }
 
             gameManager.broadcastTeamTitle(team, title, subtitle,
-                    gameOverConfig.getTitleFadeIn(), gameOverConfig.getTitleStay(), gameOverConfig.getTitleFadeOut()
+                    gameOver().getTitleFadeIn(), gameOver().getTitleStay(), gameOver().getTitleFadeOut()
             );
         });
     }
@@ -154,7 +152,7 @@ public class GameOverTask extends BukkitRunnable {
                 isFirst = false;
             }
         } else {
-            winnerText.append(gameOverConfig.getNoWinner());
+            winnerText.append(gameOver().getNoWinner());
         }
 
         return winnerText.toString();
@@ -169,9 +167,8 @@ public class GameOverTask extends BukkitRunnable {
     private List<String> generateLeaderboard(String winnerText) {
         List<String> messages = new ArrayList<>();
 
-
         // 使用自定义排行榜配置
-        List<String> customMessages = gameOverConfig.getCustomLeaderboardMessages();
+        List<String> customMessages = gameOver().getCustomLeaderboardMessages();
         if (customMessages != null && !customMessages.isEmpty()) {
             for (String message : customMessages) {
                 String processedMessage = processLeaderboardPlaceholders(message, winnerText);
@@ -345,18 +342,18 @@ public class GameOverTask extends BukkitRunnable {
      */
     private void spawnVictoryFireworks(GameTeam winner) {
         if (isTie(winner)) {
-            if (gameOverConfig.isTieFireworkEnabled()) {
+            if (gameOver().isTieFireworkEnabled()) {
                 gameManager.getGameTeams().stream()
                         .filter(team -> !team.isDead())
                         .flatMap(team -> team.getAlivePlayers().stream())
                         .forEach(gamePlayer -> FireWorkUtil.spawnFireWork(
-                                gamePlayer.getPlayer().getLocation().add(0.0D, gameOverConfig.getFireworkHeight(), 0.0D),
+                                gamePlayer.getPlayer().getLocation().add(0.0D, gameOver().getFireworkHeight(), 0.0D),
                                 Objects.requireNonNull(gamePlayer.getPlayer().getLocation().getWorld())
                         ));
             }
         } else if (winner != null) {
             winner.getAlivePlayers().forEach(gamePlayer -> FireWorkUtil.spawnFireWork(
-                    gamePlayer.getPlayer().getLocation().add(0.0D, gameOverConfig.getFireworkHeight(), 0.0D),
+                    gamePlayer.getPlayer().getLocation().add(0.0D, gameOver().getFireworkHeight(), 0.0D),
                     Objects.requireNonNull(gamePlayer.getPlayer().getLocation().getWorld())
             ));
         }
@@ -374,6 +371,10 @@ public class GameOverTask extends BukkitRunnable {
             public void run() {
                 Bukkit.shutdown();
             }
-        }.runTaskLater(AzuraBedWars.getInstance().getPlugin(), gameOverConfig.getShutdownDelay());
+        }.runTaskLater(AzuraBedWars.getInstance().getPlugin(), gameOver().getShutdownDelay());
+    }
+
+    private static TimelineConfig.GameOverEvent gameOver() {
+        return AzuraBedWars.getInstance().getTimelineConfig().getGameOverEvent();
     }
 }

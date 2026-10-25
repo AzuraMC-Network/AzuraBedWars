@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.bed.BedwarsBedDestroyEvent;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -21,7 +21,6 @@ public class BedBreakHandler {
 
     private static final AzuraBedWars PLUGIN = AzuraBedWars.getInstance();
     private static final GameManager GAME_MANAGER = PLUGIN.getGameManager();
-    private static final SettingsConfig settingsConfig = PLUGIN.getSettingsConfig();
 
     /**
      * 处理床方块破坏
@@ -47,7 +46,7 @@ public class BedBreakHandler {
 
         // 查找床所属团队
         for (GameTeam targetTeam : GAME_MANAGER.getGameTeams()) {
-            if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= settingsConfig.getBedSearchRadius()) {
+            if (targetTeam.getSpawnLocation().distance(block.getLocation()) <= gameplay().getBedSearchRadius()) {
                 if (!targetTeam.isDead()) {
                     processBedDestruction(gamePlayer, gameTeam, targetTeam);
                     return;
@@ -111,14 +110,14 @@ public class BedBreakHandler {
                     cancel();
                     return;
                 }
-                gamePlayer.sendActionBar("§6+" + settingsConfig.getBedDestroyReward() + "个金币");
+                gamePlayer.sendActionBar("§6+" + gameplay().getBedDestroyReward() + "个金币");
                 i++;
             }
         }.runTaskTimerAsynchronously(PLUGIN.getPlugin(), 0, 10);
 
         if (!VaultUtil.ecoIsNull) {
-            gamePlayer.sendMessage("§6+" + settingsConfig.getBedDestroyReward() + "个金币 (破坏床)");
-            VaultUtil.depositPlayer(gamePlayer, settingsConfig.getBedDestroyReward());
+            gamePlayer.sendMessage("§6+" + gameplay().getBedDestroyReward() + "个金币 (破坏床)");
+            VaultUtil.depositPlayer(gamePlayer, gameplay().getBedDestroyReward());
         }
     }
 
@@ -139,5 +138,7 @@ public class BedBreakHandler {
         }
     }
 
-
+    private static GameplayConfig gameplay() {
+        return PLUGIN.getGameplayConfig();
+    }
 }

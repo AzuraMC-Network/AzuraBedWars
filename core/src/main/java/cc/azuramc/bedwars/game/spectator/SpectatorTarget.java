@@ -2,7 +2,7 @@ package cc.azuramc.bedwars.game.spectator;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.PlayerConfig;
+import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -17,12 +17,7 @@ import java.text.DecimalFormat;
  */
 public class SpectatorTarget {
 
-    private static final MessageConfig.Spectator spectatorConfig = AzuraBedWars.getInstance().getMessageConfig().getSpectator();
-    private static final PlayerConfig.Spectator.Target CONFIG = AzuraBedWars.getInstance().getPlayerConfig().getSpectator().getTarget();
-
-    private static final double AUTO_TP_DISTANCE = CONFIG.getAutoTPDistance();
     private static final int TITLE_FADE_IN = 0;
-    private static final int TITLE_DURATION = CONFIG.getTitleDuration();
     private static final int TITLE_FADE_OUT = 0;
 
     private final DecimalFormat df = new DecimalFormat("0.0");
@@ -82,20 +77,20 @@ public class SpectatorTarget {
 
         // 第一人称旁观模式
         if (isFirstPersonViewActive()) {
-            String actionBarText = String.format(spectatorConfig.getFirstPersonActionBar(),
-                    target.getName(), (int) target.getHealth()) + spectatorConfig.getMenuHint();
+            String actionBarText = String.format(spectatorMessages().getFirstPersonActionBar(),
+                    target.getName(), (int) target.getHealth()) + spectatorMessages().getMenuHint();
             gamePlayer.sendActionBar(actionBarText);
             return;
         }
 
         // 检查是否在同一世界
         if (!isSameWorld()) {
-            gamePlayer.sendActionBar(spectatorConfig.getTargetLostMessage());
+            gamePlayer.sendActionBar(spectatorMessages().getTargetLostMessage());
             return;
         }
 
         // 第三人称旁观模式
-        String actionBarText = String.format(spectatorConfig.getThirdPersonActionBar(),
+        String actionBarText = String.format(spectatorMessages().getThirdPersonActionBar(),
                 target.getName(), (int) target.getHealth(), df.format(getDistance()));
         gamePlayer.sendActionBar(actionBarText);
     }
@@ -110,7 +105,7 @@ public class SpectatorTarget {
 
         SpectatorSettings settings = SpectatorSettings.get(gamePlayer);
         if (settings.getOption(SpectatorSettings.Option.AUTO_TP)) {
-            if (!isSameWorld() || getDistance() >= AUTO_TP_DISTANCE) {
+            if (!isSameWorld() || getDistance() >= config().getAutoTpDistance()) {
                 teleportToTarget();
 
                 if (settings.getOption(SpectatorSettings.Option.FIRST_PERSON)) {
@@ -198,8 +193,8 @@ public class SpectatorTarget {
      */
     private void activateFirstPersonView() {
         gamePlayer.sendTitle(
-                String.format(spectatorConfig.getFirstPersonTitle(), target.getName()), spectatorConfig.getFirstPersonSubTitle(), TITLE_FADE_IN,
-                TITLE_DURATION,
+                String.format(spectatorMessages().getFirstPersonTitle(), target.getName()), spectatorMessages().getFirstPersonSubTitle(), TITLE_FADE_IN,
+                config().getTitleDuration(),
                 TITLE_FADE_OUT
         );
         player.setGameMode(GameMode.SPECTATOR);
@@ -213,5 +208,13 @@ public class SpectatorTarget {
      */
     private boolean isFirstPersonViewActive() {
         return player.getSpectatorTarget() != null && player.getSpectatorTarget().equals(target);
+    }
+
+    private static MessageConfig.Spectator spectatorMessages() {
+        return AzuraBedWars.getInstance().getMessageConfig().getSpectator();
+    }
+
+    private static GameplayConfig.Spectator.Target config() {
+        return AzuraBedWars.getInstance().getGameplayConfig().getSpectator().getTarget();
     }
 }

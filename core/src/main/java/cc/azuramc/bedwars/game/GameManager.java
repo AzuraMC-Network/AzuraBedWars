@@ -9,9 +9,6 @@ import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
-import cc.azuramc.bedwars.config.object.ItemConfig;
-import cc.azuramc.bedwars.config.object.MessageConfig;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
@@ -52,23 +49,11 @@ import java.util.stream.Collectors;
 @Data
 public class GameManager implements IGameManager {
 
-    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
-    private ItemConfig.GameManager itemConfig;
-    private SettingsConfig settingsConfig;
-
     private static final long COUNTDOWN_TICK_PERIOD = 20L;
     private static final int ASSIST_TIME_WINDOW_MS = 10000;
 
-    private String msgPlayerReconnect;
-    private String msgPlayerLeave;
-
     private Material teamSelectorMaterial;
-    private String teamSelectorName;
     private Material leaveGameMaterial;
-    private String leaveGameName;
-
-    private boolean arrowDisplayEnabled;
-    private boolean attackDisplayEnabled;
 
     private AzuraBedWars plugin;
     private EconomyType economyType;
@@ -94,8 +79,6 @@ public class GameManager implements IGameManager {
 
     private List<AbstractSpecialItem> abstractSpecialItems;
 
-    private int teamBlockSearchRadius;
-
     private TabListManager tabListManager;
 
     /**
@@ -116,11 +99,12 @@ public class GameManager implements IGameManager {
         this.armorSande = new HashSet<>();
         this.armorStand = new HashSet<>();
         this.abstractSpecialItems = new ArrayList<>();
-        this.economyType = EconomyType.fromConfig(plugin.getSettingsConfig().getEconomyMode());
+        this.economyType = plugin.getSettingsConfig().getEconomyMode();
         ShopCatalog.init(economyType);
         this.generatorManager = new GeneratorManager(this);
         this.timeline = new GameTimeline(this);
-        initializeConfigs();
+        this.teamSelectorMaterial = XMaterial.WHITE_WOOL.get();
+        this.leaveGameMaterial = XMaterial.SLIME_BALL.get();
 
         this.tabListManager = new TabListManager(this);
         Bukkit.getPluginManager().registerEvents(new TabListListener(tabListManager), plugin.getPlugin());
@@ -130,21 +114,12 @@ public class GameManager implements IGameManager {
         return economyType.getMode();
     }
 
-    private void initializeConfigs() {
-        this.itemConfig = plugin.getItemConfig().getGameManager();
-        this.settingsConfig = plugin.getSettingsConfig();
+    public boolean isArrowDisplayEnabled() {
+        return plugin.getDisplayConfig().getDisplayDamage().isArrowDisplayEnabled();
+    }
 
-        this.msgPlayerReconnect = messageConfig.getPlayerReconnectMessage();
-        this.msgPlayerLeave = messageConfig.getPlayerLeaveMessage();
-
-        this.teamSelectorMaterial = XMaterial.WHITE_WOOL.get();
-        this.teamSelectorName = itemConfig.getTeamSelectorName();
-        this.leaveGameMaterial = XMaterial.SLIME_BALL.get();
-        this.leaveGameName = itemConfig.getLeaveGameName();
-
-        this.arrowDisplayEnabled = settingsConfig.getDisplayDamage().isArrowDisplayEnabled();
-        this.attackDisplayEnabled = settingsConfig.getDisplayDamage().isAttackDisplayEnabled();
-        this.teamBlockSearchRadius = settingsConfig.getTeamBlockSearchRadius();
+    public boolean isAttackDisplayEnabled() {
+        return plugin.getDisplayConfig().getDisplayDamage().isAttackDisplayEnabled();
     }
 
     /**
@@ -279,7 +254,7 @@ public class GameManager implements IGameManager {
      */
     private TeamColor detectTeamColorFromWool(Location location) {
         // 搜索范围，可以根据实际情况调整
-        int radius = teamBlockSearchRadius;
+        int radius = plugin.getGameplayConfig().getTeamBlockSearchRadius();
         World world = location.getWorld();
         LoggerUtil.debug("GameManager$detectTeamColorFromWool | world is " + world);
         LoggerUtil.debug("GameManager$detectTeamColorFromWool | location is " + location);
@@ -408,11 +383,11 @@ public class GameManager implements IGameManager {
         Player player = gamePlayer.getPlayer();
 
         // Team Selection
-        if (settingsConfig.isEnableTeamSelection()) {
+        if (plugin.getSettingsConfig().isEnableTeamSelection()) {
             player.getInventory().setItem(2,
                     new ItemBuilder()
                             .setType(teamSelectorMaterial)
-                            .setDisplayName(teamSelectorName)
+                            .setDisplayName(plugin.getItemConfig().getGameManager().getTeamSelectorName())
                             .getItem()
             );
         }
@@ -421,7 +396,7 @@ public class GameManager implements IGameManager {
         player.getInventory().setItem(8,
                 new ItemBuilder()
                         .setType(leaveGameMaterial)
-                        .setDisplayName(leaveGameName)
+                        .setDisplayName(plugin.getItemConfig().getGameManager().getLeaveGameName())
                         .getItem()
         );
     }
@@ -453,7 +428,7 @@ public class GameManager implements IGameManager {
 
                 gamePlayer.setReconnect(true);
                 PlayerUtil.callPlayerRespawnEvent(gamePlayer.getPlayer(), respawnLocation);
-                broadcastMessage(String.format(msgPlayerReconnect, gamePlayer.getNickName()));
+                broadcastMessage(String.format(plugin.getMessageConfig().getPlayerReconnectMessage(), gamePlayer.getNickName()));
 
                 // 触发玩家重连完成后置事件
                 Bukkit.getPluginManager().callEvent(new BedwarsPlayerReconnectEvent.Post(
@@ -488,7 +463,7 @@ public class GameManager implements IGameManager {
         }
 
         if (gameState == GameState.WAITING) {
-            broadcastMessage(String.format(msgPlayerLeave, gamePlayer.getNickName()));
+            broadcastMessage(String.format(plugin.getMessageConfig().getPlayerLeaveMessage(), gamePlayer.getNickName()));
         }
 
         if (gameState == GameState.RUNNING && gamePlayer.isSpectator()) {

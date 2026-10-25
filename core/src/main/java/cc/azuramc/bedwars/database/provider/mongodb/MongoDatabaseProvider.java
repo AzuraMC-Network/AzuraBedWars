@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.database.provider.mongodb;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.DatabaseConfig;
 import cc.azuramc.bedwars.database.provider.DatabaseType;
 import cc.azuramc.bedwars.database.provider.IDatabaseProvider;
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
@@ -29,13 +29,13 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
     private static final String MONGO_URL_NO_AUTH = "mongodb://%s:%s/%s";
 
     private final AzuraBedWars plugin;
-    private final SettingsConfig.DatabaseConfig databaseConfig;
+    private final DatabaseConfig databaseConfig;
 
     private boolean initialized = false;
     private MongoClient mongoClient;
     private MongoDatabase mongoDatabase;
 
-    public MongoDatabaseProvider(AzuraBedWars plugin, SettingsConfig.DatabaseConfig databaseConfig) {
+    public MongoDatabaseProvider(AzuraBedWars plugin, DatabaseConfig databaseConfig) {
         this.plugin = plugin;
         this.databaseConfig = databaseConfig;
     }

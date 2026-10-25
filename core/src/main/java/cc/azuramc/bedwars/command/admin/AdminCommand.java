@@ -2,6 +2,10 @@ package cc.azuramc.bedwars.command.admin;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.WorldUtil;
+import cc.azuramc.bedwars.config.ApplyResult;
+import cc.azuramc.bedwars.config.ConfigDocument;
+import cc.azuramc.bedwars.config.ConfigProblem;
+import cc.azuramc.bedwars.config.ConfigService;
 import cc.azuramc.bedwars.util.CommandUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.Bukkit;
@@ -11,11 +15,14 @@ import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.AutoComplete;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.DefaultFor;
+import revxrsal.commands.annotation.Optional;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,10 +41,13 @@ public class AdminCommand {
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 指令帮助",
                 "",
-                "&7 • &f/bw reload &7重新加载配置文件",
+                "&7 • &f/bw reload [配置名] &7校验并重新加载配置文件",
+                "&7 • &f/bw config check &7检查所有配置文件的错误",
+                "&7 • &f/bw config schema &7重新生成编辑器补全用的 JSON Schema",
                 "&7 • &f/map &7查看地图相关指令帮助 &3&o[仅EditMode]",
                 "&7 • &f/setup &7查看快速配置相关指令 &3&o[仅EditMode]",
                 "&7 • &f/bw editorMode true/false &7开关编辑模式(重启后生效)",
+                "&7 • &f/bw debugMode true/false &7开关调试日志",
                 "&7 • &f/bw toWorld <worldName> &7前往世界",
                 "&7 • &f/bw loadWorld <worldName> &7加载世界",
                 "&7 • &f/bw start &7立即开始游戏 &3&o[仅非EditMode]",
@@ -48,36 +58,92 @@ public class AdminCommand {
     }
 
     @Subcommand("reload")
-    public void reloadConfigFiles(BukkitCommandActor actor) {
-        plugin.getConfigManager().reloadAll();
-        CommandUtil.sendLayout(actor, "&a成功重载配置文件");
+    @AutoComplete("@configDocuments")
+    public void reloadConfigFiles(BukkitCommandActor actor, @Optional String document) {
+        ConfigService configService = plugin.getConfigService();
+        if (document != null && configService.document(document) == null) {
+            CommandUtil.sendLayout(actor, "&c没有名为 " + document + " 的配置，可选: " + documentIds());
+            return;
+        }
+        List<ApplyResult> results = document == null
+                ? configService.reloadAll()
+                : Collections.singletonList(configService.reload(document));
+        List<String> lines = new ArrayList<>();
+        for (ApplyResult result : results) {
+            lines.add(describe(result));
+            addProblems(lines, result.getProblems());
+        }
+        CommandUtil.sendLayout(actor, lines);
+    }
+
+    @Subcommand("config check")
+    public void checkConfig(BukkitCommandActor actor) {
+        List<ConfigProblem> problems = plugin.getConfigService().check();
+        List<String> lines = new ArrayList<>();
+        lines.add(problems.isEmpty() ? "&a配置文件没有发现问题" : "&e配置文件有 " + problems.size() + " 个问题:");
+        addProblems(lines, problems);
+        CommandUtil.sendLayout(actor, lines);
+    }
+
+    @Subcommand("config schema")
+    public void exportSchema(BukkitCommandActor actor) {
+        plugin.getConfigService().exportSchemas();
+        CommandUtil.sendLayout(actor, "&a已重新生成 " + ConfigService.SCHEMA_DIR + "/ 下的 JSON Schema");
     }
 
     @Subcommand("editorMode")
     @AutoComplete("@booleanValues")
     public void editorMode(BukkitCommandActor actor, boolean value) {
-        if (plugin.getSettingsConfig().isEditorMode() == value) {
-            CommandUtil.sendLayout(actor, "&ceditorMode值已经是 " + value);
-            return;
-        }
-        plugin.getSettingsConfig().setEditorMode(value);
-        CommandUtil.sendLayout(actor, "&a成功设置值为 " + value);
-        CommandUtil.sendLayout(actor, "&a&l重启后&a令此设置生效.");
-        plugin.getConfigManager().saveConfig("settings");
+        setSetting(actor, "editor-mode", value);
     }
 
     @Subcommand("debugMode")
     @AutoComplete("@booleanValues")
     public void debugMode(BukkitCommandActor actor, boolean value) {
-        if (plugin.getSettingsConfig().isEditorMode() == value) {
-            CommandUtil.sendLayout(actor, "&cdebugMode值已经是 " + value);
-            return;
-        }
-        plugin.getSettingsConfig().setDebugMode(value);
-        CommandUtil.sendLayout(actor, "&a成功设置值为 " + value);
-        plugin.getConfigManager().saveConfig("settings");
+        setSetting(actor, "debug-mode", value);
     }
 
+    private void setSetting(BukkitCommandActor actor, String key, boolean value) {
+        ApplyResult result = plugin.getConfigService().setValue("settings", key, value);
+        List<String> lines = new ArrayList<>();
+        lines.add(describe(result));
+        addProblems(lines, result.getProblems());
+        CommandUtil.sendLayout(actor, lines);
+    }
+
+    private static String describe(ApplyResult result) {
+        String name = "&f" + result.getDocumentId() + " ";
+        switch (result.getStatus()) {
+            case APPLIED:
+                return name + "&a已生效";
+            case NEXT_GAME:
+                return name + "&e已保存，下一局开始时生效";
+            case RESTART_REQUIRED:
+                return name + "&e已生效，以下项重启后生效: &f" + String.join(", ", result.getRestartPaths());
+            default:
+                return name + "&c有错误，未应用，仍使用原配置";
+        }
+    }
+
+    private static void addProblems(List<String> lines, List<ConfigProblem> problems) {
+        int shown = Math.min(problems.size(), 10);
+        for (int i = 0; i < shown; i++) {
+            ConfigProblem problem = problems.get(i);
+            lines.add((problem.isError() ? "&c ✖ " : "&e ! ") + "&7" + problem);
+        }
+        if (problems.size() > shown) {
+            lines.add("&7 ……还有 " + (problems.size() - shown) + " 个，完整列表见控制台");
+            AzuraBedWars.logProblems(problems);
+        }
+    }
+
+    private String documentIds() {
+        List<String> ids = new ArrayList<>();
+        for (ConfigDocument<?> document : plugin.getConfigService().documents()) {
+            ids.add(document.getId());
+        }
+        return String.join(", ", ids);
+    }
 
     @Subcommand("toWorld")
     public void toWorld(Player player, String worldName) {

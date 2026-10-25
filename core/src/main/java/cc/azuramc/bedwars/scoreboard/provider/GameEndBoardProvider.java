@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.scoreboard.provider;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.DisplayConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -14,16 +14,13 @@ import java.util.List;
  */
 public class GameEndBoardProvider extends AbstractBoardProvider {
 
-    private final SettingsConfig.GameEndScoreboard config;
-
     public GameEndBoardProvider(GameManager gameManager) {
         super(gameManager);
-        this.config = AzuraBedWars.getInstance().getSettingsConfig().getGameEndScoreboard();
     }
 
     @Override
     protected String getTitle() {
-        return config.getTitle();
+        return config().getTitle();
     }
 
     @Override
@@ -34,11 +31,15 @@ public class GameEndBoardProvider extends AbstractBoardProvider {
                 .set("date", getFormattedDateRaw())
                 .set("winner", getWinnerName())
                 .set("server", "")
-                .formatLines(config.getLines());
+                .formatLines(config().getLines());
     }
 
     private String getWinnerName() {
         GameTeam winner = gameManager.getWinner();
         return winner != null ? winner.getName() : "无";
+    }
+
+    private static DisplayConfig.GameEndScoreboard config() {
+        return AzuraBedWars.getInstance().getDisplayConfig().getGameEndScoreboard();
     }
 }

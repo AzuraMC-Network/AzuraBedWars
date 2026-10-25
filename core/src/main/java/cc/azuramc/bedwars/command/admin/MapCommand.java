@@ -308,7 +308,6 @@ public class MapCommand {
         }
     }
 
-
     @Subcommand("setUrl")
     @AutoComplete("@mapNames @pathVariables")
     public void setUrl(Player player, String mapName, String fileUrl) {
@@ -381,7 +380,7 @@ public class MapCommand {
         MapStorageType storageType;
 
         if ("CURRENT".equals(type)) {
-            storageType = MapStorageType.valueOf(plugin.getSettingsConfig().getMapStorage().toUpperCase());
+            storageType = plugin.getSettingsConfig().getMapStorage();
         } else {
             try {
                 storageType = MapStorageType.valueOf(type.toUpperCase());

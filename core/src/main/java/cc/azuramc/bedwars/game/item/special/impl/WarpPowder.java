@@ -33,35 +33,6 @@ import java.util.List;
  */
 public class WarpPowder extends AbstractSpecialItem {
 
-    private static final ItemConfig.WarpPowder CONFIG = AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
-    private static final MessageConfig messageConfig = AzuraBedWars.getInstance().getMessageConfig();
-
-    /**
-     * 默认传送时间（秒）
-     */
-    private static final int DEFAULT_TELEPORT_TIME = CONFIG.getDefaultTeleportTime();
-    /**
-     * 每个粒子环的粒子数量
-     */
-    private static final int CIRCLE_ELEMENTS = CONFIG.getCircleElements();
-    /**
-     * 粒子环半径
-     */
-    private static final double PARTICLE_RADIUS = CONFIG.getParticleRadius();
-    /**
-     * 粒子效果总高度
-     */
-    private static final double PARTICLE_HEIGHT = CONFIG.getParticleHeight();
-    /**
-     * 粒子环的数量
-     */
-    private static final double CIRCLE_COUNT = CONFIG.getCircleCount();
-
-    /**
-     * 取消传送物品名称
-     */
-    private static final String CANCEL_ITEM_NAME = CONFIG.getCancelItemName();
-
     /**
      * 完整传送时间
      */
@@ -94,12 +65,12 @@ public class WarpPowder extends AbstractSpecialItem {
      */
     public WarpPowder() {
         super();
-        this.fullTeleportingTime = DEFAULT_TELEPORT_TIME;
+        this.fullTeleportingTime = config().getDefaultTeleportTime();
         this.gameManager = AzuraBedWars.getInstance().getGameManager();
         this.gamePlayer = null;
         this.stack = null;
         this.teleportingTask = null;
-        this.teleportingTime = DEFAULT_TELEPORT_TIME;
+        this.teleportingTime = config().getDefaultTeleportTime();
     }
 
     /**
@@ -109,7 +80,7 @@ public class WarpPowder extends AbstractSpecialItem {
      */
     public WarpPowder(int teleportTime) {
         super();
-        this.fullTeleportingTime = teleportTime > 0 ? teleportTime : DEFAULT_TELEPORT_TIME;
+        this.fullTeleportingTime = teleportTime > 0 ? teleportTime : config().getDefaultTeleportTime();
         this.gameManager = AzuraBedWars.getInstance().getGameManager();
         this.gamePlayer = null;
         this.stack = null;
@@ -147,7 +118,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
         // 显示消息
         if (showMessage) {
-            gamePlayer.sendMessage(messageConfig.getWarpPowderCancelMessage());
+            gamePlayer.sendMessage(messages().getWarpPowderCancelMessage());
         }
 
         // 恢复物品
@@ -189,7 +160,7 @@ public class WarpPowder extends AbstractSpecialItem {
         ItemStack glowstone = new ItemStack(this.getActivatedMaterial(), 1);
         ItemMeta meta = glowstone.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(CANCEL_ITEM_NAME);
+            meta.setDisplayName(config().getCancelItemName());
             glowstone.setItemMeta(meta);
         }
         return glowstone;
@@ -248,7 +219,7 @@ public class WarpPowder extends AbstractSpecialItem {
         teleportingTime = fullTeleportingTime;
 
         // 发送开始传送消息
-        gamePlayer.sendMessage(String.format(messageConfig.getWarpPowderStartMessage(), this.fullTeleportingTime));
+        gamePlayer.sendMessage(String.format(messages().getWarpPowderStartMessage(), this.fullTeleportingTime));
 
         // 播放开始传送音效
         if (XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get() != null) {
@@ -256,7 +227,7 @@ public class WarpPowder extends AbstractSpecialItem {
         }
 
         // 计算每个tick减少的时间
-        final double perThrough = (Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((fullTeleportingTime * 20) / CIRCLE_COUNT)) / 20);
+        final double perThrough = (Math.ceil((config().getParticleHeight() / config().getCircleCount()) * ((fullTeleportingTime * 20) / config().getCircleCount())) / 20);
 
         // 创建传送任务
         this.teleportingTask = new BukkitRunnable() {
@@ -301,7 +272,7 @@ public class WarpPowder extends AbstractSpecialItem {
                 }
             }
         }.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0L,
-                (long) Math.ceil((PARTICLE_HEIGHT / CIRCLE_COUNT) * ((this.fullTeleportingTime * 20) / CIRCLE_COUNT)));
+                (long) Math.ceil((config().getParticleHeight() / config().getCircleCount()) * ((this.fullTeleportingTime * 20) / config().getCircleCount())));
 
         // 添加到游戏中的特殊物品列表
         this.gameManager.addSpecialItem(this);
@@ -316,12 +287,12 @@ public class WarpPowder extends AbstractSpecialItem {
      * @param through 当前高度计数
      */
     private void createTeleportParticles(Location fromLoc, Location toLoc, double through) {
-        double y = (PARTICLE_HEIGHT / CIRCLE_COUNT) * through;
+        double y = (config().getParticleHeight() / config().getCircleCount()) * through;
 
-        for (int i = 0; i < CIRCLE_ELEMENTS; i++) {
-            double alpha = (360.0 / CIRCLE_ELEMENTS) * i;
-            double x = PARTICLE_RADIUS * Math.sin(Math.toRadians(alpha));
-            double z = PARTICLE_RADIUS * Math.cos(Math.toRadians(alpha));
+        for (int i = 0; i < config().getCircleElements(); i++) {
+            double alpha = (360.0 / config().getCircleElements()) * i;
+            double x = config().getParticleRadius() * Math.sin(Math.toRadians(alpha));
+            double z = config().getParticleRadius() * Math.cos(Math.toRadians(alpha));
 
             // 在玩家位置生成粒子
             Location particleFrom = new Location(fromLoc.getWorld(), fromLoc.getX() + x, fromLoc.getY() + y, fromLoc.getZ() + z);
@@ -379,5 +350,13 @@ public class WarpPowder extends AbstractSpecialItem {
 //        packet.getFloat().write(6, 0.0F);
 //        packet.getIntegers().write(0, 1);
 //        gamePlayers.forEach(gamePlayer -> protocolManager.sendServerPacket(gamePlayer.getPlayer(), packet));
+    }
+
+    private static ItemConfig.WarpPowder config() {
+        return AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
+    }
+
+    private static MessageConfig messages() {
+        return AzuraBedWars.getInstance().getMessageConfig();
     }
 }

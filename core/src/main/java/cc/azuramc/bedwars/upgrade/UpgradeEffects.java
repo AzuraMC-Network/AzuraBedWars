@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.upgrade;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.TeamUpgradeConfig;
+import cc.azuramc.bedwars.config.object.UpgradeConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -113,7 +113,7 @@ public final class UpgradeEffects {
     }
 
     public static void tick(GameManager gameManager) {
-        TeamUpgradeConfig config = AzuraBedWars.getInstance().getTeamUpgradeConfig();
+        UpgradeConfig config = AzuraBedWars.getInstance().getUpgradeConfig();
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
             TeamUpgrades upgrades = gameTeam.getUpgrades();
             int haste = upgrades.getLevel(TeamUpgrade.MANIC_MINER);
@@ -135,7 +135,7 @@ public final class UpgradeEffects {
         }
     }
 
-    private static void checkIntruders(GameTeam gameTeam, TeamUpgradeConfig config) {
+    private static void checkIntruders(GameTeam gameTeam, UpgradeConfig config) {
         for (GamePlayer intruder : GamePlayer.getOnlinePlayers()) {
             if (intruder.isSpectator() || gameTeam.isInTeam(intruder) || intruder.isTrapTriggerCooldown()
                     || !isNear(intruder.getPlayer(), gameTeam.getSpawnLocation(), config.getTrapTriggerRange())) {
@@ -150,7 +150,7 @@ public final class UpgradeEffects {
         }
     }
 
-    private static void triggerTrap(GameTeam gameTeam, GamePlayer intruder, TrapType trap, TeamUpgradeConfig config) {
+    private static void triggerTrap(GameTeam gameTeam, GamePlayer intruder, TrapType trap, UpgradeConfig config) {
         if (!intruder.isHasTrapProtection()) {
             Player player = intruder.getPlayer();
             switch (trap) {
