@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.config.yaml;
 
 import cc.azuramc.bedwars.config.annotation.Comment;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -126,7 +127,7 @@ public class YamlSerializer {
     }
 
     private String getIndent(int level) {
-        return " ".repeat(Math.max(0, level * 2));
+        return StringUtils.repeat(' ', Math.max(0, level * 2));
     }
 
     private boolean isPrimitive(Class<?> type) {

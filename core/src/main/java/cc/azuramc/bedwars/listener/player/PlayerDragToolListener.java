@@ -29,9 +29,10 @@ public class PlayerDragToolListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) {
+        if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getWhoClicked();
 
         Inventory clickedInventory = event.getClickedInventory();
         if (clickedInventory == null || !isForbiddenContainer(clickedInventory)) {
@@ -46,9 +47,10 @@ public class PlayerDragToolListener implements Listener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (!(event.getWhoClicked() instanceof Player player)) {
+        if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getWhoClicked();
 
         Inventory topInventory = XInventoryView.of(event.getView()).getTopInventory();
         if (!isForbiddenContainer(topInventory)) {

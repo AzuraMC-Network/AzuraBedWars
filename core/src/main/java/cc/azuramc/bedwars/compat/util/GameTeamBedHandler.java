@@ -103,9 +103,11 @@ public class GameTeamBedHandler {
         BlockData bedData2 = block2.getBlockData();
 
         // 检查是否为床类型
-        if (!(bedData1 instanceof Bed bed1) || !(bedData2 instanceof Bed bed2)) {
+        if (!(bedData1 instanceof Bed) || !(bedData2 instanceof Bed)) {
             throw new IllegalArgumentException("Block is not a bed");
         }
+        Bed bed1 = (Bed) bedData1;
+        Bed bed2 = (Bed) bedData2;
 
         if (bed1.getPart() == Bed.Part.HEAD) {
             gameTeam.setBedHead(block1);

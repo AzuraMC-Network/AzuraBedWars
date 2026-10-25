@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.upgrade.upgrade.AbstractTieredUpgradeStrategy;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class ManicMinerUpgradeStrategy extends AbstractTieredUpgradeStrategy {
 
     @Override
     public List<String> getDescription() {
-        return List.of("§7己方所有成员获得急迫效果。");
+        return Collections.singletonList("§7己方所有成员获得急迫效果。");
     }
 
     @Override

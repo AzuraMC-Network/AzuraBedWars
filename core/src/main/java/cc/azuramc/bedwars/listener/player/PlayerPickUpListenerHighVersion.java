@@ -17,9 +17,10 @@ public class PlayerPickUpListenerHighVersion implements Listener {
     @EventHandler
     public void onPickup(EntityPickupItemEvent event) {
         // 检查拾取实体是否为玩家
-        if (!(event.getEntity() instanceof Player player)) {
+        if (!(event.getEntity() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getEntity();
 
         ItemStack itemStack = event.getItem().getItemStack();
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());

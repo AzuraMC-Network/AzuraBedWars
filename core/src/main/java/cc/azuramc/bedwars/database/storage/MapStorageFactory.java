@@ -65,16 +65,14 @@ public class MapStorageFactory {
      * @return 存储实现
      */
     public static IMapStorage getStorage(MapStorageType mapStorageType) {
-        return switch (mapStorageType) {
-            case JSON -> {
+        switch (mapStorageType) {
+            case JSON:
                 LoggerUtil.debug("MapStorageFactory$getStorage | input storageType is json");
-                yield getJsonStorage();
-            }
-            case MYSQL -> {
+                return getJsonStorage();
+            default:
                 LoggerUtil.debug("MapStorageFactory$getStorage | input storageType is MySQL");
-                yield getMysqlStorage();
-            }
-        };
+                return getMysqlStorage();
+        }
     }
 
     /**

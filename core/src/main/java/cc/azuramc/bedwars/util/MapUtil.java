@@ -130,14 +130,21 @@ public class MapUtil {
      */
     private static BlockFace convertDataToBlockFace(byte data) {
         // 此映射基于大多数方向性方块的通用规则，可能需要根据特定方块调整
-        return switch (data & 0x7) { // 只使用低3位
-            case 0 -> BlockFace.DOWN;
-            case 1 -> BlockFace.UP;
-            case 2 -> BlockFace.NORTH;
-            case 3 -> BlockFace.SOUTH;
-            case 4 -> BlockFace.WEST;
-            case 5 -> BlockFace.EAST;
-            default -> null;
-        };
+        switch (data & 0x7) { // 只使用低3位
+            case 0:
+                return BlockFace.DOWN;
+            case 1:
+                return BlockFace.UP;
+            case 2:
+                return BlockFace.NORTH;
+            case 3:
+                return BlockFace.SOUTH;
+            case 4:
+                return BlockFace.WEST;
+            case 5:
+                return BlockFace.EAST;
+            default:
+                return null;
+        }
     }
 }

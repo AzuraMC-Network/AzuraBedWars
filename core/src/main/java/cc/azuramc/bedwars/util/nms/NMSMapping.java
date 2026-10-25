@@ -134,7 +134,8 @@ public class NMSMapping {
      * @return 解析后的值
      */
     private static String resolveMapping(Object mappingData) {
-        if (mappingData instanceof JsonObject jsonObj) {
+        if (mappingData instanceof JsonObject) {
+            JsonObject jsonObj = (JsonObject) mappingData;
 
             if (jsonObj.has("versionRanges")) {
                 JsonArray versionRanges = jsonObj.getAsJsonArray("versionRanges");

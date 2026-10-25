@@ -22,10 +22,13 @@ public class ServerMOTD {
      * @return 当前游戏状态的MOTD字符串
      */
     public static String getMOTD() {
-        return switch (currentGameState) {
-            case RUNNING -> "abw-running";
-            case WAITING -> "abw-waiting";
-            case ENDING -> "abw-ending";
-        };
+        switch (currentGameState) {
+            case RUNNING:
+                return "abw-running";
+            case WAITING:
+                return "abw-waiting";
+            default:
+                return "abw-ending";
+        }
     }
 }

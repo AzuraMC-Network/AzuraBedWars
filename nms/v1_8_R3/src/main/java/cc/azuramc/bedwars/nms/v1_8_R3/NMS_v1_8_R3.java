@@ -38,7 +38,8 @@ public class NMS_v1_8_R3 implements NMSAccess {
 
     @Override
     public void setAI(LivingEntity entity, boolean ai) {
-        if (((CraftLivingEntity) entity).getHandle() instanceof EntityInsentient insentient) {
+        if (((CraftLivingEntity) entity).getHandle() instanceof EntityInsentient) {
+            EntityInsentient insentient = (EntityInsentient) ((CraftLivingEntity) entity).getHandle();
             insentient.k(!ai);
         }
     }

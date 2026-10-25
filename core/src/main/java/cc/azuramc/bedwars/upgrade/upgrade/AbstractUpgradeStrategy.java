@@ -325,14 +325,20 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
      * @return 罗马数字表示
      */
     protected String getRomanNumeral(int number) {
-        return switch (number) {
-            case 1 -> "I";
-            case 2 -> "II";
-            case 3 -> "III";
-            case 4 -> "IV";
-            case 5 -> "V";
-            default -> String.valueOf(number);
-        };
+        switch (number) {
+            case 1:
+                return "I";
+            case 2:
+                return "II";
+            case 3:
+                return "III";
+            case 4:
+                return "IV";
+            case 5:
+                return "V";
+            default:
+                return String.valueOf(number);
+        }
     }
 
     /**

@@ -9,6 +9,7 @@ import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class FallingProtectionUpgradeStrategy extends AbstractTieredUpgradeStrat
 
     @Override
     public List<String> getDescription() {
-        return List.of("§7你队伍的靴子获得了永久摔落保护！");
+        return Collections.singletonList("§7你队伍的靴子获得了永久摔落保护！");
     }
 
     @Override

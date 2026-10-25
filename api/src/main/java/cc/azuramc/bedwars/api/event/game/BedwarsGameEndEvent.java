@@ -9,6 +9,8 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,7 +63,7 @@ public class BedwarsGameEndEvent extends Event {
     public BedwarsGameEndEvent(@NotNull IGameManager gameManager) {
         this.gameManager = gameManager;
         this.winner = gameManager.getWinner();
-        this.aliveTeams = List.copyOf(gameManager.getAliveTeams());
+        this.aliveTeams = Collections.unmodifiableList(new ArrayList<>(gameManager.getAliveTeams()));
         this.message = winner != null ? "§a游戏结束！获胜队伍：" + winner.getName() : "§e游戏结束！平局！";
         this.title = "§6游戏结束";
         this.subTitle = winner != null ? "§a获胜队伍：" + winner.getName() : "§e平局！";

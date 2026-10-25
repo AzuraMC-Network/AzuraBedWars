@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
 
     @Override
     public List<String> getDescription() {
-        return List.of("§7你方所有成员的剑将永久获得锋利I附魔！");
+        return Collections.singletonList("§7你方所有成员的剑将永久获得锋利I附魔！");
     }
 
     @Override
@@ -71,7 +72,7 @@ public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam == null) {
-            return List.of();
+            return Collections.emptyList();
         }
         boolean isUnlocked = gameTeam.getUpgradeManager().hasSharpnessUpgrade();
         String tierColor = isUnlocked ? "§a" : "§e";

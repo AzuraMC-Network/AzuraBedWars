@@ -10,6 +10,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public class AlarmTrapStrategy extends AbstractTrapStrategy {
 
     @Override
     public List<String> getDescription() {
-        return List.of(
+        return Arrays.asList(
                 "§7显示隐身的玩家，",
                 "§7及其名称与队伍名。"
         );

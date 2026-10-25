@@ -25,9 +25,10 @@ public class SilverFishListener implements Listener {
             return;
         }
 
-        if (!(event.getEntity().getShooter() instanceof Player shooter) || !(event.getEntity() instanceof Snowball)) {
+        if (!(event.getEntity().getShooter() instanceof Player) || !(event.getEntity() instanceof Snowball)) {
             return;
         }
+        Player shooter = (Player) event.getEntity().getShooter();
 
         GamePlayer gamePlayer = GamePlayer.get(shooter);
         if (gamePlayer == null || gamePlayer.isSpectator() || gamePlayer.getGameTeam() == null) {

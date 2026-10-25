@@ -32,7 +32,7 @@ public class MySQLDatabaseProvider implements IDatabaseProvider {
     public boolean initialize() {
         try {
             SettingsConfig.DatabaseConfig database = plugin.getSettingsConfig().getDatabase();
-            String jdbcUrl = JDBC_URL_TEMPLATE.formatted(
+            String jdbcUrl = String.format(JDBC_URL_TEMPLATE,
                     database.getHost(),
                     database.getPort(),
                     database.getDatabase()

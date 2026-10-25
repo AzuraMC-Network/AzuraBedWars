@@ -69,9 +69,10 @@ public class PlayerDamageListener implements Listener {
         }
 
         // 只处理玩家伤害
-        if (!(event.getEntity() instanceof Player player)) {
+        if (!(event.getEntity() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getEntity();
         GamePlayer gamePlayer = GamePlayer.get(player);
 
         // 处理等待阶段的伤害

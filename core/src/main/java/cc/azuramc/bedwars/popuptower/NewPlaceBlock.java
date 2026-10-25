@@ -28,18 +28,14 @@ public class NewPlaceBlock {
 
     private BlockFace getFaceByData(int data) {
         switch (data) {
-            case 2 -> {
+            case 2:
                 return BlockFace.NORTH;
-            }
-            case 3 -> {
+            case 3:
                 return BlockFace.SOUTH;
-            }
-            case 4 -> {
+            case 4:
                 return BlockFace.WEST;
-            }
-            case 5 -> {
+            case 5:
                 return BlockFace.EAST;
-            }
         }
         return BlockFace.NORTH;
     }

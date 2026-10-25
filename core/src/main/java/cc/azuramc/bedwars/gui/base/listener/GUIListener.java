@@ -48,7 +48,7 @@ public class GUIListener implements Listener {
         if (list == null || list.isEmpty()) {
             return null;
         }
-        return list.getFirst();
+        return list.get(0);
     }
 
     @EventHandler
@@ -92,7 +92,8 @@ public class GUIListener implements Listener {
                         if (guiAction == null) {
                             newGUIAction.getRunnable().run(event);
                         } else {
-                            if (guiAction.getRunnable() instanceof GUIActionRunnable guiActionRunnable) {
+                            if (guiAction.getRunnable() instanceof GUIActionRunnable) {
+                                GUIActionRunnable guiActionRunnable = (GUIActionRunnable) guiAction.getRunnable();
                                 guiActionRunnable.setEvent(event);
                                 guiActionRunnable.run();
                             } else {

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -183,7 +184,7 @@ public final class MessageUtil {
     @NotNull
     public static List<String> formatLocationList(@Nullable List<MapData.RawLocation> locations) {
         if (locations == null || locations.isEmpty()) {
-            return List.of("&c无");
+            return Collections.singletonList("&c无");
         }
 
         List<String> result = new ArrayList<>();

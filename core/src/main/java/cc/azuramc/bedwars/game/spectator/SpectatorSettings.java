@@ -69,13 +69,18 @@ public class SpectatorSettings {
      * @return 是否启用
      */
     public boolean getOption(Option option) {
-        return switch (option) {
-            case AUTO_TP -> autoTp;
-            case NIGHT_VISION -> nightVision;
-            case FIRST_PERSON -> firstPerson;
-            case HIDE_OTHER -> hideOther;
-            case FLY -> fly;
-        };
+        switch (option) {
+            case AUTO_TP:
+                return autoTp;
+            case NIGHT_VISION:
+                return nightVision;
+            case FIRST_PERSON:
+                return firstPerson;
+            case HIDE_OTHER:
+                return hideOther;
+            default:
+                return fly;
+        }
     }
 
     /**

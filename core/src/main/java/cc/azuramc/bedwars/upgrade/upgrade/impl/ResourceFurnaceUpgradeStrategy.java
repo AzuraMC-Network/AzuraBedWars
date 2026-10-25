@@ -8,6 +8,7 @@ import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class ResourceFurnaceUpgradeStrategy extends AbstractTieredUpgradeStrateg
 
     @Override
     public List<String> getDescription() {
-        return List.of("§7升级你岛屿资源池的生成速度和和最大容量.");
+        return Collections.singletonList("§7升级你岛屿资源池的生成速度和和最大容量.");
     }
 
     @Override
@@ -48,13 +49,18 @@ public class ResourceFurnaceUpgradeStrategy extends AbstractTieredUpgradeStrateg
 
     @Override
     protected String getTierEffectDescription(int tier) {
-        return switch (tier) {
-            case 1 -> "+50%资源";
-            case 2 -> "+100%资源";
-            case 3 -> "生成绿宝石";
-            case 4 -> "+200%资源";
-            default -> "";
-        };
+        switch (tier) {
+            case 1:
+                return "+50%资源";
+            case 2:
+                return "+100%资源";
+            case 3:
+                return "生成绿宝石";
+            case 4:
+                return "+200%资源";
+            default:
+                return "";
+        }
     }
 
     @Override

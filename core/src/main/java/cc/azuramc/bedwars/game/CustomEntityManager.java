@@ -277,7 +277,8 @@ public class CustomEntityManager {
             return false;
         }
 
-        if (target instanceof Player player) {
+        if (target instanceof Player) {
+            Player player = (Player) target;
             GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
             return gamePlayer != null && !gamePlayer.isSpectator() && gamePlayer.getGameTeam() != gameTeam;
         }
@@ -298,11 +299,13 @@ public class CustomEntityManager {
         if (this == obj) return true;
         if (obj == null) return false;
 
-        if (obj instanceof CustomEntityManager other) {
+        if (obj instanceof CustomEntityManager) {
+            CustomEntityManager other = (CustomEntityManager) obj;
             return Objects.equals(this.uuid, other.uuid);
         }
 
-        if (obj instanceof LivingEntity entity) {
+        if (obj instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) obj;
             return Objects.equals(this.uuid, entity.getUniqueId());
         }
 

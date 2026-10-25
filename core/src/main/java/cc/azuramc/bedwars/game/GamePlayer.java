@@ -657,7 +657,7 @@ public class GamePlayer implements IGamePlayer {
         if (gamePlayers.isEmpty()) {
             return null;
         }
-        return gamePlayers.getLast();
+        return gamePlayers.get(gamePlayers.size() - 1);
     }
 
     /**

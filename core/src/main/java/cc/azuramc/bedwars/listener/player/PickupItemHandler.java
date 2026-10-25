@@ -195,7 +195,8 @@ public class PickupItemHandler {
             return;
         }
         for (Entity entity : player.getNearbyEntities(2, 2, 2)) {
-            if (entity instanceof Player players) {
+            if (entity instanceof Player) {
+                Player players = (Player) entity;
                 // 只有队员可以捡起
                 if (!gameTeam.getGamePlayers().contains(GamePlayer.get(players))) {
                     return;

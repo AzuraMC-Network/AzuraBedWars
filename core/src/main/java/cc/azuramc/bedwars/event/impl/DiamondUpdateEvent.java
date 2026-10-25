@@ -64,11 +64,14 @@ public class DiamondUpdateEvent extends AbstractGameEvent {
      * @return 刷新间隔（秒）
      */
     private int getRefreshSecondsForLevel() {
-        return switch (level) {
-            case 2 -> diamondUpdateConfig.getLevel2RefreshSecond();
-            case 3 -> diamondUpdateConfig.getLevel3RefreshSecond();
-            default -> diamondUpdateConfig.getLevel1RefreshSecond();
-        };
+        switch (level) {
+            case 2:
+                return diamondUpdateConfig.getLevel2RefreshSecond();
+            case 3:
+                return diamondUpdateConfig.getLevel3RefreshSecond();
+            default:
+                return diamondUpdateConfig.getLevel1RefreshSecond();
+        }
     }
 
     /**
