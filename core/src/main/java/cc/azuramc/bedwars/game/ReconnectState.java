@@ -25,7 +25,7 @@ public class ReconnectState {
     private final int currentGameKills;
     private final int currentGameFinalKills;
     private final int currentGameAssists;
-    private final int currentGameDeaths;
+    private int currentGameDeaths;
     private final int currentGameDestroyedBeds;
 
     private final ArmorType armorType;
@@ -48,6 +48,10 @@ public class ReconnectState {
         this.pickaxeType = gamePlayer.getPickaxeType();
         this.axeType = gamePlayer.getAxeType();
         this.shear = gamePlayer.isShear();
+    }
+
+    public void addDeath() {
+        currentGameDeaths++;
     }
 
     public void restoreTo(@NotNull GamePlayer gamePlayer, @NotNull GameManager gameManager) {
