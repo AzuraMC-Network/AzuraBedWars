@@ -7,12 +7,14 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
 import cc.azuramc.bedwars.shop.QuickBuy;
+import cc.azuramc.bedwars.shop.ShopCatalog;
 import cc.azuramc.bedwars.shop.ShopItem;
 import cc.azuramc.bedwars.shop.ShopPurchase;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -21,10 +23,11 @@ import java.util.Objects;
  */
 public class QuickBuyEditGUI extends CustomGUI {
 
-    public QuickBuyEditGUI(GamePlayer gamePlayer, GameManager gameManager, String key) {
+    public QuickBuyEditGUI(GamePlayer gamePlayer, GameManager gameManager, String ref) {
         super(gamePlayer, "§8添加物品到快捷购买", 54);
 
-        ShopItem adding = Objects.requireNonNull(QuickBuy.resolve(key));
+        ShopCatalog catalog = ShopCatalog.get();
+        ShopItem adding = Objects.requireNonNull(catalog.find(ref));
         setItem(4, new ItemBuilder()
                         .setItemStack(ShopPurchase.displayIcon(gamePlayer, adding))
                         .setDisplayName("§c" + adding.getName())
@@ -43,10 +46,11 @@ public class QuickBuyEditGUI extends CustomGUI {
 
         PlayerData playerData = gamePlayer.getPlayerData();
         Map<Integer, String> layout = QuickBuy.load(playerData);
-        for (int i = 0; i < QuickBuy.SLOTS.length; i++) {
-            int slot = i;
-            ShopItem custom = QuickBuy.customItem(layout, slot);
-            ShopItem fallback = QuickBuy.defaultItem(slot);
+        List<Integer> slots = catalog.getQuickBuySlots();
+        for (int i = 0; i < slots.size(); i++) {
+            int index = i;
+            ShopItem custom = QuickBuy.customItem(catalog, layout, index);
+            ShopItem fallback = index < catalog.getQuickBuyDefaults().size() ? catalog.getQuickBuyDefaults().get(index) : null;
 
             ItemStack icon;
             if (custom != null) {
@@ -66,8 +70,8 @@ public class QuickBuyEditGUI extends CustomGUI {
                         .getItem();
             }
 
-            setItem(QuickBuy.SLOTS[slot], icon, new GUIAction(0, () -> {
-                QuickBuy.set(playerData, slot, key);
+            setItem(slots.get(index), icon, new GUIAction(0, () -> {
+                QuickBuy.set(playerData, index, ref);
                 if (XSound.UI_BUTTON_CLICK.get() != null) {
                     gamePlayer.playSound(XSound.UI_BUTTON_CLICK.get(), 1, 10F);
                 }

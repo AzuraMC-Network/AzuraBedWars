@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&a药水"
+icon: BREWING_STAND
+items:
+  speed:
+    name: "速度药水&7（45秒）"
+    item: { material: POTION, potion: { effect: SPEED, seconds: 45, level: 3 } }
+    price: 1 emerald
+    xp: 100
+  jump:
+    name: "跳跃药水&7（45秒）"
+    item: { material: POTION, potion: { effect: JUMP_BOOST, seconds: 45, level: 6 } }
+    price: 1 emerald
+    xp: 100
+  invisibility:
+    name: "隐身药水&7（30秒）"
+    item: { material: POTION, potion: { effect: INVISIBILITY, seconds: 30, level: 2 } }
+    special: invisibility
+    price: 2 emerald
+    xp: 200

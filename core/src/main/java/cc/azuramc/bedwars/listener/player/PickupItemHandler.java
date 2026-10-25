@@ -2,8 +2,10 @@ package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.game.*;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
+import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
@@ -114,13 +116,8 @@ public class PickupItemHandler {
      * @return 如果玩家挂机且尝试拾取资源返回true
      */
     public static boolean checkAfkResourcePickup(ItemStack itemStack, GamePlayer gamePlayer) {
-        boolean isResource = itemStack.getType() == XMaterial.IRON_INGOT.get() ||
-                itemStack.getType() == XMaterial.GOLD_INGOT.get() ||
-                itemStack.getType() == XMaterial.DIAMOND.get() ||
-                itemStack.getType() == XMaterial.EMERALD.get();
-
         // 玩家挂机状态不能拾取资源
-        return isResource && gamePlayer.isAfk();
+        return gamePlayer.isAfk() && GeneratorManager.resourceOf(itemStack.getType()) != null;
     }
 
     /**
@@ -133,9 +130,9 @@ public class PickupItemHandler {
         }
         item.remove();
 
-        boolean isIngot = itemStack.getType() == XMaterial.IRON_INGOT.get() || itemStack.getType() == XMaterial.GOLD_INGOT.get();
+        GeneratorConfig.Resource resource = GeneratorManager.resourceOf(itemStack.getType());
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        if (!isIngot || gameTeam == null) {
+        if (resource == null || resource.getAt() != GeneratorConfig.Spawn.BASE || gameTeam == null) {
             return true;
         }
 

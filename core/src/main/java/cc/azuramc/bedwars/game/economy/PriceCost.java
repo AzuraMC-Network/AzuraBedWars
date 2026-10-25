@@ -1,9 +1,7 @@
 package cc.azuramc.bedwars.game.economy;
 
-import com.cryptomorin.xseries.XMaterial;
 import lombok.Value;
 import lombok.experimental.Accessors;
-import org.bukkit.Material;
 
 /**
  * @author an5w1r@163.com
@@ -11,11 +9,12 @@ import org.bukkit.Material;
 @Value
 @Accessors(fluent = true)
 public class PriceCost {
-    Material material;
+    /** Resource id of generators.yml */
+    String currency;
     int amount;
     int xp;
 
     public static PriceCost teamUpgrade(int diamonds) {
-        return new PriceCost(XMaterial.DIAMOND.get(), diamonds, diamonds * 100);
+        return new PriceCost("diamond", diamonds, diamonds * 100);
     }
 }

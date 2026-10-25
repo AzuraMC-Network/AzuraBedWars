@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&a经验转换"
+icon: EXPERIENCE_BOTTLE
+economy: EXPERIENCE
+items:
+  iron:
+    name: "铁锭"
+    item: IRON_INGOT
+    xp: 1
+  gold:
+    name: "金锭"
+    item: GOLD_INGOT
+    xp: 5
+  diamond:
+    name: "钻石"
+    item: DIAMOND
+    xp: 50
+  emerald:
+    name: "绿宝石"
+    item: EMERALD
+    xp: 100
