@@ -10,7 +10,9 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,6 +85,28 @@ class ConfigServiceTest {
         service.loadAll();
         service.setValue("settings", "enable-team-selection", false);
         assertEquals("debug-mode: false\nenable-team-selection: false\n", ConfigService.read(file("settings.yml")));
+    }
+
+    @Test
+    void setValuesAppliesAllChangesOrNone() throws IOException {
+        ConfigService.writeAtomically(file("settings.yml"), "debug-mode: false\nplay-again-command: \"/hub\" # keep\n");
+        service.loadAll();
+        String hash = service.hash("settings");
+
+        Map<String, Object> bad = new LinkedHashMap<>();
+        bad.put("play-again-command", "/lobby");
+        bad.put("debug-mode", "maybe");
+        assertEquals(ApplyResult.Status.REJECTED, service.setValues("settings", bad, hash).getStatus());
+        assertEquals(hash, service.hash("settings"));
+
+        Map<String, Object> good = new LinkedHashMap<>();
+        good.put("play-again-command", "/lobby");
+        good.put("debug-mode", true);
+        assertEquals(ApplyResult.Status.APPLIED, service.setValues("settings", good, hash).getStatus());
+        assertEquals("debug-mode: true\nplay-again-command: \"/lobby\" # keep\n", ConfigService.read(file("settings.yml")));
+        assertEquals("/lobby", service.get(SettingsConfig.class).getPlayAgainCommand());
+
+        assertEquals(ApplyResult.Status.REJECTED, service.setValues("settings", good, hash).getStatus());
     }
 
     @Test
