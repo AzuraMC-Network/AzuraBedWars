@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -293,9 +294,10 @@ public class MapData implements IMapData {
                 || location.getBlockZ() < region.getMinZ() || location.getBlockZ() > region.getMaxZ();
     }
 
-    public boolean containsChunk(int chunkX, int chunkZ) {
-        return chunkX >= region.getMinX() >> 4 && chunkX <= region.getMaxX() >> 4
-                && chunkZ >= region.getMinZ() >> 4 && chunkZ <= region.getMaxZ() >> 4;
+    public boolean containsChunk(Chunk chunk) {
+        return chunk.getWorld().getName().equals(region.getPos1().getWorld())
+                && chunk.getX() >= region.getMinX() >> 4 && chunk.getX() <= region.getMaxX() >> 4
+                && chunk.getZ() >= region.getMinZ() >> 4 && chunk.getZ() <= region.getMaxZ() >> 4;
     }
 
     public enum DropType {

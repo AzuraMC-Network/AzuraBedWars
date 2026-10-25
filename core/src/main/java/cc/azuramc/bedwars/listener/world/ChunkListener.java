@@ -34,7 +34,7 @@ public class ChunkListener implements Listener {
             return;
         }
 
-        if (!gameManager.getMapData().containsChunk(event.getChunk().getX(), event.getChunk().getZ())) {
+        if (!gameManager.getMapData().containsChunk(event.getChunk())) {
             return;
         }
 
