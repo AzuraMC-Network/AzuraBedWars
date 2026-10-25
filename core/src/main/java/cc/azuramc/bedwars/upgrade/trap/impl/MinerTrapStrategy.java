@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class MinerTrapStrategy extends AbstractTrapStrategy {
 
     @Override
     public List<String> getDescription() {
-        return List.of("§7造成挖掘疲劳效果，持续8秒。");
+        return Collections.singletonList("§7造成挖掘疲劳效果，持续8秒。");
     }
 
     @Override

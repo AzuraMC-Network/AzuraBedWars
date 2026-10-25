@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class FightBackTrapStrategy extends AbstractTrapStrategy {
 
     @Override
     public List<String> getDescription() {
-        return List.of(
+        return Arrays.asList(
                 "§7赋予基地附近的队友速度 II 与跳跃提升 II",
                 "§7效果，持续15秒。"
         );

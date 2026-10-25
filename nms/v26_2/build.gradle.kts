@@ -6,8 +6,13 @@ dependencies {
     compileOnly("org.spigotmc:spigot:26.2-R0.1-SNAPSHOT")
 }
 
+// Minecraft 26.1 and newer require Java 25
+tasks.withType<JavaCompile>().configureEach {
+    options.release = 25
+}
+
 // Paper changes member access on the same Minecraft version
-val paperClasspath by configurations.creating
+val paperClasspath = configurations.create("paperClasspath")
 
 dependencies {
     paperClasspath(libs.paper.server)

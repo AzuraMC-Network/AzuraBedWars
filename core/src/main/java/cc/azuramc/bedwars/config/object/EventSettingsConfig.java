@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -126,7 +127,7 @@ public class EventSettingsConfig {
         private boolean tieFireworkEnabled = true;
 
         @Comment({"自定义排行榜消息", "可用变量: <winnerFormat>, <firstName>, <firstKills>, <secondName>, <secondKills>, <thirdName>, <thirdKills>"})
-        private List<String> customLeaderboardMessages = new ArrayList<>(List.of(
+        private List<String> customLeaderboardMessages = new ArrayList<>(Arrays.asList(
                 "§a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
                 "§f                                   §l起床战争",
                 "",

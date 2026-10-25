@@ -10,8 +10,10 @@ import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -37,11 +39,11 @@ public class FireballHandler implements Listener {
         }
 
         // 获取火球发射者
-        var metadataList = fireball.getMetadata(FIREBALL_METADATA);
+        List<MetadataValue> metadataList = fireball.getMetadata(FIREBALL_METADATA);
         if (metadataList.isEmpty()) {
             return;
         }
-        Object metaData = metadataList.getFirst().value();
+        Object metaData = metadataList.get(0).value();
         if (metaData == null) {
             return;
         }
@@ -56,9 +58,10 @@ public class FireballHandler implements Listener {
                 3,
                 3)) {
 
-            if (!(entity instanceof Player player)) {
+            if (!(entity instanceof Player)) {
                 continue;
             }
+            Player player = (Player) entity;
 
             GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
 

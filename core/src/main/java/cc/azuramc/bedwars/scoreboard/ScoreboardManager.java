@@ -57,11 +57,14 @@ public class ScoreboardManager implements Listener {
      * @return 当前状态的计分板提供者
      */
     private AbstractBoardProvider getCurrentProvider() {
-        return switch (gameManager.getGameState()) {
-            case RUNNING -> gameRunningBoardProvider;
-            case ENDING -> gameEndBoardProvider;
-            default -> lobbyBoardProvider;
-        };
+        switch (gameManager.getGameState()) {
+            case RUNNING:
+                return gameRunningBoardProvider;
+            case ENDING:
+                return gameEndBoardProvider;
+            default:
+                return lobbyBoardProvider;
+        }
     }
 
     /**

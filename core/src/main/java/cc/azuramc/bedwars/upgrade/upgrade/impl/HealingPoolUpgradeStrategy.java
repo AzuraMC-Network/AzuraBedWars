@@ -9,6 +9,7 @@ import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class HealingPoolUpgradeStrategy extends AbstractUpgradeStrategy {
 
     @Override
     public List<String> getDescription() {
-        return List.of("§7基地附近的队伍成员将获得生命恢复效果！");
+        return Collections.singletonList("§7基地附近的队伍成员将获得生命恢复效果！");
     }
 
     @Override
@@ -67,7 +68,7 @@ public class HealingPoolUpgradeStrategy extends AbstractUpgradeStrategy {
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam == null) {
-            return List.of();
+            return Collections.emptyList();
         }
         boolean isUnlocked = gameTeam.getUpgradeManager().hasHealPoolUpgrade();
 

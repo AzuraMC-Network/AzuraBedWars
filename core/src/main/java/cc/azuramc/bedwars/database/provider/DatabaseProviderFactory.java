@@ -50,10 +50,13 @@ public class DatabaseProviderFactory {
         SettingsConfig.DatabaseConfig config = plugin.getSettingsConfig().getDatabase();
         DatabaseType type = DatabaseType.valueOf(config.getDatabaseType().toUpperCase());
 
-        return switch (type) {
-            case MYSQL -> new MySQLDatabaseProvider(plugin);
-            case MONGODB -> new MongoDatabaseProvider(plugin, config);
-            default -> throw new IllegalArgumentException("Unsupported database type: " + type);
-        };
+        switch (type) {
+            case MYSQL:
+                return new MySQLDatabaseProvider(plugin);
+            case MONGODB:
+                return new MongoDatabaseProvider(plugin, config);
+            default:
+                throw new IllegalArgumentException("Unsupported database type: " + type);
+        }
     }
 }

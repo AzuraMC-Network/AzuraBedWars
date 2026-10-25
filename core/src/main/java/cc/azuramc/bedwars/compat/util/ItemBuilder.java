@@ -159,9 +159,10 @@ public class ItemBuilder {
      * @return 构建器实例
      */
     public ItemBuilder setPotionData(PotionEffect potionEffect) {
-        if (!(itemStack.getItemMeta() instanceof PotionMeta potionMeta)) {
+        if (!(itemStack.getItemMeta() instanceof PotionMeta)) {
             return this;
         }
+        PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
 
         potionMeta.addCustomEffect(potionEffect, true);
         itemStack.setItemMeta(potionMeta);
@@ -175,9 +176,10 @@ public class ItemBuilder {
      * @return 构建器实例
      */
     public ItemBuilder setColor(Color color) {
-        if (!(itemStack.getItemMeta() instanceof LeatherArmorMeta leatherArmorMeta)) {
+        if (!(itemStack.getItemMeta() instanceof LeatherArmorMeta)) {
             return this;
         }
+        LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
 
         leatherArmorMeta.setColor(color);
         itemStack.setItemMeta(leatherArmorMeta);

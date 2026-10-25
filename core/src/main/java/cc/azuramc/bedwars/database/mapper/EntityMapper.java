@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author an5w1r@163.com
@@ -123,7 +124,7 @@ public final class EntityMapper {
     public static List<ColumnMeta> getNonPrimaryKeyColumns(Class<?> clazz) {
         return getColumnMetas(clazz).stream()
                 .filter(meta -> !meta.primaryKey())
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -132,7 +133,7 @@ public final class EntityMapper {
     public static List<ColumnMeta> getUpdatableColumns(Class<?> clazz) {
         return getColumnMetas(clazz).stream()
                 .filter(meta -> !meta.primaryKey() && meta.updatable())
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -198,11 +199,14 @@ public final class EntityMapper {
     public static void setParameter(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             ps.setObject(index, null);
-        } else if (value instanceof UUID uuid) {
+        } else if (value instanceof UUID) {
+            UUID uuid = (UUID) value;
             ps.setString(index, uuid.toString());
-        } else if (value instanceof Enum<?> e) {
+        } else if (value instanceof Enum<?>) {
+            Enum<?> e = (Enum<?>) value;
             ps.setString(index, e.name());
-        } else if (value instanceof Timestamp ts) {
+        } else if (value instanceof Timestamp) {
+            Timestamp ts = (Timestamp) value;
             ps.setTimestamp(index, ts);
         } else {
             ps.setObject(index, value);
@@ -220,9 +224,11 @@ public final class EntityMapper {
             }
             Object value = getFieldValue(meta.field(), entity);
             // 特殊类型转换
-            if (value instanceof UUID uuid) {
+            if (value instanceof UUID) {
+                UUID uuid = (UUID) value;
                 value = uuid.toString();
-            } else if (value instanceof Enum<?> e) {
+            } else if (value instanceof Enum<?>) {
+                Enum<?> e = (Enum<?>) value;
                 value = e.name();
             }
             map.put(meta.columnName(), value);
@@ -251,9 +257,11 @@ public final class EntityMapper {
                 continue;
             }
             Object value = getFieldValue(meta.field(), entity);
-            if (value instanceof UUID uuid) {
+            if (value instanceof UUID) {
+                UUID uuid = (UUID) value;
                 value = uuid.toString();
-            } else if (value instanceof Enum<?> e) {
+            } else if (value instanceof Enum<?>) {
+                Enum<?> e = (Enum<?>) value;
                 value = e.name();
             }
             setDoc.append(meta.columnName(), value);
@@ -290,7 +298,8 @@ public final class EntityMapper {
                 try {
                     idField.setAccessible(true);
                     Object idValue = doc.get("_id");
-                    if (idValue instanceof ObjectId objectId) {
+                    if (idValue instanceof ObjectId) {
+                        ObjectId objectId = (ObjectId) idValue;
                         idField.set(entity, objectId.toString());
                     } else {
                         idField.set(entity, idValue.toString());
@@ -374,22 +383,22 @@ public final class EntityMapper {
         try {
             Class<?> fieldType = field.getType();
 
-            if (fieldType == UUID.class && value instanceof String s) {
-                value = UUID.fromString(s);
-            } else if (fieldType.isEnum() && value instanceof String s) {
+            if (fieldType == UUID.class && value instanceof String) {
+                value = UUID.fromString((String) value);
+            } else if (fieldType.isEnum() && value instanceof String) {
                 @SuppressWarnings({"unchecked", "rawtypes"})
-                Object enumValue = Enum.valueOf((Class<Enum>) fieldType, s.toUpperCase());
+                Object enumValue = Enum.valueOf((Class<Enum>) fieldType, ((String) value).toUpperCase());
                 value = enumValue;
-            } else if ((fieldType == double.class || fieldType == Double.class) && value instanceof Number n) {
-                value = n.doubleValue();
-            } else if ((fieldType == int.class || fieldType == Integer.class) && value instanceof Number n) {
-                value = n.intValue();
-            } else if ((fieldType == long.class || fieldType == Long.class) && value instanceof Number n) {
-                value = n.longValue();
-            } else if (fieldType == String.class && value instanceof Integer i) {
-                value = String.valueOf(i);
-            } else if (fieldType == Timestamp.class && value instanceof java.util.Date date) {
-                value = new Timestamp(date.getTime());
+            } else if ((fieldType == double.class || fieldType == Double.class) && value instanceof Number) {
+                value = ((Number) value).doubleValue();
+            } else if ((fieldType == int.class || fieldType == Integer.class) && value instanceof Number) {
+                value = ((Number) value).intValue();
+            } else if ((fieldType == long.class || fieldType == Long.class) && value instanceof Number) {
+                value = ((Number) value).longValue();
+            } else if (fieldType == String.class && value instanceof Integer) {
+                value = String.valueOf(value);
+            } else if (fieldType == Timestamp.class && value instanceof java.util.Date) {
+                value = new Timestamp(((java.util.Date) value).getTime());
             }
 
             field.set(entity, value);

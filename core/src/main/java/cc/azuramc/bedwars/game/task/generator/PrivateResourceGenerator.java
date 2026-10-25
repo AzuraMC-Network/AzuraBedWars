@@ -70,7 +70,8 @@ public class PrivateResourceGenerator {
         // 统计指定类型的物品数量
         int count = 0;
         for (Entity entity : nearbyEntities) {
-            if (entity instanceof Item item) {
+            if (entity instanceof Item) {
+                Item item = (Item) entity;
                 if (item.getItemStack().getType() == material) {
                     count += item.getItemStack().getAmount();
                 }

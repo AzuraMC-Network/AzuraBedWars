@@ -17,6 +17,11 @@ base {
     archivesName = "AzuraBedWars"
 }
 
+// nms modules for newer Minecraft target newer Java
+java {
+    disableAutoTargetJvm()
+}
+
 tasks.jar {
     enabled = false
 }
@@ -67,6 +72,21 @@ val runtimeLibraries = tasks.register<RuntimeLibrariesTask>("runtimeLibraries") 
     files.from(libraryArtifacts.map { artifacts -> artifacts.map { it.file } })
     manifest = layout.buildDirectory.file("runtime-libraries/libraries.txt")
     bundle = layout.buildDirectory.dir("runtime-libraries/bundle")
+}
+
+val checkBytecode = tasks.register<CheckBytecodeTask>("checkBytecode") {
+    // loaded only on Java 16 and newer
+    val optional = setOf("org.mongodb:bson-record-codec")
+    jars.from(libraryArtifacts.map { artifacts ->
+        artifacts.filter {
+            (it.id.componentIdentifier as ModuleComponentIdentifier).moduleIdentifier.toString() !in optional
+        }.map { it.file }
+    })
+    javaVersion = 8
+}
+
+tasks.check {
+    dependsOn(checkBytecode)
 }
 
 /** Paths must match LibraryResolver in bootstrap */

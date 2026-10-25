@@ -49,7 +49,8 @@ public class WarpPowderListener implements Listener {
         }
 
         for (AbstractSpecialItem item : gameManager.getAbstractSpecialItems()) {
-            if (item instanceof WarpPowder powder) {
+            if (item instanceof WarpPowder) {
+                WarpPowder powder = (WarpPowder) item;
                 if (powder.getPlayer() != null && powder.getPlayer().equals(gamePlayer)) {
                     return powder;
                 }
@@ -67,9 +68,10 @@ public class WarpPowderListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onDamage(EntityDamageEvent event) {
         // 检查是否为玩家
-        if (!(event.getEntity() instanceof Player player)) {
+        if (!(event.getEntity() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getEntity();
 
         GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
 

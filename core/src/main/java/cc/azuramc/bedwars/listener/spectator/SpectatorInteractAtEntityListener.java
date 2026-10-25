@@ -34,7 +34,8 @@ public class SpectatorInteractAtEntityListener implements Listener {
      * 处理旁观者与实体的交互
      */
     private void handleSpectatorEntityInteraction(PlayerInteractAtEntityEvent event, GamePlayer gamePlayer) {
-        if (event.getRightClicked() instanceof Player targetPlayer && SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) {
+        if (event.getRightClicked() instanceof Player && SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) {
+            Player targetPlayer = (Player) event.getRightClicked();
             event.setCancelled(true);
 
             GamePlayer targetGamePlayer = GamePlayer.get(targetPlayer.getUniqueId());

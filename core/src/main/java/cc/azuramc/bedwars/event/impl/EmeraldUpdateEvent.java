@@ -64,11 +64,14 @@ public class EmeraldUpdateEvent extends AbstractGameEvent {
      * @return 刷新间隔（秒）
      */
     private int getRefreshSecondsForLevel() {
-        return switch (level) {
-            case 2 -> emeraldUpdateConfig.getLevel2RefreshSecond();
-            case 3 -> emeraldUpdateConfig.getLevel3RefreshSecond();
-            default -> emeraldUpdateConfig.getLevel1RefreshSecond();
-        };
+        switch (level) {
+            case 2:
+                return emeraldUpdateConfig.getLevel2RefreshSecond();
+            case 3:
+                return emeraldUpdateConfig.getLevel3RefreshSecond();
+            default:
+                return emeraldUpdateConfig.getLevel1RefreshSecond();
+        }
     }
 
     /**

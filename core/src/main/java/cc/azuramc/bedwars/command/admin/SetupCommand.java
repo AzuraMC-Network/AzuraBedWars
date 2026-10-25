@@ -10,6 +10,7 @@ import revxrsal.commands.annotation.DefaultFor;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public class SetupCommand {
             return;
         }
 
-        List<String> messageList = MessageUtil.color(List.of(
+        List<String> messageList = MessageUtil.color(Arrays.asList(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 设置工具",
                 "",

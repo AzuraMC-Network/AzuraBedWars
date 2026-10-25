@@ -1,5 +1,8 @@
 package cc.azuramc.bedwars.database.mapper;
 
+import lombok.Value;
+import lombok.experimental.Accessors;
+
 import java.lang.reflect.Field;
 
 /**
@@ -16,17 +19,19 @@ import java.lang.reflect.Field;
  * @param updatable     是否可更新
  * @author an5w1r@163.com
  */
-public record ColumnMeta(
-        Field field,
-        String columnName,
-        boolean primaryKey,
-        boolean autoIncrement,
-        String type,
-        String defaultValue,
-        int size,
-        boolean nullable,
-        boolean updatable
-) {
+@Value
+@Accessors(fluent = true)
+public class ColumnMeta {
+    Field field;
+    String columnName;
+    boolean primaryKey;
+    boolean autoIncrement;
+    String type;
+    String defaultValue;
+    int size;
+    boolean nullable;
+    boolean updatable;
+
     /**
      * 获取字段的 Java 类型
      */

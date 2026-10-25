@@ -3,7 +3,7 @@ package cc.azuramc.bedwars.database.dialect;
 /**
  * @author an5w1r@163.com
  */
-public sealed interface SqlDialect permits MySqlDialect {
+public interface SqlDialect {
 
     /**
      * 获取方言名称

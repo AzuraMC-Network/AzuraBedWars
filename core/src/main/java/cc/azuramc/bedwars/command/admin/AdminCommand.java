@@ -15,6 +15,7 @@ import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +30,7 @@ public class AdminCommand {
 
     @DefaultFor({"azurabedwars", "bedwars", "abw", "bw"})
     public void getHelpCommand(BukkitCommandActor actor) {
-        List<String> helpMessages = MessageUtil.color(List.of(
+        List<String> helpMessages = MessageUtil.color(Arrays.asList(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 指令帮助",
                 "",

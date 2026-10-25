@@ -12,6 +12,8 @@ import cc.azuramc.bedwars.shop.gui.ItemShopGUI;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -239,6 +241,10 @@ public final class ShopItemGiver {
     /**
      * 工具给予动作封装
      */
-    private record ToolGiveAction(BiConsumer<GamePlayer, Boolean> action, boolean replace) {
+    @Value
+    @Accessors(fluent = true)
+    private static class ToolGiveAction {
+        BiConsumer<GamePlayer, Boolean> action;
+        boolean replace;
     }
 }

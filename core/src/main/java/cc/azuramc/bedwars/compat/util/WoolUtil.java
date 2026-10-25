@@ -68,48 +68,80 @@ public class WoolUtil {
             // 1.13+版本的羊毛命名格式为 COLOR_WOOL
             String colorName = blockType.substring(0, blockType.length() - 5);
             // 映射颜色名称到TeamColor
-            return switch (colorName) {
-                case "RED" -> TeamColor.RED;
-                case "BLUE" -> TeamColor.BLUE;
-                case "GREEN" -> TeamColor.GREEN;
-                case "LIME" -> TeamColor.LIME;
-                case "YELLOW" -> TeamColor.YELLOW;
-                case "CYAN" -> TeamColor.CYAN;
-                case "LIGHT_BLUE" -> TeamColor.LIGHT_BLUE;
-                case "WHITE" -> TeamColor.WHITE;
-                case "PINK" -> TeamColor.PINK;
-                case "MAGENTA" -> TeamColor.MAGENTA;
-                case "PURPLE" -> TeamColor.PURPLE;
-                case "GRAY" -> TeamColor.GRAY;
-                case "BLACK" -> TeamColor.BLACK;
-                case "ORANGE" -> TeamColor.ORANGE;
-                case "BROWN" -> TeamColor.BROWN;
-                default -> null;
-            };
+            switch (colorName) {
+                case "RED":
+                    return TeamColor.RED;
+                case "BLUE":
+                    return TeamColor.BLUE;
+                case "GREEN":
+                    return TeamColor.GREEN;
+                case "LIME":
+                    return TeamColor.LIME;
+                case "YELLOW":
+                    return TeamColor.YELLOW;
+                case "CYAN":
+                    return TeamColor.CYAN;
+                case "LIGHT_BLUE":
+                    return TeamColor.LIGHT_BLUE;
+                case "WHITE":
+                    return TeamColor.WHITE;
+                case "PINK":
+                    return TeamColor.PINK;
+                case "MAGENTA":
+                    return TeamColor.MAGENTA;
+                case "PURPLE":
+                    return TeamColor.PURPLE;
+                case "GRAY":
+                    return TeamColor.GRAY;
+                case "BLACK":
+                    return TeamColor.BLACK;
+                case "ORANGE":
+                    return TeamColor.ORANGE;
+                case "BROWN":
+                    return TeamColor.BROWN;
+                default:
+                    return null;
+            }
         } else if ("WOOL".equals(blockType)) {
             // 1.12-版本需要检查数据值
             @SuppressWarnings("deprecation")
             byte data = block.getData();
 
             // 根据羊毛的数据值映射到TeamColor
-            return switch (data) {
-                case 0 -> TeamColor.WHITE;
-                case 1 -> TeamColor.ORANGE;
-                case 2 -> TeamColor.MAGENTA;
-                case 3 -> TeamColor.LIGHT_BLUE;
-                case 4 -> TeamColor.YELLOW;
-                case 5 -> TeamColor.LIME;
-                case 6 -> TeamColor.PINK;
-                case 7 -> TeamColor.GRAY;
-                case 9 -> TeamColor.CYAN;
-                case 10 -> TeamColor.PURPLE;
-                case 11 -> TeamColor.BLUE;
-                case 12 -> TeamColor.BROWN;
-                case 13 -> TeamColor.GREEN;
-                case 14 -> TeamColor.RED;
-                case 15 -> TeamColor.BLACK;
-                default -> null;
-            };
+            switch (data) {
+                case 0:
+                    return TeamColor.WHITE;
+                case 1:
+                    return TeamColor.ORANGE;
+                case 2:
+                    return TeamColor.MAGENTA;
+                case 3:
+                    return TeamColor.LIGHT_BLUE;
+                case 4:
+                    return TeamColor.YELLOW;
+                case 5:
+                    return TeamColor.LIME;
+                case 6:
+                    return TeamColor.PINK;
+                case 7:
+                    return TeamColor.GRAY;
+                case 9:
+                    return TeamColor.CYAN;
+                case 10:
+                    return TeamColor.PURPLE;
+                case 11:
+                    return TeamColor.BLUE;
+                case 12:
+                    return TeamColor.BROWN;
+                case 13:
+                    return TeamColor.GREEN;
+                case 14:
+                    return TeamColor.RED;
+                case 15:
+                    return TeamColor.BLACK;
+                default:
+                    return null;
+            }
         }
 
         return null;
@@ -124,24 +156,40 @@ public class WoolUtil {
     public static byte getWoolDataFromTeamColor(TeamColor teamColor) {
 
         // 根据羊毛的数据值映射到TeamColor
-        return switch (teamColor) {
-            case WHITE -> 0;
-            case ORANGE -> 1;
-            case MAGENTA -> 2;
-            case LIGHT_BLUE -> 3;
-            case YELLOW -> 4;
-            case LIME -> 5;
-            case PINK -> 6;
-            case GRAY -> 7;
-            case CYAN -> 9;
-            case PURPLE -> 10;
-            case BLUE -> 11;
-            case BROWN -> 12;
-            case GREEN -> 13;
-            case RED -> 14;
-            case BLACK -> 15;
-            default -> 0;
-        };
+        switch (teamColor) {
+            case WHITE:
+                return 0;
+            case ORANGE:
+                return 1;
+            case MAGENTA:
+                return 2;
+            case LIGHT_BLUE:
+                return 3;
+            case YELLOW:
+                return 4;
+            case LIME:
+                return 5;
+            case PINK:
+                return 6;
+            case GRAY:
+                return 7;
+            case CYAN:
+                return 9;
+            case PURPLE:
+                return 10;
+            case BLUE:
+                return 11;
+            case BROWN:
+                return 12;
+            case GREEN:
+                return 13;
+            case RED:
+                return 14;
+            case BLACK:
+                return 15;
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -151,25 +199,42 @@ public class WoolUtil {
      * @return 颜色名称
      */
     public static String getColorNameFromData(byte data) {
-        return switch (data & 0xF) { // 只使用低4位
-            case 0 -> "WHITE";
-            case 1 -> "ORANGE";
-            case 2 -> "MAGENTA";
-            case 3 -> "LIGHT_BLUE";
-            case 4 -> "YELLOW";
-            case 5 -> "LIME";
-            case 6 -> "PINK";
-            case 7 -> "GRAY";
-            case 8 -> "SILVER";
-            case 9 -> "CYAN";
-            case 10 -> "PURPLE";
-            case 11 -> "BLUE";
-            case 12 -> "BROWN";
-            case 13 -> "GREEN";
-            case 14 -> "RED";
-            case 15 -> "BLACK";
-            default -> "WHITE";
-        };
+        switch (data & 0xF) { // 只使用低4位
+            case 0:
+                return "WHITE";
+            case 1:
+                return "ORANGE";
+            case 2:
+                return "MAGENTA";
+            case 3:
+                return "LIGHT_BLUE";
+            case 4:
+                return "YELLOW";
+            case 5:
+                return "LIME";
+            case 6:
+                return "PINK";
+            case 7:
+                return "GRAY";
+            case 8:
+                return "SILVER";
+            case 9:
+                return "CYAN";
+            case 10:
+                return "PURPLE";
+            case 11:
+                return "BLUE";
+            case 12:
+                return "BROWN";
+            case 13:
+                return "GREEN";
+            case 14:
+                return "RED";
+            case 15:
+                return "BLACK";
+            default:
+                return "WHITE";
+        }
     }
 
     /**

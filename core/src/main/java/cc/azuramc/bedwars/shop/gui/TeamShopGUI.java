@@ -217,13 +217,19 @@ public class TeamShopGUI extends CustomGUI {
      * @return 中文汉字数字
      */
     private String getChineseNumber(int number) {
-        return switch (number) {
-            case 1 -> "一";
-            case 2 -> "二";
-            case 3 -> "三";
-            case 4 -> "四";
-            case 5 -> "五";
-            default -> String.valueOf(number);
-        };
+        switch (number) {
+            case 1:
+                return "一";
+            case 2:
+                return "二";
+            case 3:
+                return "三";
+            case 4:
+                return "四";
+            case 5:
+                return "五";
+            default:
+                return String.valueOf(number);
+        }
     }
 }

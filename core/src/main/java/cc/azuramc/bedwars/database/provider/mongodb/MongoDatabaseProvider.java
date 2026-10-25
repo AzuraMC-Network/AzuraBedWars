@@ -76,7 +76,7 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
                 && databaseConfig.getPassword() != null && !databaseConfig.getPassword().isEmpty();
 
         if (hasAuth) {
-            return MONGO_URL_WITH_AUTH.formatted(
+            return String.format(MONGO_URL_WITH_AUTH,
                     databaseConfig.getUsername(),
                     databaseConfig.getPassword(),
                     databaseConfig.getHost(),
@@ -84,7 +84,7 @@ public class MongoDatabaseProvider implements IDatabaseProvider {
                     databaseConfig.getDatabase()
             );
         } else {
-            return MONGO_URL_NO_AUTH.formatted(
+            return String.format(MONGO_URL_NO_AUTH,
                     databaseConfig.getHost(),
                     databaseConfig.getPort(),
                     databaseConfig.getDatabase()

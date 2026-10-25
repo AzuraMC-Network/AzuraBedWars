@@ -151,12 +151,20 @@ public final class ShopPaymentHandler {
                 fallbackResources = new String[]{"DIAMOND", "GOLD", "IRON"};
             } else {
                 // 其他资源不足时向上递增
-                fallbackResources = switch (requiredResourceType) {
-                    case "IRON" -> new String[]{"GOLD", "DIAMOND", "EMERALD"};
-                    case "GOLD" -> new String[]{"DIAMOND", "EMERALD"};
-                    case "DIAMOND" -> new String[]{"EMERALD"};
-                    default -> new String[0];
-                };
+                switch (requiredResourceType) {
+                    case "IRON":
+                        fallbackResources = new String[]{"GOLD", "DIAMOND", "EMERALD"};
+                        break;
+                    case "GOLD":
+                        fallbackResources = new String[]{"DIAMOND", "EMERALD"};
+                        break;
+                    case "DIAMOND":
+                        fallbackResources = new String[]{"EMERALD"};
+                        break;
+                    default:
+                        fallbackResources = new String[0];
+                        break;
+                }
             }
 
             remainingXp = deductFromResources(gamePlayer, remainingXp, fallbackResources);

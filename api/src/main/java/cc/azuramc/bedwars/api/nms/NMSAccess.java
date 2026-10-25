@@ -88,23 +88,39 @@ public interface NMSAccess {
      * @return 颜色名
      */
     static String woolColorName(byte data) {
-        return switch (data & 0xF) {
-            case 1 -> "ORANGE";
-            case 2 -> "MAGENTA";
-            case 3 -> "LIGHT_BLUE";
-            case 4 -> "YELLOW";
-            case 5 -> "LIME";
-            case 6 -> "PINK";
-            case 7 -> "GRAY";
-            case 8 -> "LIGHT_GRAY";
-            case 9 -> "CYAN";
-            case 10 -> "PURPLE";
-            case 11 -> "BLUE";
-            case 12 -> "BROWN";
-            case 13 -> "GREEN";
-            case 14 -> "RED";
-            case 15 -> "BLACK";
-            default -> "WHITE";
-        };
+        switch (data & 0xF) {
+            case 1:
+                return "ORANGE";
+            case 2:
+                return "MAGENTA";
+            case 3:
+                return "LIGHT_BLUE";
+            case 4:
+                return "YELLOW";
+            case 5:
+                return "LIME";
+            case 6:
+                return "PINK";
+            case 7:
+                return "GRAY";
+            case 8:
+                return "LIGHT_GRAY";
+            case 9:
+                return "CYAN";
+            case 10:
+                return "PURPLE";
+            case 11:
+                return "BLUE";
+            case 12:
+                return "BROWN";
+            case 13:
+                return "GREEN";
+            case 14:
+                return "RED";
+            case 15:
+                return "BLACK";
+            default:
+                return "WHITE";
+        }
     }
 }

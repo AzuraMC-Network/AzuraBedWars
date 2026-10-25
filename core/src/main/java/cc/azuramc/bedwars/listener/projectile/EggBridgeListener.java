@@ -42,14 +42,16 @@ public class EggBridgeListener implements Listener {
         }
 
         // 投掷物是否为鸡蛋判断
-        if (!(event.getEntity() instanceof Egg egg)) {
+        if (!(event.getEntity() instanceof Egg)) {
             return;
         }
+        Egg egg = (Egg) event.getEntity();
 
         // 仅为玩家
-        if (!(egg.getShooter() instanceof Player shooter)) {
+        if (!(egg.getShooter() instanceof Player)) {
             return;
         }
+        Player shooter = (Player) egg.getShooter();
 
         // 仅为游戏玩家
         GamePlayer gamePlayer = GamePlayer.get(shooter.getUniqueId());

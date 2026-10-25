@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public class ReinforcedArmorUpgradeStrategy extends AbstractTieredUpgradeStrateg
 
     @Override
     public List<String> getDescription() {
-        return List.of("§7己方所有成员的盔甲将获得永久保护附魔！");
+        return Collections.singletonList("§7己方所有成员的盔甲将获得永久保护附魔！");
     }
 
     @Override

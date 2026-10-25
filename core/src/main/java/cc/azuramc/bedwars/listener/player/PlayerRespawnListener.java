@@ -98,9 +98,10 @@ public class PlayerRespawnListener implements Listener {
      */
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player player)) {
+        if (!(event.getEntity() instanceof Player)) {
             return;
         }
+        Player player = (Player) event.getEntity();
 
         if (!RESPAWN_PROTECT.contains(GamePlayer.get(player))) {
             return;
@@ -276,12 +277,16 @@ public class PlayerRespawnListener implements Listener {
      * @return 降级后的工具等级
      */
     private ToolType degradeToolLevel(ToolType currentType) {
-        return switch (currentType) {
-            case DIAMOND -> ToolType.IRON;
-            case IRON -> ToolType.STONE;
-            case STONE -> ToolType.WOOD;
-            default -> currentType;
-        };
+        switch (currentType) {
+            case DIAMOND:
+                return ToolType.IRON;
+            case IRON:
+                return ToolType.STONE;
+            case STONE:
+                return ToolType.WOOD;
+            default:
+                return currentType;
+        }
     }
 
     /**

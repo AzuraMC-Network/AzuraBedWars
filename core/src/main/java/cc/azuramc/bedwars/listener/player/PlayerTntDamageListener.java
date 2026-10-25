@@ -26,9 +26,12 @@ public class PlayerTntDamageListener implements Listener {
     @EventHandler
     public void onTntExplosion(EntityDamageByEntityEvent event) {
         if (AzuraBedWars.getInstance().getGameManager().getGameState() != GameState.RUNNING) return;
-        if (!(event.getEntity() instanceof Player player)) return;
-        if (!(event.getDamager() instanceof TNTPrimed tnt)) return;
-        if (!(tnt.getSource() instanceof Player damager)) return;
+        if (!(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        if (!(event.getDamager() instanceof TNTPrimed)) return;
+        TNTPrimed tnt = (TNTPrimed) event.getDamager();
+        if (!(tnt.getSource() instanceof Player)) return;
+        Player damager = (Player) tnt.getSource();
 
         if (damager.equals(player)) {
             applySelfTntDamage(event, player, tnt);

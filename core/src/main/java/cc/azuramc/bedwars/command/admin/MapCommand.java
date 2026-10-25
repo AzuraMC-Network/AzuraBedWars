@@ -77,7 +77,7 @@ public class MapCommand {
                 .map(Enum::name)
                 .collect(Collectors.joining("/"));
 
-        List<String> messageList = MessageUtil.color(List.of(
+        List<String> messageList = MessageUtil.color(Arrays.asList(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 地图设置",
                 "",
@@ -286,10 +286,18 @@ public class MapCommand {
             MapData.DropType dropType = MapData.DropType.valueOf(value.toUpperCase());
             mapData.addDrop(dropType, player.getLocation());
             switch (dropType) {
-                case BASE -> player.sendMessage(MessageUtil.color("&a成功添加基地资源点"));
-                case DIAMOND -> player.sendMessage(MessageUtil.color("&a成功添加钻石资源点"));
-                case EMERALD -> player.sendMessage(MessageUtil.color("&a成功添加绿宝石资源点"));
-                default -> player.sendMessage(MessageUtil.color("&c添加资源点失败"));
+                case BASE:
+                    player.sendMessage(MessageUtil.color("&a成功添加基地资源点"));
+                    break;
+                case DIAMOND:
+                    player.sendMessage(MessageUtil.color("&a成功添加钻石资源点"));
+                    break;
+                case EMERALD:
+                    player.sendMessage(MessageUtil.color("&a成功添加绿宝石资源点"));
+                    break;
+                default:
+                    player.sendMessage(MessageUtil.color("&c添加资源点失败"));
+                    break;
             }
         } catch (IllegalArgumentException e) {
             player.sendMessage(MessageUtil.color("&c无效的资源点类型: " + value));
@@ -390,7 +398,7 @@ public class MapCommand {
         IMapStorage storage = MapStorageFactory.getStorage(storageType);
         List<String> mapNames = storage.getAllMapNames();
 
-        List<String> messageList = new ArrayList<>(MessageUtil.color(List.of(
+        List<String> messageList = new ArrayList<>(MessageUtil.color(Arrays.asList(
                 MessageUtil.CHAT_BAR,
                 "&b存储类型 [" + storageType.name() + "] 中的地图列表",
                 "",
@@ -400,13 +408,13 @@ public class MapCommand {
         )));
 
         if (mapNames.isEmpty()) {
-            messageList.addAll(MessageUtil.color(List.of(
+            messageList.addAll(MessageUtil.color(Arrays.asList(
                     " &e没有找到地图",
                     "",
                     MessageUtil.CHAT_BAR
             )));
         } else {
-            messageList.addAll(MessageUtil.color(List.of(
+            messageList.addAll(MessageUtil.color(Arrays.asList(
                     " &9&l▸ &f地图列表:"
             )));
 
@@ -414,7 +422,7 @@ public class MapCommand {
                 messageList.add(MessageUtil.color(" &7  - &a" + mapName));
             }
 
-            messageList.addAll(MessageUtil.color(List.of(
+            messageList.addAll(MessageUtil.color(Arrays.asList(
                     "",
                     MessageUtil.CHAT_BAR
             )));
@@ -485,7 +493,7 @@ public class MapCommand {
             return;
         }
         List<String> messageList = new ArrayList<>();
-        messageList.addAll(MessageUtil.color(List.of(
+        messageList.addAll(MessageUtil.color(Arrays.asList(
                 MessageUtil.CHAT_BAR,
                 "&b地图信息",
                 "",
@@ -504,7 +512,7 @@ public class MapCommand {
 
         messageList.addAll(MessageUtil.color(MessageUtil.formatLocationList(mapData.getBases())));
 
-        messageList.addAll(MessageUtil.color(List.of(
+        messageList.addAll(MessageUtil.color(Arrays.asList(
                 "",
                 " &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE),
                 " &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND),

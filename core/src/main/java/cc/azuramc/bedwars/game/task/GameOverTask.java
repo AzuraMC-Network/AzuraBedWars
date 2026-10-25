@@ -8,6 +8,8 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.ReconnectState;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.util.FireWorkUtil;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -254,12 +256,16 @@ public class GameOverTask extends BukkitRunnable {
      * @return 排名名称
      */
     private String getRankName(int index) {
-        return switch (index) {
-            case 0 -> "first";
-            case 1 -> "second";
-            case 2 -> "third";
-            default -> "first";
-        };
+        switch (index) {
+            case 0:
+                return "first";
+            case 1:
+                return "second";
+            case 2:
+                return "third";
+            default:
+                return "first";
+        }
     }
 
     /**
@@ -272,7 +278,11 @@ public class GameOverTask extends BukkitRunnable {
     /**
      * 结算排行榜条目（昵称 + 数值），便于统一表示在线玩家与断线快照
      */
-    private record RankingEntry(String name, int value) {
+    @Value
+    @Accessors(fluent = true)
+    private static class RankingEntry {
+        String name;
+        int value;
     }
 
     /**
@@ -297,12 +307,16 @@ public class GameOverTask extends BukkitRunnable {
     }
 
     private int getValue(String type, int kills, int assists, int bedBreaks) {
-        return switch (type) {
-            case "Kills" -> kills;
-            case "Assists" -> assists;
-            case "BedBreaks" -> bedBreaks;
-            default -> 0;
-        };
+        switch (type) {
+            case "Kills":
+                return kills;
+            case "Assists":
+                return assists;
+            case "BedBreaks":
+                return bedBreaks;
+            default:
+                return 0;
+        }
     }
 
     /**

@@ -118,9 +118,10 @@ public class CustomEntityDamageListener implements Listener {
         }
 
         // 检查投掷物发射者是否为玩家
-        if (!(projectile.getShooter() instanceof Player shooter)) {
+        if (!(projectile.getShooter() instanceof Player)) {
             return;
         }
+        Player shooter = (Player) projectile.getShooter();
 
         GamePlayer shooterGamePlayer = GamePlayer.get(shooter.getUniqueId());
 

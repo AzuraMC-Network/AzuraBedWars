@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 游戏管理核心类
@@ -629,7 +630,7 @@ public class GameManager implements IGameManager {
         return gameTeams.stream()
                 .filter(team -> !team.isFull())
                 .min(Comparator.comparingInt(team -> team.getGamePlayers().size()))
-                .orElse(gameTeams.getFirst());
+                .orElse(gameTeams.get(0));
     }
 
     /**
@@ -655,7 +656,7 @@ public class GameManager implements IGameManager {
             List<GamePlayer> unassignedPlayers = gameParty.getPlayers().stream()
                     .map(player -> GamePlayer.get(player.getUuid()))
                     .filter(player -> player != null && player.getGameTeam() == null)
-                    .toList();
+                    .collect(Collectors.toList());
 
             for (GamePlayer gamePlayer : unassignedPlayers) {
                 if (!lowest.addPlayer(gamePlayer)) {
@@ -672,7 +673,7 @@ public class GameManager implements IGameManager {
     private void assignIndividualPlayersToTeams() {
         List<GamePlayer> freePlayers = GamePlayer.getOnlinePlayers().stream()
                 .filter(player -> player.getGameTeam() == null)
-                .toList();
+                .collect(Collectors.toList());
 
         for (GamePlayer gamePlayer : freePlayers) {
             GameTeam lowest = getLowestTeam();
@@ -1016,10 +1017,10 @@ public class GameManager implements IGameManager {
     public GameTeam getWinner() {
         List<GameTeam> aliveTeams = gameTeams.stream()
                 .filter(team -> !team.isDead())
-                .toList();
+                .collect(Collectors.toList());
 
         if (aliveTeams.size() == 1) {
-            return aliveTeams.getFirst();
+            return aliveTeams.get(0);
         }
 
         return null;
@@ -1029,7 +1030,7 @@ public class GameManager implements IGameManager {
     public List<GameTeam> getAliveTeams() {
         return gameTeams.stream()
                 .filter(team -> !team.isDead())
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public boolean isTie() {
