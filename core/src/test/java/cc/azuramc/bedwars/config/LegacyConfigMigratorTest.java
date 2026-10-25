@@ -51,8 +51,9 @@ class LegacyConfigMigratorTest {
         service.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
         service.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
         service.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, service.content("timeline.yml")));
-        service.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 2);
+        service.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 3);
         service.addMigration("timeline", 1, TimelineConfig::fromVersion1);
+        service.addMigration("timeline", 2, TimelineConfig::fromVersion2);
         service.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
         service.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, ConfigService.bundled("upgrades.yml")));
         service.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
@@ -83,7 +84,7 @@ class LegacyConfigMigratorTest {
         assertEquals(3, generators.resource("gold").level(1).getInterval());
         assertEquals(7, generators.resource("diamond").level(2).getMaxStack());
         assertEquals(20, generators.resource("diamond").level(2).getInterval());
-        assertEquals(100, service.get(TimelineConfig.class).getBedDestroyedEvent().getExecuteSeconds());
+        assertEquals(100, service.get(TimelineConfig.class).getStages().get(4).getAfter());
         assertEquals(3, service.get(UpgradeConfig.class).getUpgrades().get("M").getLevels().get(0).getEffects().get(0).getSeconds());
         assertEquals("§aNV", service.get(MessageConfig.class).getSpectator().getNightVisionEnabled());
 

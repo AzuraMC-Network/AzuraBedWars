@@ -22,6 +22,7 @@ import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapManager;
+import cc.azuramc.bedwars.game.timeline.TimelineValidator;
 import cc.azuramc.bedwars.gui.base.listener.GUIListener;
 import cc.azuramc.bedwars.listener.ListenerRegistry;
 import cc.azuramc.bedwars.listener.packet.InvisibilityPacketListener;
@@ -343,8 +344,9 @@ public final class AzuraBedWars implements PluginEntrypoint {
         configService.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
         configService.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
         configService.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, configService.content("timeline.yml")));
-        configService.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 2);
+        configService.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 3);
         configService.addMigration("timeline", 1, TimelineConfig::fromVersion1);
+        configService.addMigration("timeline", 2, TimelineConfig::fromVersion2);
         configService.register("items", "items.yml", ItemConfig.class, ApplyMode.LIVE, 1);
         configService.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
         configService.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, ConfigService.bundled("upgrades.yml")));
@@ -355,6 +357,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
                 "blocks.yml", "melee.yml", "armor.yml", "tools.yml", "ranged.yml", "potions.yml", "utility.yml", "convert.yml");
         configService.addValidator(new ShopValidator(ItemSpecs.NAMES));
         configService.addValidator(new UpgradeValidator(ItemSpecs.NAMES));
+        configService.addValidator(new TimelineValidator(ItemSpecs.NAMES));
         configService.register(Devtools.DOCUMENT_ID, "devtools.yml", DevtoolsConfig.class, ApplyMode.LIVE, 1);
 
         LegacyConfigMigrator.migrateIfPresent(plugin.getDataFolder(), configService);

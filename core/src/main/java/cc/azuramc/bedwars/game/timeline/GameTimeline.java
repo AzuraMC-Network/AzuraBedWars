@@ -13,8 +13,10 @@ import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,12 +54,9 @@ public class GameTimeline {
         config = AzuraBedWars.getInstance().getTimelineConfig();
         events.clear();
         events.add(new TimelineEvent("开始游戏", config.getGameStartEvent().getCountDown(), this::showStartCountdown, this::startGenerators));
-        events.add(new TimelineEvent("钻石资源点升级到II级", 360, () -> gameManager.getGeneratorManager().setPublicLevel("diamond", 2)));
-        events.add(new TimelineEvent("绿宝石升级到II级", 360, () -> gameManager.getGeneratorManager().setPublicLevel("emerald", 2)));
-        events.add(new TimelineEvent("钻石资源点升级到III级", 360, () -> gameManager.getGeneratorManager().setPublicLevel("diamond", 3)));
-        events.add(new TimelineEvent("绿宝石升级到III级", 360, () -> gameManager.getGeneratorManager().setPublicLevel("emerald", 3)));
-        events.add(new TimelineEvent("床自毁", config.getBedDestroyedEvent().getExecuteSeconds(), this::destroyAllBeds));
-        events.add(new TimelineEvent("游戏结束", config.getGameOverEvent().getExecuteSeconds(), this::endWithoutWinner));
+        for (TimelineConfig.Stage stage : config.getStages()) {
+            events.add(new TimelineEvent(stage.getName(), stage.getAfter(), () -> stage.getActions().forEach(this::run)));
+        }
         task = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), this::tick, 0L, 20L);
     }
 
@@ -135,17 +134,53 @@ public class GameTimeline {
         new SpectatorCompassTask().start();
     }
 
-    private void destroyAllBeds() {
-        for (GameTeam gameTeam : gameManager.getGameTeams()) {
-            if (!gameTeam.isDestroyed()) {
-                gameTeam.setDestroyed(true);
-            }
+    private void run(TimelineConfig.Action action) {
+        switch (action.getType()) {
+            case TimelineConfig.Action.GENERATOR_LEVEL:
+                if (action.getResource() != null && action.getLevel() != null) {
+                    gameManager.getGeneratorManager().setPublicLevel(action.getResource(), action.getLevel());
+                }
+                break;
+            case TimelineConfig.Action.DESTROY_BEDS:
+                for (GameTeam gameTeam : gameManager.getGameTeams()) {
+                    if (!gameTeam.isDestroyed()) {
+                        gameTeam.setDestroyed(true);
+                    }
+                }
+                break;
+            case TimelineConfig.Action.END_GAME:
+                if (!ended) {
+                    endWithoutWinner();
+                }
+                break;
+            case TimelineConfig.Action.TITLE:
+                gameManager.broadcastTitleToAll(Objects.toString(action.getTitle(), ""), Objects.toString(action.getSubtitle(), ""),
+                        orDefault(action.getFadeIn(), 10), orDefault(action.getStay(), 40), orDefault(action.getFadeOut(), 10));
+                break;
+            case TimelineConfig.Action.SOUND:
+                Sound sound = action.getSound() == null ? null : XSound.of(action.getSound()).map(XSound::get).orElse(null);
+                if (sound != null) {
+                    gameManager.broadcastSound(sound, action.getVolume() != null ? action.getVolume() : 1,
+                            action.getPitch() != null ? action.getPitch() : 1);
+                }
+                break;
+            case TimelineConfig.Action.MESSAGE:
+                if (action.getMessage() != null) {
+                    gameManager.broadcastMessage(action.getMessage());
+                }
+                break;
+            case TimelineConfig.Action.COMMAND:
+                if (action.getCommands() != null) {
+                    action.getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+                }
+                break;
+            default:
+                break;
         }
+    }
 
-        TimelineConfig.BedDestroyedEvent bedDestroyed = config.getBedDestroyedEvent();
-        gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_GROWL.get(), 1, 1);
-        gameManager.broadcastTitleToAll(bedDestroyed.getTitle(), bedDestroyed.getSubtitle(),
-                bedDestroyed.getFadeIn(), bedDestroyed.getTitleStay(), bedDestroyed.getFadeOut());
+    private static int orDefault(@Nullable Integer value, int fallback) {
+        return value != null ? value : fallback;
     }
 
     private void showBaseDistance() {
