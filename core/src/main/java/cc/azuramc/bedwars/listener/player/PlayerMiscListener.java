@@ -96,7 +96,7 @@ public class PlayerMiscListener implements Listener {
             return;
         }
 
-        if (player.hasMetadata("等待上一次求救")) {
+        if (gamePlayer.isSpectator() || gamePlayer.isRespawning() || player.hasMetadata("等待上一次求救")) {
             return;
         }
 

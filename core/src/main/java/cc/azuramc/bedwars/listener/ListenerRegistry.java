@@ -38,7 +38,6 @@ public class ListenerRegistry {
         register(new PlayerAFKListener());
         register(new PlayerChestOpenListener());
         register(new PlayerDamageListener());
-        register(new PlayerDeathReasonListener());
         register(new PlayerDragToolListener());
         register(new PlayerDrinkMilkListener(plugin));
         register(new PlayerDropListener());
