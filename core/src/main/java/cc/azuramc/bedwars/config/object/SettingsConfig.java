@@ -39,6 +39,9 @@ public class SettingsConfig {
     @Comment("再来一局命令")
     private String playAgainCommand = "/not impl now";
 
+    @Comment({"离开游戏和游戏结束时前往的 BungeeCord 子服", "留空则直接踢出玩家"})
+    private String lobbyServer = "G_BedwarsLobby#1";
+
     @Comment("玩家最大生命值")
     private int maxHealth = 20;
 
