@@ -1,4 +1,4 @@
-package cc.azuramc.bedwars.shop;
+package cc.azuramc.bedwars.game.economy;
 
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Value;

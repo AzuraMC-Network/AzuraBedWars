@@ -5,9 +5,8 @@ import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.shop.PriceCost;
+import cc.azuramc.bedwars.game.economy.PriceCost;
 import cc.azuramc.bedwars.shop.gui.TeamShopGUI;
-import cc.azuramc.bedwars.shop.helper.ShopPaymentHandler;
 import com.cryptomorin.xseries.XEnchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -91,7 +90,7 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
             // 先进行支付
             PriceCost price = PriceCost.teamUpgrade(getUpgradePrice(getCurrentLevel(gamePlayer)));
-            if (!ShopPaymentHandler.processPayment(gamePlayer, price)) {
+            if (!AzuraBedWars.getInstance().getGameManager().getEconomy().charge(gamePlayer, price)) {
                 return false;
             }
 

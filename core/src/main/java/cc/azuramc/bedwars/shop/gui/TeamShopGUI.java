@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
-import cc.azuramc.bedwars.shop.PriceCost;
+import cc.azuramc.bedwars.game.economy.PriceCost;
 import cc.azuramc.bedwars.upgrade.factory.TrapStrategyFactory;
 import cc.azuramc.bedwars.upgrade.factory.UpgradeStrategyFactory;
 import cc.azuramc.bedwars.upgrade.trap.TrapManager;

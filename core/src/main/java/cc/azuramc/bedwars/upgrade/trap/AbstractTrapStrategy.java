@@ -6,8 +6,7 @@ import cc.azuramc.bedwars.config.object.TeamUpgradeConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
-import cc.azuramc.bedwars.shop.PriceCost;
-import cc.azuramc.bedwars.shop.helper.ShopPaymentHandler;
+import cc.azuramc.bedwars.game.economy.PriceCost;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.inventory.ItemFlag;
@@ -55,7 +54,7 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
             }
 
             // 先进行支付
-            if (!ShopPaymentHandler.processPayment(gamePlayer, PriceCost.teamUpgrade(getPrice(gamePlayer)))) {
+            if (!AzuraBedWars.getInstance().getGameManager().getEconomy().charge(gamePlayer, PriceCost.teamUpgrade(getPrice(gamePlayer)))) {
                 return false;
             }
 

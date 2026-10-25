@@ -21,7 +21,7 @@ import cc.azuramc.bedwars.game.spectator.SpectatorManager;
 import cc.azuramc.bedwars.game.task.GameStartTask;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
-import cc.azuramc.bedwars.shop.ShopManager;
+import cc.azuramc.bedwars.shop.ShopCatalog;
 import cc.azuramc.bedwars.tablist.TabListListener;
 import cc.azuramc.bedwars.tablist.TabListManager;
 import cc.azuramc.bedwars.upgrade.task.TeamUpgradeCheckTask;
@@ -118,7 +118,7 @@ public class GameManager implements IGameManager {
         this.armorStand = new HashSet<>();
         this.abstractSpecialItems = new ArrayList<>();
         this.economyType = EconomyType.fromConfig(plugin.getSettingsConfig().getEconomyMode());
-        ShopManager.init(this);
+        ShopCatalog.init(economyType);
         this.generatorManager = new GeneratorManager(this);
         this.gameEventManager = new GameEventManager(this);
         initializeConfigs();
