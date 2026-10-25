@@ -74,6 +74,21 @@ val runtimeLibraries = tasks.register<RuntimeLibrariesTask>("runtimeLibraries") 
     bundle = layout.buildDirectory.dir("runtime-libraries/bundle")
 }
 
+val checkBytecode = tasks.register<CheckBytecodeTask>("checkBytecode") {
+    // loaded only on Java 16 and newer
+    val optional = setOf("org.mongodb:bson-record-codec")
+    jars.from(libraryArtifacts.map { artifacts ->
+        artifacts.filter {
+            (it.id.componentIdentifier as ModuleComponentIdentifier).moduleIdentifier.toString() !in optional
+        }.map { it.file }
+    })
+    javaVersion = 8
+}
+
+tasks.check {
+    dependsOn(checkBytecode)
+}
+
 /** Paths must match LibraryResolver in bootstrap */
 fun Jar.pluginContents(archives: ArchiveOperations) {
     from(outerProjectJars.map { jars -> jars.map { archives.zipTree(it) } }) {
