@@ -18,6 +18,7 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
     private final DataSource dataSource;
 
     private static final SqlGenerator SQL = SqlGenerator.mysql();
+    private static final String TABLE_NAME = EntityMapper.getTableName(PlayerData.class);
 
     private static final String CREATE_TABLE_SQL = SQL.generateCreateTableSql(
             PlayerData.class,
@@ -89,6 +90,22 @@ public class MySQLPlayerDataRepository implements IPlayerDataRepository {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to select player data by uuid", e);
+        }
+    }
+
+    @Override
+    public void dropColumn(String column) {
+        try (Connection conn = dataSource.getConnection()) {
+            try (ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), null, TABLE_NAME, column)) {
+                if (!rs.next()) {
+                    return;
+                }
+            }
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("ALTER TABLE `" + TABLE_NAME + "` DROP COLUMN `" + column + "`");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to drop column " + column + " from " + TABLE_NAME, e);
         }
     }
 }

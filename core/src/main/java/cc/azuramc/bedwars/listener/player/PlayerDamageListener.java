@@ -101,13 +101,10 @@ public class PlayerDamageListener implements Listener {
         GamePlayer gamePlayer = GamePlayer.get(player);
         GameTeam gameTeam = gamePlayer != null ? gamePlayer.getGameTeam() : null;
 
-        // 如果没有击杀者，直接清理掉落物并继续处理
-        if (killer == null) {
-            LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer is null");
-        } else {
-            LoggerUtil.debug("Triggered PlayerDamageListener$onDeath | killer isn't null");
-            // 处理击杀奖励
-            KillRewardHandler.processKillReward(event, gamePlayer, GamePlayer.get(killer));
+        GamePlayer gameKiller = killer == null ? null : GamePlayer.get(killer);
+        if (gamePlayer != null && gameKiller != null && gameKiller != gamePlayer
+                && !gameKiller.isSpectator() && !gameKiller.isRespawning()) {
+            gameManager.getEconomy().rewardKill(gamePlayer, gameKiller);
         }
 
         // 清理掉落物

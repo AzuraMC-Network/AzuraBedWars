@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.gui.ModeSelectionGUI;
 import cc.azuramc.bedwars.gui.TeamSelectionGUI;
 import cc.azuramc.bedwars.util.BungeeUtil;
 import com.cryptomorin.xseries.XMaterial;
@@ -39,9 +38,7 @@ public class PlayerLobbyInteractListener implements Listener {
     private void handleWaitingState(PlayerInteractEvent event, GamePlayer gamePlayer, Material interactingMaterial) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
             event.setCancelled(true);
-            if (interactingMaterial == XMaterial.PAPER.get()) {
-                new ModeSelectionGUI(gamePlayer).open();
-            } else if (interactingMaterial == XMaterial.SLIME_BALL.get()) {
+            if (interactingMaterial == XMaterial.SLIME_BALL.get()) {
                 BungeeUtil.connectToLobby(gamePlayer);
             } else if (interactingMaterial.name().contains("WOOL")) {
                 new TeamSelectionGUI(gamePlayer).open();

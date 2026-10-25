@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.database.entity;
 import cc.azuramc.bedwars.database.annotation.Column;
 import cc.azuramc.bedwars.database.annotation.QueryField;
 import cc.azuramc.bedwars.database.annotation.Table;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import lombok.Getter;
@@ -37,9 +36,6 @@ public class PlayerData {
     @QueryField("BY_UUID")
     @Column(value = "uuid", size = 36, nullable = false)
     private UUID uuid;
-
-    @Column(value = "mode", size = 16, nullable = false)
-    private GameModeType mode;
 
     @Column(value = "level", defaultValue = "1")
     private int level;
@@ -92,7 +88,6 @@ public class PlayerData {
     public PlayerData(@NotNull GamePlayer gamePlayer) {
         this.setName(gamePlayer.getName());
         this.setUuid(gamePlayer.getUuid());
-        this.setMode(GameModeType.DEFAULT);
         this.setLevel(1);
         this.setExperience(0.0);
         this.setKills(0);

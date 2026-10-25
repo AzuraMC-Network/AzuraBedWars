@@ -385,6 +385,9 @@ public final class AzuraBedWars implements PluginEntrypoint {
         playerConfig = configManager.getConfig("player", PlayerConfig.class);
         teamUpgradeConfig = configManager.getConfig("teamUpgrade", TeamUpgradeConfig.class);
 
+        // lobby line written by versions with a per-player economy
+        settingsConfig.getLobbyScoreboard().getLines().replaceAll(line -> line.equals("&f你的模式: &a{mode}") ? "&f模式: &a{mode}" : line);
+
         // 保存配置
         configManager.saveAll();
     }

@@ -1,6 +1,5 @@
 package cc.azuramc.bedwars.upgrade.upgrade;
 
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public abstract class AbstractTieredUpgradeStrategy extends AbstractUpgradeStrat
     }
 
     @Override
-    public List<String> getUpgradeLore(GamePlayer gamePlayer, GameModeType gameModeType) {
+    public List<String> getUpgradeLore(GamePlayer gamePlayer) {
         List<String> lore = new ArrayList<>(getDescription());
         lore.add("");
 
@@ -50,7 +49,7 @@ public abstract class AbstractTieredUpgradeStrategy extends AbstractUpgradeStrat
 
             String effectDescription = getTierEffectDescription(displayTier);
             lore.add(tierColor + "等级 " + displayTier + "：" + effectDescription +
-                    "，§b" + formatPrice(price, gameModeType));
+                    "，§b" + formatPrice(price));
         }
 
         lore.add("");

@@ -45,20 +45,7 @@ public class PlayerPickUpListenerLowVersion implements Listener {
             return;
         }
 
-        // 处理金铁锭拾取
-        if (PickupItemHandler.handleIngotPickup(itemStack, gamePlayer, event.getItem())) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 处理钻石拾取
-        if (PickupItemHandler.handleDiamondPickup(itemStack, gamePlayer, event.getItem())) {
-            event.setCancelled(true);
-            return;
-        }
-
-        // 处理绿宝石拾取
-        if (PickupItemHandler.handleEmeraldPickup(itemStack, gamePlayer, event.getItem())) {
+        if (PickupItemHandler.handleResourcePickup(itemStack, gamePlayer, event.getItem())) {
             event.setCancelled(true);
         }
     }
