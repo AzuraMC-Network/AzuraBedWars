@@ -3,8 +3,10 @@ package cc.azuramc.bedwars.game;
 import cc.azuramc.bedwars.AzuraBedWars;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -230,6 +232,23 @@ public class CustomEntityManager {
      */
     public int getRemainingTime() {
         return liveLeftTime;
+    }
+
+    /**
+     * Enemy players and custom entities of other teams
+     */
+    public boolean isEnemy(Entity target) {
+        if (gameTeam == null) {
+            return false;
+        }
+
+        if (target instanceof Player player) {
+            GamePlayer gamePlayer = GamePlayer.get(player.getUniqueId());
+            return gamePlayer != null && !gamePlayer.isSpectator() && gamePlayer.getGameTeam() != gameTeam;
+        }
+
+        CustomEntityManager other = customEntityMap.get(target.getUniqueId());
+        return other != null && other.gameTeam != null && other.gameTeam != gameTeam;
     }
 
     /**
