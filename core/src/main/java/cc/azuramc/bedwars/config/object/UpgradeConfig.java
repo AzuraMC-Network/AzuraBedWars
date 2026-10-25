@@ -3,11 +3,13 @@ package cc.azuramc.bedwars.config.object;
 import cc.azuramc.bedwars.api.config.Comment;
 import cc.azuramc.bedwars.api.config.Range;
 import cc.azuramc.bedwars.api.config.Raw;
+import cc.azuramc.bedwars.config.ExtensionSettings;
 import cc.azuramc.bedwars.config.object.shop.ItemSpec;
 import cc.azuramc.bedwars.config.object.shop.Price;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,7 +150,7 @@ public class UpgradeConfig {
         public static final String INTRUDER = "intruder";
         public static final List<String> PLAYER_TARGETS = Collections.unmodifiableList(Arrays.asList(TEAM, BASE, INTRUDER));
 
-        @Comment("enchant, potion, generator, reveal, title, sound, message, command")
+        @Comment({"enchant, potion, generator, reveal, title, sound, message, command", "or an effect of another plugin as plugin:id"})
         @Raw
         private String type = MESSAGE;
 
@@ -223,6 +225,11 @@ public class UpgradeConfig {
         @Comment({"Command run by the console", "Placeholders: {team} {intruder} {intruder-team}"})
         @Raw
         private List<String> commands = new ArrayList<>();
+
+        @Comment("Settings of an effect of another plugin")
+        @Nullable
+        @ExtensionSettings({"type=upgrade-effect", "type=trap-effect"})
+        private Node settings;
 
         public Effect(String type) {
             this.type = type;

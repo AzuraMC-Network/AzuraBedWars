@@ -90,6 +90,7 @@ public abstract class AbstractBoardProvider {
 
         // 构建并更新计分板内容
         List<String> lines = buildLines(gamePlayer);
+        lines.replaceAll(line -> AzuraBedWars.getInstance().getExtensions().replace(line, player));
         board.updateLines(lines.toArray(new String[0]));
     }
 

@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars;
 
 import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
+import cc.azuramc.bedwars.api.extension.ExtensionRegistry;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.api.nms.NMSAccess;
 import cc.azuramc.bedwars.bootstrap.PluginEntrypoint;
@@ -16,6 +17,9 @@ import cc.azuramc.bedwars.config.object.shop.ShopMenuConfig;
 import cc.azuramc.bedwars.config.object.shop.TierChains;
 import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
 import cc.azuramc.bedwars.devtools.Devtools;
+import cc.azuramc.bedwars.extension.ExtensionKind;
+import cc.azuramc.bedwars.extension.ExtensionValidator;
+import cc.azuramc.bedwars.extension.Extensions;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -48,10 +52,12 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.event.Event;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -76,6 +82,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
     private DatabaseProviderFactory databaseProviderFactory;
     private Devtools devtools;
     private Economy econ = null;
+    private Extensions extensions;
     private GameManager gameManager;
     private LuckPerms luckPermsApi;
     /** True when editorMode is on or no map can run */
@@ -133,6 +140,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         // bStats
         loadBStats();
 
+        Bukkit.getScheduler().runTask(plugin, this::resolveExtensions);
         Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "Loaded in " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
@@ -265,6 +273,11 @@ public final class AzuraBedWars implements PluginEntrypoint {
             }
 
             @Override
+            public ExtensionRegistry getRegistry() {
+                return extensions;
+            }
+
+            @Override
             public void info(String message) {
                 LoggerUtil.info(message);
             }
@@ -370,6 +383,18 @@ public final class AzuraBedWars implements PluginEntrypoint {
         configService.addValidator(new ShopValidator(ItemSpecs.NAMES));
         configService.addValidator(new UpgradeValidator(ItemSpecs.NAMES));
         configService.addValidator(new TimelineValidator(ItemSpecs.NAMES));
+        extensions = new Extensions(name -> {
+            for (Plugin other : Bukkit.getPluginManager().getPlugins()) {
+                if (other.isEnabled() && other.getName().toLowerCase(Locale.ROOT).equals(name)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+        extensions.setOnChange(configService::exportSchemas);
+        Bukkit.getPluginManager().registerEvents(extensions, plugin);
+        configService.setExtensionSettings(kind -> extensions.settingsTypes(ExtensionKind.of(kind)));
+        configService.addValidator(new ExtensionValidator(extensions));
         configService.addValidator((view, sink) -> {
             String language = view.get(SettingsConfig.class).getLanguage();
             Set<String> languages = new TreeSet<>();
@@ -383,6 +408,15 @@ public final class AzuraBedWars implements PluginEntrypoint {
         LegacyConfigMigrator.migrateIfPresent(plugin.getDataFolder(), configService);
         logProblems(configService.loadAll());
         logProblems(MessagesMigrator.migrateIfPresent(plugin.getDataFolder(), configService));
+    }
+
+    /**
+     * Extensions register in onEnable of their plugins, which runs after this plugin is enabled
+     */
+    private void resolveExtensions() {
+        extensions.markReady();
+        configService.exportSchemas();
+        logProblems(configService.validate(new ExtensionValidator(extensions)));
     }
 
     public static void logProblems(List<ConfigProblem> problems) {

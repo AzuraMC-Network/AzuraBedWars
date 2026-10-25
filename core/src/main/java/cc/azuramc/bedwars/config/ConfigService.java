@@ -42,6 +42,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -67,6 +68,7 @@ public final class ConfigService {
     private final Map<String, TreeMap<Integer, UnaryOperator<Map<String, Object>>>> migrations = new HashMap<>();
     private final List<ConfigValidator> validators = new ArrayList<>();
     private Supplier<String> language = () -> null;
+    private Function<String, Map<String, Class<?>>> extensionSettings = kind -> Collections.emptyMap();
 
     public ConfigService(File dataFolder, BooleanSupplier gameRunning) {
         this.dataFolder = dataFolder;
@@ -112,6 +114,13 @@ public final class ConfigService {
 
     public Supplier<String> getLanguage() {
         return language;
+    }
+
+    /**
+     * Settings types of registered extensions by reference, for the schema of {@link ExtensionSettings} fields
+     */
+    public void setExtensionSettings(Function<String, Map<String, Class<?>>> extensionSettings) {
+        this.extensionSettings = extensionSettings;
     }
 
     public List<ConfigDocument<?>> documents() {
@@ -175,7 +184,7 @@ public final class ConfigService {
                 problems.addAll(load(documents.get(id)));
             }
         }
-        problems.addAll(validate(Collections.<String, Object>emptyMap(), Collections.<String, String>emptyMap()));
+        problems.addAll(validate(validators, Collections.<String, Object>emptyMap(), Collections.<String, String>emptyMap()));
         exportSchemas();
         return problems;
     }
@@ -194,7 +203,7 @@ public final class ConfigService {
             values.put(document.getId(), loaded.value);
             return loaded.problems;
         } catch (IOException e) {
-            values.put(document.getId(), new YamlBinder(document.getPath(), true).bindOnto(null, defaults(document)));
+            values.put(document.getId(), new YamlBinder(document.getPath(), true).bindOnto(null, defaults(document), ""));
             return Collections.singletonList(fileProblem(document, "Cannot read or create the file, defaults are used: " + e.getMessage()));
         }
     }
@@ -219,7 +228,7 @@ public final class ConfigService {
 
     public JsonObject schema(String id) {
         ConfigDocument<?> document = require(id);
-        return SchemaExporter.export(document.getType(), document.getKind());
+        return SchemaExporter.export(document.getType(), document.getKind(), extensionSettings);
     }
 
     public void exportSchemas() {
@@ -244,7 +253,7 @@ public final class ConfigService {
         ConfigDocument<?> document = require(id);
         Loaded<?> loaded = bind(document, text);
         List<ConfigProblem> problems = new ArrayList<>(loaded.problems);
-        problems.addAll(validate(Collections.<String, Object>singletonMap(id, loaded.value), Collections.singletonMap(id, text)));
+        problems.addAll(validate(validators, Collections.<String, Object>singletonMap(id, loaded.value), Collections.singletonMap(id, text)));
         return problems;
     }
 
@@ -266,7 +275,7 @@ public final class ConfigService {
                 problems.add(fileProblem(document, "Cannot read the file: " + e.getMessage()));
             }
         }
-        problems.addAll(validate(candidates, texts));
+        problems.addAll(validate(validators, candidates, texts));
         return problems;
     }
 
@@ -496,11 +505,11 @@ public final class ConfigService {
             return Collections.emptyList();
         }
         Set<String> existing = new HashSet<>();
-        for (ConfigProblem problem : validate(Collections.<String, Object>emptyMap(), Collections.<String, String>emptyMap())) {
+        for (ConfigProblem problem : validate(validators, Collections.<String, Object>emptyMap(), Collections.<String, String>emptyMap())) {
             existing.add(problem.getFile() + "|" + problem.getPath() + "|" + problem.getMessage());
         }
         List<ConfigProblem> added = new ArrayList<>();
-        for (ConfigProblem problem : validate(Collections.singletonMap(document.getId(), candidate), Collections.singletonMap(document.getId(), text))) {
+        for (ConfigProblem problem : validate(validators, Collections.singletonMap(document.getId(), candidate), Collections.singletonMap(document.getId(), text))) {
             if (!existing.contains(problem.getFile() + "|" + problem.getPath() + "|" + problem.getMessage())) {
                 added.add(problem);
             }
@@ -508,7 +517,14 @@ public final class ConfigService {
         return added;
     }
 
-    private List<ConfigProblem> validate(Map<String, Object> candidates, Map<String, String> texts) {
+    /**
+     * Problems one validator finds in the current values
+     */
+    public List<ConfigProblem> validate(ConfigValidator validator) {
+        return validate(Collections.singletonList(validator), Collections.<String, Object>emptyMap(), Collections.<String, String>emptyMap());
+    }
+
+    private List<ConfigProblem> validate(List<ConfigValidator> validators, Map<String, Object> candidates, Map<String, String> texts) {
         List<ConfigProblem> problems = new ArrayList<>();
         if (validators.isEmpty()) {
             return problems;
@@ -624,11 +640,11 @@ public final class ConfigService {
             String upgraded = upgrade(document, text, version);
             if (upgraded != null) {
                 YamlBinder upgradedBinder = new YamlBinder(document.getPath(), true);
-                T value = upgradedBinder.bindOnto(upgradedBinder.parse(upgraded), defaults(document));
+                T value = upgradedBinder.bindOnto(upgradedBinder.parse(upgraded), defaults(document), "");
                 return new Loaded<>(value, upgradedBinder.getProblems(), upgraded);
             }
         }
-        T value = binder.bindOnto(root, defaults(document));
+        T value = binder.bindOnto(root, defaults(document), "");
         return new Loaded<>(value, binder.getProblems(), null);
     }
 

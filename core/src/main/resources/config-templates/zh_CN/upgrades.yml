@@ -25,6 +25,7 @@ decor:
 #   generator  resource，interval(秒)，max-stack；队伍没有这个资源点时新建一个
 #   reveal   让隐身的入侵者现形
 #   title sound message command  target: team base intruder
+#   插件名:id  其他插件提供的效果，参数写在 settings 下
 upgrades:
   S:
     id: sharpened_swords

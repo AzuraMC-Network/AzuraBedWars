@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.config.object.UpgradeConfig;
 import cc.azuramc.bedwars.config.object.UpgradeConfig.Effect;
+import cc.azuramc.bedwars.extension.ExtensionKind;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -30,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Runs the effects of upgrades.yml
@@ -96,7 +98,7 @@ public final class UpgradeEffects {
 
     private static Map<Enchantment, Integer> enchantments(GameTeam gameTeam, String target) {
         Map<Enchantment, Integer> enchantments = new LinkedHashMap<>();
-        for (Effect effect : ownedEffects(gameTeam, Effect.ENCHANT)) {
+        for (Effect effect : ownedEffects(gameTeam, Effect.ENCHANT::equals)) {
             Enchantment enchantment = effect.getEnchant() == null ? null : XEnchantment.of(effect.getEnchant()).map(XEnchantment::get).orElse(null);
             if (enchantment != null && target.equals(effect.getTarget())) {
                 enchantments.put(enchantment, effect.getLevel());
@@ -108,20 +110,33 @@ public final class UpgradeEffects {
     /**
      * Effects of every owned level in level order, so a later level overrides an earlier one
      */
-    private static List<Effect> ownedEffects(GameTeam gameTeam, String type) {
+    private static List<Effect> ownedEffects(GameTeam gameTeam, Predicate<String> type) {
         List<Effect> effects = new ArrayList<>();
         for (Map.Entry<String, UpgradeConfig.Upgrade> entry : config().getUpgrades().entrySet()) {
             UpgradeConfig.Upgrade upgrade = entry.getValue();
             int owned = gameTeam.getUpgrades().getLevel(UpgradeValidator.upgradeId(entry.getKey(), upgrade));
             for (int level = 0; level < owned && level < upgrade.getLevels().size(); level++) {
                 for (Effect effect : upgrade.getLevels().get(level).getEffects()) {
-                    if (type.equals(effect.getType())) {
+                    if (type.test(effect.getType())) {
                         effects.add(effect);
                     }
                 }
             }
         }
         return effects;
+    }
+
+    /**
+     * Runs the extension effects of owned levels for a member that spawned
+     */
+    public static void onSpawn(GamePlayer gamePlayer) {
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
+        for (Effect effect : ownedEffects(gameTeam, ExtensionKind::isReference)) {
+            AzuraBedWars.getInstance().getExtensions().spawnWithUpgrade(effect.getType(), effect.getSettings(), gamePlayer);
+        }
     }
 
     private static void applyGenerator(GameTeam gameTeam, Effect effect) {
@@ -154,7 +169,7 @@ public final class UpgradeEffects {
         UpgradeConfig config = config();
         for (GameTeam gameTeam : gameManager.getGameTeams()) {
             Map<String, Effect> potions = new LinkedHashMap<>();
-            for (Effect effect : ownedEffects(gameTeam, Effect.POTION)) {
+            for (Effect effect : ownedEffects(gameTeam, Effect.POTION::equals)) {
                 potions.put(effect.getEffect() + "@" + effect.getTarget(), effect);
             }
             for (Effect effect : potions.values()) {
@@ -211,6 +226,14 @@ public final class UpgradeEffects {
      */
     @SuppressWarnings("deprecation")
     private static void run(Effect effect, GameTeam gameTeam, @Nullable GamePlayer intruder) {
+        if (ExtensionKind.isReference(effect.getType())) {
+            if (intruder != null) {
+                AzuraBedWars.getInstance().getExtensions().triggerTrap(effect.getType(), effect.getSettings(), gameTeam, intruder);
+            } else {
+                AzuraBedWars.getInstance().getExtensions().applyUpgrade(effect.getType(), effect.getSettings(), gameTeam);
+            }
+            return;
+        }
         if (Effect.REVEAL.equals(effect.getType())) {
             if (intruder != null && intruder.isInvisible()) {
                 intruder.endInvisibility();

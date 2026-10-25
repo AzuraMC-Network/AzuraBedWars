@@ -8,6 +8,9 @@ import cc.azuramc.bedwars.config.object.shop.ShopCategoryConfig;
 import cc.azuramc.bedwars.config.object.shop.ShopItemSpec;
 import cc.azuramc.bedwars.config.object.shop.ShopMenuConfig;
 import cc.azuramc.bedwars.config.object.shop.TierChains;
+import cc.azuramc.bedwars.extension.CustomItems;
+import cc.azuramc.bedwars.extension.ExtensionKind;
+import cc.azuramc.bedwars.extension.Extensions;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import lombok.Getter;
@@ -125,7 +128,7 @@ public final class ShopCatalog {
         }
         EconomyType economy = plugin.getGameManager().getEconomyType();
 
-        List<Object> sources = new ArrayList<>(Arrays.asList(menu, tiers, plugin.getGeneratorConfig(), economy));
+        List<Object> sources = new ArrayList<>(Arrays.asList(menu, tiers, plugin.getGeneratorConfig(), economy, plugin.getExtensions().getVersion()));
         sources.addAll(configs.values());
         ShopCatalog catalog = cached;
         if (catalog == null || !sameObjects(catalog.sources, sources)) {
@@ -154,6 +157,9 @@ public final class ShopCatalog {
 
     @Nullable
     private static ShopItem build(String ref, ShopItemSpec spec, TierChains tiers) {
+        if (!extensionsAvailable(spec)) {
+            return null;
+        }
         TierChains.Chain chain = null;
         if (spec.getTier() != null) {
             chain = tiers.get(spec.getTier());
@@ -170,10 +176,29 @@ public final class ShopCatalog {
             if (spec.getSpecial() != null) {
                 item = SpecialItems.tag(item, spec.getSpecial());
             }
+            if (spec.getCustom() != null) {
+                item = CustomItems.tag(item, ref);
+            }
         } else if (chain == null) {
             return null;
         }
         return new ShopItem(ref, spec.getName(), spec, item, chain);
+    }
+
+    private static boolean extensionsAvailable(ShopItemSpec spec) {
+        Extensions extensions = AzuraBedWars.getInstance().getExtensions();
+        if (spec.getCustom() != null && !extensions.isAvailable(ExtensionKind.ITEM, spec.getCustom())
+                || spec.getAction() != null && !extensions.isAvailable(ExtensionKind.PURCHASE_ACTION, spec.getAction())) {
+            return false;
+        }
+        if (spec.getRequires() != null) {
+            for (ShopItemSpec.Condition condition : spec.getRequires().getConditions()) {
+                if (!extensions.isAvailable(ExtensionKind.CONDITION, condition.getType())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private static boolean visible(@Nullable EconomyType item, @Nullable EconomyType category, EconomyType economy) {

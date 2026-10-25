@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.game.timeline;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.game.BedwarsGameEndEvent;
 import cc.azuramc.bedwars.config.object.TimelineConfig;
+import cc.azuramc.bedwars.extension.ExtensionKind;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.spectator.task.SpectatorCompassTask;
@@ -176,6 +177,9 @@ public class GameTimeline {
                 }
                 break;
             default:
+                if (ExtensionKind.isReference(action.getType())) {
+                    AzuraBedWars.getInstance().getExtensions().runTimeline(action.getType(), action.getSettings(), gameManager);
+                }
                 break;
         }
     }

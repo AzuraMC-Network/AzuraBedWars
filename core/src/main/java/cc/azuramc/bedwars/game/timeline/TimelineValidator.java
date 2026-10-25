@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.game.timeline;
 import cc.azuramc.bedwars.config.ConfigValidator;
 import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.config.object.TimelineConfig;
+import cc.azuramc.bedwars.extension.ExtensionKind;
 import cc.azuramc.bedwars.shop.SpecChecks;
 
 import java.util.Map;
@@ -40,6 +41,9 @@ public final class TimelineValidator implements ConfigValidator {
     }
 
     private void check(String document, String path, TimelineConfig.Action action, Map<String, GeneratorConfig.Resource> resources, Sink sink) {
+        if (ExtensionKind.isReference(action.getType())) {
+            return;
+        }
         switch (action.getType()) {
             case TimelineConfig.Action.GENERATOR_LEVEL:
                 GeneratorConfig.Resource resource = action.getResource() == null ? null : resources.get(action.getResource());

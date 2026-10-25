@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.config.ConfigValidator;
 import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.config.object.UpgradeConfig;
 import cc.azuramc.bedwars.config.object.shop.ItemSpec;
+import cc.azuramc.bedwars.extension.ExtensionKind;
 import cc.azuramc.bedwars.shop.SpecChecks;
 
 import java.util.HashSet;
@@ -123,6 +124,9 @@ public final class UpgradeValidator implements ConfigValidator {
 
     private void checkEffect(String document, String path, UpgradeConfig.Effect effect, Set<String> currencies, Sink sink) {
         String type = effect.getType();
+        if (ExtensionKind.isReference(type)) {
+            return;
+        }
         if (!UpgradeConfig.Effect.TYPES.contains(type)) {
             sink.error(document, path + ".type", SpecChecks.unknown("effect type", type, UpgradeConfig.Effect.TYPES));
             return;

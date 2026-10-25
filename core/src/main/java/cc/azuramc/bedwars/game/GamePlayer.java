@@ -379,6 +379,7 @@ public class GamePlayer implements IGamePlayer {
                 ShopPurchase.give(this, item);
             }
         }
+        UpgradeEffects.onSpawn(this);
         player.updateInventory();
     }
 

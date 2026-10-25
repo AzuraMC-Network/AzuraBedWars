@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.config.yaml;
 import cc.azuramc.bedwars.api.config.Comment;
 import cc.azuramc.bedwars.api.config.Range;
 import cc.azuramc.bedwars.api.config.RestartRequired;
+import cc.azuramc.bedwars.config.ExtensionSettings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -14,6 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * JSON Schema (draft-07) of a config object, for editors and the development MCP
@@ -25,8 +27,11 @@ public final class SchemaExporter {
     private SchemaExporter() {
     }
 
-    public static JsonObject export(Class<?> type, String title) {
-        JsonObject schema = Map.class.isAssignableFrom(type) ? forType(type, null) : object(type, ConfigKeys.newInstance(type));
+    /**
+     * @param extensions settings types of registered extensions by reference, for each extension kind
+     */
+    public static JsonObject export(Class<?> type, String title, Function<String, Map<String, Class<?>>> extensions) {
+        JsonObject schema = Map.class.isAssignableFrom(type) ? forType(type, null, extensions) : object(type, ConfigKeys.newInstance(type), extensions);
         if (!schema.has("properties")) {
             schema.add("properties", new JsonObject());
         }
@@ -39,15 +44,26 @@ public final class SchemaExporter {
         return schema;
     }
 
-    private static JsonObject object(Class<?> type, @Nullable Object defaults) {
+    private static JsonObject object(Class<?> type, @Nullable Object defaults, Function<String, Map<String, Class<?>>> extensions) {
         JsonObject schema = new JsonObject();
         schema.addProperty("type", "object");
         describe(schema, type.getAnnotation(Comment.class));
         JsonObject properties = new JsonObject();
+        JsonArray extensionSchemas = new JsonArray();
         for (Map.Entry<String, Field> entry : ConfigKeys.fields(type).entrySet()) {
             Field field = entry.getValue();
             Object value = defaults != null ? get(field, defaults) : null;
-            JsonObject property = forType(field.getGenericType(), value);
+            JsonObject property = forType(field.getGenericType(), value, extensions);
+            ExtensionSettings settings = field.getAnnotation(ExtensionSettings.class);
+            if (settings != null) {
+                for (String reference : settings.value()) {
+                    String key = reference.substring(0, reference.indexOf('='));
+                    for (Map.Entry<String, Class<?>> extension : extensions.apply(reference.substring(key.length() + 1)).entrySet()) {
+                        extensionSchemas.add(ifThen(key, extension.getKey(), entry.getKey(),
+                                object(extension.getValue(), ConfigKeys.newInstance(extension.getValue()), extensions)));
+                    }
+                }
+            }
             describe(property, field.getAnnotation(Comment.class));
             Range range = field.getAnnotation(Range.class);
             if (range != null) {
@@ -65,10 +81,35 @@ public final class SchemaExporter {
         }
         schema.add("properties", properties);
         schema.addProperty("additionalProperties", false);
+        if (extensionSchemas.size() > 0) {
+            schema.add("allOf", extensionSchemas);
+        }
         return schema;
     }
 
-    private static JsonObject forType(Type type, @Nullable Object value) {
+    private static JsonObject ifThen(String key, String value, String property, JsonObject schema) {
+        JsonObject constant = new JsonObject();
+        constant.addProperty("const", value);
+        JsonObject ifProperties = new JsonObject();
+        ifProperties.add(key, constant);
+        JsonArray required = new JsonArray();
+        required.add(new JsonPrimitive(key));
+        JsonObject condition = new JsonObject();
+        condition.add("properties", ifProperties);
+        condition.add("required", required);
+
+        JsonObject thenProperties = new JsonObject();
+        thenProperties.add(property, schema);
+        JsonObject then = new JsonObject();
+        then.add("properties", thenProperties);
+
+        JsonObject ifThen = new JsonObject();
+        ifThen.add("if", condition);
+        ifThen.add("then", then);
+        return ifThen;
+    }
+
+    private static JsonObject forType(Type type, @Nullable Object value, Function<String, Map<String, Class<?>>> extensions) {
         Class<?> raw = ConfigKeys.rawType(type);
         JsonObject schema = new JsonObject();
         if (Node.class.isAssignableFrom(raw)) {
@@ -91,7 +132,7 @@ public final class SchemaExporter {
         if (raw.isArray() || List.class.isAssignableFrom(raw)) {
             Type element = raw.isArray() ? raw.getComponentType() : ConfigKeys.typeArgument(type, 0);
             schema.addProperty("type", "array");
-            schema.add("items", forType(element, null));
+            schema.add("items", forType(element, null, extensions));
             if (value != null && ConfigKeys.isScalar(ConfigKeys.rawType(element))) {
                 JsonArray defaults = new JsonArray();
                 int size = raw.isArray() ? Array.getLength(value) : ((List<?>) value).size();
@@ -104,10 +145,10 @@ public final class SchemaExporter {
         }
         if (Map.class.isAssignableFrom(raw)) {
             schema.addProperty("type", "object");
-            schema.add("additionalProperties", forType(ConfigKeys.typeArgument(type, 1), null));
+            schema.add("additionalProperties", forType(ConfigKeys.typeArgument(type, 1), null, extensions));
             return schema;
         }
-        JsonObject object = object(raw, value != null ? value : ConfigKeys.newInstance(raw));
+        JsonObject object = object(raw, value != null ? value : ConfigKeys.newInstance(raw), extensions);
         if (ConfigKeys.fromString(raw) == null) {
             return object;
         }

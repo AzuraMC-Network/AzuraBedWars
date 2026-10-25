@@ -175,6 +175,11 @@ public final class ShopValidator implements ConfigValidator {
         if (item.getSpecial() != null && !SpecialItems.IDS.contains(item.getSpecial())) {
             sink.error(document, path + ".special", SpecChecks.unknown("special item", item.getSpecial(), SpecialItems.IDS));
         }
+        if (item.getCustom() != null && item.getAction() != null) {
+            sink.error(document, path + ".action", "An item has either custom or action, not both");
+        } else if ((item.getCustom() != null || item.getAction() != null) && item.getTier() != null) {
+            sink.error(document, path + ".tier", "A tier item cannot have custom or action");
+        }
     }
 
     private void checkMenu(String document, ShopMenuConfig menu, Set<String> categories, Set<String> items, Sink sink) {

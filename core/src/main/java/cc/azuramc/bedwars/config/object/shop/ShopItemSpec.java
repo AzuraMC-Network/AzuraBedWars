@@ -3,9 +3,12 @@ package cc.azuramc.bedwars.config.object.shop;
 import cc.azuramc.bedwars.api.config.Comment;
 import cc.azuramc.bedwars.api.config.Range;
 import cc.azuramc.bedwars.api.config.Raw;
+import cc.azuramc.bedwars.config.ExtensionSettings;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +57,21 @@ public class ShopItemSpec {
     @Raw
     private String special;
 
+    @Comment({"Custom item of another plugin, as plugin:id", "item is the stack it starts from"})
+    @Nullable
+    @Raw
+    private String custom;
+
+    @Comment({"Purchase action of another plugin, as plugin:id", "Runs instead of giving item, which is then only the icon"})
+    @Nullable
+    @Raw
+    private String action;
+
+    @Comment("Settings of custom or action")
+    @Nullable
+    @ExtensionSettings({"custom=item", "action=purchase-action"})
+    private Node settings;
+
     @Comment({"Commands run by the console after a purchase", "Placeholders: {player} player name, {team} team name"})
     @Raw
     private List<String> commands = new ArrayList<>();
@@ -84,5 +102,28 @@ public class ShopItemSpec {
         @Nullable
         @Raw
         private String permission;
+
+        @Comment("Conditions of other plugins, a lone plugin:id needs no settings")
+        private List<Condition> conditions = new ArrayList<>();
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class Condition {
+        @Comment("plugin:id")
+        @Raw
+        private String type = "";
+
+        @Nullable
+        @ExtensionSettings("type=condition")
+        private Node settings;
+
+        public Condition(String type) {
+            this.type = type;
+        }
+
+        public static Condition fromString(String type) {
+            return new Condition(type.trim());
+        }
     }
 }

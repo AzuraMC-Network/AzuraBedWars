@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.api;
 
+import cc.azuramc.bedwars.api.extension.ExtensionRegistry;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +42,14 @@ public final class AzuraBedWarsAPI {
         return provider().getPlayer(uuid);
     }
 
+    /**
+     * @throws IllegalStateException when the plugin is not enabled
+     */
+    @NotNull
+    public static ExtensionRegistry getRegistry() {
+        return provider().getRegistry();
+    }
+
     public static void info(@NotNull String message) {
         provider().info(message);
     }
@@ -76,6 +85,9 @@ public final class AzuraBedWarsAPI {
 
         @Nullable
         IGamePlayer getPlayer(@NotNull UUID uuid);
+
+        @NotNull
+        ExtensionRegistry getRegistry();
 
         void info(@NotNull String message);
 
