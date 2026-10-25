@@ -12,7 +12,6 @@ import cc.azuramc.bedwars.compat.util.WoolUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
-import cc.azuramc.bedwars.event.GameEventManager;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
@@ -20,11 +19,11 @@ import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.spectator.SpectatorManager;
 import cc.azuramc.bedwars.game.task.GameStartTask;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
+import cc.azuramc.bedwars.game.timeline.GameTimeline;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
 import cc.azuramc.bedwars.shop.ShopCatalog;
 import cc.azuramc.bedwars.tablist.TabListListener;
 import cc.azuramc.bedwars.tablist.TabListManager;
-import cc.azuramc.bedwars.upgrade.task.TeamUpgradeCheckTask;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.ServerMOTD;
@@ -74,7 +73,7 @@ public class GameManager implements IGameManager {
     private AzuraBedWars plugin;
     private EconomyType economyType;
     private GeneratorManager generatorManager;
-    private GameEventManager gameEventManager;
+    private GameTimeline timeline;
 
     private MapData mapData;
     private double buildLimitHeight;
@@ -120,7 +119,7 @@ public class GameManager implements IGameManager {
         this.economyType = EconomyType.fromConfig(plugin.getSettingsConfig().getEconomyMode());
         ShopCatalog.init(economyType);
         this.generatorManager = new GeneratorManager(this);
-        this.gameEventManager = new GameEventManager(this);
+        this.timeline = new GameTimeline(this);
         initializeConfigs();
 
         this.tabListManager = new TabListManager(this);
@@ -924,7 +923,7 @@ public class GameManager implements IGameManager {
         updateServerMOTD();
 
         moveFreePlayersToTeam();
-        gameEventManager.start();
+        timeline.start();
 
         preparePlayersForGame();
         teleportPlayersToTeamSpawn();
@@ -938,19 +937,8 @@ public class GameManager implements IGameManager {
         // 开始挂机状态检测
         PlayerAFKListener.startCheckAFKTask();
 
-        // 注册团队升级任务
-        registerTeamUpgradeCheckTask();
-
         // 触发游戏开始完成后置事件
         Bukkit.getPluginManager().callEvent(new BedwarsGameStartEvent.Post(this));
-    }
-
-    /**
-     * 注册团队升级任务，处理团队效果和陷阱
-     */
-    private void registerTeamUpgradeCheckTask() {
-        TeamUpgradeCheckTask teamUpgradeCheckTask = new TeamUpgradeCheckTask(this);
-        gameEventManager.registerRunnable("团队升级", (s, c) -> teamUpgradeCheckTask.execute());
     }
 
     /**

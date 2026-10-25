@@ -125,8 +125,8 @@ public final class AzuraBedWars implements PluginEntrypoint {
     @Override
     public void onDisable() {
 
-        if (gameManager != null && gameManager.getGameEventManager() != null) {
-            gameManager.getGameEventManager().stop();
+        if (gameManager != null) {
+            gameManager.getTimeline().stop();
         }
 
         // 保存配置

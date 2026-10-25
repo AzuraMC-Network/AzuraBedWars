@@ -34,8 +34,8 @@ public class GameRunningBoardProvider extends AbstractBoardProvider {
 
         return ScoreboardFormatter.create()
                 .set("date", getFormattedDateRaw())
-                .set("next_event", gameManager.getGameEventManager().formattedNextEvent())
-                .set("time_left", gameManager.getFormattedTime(gameManager.getGameEventManager().getLeftTime()))
+                .set("next_event", gameManager.getTimeline().getCurrentEventName())
+                .set("time_left", gameManager.getFormattedTime(gameManager.getTimeline().getSecondsLeft()))
                 .set("server", "")
                 .formatLinesWithTeams(config.getLines(), teamLines);
     }

@@ -61,7 +61,7 @@ public class ChatListener implements Listener {
         }
 
         // 根据游戏状态发送消息
-        if (gameManager.getGameState() == GameState.RUNNING && !gameManager.getGameEventManager().isOver() && gamePlayer != null) {
+        if (gameManager.getGameState() == GameState.RUNNING && !gameManager.getTimeline().isEnded() && gamePlayer != null) {
             handleInGameChat(gamePlayer, message);
         } else {
             // 游戏未开始或已结束时的聊天，全服可见
