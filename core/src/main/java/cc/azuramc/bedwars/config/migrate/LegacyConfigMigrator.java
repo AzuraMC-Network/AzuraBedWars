@@ -51,16 +51,16 @@ public final class LegacyConfigMigrator {
             if (document == null || entry.getValue().isEmpty() || service.file(document).exists()) {
                 continue;
             }
-            Map<String, Object> content = service.upgrade(document.getKind(), entry.getValue(), 1, document.getVersion());
+            String content = ConfigService.dump(service.upgrade(document.getKind(), entry.getValue(), 1, document.getVersion()));
             YamlBinder binder = new YamlBinder(document.getPath(), false);
-            Object value = binder.bind(binder.parse(new Yaml().dump(content)), document.getType());
+            binder.bind(binder.parse(content), document.getType());
             for (ConfigProblem problem : binder.getProblems()) {
                 if (problem.isError()) {
                     LoggerUtil.warn("Old config value not migrated, the default is used: " + problem);
                 }
             }
             try {
-                ConfigService.writeAtomically(service.file(document), service.render(document, value));
+                ConfigService.writeAtomically(service.file(document), service.migrated(document, content));
                 migrated++;
             } catch (IOException e) {
                 LoggerUtil.error("Cannot write " + document.getPath() + " while migrating the old config", e);

@@ -679,13 +679,22 @@ public final class ConfigService {
      */
     private void persistMigration(ConfigDocument<?> document, File file, String upgraded) throws IOException {
         backup(document, file);
+        writeAtomically(file, migrated(document, upgraded));
+    }
+
+    /**
+     * File text of migrated content, the commented template when nothing differs from it
+     */
+    public String migrated(ConfigDocument<?> document, String upgraded) throws IOException {
         if (document.getTemplate() == null) {
             YamlBinder binder = new YamlBinder(document.getPath(), false);
-            writeAtomically(file, render(document, binder.bind(binder.parse(upgraded), document.getType())));
-        } else {
-            writeAtomically(file, "# yaml-language-server: $schema=" + schemaPath(document) + "\n"
-                    + ConfigKeys.VERSION_KEY + ": " + document.getVersion() + "\n" + upgraded);
+            return render(document, binder.bind(binder.parse(upgraded), document.getType()));
         }
+        if (new Yaml().load(upgraded).equals(bundled(document.getPath()))) {
+            return template(document);
+        }
+        return "# yaml-language-server: $schema=" + schemaPath(document) + "\n"
+                + ConfigKeys.VERSION_KEY + ": " + document.getVersion() + "\n" + upgraded;
     }
 
     private static int version(@Nullable Node root, int fallback) {
@@ -756,6 +765,17 @@ public final class ConfigService {
             }
         }
         throw new IllegalArgumentException(type.getSimpleName() + " is not a registered config document");
+    }
+
+    /**
+     * Content of a bundled template without its version, for migrations that fill in a new layout
+     */
+    public static Map<String, Object> bundled(String path) {
+        String text = resource(TEMPLATE_ROOT + path);
+        Object loaded = text == null ? null : new Yaml().load(text);
+        Map<String, Object> content = loaded instanceof Map ? castMap(loaded) : new LinkedHashMap<String, Object>();
+        content.remove(ConfigKeys.VERSION_KEY);
+        return content;
     }
 
     @Nullable
