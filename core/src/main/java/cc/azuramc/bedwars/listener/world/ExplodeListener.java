@@ -68,7 +68,7 @@ public class ExplodeListener implements Listener {
             Block block = event.blockList().get(i);
 
             // 检查受保护区域
-            if (GAME_MANAGER.getMapData().hasRegion(block.getLocation())) {
+            if (GAME_MANAGER.getMapData().isOutsideRegion(block.getLocation())) {
                 continue;
             }
 

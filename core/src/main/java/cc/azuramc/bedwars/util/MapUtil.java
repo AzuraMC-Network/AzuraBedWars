@@ -34,7 +34,7 @@ public class MapUtil {
         }
 
         // 检查地图区域保护
-        if (GAME_MANAGER.getMapData().hasRegion(block.getLocation())) {
+        if (GAME_MANAGER.getMapData().isOutsideRegion(block.getLocation())) {
             return true;
         }
 
@@ -63,7 +63,7 @@ public class MapUtil {
      */
     public static boolean isProtectedArea(Location location) {
         // 检查地图区域保护
-        if (GAME_MANAGER.getMapData().hasRegion(location)) {
+        if (GAME_MANAGER.getMapData().isOutsideRegion(location)) {
             return true;
         }
 
