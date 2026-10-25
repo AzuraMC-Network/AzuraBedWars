@@ -9,7 +9,6 @@ import cc.azuramc.bedwars.listener.player.*;
 import cc.azuramc.bedwars.listener.projectile.EggBridgeListener;
 import cc.azuramc.bedwars.listener.projectile.FireballListener;
 import cc.azuramc.bedwars.listener.server.ServerListener;
-import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.listener.special.*;
 import cc.azuramc.bedwars.listener.spectator.SpectatorCompassListener;
 import cc.azuramc.bedwars.listener.spectator.SpectatorInteractAtEntityListener;
@@ -66,11 +65,6 @@ public class ListenerRegistry {
 
         // server package
         register(new ServerListener());
-
-        // setup package
-        if (plugin.getSettingsConfig().isEditorMode()) {
-            new SetupItemListener(plugin);
-        }
 
         // special package
         register(new EntityDeathListener());

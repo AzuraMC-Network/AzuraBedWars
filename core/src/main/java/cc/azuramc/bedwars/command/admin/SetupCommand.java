@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.command.admin;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.listener.setup.SetupItemListener;
 import cc.azuramc.bedwars.util.MessageUtil;
-import cc.azuramc.bedwars.util.SetupItemManager;
 import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.AutoComplete;
 import revxrsal.commands.annotation.Command;
@@ -11,78 +11,46 @@ import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
- * 地图设置命令
- *
  * @author an5w1r@163.com
  */
 @Command("setup")
 @CommandPermission("azurabedwars.admin")
 public class SetupCommand {
 
-    private final AzuraBedWars plugin;
-    private final SetupItemManager setupItemManager;
+    private final AzuraBedWars plugin = AzuraBedWars.getInstance();
+    private final SetupItemListener setup;
 
-    public SetupCommand(AzuraBedWars plugin) {
-        this.plugin = plugin;
-        this.setupItemManager = plugin.getSetupItemManager();
-    }
-
-    /**
-     * 检查是否处于编辑模式，如果不是则向用户发送消息并返回true
-     */
-    private boolean checkEditorMode(Player player) {
-        if (!plugin.getSettingsConfig().isEditorMode()) {
-            player.sendMessage(MessageUtil.color("&c错误: 该命令只能在编辑模式下使用"));
-            player.sendMessage(MessageUtil.color("&c请在配置文件中设置 editorMode: true 并重启服务器"));
-            return true;
-        }
-        return false;
+    public SetupCommand(SetupItemListener setup) {
+        this.setup = setup;
     }
 
     @DefaultFor("setup")
-    public void getSetupCommand(Player player) {
-        if (checkEditorMode(player)) {
-            return;
-        }
-
-        List<String> messageList = MessageUtil.color(Arrays.asList(
+    public void help(Player player) {
+        MessageUtil.color(Arrays.asList(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 设置工具",
                 "",
-                "&7 • &f/setup start <mapName> &7开始配置地图",
-                "&7 • &f/setup stop <mapName> &7结束配置地图",
-                "",
+                "&7 • &f/setup start <地图> &7领取设置工具 右键在脚下设置",
+                "&7 • &f/setup stop &7收回设置工具",
                 MessageUtil.CHAT_BAR
-        ));
-
-        messageList.forEach(player::sendMessage);
+        )).forEach(player::sendMessage);
     }
 
     @Subcommand("start")
     @AutoComplete("@mapNames")
-    public void startSetup(Player player, String mapName) {
-        if (checkEditorMode(player)) {
+    public void start(Player player, String mapName) {
+        if (plugin.getMapManager().getMap(mapName) == null) {
+            player.sendMessage(MessageUtil.color("&c找不到地图 " + mapName + " 先用 /map create " + mapName + " 创建"));
             return;
         }
-        AzuraBedWars.getInstance().getMapManager().getAndLoadMapData(mapName);
-
-        setupItemManager.giveSetupItems(player, mapName);
-        setupItemManager.setPlayerMapContext(player.getName(), mapName);
-        player.sendMessage(MessageUtil.color("&a已进入地图「" + mapName + "」的设置模式！"));
+        setup.start(player, mapName);
+        player.sendMessage(MessageUtil.color("&a正在设置地图 " + mapName + " 右键工具在脚下设置 每次修改自动保存"));
     }
 
-
     @Subcommand("stop")
-    public void stopSetup(Player player) {
-        if (checkEditorMode(player)) {
-            return;
-        }
-
-        setupItemManager.removePlayerMapContext(player.getName());
-        player.getInventory().clear();
-        player.sendMessage(MessageUtil.color("&a已退出地图设置模式！"));
+    public void stop(Player player) {
+        player.sendMessage(MessageUtil.color(setup.stop(player) ? "&a已退出地图设置" : "&c你没有在设置地图"));
     }
 }

@@ -4,11 +4,12 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.storage.IMapStorage;
 import cc.azuramc.bedwars.database.storage.MapStorageFactory;
 import cc.azuramc.bedwars.database.storage.MapStorageType;
+import cc.azuramc.bedwars.game.map.MapCheck;
 import cc.azuramc.bedwars.game.map.MapData;
 import cc.azuramc.bedwars.game.map.MapManager;
 import cc.azuramc.bedwars.util.MessageUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.*;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
@@ -16,564 +17,353 @@ import revxrsal.commands.bukkit.annotation.CommandPermission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * Every edit is saved to storage right away
+ *
  * @author an5w1r@163.com
  */
 @Command("map")
 @CommandPermission("azurabedwars.admin")
 public class MapCommand {
 
+    private static final String NAME_PATTERN = "^[a-zA-Z0-9_\\-]{1,30}$";
+    private static final double REMOVE_RANGE = 3;
+
     private final AzuraBedWars plugin = AzuraBedWars.getInstance();
-    private final MapManager mapManager = AzuraBedWars.getInstance().getMapManager();
-
-    /**
-     * 检查是否处于编辑模式，如果不是则向用户发送消息并返回true
-     */
-    private boolean checkEditorMode(Player player) {
-        if (!plugin.getSettingsConfig().isEditorMode()) {
-            player.sendMessage(MessageUtil.color("&c错误: 该命令只能在编辑模式下使用"));
-            player.sendMessage(MessageUtil.color("&c请在配置文件中设置 editorMode: true 并重启服务器"));
-            return true;
-        }
-        return false;
-    }
-
-    private boolean validateMapName(Player player, String mapName) {
-        if (mapName == null || mapName.trim().isEmpty()) {
-            player.sendMessage(MessageUtil.color("&c地图名称不能为空!"));
-            return true;
-        }
-        if (mapName.length() > 30) {
-            player.sendMessage(MessageUtil.color("&c地图名称长度不能超过30个字符!"));
-            return true;
-        }
-        if (!mapName.matches("^[a-zA-Z0-9_\\-]+$")) {
-            player.sendMessage(MessageUtil.color("&c地图名称只能包含字母、数字、下划线和连字符!"));
-            return true;
-        }
-        return false;
-    }
+    private final MapManager mapManager = plugin.getMapManager();
 
     @DefaultFor("map")
-    public void getMapCommand(Player player) {
-        if (checkEditorMode(player)) {
-            return;
-        }
-
-        // 存储类型列表
-        String storageTypes = Arrays.stream(MapStorageType.values())
-                .map(Enum::name)
-                .collect(Collectors.joining("/"));
-
-        // 资源点类型列表
-        String dropTypes = Arrays.stream(MapData.DropType.values())
-                .map(Enum::name)
-                .collect(Collectors.joining("/"));
-
-        // 商店类型列表
-        String shopTypes = Arrays.stream(MapData.ShopType.values())
-                .map(Enum::name)
-                .collect(Collectors.joining("/"));
-
-        List<String> messageList = MessageUtil.color(Arrays.asList(
+    public void help(CommandSender sender) {
+        send(sender, Arrays.asList(
                 MessageUtil.CHAT_BAR,
                 "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 地图设置",
                 "",
-                "&7 • &f/map create <mapName> &7创建新的地图",
-                "&7 • &f/map setWaiting <mapName> &7设置等待大厅位置",
-                "&7 • &f/map setAuthor <mapName> <authorName> &7设置地图作者名",
-                "&7 • &f/map setTeamPlayers <mapName> <number> &7设置队伍最大人数",
-                "&7 • &f/map setMinPlayers <mapName> <number> &7设置地图最小需要人数",
-                "&7 • &f/map setRespawn <mapName> &7设置地图重生点",
-                "&7 • &f/map addBase <mapName> &7增加基地出生点",
-                "&7 • &f/map addDrop <mapName> <type> &7增加资源点 (类型: " + dropTypes + ")",
-                "&7 • &f/map addShop <mapName> <type> &7增加商店 (类型: " + shopTypes + ")",
-                "&7 • &f/map setPos1 <mapName> &7设置地图边界1",
-                "&7 • &f/map setPos2 <mapName> &7设置地图边界2",
-                "&7 • &f/map setUrl <url> &7设置地图文件物理路径",
-                "&7 •  &9&l▸ &f可用变量: ",
-                "&7 •  &9&l▸ &f- {$baseDir}: 插件根目录(plugins文件夹)",
-                "&7 •  &9&l▸ &f- {$pluginDir}: 插件数据文件夹(plugins/AzuraBedWars)",
-                "&7 •  &9&l▸ &f- {$serverDir}: 服务器根目录",
-                "&7 •",
-                "&7 • &f/map save <mapName> &7保存地图",
-                "&7 • &f/map load <mapName> &7加载地图配置",
-                "&7 •",
-                "&7 • &f/map list [type] &7查看指定存储方式地图列表",
-                "&7 • &f/map migrate &7迁移所有地图数据存储方式 (类型: " + storageTypes + ")",
-                "&7 • &f/map migrate <源类型> <目标类型> [mapName] &7迁移地图存储方式",
-                "&7 • &f/map info <mapName> &7查看地图信息",
-                "&7 • &f/map align &7对齐玩家位置和视角为整数值",
+                "&7 • &f/map create <地图> &7创建地图",
+                "&7 • &f/map setUrl <地图> <路径> &7设置地图世界文件夹",
+                "&7 •  &9&l▸ &f可用变量 {$serverDir} 服务器根目录 {$baseDir} plugins {$pluginDir} plugins/AzuraBedWars",
+                "&7 • &f/map setWaiting <地图> &7在脚下设置等待大厅",
+                "&7 • &f/map setRespawn <地图> &7在脚下设置观战重生点",
+                "&7 • &f/map setPos1 <地图> &7 /map setPos2 <地图> &7设置地图边界 较高的一角决定建筑限高",
+                "&7 • &f/map addBase <地图> &7在脚下添加基地 颜色取附近羊毛",
+                "&7 • &f/map addDrop <地图> <BASE/DIAMOND/EMERALD> &7添加资源点",
+                "&7 • &f/map addShop <地图> <ITEM/UPGRADE> &7添加商店",
+                "&7 • &f/map remove <地图> &7删除 " + (int) REMOVE_RANGE + " 格内最近的基地 资源点或商店",
+                "&7 • &f/map setAuthor <地图> <作者> &7设置作者",
+                "&7 • &f/map setTeamPlayers <地图> <人数> &7设置每队人数",
+                "&7 • &f/map setMinPlayers <地图> <人数> &7设置开局最少人数",
+                "&7 • &f/map check <地图> &7检查地图还缺什么",
+                "&7 • &f/map info <地图> &7查看地图信息",
+                "&7 • &f/map list [JSON/MYSQL] &7查看地图列表",
+                "&7 • &f/map load <地图> &7从存储重新读取地图",
+                "&7 • &f/map delete <地图> confirm &7删除地图数据 不删除世界文件",
+                "&7 • &f/map migrate <源类型> <目标类型> [地图] &7迁移地图存储",
+                "&7 • &f/map align &7把位置和视角对齐到整数",
                 MessageUtil.CHAT_BAR
         ));
-
-        messageList.forEach(player::sendMessage);
-    }
-
-    @Subcommand("check")
-    public void checkHashMap(Player player) {
-        if (checkEditorMode(player)) {
-            return;
-        }
-        player.sendMessage(mapManager.getLoadedMaps().toString());
     }
 
     @Subcommand("create")
-    public void createMap(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
+    public void create(CommandSender sender, String mapName) {
+        if (!mapName.matches(NAME_PATTERN)) {
+            reply(sender, "&c地图名只能包含字母 数字 下划线和连字符 最多 30 个字符");
             return;
         }
-        if (mapManager.getLoadedMaps().containsKey(mapName)) {
-            player.sendMessage(MessageUtil.color("&c地图 '" + mapName + "' 已存在!"));
+        if (mapManager.exists(mapName)) {
+            reply(sender, "&c地图 " + mapName + " 已存在");
             return;
         }
-        mapManager.getLoadedMaps().put(mapName, new MapData(mapName));
-        mapManager.saveMapData(mapName);
-        player.sendMessage(MessageUtil.color("&a地图创建成功!"));
+        if (!mapManager.save(new MapData(mapName))) {
+            reply(sender, "&c地图保存失败 详见控制台");
+            return;
+        }
+        reply(sender, "&a地图 " + mapName + " 已创建 下一步 /map setUrl " + mapName + " <世界文件夹>");
+    }
+
+    @Subcommand("delete")
+    @AutoComplete("@mapNames")
+    public void delete(CommandSender sender, String mapName, @Default("") String confirm) {
+        if (mapManager.getMap(mapName) == null) {
+            reply(sender, "&c找不到地图 " + mapName);
+            return;
+        }
+        if (!confirm.equals("confirm")) {
+            reply(sender, "&e将删除地图 " + mapName + " 的配置 世界文件夹不受影响 确认请输入 /map delete " + mapName + " confirm");
+            return;
+        }
+        reply(sender, mapManager.delete(mapName) ? "&a地图 " + mapName + " 已删除" : "&c删除失败 详见控制台");
+    }
+
+    @Subcommand("setUrl")
+    @AutoComplete("@mapNames @pathVariables")
+    public void setUrl(CommandSender sender, String mapName, String fileUrl) {
+        edit(sender, mapName, map -> map.setFileUrl(fileUrl.trim()), map -> {
+            String error = MapCheck.findWorldFolderError(map);
+            return "地图文件夹已设置为 " + map.getWorldFolder() + (error == null ? "" : " &e但" + error);
+        });
     }
 
     @Subcommand("setWaiting")
     @AutoComplete("@mapNames")
     public void setWaiting(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        mapData.setWaitingLocation(player.getLocation());
-        player.sendMessage(MessageUtil.color("&a地图等待大厅设置成功!"));
+        edit(player, mapName, map -> map.setWaitingLocation(player.getLocation()), map -> "等待大厅已设置");
     }
 
     @Subcommand("setRespawn")
     @AutoComplete("@mapNames")
     public void setRespawn(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        mapData.setRespawnLocation(player.getLocation());
-        player.sendMessage(MessageUtil.color("&a地图重生点设置成功!"));
-    }
-
-    @Subcommand("addBase")
-    @AutoComplete("@mapNames")
-    public void addBase(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        mapData.addBase(player.getLocation());
-        player.sendMessage(MessageUtil.color("&a基地出生点增加成功!"));
+        edit(player, mapName, map -> map.setRespawnLocation(player.getLocation()), map -> "观战重生点已设置");
     }
 
     @Subcommand("setPos1")
     @AutoComplete("@mapNames")
     public void setPos1(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        mapData.setPos1(player.getLocation());
-        player.sendMessage(MessageUtil.color("&a设置地图边界 1 成功!"));
+        edit(player, mapName, map -> map.setPos1(player.getLocation()), map -> "地图边界 1 已设置");
     }
 
     @Subcommand("setPos2")
     @AutoComplete("@mapNames")
     public void setPos2(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        mapData.setPos2(player.getLocation());
-        player.sendMessage(MessageUtil.color("&a设置地图边界 2 成功!"));
+        edit(player, mapName, map -> map.setPos2(player.getLocation()), map -> "地图边界 2 已设置");
     }
 
-    @Subcommand("setAuthor")
-    @AutoComplete("@mapNames *")
-    public void setAuthor(Player player, String mapName, String authorName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        if (authorName == null || authorName.trim().isEmpty()) {
-            player.sendMessage(MessageUtil.color("&c作者名不能为空!"));
-            return;
-        }
-        if (authorName.length() > 24) {
-            player.sendMessage(MessageUtil.color("&c作者名长度不能超过24个字符!"));
-            return;
-        }
-        mapData.setAuthor(authorName.trim());
-        player.sendMessage(MessageUtil.color("&a地图作者设置成功!"));
-    }
-
-    @Subcommand("setTeamPlayers")
-    @AutoComplete("@mapNames *")
-    public void setTeamPlayers(Player player, String mapName, int value) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        if (value < 1 || value > 8) {
-            player.sendMessage(MessageUtil.color("&c队伍人数必须在1-8之间!"));
-            return;
-        }
-        mapData.getPlayers().setTeam(value);
-        player.sendMessage(MessageUtil.color("&a队伍最大人数设置成功!"));
-    }
-
-    @Subcommand("setMinPlayers")
-    @AutoComplete("@mapNames *")
-    public void setMinPlayers(Player player, String mapName, int value) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        if (value < 2 || value > 16) {
-            player.sendMessage(MessageUtil.color("&c最小人数必须在2-16之间!"));
-            return;
-        }
-        mapData.getPlayers().setMin(value);
-        player.sendMessage(MessageUtil.color("&a地图最小人数设置成功!"));
+    @Subcommand("addBase")
+    @AutoComplete("@mapNames")
+    public void addBase(Player player, String mapName) {
+        edit(player, mapName, map -> map.addBase(player.getLocation()), map -> {
+            int radius = plugin.getSettingsConfig().getTeamBlockSearchRadius();
+            Object color = MapData.findWoolColor(player.getLocation(), radius);
+            return "基地 #" + map.getBases().size() + " 已添加 " + (color == null ? "&e附近 " + radius + " 格内没有羊毛 开局将自动分配颜色" : "附近羊毛 " + color);
+        });
     }
 
     @Subcommand("addDrop")
     @AutoComplete("@mapNames @dropTypes")
-    public void addDrop(Player player, String mapName, String value) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
+    public void addDrop(Player player, String mapName, String type) {
+        MapData.DropType dropType = parse(player, MapData.DropType.class, type);
+        if (dropType != null) {
+            edit(player, mapName, map -> map.addDrop(dropType, player.getLocation()), map -> dropType + " 资源点已添加 共 " + map.getDrops(dropType) + " 个");
         }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-
-        try {
-            MapData.DropType dropType = MapData.DropType.valueOf(value.toUpperCase());
-            mapData.addDrop(dropType, player.getLocation());
-            switch (dropType) {
-                case BASE:
-                    player.sendMessage(MessageUtil.color("&a成功添加基地资源点"));
-                    break;
-                case DIAMOND:
-                    player.sendMessage(MessageUtil.color("&a成功添加钻石资源点"));
-                    break;
-                case EMERALD:
-                    player.sendMessage(MessageUtil.color("&a成功添加绿宝石资源点"));
-                    break;
-                default:
-                    player.sendMessage(MessageUtil.color("&c添加资源点失败"));
-                    break;
-            }
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(MessageUtil.color("&c无效的资源点类型: " + value));
-            String validTypes = Arrays.stream(MapData.DropType.values())
-                    .map(Enum::name)
-                    .collect(Collectors.joining("&7, &a"));
-            player.sendMessage(MessageUtil.color("&7有效的类型: &a" + validTypes));
-        }
-    }
-
-
-    @Subcommand("setUrl")
-    @AutoComplete("@mapNames @pathVariables")
-    public void setUrl(Player player, String mapName, String fileUrl) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-        if (fileUrl == null || fileUrl.trim().isEmpty()) {
-            player.sendMessage(MessageUtil.color("&c文件URL不能为空!"));
-            return;
-        }
-        if (fileUrl.length() > 200) {
-            player.sendMessage(MessageUtil.color("&c文件URL长度不能超过200个字符!"));
-            return;
-        }
-
-        mapData.setFileUrl(fileUrl.trim());
-        player.sendMessage(MessageUtil.color("&a地图文件URL设置成功!"));
     }
 
     @Subcommand("addShop")
     @AutoComplete("@mapNames @shopTypes")
-    public void addShop(Player player, String mapName, String value) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
-            return;
-        }
-        MapData mapData = mapManager.getLoadedMaps().get(mapName);
-        if (mapData == null) {
-            player.sendMessage(MessageUtil.color("&c找不到地图: " + mapName));
-            return;
-        }
-
-        try {
-            MapData.ShopType shopType = MapData.ShopType.valueOf(value.toUpperCase());
-            mapData.addShop(shopType, player.getLocation());
-            if (shopType == MapData.ShopType.ITEM) {
-                player.sendMessage(MessageUtil.color("&a成功设置物品商店!"));
-            } else {
-                player.sendMessage(MessageUtil.color("&a成功设置团队升级!"));
-            }
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(MessageUtil.color("&c无效的商店类型: " + value));
-            String validTypes = Arrays.stream(MapData.ShopType.values())
-                    .map(Enum::name)
-                    .collect(Collectors.joining("&7, &a"));
-            player.sendMessage(MessageUtil.color("&7有效的类型: &a" + validTypes));
+    public void addShop(Player player, String mapName, String type) {
+        MapData.ShopType shopType = parse(player, MapData.ShopType.class, type);
+        if (shopType != null) {
+            edit(player, mapName, map -> map.addShop(shopType, player.getLocation()), map -> shopType + " 商店已添加 共 " + map.getShops(shopType) + " 个");
         }
     }
 
-    @Subcommand("preloadMap")
+    @Subcommand("remove")
     @AutoComplete("@mapNames")
-    public void preloadMap(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
+    public void remove(Player player, String mapName) {
+        MapData map = mapManager.getMap(mapName);
+        if (map == null) {
+            reply(player, "&c找不到地图 " + mapName);
             return;
         }
-        mapManager.getAndLoadMapData(mapName);
-        player.sendMessage(MessageUtil.color("&a地图预加载完成"));
+        MapData.RawLocation removed = map.removeNearest(player.getLocation(), REMOVE_RANGE);
+        if (removed == null) {
+            reply(player, "&c" + (int) REMOVE_RANGE + " 格内没有基地 资源点或商店");
+            return;
+        }
+        String what = removed instanceof MapData.DropRawLocation ? ((MapData.DropRawLocation) removed).getDropType() + " 资源点"
+                : removed instanceof MapData.ShopRawLocation ? ((MapData.ShopRawLocation) removed).getShopType() + " 商店" : "基地";
+        reply(player, mapManager.save(map) ? "&a已删除 " + what + " " + MessageUtil.formatLocation(removed) : "&c地图保存失败 详见控制台");
     }
 
-    @Subcommand("list")
-    @AutoComplete("@storageTypes")
-    public void list(Player player, @Default("CURRENT") String type) {
-        if (checkEditorMode(player)) {
+    @Subcommand("setAuthor")
+    @AutoComplete("@mapNames *")
+    public void setAuthor(CommandSender sender, String mapName, String author) {
+        if (author.length() > 24) {
+            reply(sender, "&c作者名最多 24 个字符");
             return;
         }
-        MapStorageType storageType;
-
-        if ("CURRENT".equals(type)) {
-            storageType = MapStorageType.valueOf(plugin.getSettingsConfig().getMapStorage().toUpperCase());
-        } else {
-            try {
-                storageType = MapStorageType.valueOf(type.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                player.sendMessage(MessageUtil.color("&c无效的存储类型: " + type));
-                String validTypes = Arrays.stream(MapStorageType.values())
-                        .map(Enum::name)
-                        .collect(Collectors.joining("&7, &a"));
-                player.sendMessage(MessageUtil.color("&7有效的类型: &a" + validTypes));
-                return;
-            }
-        }
-
-        IMapStorage storage = MapStorageFactory.getStorage(storageType);
-        List<String> mapNames = storage.getAllMapNames();
-
-        List<String> messageList = new ArrayList<>(MessageUtil.color(Arrays.asList(
-                MessageUtil.CHAT_BAR,
-                "&b存储类型 [" + storageType.name() + "] 中的地图列表",
-                "",
-                " &9&l▸ &f存储类型: &b" + storageType.name(),
-                " &9&l▸ &f地图总数: &b" + mapNames.size(),
-                ""
-        )));
-
-        if (mapNames.isEmpty()) {
-            messageList.addAll(MessageUtil.color(Arrays.asList(
-                    " &e没有找到地图",
-                    "",
-                    MessageUtil.CHAT_BAR
-            )));
-        } else {
-            messageList.addAll(MessageUtil.color(Arrays.asList(
-                    " &9&l▸ &f地图列表:"
-            )));
-
-            for (String mapName : mapNames) {
-                messageList.add(MessageUtil.color(" &7  - &a" + mapName));
-            }
-
-            messageList.addAll(MessageUtil.color(Arrays.asList(
-                    "",
-                    MessageUtil.CHAT_BAR
-            )));
-        }
-
-        messageList.forEach(player::sendMessage);
+        edit(sender, mapName, map -> map.setAuthor(author), map -> "作者已设置为 " + author);
     }
 
-    @Subcommand("migrate")
-    @AutoComplete("@storageTypes @storageTypes @mapNames")
-    public void migrate(Player player, String sourceTypeString, String targetTypeString, @Default("ALL") String mapName) {
-        if (checkEditorMode(player)) {
+    @Subcommand("setTeamPlayers")
+    @AutoComplete("@mapNames *")
+    public void setTeamPlayers(CommandSender sender, String mapName, int value) {
+        if (value < 1 || value > 8) {
+            reply(sender, "&c每队人数必须在 1 到 8 之间");
             return;
         }
+        edit(sender, mapName, map -> map.getPlayers().setTeam(value), map -> "每队人数已设置为 " + value + " 地图容量 " + map.getMaxPlayers());
+    }
 
-        MapStorageType sourceTypeEnum;
-        MapStorageType targetTypeEnum;
-
-        try {
-            sourceTypeEnum = MapStorageType.valueOf(sourceTypeString.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(ChatColor.RED + "无效的源存储类型: " + sourceTypeString);
+    @Subcommand("setMinPlayers")
+    @AutoComplete("@mapNames *")
+    public void setMinPlayers(CommandSender sender, String mapName, int value) {
+        if (value < 2) {
+            reply(sender, "&c开局最少人数至少为 2");
             return;
         }
+        edit(sender, mapName, map -> map.getPlayers().setMin(value), map -> "开局最少人数已设置为 " + value);
+    }
 
-        try {
-            targetTypeEnum = MapStorageType.valueOf(targetTypeString.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(ChatColor.RED + "无效的目标存储类型: " + targetTypeString);
+    @Subcommand("check")
+    @AutoComplete("@mapNames")
+    public void check(CommandSender sender, String mapName) {
+        MapData map = mapManager.getMap(mapName);
+        if (map == null) {
+            reply(sender, "&c找不到地图 " + mapName);
             return;
         }
-
-        if (sourceTypeEnum == targetTypeEnum) {
-            player.sendMessage(ChatColor.RED + "源存储类型和目标存储类型不能相同");
-            return;
-        }
-
-        // 处理默认值"ALL"，转换为null以迁移所有地图
-        String actualMapName = "ALL".equals(mapName) ? null : mapName;
-
-        // 如果指定了具体地图名称，检查地图是否存在
-        if (actualMapName != null && !MapStorageFactory.getStorage(sourceTypeEnum).exists(actualMapName)) {
-            player.sendMessage(ChatColor.RED + "找不到地图: " + actualMapName);
-            return;
-        }
-
-        player.sendMessage(ChatColor.YELLOW + "开始迁移地图数据从 " + sourceTypeEnum + " 到 " + targetTypeEnum +
-                (actualMapName != null ? " (地图: " + actualMapName + ")" : " (所有地图)"));
-
-        boolean success = MapStorageFactory.migrateStorage(sourceTypeEnum, targetTypeEnum, actualMapName);
-
-        if (success) {
-            player.sendMessage(ChatColor.GREEN + "地图数据迁移成功");
-        } else {
-            player.sendMessage(ChatColor.RED + "地图数据迁移失败，请检查控制台日志");
-        }
+        MapCheck check = MapCheck.of(map);
+        List<String> lines = new ArrayList<>();
+        lines.add(MessageUtil.CHAT_BAR);
+        lines.add(check.getErrors().isEmpty() ? "&a地图 " + mapName + " 可以开始游戏" : "&c地图 " + mapName + " 还不能开始游戏");
+        check.getErrors().forEach(error -> lines.add(" &c✘ " + error));
+        check.getWarnings().forEach(warning -> lines.add(" &e! " + warning));
+        check.getBaseLines().forEach(line -> lines.add(" &7" + line));
+        lines.add(MessageUtil.CHAT_BAR);
+        send(sender, lines);
     }
 
     @Subcommand("info")
     @AutoComplete("@mapNames")
-    public void info(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
+    public void info(CommandSender sender, String mapName) {
+        MapData map = mapManager.getMap(mapName);
+        if (map == null) {
+            reply(sender, "&c找不到地图 " + mapName);
             return;
         }
-        MapData mapData = mapManager.getAndLoadMapData(mapName);
-        if (mapData == null) {
-            player.sendMessage(ChatColor.RED + "找不到地图: " + mapName);
-            return;
-        }
-        List<String> messageList = new ArrayList<>();
-        messageList.addAll(MessageUtil.color(Arrays.asList(
+        List<String> lines = new ArrayList<>(Arrays.asList(
                 MessageUtil.CHAT_BAR,
                 "&b地图信息",
                 "",
-                " &9&l▸ &f名称: &b" + mapData.getName(),
-                " &9&l▸ &f作者: &b" + mapData.getAuthor(),
-                " &9&l▸ &f地图最小人数: &b" + mapData.getPlayers().getMin(),
-                " &9&l▸ &f队伍最大人数: &b" + mapData.getPlayers().getTeam(),
+                " &9&l▸ &f名称: &b" + map.getName(),
+                " &9&l▸ &f作者: &b" + map.getAuthor(),
+                " &9&l▸ &f开局最少人数: &b" + map.getPlayers().getMin(),
+                " &9&l▸ &f每队人数: &b" + map.getPlayers().getTeam() + " &7容量 " + map.getMaxPlayers(),
+                " &9&l▸ &f建筑限高: &b" + map.getHigherY(),
                 "",
-                " &9&l▸ &fPos1: " + MessageUtil.formatLocation(mapData.getRegion().getPos1()),
-                " &9&l▸ &fPos2: " + MessageUtil.formatLocation(mapData.getRegion().getPos2()),
-                " &9&l▸ &f大厅位置: " + MessageUtil.formatLocation(mapData.getWaitingLocation()),
-                " &9&l▸ &f复活时位置: " + MessageUtil.formatLocation(mapData.getRespawnLocation()),
+                " &9&l▸ &fPos1: " + MessageUtil.formatLocation(map.getRegion().getPos1()),
+                " &9&l▸ &fPos2: " + MessageUtil.formatLocation(map.getRegion().getPos2()),
+                " &9&l▸ &f等待大厅: " + MessageUtil.formatLocation(map.getWaitingLocation()),
+                " &9&l▸ &f观战重生点: " + MessageUtil.formatLocation(map.getRespawnLocation()),
                 "",
-                " &9&l▸ &f基地出生点:"
-        )));
-
-        messageList.addAll(MessageUtil.color(MessageUtil.formatLocationList(mapData.getBases())));
-
-        messageList.addAll(MessageUtil.color(Arrays.asList(
+                " &9&l▸ &f基地:"
+        ));
+        lines.addAll(MessageUtil.formatLocationList(map.getBases()));
+        lines.addAll(Arrays.asList(
                 "",
-                " &9&l▸ &f基地资源点: &b" + mapData.getDrops(MapData.DropType.BASE),
-                " &9&l▸ &f钻石资源点: &b" + mapData.getDrops(MapData.DropType.DIAMOND),
-                " &9&l▸ &f绿宝石资源点: &b" + mapData.getDrops(MapData.DropType.EMERALD),
+                " &9&l▸ &f基地资源点: &b" + map.getDrops(MapData.DropType.BASE),
+                " &9&l▸ &f钻石资源点: &b" + map.getDrops(MapData.DropType.DIAMOND),
+                " &9&l▸ &f绿宝石资源点: &b" + map.getDrops(MapData.DropType.EMERALD),
+                " &9&l▸ &f物品商店: &b" + map.getShops(MapData.ShopType.ITEM),
+                " &9&l▸ &f升级商店: &b" + map.getShops(MapData.ShopType.UPGRADE),
                 "",
-                " &7&l注意: &7坐标精度已限制为2位小数",
-                "",
-                " &9&l▸ &f地图文件物理地址: &b" + mapData.getProcessedFileUrl(),
+                " &9&l▸ &f地图文件夹: &b" + map.getWorldFolder(),
                 MessageUtil.CHAT_BAR
-        )));
-
-        messageList.forEach(player::sendMessage);
+        ));
+        send(sender, lines);
     }
 
-    @Subcommand("save")
-    @AutoComplete("@mapNames")
-    public void save(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
+    @Subcommand("list")
+    @AutoComplete("@storageTypes")
+    public void list(CommandSender sender, @Default("CURRENT") String type) {
+        MapStorageType storageType = type.equals("CURRENT") ? MapStorageFactory.getDefaultType() : parse(sender, MapStorageType.class, type);
+        if (storageType == null || !isAvailable(sender, storageType)) {
             return;
         }
-        if (mapManager.saveMapData(mapName)) {
-            player.sendMessage(MessageUtil.color("&a保存成功!"));
-            return;
+        List<String> mapNames = MapStorageFactory.getStorage(storageType).getAllMapNames();
+        List<String> lines = new ArrayList<>(Arrays.asList(
+                MessageUtil.CHAT_BAR,
+                "&b存储类型 " + storageType + " 中的地图 共 " + mapNames.size() + " 个",
+                ""
+        ));
+        if (mapNames.isEmpty()) {
+            lines.add(" &e没有找到地图");
         }
-        player.sendMessage(MessageUtil.color("&c地图保存失败!"));
+        mapNames.forEach(name -> lines.add(" &7  - &a" + name));
+        lines.add(MessageUtil.CHAT_BAR);
+        send(sender, lines);
     }
 
     @Subcommand("load")
     @AutoComplete("@mapNames")
-    public void load(Player player, String mapName) {
-        if (checkEditorMode(player) || validateMapName(player, mapName)) {
+    public void load(CommandSender sender, String mapName) {
+        reply(sender, mapManager.reload(mapName) != null ? "&a已从存储重新读取地图 " + mapName : "&c存储中找不到地图 " + mapName);
+    }
+
+    @Subcommand("migrate")
+    @AutoComplete("@storageTypes @storageTypes @mapNames")
+    public void migrate(CommandSender sender, String sourceType, String targetType, @Default("ALL") String mapName) {
+        MapStorageType source = parse(sender, MapStorageType.class, sourceType);
+        MapStorageType target = parse(sender, MapStorageType.class, targetType);
+        if (source == null || target == null || !isAvailable(sender, source) || !isAvailable(sender, target)) {
             return;
         }
-        mapManager.getAndLoadMapData(mapName);
-        player.sendMessage(MessageUtil.color("&a地图加载成功!"));
+        if (source == target) {
+            reply(sender, "&c源存储类型和目标存储类型不能相同");
+            return;
+        }
+        IMapStorage sourceStorage = MapStorageFactory.getStorage(source);
+        String onlyMap = mapName.equals("ALL") ? null : mapName;
+        if (onlyMap != null && !sourceStorage.exists(onlyMap)) {
+            reply(sender, "&c" + source + " 中找不到地图 " + onlyMap);
+            return;
+        }
+        boolean success = MapStorageFactory.migrate(sourceStorage, MapStorageFactory.getStorage(target), onlyMap);
+        reply(sender, success ? "&a已把" + (onlyMap == null ? "全部地图" : "地图 " + onlyMap) + "从 " + source + " 迁移到 " + target : "&c部分地图迁移失败 详见控制台");
     }
 
     @Subcommand("align")
-    public void alignPlayer(Player player) {
-        if (checkEditorMode(player)) {
+    public void align(Player player) {
+        Location location = player.getLocation();
+        location.setX(Math.round(location.getX()));
+        location.setY(Math.round(location.getY()));
+        location.setZ(Math.round(location.getZ()));
+        location.setYaw(Math.round(location.getYaw() / 90) * 90);
+        location.setPitch(Math.round(location.getPitch() / 90) * 90);
+        player.teleport(location);
+        reply(player, "&a已对齐到 " + location.getX() + ", " + location.getY() + ", " + location.getZ()
+                + " &7Yaw " + location.getYaw() + " Pitch " + location.getPitch());
+    }
+
+    private void edit(CommandSender sender, String mapName, Consumer<MapData> change, Function<MapData, String> done) {
+        MapData map = mapManager.getMap(mapName);
+        if (map == null) {
+            reply(sender, "&c找不到地图 " + mapName + " 先用 /map create " + mapName + " 创建");
             return;
         }
-        // 获取当前位置
-        Location loc = player.getLocation();
+        change.accept(map);
+        if (!mapManager.save(map)) {
+            reply(sender, "&c地图保存失败 详见控制台");
+            return;
+        }
+        reply(sender, "&a" + done.apply(map));
+    }
 
-        // 对齐到最近的整数位置
-        double x = Math.round(loc.getX());
-        double y = Math.round(loc.getY());
-        double z = Math.round(loc.getZ());
+    private <E extends Enum<E>> E parse(CommandSender sender, Class<E> type, String value) {
+        try {
+            return Enum.valueOf(type, value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            String valid = Arrays.stream(type.getEnumConstants()).map(Enum::name).collect(Collectors.joining(", "));
+            reply(sender, "&c无效的类型 " + value + " 可选 " + valid);
+            return null;
+        }
+    }
 
-        // 对齐视角为90度的倍数 (0, 90, 180, 270)
-        float yaw = Math.round(loc.getYaw() / 90) * 90;
-        float pitch = Math.round(loc.getPitch() / 90) * 90;
+    private boolean isAvailable(CommandSender sender, MapStorageType type) {
+        if (type == MapStorageType.MYSQL && !MapStorageFactory.isMysqlAvailable()) {
+            reply(sender, "&cMYSQL 地图存储需要 database.databaseType 为 MySQL");
+            return false;
+        }
+        return true;
+    }
 
-        // 创建新位置
-        Location newLoc = new Location(loc.getWorld(), x, y, z, yaw, pitch);
+    private static void reply(CommandSender sender, String message) {
+        sender.sendMessage(MessageUtil.color(message));
+    }
 
-        // 传送玩家
-        player.teleport(newLoc);
-
-        player.sendMessage(MessageUtil.color("&a位置已对齐到整数坐标! &7X: " + x + ", Y: " + y + ", Z: " + z));
-        player.sendMessage(MessageUtil.color("&a视角已对齐到90度! &7Yaw: " + yaw + ", Pitch: " + pitch));
+    private static void send(CommandSender sender, List<String> lines) {
+        MessageUtil.color(lines).forEach(sender::sendMessage);
     }
 }
