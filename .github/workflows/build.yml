@@ -8,11 +8,15 @@ on:
   release:
     types: [ published ]
 
+concurrency:
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     env:
       TAG: ${{ github.event.release.tag_name }}
     steps:
@@ -28,7 +32,18 @@ jobs:
         with:
           name: AzuraBedWars
           path: plugin/build/libs/AzuraBedWars-*.jar
-      - if: github.event_name == 'release'
-        run: gh release upload "$TAG" plugin/build/libs/AzuraBedWars-*.jar --clobber
+
+  release:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzuraBedWars
+      - run: gh release upload "$TAG" AzuraBedWars-*.jar --clobber --repo "$GITHUB_REPOSITORY"
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
