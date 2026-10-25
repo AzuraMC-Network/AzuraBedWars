@@ -5,7 +5,8 @@ import cc.azuramc.bedwars.config.object.DatabaseConfig;
 import cc.azuramc.bedwars.config.object.DisplayConfig;
 import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.config.object.GeneratorConfig;
-import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.migrate.MessagesMigrator;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.config.object.TimelineConfig;
 import cc.azuramc.bedwars.config.object.UpgradeConfig;
@@ -45,7 +46,8 @@ class LegacyConfigMigratorTest {
         ConfigService.writeAtomically(new File(legacy, "teamUpgrade.yml"), "healingPoolRange: 18.0\nhasteEffectDuration: 60\n");
 
         ConfigService service = new ConfigService(dataFolder, () -> false);
-        service.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 1);
+        service.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 2);
+        service.addMigration("settings", 1, SettingsConfig::fromVersion1);
         service.register("database", "database.yml", DatabaseConfig.class, ApplyMode.RESTART, 1);
         service.register("gameplay", "gameplay.yml", GameplayConfig.class, ApplyMode.LIVE, 1);
         service.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
@@ -56,10 +58,11 @@ class LegacyConfigMigratorTest {
         service.addMigration("timeline", 2, TimelineConfig::fromVersion2);
         service.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
         service.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, ConfigService.bundled("upgrades.yml")));
-        service.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
+        service.registerDirectory("lang", LangConfig.class, ApplyMode.LIVE, 1, "lang", "en_US.yml", "zh_CN.yml");
 
         LegacyConfigMigrator.migrateIfPresent(dataFolder, service);
         assertTrue(service.loadAll().isEmpty());
+        assertTrue(MessagesMigrator.migrateIfPresent(dataFolder, service).isEmpty());
 
         assertFalse(legacy.exists());
         File[] backups = dataFolder.listFiles((dir, name) -> name.startsWith("config-backup-"));
@@ -86,7 +89,9 @@ class LegacyConfigMigratorTest {
         assertEquals(20, generators.resource("diamond").level(2).getInterval());
         assertEquals(100, service.get(TimelineConfig.class).getStages().get(4).getAfter());
         assertEquals(3, service.get(UpgradeConfig.class).getUpgrades().get("M").getLevels().get(0).getEffects().get(0).getSeconds());
-        assertEquals("§aNV", service.get(MessageConfig.class).getSpectator().getNightVisionEnabled());
+        assertEquals("zh_CN", settings.getLanguage());
+        assertEquals("§aNV", service.get("lang/zh_CN", LangConfig.class).getSpectator().getNightVisionEnabled());
+        assertFalse(new File(dataFolder, MessagesMigrator.FILE).exists());
 
         String written = ConfigService.read(new File(dataFolder, "gameplay.yml"));
         assertTrue(written.contains("global-chat-tag: \"&6[G]\""), written);

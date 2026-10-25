@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XMaterial;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -86,7 +87,7 @@ public class RescuePlatform extends AbstractSpecialItem {
 
         // 检查玩家是否在空中
         if (!isPlayerInAir(player)) {
-            gamePlayer.sendMessage("§c你不在空气中!");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getRescuePlatformNotInAir());
             return false;
         }
 
@@ -119,7 +120,7 @@ public class RescuePlatform extends AbstractSpecialItem {
             for (RescuePlatform livingPlatform : livingPlatforms) {
                 int waitLeft = waitTime - livingPlatform.getLivingTime();
                 if (waitLeft > 0) {
-                    gamePlayer.sendMessage("§c需要 §e" + waitLeft + "秒§c 你才能使用下一个救援平台!");
+                    gamePlayer.sendMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getItems().getRescuePlatformCooldown(), "seconds", waitLeft));
                     return false;
                 }
             }

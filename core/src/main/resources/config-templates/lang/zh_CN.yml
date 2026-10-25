@@ -1,0 +1,644 @@
+# yaml-language-server: $schema=../schema/lang.json
+# 玩家和管理员看到的文字
+# 花括号中的词如 {player} 由插件填入
+config-version: 1
+
+command:
+  missing-argument: "&c缺少参数"
+  player-offline: "&c指定的玩家不在线"
+  no-permission: "&c权限不足"
+  players-only: "&c该命令只能由玩家执行！"
+  only-in-game: "&c该命令只能在游戏开始后使用！"
+  shout-usage: "&c用法: /shout <message>"
+  shout-cooldown: "&c喊话冷却中！"
+  game-started: "&c游戏已经开始或处于结算状态!"
+
+  # {min}
+  not-enough-players: "&c游戏人数不足! 至少需要{min}人且分属两支队伍才能&n开始游戏&c."
+  damage-display-usage: "&c用法: /displaydamage <arrow|attack>"
+  damage-display-disabled: "&c该功能未启用！"
+  arrow-damage-on: "&a弓箭伤害显示已开启！"
+  arrow-damage-off: "&c弓箭伤害显示已关闭！"
+  attack-damage-on: "&a攻击伤害显示已开启！"
+  attack-damage-off: "&c攻击伤害显示已关闭！"
+
+admin:
+  # {version}
+  help:
+    - "&b&lAzuraBedWars &8- &7v{version} &8- &b起床战争 - 指令帮助"
+    - ""
+    - "&7 • &f/bw reload [配置名] &7校验并重新加载配置文件"
+    - "&7 • &f/bw config check &7检查所有配置文件的错误"
+    - "&7 • &f/bw config schema &7重新生成编辑器补全用的 JSON Schema"
+    - "&7 • &f/map &7查看地图相关指令帮助 &3&o[仅EditMode]"
+    - "&7 • &f/setup &7查看快速配置相关指令 &3&o[仅EditMode]"
+    - "&7 • &f/bw editorMode true/false &7开关编辑模式(重启后生效)"
+    - "&7 • &f/bw debugMode true/false &7开关调试日志"
+    - "&7 • &f/bw devtools on/off/status/restart/rotate &7开发服的 AI 配置助手(MCP)"
+    - "&7 • &f/bw toWorld <worldName> &7前往世界"
+    - "&7 • &f/bw loadWorld <worldName> &7加载世界"
+    - "&7 • &f/bw start &7立即开始游戏 &3&o[仅非EditMode]"
+
+  # {config} {available}
+  unknown-config: "&c没有名为 {config} 的配置，可选: {available}"
+  config-clean: "&a配置文件没有发现问题"
+
+  # {count}
+  config-problems: "&e配置文件有 {count} 个问题:"
+
+  # {count}
+  more-problems: "&7 ……还有 {count} 个，完整列表见控制台"
+
+  # {folder}
+  schema-written: "&a已重新生成 {folder}/ 下的 JSON Schema"
+
+  # {config}
+  applied: "&f{config} &a已生效"
+  applied-next-game: "&f{config} &e已保存，下一局开始时生效"
+
+  # {config} {paths}
+  applied-restart: "&f{config} &e已生效，以下项重启后生效: &f{paths}"
+  rejected: "&f{config} &c有错误，未应用，仍使用原配置"
+
+  # {world}
+  world-not-loaded: "&c世界 {world} 未加载 先用 /bw loadWorld {world}"
+  world-missing: "&c服务器目录下没有世界存档 {world}"
+  world-load-failed: "&c无法加载世界 {world}"
+  world-loaded: "&a世界 {world} 已加载 /bw toWorld {world} 前往"
+  devtools-off: "&aMCP 已关闭 端口已释放"
+  devtools-off-unsaved: "&eMCP 已关闭 但 devtools.yml 未能保存 重启后会再次开启"
+  devtools-not-running: "&eMCP 未开启 /bw devtools on 开启"
+  devtools-rotated: "&a令牌已更换 旧令牌立即失效 AI 客户端需要用新命令重新添加"
+
+  # {error}
+  devtools-start-failed: "&cMCP 未能启动: {error}"
+  devtools-rotate-restart-failed: "&c令牌已更换 但 MCP 未能重新启动: {error}"
+  devtools-token-write-failed: "&c无法写入新令牌: {error}"
+
+  # {endpoint} {command}
+  devtools-running:
+    - "&aMCP 运行中 &f{endpoint}"
+    - "&7在 AI 客户端所在的电脑上执行:"
+    - "&f{command}"
+    - "&7令牌保存在 plugins/AzuraBedWars/devtools/token 审计日志在 devtools/audit.log"
+
+map:
+  # {version} {range}
+  help:
+    - "&b&lAzuraBedWars &8- &7v{version} &8- &b起床战争 - 地图设置"
+    - ""
+    - "&7 • &f/map create <地图> &7创建地图"
+    - "&7 • &f/map setUrl <地图> <路径> &7设置地图世界文件夹"
+    - "&7 •  &9&l▸ &f可用变量 {$serverDir} 服务器根目录 {$baseDir} plugins {$pluginDir} plugins/AzuraBedWars"
+    - "&7 • &f/map setWaiting <地图> &7在脚下设置等待大厅"
+    - "&7 • &f/map setRespawn <地图> &7在脚下设置观战重生点"
+    - "&7 • &f/map setPos1 <地图> &7 /map setPos2 <地图> &7设置地图边界 较高的一角决定建筑限高"
+    - "&7 • &f/map addBase <地图> &7在脚下添加基地 颜色取附近羊毛"
+    - "&7 • &f/map addDrop <地图> <BASE/DIAMOND/EMERALD> &7添加资源点"
+    - "&7 • &f/map addShop <地图> <ITEM/UPGRADE> &7添加商店"
+    - "&7 • &f/map remove <地图> &7删除 {range} 格内最近的基地 资源点或商店"
+    - "&7 • &f/map setAuthor <地图> <作者> &7设置作者"
+    - "&7 • &f/map setTeamPlayers <地图> <人数> &7设置每队人数"
+    - "&7 • &f/map setMinPlayers <地图> <人数> &7设置开局最少人数"
+    - "&7 • &f/map check <地图> &7检查地图还缺什么"
+    - "&7 • &f/map info <地图> &7查看地图信息"
+    - "&7 • &f/map list [JSON/MYSQL] &7查看地图列表"
+    - "&7 • &f/map load <地图> &7从存储重新读取地图"
+    - "&7 • &f/map delete <地图> confirm &7删除地图数据 不删除世界文件"
+    - "&7 • &f/map migrate <源类型> <目标类型> [地图] &7迁移地图存储"
+    - "&7 • &f/map align &7把位置和视角对齐到整数"
+  invalid-name: "&c地图名只能包含字母 数字 下划线和连字符 最多 30 个字符"
+
+  # {map}
+  exists: "&c地图 {map} 已存在"
+  save-failed: "&c地图保存失败 详见控制台"
+  created: "&a地图 {map} 已创建 下一步 /map setUrl {map} <世界文件夹>"
+  not-found: "&c找不到地图 {map}"
+  not-found-create: "&c找不到地图 {map} 先用 /map create {map} 创建"
+  delete-confirm: "&e将删除地图 {map} 的配置 世界文件夹不受影响 确认请输入 /map delete {map} confirm"
+  deleted: "&a地图 {map} 已删除"
+  delete-failed: "&c删除失败 详见控制台"
+
+  # {folder}
+  folder-set: "&a地图文件夹已设置为 {folder}"
+
+  # {problem}
+  folder-problem: " &e但{problem}"
+  waiting-set: "&a等待大厅已设置"
+  respawn-set: "&a观战重生点已设置"
+  pos1-set: "&a地图边界 1 已设置"
+  pos2-set: "&a地图边界 2 已设置"
+
+  # {number} {color}
+  base-added: "&a基地 #{number} 已添加 附近羊毛 {color}"
+
+  # {number} {radius}
+  base-added-no-wool: "&a基地 #{number} 已添加 &e附近 {radius} 格内没有羊毛 开局将自动分配颜色"
+
+  # {type} {count}
+  drop-added: "&a{type} 资源点已添加 共 {count} 个"
+  shop-added: "&a{type} 商店已添加 共 {count} 个"
+
+  # {range}
+  nothing-to-remove: "&c{range} 格内没有基地 资源点或商店"
+
+  # {what} {location}
+  removed: "&a已删除 {what} {location}"
+
+  # {type}
+  drop: "{type} 资源点"
+  shop: "{type} 商店"
+  base: "基地"
+  author-too-long: "&c作者名最多 24 个字符"
+
+  # {author}
+  author-set: "&a作者已设置为 {author}"
+  team-players-range: "&c每队人数必须在 1 到 8 之间"
+
+  # {players} {capacity}
+  team-players-set: "&a每队人数已设置为 {players} 地图容量 {capacity}"
+  min-players-range: "&c开局最少人数至少为 2"
+  min-players-set: "&a开局最少人数已设置为 {players}"
+
+  # {map}
+  ready: "&a地图 {map} 可以开始游戏"
+  not-ready: "&c地图 {map} 还不能开始游戏"
+
+  # {name} {author} {min} {team} {capacity} {height} {pos1} {pos2} {waiting} {respawn} {bases}
+  # {base-drops} {diamond-drops} {emerald-drops} {item-shops} {upgrade-shops} {folder}
+  info:
+    - "&b地图信息"
+    - ""
+    - " &9&l▸ &f名称: &b{name}"
+    - " &9&l▸ &f作者: &b{author}"
+    - " &9&l▸ &f开局最少人数: &b{min}"
+    - " &9&l▸ &f每队人数: &b{team} &7容量 {capacity}"
+    - " &9&l▸ &f建筑限高: &b{height}"
+    - ""
+    - " &9&l▸ &fPos1: {pos1}"
+    - " &9&l▸ &fPos2: {pos2}"
+    - " &9&l▸ &f等待大厅: {waiting}"
+    - " &9&l▸ &f观战重生点: {respawn}"
+    - ""
+    - " &9&l▸ &f基地:"
+    - "{bases}"
+    - ""
+    - " &9&l▸ &f基地资源点: &b{base-drops}"
+    - " &9&l▸ &f钻石资源点: &b{diamond-drops}"
+    - " &9&l▸ &f绿宝石资源点: &b{emerald-drops}"
+    - " &9&l▸ &f物品商店: &b{item-shops}"
+    - " &9&l▸ &f升级商店: &b{upgrade-shops}"
+    - ""
+    - " &9&l▸ &f地图文件夹: &b{folder}"
+
+  # {number} {location}
+  base-line: "    &7- 基地{number}: {location}"
+  none: "&c无"
+  not-set: "&c未设置"
+  unknown-world: "未知世界"
+
+  # {storage} {count}
+  list-header: "&b存储类型 {storage} 中的地图 共 {count} 个"
+  list-empty: " &e没有找到地图"
+
+  # {map}
+  reloaded: "&a已从存储重新读取地图 {map}"
+  not-in-storage: "&c存储中找不到地图 {map}"
+  same-storage: "&c源存储类型和目标存储类型不能相同"
+
+  # {storage} {map}
+  not-in-source: "&c{storage} 中找不到地图 {map}"
+
+  # {maps} {from} {to}
+  migrated: "&a已把{maps}从 {from} 迁移到 {to}"
+  all-maps: "全部地图"
+
+  # {map}
+  one-map: "地图 {map}"
+  migrate-failed: "&c部分地图迁移失败 详见控制台"
+
+  # {x} {y} {z} {yaw} {pitch}
+  aligned: "&a已对齐到 {x}, {y}, {z} &7Yaw {yaw} Pitch {pitch}"
+
+  # {value} {available}
+  invalid-type: "&c无效的类型 {value} 可选 {available}"
+  mysql-unavailable: "&cMYSQL 地图存储需要 database.yml 中 database-type 为 MySQL"
+
+map-check:
+  # {world}
+  world-not-loaded: "世界 {world} 未加载 跳过床和羊毛检查"
+  no-waiting: "未设置等待大厅 /map setWaiting"
+  no-respawn: "未设置观战重生点 /map setRespawn"
+  no-region: "未设置地图边界 /map setPos1 与 /map setPos2"
+
+  # {count}
+  too-few-bases: "至少需要 2 个基地 当前 {count} 个"
+
+  # {max} {count}
+  too-many-bases: "基地最多 {max} 个 当前 {count} 个"
+  no-base-drop: "没有基地资源点 /map addDrop <地图> BASE"
+  no-diamond-drop: "没有钻石资源点"
+  no-emerald-drop: "没有绿宝石资源点"
+  no-item-shop: "没有物品商店"
+  no-upgrade-shop: "没有团队升级商店"
+
+  # {map}
+  same-as-main-world: "地图名不能与主世界 {map} 同名"
+  no-author: "未设置作者 /map setAuthor"
+  region-worlds: "边界 1 和边界 2 不在同一个世界"
+  respawn: "观战重生点"
+
+  # {number}
+  base: "基地 #{number}"
+
+  # {type}
+  drop: "{type} 资源点"
+  shop: "{type} 商店"
+
+  # {name} {world} {region-world}
+  other-world: "{name} 在世界 {world} 不在边界所在的世界 {region-world}"
+
+  # {name}
+  outside-region: "{name} 在地图边界外 玩家在边界外无法放置方块"
+
+  # {min} {capacity}
+  min-above-capacity: "最少人数 {min} 超过地图容量 {capacity} 游戏永远无法开始"
+  no-folder: "未设置地图文件夹 /map setUrl"
+
+  # {file}
+  not-a-world: "地图文件夹不是一个世界存档 找不到 {file}"
+
+  # {folder}
+  folder-is-game-world: "地图文件夹就是游戏世界目录 {folder} 开局复制时会被清空 请把地图放到其它目录"
+
+  # {folder} {error}
+  folder-unreadable: "无法解析地图文件夹 {folder} {error}"
+
+  # {name} {radius}
+  no-wool: "{name} 附近 {radius} 格内没有羊毛 将自动分配颜色"
+
+  # {name} {color}
+  same-color: "{name} 与其它基地都识别为 {color} 将自动换一个颜色"
+
+  # {name} {radius}
+  no-bed: "{name} 附近 {radius} 格内没有床"
+  shared-bed: "{name} 与其它基地识别到同一张床"
+  several-beds: "{name} 附近有不止一张床 将使用离出生点最近的一张"
+  shared-drop: "{name} 与其它基地共用同一个基地资源点"
+
+  # {name} {color} {beds} {distance}
+  base-line: "{name} 羊毛 {color} 床方块 {beds} 资源点距离 {distance}"
+  none: "无"
+
+setup:
+  # {version}
+  help:
+    - "&b&lAzuraBedWars &8- &7v{version} &8- &b起床战争 - 设置工具"
+    - ""
+    - "&7 • &f/setup start <地图> &7领取设置工具 右键在脚下设置"
+    - "&7 • &f/setup stop &7收回设置工具"
+
+  # {map}
+  started: "&a正在设置地图 {map} 右键工具在脚下设置 每次修改自动保存"
+  stopped: "&a已退出地图设置"
+  not-active: "&c你没有在设置地图"
+  waiting:
+    name: "&e设置等待大厅"
+    lore: "在脚下设置等待大厅"
+  respawn:
+    name: "&e设置观战重生点"
+    lore: "在脚下设置观战重生点"
+  pos1:
+    name: "&c设置边界1"
+    lore: "在脚下设置地图边界的一角"
+  pos2:
+    name: "&c设置边界2"
+    lore: "在脚下设置地图边界的另一角"
+  base:
+    name: "&d添加队伍基地"
+    lore: "站在出生点 附近的羊毛决定队伍颜色"
+  base-drop:
+    name: "&7添加基地资源点"
+    lore: "在脚下添加基地资源点"
+  diamond-drop:
+    name: "&b添加钻石资源点"
+    lore: "在脚下添加钻石资源点"
+  emerald-drop:
+    name: "&a添加绿宝石资源点"
+    lore: "在脚下添加绿宝石资源点"
+  item-shop:
+    name: "&6添加物品商店"
+    lore: "在脚下添加物品商店"
+  upgrade-shop:
+    name: "&d添加团队升级商店"
+    lore: "在脚下添加团队升级商店"
+  remove:
+    name: "&c删除最近的点"
+    lore: "删除附近最近的基地 资源点或商店"
+  check:
+    name: "&a检查地图"
+    lore: "列出地图还缺什么"
+
+game:
+  # {player}
+  reconnected: "&7{player}&a重连上线"
+  left: "&7{player}&e离开游戏"
+  full: "游戏人数已满"
+  already-started: "游戏已开始"
+  normal-kill-reward: "&6+1个金币"
+  final-kill-reward: "&6+1个金币 (最终击杀)"
+
+  # {seconds}
+  respawn-countdown-title: "&e&l{seconds}"
+  respawn-countdown-subtitle: "&7你死了 将在稍后重生"
+  respawned-title: "&a已复活！"
+  respawned-subtitle: "&7因为你的床还在 所以你复活了"
+  eliminated-title: "&c你凉了！"
+  eliminated-subtitle: "&7你没床了"
+  team-eliminated-bar: "&7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃"
+
+  # {team} {breaker}
+  team-eliminated: "{team} &c凉了! &e挖床者: {breaker}"
+  play-again: "&c你凉了!想再来一局吗? "
+  play-again-button: "&b&l点击这里!"
+  own-bed: "&c你不能破坏你家的床"
+  bed-without-team: "&c此床没有队伍"
+
+  # {team} {breaker}
+  bed-broken: "&f&l床被破坏 >>> {team} 的床 &7被 {breaker} 破坏"
+  bed-broken-title: "&c&l床被摧毁"
+  bed-broken-subtitle: "&c死亡将无法复活"
+
+  # {coins}
+  bed-reward: "&6+{coins}个金币 (破坏床)"
+  bed-reward-action-bar: "&6+{coins}个金币"
+
+  # {player}
+  bed-in-danger: "{player} 说: &c注意,我们的床有危险！"
+  cannot-place: "&c你不能在此处放置方块！"
+  cannot-place-water: "&c你不能在此处放置水！"
+  team-chest-only: "&c只有该队伍的玩家可以打开这个箱子"
+  team-chest-use-only: "&c只有该队伍的玩家才可以使用这个箱子"
+  fast-put-last-item: "&c你不能将仅有的一件该物品放入箱子！"
+
+  # {count}
+  fast-put-moved: "&a成功转移了 {count} 个物品！"
+
+  # {moved} {total}
+  fast-put-partial: "&e部分物品添加失败！已转移 {moved}/{total} 个物品，箱子空间不足。"
+  fast-put-failed: "&c物品添加失败！箱子已满或空间不足。"
+
+  # {damage} {health}
+  damage-display: "&b伤害 &f- &e{damage}  &b血量 &f- &e{health}"
+
+  # {player} {health}
+  arrow-hit: "&e&l目标玩家 &c&l{player} &e&l剩余血量: &c&l{health}"
+  no-target: "&c没有目标"
+
+  # {player} {distance}
+  tracker-target: "&f玩家 {player} &f距离您 {distance}m"
+
+  # {team} {distance}
+  base-tracker: "&f队伍: {team}&f 追踪: {distance}m"
+
+  # {old} {new}
+  level-up: "&6恭喜！你从等级 {old} 升级到了等级 {new}！"
+
+  # {levels} {old} {new}
+  levels-up: "&6恭喜！你连续升级了 {levels} 级！从等级 {old} 升级到了等级 {new}！"
+
+  # {levels}
+  xp-gained: "&e+{levels}级"
+  xp-price: "{levels}级"
+  no-winner: "无"
+  start-stage: "开始游戏"
+
+  # {health} {team} {seconds}
+  golem-name: "&c{health}❤ {team}队守卫 &e{seconds}s"
+  silverfish-name: "{team}队蠹虫 &e{seconds}s"
+
+# 各颜色队伍的名称
+teams:
+  RED: "&c红"
+  BLUE: "&9蓝"
+  GREEN: "&a绿"
+  YELLOW: "&e黄"
+  AQUA: "&b青"
+  WHITE: "&f白"
+  PINK: "&d粉"
+  GRAY: "&8灰"
+  ORANGE: "&6橙"
+  MAGENTA: "&5品红"
+  LIGHT_BLUE: "&b淡蓝"
+  LIME: "&a黄绿"
+  PURPLE: "&5紫"
+  CYAN: "&3深青"
+  BLACK: "&0黑"
+  BROWN: "&4棕"
+
+death:
+  # 最终击杀时追加在消息末尾
+  final-kill: "&b&l[最终击杀]"
+
+  # {player} {killer} {color} {final}
+  quit: "&b&l» {player} {color}断开了连接 {final}"
+  quit-in-combat: "&b&l» {player} {color}在逃离 {killer} {color}时断开了连接 {final}"
+
+  # 无击杀者的死亡消息，按伤害类型，其它类型使用 VOID
+  # {player} {color} {final}
+  self:
+    VOID:
+      - "&b&l» {player} {color}坠入深渊 {final}"
+      - "&b&l» {player} {color}掉出了这个世界 {final}"
+      - "&b&l» {player} {color}迷失了自我 {final}"
+      - "&b&l» {player} {color}陨落了 {final}"
+    FALL:
+      - "&b&l» {player} {color}感受到了动能 {final}"
+      - "&b&l» {player} {color}没能摆脱地心引力 {final}"
+      - "&b&l» {player} {color}一跃而下, 可惜落地过猛 {final}"
+    FIRE:
+      - "&b&l» {player} {color}欲火焚身 {final}"
+      - "&b&l» {player} {color}被烤的酥脆 {final}"
+    FIRE_TICK:
+      - "&b&l» {player} {color}欲火焚身 {final}"
+      - "&b&l» {player} {color}被烤的酥脆 {final}"
+    LAVA:
+      - "&b&l» {player} {color}试图在岩浆中游泳 {final}"
+      - "&b&l» {player} {color}试图达成目标'热腾腾的' {final}"
+    PROJECTILE:
+      - "&b&l» {player} {color}被一击必杀 {final}"
+    ENTITY_EXPLOSION:
+      - "&b&l» {player} {color}在一团火球中消散了 {final}"
+    BLOCK_EXPLOSION:
+      - "&b&l» {player} {color}在一团火球中消散了 {final}"
+
+  # 有击杀者的死亡消息，按伤害类型，其它类型使用 VOID
+  # {player} {killer} {color} {final}
+  kill:
+    VOID:
+      - "&b&l» {player} {color}被 {killer} {color}驱逐出了这个世界 {final}"
+      - "&b&l» {player} {color}在逃离 {killer} {color}时不慎坠入深渊 {final}"
+      - "&b&l» {player} {color}被 {killer} {color}扔下了虚空 {final}"
+    ENTITY_ATTACK:
+      - "&b&l» {killer} {color}击杀了 {player} {final}"
+      - "&b&l» {killer} {color}超度了 {player} {color}的灵魂 {final}"
+      - "&b&l» {player} {color}没能逃脱 {killer} {color}的利爪 {final}"
+      - "&b&l» {player} {color}被 {killer} {color}写入了死亡笔记 {final}"
+    FALL:
+      - "&b&l» {player} {color}在逃离 {killer} {color}时落地过猛 {final}"
+    FIRE:
+      - "&b&l» {player} {color}在逃离 {killer} {color}时欲火焚身 {final}"
+      - "&b&l» {player} {color}在与 {killer} {color}战斗中被烤的酥脆 {final}"
+    FIRE_TICK:
+      - "&b&l» {player} {color}在逃离 {killer} {color}时欲火焚身 {final}"
+      - "&b&l» {player} {color}在与 {killer} {color}战斗中被烤的酥脆 {final}"
+    LAVA:
+      - "&b&l» {player} {color}在逃离 {killer} {color}时试图潜入岩浆 {final}"
+    PROJECTILE:
+      - "&b&l» {player} {color}被 {killer} {color}一箭射杀 {final}"
+    ENTITY_EXPLOSION:
+      - "&b&l» {player} {color}在逃离 {killer} {color}时爆炸了 {final}"
+    BLOCK_EXPLOSION:
+      - "&b&l» {player} {color}在逃离 {killer} {color}时爆炸了 {final}"
+
+team-selection:
+  title: "&8队伍选择"
+
+  # {players} {max}
+  players: "&7队伍人数: &f{players}&7/&f{max}"
+  members: "&7队伍成员:"
+
+  # {player}
+  you: "&a  ▸ {player} &7(你)"
+  member: "&7  ▸ {player}"
+  selected: "&a&l✓ 已选择"
+  full: "&c&l✗ 队伍已满"
+  click-to-select: "&7点击选择此队伍"
+  already-selected: "&c你已经选择了该队伍！"
+  team-full: "&c该队伍已满，无法加入！"
+  unbalanced: "&c为了保持游戏平衡，请选择人数较少的队伍！"
+
+  # {team}
+  joined: "&a你选择了 {team}"
+  join-failed: "&c加入队伍失败，请稍后重试！"
+
+shop:
+  item-shop-name: "&b&l物品商人"
+  upgrade-shop-name: "&e&l团队升级"
+  not-enough-resources: "&c没有足够资源购买！"
+  no-permission: "&c你没有权限购买这个物品！"
+  inventory-full: "&c背包已满！"
+  empty-slot-name: "&c空闲的槽位"
+  empty-slot-lore:
+    - "&7这是一个快捷购买槽位!&bShift+左键"
+    - "&7将任意物品放到这里~"
+  empty-slot-clicked: "&c这是个空的槽位!请使用Shift+左键添加物品到这里~"
+  quick-buy-edit-title: "&8添加物品到快捷购买"
+  quick-buy-adding: "&e正在添加物品到快捷购买菜单.."
+  quick-buy-replace: "&e点击替换为当前物品"
+
+  # {item}
+  quick-buy-default-name: "&a{item} &7(默认)"
+  quick-buy-default-lore:
+    - "&7这是默认快捷购买物品"
+    - "&e点击替换为当前选择的物品"
+  quick-buy-set: "&e点击设置该位置为当前物品"
+
+items:
+  invisibility-ended: "&c隐身效果结束"
+  magic-milk-ended: "&c魔法牛奶效果结束"
+  magic-milk-drunk: "&a你喝下了魔法牛奶，将会在30s内不受陷阱效果影响"
+  rescue-platform-not-in-air: "&c你不在空气中!"
+
+  # {seconds}
+  rescue-platform-cooldown: "&c需要 &e{seconds}秒&c 你才能使用下一个救援平台!"
+  fireball-cooldown: "&c火焰弹发射冷却中"
+  golem-no-space: "&c无法在此位置生成铁傀儡，请选择更开阔的区域或确保在地上。"
+
+  # {seconds}
+  warp-powder-start: "&a在 &c{seconds}&a 秒后你将被传送，请不要移动!"
+  warp-powder-cancelled: "&c你的传送被取消!"
+  warp-powder-moved: "&c你移动了，传送被取消!"
+  warp-powder-active: "&c你已经开始了一个传送!"
+  warp-powder-in-air: "&c你不能在空中使用传送粉末!"
+  warp-powder-no-spawn: "&c无法找到你的队伍出生点!"
+  recovery-bed-used: "&a使用回春床成功!"
+
+  # {team}
+  recovery-bed-broadcast: "{team} &c使用了回春床！"
+  recovery-bed-too-late: "&c开局已超过10分钟."
+  recovery-bed-used-before: "&c已使用过回春床了"
+  recovery-bed-standing: "&c床仍然存在 无法使用回春床"
+  recovery-bed-no-bed: "&c地图没有为你的队伍设置床"
+  recovery-bed-too-far: "&c请靠近出生点使用!"
+
+spectator:
+  compass-item: "&a&l传送器 &7(右键打开)"
+  settings-item: "&c&l旁观者设置 &7(右键打开)"
+  play-again-item: "&b&l快速加入 &7(右键加入)"
+  leave-item: "&c&l离开游戏 &7(右键离开)"
+  compass-title: "&8选择一个玩家来传送"
+
+  # {value}
+  health: "&f血量: &8{value}"
+  food: "&f饥饿: &8{value}"
+  level: "&f等级: &8{value}"
+  distance: "&f距离: &8{value}"
+  settings-title: "&8旁观者设置"
+  no-speed: "&a没有速度效果"
+
+  # {level}
+  speed: "&a速度 {level}"
+  speed-removed: "&c你不再有任何速度效果！"
+  speed-added: "&a你获得了 速度 {level} 效果！"
+  auto-tp-on: "&a启动自动传送"
+  auto-tp-off: "&c停用自动传送"
+  auto-tp-on-lore: "&7点击启用自动传送"
+  auto-tp-off-lore: "&7点击停用自动传送"
+  auto-tp-enabled: "&a你开启了自动传送功能！"
+  auto-tp-disabled: "&c你不再被自动传送到目标位置！"
+  night-vision-on: "&a启动夜视"
+  night-vision-off: "&c停用夜视"
+  night-vision-on-lore: "&7点击启用夜视"
+  night-vision-off-lore: "&7点击停用夜视"
+  night-vision-enabled: "&a你现在拥有了夜视！"
+  night-vision-disabled: "&c你不再有夜视效果了！"
+  first-person-on: "&a启动第一人称旁观"
+  first-person-off: "&c停用第一人称旁观"
+  first-person-on-lore:
+    - "&7点击确认使用指南针时"
+    - "&7自动沿用第一人称旁观！"
+    - "&7你也可以右键点击一位玩家"
+    - "&7来启用第一人称旁观"
+  first-person-off-lore: "&7点击停用第一人称旁观"
+  first-person-enabled: "&a当你用你的指南针现在一个玩家后，你会被自动传送到他那里！"
+  first-person-disabled: "&c你将默认使用第三人称模式！"
+  hide-others-on: "&c隐藏旁观者"
+  hide-others-off: "&a查看旁观者"
+  hide-others-on-lore: "&7点击来隐藏其他旁观者"
+  hide-others-off-lore: "&7点击以显示其他旁观者"
+  hide-others-enabled: "&c你不会再看到其他的旁观者！"
+  hide-others-disabled: "&a你现在可以看见其他旁观者了！"
+  fly-on: "&a启动持续飞行"
+  fly-off: "&c停用持续飞行"
+  fly-on-lore: "&7点击启用飞行"
+  fly-off-lore: "&7点击停用飞行"
+  fly-enabled: "&a你现在不能停止飞行！"
+  fly-disabled: "&a你现在能停止飞行！"
+  target-lost: "&c&l目标已丢失或不在同一个世界"
+  left-spectating: "&e退出旁观模式"
+
+  # {player}
+  first-person-title: "&a正在旁观&7{player}"
+  first-person-subtitle: "&a点击左键打开菜单  &c按Shift键退出"
+
+  # {player} {health}
+  first-person-action-bar: "&f目标: &a&l{player}  &f生命值: &a&l{health} &c&l❤  &a点击左键打开菜单  &c按Shift退出"
+
+  # {player} {health} {distance}
+  third-person-action-bar: "&f目标: &a&l{player}  &f生命值: &a&l{health}  &f距离: &a&l{distance}米"
+
+tab:
+  unknown: "&7[未知] | "
+  spectator: "&7[旁观者] | "
+  unassigned: "&7[未分配] | "

@@ -1,9 +1,10 @@
 package cc.azuramc.bedwars.game.spectator;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
@@ -77,21 +78,21 @@ public class SpectatorTarget {
 
         // 第一人称旁观模式
         if (isFirstPersonViewActive()) {
-            String actionBarText = String.format(spectatorMessages().getFirstPersonActionBar(),
-                    target.getName(), (int) target.getHealth()) + spectatorMessages().getMenuHint();
+            String actionBarText = MessageUtil.fill(spectatorMessages().getFirstPersonActionBar(),
+                    "player", target.getName(), "health", (int) target.getHealth());
             gamePlayer.sendActionBar(actionBarText);
             return;
         }
 
         // 检查是否在同一世界
         if (!isSameWorld()) {
-            gamePlayer.sendActionBar(spectatorMessages().getTargetLostMessage());
+            gamePlayer.sendActionBar(spectatorMessages().getTargetLost());
             return;
         }
 
         // 第三人称旁观模式
-        String actionBarText = String.format(spectatorMessages().getThirdPersonActionBar(),
-                target.getName(), (int) target.getHealth(), df.format(getDistance()));
+        String actionBarText = MessageUtil.fill(spectatorMessages().getThirdPersonActionBar(),
+                "player", target.getName(), "health", (int) target.getHealth(), "distance", df.format(getDistance()));
         gamePlayer.sendActionBar(actionBarText);
     }
 
@@ -193,7 +194,7 @@ public class SpectatorTarget {
      */
     private void activateFirstPersonView() {
         gamePlayer.sendTitle(
-                String.format(spectatorMessages().getFirstPersonTitle(), target.getName()), spectatorMessages().getFirstPersonSubTitle(), TITLE_FADE_IN,
+                MessageUtil.fill(spectatorMessages().getFirstPersonTitle(), "player", target.getName()), spectatorMessages().getFirstPersonSubtitle(), TITLE_FADE_IN,
                 config().getTitleDuration(),
                 TITLE_FADE_OUT
         );
@@ -210,8 +211,8 @@ public class SpectatorTarget {
         return player.getSpectatorTarget() != null && player.getSpectatorTarget().equals(target);
     }
 
-    private static MessageConfig.Spectator spectatorMessages() {
-        return AzuraBedWars.getInstance().getMessageConfig().getSpectator();
+    private static LangConfig.Spectator spectatorMessages() {
+        return AzuraBedWars.getInstance().getLang().getSpectator();
     }
 
     private static GameplayConfig.Spectator.Target config() {

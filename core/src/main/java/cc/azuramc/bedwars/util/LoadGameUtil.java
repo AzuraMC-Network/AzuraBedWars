@@ -38,8 +38,6 @@ public class LoadGameUtil {
     private static final double RESOURCE_LINE_SPACING = 0.27D;
     /** Must match the fall distance ArmorStandUtil animates */
     private static final float BLOCK_FALL_DISTANCE = 7.0F;
-    private static final String ITEM_SHOP_DISPLAY_NAME = "§b§l物品商人";
-    private static final String UPGRADE_SHOP_DISPLAY_NAME = "§e§l团队升级";
 
     public static void spawnAll(AzuraBedWars plugin) {
         GameManager gameManager = plugin.getGameManager();
@@ -107,7 +105,7 @@ public class LoadGameUtil {
                 location,
                 Villager.Profession.LIBRARIAN,
                 ITEM_SHOP_METADATA_KEY,
-                ITEM_SHOP_DISPLAY_NAME
+                plugin.getLang().getShop().getItemShopName()
         );
     }
 
@@ -123,7 +121,7 @@ public class LoadGameUtil {
                 location,
                 Villager.Profession.FARMER,
                 UPGRADE_SHOP_METADATA_KEY,
-                UPGRADE_SHOP_DISPLAY_NAME
+                plugin.getLang().getShop().getUpgradeShopName()
         );
     }
 

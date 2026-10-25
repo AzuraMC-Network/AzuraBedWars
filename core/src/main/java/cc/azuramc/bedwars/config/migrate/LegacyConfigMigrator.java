@@ -48,6 +48,11 @@ public final class LegacyConfigMigrator {
         int migrated = 0;
         for (Map.Entry<String, Map<String, Object>> entry : convert(legacy).entrySet()) {
             ConfigDocument<?> document = service.document(entry.getKey());
+            if (entry.getKey().equals("messages") && !entry.getValue().isEmpty()) {
+                // picked up by MessagesMigrator once lang/ exists
+                writeMessages(dataFolder, entry.getValue());
+                continue;
+            }
             if (document == null || entry.getValue().isEmpty() || service.file(document).exists()) {
                 continue;
             }
@@ -73,6 +78,18 @@ public final class LegacyConfigMigrator {
             LoggerUtil.info("Migrated the old config into " + migrated + " new files, the old files are kept in " + backup.getName());
         } else {
             LoggerUtil.warn("Migrated the old config into " + migrated + " new files, but could not rename " + legacyDir + ", delete or move it to stop this message");
+        }
+    }
+
+    private static void writeMessages(File dataFolder, Map<String, Object> messages) {
+        File file = new File(dataFolder, MessagesMigrator.FILE);
+        if (file.exists()) {
+            return;
+        }
+        try {
+            ConfigService.writeAtomically(file, ConfigService.dump(messages));
+        } catch (IOException e) {
+            LoggerUtil.error("Cannot write " + MessagesMigrator.FILE + " while migrating the old config", e);
         }
     }
 

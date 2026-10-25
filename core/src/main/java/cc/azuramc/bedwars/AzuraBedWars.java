@@ -9,6 +9,7 @@ import cc.azuramc.bedwars.config.ApplyMode;
 import cc.azuramc.bedwars.config.ConfigProblem;
 import cc.azuramc.bedwars.config.ConfigService;
 import cc.azuramc.bedwars.config.migrate.LegacyConfigMigrator;
+import cc.azuramc.bedwars.config.migrate.MessagesMigrator;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.config.object.shop.ShopCategoryConfig;
 import cc.azuramc.bedwars.config.object.shop.ShopMenuConfig;
@@ -31,6 +32,7 @@ import cc.azuramc.bedwars.nms.NMSProvider;
 import cc.azuramc.bedwars.scoreboard.ScoreboardManager;
 import cc.azuramc.bedwars.shop.ItemSpecs;
 import cc.azuramc.bedwars.shop.ShopValidator;
+import cc.azuramc.bedwars.shop.SpecChecks;
 import cc.azuramc.bedwars.upgrade.UpgradeValidator;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.bstats.Metrics;
@@ -50,6 +52,9 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * AzuraBedWars插件主类
@@ -60,6 +65,7 @@ import java.util.List;
 @Getter
 public final class AzuraBedWars implements PluginEntrypoint {
     private static final String PLUGIN_PREFIX = "[AzuraBedWars] ";
+    private static final LangConfig DEFAULT_LANG = new LangConfig();
 
     @Getter
     private static AzuraBedWars instance;
@@ -116,7 +122,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         MapData mapData = settings.isEditorMode() ? null : mapManager.loadGameMap(settings.getDefaultMapName());
         editing = mapData == null;
         if (editing) {
-            LoggerUtil.warn(settings.isEditorMode() ? "当前处于编辑模式 /map 设置地图" : "没有可以运行的地图 已进入编辑模式 用 /map 设置地图后重启");
+            LoggerUtil.warn(settings.isEditorMode() ? "Editor mode is on, set up maps with /map" : "No map can run, editor mode is on. Set up a map with /map and restart");
             initEditorFeatures();
         } else {
             initGameFeatures(mapData);
@@ -127,7 +133,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         // bStats
         loadBStats();
 
-        Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "加载完成耗时 " + (System.currentTimeMillis() - startTime) + " ms");
+        Bukkit.getConsoleSender().sendMessage(PLUGIN_PREFIX + "Loaded in " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
     @Override
@@ -184,7 +190,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
      * 初始化游戏相关功能
      */
     private void initGameFeatures(MapData mapData) {
-        LoggerUtil.info("开始加载游戏相关特性...");
+        LoggerUtil.info("Loading game features...");
         // 注册GUI监听器
         new GUIListener(this);
 
@@ -207,7 +213,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         // 配置世界设置
         configureWorlds();
 
-        LoggerUtil.info("游戏相关特性加载完成");
+        LoggerUtil.info("Game features loaded");
     }
 
     /**
@@ -338,7 +344,8 @@ public final class AzuraBedWars implements PluginEntrypoint {
     private void initConfigSystem() {
         configService = new ConfigService(plugin.getDataFolder(),
                 () -> gameManager != null && gameManager.getGameState() != GameState.WAITING);
-        configService.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 1);
+        configService.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 2);
+        configService.addMigration("settings", 1, SettingsConfig::fromVersion1);
         configService.register("database", "database.yml", DatabaseConfig.class, ApplyMode.RESTART, 1);
         configService.register("gameplay", "gameplay.yml", GameplayConfig.class, ApplyMode.LIVE, 1);
         configService.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
@@ -350,7 +357,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         configService.register("items", "items.yml", ItemConfig.class, ApplyMode.LIVE, 1);
         configService.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
         configService.addMigration("upgrades", 1, old -> UpgradeConfig.fromVersion1(old, ConfigService.bundled("upgrades.yml")));
-        configService.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
+        configService.registerDirectory("lang", LangConfig.class, ApplyMode.LIVE, 1, "lang", "en_US.yml", "zh_CN.yml");
         configService.registerTemplate("shop/menu", "shop/menu.yml", ShopMenuConfig.class, ApplyMode.LIVE, 1, "shop/menu");
         configService.registerTemplate("shop/tiers", "shop/tiers.yml", TierChains.class, ApplyMode.NEXT_GAME, 1, "shop/tiers");
         configService.registerDirectory("shop/categories", ShopCategoryConfig.class, ApplyMode.LIVE, 1, "shop/category",
@@ -358,10 +365,19 @@ public final class AzuraBedWars implements PluginEntrypoint {
         configService.addValidator(new ShopValidator(ItemSpecs.NAMES));
         configService.addValidator(new UpgradeValidator(ItemSpecs.NAMES));
         configService.addValidator(new TimelineValidator(ItemSpecs.NAMES));
+        configService.addValidator((view, sink) -> {
+            String language = view.get(SettingsConfig.class).getLanguage();
+            Set<String> languages = new TreeSet<>();
+            view.all(LangConfig.class).keySet().forEach(id -> languages.add(ConfigService.name(id)));
+            if (!languages.contains(language)) {
+                sink.error(view.idOf(SettingsConfig.class), "language", SpecChecks.unknown("language", language, languages));
+            }
+        });
         configService.register(Devtools.DOCUMENT_ID, "devtools.yml", DevtoolsConfig.class, ApplyMode.LIVE, 1);
 
         LegacyConfigMigrator.migrateIfPresent(plugin.getDataFolder(), configService);
         logProblems(configService.loadAll());
+        logProblems(MessagesMigrator.migrateIfPresent(plugin.getDataFolder(), configService));
     }
 
     public static void logProblems(List<ConfigProblem> problems) {
@@ -412,8 +428,16 @@ public final class AzuraBedWars implements PluginEntrypoint {
         return configService.get(UpgradeConfig.class);
     }
 
-    public MessageConfig getMessageConfig() {
-        return configService.get(MessageConfig.class);
+    /**
+     * Text in the language of settings.yml, en_US when that file is missing
+     */
+    public LangConfig getLang() {
+        Map<String, LangConfig> languages = configService.all(LangConfig.class);
+        LangConfig lang = languages.get("lang/" + getSettingsConfig().getLanguage());
+        if (lang == null) {
+            lang = languages.get("lang/en_US");
+        }
+        return lang != null ? lang : DEFAULT_LANG;
     }
 
     public DevtoolsConfig getDevtoolsConfig() {

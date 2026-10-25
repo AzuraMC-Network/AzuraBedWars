@@ -52,10 +52,10 @@ public class SpectatorManager {
     }
 
     private static void setupSpectatorInventory(Player player) {
-        player.getInventory().setItem(0, createSpectatorItem(XMaterial.COMPASS.get(), "§a§l传送器 §7(右键打开)"));
-        player.getInventory().setItem(4, createSpectatorItem(XMaterial.COMPARATOR.get(), "§c§l旁观者设置 §7(右键打开)"));
-        player.getInventory().setItem(7, createSpectatorItem(XMaterial.PAPER.get(), "§b§l快速加入 §7(右键加入)"));
-        player.getInventory().setItem(8, createSpectatorItem(XMaterial.SLIME_BALL.get(), "§c§l离开游戏 §7(右键离开)"));
+        player.getInventory().setItem(0, createSpectatorItem(XMaterial.COMPASS.get(), AzuraBedWars.getInstance().getLang().getSpectator().getCompassItem()));
+        player.getInventory().setItem(4, createSpectatorItem(XMaterial.COMPARATOR.get(), AzuraBedWars.getInstance().getLang().getSpectator().getSettingsItem()));
+        player.getInventory().setItem(7, createSpectatorItem(XMaterial.PAPER.get(), AzuraBedWars.getInstance().getLang().getSpectator().getPlayAgainItem()));
+        player.getInventory().setItem(8, createSpectatorItem(XMaterial.SLIME_BALL.get(), AzuraBedWars.getInstance().getLang().getSpectator().getLeaveItem()));
     }
 
     private static ItemStack createSpectatorItem(Material material, String name) {

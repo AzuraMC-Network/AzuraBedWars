@@ -36,7 +36,7 @@ public class GameEndBoardProvider extends AbstractBoardProvider {
 
     private String getWinnerName() {
         GameTeam winner = gameManager.getWinner();
-        return winner != null ? winner.getName() : "无";
+        return winner != null ? winner.getName() : AzuraBedWars.getInstance().getLang().getGame().getNoWinner();
     }
 
     private static DisplayConfig.GameEndScoreboard config() {

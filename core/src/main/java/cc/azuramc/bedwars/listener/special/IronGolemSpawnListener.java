@@ -60,7 +60,7 @@ public class IronGolemSpawnListener implements Listener {
         Location spawnLocation = block.getRelative(face).getLocation().add(0.5, 0, 0.5);
 
         if (!isLocationSafe(spawnLocation)) {
-            gamePlayer.sendMessage("§c无法在此位置生成铁傀儡，请选择更开阔的区域或确保在地上。");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getGolemNoSpace());
             event.setCancelled(true);
             return;
         }

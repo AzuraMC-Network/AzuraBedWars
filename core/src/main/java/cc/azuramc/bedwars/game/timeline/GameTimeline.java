@@ -9,6 +9,7 @@ import cc.azuramc.bedwars.game.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.game.task.GameOverTask;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
 import cc.azuramc.bedwars.upgrade.UpgradeEffects;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -53,7 +54,7 @@ public class GameTimeline {
         }
         config = AzuraBedWars.getInstance().getTimelineConfig();
         events.clear();
-        events.add(new TimelineEvent("开始游戏", config.getGameStartEvent().getCountDown(), this::showStartCountdown, this::startGenerators));
+        events.add(new TimelineEvent(AzuraBedWars.getInstance().getLang().getGame().getStartStage(), config.getGameStartEvent().getCountDown(), this::showStartCountdown, this::startGenerators));
         for (TimelineConfig.Stage stage : config.getStages()) {
             events.add(new TimelineEvent(stage.getName(), stage.getAfter(), () -> stage.getActions().forEach(this::run)));
         }
@@ -192,8 +193,8 @@ public class GameTimeline {
                     return;
                 }
                 int distance = (int) player.getLocation().distance(spawn);
-                gamePlayer.sendActionBar("§f队伍: " + gameTeam.getChatColor() + gameTeam.getName()
-                        + "§f 追踪: " + gameTeam.getChatColor() + distance + "m");
+                gamePlayer.sendActionBar(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getBaseTracker(),
+                        "team", gameTeam.getName(), "distance", gameTeam.getChatColor().toString() + distance));
             });
         }
     }

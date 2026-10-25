@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.gui;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
@@ -34,7 +35,7 @@ public class TeamSelectionGUI extends CustomGUI {
     private static final int HIGHLIGHT_GLASS_COLOR = 5;
 
     public TeamSelectionGUI(GamePlayer gamePlayer) {
-        super(gamePlayer, "§8队伍选择", 27);
+        super(gamePlayer, AzuraBedWars.getInstance().getLang().getTeamSelection().getTitle(), 27);
 
         initializeTeamData();
         setupBorders();
@@ -134,18 +135,19 @@ public class TeamSelectionGUI extends CustomGUI {
         ChatColor chatColor = teamColor.getChatColor();
         String teamName = teamColor.getName();
 
+        LangConfig.TeamSelection lang = AzuraBedWars.getInstance().getLang().getTeamSelection();
         List<String> loreList = new ArrayList<>();
-        loreList.add("§7队伍人数: §f" + currentPlayers + "§7/§f" + maxPlayers);
+        loreList.add(MessageUtil.fill(lang.getPlayers(), "players", currentPlayers, "max", maxPlayers));
 
         if (!team.getGamePlayers().isEmpty()) {
             loreList.add("§7");
-            loreList.add("§7队伍成员:");
+            loreList.add(lang.getMembers());
             for (GamePlayer teamPlayer : team.getGamePlayers()) {
                 String memberName = teamPlayer.getName();
                 if (teamPlayer == getGamePlayer()) {
-                    loreList.add("§a  ▸ " + memberName + " §7(你)");
+                    loreList.add(MessageUtil.fill(lang.getYou(), "player", memberName));
                 } else {
-                    loreList.add("§7  ▸ " + memberName);
+                    loreList.add(MessageUtil.fill(lang.getMember(), "player", memberName));
                 }
             }
         }
@@ -154,11 +156,11 @@ public class TeamSelectionGUI extends CustomGUI {
 
         String statusLine;
         if (isSelected) {
-            statusLine = "§a§l✓ 已选择";
+            statusLine = lang.getSelected();
         } else if (isFull) {
-            statusLine = "§c§l✗ 队伍已满";
+            statusLine = lang.getFull();
         } else {
-            statusLine = "§7点击选择此队伍";
+            statusLine = lang.getClickToSelect();
         }
         loreList.add(statusLine);
 
@@ -177,13 +179,13 @@ public class TeamSelectionGUI extends CustomGUI {
 
         // 检查是否已经选择了该队伍
         if (currentTeam == targetTeam) {
-            gamePlayer.sendMessage(MessageUtil.color("&c你已经选择了该队伍！"));
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getTeamSelection().getAlreadySelected());
             return;
         }
 
         // 检查队伍是否已满
         if (targetTeam.isFull()) {
-            gamePlayer.sendMessage(MessageUtil.color("&c该队伍已满，无法加入！"));
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getTeamSelection().getTeamFull());
             return;
         }
 
@@ -196,7 +198,7 @@ public class TeamSelectionGUI extends CustomGUI {
 
             // 只允许选择人数最少的队伍
             if (targetSize > lowestSize) {
-                gamePlayer.sendMessage(MessageUtil.color("&c为了保持游戏平衡，请选择人数较少的队伍！"));
+                gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getTeamSelection().getUnbalanced());
                 return;
             }
         }
@@ -206,7 +208,7 @@ public class TeamSelectionGUI extends CustomGUI {
             String teamDisplayName = teamColor.getName();
             ChatColor teamChatColor = teamColor.getChatColor();
 
-            gamePlayer.sendMessage(MessageUtil.color("&a你选择了 " + teamChatColor + teamDisplayName));
+            gamePlayer.sendMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getTeamSelection().getJoined(), "team", teamChatColor + teamDisplayName));
             if (XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get() != null) {
                 gamePlayer.playSound(XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get(), 1.0F, 1.0F);
             }
@@ -217,7 +219,7 @@ public class TeamSelectionGUI extends CustomGUI {
                 player.getInventory().setItem(2, WoolUtil.getColoredWool(teamColor));
             }
         } else {
-            gamePlayer.sendMessage(MessageUtil.color("&c加入队伍失败，请稍后重试！"));
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getTeamSelection().getJoinFailed());
         }
     }
 }

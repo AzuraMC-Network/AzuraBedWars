@@ -44,12 +44,12 @@ public final class ShopPurchase {
         }
         if (spec.getRequires() != null && spec.getRequires().getPermission() != null
                 && !gamePlayer.getPlayer().hasPermission(spec.getRequires().getPermission())) {
-            gamePlayer.sendMessage("§c你没有权限购买这个物品！");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getShop().getNoPermission());
             return false;
         }
         boolean armor = item.getChain() != null && item.getChain().getSlot() == TierChains.Slot.ARMOR;
         if (!armor && gamePlayer.getPlayer().getInventory().firstEmpty() == -1) {
-            gamePlayer.sendMessage("§c背包已满！");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getShop().getInventoryFull());
             return false;
         }
         if (!economy().charge(gamePlayer, priceFor(gamePlayer, item))) {

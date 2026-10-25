@@ -44,13 +44,13 @@ public class PlacementListener implements Listener {
         }
 
         if (MapUtil.isProtectedArea(block.getLocation())) {
-            gamePlayer.sendMessage("&c你不能在此处放置方块！");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getGame().getCannotPlace());
             event.setCancelled(true);
             return;
         }
 
         if (block.getLocation().getY() > gameManager.getBuildLimitHeight()) {
-            gamePlayer.sendMessage("&c你不能在此处放置方块！");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getGame().getCannotPlace());
             event.setCancelled(true);
             return;
         }

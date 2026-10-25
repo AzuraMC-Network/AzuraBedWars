@@ -30,7 +30,7 @@ public class PlayerUseBucketListener implements Listener {
 
         if (MapUtil.isProtectedArea(player.getLocation())) {
             event.setCancelled(true);
-            gamePlayer.sendMessage("&c你不能在此处放置水！");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getGame().getCannotPlaceWater());
             return;
         }
 

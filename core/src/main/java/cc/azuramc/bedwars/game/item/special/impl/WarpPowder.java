@@ -3,11 +3,11 @@ package cc.azuramc.bedwars.game.item.special.impl;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.ItemConfig;
-import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
@@ -118,7 +118,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
         // 显示消息
         if (showMessage) {
-            gamePlayer.sendMessage(messages().getWarpPowderCancelMessage());
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getWarpPowderCancelled());
         }
 
         // 恢复物品
@@ -206,7 +206,7 @@ public class WarpPowder extends AbstractSpecialItem {
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam == null) {
-            gamePlayer.sendMessage("§c无法找到你的队伍出生点!");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getWarpPowderNoSpawn());
             return false;
         }
 
@@ -219,7 +219,7 @@ public class WarpPowder extends AbstractSpecialItem {
         teleportingTime = fullTeleportingTime;
 
         // 发送开始传送消息
-        gamePlayer.sendMessage(String.format(messages().getWarpPowderStartMessage(), this.fullTeleportingTime));
+        gamePlayer.sendMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getItems().getWarpPowderStart(), "seconds", this.fullTeleportingTime));
 
         // 播放开始传送音效
         if (XSound.ENTITY_EXPERIENCE_ORB_PICKUP.get() != null) {
@@ -356,7 +356,4 @@ public class WarpPowder extends AbstractSpecialItem {
         return AzuraBedWars.getInstance().getItemConfig().getWarpPowder();
     }
 
-    private static MessageConfig messages() {
-        return AzuraBedWars.getInstance().getMessageConfig();
-    }
 }

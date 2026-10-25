@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.listener.player;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -44,7 +44,7 @@ public class PlayerRespawnListener implements Listener {
             // spectator setup does not stick during the respawn event
             Bukkit.getScheduler().runTaskLater(AzuraBedWars.getInstance().getPlugin(), () -> {
                 sendPlayAgainMessage(gamePlayer);
-                SpectatorManager.toSpectator(gamePlayer, messages().getDeathPermanentTitle(), messages().getDeathPermanentSubTitle());
+                SpectatorManager.toSpectator(gamePlayer, messages().getEliminatedTitle(), messages().getEliminatedSubtitle());
             }, 1L);
             return;
         }
@@ -64,14 +64,14 @@ public class PlayerRespawnListener implements Listener {
     }
 
     private void sendPlayAgainMessage(GamePlayer gamePlayer) {
-        TextComponent textComponent = new TextComponent(messages().getPlayAgainMessage());
+        TextComponent textComponent = new TextComponent(messages().getPlayAgain());
         TextComponent button = new TextComponent(messages().getPlayAgainButton());
         button.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, AzuraBedWars.getInstance().getSettingsConfig().getPlayAgainCommand()));
         textComponent.addExtra(button);
         gamePlayer.getPlayer().spigot().sendMessage(textComponent);
     }
 
-    private static MessageConfig messages() {
-        return AzuraBedWars.getInstance().getMessageConfig();
+    private static LangConfig.Game messages() {
+        return AzuraBedWars.getInstance().getLang().getGame();
     }
 }

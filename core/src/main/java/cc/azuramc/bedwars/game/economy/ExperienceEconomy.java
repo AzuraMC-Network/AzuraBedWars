@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +31,7 @@ public class ExperienceEconomy implements EconomyMode {
 
     @Override
     public String formatPrice(PriceCost price) {
-        return price.xp() + "级";
+        return MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getXpPrice(), "levels", price.xp());
     }
 
     @Override
@@ -66,6 +67,6 @@ public class ExperienceEconomy implements EconomyMode {
         Player killerPlayer = killer.getPlayer();
         killerPlayer.setLevel(killerPlayer.getLevel() + levels);
         victimPlayer.setLevel(0);
-        killer.sendMessage("§e+" + levels + "级");
+        killer.sendMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getXpGained(), "levels", levels));
     }
 }

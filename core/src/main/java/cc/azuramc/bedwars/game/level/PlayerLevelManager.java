@@ -1,7 +1,9 @@
 package cc.azuramc.bedwars.game.level;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -157,7 +159,7 @@ public class PlayerLevelManager {
         if (gamePlayer == null) {
             return;
         }
-        gamePlayer.sendMessage("§6恭喜！你从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
+        gamePlayer.sendMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getLevelUp(), "old", oldLevel, "new", newLevel));
     }
 
     /**
@@ -172,7 +174,7 @@ public class PlayerLevelManager {
         if (gamePlayer == null) {
             return;
         }
-        gamePlayer.sendMessage("§6恭喜！你连续升级了 " + levelsGained + " 级！从等级 " + oldLevel + " 升级到了等级 " + newLevel + "！");
+        gamePlayer.sendMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getLevelsUp(), "levels", levelsGained, "old", oldLevel, "new", newLevel));
     }
 
     /**

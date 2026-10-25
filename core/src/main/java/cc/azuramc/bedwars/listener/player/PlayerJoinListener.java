@@ -33,9 +33,9 @@ public class PlayerJoinListener implements Listener {
         }
 
         if (gameManager.getGameState() != GameState.WAITING) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "游戏已开始");
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, AzuraBedWars.getInstance().getLang().getGame().getAlreadyStarted());
         } else if (Bukkit.getOnlinePlayers().size() >= gameManager.getMaxPlayers()) {
-            event.disallow(PlayerLoginEvent.Result.KICK_FULL, "游戏人数已满");
+            event.disallow(PlayerLoginEvent.Result.KICK_FULL, AzuraBedWars.getInstance().getLang().getGame().getFull());
         }
     }
 

@@ -1,5 +1,7 @@
 package cc.azuramc.bedwars.util;
 
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.game.map.MapData;
 import com.cryptomorin.xseries.messages.ActionBar;
 import com.cryptomorin.xseries.messages.Titles;
@@ -30,6 +32,17 @@ public final class MessageUtil {
     public static final String CHAT_BAR = ChatColor.GRAY.toString() + ChatColor.STRIKETHROUGH
             + "------------------------------------------------";
 
+
+    /**
+     * Fills {name} placeholders of a lang text, pairs are a name and then its value
+     */
+    @NotNull
+    public static String fill(@NotNull String text, Object... pairs) {
+        for (int i = 0; i + 1 < pairs.length; i += 2) {
+            text = text.replace("{" + pairs[i] + "}", String.valueOf(pairs[i + 1]));
+        }
+        return text;
+    }
 
     public static void sendTitle(@NotNull Player player, @Nullable String title, @Nullable String subtitle, int fadeIn, int stay, int fadeOut) {
         if (title == null && subtitle == null) {
@@ -125,75 +138,41 @@ public final class MessageUtil {
         return ChatColor.RESET;
     }
 
-    /**
-     * 格式化Location的显示格式
-     * 格式: 世界名: X.XX, Y.YY, Z.ZZ (Yaw: XX.X, Pitch: XX.X)
-     *
-     * @param location 要格式化的位置
-     * @return 格式化后的字符串，如果location为null则返回"未设置"
-     */
     @NotNull
     public static String formatLocation(@Nullable Location location) {
         if (location == null) {
-            return "&c未设置";
+            return AzuraBedWars.getInstance().getLang().getMap().getNotSet();
         }
-
-        String worldName = location.getWorld() != null ? location.getWorld().getName() : "未知世界";
-        String x = COORDINATE_FORMAT.format(location.getX());
-        String y = COORDINATE_FORMAT.format(location.getY());
-        String z = COORDINATE_FORMAT.format(location.getZ());
-        String yaw = ANGLE_FORMAT.format(location.getYaw());
-        String pitch = ANGLE_FORMAT.format(location.getPitch());
-
-        return String.format("&b%s&f: &b%s, %s, %s &7(Yaw: %s, Pitch: %s)",
-                worldName, x, y, z, yaw, pitch);
+        return formatLocation(location.getWorld() != null ? location.getWorld().getName() : null,
+                location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
     }
 
-    /**
-     * 格式化RawLocation的显示格式
-     * 格式: 世界名: X.XX, Y.YY, Z.ZZ (Yaw: XX.X, Pitch: XX.X)
-     *
-     * @param rawLocation 要格式化的原始位置
-     * @return 格式化后的字符串，如果rawLocation为null则返回"未设置"
-     */
     @NotNull
     public static String formatLocation(@Nullable MapData.RawLocation rawLocation) {
         if (rawLocation == null) {
-            return "&c未设置";
+            return AzuraBedWars.getInstance().getLang().getMap().getNotSet();
         }
-
-        String worldName = rawLocation.getWorld() != null ? rawLocation.getWorld() : "未知世界";
-        String x = COORDINATE_FORMAT.format(rawLocation.getX());
-        String y = COORDINATE_FORMAT.format(rawLocation.getY());
-        String z = COORDINATE_FORMAT.format(rawLocation.getZ());
-        String yaw = ANGLE_FORMAT.format(rawLocation.getYaw());
-        String pitch = ANGLE_FORMAT.format(rawLocation.getPitch());
-
-        return String.format("&b%s&f: &b%s, %s, %s &7(Yaw: %s, Pitch: %s)",
-                worldName, x, y, z, yaw, pitch);
+        return formatLocation(rawLocation.getWorld(), rawLocation.getX(), rawLocation.getY(), rawLocation.getZ(),
+                rawLocation.getYaw(), rawLocation.getPitch());
     }
 
-    /**
-     * 格式化RawLocation列表为友好的显示格式
-     * 格式: 基地1: 世界名: X.XX, Y.YY, Z.ZZ (Yaw: XX.X, Pitch: XX.X)
-     * 基地2: 世界名: X.XX, Y.YY, Z.ZZ (Yaw: XX.X, Pitch: XX.X)
-     *
-     * @param locations RawLocation列表
-     * @return 格式化后的字符串列表，如果列表为空则返回包含"无"的单元素列表
-     */
+    private static String formatLocation(@Nullable String world, double x, double y, double z, float yaw, float pitch) {
+        return String.format("&b%s&f: &b%s, %s, %s &7(Yaw: %s, Pitch: %s)",
+                world != null ? world : AzuraBedWars.getInstance().getLang().getMap().getUnknownWorld(),
+                COORDINATE_FORMAT.format(x), COORDINATE_FORMAT.format(y), COORDINATE_FORMAT.format(z),
+                ANGLE_FORMAT.format(yaw), ANGLE_FORMAT.format(pitch));
+    }
+
     @NotNull
     public static List<String> formatLocationList(@Nullable List<MapData.RawLocation> locations) {
+        LangConfig.Maps lang = AzuraBedWars.getInstance().getLang().getMap();
         if (locations == null || locations.isEmpty()) {
-            return Collections.singletonList("&c无");
+            return Collections.singletonList(lang.getNone());
         }
-
         List<String> result = new ArrayList<>();
         for (int i = 0; i < locations.size(); i++) {
-            MapData.RawLocation location = locations.get(i);
-            result.add(String.format("    &7- 基地%d: %s", i + 1, formatLocation(location)));
+            result.add(fill(lang.getBaseLine(), "number", i + 1, "location", formatLocation(locations.get(i))));
         }
-
         return result;
     }
-
 }
