@@ -35,7 +35,7 @@ public class EventSettingsConfig {
 
     @Data
     public static class BedDestroyedEvent {
-        @Comment("床自毁触发时间(秒，从游戏开始计算)")
+        @Comment("床自毁触发时间(秒，从上一阶段结束计算)")
         private int executeSeconds = 360;
 
         @Comment("床自毁标题")
@@ -81,7 +81,7 @@ public class EventSettingsConfig {
 
     @Data
     public static class GameOverEvent {
-        @Comment("游戏强制结束时间(秒，从游戏开始计算)")
+        @Comment("游戏强制结束时间(秒，从床自毁后计算)")
         private int executeSeconds = 360;
 
         @Comment("游戏结束倒计时时间(秒)")
