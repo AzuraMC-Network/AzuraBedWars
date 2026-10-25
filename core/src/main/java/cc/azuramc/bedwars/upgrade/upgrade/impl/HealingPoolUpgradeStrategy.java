@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.upgrade.upgrade.impl;
 
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.upgrade.upgrade.AbstractUpgradeStrategy;
@@ -63,7 +62,7 @@ public class HealingPoolUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     @Override
-    public List<String> getUpgradeLore(GamePlayer gamePlayer, GameModeType gameModeType) {
+    public List<String> getUpgradeLore(GamePlayer gamePlayer) {
         List<String> lore = new ArrayList<>();
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
@@ -76,7 +75,7 @@ public class HealingPoolUpgradeStrategy extends AbstractUpgradeStrategy {
             int price = getUpgradePrice(0);
             lore.addAll(getDescription());
             lore.add("");
-            lore.add("§7价格: §b" + formatPrice(price, gameModeType));
+            lore.add("§7价格: §b" + formatPrice(price));
             lore.add("");
             lore.add("§e点击购买");
         } else {

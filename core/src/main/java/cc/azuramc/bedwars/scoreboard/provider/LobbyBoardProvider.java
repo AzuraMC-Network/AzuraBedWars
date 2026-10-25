@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.scoreboard.provider;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.task.GameStartTask;
@@ -32,10 +31,6 @@ public class LobbyBoardProvider extends AbstractBoardProvider {
     protected List<String> buildLines(GamePlayer gamePlayer) {
         updatePlayerLevel(gamePlayer.getPlayer(), gamePlayer.getPlayerData());
 
-        String modeText = gamePlayer.getPlayerData().getMode() == GameModeType.DEFAULT
-                ? config.getDefaultMode()
-                : config.getExpMode();
-
         return ScoreboardFormatter.create()
                 .set("date", getFormattedDateRaw())
                 .set("map_name", gameManager.getMapData().getName())
@@ -45,7 +40,7 @@ public class LobbyBoardProvider extends AbstractBoardProvider {
                 .set("players", GamePlayer.getOnlinePlayers().size())
                 .set("max_players", gameManager.getMaxPlayers())
                 .set("countdown", getCountdown())
-                .set("mode", modeText)
+                .set("mode", gameManager.getEconomy().getDisplayName())
                 .set("version", plugin.getPlugin().getDescription().getVersion())
                 .set("server", "")
                 .formatLines(config.getLines());

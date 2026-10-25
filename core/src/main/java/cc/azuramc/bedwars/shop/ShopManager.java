@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.shop;
 
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.economy.EconomyType;
 import cc.azuramc.bedwars.shop.page.*;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,9 @@ public class ShopManager {
         registerShop(new BowShopPage());
         registerShop(new PotionShopPage());
         registerShop(new UtilityShopPage());
-        registerShop(new ConvertShopPage());
+        if (gameManager.getEconomyType() == EconomyType.EXPERIENCE) {
+            registerShop(new ConvertShopPage());
+        }
     }
 
     public static void registerShop(@NotNull ShopData shopData) {

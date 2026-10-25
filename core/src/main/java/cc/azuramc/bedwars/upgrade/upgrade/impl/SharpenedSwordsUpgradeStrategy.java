@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.upgrade.upgrade.impl;
 
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.upgrade.upgrade.AbstractUpgradeStrategy;
@@ -66,7 +65,7 @@ public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     @Override
-    public List<String> getUpgradeLore(GamePlayer gamePlayer, GameModeType gameModeType) {
+    public List<String> getUpgradeLore(GamePlayer gamePlayer) {
         List<String> lore = new ArrayList<>(getDescription());
         lore.add("");
 
@@ -78,7 +77,7 @@ public class SharpenedSwordsUpgradeStrategy extends AbstractUpgradeStrategy {
         String tierColor = isUnlocked ? "§a" : "§e";
         int price = getUpgradePrice(0);
 
-        lore.add(tierColor + "等级 1：锋利 I，§b" + formatPrice(price, gameModeType));
+        lore.add(tierColor + "等级 1：锋利 I，§b" + formatPrice(price));
         lore.add("");
 
         if (isUnlocked) {

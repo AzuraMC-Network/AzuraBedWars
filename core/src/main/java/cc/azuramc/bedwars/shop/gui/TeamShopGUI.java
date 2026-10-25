@@ -2,11 +2,11 @@ package cc.azuramc.bedwars.shop.gui;
 
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
+import cc.azuramc.bedwars.shop.PriceCost;
 import cc.azuramc.bedwars.upgrade.factory.TrapStrategyFactory;
 import cc.azuramc.bedwars.upgrade.factory.UpgradeStrategyFactory;
 import cc.azuramc.bedwars.upgrade.trap.TrapManager;
@@ -44,19 +44,18 @@ public class TeamShopGUI extends CustomGUI {
         if (gamePlayer.getPlayerData() == null) {
             return;
         }
-        GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
 
         // 设置界面边框
         setupBorders();
 
         // 设置升级选项
-        setupUpgradeOptions(gamePlayer, gameManager, gameModeType);
+        setupUpgradeOptions(gamePlayer, gameManager);
 
         // 设置陷阱选项
-        setupTrapOptions(gamePlayer, gameManager, gameModeType);
+        setupTrapOptions(gamePlayer, gameManager);
 
         // 陷阱列表
-        setupTrapList(gamePlayer);
+        setupTrapList(gamePlayer, gameManager);
     }
 
     /**
@@ -73,7 +72,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 设置升级选项
      */
-    private void setupUpgradeOptions(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void setupUpgradeOptions(GamePlayer gamePlayer, GameManager gameManager) {
         Map<String, UpgradeStrategy> strategies = UpgradeStrategyFactory.getAllStrategies();
 
         // 升级选项的槽位映射
@@ -83,7 +82,7 @@ public class TeamShopGUI extends CustomGUI {
         for (int i = 0; i < upgradeNames.length; i++) {
             UpgradeStrategy strategy = strategies.get(upgradeNames[i]);
             if (strategy != null) {
-                setupUpgradeItem(upgradeSlots[i], strategy, gamePlayer, gameManager, gameModeType);
+                setupUpgradeItem(upgradeSlots[i], strategy, gamePlayer, gameManager);
             }
         }
     }
@@ -91,8 +90,8 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 设置单个升级选项
      */
-    private void setupUpgradeItem(int slot, UpgradeStrategy strategy, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        ItemStack item = strategy.createUpgradeItem(gamePlayer, gameModeType);
+    private void setupUpgradeItem(int slot, UpgradeStrategy strategy, GamePlayer gamePlayer, GameManager gameManager) {
+        ItemStack item = strategy.createUpgradeItem(gamePlayer);
 
         GUIAction action = new GUIAction(0, () -> {
             if (strategy.canUpgrade(gamePlayer)) {
@@ -106,7 +105,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 设置陷阱选项
      */
-    private void setupTrapOptions(GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
+    private void setupTrapOptions(GamePlayer gamePlayer, GameManager gameManager) {
         Map<TrapType, TrapStrategy> strategies = TrapStrategyFactory.getAllStrategies();
 
         // 陷阱选项的槽位映射
@@ -116,7 +115,7 @@ public class TeamShopGUI extends CustomGUI {
         for (int i = 0; i < trapTypes.length; i++) {
             TrapStrategy strategy = strategies.get(trapTypes[i]);
             if (strategy != null) {
-                setupTrapItem(trapSlots[i], strategy, gamePlayer, gameManager, gameModeType);
+                setupTrapItem(trapSlots[i], strategy, gamePlayer, gameManager);
             }
         }
     }
@@ -124,8 +123,8 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 设置单个陷阱选项
      */
-    private void setupTrapItem(int slot, TrapStrategy strategy, GamePlayer gamePlayer, GameManager gameManager, GameModeType gameModeType) {
-        ItemStack item = strategy.createTrapItem(gamePlayer, gameModeType);
+    private void setupTrapItem(int slot, TrapStrategy strategy, GamePlayer gamePlayer, GameManager gameManager) {
+        ItemStack item = strategy.createTrapItem(gamePlayer);
 
         GUIAction action = new GUIAction(0, () -> {
             if (strategy.canPurchase(gamePlayer)) {
@@ -139,7 +138,7 @@ public class TeamShopGUI extends CustomGUI {
     /**
      * 设置陷阱列表
      */
-    private void setupTrapList(GamePlayer gamePlayer) {
+    private void setupTrapList(GamePlayer gamePlayer, GameManager gameManager) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam == null) {
             return;
@@ -159,7 +158,7 @@ public class TeamShopGUI extends CustomGUI {
                                     "§7购买的陷阱会再次排列，具体",
                                     "§7费用取决已排列的陷阱数量。",
                                     "",
-                                    "§7下一个陷阱: §b" + formatPrice(trapManager.getCurrentTrapPrice(), gamePlayer.getPlayerData().getMode())
+                                    "§7下一个陷阱: §b" + gameManager.getEconomy().formatPrice(PriceCost.teamUpgrade(trapManager.getCurrentTrapPrice()))
                             )
                             .getItem(),
                     new GUIAction(0, () -> {
@@ -184,7 +183,7 @@ public class TeamShopGUI extends CustomGUI {
                                     "§7购买的陷阱会再次排列，具体",
                                     "§7费用取决已排列的陷阱数量。",
                                     "",
-                                    "§7下一个陷阱: §b" + formatPrice(trapManager.getCurrentTrapPrice(), gamePlayer.getPlayerData().getMode())
+                                    "§7下一个陷阱: §b" + gameManager.getEconomy().formatPrice(PriceCost.teamUpgrade(trapManager.getCurrentTrapPrice()))
                             )
                             .getItem();
 
@@ -192,21 +191,6 @@ public class TeamShopGUI extends CustomGUI {
                     }, false));
                 }
             }
-        }
-    }
-
-    /**
-     * 格式化价格显示
-     *
-     * @param price        价格
-     * @param gameModeType 游戏模式
-     * @return 格式化后的价格字符串
-     */
-    private String formatPrice(int price, GameModeType gameModeType) {
-        if (gameModeType == GameModeType.DEFAULT) {
-            return price + " 钻石";
-        } else {
-            return (price * 100) + "级";
         }
     }
 

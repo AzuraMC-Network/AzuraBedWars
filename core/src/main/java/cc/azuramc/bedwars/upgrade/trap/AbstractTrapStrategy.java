@@ -4,21 +4,17 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.config.object.TeamUpgradeConfig;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.shop.PriceCost;
+import cc.azuramc.bedwars.shop.helper.ShopPaymentHandler;
 import com.cryptomorin.xseries.XEnchantment;
-import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 抽象陷阱策略基类
@@ -29,15 +25,6 @@ import java.util.Map;
 public abstract class AbstractTrapStrategy implements TrapStrategy {
 
     public static final TeamUpgradeConfig teamUpgradeConfig = AzuraBedWars.getInstance().getTeamUpgradeConfig();
-    /**
-     * 资源类型名称缓存
-     */
-    private static final Map<Material, String> RESOURCE_NAMES = new HashMap<>();
-
-    static {
-        // 初始化资源名称
-        RESOURCE_NAMES.put(XMaterial.DIAMOND.get(), "钻石");
-    }
 
     /**
      * 获取陷阱类型枚举
@@ -60,27 +47,15 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
             return false;
         }
         TrapManager trapManager = gameTeam.getTrapManager();
-        GameModeType gameModeType = gamePlayer.getPlayerData().getMode();
-        int price = getPrice(gamePlayer);
 
         synchronized (trapManager) {
-            // 检查是否有足够资源
-            if (!canAfford(gamePlayer, price, gameModeType)) {
-                Player player = gamePlayer.getPlayer();
-                if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
-                    player.playSound(player.getLocation(), XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
-                }
-                player.sendMessage("§c没有足够资源购买！");
-                return false;
-            }
-
             // 检查陷阱是否可购买
             if (trapManager.isTrapActive(getTrapTypeEnum()) || trapManager.isReachedActiveLimit()) {
                 return false;
             }
 
             // 先进行支付
-            if (!processPayment(gamePlayer, price, gameModeType)) {
+            if (!ShopPaymentHandler.processPayment(gamePlayer, PriceCost.teamUpgrade(getPrice(gamePlayer)))) {
                 return false;
             }
 
@@ -97,18 +72,17 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     /**
      * 创建陷阱物品
      *
-     * @param gamePlayer   游戏玩家
-     * @param gameModeType 游戏模式
+     * @param gamePlayer 游戏玩家
      * @return 陷阱物品
      */
     @Override
-    public ItemStack createTrapItem(GamePlayer gamePlayer, GameModeType gameModeType) {
+    public ItemStack createTrapItem(GamePlayer gamePlayer) {
         ItemBuilder builder = new ItemBuilder()
                 .setType(getIconMaterial())
                 .setDisplayName("§a" + getDisplayName());
 
         // 添加Lore
-        builder.setLores(getTrapLore(gamePlayer, gameModeType));
+        builder.setLores(getTrapLore(gamePlayer));
 
         // 如果已激活，添加附魔效果
         TrapState state = getTrapState(gamePlayer);
@@ -126,18 +100,17 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
     /**
      * 获取陷阱Lore
      *
-     * @param gamePlayer   游戏玩家
-     * @param gameModeType 游戏模式
+     * @param gamePlayer 游戏玩家
      * @return Lore列表
      */
     @Override
-    public List<String> getTrapLore(GamePlayer gamePlayer, GameModeType gameModeType) {
+    public List<String> getTrapLore(GamePlayer gamePlayer) {
         List<String> lore = new ArrayList<>(getDescription());
         TrapState state = getTrapState(gamePlayer);
         int price = getPrice(gamePlayer);
 
         lore.add("");
-        lore.add("§7价格: §b" + formatPrice(price, gameModeType));
+        lore.add("§7价格: §b" + AzuraBedWars.getInstance().getGameManager().getEconomy().formatPrice(PriceCost.teamUpgrade(price)));
         lore.add("");
 
         switch (state) {
@@ -191,140 +164,6 @@ public abstract class AbstractTrapStrategy implements TrapStrategy {
             return TrapState.FULLED;
         } else {
             return TrapState.ACTIVE;
-        }
-    }
-
-    /**
-     * 检查是否有足够资源支付
-     *
-     * @param gamePlayer   游戏玩家
-     * @param price        价格
-     * @param gameModeType 游戏模式
-     * @return 是否有足够资源
-     */
-    protected boolean canAfford(GamePlayer gamePlayer, int price, GameModeType gameModeType) {
-        if (gameModeType == GameModeType.DEFAULT) {
-            return canAffordItem(gamePlayer, XMaterial.DIAMOND.get(), price);
-        } else {
-            return canAffordExperience(gamePlayer, price * 100);
-        }
-    }
-
-    /**
-     * 处理支付（实际扣除资源）
-     *
-     * @param gamePlayer   游戏玩家
-     * @param price        价格
-     * @param gameModeType 游戏模式
-     * @return 是否支付成功
-     */
-    protected boolean processPayment(GamePlayer gamePlayer, int price, GameModeType gameModeType) {
-        if (gameModeType == GameModeType.DEFAULT) {
-            return spendItem(gamePlayer, XMaterial.DIAMOND.get(), price);
-        } else {
-            return spendExperience(gamePlayer, price * 100);
-        }
-    }
-
-    /**
-     * 检查是否有足够物品
-     *
-     * @param gamePlayer 玩家
-     * @param material   物品类型
-     * @param amount     数量
-     * @return 是否有足够物品
-     */
-    private boolean canAffordItem(GamePlayer gamePlayer, Material material, int amount) {
-        Player player = gamePlayer.getPlayer();
-
-        // 计算玩家拥有的资源总数
-        int playerTotal = 0;
-        ItemStack[] inventory = player.getInventory().getContents();
-
-        for (ItemStack item : inventory) {
-            if (item != null && item.getType().equals(material)) {
-                playerTotal += item.getAmount();
-            }
-        }
-
-        return playerTotal >= amount;
-    }
-
-    /**
-     * 扣除物品
-     *
-     * @param gamePlayer 玩家
-     * @param material   物品类型
-     * @param amount     数量
-     * @return 是否扣除成功
-     */
-    private boolean spendItem(GamePlayer gamePlayer, Material material, int amount) {
-        Player player = gamePlayer.getPlayer();
-        ItemStack[] inventory = player.getInventory().getContents();
-
-        // 扣除资源
-        int remainingToDeduct = amount;
-        for (int i = 0; i < inventory.length; i++) {
-            ItemStack item = inventory[i];
-            if (item != null && item.getType().equals(material) && remainingToDeduct > 0) {
-                if (item.getAmount() > remainingToDeduct) {
-                    item.setAmount(item.getAmount() - remainingToDeduct);
-                    remainingToDeduct = 0;
-                } else {
-                    remainingToDeduct -= item.getAmount();
-                    item.setAmount(0);
-                }
-                player.getInventory().setItem(i, item);
-            }
-        }
-
-        if (XSound.ENTITY_ITEM_PICKUP.get() != null) {
-            player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
-        }
-        return true;
-    }
-
-    /**
-     * 检查是否有足够经验
-     *
-     * @param gamePlayer 游戏玩家
-     * @param xpLevel    经验等级
-     * @return 是否有足够经验
-     */
-    private boolean canAffordExperience(GamePlayer gamePlayer, int xpLevel) {
-        Player player = gamePlayer.getPlayer();
-        return player.getLevel() >= xpLevel;
-    }
-
-    /**
-     * 扣除经验
-     *
-     * @param gamePlayer 游戏玩家
-     * @param xpLevel    经验等级
-     * @return 是否扣除成功
-     */
-    private boolean spendExperience(GamePlayer gamePlayer, int xpLevel) {
-        Player player = gamePlayer.getPlayer();
-
-        player.setLevel(player.getLevel() - xpLevel);
-        if (XSound.ENTITY_ITEM_PICKUP.get() != null) {
-            player.playSound(player.getLocation(), XSound.ENTITY_ITEM_PICKUP.get(), 1F, 1F);
-        }
-        return true;
-    }
-
-    /**
-     * 格式化价格显示
-     *
-     * @param price        价格
-     * @param gameModeType 游戏模式
-     * @return 格式化后的价格字符串
-     */
-    protected String formatPrice(int price, GameModeType gameModeType) {
-        if (gameModeType == GameModeType.DEFAULT) {
-            return price + " " + RESOURCE_NAMES.get(XMaterial.DIAMOND.get());
-        } else {
-            return (price * 100) + "级";
         }
     }
 

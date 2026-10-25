@@ -38,4 +38,11 @@ public interface IPlayerDataRepository {
      * @return 对应的 PlayerData 对象，如果不存在则返回新的 PlayerData 对象
      */
     PlayerData selectPlayerDataByUuid(UUID uuid, GamePlayer gamePlayer);
+
+    /**
+     * 删除玩家数据中已废弃的字段
+     *
+     * @param column 字段名
+     */
+    void dropColumn(String column);
 }

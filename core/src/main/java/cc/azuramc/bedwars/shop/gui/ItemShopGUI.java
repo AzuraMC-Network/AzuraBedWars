@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.shop.gui;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.item.armor.ArmorType;
 import cc.azuramc.bedwars.game.item.tool.ToolType;
@@ -35,18 +34,6 @@ import java.util.*;
  * @author an5w1r@163.com
  */
 public class ItemShopGUI extends CustomGUI {
-
-    /**
-     * 资源名称缓存
-     */
-    private static final Map<Material, String> RESOURCE_NAMES = new HashMap<>();
-
-    static {
-        RESOURCE_NAMES.put(XMaterial.IRON_INGOT.get(), "铁");
-        RESOURCE_NAMES.put(XMaterial.GOLD_INGOT.get(), "金");
-        RESOURCE_NAMES.put(XMaterial.EMERALD.get(), "绿宝石");
-        RESOURCE_NAMES.put(XMaterial.DIAMOND.get(), "钻石");
-    }
 
     /**
      * 创建道具商店GUI
@@ -179,7 +166,7 @@ public class ItemShopGUI extends CustomGUI {
                         ShopItemType shopItemType, int itemSlot, List<String> moreLore) {
         PlayerData playerData = gamePlayer.getPlayerData();
         ItemBuilder itemBuilder = prepareItemDisplay(gamePlayer, shopItemType);
-        List<String> lore = createItemLore(shopItemType, playerData.getMode(), moreLore);
+        List<String> lore = createItemLore(shopItemType, gameManager, moreLore);
 
         super.setItem(displaySlot,
                 itemBuilder.setDisplayName("§c" + shopItemType.getDisplayName())
@@ -208,7 +195,7 @@ public class ItemShopGUI extends CustomGUI {
     /**
      * 创建物品说明
      */
-    private List<String> createItemLore(ShopItemType shopItemType, GameModeType gameModeType, List<String> moreLore) {
+    private List<String> createItemLore(ShopItemType shopItemType, GameManager gameManager, List<String> moreLore) {
         List<String> lore = new ArrayList<>();
         lore.add("§7物品:");
         lore.add("§8•" + shopItemType.getDisplayName());
@@ -218,14 +205,7 @@ public class ItemShopGUI extends CustomGUI {
             lore.addAll(moreLore);
         }
 
-        Material priceMaterial = shopItemType.getPriceCost().material();
-        String resourceName = RESOURCE_NAMES.getOrDefault(priceMaterial, "资源");
-
-        if (gameModeType == GameModeType.EXPERIENCE) {
-            lore.add("§7花费: §3§l" + shopItemType.getPriceCost().xp() + "级");
-        } else {
-            lore.add("§7花费: §3§l" + shopItemType.getPriceCost().amount() + " " + resourceName);
-        }
+        lore.add("§7花费: §3§l" + gameManager.getEconomy().formatPrice(shopItemType.getPriceCost()));
 
         return lore;
     }
@@ -245,7 +225,7 @@ public class ItemShopGUI extends CustomGUI {
             return;
         }
 
-        if (!ShopPaymentHandler.processPayment(gamePlayer, shopItemType, playerData.getMode())) {
+        if (!ShopPaymentHandler.processPayment(gamePlayer, shopItemType.getPriceCost())) {
             return;
         }
 

@@ -69,9 +69,6 @@ public class ItemConfig {
 
     @Data
     public static class GameManager {
-        @Comment("资源类型选择器物品名称")
-        private String resourceSelectorName = MessageUtil.color("&a资源类型选择 &7(右键选择)");
-
         @Comment("队伍选择器物品名称")
         private String teamSelectorName = MessageUtil.color("&e队伍选择 &7(右键选择)");
 

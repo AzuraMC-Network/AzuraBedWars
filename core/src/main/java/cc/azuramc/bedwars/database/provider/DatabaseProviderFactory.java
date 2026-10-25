@@ -37,7 +37,7 @@ public class DatabaseProviderFactory {
         this.databaseVersionRepository = databaseProvider.createDatabaseVersionRepository();
 
         this.playerDataService = new PlayerDataService(playerDataRepository);
-        this.databaseVersionService = new DatabaseVersionService(databaseVersionRepository);
+        this.databaseVersionService = new DatabaseVersionService(databaseVersionRepository, playerDataRepository);
     }
 
     /**

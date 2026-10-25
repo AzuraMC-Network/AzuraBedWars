@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.upgrade.trap;
 
 import cc.azuramc.bedwars.game.GameManager;
-import cc.azuramc.bedwars.game.GameModeType;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import org.bukkit.Material;
@@ -66,20 +65,18 @@ public interface TrapStrategy {
     /**
      * 创建陷阱物品
      *
-     * @param gamePlayer   游戏玩家
-     * @param gameModeType 游戏模式
+     * @param gamePlayer 游戏玩家
      * @return 陷阱物品
      */
-    ItemStack createTrapItem(GamePlayer gamePlayer, GameModeType gameModeType);
+    ItemStack createTrapItem(GamePlayer gamePlayer);
 
     /**
      * 获取陷阱Lore
      *
-     * @param gamePlayer   游戏玩家
-     * @param gameModeType 游戏模式
+     * @param gamePlayer 游戏玩家
      * @return Lore列表
      */
-    List<String> getTrapLore(GamePlayer gamePlayer, GameModeType gameModeType);
+    List<String> getTrapLore(GamePlayer gamePlayer);
 
     /**
      * 获取陷阱状态

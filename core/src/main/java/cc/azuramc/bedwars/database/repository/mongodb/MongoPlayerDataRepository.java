@@ -12,6 +12,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -96,5 +97,10 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
         } catch (Exception e) {
             throw new RuntimeException("Failed to select player data", e);
         }
+    }
+
+    @Override
+    public void dropColumn(String column) {
+        collection.updateMany(Filters.exists(column), Updates.unset(column));
     }
 }

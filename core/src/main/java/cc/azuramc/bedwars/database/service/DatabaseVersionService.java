@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.database.service;
 
 import cc.azuramc.bedwars.database.repository.IDatabaseVersionRepository;
+import cc.azuramc.bedwars.database.repository.IPlayerDataRepository;
 import cc.azuramc.bedwars.util.LoggerUtil;
 
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ public class DatabaseVersionService {
     /**
      * 当前数据库版本号
      */
-    private static final int CURRENT_VERSION = 1;
+    private static final int CURRENT_VERSION = 2;
     private final IDatabaseVersionRepository databaseVersionRepository;
 
     /**
@@ -26,23 +27,18 @@ public class DatabaseVersionService {
      */
     private final Map<Integer, Runnable> versionUpgrades = new HashMap<>();
 
-    public DatabaseVersionService(IDatabaseVersionRepository databaseVersionRepository) {
+    public DatabaseVersionService(IDatabaseVersionRepository databaseVersionRepository, IPlayerDataRepository playerDataRepository) {
         this.databaseVersionRepository = databaseVersionRepository;
-        this.initVersionUpgrades();
+        this.initVersionUpgrades(playerDataRepository);
         this.initializeDatabase();
     }
 
     /**
      * 初始化版本升级映射
      */
-    private void initVersionUpgrades() {
-        // versionUpgrades.put(1, () -> {
-        //     LoggerUtil.info("执行数据库版本升级: 1 -> 2");
-        // });
-
-        // versionUpgrades.put(2, () -> {
-        //     LoggerUtil.info("执行数据库版本升级: 2 -> 3");
-        // });
+    private void initVersionUpgrades(IPlayerDataRepository playerDataRepository) {
+        // per-player economy choice of version 1
+        versionUpgrades.put(1, () -> playerDataRepository.dropColumn("mode"));
     }
 
     /**
