@@ -13,6 +13,8 @@ import cc.azuramc.bedwars.config.object.ItemConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.PlayerConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.database.entity.PlayerData;
+import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
@@ -461,8 +463,39 @@ public class GameManager implements IGameManager {
         updateServerMOTD();
     }
 
+    /**
+     * Teams whose players all left wait while their bed stands, except when only two teams remain
+     */
     public boolean isOver() {
-        return getAliveTeams().size() <= 1;
+        int alive = getAliveTeams().size();
+        long waiting = gameTeams.stream().filter(this::isWaitingForReconnect).count();
+        return alive <= 1 && alive + waiting <= 2;
+    }
+
+    public boolean isWaitingForReconnect(GameTeam gameTeam) {
+        return gameTeam.isDead() && !gameTeam.isDestroyed()
+                && reconnectStates.values().stream().anyMatch(state -> state.getTeamColor() == gameTeam.getTeamColor());
+    }
+
+    /**
+     * The bed breaker takes a final kill for every player of a team that left
+     */
+    public void eliminateOfflineTeam(GameTeam gameTeam, GamePlayer bedBreaker) {
+        PlayerDataService playerDataService = plugin.getDatabaseProviderFactory().getPlayerDataService();
+        for (ReconnectState state : reconnectStates.values()) {
+            if (state.getTeamColor() != gameTeam.getTeamColor()) {
+                continue;
+            }
+            PlayerData playerData = playerDataService.getCachedPlayerData(state.getUuid());
+            if (playerData != null) {
+                playerData.addFinalDeaths();
+            }
+            bedBreaker.recordKill(true);
+            if (!VaultUtil.ecoIsNull) {
+                rewardFinalKillCoins(bedBreaker);
+            }
+        }
+        eliminateTeam(gameTeam);
     }
 
     /**

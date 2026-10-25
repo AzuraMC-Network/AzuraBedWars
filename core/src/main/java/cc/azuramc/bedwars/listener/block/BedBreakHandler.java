@@ -32,7 +32,7 @@ public class BedBreakHandler {
 
         for (GameTeam targetTeam : GAME_MANAGER.getGameTeams()) {
             if (targetTeam.isBedBlock(block)) {
-                if (targetTeam.isDead()) {
+                if (targetTeam.isDead() && !GAME_MANAGER.isWaitingForReconnect(targetTeam)) {
                     gamePlayer.sendMessage("§c此床没有队伍");
                 } else {
                     processBedDestruction(gamePlayer, gameTeam, targetTeam);
@@ -49,6 +49,7 @@ public class BedBreakHandler {
             return;
         }
 
+        boolean teamLeft = targetTeam.isDead();
         targetTeam.setDestroyPlayer(gamePlayer);
         targetTeam.setDestroyed(true);
 
@@ -62,6 +63,9 @@ public class BedBreakHandler {
 
         rewardBedDestruction(gamePlayer);
         broadcastBedDestructionMessages(postEvent);
+        if (teamLeft) {
+            GAME_MANAGER.eliminateOfflineTeam(targetTeam, gamePlayer);
+        }
     }
 
     private static void rewardBedDestruction(GamePlayer gamePlayer) {
