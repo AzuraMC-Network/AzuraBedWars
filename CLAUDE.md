@@ -28,12 +28,13 @@ Bukkit loads `bootstrap`, `api` and every `nms/` module. Everything else runs in
 
 Rules that follow from this:
 
-- `bootstrap` has no dependencies besides the Bukkit API, compiles with `--release 8` against the 1.8.8 API, and must stay Java
+- `bootstrap` has no dependencies besides the Bukkit API, compiles against the 1.8.8 API, and must stay Java
 - `api` stays Java because other plugins compile against it
 - `cc.azuramc.bedwars.AzuraBedWars` is not a `JavaPlugin`. Anything handed to Bukkit, such as the scheduler, events, metadata or plugin channels, takes `AzuraBedWars.getInstance().getPlugin()`
 - APIs that look up the plugin from the calling class, such as `JavaPlugin.getProvidingPlugin`, cannot find it from inside the isolated loader
 - An `implementation` dependency of `core` must be resolvable from Maven Central or JitPack, because the regular jar downloads it
-- Kotlin can be added to `core` with a convention plugin. `kotlin-stdlib` then becomes one more runtime library
+- `bootstrap`, `api`, `core` and the `nms/` modules up to 1.16 compile with `--release 8`, because Minecraft 1.8 to 1.16 servers still run on Java 8. Records, switch expressions, `var`, `List.of` and other Java 9+ language features or APIs are not available there
+- Every runtime library must run on Java 8. `checkBytecode` fails the build otherwise
 
 `core` never depends on `nms`. At runtime `NMSProvider` looks up the Minecraft version in its module table and loads `cc.azuramc.bedwars.nms.<module>.NMS_<module>` by reflection, such as `v1_8_R3` or `v26_2`. The `nms/` modules are compiled against Spigot:
 
@@ -44,7 +45,7 @@ Rules that follow from this:
 To support a new Minecraft version:
 
 1. Copy the closest `nms/` directory and rename both the directory and the Java package, `v1_X_RY` after the CraftBukkit revision or `v26_X` after the first 26.x release it serves
-2. Point its `build.gradle.kts` at the matching `org.spigotmc:spigot` jar from the CodeMC NMS repository, and for 26.x keep `compilePaperJava` on a matching `paper-server`
+2. Point its `build.gradle.kts` at the matching `org.spigotmc:spigot` jar from the CodeMC NMS repository, set `options.release` to the Java version that Minecraft version requires, and for 26.x keep `compilePaperJava` on a matching `paper-server`
 3. Fix the compile errors against the new server jars
 4. Add the first Minecraft version it serves to `NMSProvider`, and move `UNTESTED` past the newest version it was run on
 
@@ -56,7 +57,7 @@ To support a new Minecraft version:
 ./gradlew build
 ```
 
-`AzuraBedWars-<version>.jar` and `AzuraBedWars-<version>-offline.jar` are written to `plugin/build/libs/`. Builds use a JDK 25 toolchain, downloaded automatically when missing, because 26.x server jars are Java 25 bytecode. Output targets Java 21, so every supported server must run on Java 21 or newer.
+`AzuraBedWars-<version>.jar` and `AzuraBedWars-<version>-offline.jar` are written to `plugin/build/libs/`. Builds use a JDK 25 toolchain, downloaded automatically when missing, because 26.x server jars are Java 25 bytecode. Output targets Java 8, except the `nms/` modules for Minecraft 1.17 and newer, which target the Java version their Minecraft version requires.
 
 # Comments
 
