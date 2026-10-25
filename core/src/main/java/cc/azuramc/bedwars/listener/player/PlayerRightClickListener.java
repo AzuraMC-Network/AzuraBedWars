@@ -10,6 +10,7 @@ import cc.azuramc.bedwars.game.spectator.gui.SpectatorCompassGUI;
 import cc.azuramc.bedwars.game.spectator.gui.SpectatorSettingGUI;
 import cc.azuramc.bedwars.util.BungeeUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
+import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
@@ -80,7 +81,7 @@ public class PlayerRightClickListener implements Listener {
         }
 
         // 处理床方块的特殊点击
-        if (event.getClickedBlock() != null && event.getClickedBlock().getType().toString().contains("BED")) {
+        if (event.getClickedBlock() != null && MapUtil.isBedBlock(event.getClickedBlock())) {
             if (event.getPlayer().isSneaking()) {
                 ItemStack item = PlayerUtil.getItemInHand(event.getPlayer());
                 if (item != null && item.getType().isBlock()) {
@@ -110,7 +111,7 @@ public class PlayerRightClickListener implements Listener {
             handlePaperInteraction(event, gamePlayer);
         } else if (material == XMaterial.SLIME_BALL.get()) {
             handleSlimeBallInteraction(event);
-        } else if (material.name().toUpperCase().contains("BED")) {
+        } else if (MapUtil.isBed(material)) {
             handleBedInteraction(event, gamePlayer, gameTeam);
         }
     }

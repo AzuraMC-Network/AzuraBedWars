@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.map.MapData;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -108,8 +109,13 @@ public class MapUtil {
      * @return 如果是床方块返回true，否则返回false
      */
     public static boolean isBedBlock(Block block) {
-        String typeName = block.getType().name().toUpperCase();
-        return typeName.contains("BED");
+        return isBed(block.getType());
+    }
+
+    /** BED and BED_BLOCK before 1.13, colored *_BED after */
+    public static boolean isBed(Material material) {
+        String name = material.name();
+        return name.endsWith("_BED") || name.equals("BED") || name.equals("BED_BLOCK");
     }
 
     /**

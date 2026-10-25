@@ -3,6 +3,7 @@ package cc.azuramc.bedwars.listener.player;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.game.*;
+import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
@@ -48,7 +49,7 @@ public class PickupItemHandler {
      * @return 如果已处理返回true
      */
     public static boolean handleBedPickup(ItemStack itemStack, Item item) {
-        if (!itemStack.getType().name().toUpperCase().contains("BED")) {
+        if (!MapUtil.isBed(itemStack.getType())) {
             return false;
         }
 

@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.compat.util;
 
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.util.MapUtil;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -55,7 +56,7 @@ public class GameTeamBedHandler {
             for (int y = -BED_SEARCH_RADIUS; y < BED_SEARCH_RADIUS; y++) {
                 for (int z = -BED_SEARCH_RADIUS; z < BED_SEARCH_RADIUS; z++) {
                     Block block = gameTeam.getSpawnLocation().clone().add(x, y, z).getBlock();
-                    if (isBedBlock(block)) {
+                    if (MapUtil.isBedBlock(block)) {
                         bedBlocks.add(block);
 
                         // 只需要找到2个床方块即可返回
@@ -143,16 +144,6 @@ public class GameTeamBedHandler {
             gameTeam.setBedFeet(block1);
             gameTeam.setBedFace(bed2.getFacing());
         }
-    }
-
-    /**
-     * 判断方块是否为床方块
-     *
-     * @param block 待检查的方块
-     * @return 如果是床方块返回true，否则返回false
-     */
-    private boolean isBedBlock(Block block) {
-        return block.getType().name().toUpperCase().contains("BED");
     }
 
 }
