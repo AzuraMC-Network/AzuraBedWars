@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.config;
 
-import cc.azuramc.bedwars.config.annotation.RestartRequired;
+import cc.azuramc.bedwars.api.config.RestartRequired;
 import cc.azuramc.bedwars.config.yaml.ConfigKeys;
 import cc.azuramc.bedwars.config.yaml.SchemaExporter;
 import cc.azuramc.bedwars.config.yaml.YamlBinder;

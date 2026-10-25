@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.config.object.shop;
 
-import cc.azuramc.bedwars.config.annotation.Comment;
-import cc.azuramc.bedwars.config.annotation.Raw;
+import cc.azuramc.bedwars.api.config.Comment;
+import cc.azuramc.bedwars.api.config.Raw;
 import lombok.Data;
 
 import java.util.ArrayList;

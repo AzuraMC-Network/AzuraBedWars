@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.config.yaml;
 
-import cc.azuramc.bedwars.config.annotation.Comment;
-import cc.azuramc.bedwars.config.annotation.Range;
-import cc.azuramc.bedwars.config.annotation.RestartRequired;
+import cc.azuramc.bedwars.api.config.Comment;
+import cc.azuramc.bedwars.api.config.Range;
+import cc.azuramc.bedwars.api.config.RestartRequired;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;

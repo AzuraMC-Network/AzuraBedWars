@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.config.object.shop;
 
-import cc.azuramc.bedwars.config.annotation.Comment;
+import cc.azuramc.bedwars.api.config.Comment;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;

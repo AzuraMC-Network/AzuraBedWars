@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.config.yaml;
 
 import cc.azuramc.bedwars.config.ConfigProblem;
-import cc.azuramc.bedwars.config.annotation.Range;
-import cc.azuramc.bedwars.config.annotation.Raw;
+import cc.azuramc.bedwars.api.config.Range;
+import cc.azuramc.bedwars.api.config.Raw;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;

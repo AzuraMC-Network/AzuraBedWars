@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.config.object;
 
-import cc.azuramc.bedwars.config.annotation.Comment;
-import cc.azuramc.bedwars.config.annotation.Raw;
-import cc.azuramc.bedwars.config.annotation.RestartRequired;
+import cc.azuramc.bedwars.api.config.Comment;
+import cc.azuramc.bedwars.api.config.Raw;
+import cc.azuramc.bedwars.api.config.RestartRequired;
 import cc.azuramc.bedwars.database.storage.MapStorageType;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import lombok.Data;
