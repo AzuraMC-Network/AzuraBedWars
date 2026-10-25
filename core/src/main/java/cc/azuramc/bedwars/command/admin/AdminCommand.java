@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.config.ApplyResult;
 import cc.azuramc.bedwars.config.ConfigDocument;
 import cc.azuramc.bedwars.config.ConfigProblem;
 import cc.azuramc.bedwars.config.ConfigService;
+import cc.azuramc.bedwars.devtools.Devtools;
 import cc.azuramc.bedwars.util.CommandUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.Bukkit;
@@ -21,6 +22,7 @@ import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,6 +50,7 @@ public class AdminCommand {
                 "&7 • &f/setup &7查看快速配置相关指令 &3&o[仅EditMode]",
                 "&7 • &f/bw editorMode true/false &7开关编辑模式(重启后生效)",
                 "&7 • &f/bw debugMode true/false &7开关调试日志",
+                "&7 • &f/bw devtools on/off/status/restart/rotate &7开发服的 AI 配置助手(MCP)",
                 "&7 • &f/bw toWorld <worldName> &7前往世界",
                 "&7 • &f/bw loadWorld <worldName> &7加载世界",
                 "&7 • &f/bw start &7立即开始游戏 &3&o[仅非EditMode]",
@@ -104,11 +107,75 @@ public class AdminCommand {
     }
 
     private void setSetting(BukkitCommandActor actor, String key, boolean value) {
-        ApplyResult result = plugin.getConfigService().setValue("settings", key, value);
+        report(actor, plugin.getConfigService().setValue("settings", key, value));
+    }
+
+    private static void report(BukkitCommandActor actor, ApplyResult result) {
         List<String> lines = new ArrayList<>();
         lines.add(describe(result));
         addProblems(lines, result.getProblems());
         CommandUtil.sendLayout(actor, lines);
+    }
+
+    @Subcommand("devtools on")
+    public void devtoolsOn(BukkitCommandActor actor) {
+        startDevtools(actor, plugin.getConfigService().setValue(Devtools.DOCUMENT_ID, "enabled", true));
+    }
+
+    @Subcommand("devtools restart")
+    public void devtoolsRestart(BukkitCommandActor actor) {
+        startDevtools(actor, plugin.getConfigService().reload(Devtools.DOCUMENT_ID));
+    }
+
+    @Subcommand("devtools off")
+    public void devtoolsOff(BukkitCommandActor actor) {
+        plugin.getDevtools().stop();
+        plugin.getConfigService().setValue(Devtools.DOCUMENT_ID, "enabled", false);
+        CommandUtil.sendLayout(actor, "&aMCP 已关闭 端口已释放");
+    }
+
+    @Subcommand("devtools rotate")
+    public void devtoolsRotate(BukkitCommandActor actor) {
+        try {
+            String error = plugin.getDevtools().rotateToken();
+            if (error != null) {
+                CommandUtil.sendLayout(actor, "&c令牌已更换 但 MCP 未能重新启动: " + error);
+                return;
+            }
+        } catch (IOException e) {
+            CommandUtil.sendLayout(actor, "&c无法写入新令牌: " + e.getMessage());
+            return;
+        }
+        CommandUtil.sendLayout(actor, "&a令牌已更换 旧令牌立即失效 AI 客户端需要用新命令重新添加");
+        devtoolsStatus(actor);
+    }
+
+    @Subcommand("devtools status")
+    public void devtoolsStatus(BukkitCommandActor actor) {
+        Devtools devtools = plugin.getDevtools();
+        if (!devtools.isRunning()) {
+            CommandUtil.sendLayout(actor, "&eMCP 未开启 /bw devtools on 开启");
+            return;
+        }
+        CommandUtil.sendLayout(actor, Arrays.asList(
+                "&aMCP 运行中 &f" + devtools.endpoint(),
+                "&7在 AI 客户端所在的电脑上执行:",
+                "&f" + devtools.connectCommand(),
+                "&7令牌保存在 plugins/AzuraBedWars/devtools/token 审计日志在 devtools/audit.log"
+        ));
+    }
+
+    private void startDevtools(BukkitCommandActor actor, ApplyResult configResult) {
+        if (configResult.getStatus() == ApplyResult.Status.REJECTED) {
+            report(actor, configResult);
+            return;
+        }
+        String error = plugin.getDevtools().start();
+        if (error != null) {
+            CommandUtil.sendLayout(actor, "&cMCP 未能启动: " + error);
+            return;
+        }
+        devtoolsStatus(actor);
     }
 
     private static String describe(ApplyResult result) {
