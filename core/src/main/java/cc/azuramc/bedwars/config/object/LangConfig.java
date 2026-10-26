@@ -490,6 +490,7 @@ public class LangConfig {
 
         public Death() {
             self.put("VOID", lines("{player} {color}fell into the void", "{player} {color}fell out of the world"));
+            self.put("ENTITY_ATTACK", lines("{player} {color}was slain by a mob"));
             self.put("FALL", lines("{player} {color}hit the ground too hard", "{player} {color}could not escape gravity"));
             self.put("FIRE", lines("{player} {color}went up in flames", "{player} {color}was burned to a crisp"));
             self.put("FIRE_TICK", lines("{player} {color}went up in flames", "{player} {color}was burned to a crisp"));

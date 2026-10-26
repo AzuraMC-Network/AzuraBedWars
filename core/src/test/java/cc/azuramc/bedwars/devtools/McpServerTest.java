@@ -41,10 +41,11 @@ class McpServerTest {
     void setUp() throws IOException {
         McpServer.Host host = new McpServer.Host() {
             @Override
-            public void checkWriteAllowed() {
+            public JsonElement callWrite(McpTool.Handler handler, Args args) throws Exception {
                 if (writesBlocked) {
                     throw new ToolError("blocked");
                 }
+                return handler.call(args);
             }
 
             @Override

@@ -16,6 +16,7 @@ import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,9 +111,11 @@ public class GameOverTask extends BukkitRunnable {
         for (String line : gameOver().getCustomLeaderboardMessages()) {
             line = line.replace("<winnerFormat>", winnerText);
             for (Map.Entry<String, List<RankingEntry>> ranking : rankings.entrySet()) {
-                line = fillRanking(line, ranking.getKey(), ranking.getValue());
+                if (line != null) {
+                    line = fillRanking(line, ranking.getKey(), ranking.getValue());
+                }
             }
-            if (!line.trim().isEmpty()) {
+            if (line != null && !line.trim().isEmpty()) {
                 messages.add(line);
             }
         }
@@ -121,15 +124,23 @@ public class GameOverTask extends BukkitRunnable {
 
     /**
      * Placeholders such as {@code <firstKills>} and {@code <firstKillsName>}, plus {@code <firstName>} for the kill ranking
+     *
+     * @return null when the line names a rank nobody holds
      */
+    @Nullable
     private static String fillRanking(String line, String type, List<RankingEntry> ranking) {
         for (int i = 0; i < RANKS.length; i++) {
-            String name = i < ranking.size() ? ranking.get(i).name() : "";
-            String value = i < ranking.size() ? String.valueOf(ranking.get(i).value()) : "0";
-            line = line.replace("<" + RANKS[i] + type + "Name>", name).replace("<" + RANKS[i] + type + ">", value);
-            if (type.equals("Kills")) {
-                line = line.replace("<" + RANKS[i] + "Name>", name);
+            String nameKey = "<" + RANKS[i] + type + "Name>";
+            String valueKey = "<" + RANKS[i] + type + ">";
+            String shortNameKey = type.equals("Kills") ? "<" + RANKS[i] + "Name>" : nameKey;
+            if (i >= ranking.size()) {
+                if (line.contains(nameKey) || line.contains(valueKey) || line.contains(shortNameKey)) {
+                    return null;
+                }
+                continue;
             }
+            String name = ranking.get(i).name();
+            line = line.replace(nameKey, name).replace(valueKey, String.valueOf(ranking.get(i).value())).replace(shortNameKey, name);
         }
         return line;
     }
@@ -165,6 +176,7 @@ public class GameOverTask extends BukkitRunnable {
         }
         return stats.stream()
                 .map(stat -> new RankingEntry(stat.getName(), value.applyAsInt(stat)))
+                .filter(entry -> entry.value() > 0)
                 .sorted((a, b) -> Integer.compare(b.value(), a.value()))
                 .collect(Collectors.toList());
     }

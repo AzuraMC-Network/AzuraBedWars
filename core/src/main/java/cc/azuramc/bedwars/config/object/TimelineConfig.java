@@ -139,7 +139,8 @@ public class TimelineConfig {
         @Comment("Launch fireworks on a draw")
         private boolean tieFireworkEnabled = true;
 
-        @Comment({"Leaderboard message", "Placeholders: <winnerFormat>, <firstName>, <firstKills>, <secondName>, <secondKills>, <thirdName>, <thirdKills>"})
+        @Comment({"Leaderboard message", "Placeholders: <winnerFormat>, <firstName>, <firstKills>, <secondName>, <secondKills>, <thirdName>, <thirdKills>",
+                "A line naming a rank nobody reached is left out"})
         private List<String> customLeaderboardMessages = new ArrayList<>(Arrays.asList(
                 "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
                 "&f                                   &lBed Wars",

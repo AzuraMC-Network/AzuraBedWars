@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -50,6 +51,9 @@ public final class Devtools implements McpServer.Host {
     private static final String DIRECTORY = "devtools";
     private static final long MAIN_THREAD_TIMEOUT_SECONDS = 5;
     private static final int AUDIT_VALUE_LIMIT = 300;
+    private static final int MAX_PORT = 65535;
+    /** Also bounds the scan when the host itself cannot be bound */
+    private static final int AUTO_PORT_ATTEMPTS = 100;
 
     private final AzuraBedWars plugin;
     @Getter
@@ -101,7 +105,10 @@ public final class Devtools implements McpServer.Host {
             }
             McpServer created = new McpServer(this, new McpContent(plugin, this), () -> withDevTools(tools), token,
                     plugin.getPlugin().getDescription().getVersion());
-            created.start(config.getHost(), config.getPort());
+            String error = listen(created, config);
+            if (error != null) {
+                return error;
+            }
             server = created;
         } catch (IOException e) {
             return "cannot listen on " + config.getHost() + ":" + config.getPort() + ": " + e.getMessage();
@@ -110,6 +117,42 @@ public final class Devtools implements McpServer.Host {
         LoggerUtil.warn("MCP devtools are listening on " + endpoint() + ", turn them off on production servers");
         if (config.isAllowRemote()) {
             LoggerUtil.warn("MCP devtools accept remote connections, anyone with the token can change this server");
+        }
+        return null;
+    }
+
+    /**
+     * @return why it cannot listen, null when it does
+     */
+    @Nullable
+    private static String listen(McpServer server, DevtoolsConfig config) throws IOException {
+        String port = config.getPort().trim();
+        if (DevtoolsConfig.AUTO_PORT.equalsIgnoreCase(port)) {
+            BindException last = null;
+            for (int candidate = DevtoolsConfig.FIRST_AUTO_PORT; candidate < DevtoolsConfig.FIRST_AUTO_PORT + AUTO_PORT_ATTEMPTS; candidate++) {
+                try {
+                    server.start(config.getHost(), candidate);
+                    return null;
+                } catch (BindException e) {
+                    last = e;
+                }
+            }
+            return "cannot listen on " + config.getHost() + " at ports " + DevtoolsConfig.FIRST_AUTO_PORT + " to "
+                    + (DevtoolsConfig.FIRST_AUTO_PORT + AUTO_PORT_ATTEMPTS - 1) + ": " + last.getMessage();
+        }
+        int number;
+        try {
+            number = Integer.parseInt(port);
+        } catch (NumberFormatException e) {
+            number = 0;
+        }
+        if (number < 1 || number > MAX_PORT) {
+            return "port " + port + " in devtools.yml is not auto or a number from 1 to " + MAX_PORT;
+        }
+        try {
+            server.start(config.getHost(), number);
+        } catch (BindException e) {
+            return "port " + number + " is in use, set port: auto in devtools.yml to take a free one";
         }
         return null;
     }
@@ -170,7 +213,7 @@ public final class Devtools implements McpServer.Host {
         if (host.contains(":")) {
             host = "[" + host + "]";
         }
-        return "http://" + host + ":" + config.getPort() + McpServer.PATH;
+        return "http://" + host + ":" + server.getAddress().getPort() + McpServer.PATH;
     }
 
     public String connectCommand() {
@@ -238,11 +281,15 @@ public final class Devtools implements McpServer.Host {
     }
 
     @Override
-    public void checkWriteAllowed() throws Exception {
-        String blocked = sync(this::writeBlocker);
-        if (blocked != null) {
-            throw new ToolError(blocked);
-        }
+    public JsonElement callWrite(McpTool.Handler handler, Args args) throws Exception {
+        // one main-thread task, so no player joins between the check and the write
+        return sync(() -> {
+            String blocked = writeBlocker();
+            if (blocked != null) {
+                throw new ToolError(blocked);
+            }
+            return handler.call(args);
+        });
     }
 
     /**

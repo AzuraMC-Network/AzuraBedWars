@@ -452,6 +452,8 @@ death:
       - "&b&l» {player} {color}掉出了这个世界 {final}"
       - "&b&l» {player} {color}迷失了自我 {final}"
       - "&b&l» {player} {color}陨落了 {final}"
+    ENTITY_ATTACK:
+      - "&b&l» {player} {color}被怪物杀死了 {final}"
     FALL:
       - "&b&l» {player} {color}感受到了动能 {final}"
       - "&b&l» {player} {color}没能摆脱地心引力 {final}"

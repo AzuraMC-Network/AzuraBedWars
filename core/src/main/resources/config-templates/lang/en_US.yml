@@ -450,6 +450,8 @@ death:
     VOID:
       - "&b&l» {player} {color}fell into the void {final}"
       - "&b&l» {player} {color}fell out of the world {final}"
+    ENTITY_ATTACK:
+      - "&b&l» {player} {color}was slain by a mob {final}"
     FALL:
       - "&b&l» {player} {color}hit the ground too hard {final}"
       - "&b&l» {player} {color}could not escape gravity {final}"
