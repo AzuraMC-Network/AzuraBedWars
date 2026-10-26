@@ -36,9 +36,9 @@ public class WorldUtil {
             GameRule<?> fireSpreadRadius = ReflectionUtil.getStaticField(GameRule.class, "FIRE_SPREAD_RADIUS_AROUND_PLAYER");
             GameRule<?> showAdvancementMessages = ReflectionUtil.getStaticField(GameRule.class, "SHOW_ADVANCEMENT_MESSAGES");
 
-            ReflectionUtil.invokeMethod(world, "setGameRule", spawnMobs, false);
-            ReflectionUtil.invokeMethod(world, "setGameRule", fireSpreadRadius, 0);
-            ReflectionUtil.invokeMethod(world, "setGameRule", showAdvancementMessages, false);
+            setGameRule(world, spawnMobs, false);
+            setGameRule(world, fireSpreadRadius, 0);
+            setGameRule(world, showAdvancementMessages, false);
             LoggerUtil.debug("WorldUtil$trySetNewestGameRules | true");
             return true;
         } catch (Exception e) {
@@ -53,15 +53,22 @@ public class WorldUtil {
             GameRule<?> doFireTick = ReflectionUtil.getStaticField(GameRule.class, "DO_FIRE_TICK");
             GameRule<?> announceAdvancements = ReflectionUtil.getStaticField(GameRule.class, "ANNOUNCE_ADVANCEMENTS");
 
-            ReflectionUtil.invokeMethod(world, "setGameRule", doMobSpawning, false);
-            ReflectionUtil.invokeMethod(world, "setGameRule", doFireTick, false);
-            ReflectionUtil.invokeMethod(world, "setGameRule", announceAdvancements, false);
+            setGameRule(world, doMobSpawning, false);
+            setGameRule(world, doFireTick, false);
+            setGameRule(world, announceAdvancements, false);
             LoggerUtil.debug("WorldUtil$trySetLegacyGameRules | true");
             return true;
         } catch (Exception e) {
             LoggerUtil.debug("WorldUtil$trySetLegacyGameRules | false");
             return false;
         }
+    }
+
+    /**
+     * World#setGameRule is (GameRule, Object) after erasure, a lookup by the argument classes never finds it
+     */
+    private static void setGameRule(World world, GameRule<?> rule, Object value) throws ReflectiveOperationException {
+        World.class.getMethod("setGameRule", GameRule.class, Object.class).invoke(world, rule, value);
     }
 
     private static void trySetOldestGameRules(World world) {
