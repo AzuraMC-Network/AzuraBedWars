@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../schema/shop-menu.json
+config-version: 1
+# Shop frame: category order, lore and quick buy
+
+title: "&8Item Shop - {category}"
+# Category order, up to 8 file names from shop/categories, remove one to hide that category
+categories: [blocks, melee, armor, tools, ranged, potions, utility, convert]
+
+navigation:
+  selected: LIME_STAINED_GLASS_PANE
+  unselected: GRAY_STAINED_GLASS_PANE
+  category-lore: ["&eClick to view!"]
+
+item-name: "&c{name}"
+# A line holding only {tiers} {hint} or {status} is dropped when empty
+lore:
+  - "&7Item:"
+  - "&8•{name}"
+  - "{tiers}"
+  - " "
+  - "{hint}"
+  - "&7Cost: &3&l{price}"
+  - "{status}"
+
+status:
+  can-buy: "&eClick to purchase!"
+  too-poor: "&cYou don't have enough resources!"
+  owned: "&aUNLOCKED"
+  maxed: "&aMAXED"
+  locked: "&cBuy the previous tier first"
+
+quick-buy:
+  icon: NETHER_STAR
+  name: "&bQuick Buy"
+  # Q marks the slots players can customize
+  layout:
+    - "         "
+    - "         "
+    - " QQQQQQQ "
+    - " QQQQQQQ "
+    - " QQQQQQQ "
+    - "         "
+  defaults: [blocks.wool, melee.stone_sword, armor.chainmail, utility.golden_apple,
+             ranged.bow, potions.speed, utility.tnt, blocks.planks, melee.iron_sword,
+             armor.iron, utility.fireball, ranged.arrows, potions.jump, utility.water]
+  add-hint: "&7Shift Click to add to Quick Buy"
+  remove-hint: "&7Shift Click to remove from Quick Buy"
+
+tier-lore:
+  header: "&7Tier {current}/{max}"
+  owned: "&a✔ {name}"
+  next: "&e➜ {name} &7- {price}"
+  locked: "&8✖ {name} - {price}"
+  keep: ""
+  downgrade: "&7Goes down a tier on death"
+  reset: "&7Resets on death"

@@ -1,0 +1,19 @@
+# Read once at startup, restart the server after changing it
+
+libraries:
+  # Repositories for runtime libraries, downloaded into plugins/AzuraBedWars/libraries/
+  # Only the regular jar reads this, the offline jar already embeds every library
+  # Tried in order, every file is checked against its sha256 so a bad mirror is rejected
+  # Accepts http(s) URLs or local Maven layout directories such as file:/path/to/repo/
+  repositories:
+    - https://repo1.maven.org/maven2/
+    - https://maven.aliyun.com/repository/public/
+    - https://jitpack.io/
+
+updater:
+  # Checks GitHub releases on startup and downloads a newer jar of the same kind, regular or offline,
+  # into the update folder, plugins/update/ by default. The server installs it on the next restart
+  # The downloaded jar keeps the file name of the current one
+  enabled: true
+  # Also accept beta releases
+  include-prereleases: true

@@ -1,0 +1,45 @@
+package cc.azuramc.bedwars.scoreboard.provider;
+
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.DisplayConfig;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.scoreboard.util.ScoreboardFormatter;
+
+import java.util.List;
+
+/**
+ * @author an5w1r@163.com
+ */
+public class GameEndBoardProvider extends AbstractBoardProvider {
+
+    public GameEndBoardProvider(GameManager gameManager) {
+        super(gameManager);
+    }
+
+    @Override
+    protected String getTitle() {
+        return config().getTitle();
+    }
+
+    @Override
+    protected List<String> buildLines(GamePlayer gamePlayer) {
+        updatePlayerLevel(gamePlayer.getPlayer(), gamePlayer.getPlayerData());
+
+        return ScoreboardFormatter.create()
+                .set("date", getFormattedDateRaw())
+                .set("winner", getWinnerName())
+                .set("server", "")
+                .formatLines(config().getLines());
+    }
+
+    private String getWinnerName() {
+        GameTeam winner = gameManager.getWinner();
+        return winner != null ? winner.getName() : AzuraBedWars.getInstance().getLang().getGame().getNoWinner();
+    }
+
+    private static DisplayConfig.GameEndScoreboard config() {
+        return AzuraBedWars.getInstance().getDisplayConfig().getGameEndScoreboard();
+    }
+}

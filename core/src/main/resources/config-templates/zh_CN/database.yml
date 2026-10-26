@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=schema/database.json
+# 数据库配置
+# 用于存储玩家数据和统计信息, 修改后需要重启服务器
+config-version: 1
+
+# 数据库类型
+# 可选: MYSQL, MONGODB
+database-type: MYSQL
+
+# 数据库主机地址
+host: "localhost"
+
+# 数据库端口
+port: 3306
+
+# 数据库用户名
+username: "root"
+
+# 数据库密码
+password: "123456"
+
+# 数据库名称
+database: "azurabw"

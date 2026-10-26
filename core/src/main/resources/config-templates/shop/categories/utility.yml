@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&aUtility"
+icon: TNT
+# Settings of special items are in items.yml
+items:
+  fireball:
+    name: "Fireball"
+    item: FIRE_CHARGE
+    special: fireball
+    price: 50 iron
+    xp: 50
+  tnt:
+    name: "TNT"
+    item: TNT
+    special: tnt
+    price: 4 gold
+    xp: 40
+  ender_pearl:
+    name: "Ender Pearl"
+    item: ENDER_PEARL
+    price: 4 emerald
+    xp: 400
+  water:
+    name: "Water Bucket"
+    item: WATER_BUCKET
+    price: 1 emerald
+    xp: 100
+  rescue_platform:
+    name: "Rescue Platform"
+    item: { material: BLAZE_ROD, lore: [" ", "&fUse it in the air to spawn", "&fa temporary slime platform below you!"] }
+    special: rescue_platform
+    price: 1 emerald
+    xp: 80
+  golden_apple:
+    name: "Golden Apple"
+    item: GOLDEN_APPLE
+    price: 3 gold
+    xp: 15
+  bridge_egg:
+    name: "Bridge Egg"
+    item: EGG
+    special: bridge_egg
+    price: 1 emerald
+    xp: 100
+  silverfish:
+    name: "Bedbug"
+    item: SNOWBALL
+    special: silverfish
+    price: 40 iron
+    xp: 40
+  dream_defender:
+    name: "Dream Defender"
+    item: { material: WOLF_SPAWN_EGG, spawn-egg: WOLF }
+    special: dream_defender
+    price: 128 iron
+    xp: 128
+  popup_tower:
+    name: "Compact Pop-up Tower"
+    item: CHEST
+    special: popup_tower
+    price: 64 iron
+    xp: 64
+  magic_milk:
+    name: "Magic Milk"
+    item: MILK_BUCKET
+    special: magic_milk
+    price: 8 gold
+    xp: 80

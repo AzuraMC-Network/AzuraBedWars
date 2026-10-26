@@ -1,0 +1,24 @@
+name: Stale Issues
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          # Label names and the 14 days match labels.json
+          stale-issue-label: ⏰ Stale
+          exempt-issue-labels: 🔄 In Progress
+          days-before-stale: 14
+          days-before-close: -1
+          days-before-pr-stale: -1
+          stale-issue-message: ''
+          operations-per-run: 100

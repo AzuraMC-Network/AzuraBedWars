@@ -1,0 +1,26 @@
+name: Label Pull Requests
+
+# pull_request_target always runs the copy of this file on the default branch
+# It gets a write token for fork PRs too and never checks out PR code
+on:
+  pull_request_target:
+    types: [ opened, edited, reopened, ready_for_review, converted_to_draft, closed ]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: label-pr-${{ github.event.pull_request.number }}
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+      - uses: actions/github-script@v7
+        with:
+          script: await require('./.github/scripts/pr-labels.js')({ github, context })

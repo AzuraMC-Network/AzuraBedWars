@@ -1,0 +1,64 @@
+package cc.azuramc.bedwars.listener.spectator;
+
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.spectator.SpectatorSettings;
+import cc.azuramc.bedwars.util.MessageUtil;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+
+/**
+ * @author an5w1r@163.com
+ */
+public class SpectatorInteractAtEntityListener implements Listener {
+
+    private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
+        GamePlayer gamePlayer = GamePlayer.get(event.getPlayer().getUniqueId());
+        if (gamePlayer == null) {
+            return;
+        }
+        if (gamePlayer.isSpectator() && gameManager.getGameState() == GameState.RUNNING) {
+            handleSpectatorEntityInteraction(event, gamePlayer);
+        }
+    }
+
+    /**
+     * 处理旁观者与实体的交互
+     */
+    private void handleSpectatorEntityInteraction(PlayerInteractAtEntityEvent event, GamePlayer gamePlayer) {
+        if (event.getRightClicked() instanceof Player && SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) {
+            Player targetPlayer = (Player) event.getRightClicked();
+            event.setCancelled(true);
+
+            GamePlayer targetGamePlayer = GamePlayer.get(targetPlayer.getUniqueId());
+            if (targetGamePlayer == null) {
+                return;
+            }
+            if (targetGamePlayer.isSpectator()) {
+                return;
+            }
+
+            enableFirstPersonSpectating(gamePlayer, event.getPlayer(), targetPlayer);
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    /**
+     * 启用第一人称旁观模式
+     */
+    private void enableFirstPersonSpectating(GamePlayer gamePlayer, Player spectator, Player target) {
+        gamePlayer.sendTitle(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getSpectator().getFirstPersonTitle(), "player", target.getName()), AzuraBedWars.getInstance().getLang().getSpectator().getFirstPersonSubtitle(), 0, 20, 0);
+        spectator.setGameMode(GameMode.SPECTATOR);
+        spectator.setSpectatorTarget(target);
+    }
+}

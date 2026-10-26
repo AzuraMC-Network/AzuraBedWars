@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&aBlocks"
+icon: TERRACOTTA
+# Without a layout the items fill the quick buy slots in order, the keys of items are the item ids
+items:
+  wool:
+    name: "Wool"
+    item: { material: WHITE_WOOL, amount: 16, team-color: true }
+    price: 4 iron
+    xp: 4
+  speed_wool:
+    name: "Speed Wool"
+    item: { material: WHITE_WOOL, amount: 4, team-color: true, enchants: { EFFICIENCY: 1 }, flags: [HIDE_ENCHANTS] }
+    special: speed_wool
+    price: 4 iron
+    xp: 4
+  clay:
+    name: "Hardened Clay"
+    item: { material: TERRACOTTA, amount: 16, team-color: true }
+    price: 12 iron
+    xp: 12
+  glass:
+    name: "Blast-Proof Glass"
+    item: { material: GLASS, amount: 4, team-color: true }
+    price: 12 iron
+    xp: 12
+  endstone:
+    name: "End Stone"
+    item: { material: END_STONE, amount: 12 }
+    price: 24 iron
+    xp: 24
+  ladder:
+    name: "Ladder"
+    item: { material: LADDER, amount: 16 }
+    price: 4 iron
+    xp: 4
+  planks:
+    name: "Wood"
+    item: { material: OAK_PLANKS, amount: 16 }
+    price: 4 gold
+    xp: 20
+  slime:
+    name: "Slime Block"
+    item: { material: SLIME_BLOCK, amount: 4 }
+    price: 2 gold
+    xp: 10
+  cobweb:
+    name: "Cobweb"
+    item: { material: COBWEB, amount: 2 }
+    price: 4 gold
+    xp: 20
+  obsidian:
+    name: "Obsidian"
+    item: { material: OBSIDIAN, amount: 4 }
+    price: 4 emerald
+    xp: 400

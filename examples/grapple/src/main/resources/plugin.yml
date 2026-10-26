@@ -1,0 +1,7 @@
+name: Grapple
+version: ${version}
+main: cc.azuramc.bedwars.example.grapple.GrapplePlugin
+description: Sample AzuraBedWars extension, a grappling hook sold by the shop
+api-version: 1.13
+depend:
+  - AzuraBedWars

@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&aMelee"
+icon: GOLDEN_SWORD
+items:
+  stone_sword:
+    name: "Stone Sword"
+    item: { material: STONE_SWORD, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
+    sword: true
+    price: 10 iron
+    xp: 10
+  iron_sword:
+    name: "Iron Sword"
+    item: { material: IRON_SWORD, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
+    sword: true
+    price: 7 gold
+    xp: 35
+  diamond_sword:
+    name: "Diamond Sword"
+    item: { material: DIAMOND_SWORD, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
+    sword: true
+    price: 4 emerald
+    xp: 400
+  knockback_stick:
+    name: "Stick (Knockback I)"
+    item: { material: STICK, enchants: { KNOCKBACK: 1 } }
+    price: 10 gold
+    xp: 150

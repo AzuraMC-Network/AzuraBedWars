@@ -1,0 +1,52 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+  release:
+    types: [ published ]
+
+concurrency:
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          # Only writes the cache on the default branch by default, but builds run on develop and PRs into it
+          cache-read-only: ${{ github.event_name != 'push' }}
+      # release jars take their version from the tag for the bootstrap updater
+      - run: ./gradlew build ${TAG:+-Pversion=${TAG#v}}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzuraBedWars
+          path: plugin/build/libs/AzuraBedWars-*.jar
+
+  release:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: AzuraBedWars
+      - run: gh release upload "$TAG" AzuraBedWars-*.jar --clobber --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}

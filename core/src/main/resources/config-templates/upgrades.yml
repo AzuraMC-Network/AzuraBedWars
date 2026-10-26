@@ -1,0 +1,171 @@
+# yaml-language-server: $schema=schema/upgrades.json
+config-version: 2
+# Team upgrades and traps, read when a game starts, a running game keeps its own
+
+title: "&8Upgrades & Traps"
+# Range of the base target in blocks, from the team spawn
+base-range: 18
+# How close to the spawn an enemy triggers a trap in blocks
+trap-trigger-range: 20
+
+# Each character is a key of upgrades, traps.types or decor, Q is the trap queue
+layout:
+  - "         "
+  - " SAM BFL "
+  - " RHC N   "
+  - "---------"
+  - "   QQQ   "
+  - "         "
+decor:
+  "-": { material: GRAY_STAINED_GLASS_PANE, name: " " }
+
+# Effect types
+#   enchant  target: sword armor boots, enchant, level
+#   potion   target: team base intruder, effect, level, seconds, potions of team upgrades are given again every second
+#   generator  resource, interval in seconds, max-stack, a team without this generator gets a new one
+#   reveal   shows invisible intruders
+#   title sound message command  target: team base intruder
+#   plugin:id  an effect of another plugin, its settings go under settings
+upgrades:
+  S:
+    id: sharpened_swords
+    name: "&aSharpened Swords"
+    icon: IRON_SWORD
+    description: ["&7Your team permanently gains", "&7Sharpness I on all swords!"]
+    levels:
+      - { name: "Sharpness I", price: 8 diamond, xp: 800, effects: [{ type: enchant, target: sword, enchant: SHARPNESS, level: 1 }] }
+  A:
+    id: reinforced_armor
+    name: "&aReinforced Armor"
+    icon: IRON_CHESTPLATE
+    description: ["&7Your team permanently gains", "&7Protection on all armor pieces!"]
+    levels:
+      - { name: "Protection I", price: 5 diamond, xp: 500, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 1 }] }
+      - { name: "Protection II", price: 10 diamond, xp: 1000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 2 }] }
+      - { name: "Protection III", price: 20 diamond, xp: 2000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 3 }] }
+      - { name: "Protection IV", price: 30 diamond, xp: 3000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 4 }] }
+  M:
+    id: manic_miner
+    name: "&aManiac Miner"
+    icon: GOLDEN_PICKAXE
+    description: ["&7All players on your team", "&7permanently gain Haste."]
+    levels:
+      - { name: "Haste I", price: 4 diamond, xp: 400, effects: [{ type: potion, target: team, effect: HASTE, level: 1, seconds: 2 }] }
+      - { name: "Haste II", price: 6 diamond, xp: 600, effects: [{ type: potion, target: team, effect: HASTE, level: 2, seconds: 2 }] }
+  R:
+    id: resource_furnace
+    name: "&aIron Forge"
+    icon: FURNACE
+    description: ["&7Upgrade resource spawning", "&7on your island."]
+    levels:
+      - name: "+50% Resources"
+        price: 4 diamond
+        xp: 400
+        effects:
+          - { type: generator, resource: iron, interval: 1, max-stack: 48 }
+          - { type: generator, resource: gold, interval: 3, max-stack: 8 }
+      - name: "+100% Resources"
+        price: 8 diamond
+        xp: 800
+        effects:
+          - { type: generator, resource: iron, interval: 0.8, max-stack: 72 }
+          - { type: generator, resource: gold, interval: 2.4, max-stack: 12 }
+      - name: "Spawn emeralds"
+        price: 12 diamond
+        xp: 1200
+        effects:
+          - { type: generator, resource: iron, interval: 0.6, max-stack: 96 }
+          - { type: generator, resource: gold, interval: 2, max-stack: 16 }
+          - { type: generator, resource: emerald, interval: 60, max-stack: 2 }
+      - name: "+200% Resources"
+        price: 16 diamond
+        xp: 1600
+        effects:
+          - { type: generator, resource: iron, interval: 0.4, max-stack: 128 }
+          - { type: generator, resource: gold, interval: 1.6, max-stack: 24 }
+          - { type: generator, resource: emerald, interval: 30 }
+  H:
+    id: healing_pool
+    name: "&aHeal Pool"
+    icon: BEACON
+    description: ["&7Creates a Regeneration field", "&7around your base!"]
+    levels:
+      - { name: "Regeneration", price: 3 diamond, xp: 300, effects: [{ type: potion, target: base, effect: REGENERATION, level: 1, seconds: 3 }] }
+  C:
+    id: cushioned_boots
+    name: "&aCushioned Boots"
+    icon: DIAMOND_BOOTS
+    description: ["&7Your team permanently gains", "&7Feather Falling on boots!"]
+    levels:
+      - { name: "Feather Falling I", price: 2 diamond, xp: 200, effects: [{ type: enchant, target: boots, enchant: FEATHER_FALLING, level: 1 }] }
+      - { name: "Feather Falling II", price: 4 diamond, xp: 400, effects: [{ type: enchant, target: boots, enchant: FEATHER_FALLING, level: 2 }] }
+
+traps:
+  queue-size: 3
+  # Price of the 1st, 2nd and 3rd trap in the queue
+  prices: [1 diamond, 2 diamond, 3 diamond]
+  xp: [100, 200, 300]
+  # Effects on your own team when any trap triggers, a trap with its own alert uses that
+  alert:
+    - { type: title, target: team, title: "&c&lTRAP TRIGGERED!", fade-in: 0, stay: 40, fade-out: 0 }
+    - { type: sound, target: team, sound: ENTITY_ENDERMAN_TELEPORT, volume: 30 }
+  types:
+    B:
+      id: blindness
+      name: "&aIt's a trap!"
+      icon: TRIPWIRE_HOOK
+      description: ["&7Inflicts Blindness and Slowness", "&7for 8 seconds."]
+      effects:
+        - { type: potion, target: intruder, effect: BLINDNESS, seconds: 8 }
+        - { type: potion, target: intruder, effect: SLOWNESS, seconds: 8 }
+    F:
+      id: fight_back
+      name: "&aCounter-Offensive Trap"
+      icon: FEATHER
+      description: ["&7Grants Speed II and Jump Boost II", "&7for 15 seconds to allied players", "&7near your base."]
+      effects:
+        - { type: potion, target: team, effect: SPEED, level: 2, seconds: 15 }
+        - { type: potion, target: team, effect: JUMP_BOOST, level: 2, seconds: 15 }
+    L:
+      id: alarm
+      name: "&aAlarm Trap"
+      icon: REDSTONE_TORCH
+      description: ["&7Reveals invisible players as", "&7well as their name and team."]
+      effects:
+        - reveal
+      alert:
+        - { type: title, target: team, title: "&c&lALARM!!!", subtitle: "&eAlarm set off by {intruder-team} &eteam", fade-in: 0, stay: 40, fade-out: 0 }
+        - { type: sound, target: team, sound: ENTITY_ENDERMAN_TELEPORT, volume: 30 }
+    N:
+      id: miner
+      name: "&aMiner Fatigue Trap"
+      icon: IRON_PICKAXE
+      description: ["&7Inflicts Mining Fatigue", "&7for 8 seconds."]
+      effects:
+        - { type: potion, target: intruder, effect: MINING_FATIGUE, seconds: 8 }
+
+text:
+  tier-owned: "&aTier {level}: {name}, &b{price}"
+  tier-next: "&eTier {level}: {name}, &b{price}"
+  tier-locked: "&7Tier {level}: {name}, &b{price}"
+  # Upgrades with one level
+  buy: "&eClick to purchase!"
+  bought: "&aPurchased"
+  # {level} is a roman number
+  upgrade: "&eClick to upgrade to tier {level}"
+  maxed: "&aMaxed out"
+  trap-price: "&7Cost: &b{price}"
+  trap-active: "&aActive"
+  trap-full: "&cTrap queue full"
+  queue-name: "&aTrap #{index}: {name}"
+  queue-empty-name: "&cTrap #{index}: No Trap!"
+  queue-empty: GRAY_STAINED_GLASS
+  queue-lore:
+    - "&7The {ordinal} enemy to walk into"
+    - "&7your base will trigger this trap!"
+    - ""
+    - "&7Purchasing traps will queue them"
+    - "&7here, the cost scales with the queue."
+    - ""
+    - "&7Next trap: &b{price}"
+  ordinals: ["first", "second", "third"]

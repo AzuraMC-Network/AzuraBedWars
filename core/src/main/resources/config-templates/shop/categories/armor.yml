@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&aArmor"
+icon: CHAINMAIL_BOOTS
+# Prices of tier items come from shop/tiers.yml, item is only the shop icon
+items:
+  chainmail:
+    name: "Permanent Chainmail Armor"
+    item: { material: CHAINMAIL_BOOTS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
+    tier: armor
+    level: 2
+  iron:
+    name: "Permanent Iron Armor"
+    item: { material: IRON_BOOTS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
+    tier: armor
+    level: 3
+  diamond:
+    name: "Permanent Diamond Armor"
+    item: { material: DIAMOND_BOOTS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
+    tier: armor
+    level: 4

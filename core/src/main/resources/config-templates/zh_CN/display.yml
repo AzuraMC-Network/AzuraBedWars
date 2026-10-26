@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=schema/display.json
+# 计分板、Tab 列表与伤害显示
+config-version: 1
+
+# 游戏中计分板
+game-scoreboard:
+  # 计分板标题
+  title: "&e&l起床战争"
+
+  # 计分板内容行
+  # 可用变量: {date}, {next_event}, {time_left}, {server}
+  # 特殊标记: {teams} 会被替换为所有队伍状态行
+  lines:
+    - "&7{date}"
+    - ""
+    - "{next_event}"
+    - "&a{time_left}"
+    - ""
+    - "{teams}"
+    - ""
+    - "&bas.azuramc.cc"
+
+  # 队伍行格式
+  # 可用变量: {team_name}, {bed_status}, {alive_count}, {my_team_mark}
+  team-line-format: "{team_name} {bed_status} &f| {alive_count}{my_team_mark}"
+
+  # 我的队伍标记
+  my-team-mark: " &7(我的队伍)"
+
+  # 床已被破坏图标
+  bed-destroyed: "&7❤"
+
+  # 床存活图标
+  bed-alive: "&c❤"
+
+# 大厅计分板
+lobby-scoreboard:
+  # 计分板标题
+  title: "&e&l起床战争"
+
+  # 计分板内容行
+  # 可用变量: {date}, {map_name}, {team_size}, {team_count}, {author},
+  #           {players}, {max_players}, {countdown}, {mode}, {version}, {server}
+  lines:
+    - "&7{date}"
+    - ""
+    - "&f地图: &a{map_name}"
+    - "&f队伍: &a{team_size}人 {team_count}队"
+    - "&f作者: &a{author}"
+    - ""
+    - "&f玩家: &a{players}/{max_players}"
+    - ""
+    - "{countdown}"
+    - ""
+    - "&f模式: &a{mode}"
+    - ""
+    - "&f版本: &a{version}"
+    - ""
+    - "&bas.azuramc.cc"
+
+  # 等待中消息
+  waiting-message: "&f等待中..."
+
+  # 倒计时格式
+  countdown-format: "{seconds}秒后开始"
+
+  # 普通模式名称
+  default-mode: "普通模式"
+
+  # 经验模式名称
+  exp-mode: "经验模式"
+
+# 游戏结束计分板
+game-end-scoreboard:
+  # 计分板标题
+  title: "&e&l起床战争"
+
+  # 计分板内容行
+  # 可用变量: {date}, {winner}, {server}
+  lines:
+    - "&7{date}"
+    - ""
+    - "&c游戏结束"
+    - "&f胜利者: &a{winner}"
+    - ""
+    - "&bas.azuramc.cc"
+
+# Tab 列表
+tab-list:
+  # 等待中
+  waiting:
+    # 头部
+    header:
+      - "&b你正在 &eAzuraMC &b游玩起床战争"
+
+    # 底部
+    footer:
+      - "&bas.azuramc.cc"
+
+  # 游戏中
+  # 可用变量: <currentGameKill>, <currentGameFinalKill>, <currentGameBedBreak>
+  running:
+    # 头部
+    header:
+      - "&b你正在 &eAzuraMC &b游玩起床战争"
+
+    # 底部
+    footer:
+      - "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>"
+      - "&bas.azuramc.cc"
+
+  # 游戏结束
+  # 可用变量: <gameResult>, <currentGameKill>, <currentGameFinalKill>, <currentGameBedBreak>
+  ending:
+    # 头部
+    header:
+      - "&b你正在 &eAzuraMC &b游玩起床战争"
+      - "&b游戏结束 &e<gameResult>"
+
+    # 底部
+    footer:
+      - "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>"
+      - "&bas.azuramc.cc"
+
+# 伤害显示
+display-damage:
+  # 是否启用弓箭伤害显示
+  arrow-display-enabled: true
+
+  # 是否启用近战伤害显示
+  attack-display-enabled: true

@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../schema/shop-tiers.json
+config-version: 1
+# Tier chains, read by purchases, respawns, reconnects and the shop
+# buy-order: SEQUENTIAL buys one tier at a time, ANY can skip to a higher tier
+# on-death: KEEP keeps it, DOWNGRADE drops one tier but never below the first, RESET goes back to start
+
+pickaxe:
+  name: "Pickaxe"
+  buy-order: SEQUENTIAL
+  on-death: DOWNGRADE
+  tiers:
+    - name: "Wooden Pickaxe"
+      item: { material: WOODEN_PICKAXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
+      price: 10 iron
+      xp: 10
+    - name: "Stone Pickaxe"
+      item: { material: STONE_PICKAXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
+      price: 20 iron
+      xp: 20
+    - name: "Iron Pickaxe"
+      item: { material: IRON_PICKAXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
+      price: 8 gold
+      xp: 24
+    - name: "Diamond Pickaxe"
+      item: { material: DIAMOND_PICKAXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
+      price: 12 gold
+      xp: 36
+
+axe:
+  name: "Axe"
+  buy-order: SEQUENTIAL
+  on-death: DOWNGRADE
+  tiers:
+    - name: "Wooden Axe"
+      item: { material: WOODEN_AXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
+      price: 10 iron
+      xp: 10
+    - name: "Stone Axe"
+      item: { material: STONE_AXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
+      price: 20 iron
+      xp: 20
+    - name: "Iron Axe"
+      item: { material: IRON_AXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
+      price: 8 gold
+      xp: 24
+    - name: "Diamond Axe"
+      item: { material: DIAMOND_AXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
+      price: 12 gold
+      xp: 36
+
+armor:
+  name: "Armor"
+  buy-order: ANY
+  on-death: KEEP
+  # Leather is worn from spawn and not sold
+  start: 1
+  slot: ARMOR
+  tiers:
+    - { name: "Leather", material-prefix: LEATHER }
+    - { name: "Chainmail", material-prefix: CHAINMAIL, price: 40 iron, xp: 40 }
+    - { name: "Iron", material-prefix: IRON, price: 12 gold, xp: 60 }
+    - { name: "Diamond", material-prefix: DIAMOND, price: 6 emerald, xp: 600 }

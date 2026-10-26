@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=schema/generators.json
+# 资源点配置
+# 每种资源同时就是商店的货币，价格写成 数量 资源id，例如 4 iron
+config-version: 2
+
+# 资源种类，键是资源 id
+resources:
+  iron:
+    material: "IRON_INGOT"
+    name: "铁"
+    at: BASE
+    hologram: []
+    xp-value: 1
+    levels:
+      - interval: 1.0
+        max-stack: 48
+  gold:
+    material: "GOLD_INGOT"
+    name: "金"
+    at: BASE
+    hologram: []
+    xp-value: 3
+    levels:
+      - interval: 3.0
+        max-stack: 8
+  diamond:
+    material: "DIAMOND"
+    name: "钻石"
+    at: PUBLIC
+    drop: DIAMOND
+    block: "DIAMOND_BLOCK"
+    hologram:
+      - "&e等级 &c{level}"
+      - "&b钻石"
+      - "&e将在&c{seconds}&e秒后刷新"
+    xp-value: 40
+    levels:
+      - interval: 35.0
+        max-stack: 4
+      - interval: 23.0
+        max-stack: 6
+      - interval: 15.0
+        max-stack: 8
+  emerald:
+    material: "EMERALD"
+    name: "绿宝石"
+    at: PUBLIC
+    drop: EMERALD
+    block: "EMERALD_BLOCK"
+    hologram:
+      - "&e等级 &c{level}"
+      - "&2绿宝石"
+      - "&e将在&c{seconds}&e秒后刷新"
+    xp-value: 80
+    levels:
+      - interval: 60.0
+        max-stack: 2
+      - interval: 23.0
+        max-stack: 4
+      - interval: 15.0
+        max-stack: 4

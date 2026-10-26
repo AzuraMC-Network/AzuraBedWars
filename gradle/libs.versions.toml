@@ -1,0 +1,46 @@
+[versions]
+spigot-api = "1.21.11-R0.1-SNAPSHOT"
+spigot-api-legacy = "1.8.8-R0.1-SNAPSHOT"
+paper-api = "26.3.build.222-stable"
+paper-server = "26.3.build.1396-stable"
+datafixerupper = "10.0.21"
+placeholderapi = "2.11.6"
+luckperms = "5.4"
+vault = "1.7"
+packetevents = "2.10.0"
+commons-lang3 = "3.18.0"
+commons-io = "2.18.0"
+lamp = "3.2.1"
+xseries = "13.7.1"
+fastboard = "2.1.5"
+mongodb = "5.5.1"
+hikaricp = "4.0.3"
+mysql-connector = "26.10.0"
+jetbrains-annotations = "26.1.0"
+lombok = "1.18.48"
+junit = "5.14.4"
+
+[libraries]
+spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot-api" }
+spigot-api-legacy = { module = "org.spigotmc:spigot-api", version.ref = "spigot-api-legacy" }
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+paper-server = { module = "io.papermc.paper:paper-server", version.ref = "paper-server" }
+datafixerupper = { module = "com.mojang:datafixerupper", version.ref = "datafixerupper" }
+placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }
+luckperms-api = { module = "net.luckperms:api", version.ref = "luckperms" }
+vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
+packetevents-spigot = { module = "com.github.retrooper:packetevents-spigot", version.ref = "packetevents" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+lamp-common = { module = "com.github.Revxrsal.Lamp:common", version.ref = "lamp" }
+lamp-bukkit = { module = "com.github.Revxrsal.Lamp:bukkit", version.ref = "lamp" }
+xseries = { module = "com.github.cryptomorin:XSeries", version.ref = "xseries" }
+fastboard = { module = "fr.mrmicky:fastboard", version.ref = "fastboard" }
+mongodb-driver-sync = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodb" }
+hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
+mysql-connector = { module = "com.mysql:mysql-connector-j", version.ref = "mysql-connector" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }

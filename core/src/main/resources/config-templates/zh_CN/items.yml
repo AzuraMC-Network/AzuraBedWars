@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=schema/items.json
+# 特殊道具配置
+config-version: 1
+
+# 救援平台配置
+rescue-platform:
+  # 平台存在时间(秒)
+  default-break-time: 12
+
+  # 使用冷却时间(秒)
+  default-wait-time: 20
+
+  # 跳跃提升力度
+  jump-boost: 0.7
+
+# 传送粉配置
+warp-powder:
+  # 传送所需时间(秒)
+  default-teleport-time: 6
+
+  # 每个粒子环的粒子数量
+  circle-elements: 20
+
+  # 粒子环半径
+  particle-radius: 1.0
+
+  # 粒子效果总高度
+  particle-height: 2.0
+
+  # 粒子环的数量
+  circle-count: 15.0
+
+  # 取消传送物品名称
+  cancel-item-name: "&4取消传送"
+
+# 速度羊毛配置
+speed-wool-handler:
+  # 速度羊毛最大延伸长度
+  max-speed-wool-length: 6
+
+# 搭桥蛋配置
+egg-bridge:
+  # 搭桥蛋冷却时间(秒)
+  egg-cooldown-seconds: 3
+
+  # 冷却中提示消息
+  egg-cooldown-message: "&c搭桥蛋冷却中！"
+
+# 游戏管理物品配置
+game-manager:
+  # 队伍选择器物品名称
+  team-selector-name: "&e队伍选择 &7(右键选择)"
+
+  # 离开游戏物品名称
+  leave-game-name: "&c离开游戏 &7(右键离开)"

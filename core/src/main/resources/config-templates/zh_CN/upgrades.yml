@@ -1,0 +1,171 @@
+# yaml-language-server: $schema=schema/upgrades.json
+config-version: 2
+# 团队升级与陷阱，开局时读取，进行中的对局不受重载影响
+
+title: "&8团队升级"
+# base 目标的范围(方块)，从队伍出生点算起
+base-range: 18
+# 敌人离出生点多近时触发陷阱(方块)
+trap-trigger-range: 20
+
+# 字符对应 upgrades、traps.types、decor 的键，Q 是陷阱队列
+layout:
+  - "         "
+  - " SAM BFL "
+  - " RHC N   "
+  - "---------"
+  - "   QQQ   "
+  - "         "
+decor:
+  "-": { material: GRAY_STAINED_GLASS_PANE, name: " " }
+
+# 效果类型
+#   enchant  target: sword armor boots，enchant，level
+#   potion   target: team base intruder，effect，level，seconds；团队升级的药水每秒重新给一次
+#   generator  resource，interval(秒)，max-stack；队伍没有这个资源点时新建一个
+#   reveal   让隐身的入侵者现形
+#   title sound message command  target: team base intruder
+#   插件名:id  其他插件提供的效果，参数写在 settings 下
+upgrades:
+  S:
+    id: sharpened_swords
+    name: "&a磨刀石"
+    icon: IRON_SWORD
+    description: ["&7你方所有成员的剑将永久获得锋利I附魔！"]
+    levels:
+      - { name: "锋利 I", price: 8 diamond, xp: 800, effects: [{ type: enchant, target: sword, enchant: SHARPNESS, level: 1 }] }
+  A:
+    id: reinforced_armor
+    name: "&a精制护甲"
+    icon: IRON_CHESTPLATE
+    description: ["&7己方所有成员的盔甲将获得永久保护附魔！"]
+    levels:
+      - { name: "保护 I", price: 5 diamond, xp: 500, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 1 }] }
+      - { name: "保护 II", price: 10 diamond, xp: 1000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 2 }] }
+      - { name: "保护 III", price: 20 diamond, xp: 2000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 3 }] }
+      - { name: "保护 IV", price: 30 diamond, xp: 3000, effects: [{ type: enchant, target: armor, enchant: PROTECTION, level: 4 }] }
+  M:
+    id: manic_miner
+    name: "&a疯狂矿工"
+    icon: GOLDEN_PICKAXE
+    description: ["&7己方所有成员获得急迫效果。"]
+    levels:
+      - { name: "急迫 I", price: 4 diamond, xp: 400, effects: [{ type: potion, target: team, effect: HASTE, level: 1, seconds: 2 }] }
+      - { name: "急迫 II", price: 6 diamond, xp: 600, effects: [{ type: potion, target: team, effect: HASTE, level: 2, seconds: 2 }] }
+  R:
+    id: resource_furnace
+    name: "&a铁锻炉"
+    icon: FURNACE
+    description: ["&7升级你岛屿资源池的生成速度和和最大容量."]
+    levels:
+      - name: "+50%资源"
+        price: 4 diamond
+        xp: 400
+        effects:
+          - { type: generator, resource: iron, interval: 1, max-stack: 48 }
+          - { type: generator, resource: gold, interval: 3, max-stack: 8 }
+      - name: "+100%资源"
+        price: 8 diamond
+        xp: 800
+        effects:
+          - { type: generator, resource: iron, interval: 0.8, max-stack: 72 }
+          - { type: generator, resource: gold, interval: 2.4, max-stack: 12 }
+      - name: "生成绿宝石"
+        price: 12 diamond
+        xp: 1200
+        effects:
+          - { type: generator, resource: iron, interval: 0.6, max-stack: 96 }
+          - { type: generator, resource: gold, interval: 2, max-stack: 16 }
+          - { type: generator, resource: emerald, interval: 60, max-stack: 2 }
+      - name: "+200%资源"
+        price: 16 diamond
+        xp: 1600
+        effects:
+          - { type: generator, resource: iron, interval: 0.4, max-stack: 128 }
+          - { type: generator, resource: gold, interval: 1.6, max-stack: 24 }
+          - { type: generator, resource: emerald, interval: 30 }
+  H:
+    id: healing_pool
+    name: "&a治愈池"
+    icon: BEACON
+    description: ["&7基地附近的队伍成员将获得生命恢复效果！"]
+    levels:
+      - { name: "生命恢复", price: 3 diamond, xp: 300, effects: [{ type: potion, target: base, effect: REGENERATION, level: 1, seconds: 3 }] }
+  C:
+    id: cushioned_boots
+    name: "&a缓冲靴子"
+    icon: DIAMOND_BOOTS
+    description: ["&7你队伍的靴子获得了永久摔落保护！"]
+    levels:
+      - { name: "缓冲靴子 I", price: 2 diamond, xp: 200, effects: [{ type: enchant, target: boots, enchant: FEATHER_FALLING, level: 1 }] }
+      - { name: "缓冲靴子 II", price: 4 diamond, xp: 400, effects: [{ type: enchant, target: boots, enchant: FEATHER_FALLING, level: 2 }] }
+
+traps:
+  queue-size: 3
+  # 队列里第 1、2、3 个陷阱的价格
+  prices: [1 diamond, 2 diamond, 3 diamond]
+  xp: [100, 200, 300]
+  # 任意陷阱触发时对己方队伍生效，陷阱自己写了 alert 时用它的
+  alert:
+    - { type: title, target: team, title: "&c&l陷阱触发！", fade-in: 0, stay: 40, fade-out: 0 }
+    - { type: sound, target: team, sound: ENTITY_ENDERMAN_TELEPORT, volume: 30 }
+  types:
+    B:
+      id: blindness
+      name: "&a致盲陷阱"
+      icon: TRIPWIRE_HOOK
+      description: ["&7造成失明与缓慢效果，持续8秒。"]
+      effects:
+        - { type: potion, target: intruder, effect: BLINDNESS, seconds: 8 }
+        - { type: potion, target: intruder, effect: SLOWNESS, seconds: 8 }
+    F:
+      id: fight_back
+      name: "&a反击陷阱"
+      icon: FEATHER
+      description: ["&7赋予基地附近的队友速度 II 与跳跃提升 II", "&7效果，持续15秒。"]
+      effects:
+        - { type: potion, target: team, effect: SPEED, level: 2, seconds: 15 }
+        - { type: potion, target: team, effect: JUMP_BOOST, level: 2, seconds: 15 }
+    L:
+      id: alarm
+      name: "&a警报陷阱"
+      icon: REDSTONE_TORCH
+      description: ["&7显示隐身的玩家，", "&7及其名称与队伍名。"]
+      effects:
+        - reveal
+      alert:
+        - { type: title, target: team, title: "&c&l陷阱触发！", subtitle: "&e触发者 {intruder-team} 队伍", fade-in: 0, stay: 40, fade-out: 0 }
+        - { type: sound, target: team, sound: ENTITY_ENDERMAN_TELEPORT, volume: 30 }
+    N:
+      id: miner
+      name: "&a挖掘疲劳陷阱"
+      icon: IRON_PICKAXE
+      description: ["&7造成挖掘疲劳效果，持续8秒。"]
+      effects:
+        - { type: potion, target: intruder, effect: MINING_FATIGUE, seconds: 8 }
+
+text:
+  tier-owned: "&a等级 {level}：{name}，&b{price}"
+  tier-next: "&e等级 {level}：{name}，&b{price}"
+  tier-locked: "&7等级 {level}：{name}，&b{price}"
+  # 只有一级的升级
+  buy: "&e点击购买"
+  bought: "&a已购买"
+  # {level} 是罗马数字
+  upgrade: "&e点击升级到等级 {level}"
+  maxed: "&a已达到最高等级"
+  trap-price: "&7价格: &b{price}"
+  trap-active: "&a已激活"
+  trap-full: "&c陷阱已满"
+  queue-name: "&a陷阱#{index}: {name}"
+  queue-empty-name: "&c陷阱#{index}: 没有陷阱！"
+  queue-empty: GRAY_STAINED_GLASS
+  queue-lore:
+    - "&7第{ordinal}个敌人进入己方基地后"
+    - "&7会触发该陷阱！"
+    - ""
+    - "&7购买的陷阱会再次排列，具体"
+    - "&7费用取决已排列的陷阱数量。"
+    - ""
+    - "&7下一个陷阱: &b{price}"
+  ordinals: ["一", "二", "三"]

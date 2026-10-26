@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&aExperience Exchange"
+icon: EXPERIENCE_BOTTLE
+economy: EXPERIENCE
+items:
+  iron:
+    name: "Iron Ingot"
+    item: IRON_INGOT
+    xp: 1
+  gold:
+    name: "Gold Ingot"
+    item: GOLD_INGOT
+    xp: 5
+  diamond:
+    name: "Diamond"
+    item: DIAMOND
+    xp: 50
+  emerald:
+    name: "Emerald"
+    item: EMERALD
+    xp: 100

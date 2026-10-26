@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&aTools"
+icon: STONE_PICKAXE
+items:
+  # The icon and price of a tier item follow the tier of the player
+  pickaxe:
+    name: "Pickaxe"
+    tier: pickaxe
+  axe:
+    name: "Axe"
+    tier: axe
+  shears:
+    name: "Permanent Shears"
+    item: { material: SHEARS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
+    price: 30 iron
+    xp: 30
+    limit: once
+    keep-on-respawn: true

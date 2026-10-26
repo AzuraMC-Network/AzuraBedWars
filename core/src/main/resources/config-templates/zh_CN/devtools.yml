@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=schema/devtools.json
+# 开发工具配置
+# 只在开发服使用 生产服保持 enabled: false
+# 改动后执行 /bw devtools restart 生效
+config-version: 1
+
+# 是否开启 MCP 端点 让 AI 客户端读写配置和地图
+# 也可以用 /bw devtools on 和 /bw devtools off 开关
+enabled: false
+
+# 监听地址
+# 默认只允许本机连接 远程开发服请用 SSH 端口转发
+host: "127.0.0.1"
+
+# 监听端口
+port: 25599
+
+# 是否允许监听本机以外的地址
+# 打开后同一网络里拿到令牌的人都能修改服务器配置
+allow-remote: false
+
+# 有非管理员玩家在线时是否仍允许 AI 写入
+# 关闭时只有管理员在线才能修改配置和地图
+allow-with-players: false

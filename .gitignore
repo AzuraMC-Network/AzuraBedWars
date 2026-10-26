@@ -122,3 +122,7 @@ run/
 # Myself test environment folder (an5w1r@163.com)
 /server/
 /server_*/
+
+# Claude Code
+.claude/
+CLAUDE.local.md

@@ -1,0 +1,133 @@
+package cc.azuramc.bedwars.listener.player;
+
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
+import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.GamePlayer;
+import cc.azuramc.bedwars.game.GameState;
+import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.game.spectator.SpectatorSettings;
+import cc.azuramc.bedwars.util.MessageUtil;
+import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
+
+/**
+ * @author an5w1r@163.com
+ */
+public class PlayerMiscListener implements Listener {
+    private static final String BED_ALERT_KEY = "azurabedwars:bed-alert";
+    private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
+
+    @EventHandler
+    public void onFood(FoodLevelChangeEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void craftItem(PrepareItemCraftEvent event) {
+        for (HumanEntity entity : event.getViewers()) {
+            if (entity instanceof Player) {
+                event.getInventory().setResult(new ItemStack(Material.AIR));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (gameManager.getGameState() == GameState.WAITING) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (gameManager.getGameState() == GameState.RUNNING && event.getSlotType() == InventoryType.SlotType.ARMOR) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onConsume(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+
+        if (event.getItem().getType() != XMaterial.POTION.get()) {
+            return;
+        }
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (PlayerUtil.getItemInHand(player).getType() == XMaterial.GLASS_BOTTLE.get()) {
+                    PlayerUtil.setItemInHand(player, new ItemStack(Material.AIR));
+                }
+            }
+        }.runTaskLater(AzuraBedWars.getInstance().getPlugin(), 0);
+    }
+
+
+    @EventHandler
+    public void onSneak(PlayerToggleSneakEvent event) {
+        Player player = event.getPlayer();
+        GamePlayer gamePlayer = GamePlayer.get(player);
+        if (gamePlayer == null) {
+            return;
+        }
+
+        if (gameManager.getGameState() != GameState.RUNNING) {
+            return;
+        }
+
+        if (gamePlayer.isSpectator() && (SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) && player.getGameMode() == GameMode.SPECTATOR) {
+            gamePlayer.sendTitle(AzuraBedWars.getInstance().getLang().getSpectator().getLeftSpectating(), "", 0, 20, 0);
+            player.setGameMode(GameMode.ADVENTURE);
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            return;
+        }
+
+        if (gamePlayer.isSpectator() || gamePlayer.isRespawning() || player.hasMetadata(BED_ALERT_KEY)) {
+            return;
+        }
+
+        if (player.getLocation().getPitch() > -80) {
+            return;
+        }
+
+        player.setMetadata(BED_ALERT_KEY, new FixedMetadataValue(AzuraBedWars.getInstance().getPlugin(), ""));
+
+        GameTeam gameTeam = gamePlayer.getGameTeam();
+        if (gameTeam == null) {
+            return;
+        }
+
+        new BukkitRunnable() {
+            int i = 0;
+
+            @Override
+            public void run() {
+                if (i > 5) {
+                    player.removeMetadata(BED_ALERT_KEY, AzuraBedWars.getInstance().getPlugin());
+                    cancel();
+                    return;
+                }
+
+                gameManager.broadcastTeamTitle(gameTeam, "", MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getBedInDanger(), "player", gameTeam.getChatColor() + gamePlayer.getNickName()), 0, 8, 0);
+                gameManager.broadcastTeamSound(gameTeam, XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
+                i++;
+            }
+        }.runTaskTimer(AzuraBedWars.getInstance().getPlugin(), 0, 10L);
+    }
+}

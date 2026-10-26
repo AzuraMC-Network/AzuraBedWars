@@ -1,0 +1,23 @@
+name: Label Issues
+
+on:
+  issues:
+    types: [ opened, closed, reopened ]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: label-issue-${{ github.event.issue.number }}
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github
+      - uses: actions/github-script@v7
+        with:
+          script: await require('./.github/scripts/issue-labels.js')({ github, context })
