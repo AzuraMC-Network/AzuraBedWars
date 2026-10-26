@@ -80,6 +80,14 @@ class ConfigServiceTest {
     }
 
     @Test
+    void backupsInTheSameMillisecondAreAllKept() throws IOException {
+        for (int i = 0; i < 10; i++) {
+            ConfigService.backup(dataFolder, "settings.yml.", new byte[]{(byte) i});
+        }
+        assertEquals(10, file(ConfigService.HISTORY_DIR).list().length);
+    }
+
+    @Test
     void setValueAppendsMissingTopLevelKey() throws IOException {
         ConfigService.writeAtomically(file("settings.yml"), "debug-mode: false");
         service.loadAll();

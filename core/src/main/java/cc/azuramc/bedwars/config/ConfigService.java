@@ -925,9 +925,15 @@ public final class ConfigService {
      */
     public static void backup(File dataFolder, String prefix, byte[] content) throws IOException {
         File history = new File(dataFolder, HISTORY_DIR);
-        String stamp = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS");
+        long time = System.currentTimeMillis();
+        File target;
+        // two backups in one millisecond
+        while ((target = new File(history, prefix + format.format(new Date(time)))).exists()) {
+            time++;
+        }
         Files.createDirectories(history.toPath());
-        Files.write(new File(history, prefix + stamp).toPath(), content);
+        Files.write(target.toPath(), content);
 
         File[] old = history.listFiles((dir, name) -> name.startsWith(prefix));
         if (old != null && old.length > HISTORY_LIMIT) {
