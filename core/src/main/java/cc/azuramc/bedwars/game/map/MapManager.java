@@ -21,6 +21,9 @@ import java.util.*;
  */
 public class MapManager {
 
+    /** Paper 26 dimension folders of the main world */
+    private static final Set<String> VANILLA_DIMENSIONS = new HashSet<>(Arrays.asList("overworld", "the_nether", "the_end"));
+
     private final IMapStorage storage;
     private final Map<String, MapData> maps = new LinkedHashMap<>();
 
@@ -137,12 +140,17 @@ public class MapManager {
             LoggerUtil.warn("Cannot unload the loaded world " + name + ", a map cannot have the name of the main world");
             return null;
         }
-        // Paper 26+ moves a loaded world into <main world>/dimensions/minecraft/<name> and refuses to overwrite it next time
-        File migrated = new File(Bukkit.getWorldContainer(), Bukkit.getWorlds().get(0).getName() + "/dimensions/minecraft/" + name);
+        File dimension = WorldUtil.getDimensionFolder(name);
+        if (dimension.getParentFile().isDirectory() && VANILLA_DIMENSIONS.contains(name)) {
+            LoggerUtil.warn("A map cannot be named " + name + ", the main world uses that dimension");
+            return null;
+        }
         try {
             FileUtils.deleteDirectory(target);
-            FileUtils.deleteDirectory(migrated);
-            FileUtils.copyDirectory(source, target);
+            // Paper 26 refuses to overwrite its moved copy of the last game
+            FileUtils.deleteDirectory(dimension);
+            // a world folder is moved into place by Paper, a dimension folder is not
+            FileUtils.copyDirectory(source, new File(source, "level.dat").isFile() ? target : dimension);
         } catch (IOException e) {
             LoggerUtil.error("Cannot copy the world files of map " + name, e);
             return null;
@@ -150,6 +158,7 @@ public class MapManager {
         // Bukkit refuses duplicate world uids
         new File(target, "uid.dat").delete();
         new File(target, "session.lock").delete();
+        new File(dimension, "data/paper/metadata.dat").delete();
 
         World world = Bukkit.createWorld(new WorldCreator(name).environment(World.Environment.NORMAL));
         if (world == null) {

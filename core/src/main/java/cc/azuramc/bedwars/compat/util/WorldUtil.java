@@ -3,13 +3,26 @@ package cc.azuramc.bedwars.compat.util;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.nms.ReflectionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
+
+import java.io.File;
 
 /**
  * @author an5w1r@163.com
  */
 public class WorldUtil {
+
+    /** Paper 26 moves a world loaded from the server folder here */
+    public static File getDimensionFolder(String worldName) {
+        return new File(Bukkit.getWorldContainer(), Bukkit.getWorlds().get(0).getName() + "/dimensions/minecraft/" + worldName);
+    }
+
+    /** A world folder or a Paper 26 dimension folder */
+    public static boolean isWorldSave(File folder) {
+        return new File(folder, "level.dat").isFile() || new File(folder, "data/minecraft/world_gen_settings.dat").isFile();
+    }
 
     public static World setWorldRules(World world) {
         world.setAutoSave(false);

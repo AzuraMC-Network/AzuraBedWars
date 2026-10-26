@@ -4,6 +4,7 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.game.map.IMapData;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.WoolUtil;
+import cc.azuramc.bedwars.compat.util.WorldUtil;
 import cc.azuramc.bedwars.game.TeamColor;
 import cc.azuramc.bedwars.util.MapUtil;
 import lombok.Data;
@@ -73,7 +74,15 @@ public class MapData implements IMapData {
                 .replace("{$baseDir}", dataFolder.getParent())
                 .replace("{$pluginDir}", dataFolder.getPath())
                 .replace("{$serverDir}", new File("").getAbsolutePath());
-        return new File(path).getAbsoluteFile();
+        File folder = new File(path).getAbsoluteFile();
+        if (!folder.exists()) {
+            // moved by Paper 26 when the world was loaded for editing
+            File dimension = WorldUtil.getDimensionFolder(folder.getName());
+            if (dimension.isDirectory()) {
+                return dimension.getAbsoluteFile();
+            }
+        }
+        return folder;
     }
 
     public void setWaitingLocation(Location location) {
