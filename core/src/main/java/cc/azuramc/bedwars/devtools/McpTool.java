@@ -47,6 +47,10 @@ public final class McpTool {
         return new Builder(name, description, false, true);
     }
 
+    public static McpTool external(String name, String description, JsonObject inputSchema, boolean readOnly, Handler handler) {
+        return new McpTool(name, description, inputSchema, readOnly, false, handler);
+    }
+
     public JsonObject describe() {
         JsonObject tool = new JsonObject();
         tool.addProperty("name", name);

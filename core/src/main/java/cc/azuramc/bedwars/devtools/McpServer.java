@@ -22,13 +22,12 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 /**
  * MCP over Streamable HTTP, answering every request with a single JSON body and never opening an SSE stream
@@ -60,7 +59,8 @@ public final class McpServer {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().serializeNulls().create();
     private final Host host;
     private final McpContent content;
-    private final Map<String, McpTool> tools = new LinkedHashMap<>();
+    /** Asked on every request, other plugins register tools at any time */
+    private final Supplier<List<McpTool>> tools;
     private final byte[] expectedAuthorization;
     private final String version;
     private HttpServer server;
@@ -68,12 +68,10 @@ public final class McpServer {
     @Getter
     private InetSocketAddress address;
 
-    public McpServer(Host host, McpContent content, List<McpTool> tools, String token, String version) {
+    public McpServer(Host host, McpContent content, Supplier<List<McpTool>> tools, String token, String version) {
         this.host = host;
         this.content = content;
-        for (McpTool tool : tools) {
-            this.tools.put(tool.getName(), tool);
-        }
+        this.tools = tools;
         this.expectedAuthorization = ("Bearer " + token).getBytes(StandardCharsets.UTF_8);
         this.version = version;
     }
@@ -182,7 +180,7 @@ public final class McpServer {
                 return new JsonObject();
             case "tools/list":
                 JsonArray list = new JsonArray();
-                for (McpTool tool : tools.values()) {
+                for (McpTool tool : tools.get()) {
                     list.add(tool.describe());
                 }
                 return wrap("tools", list);
@@ -222,7 +220,13 @@ public final class McpServer {
 
     private JsonObject callTool(JsonObject params) {
         String name = params.has("name") ? params.get("name").getAsString() : "";
-        McpTool tool = tools.get(name);
+        McpTool tool = null;
+        for (McpTool candidate : tools.get()) {
+            if (candidate.getName().equals(name)) {
+                tool = candidate;
+                break;
+            }
+        }
         if (tool == null) {
             throw new RpcError(INVALID_PARAMS, "Unknown tool " + name);
         }

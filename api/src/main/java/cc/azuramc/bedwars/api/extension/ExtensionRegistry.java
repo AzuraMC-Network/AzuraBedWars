@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.api.extension;
 
+import com.google.gson.JsonObject;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,17 @@ public interface ExtensionRegistry {
     <S> void registerTimelineAction(@NotNull Plugin plugin, @NotNull String id, @NotNull Class<S> settings, @NotNull TimelineAction<S> action);
 
     void registerPlaceholder(@NotNull Plugin plugin, @NotNull String id, @NotNull Placeholder placeholder);
+
+    /**
+     * Only reachable while {@code devtools.yml} is enabled on a development server.
+     * Tools that change something are refused while players without admin rights are online
+     *
+     * @param inputSchema JSON Schema of the arguments object
+     * @param readOnly    true when the tool only reads
+     * @throws IllegalArgumentException when {@code <plugin>_<id>} is taken or longer than 64 characters
+     */
+    void registerDevTool(@NotNull Plugin plugin, @NotNull String id, @NotNull String description,
+                         @NotNull JsonObject inputSchema, boolean readOnly, @NotNull DevTool tool);
 
     void unregisterAll(@NotNull Plugin plugin);
 }

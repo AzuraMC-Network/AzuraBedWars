@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.extension;
 
 import cc.azuramc.bedwars.api.extension.CustomItem;
+import cc.azuramc.bedwars.api.extension.DevTool;
 import cc.azuramc.bedwars.api.extension.ExtensionRegistry;
 import cc.azuramc.bedwars.api.extension.ItemUseContext;
 import cc.azuramc.bedwars.api.extension.Placeholder;
@@ -15,6 +16,7 @@ import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.config.yaml.ConfigKeys;
 import cc.azuramc.bedwars.config.yaml.YamlBinder;
 import cc.azuramc.bedwars.util.LoggerUtil;
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
@@ -27,9 +29,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.nodes.Node;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -46,6 +50,8 @@ import java.util.regex.Pattern;
 public final class Extensions implements ExtensionRegistry, Listener {
 
     private static final Pattern ID = Pattern.compile("[a-z0-9_-]+");
+    /** Longest tool name the Claude API accepts */
+    private static final int MAX_TOOL_NAME = 64;
 
     public enum Status {
         AVAILABLE,
@@ -56,6 +62,9 @@ public final class Extensions implements ExtensionRegistry, Listener {
     }
 
     private final Map<ExtensionKind, Map<String, Registered>> registered = new EnumMap<>(ExtensionKind.class);
+    /** Read from MCP worker threads, so replaced rather than changed */
+    @Getter
+    private volatile List<Tool> devTools = Collections.emptyList();
     /** Bound settings by the node they came from, a reload brings new nodes */
     private final Map<Node, Object> settings = new WeakHashMap<>();
     /** Enabled state of a plugin by its lower case name */
@@ -113,6 +122,31 @@ public final class Extensions implements ExtensionRegistry, Listener {
         register(ExtensionKind.PLACEHOLDER, plugin, id, Void.class, placeholder);
     }
 
+    @Override
+    public void registerDevTool(@NotNull Plugin plugin, @NotNull String id, @NotNull String description,
+                                @NotNull JsonObject inputSchema, boolean readOnly, @NotNull DevTool tool) {
+        Objects.requireNonNull(plugin, "plugin");
+        Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(description, "description");
+        Objects.requireNonNull(inputSchema, "inputSchema");
+        Objects.requireNonNull(tool, "tool");
+        if (!ID.matcher(id).matches()) {
+            throw new IllegalArgumentException("Dev tool id " + id + " may only use a-z, 0-9, _ and -");
+        }
+        String name = plugin.getName().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_-]", "_") + "_" + id;
+        if (name.length() > MAX_TOOL_NAME) {
+            throw new IllegalArgumentException("Dev tool name " + name + " is longer than " + MAX_TOOL_NAME + " characters");
+        }
+        List<Tool> tools = new ArrayList<>(devTools);
+        for (Tool registered : tools) {
+            if (registered.name.equals(name)) {
+                throw new IllegalArgumentException("The dev tool " + name + " is already registered");
+            }
+        }
+        tools.add(new Tool(plugin, name, description, inputSchema, readOnly, tool));
+        devTools = Collections.unmodifiableList(tools);
+    }
+
     private void register(ExtensionKind kind, Plugin plugin, String id, Class<?> settingsType, Object extension) {
         Objects.requireNonNull(plugin, "plugin");
         Objects.requireNonNull(id, "id");
@@ -138,6 +172,10 @@ public final class Extensions implements ExtensionRegistry, Listener {
         boolean removed = false;
         for (Map<String, Registered> ofKind : registered.values()) {
             removed |= ofKind.values().removeIf(entry -> entry.plugin == plugin);
+        }
+        List<Tool> tools = new ArrayList<>(devTools);
+        if (tools.removeIf(tool -> tool.plugin == plugin)) {
+            devTools = Collections.unmodifiableList(tools);
         }
         if (removed) {
             changed();
@@ -179,6 +217,17 @@ public final class Extensions implements ExtensionRegistry, Listener {
             types.put(entry.getKey(), entry.getValue().settingsType);
         }
         return types;
+    }
+
+    /**
+     * Names of the plugins that registered each extension of a kind, by reference
+     */
+    public Map<String, String> owners(ExtensionKind kind) {
+        Map<String, String> owners = new LinkedHashMap<>();
+        for (Map.Entry<String, Registered> entry : registered.getOrDefault(kind, Collections.<String, Registered>emptyMap()).entrySet()) {
+            owners.put(entry.getKey(), entry.getValue().plugin.getName());
+        }
+        return owners;
     }
 
     @NotNull
@@ -289,6 +338,26 @@ public final class Extensions implements ExtensionRegistry, Listener {
     @FunctionalInterface
     private interface Call<E, R> {
         R apply(E extension, Object settings);
+    }
+
+    @Getter
+    public static final class Tool {
+        private final Plugin plugin;
+        /** {@code <plugin>_<id>} as AI clients call it */
+        private final String name;
+        private final String description;
+        private final JsonObject inputSchema;
+        private final boolean readOnly;
+        private final DevTool tool;
+
+        Tool(Plugin plugin, String name, String description, JsonObject inputSchema, boolean readOnly, DevTool tool) {
+            this.plugin = plugin;
+            this.name = name;
+            this.description = description;
+            this.inputSchema = inputSchema;
+            this.readOnly = readOnly;
+            this.tool = tool;
+        }
     }
 
     private static final class Registered {
