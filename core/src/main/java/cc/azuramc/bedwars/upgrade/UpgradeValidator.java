@@ -62,7 +62,7 @@ public final class UpgradeValidator implements ConfigValidator {
 
         UpgradeConfig.Traps traps = config.getTraps();
         if (traps.getPrices().isEmpty()) {
-            sink.error(document, "traps.prices", "Traps need at least one price");
+            sink.error(document, "traps.prices", "Traps need at least one price, the default prices are used");
         }
         for (int i = 0; i < traps.getPrices().size(); i++) {
             SpecChecks.price(document, "traps.prices[" + i + "]", traps.getPrices().get(i), currencies, sink);

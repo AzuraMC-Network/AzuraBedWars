@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.upgrade;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.UpgradeConfig;
+import cc.azuramc.bedwars.config.object.shop.Price;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
@@ -74,7 +75,8 @@ public class TeamUpgrades {
         UpgradeConfig.Traps settings = config().getTraps();
         int index = traps.size();
         Integer xp = settings.getXp().isEmpty() ? null : settings.getXp().get(Math.min(index, settings.getXp().size() - 1));
-        return ShopPurchase.cost(settings.getPrices().get(Math.min(index, settings.getPrices().size() - 1)), xp);
+        List<Price> prices = settings.getPrices().isEmpty() ? new UpgradeConfig.Traps().getPrices() : settings.getPrices();
+        return ShopPurchase.cost(prices.get(Math.min(index, prices.size() - 1)), xp);
     }
 
     public boolean buyTrap(GamePlayer buyer, String trap) {
