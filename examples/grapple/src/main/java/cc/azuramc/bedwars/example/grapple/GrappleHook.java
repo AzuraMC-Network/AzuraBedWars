@@ -3,6 +3,8 @@ package cc.azuramc.bedwars.example.grapple;
 import cc.azuramc.bedwars.api.extension.CustomItem;
 import cc.azuramc.bedwars.api.extension.ItemUseContext;
 import cc.azuramc.bedwars.api.game.IGamePlayer;
+import com.google.gson.JsonObject;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -60,5 +62,17 @@ public final class GrappleHook implements CustomItem<GrappleSettings> {
         player.setVelocity(pull);
         player.setFallDistance(0);
         lastPull.put(player.getUniqueId(), now);
+    }
+
+    JsonObject lastPulls() {
+        JsonObject pulls = new JsonObject();
+        long now = System.currentTimeMillis();
+        for (Map.Entry<UUID, Long> entry : lastPull.entrySet()) {
+            Player player = Bukkit.getPlayer(entry.getKey());
+            if (player != null) {
+                pulls.addProperty(player.getName(), (now - entry.getValue()) / 1000);
+            }
+        }
+        return pulls;
     }
 }
