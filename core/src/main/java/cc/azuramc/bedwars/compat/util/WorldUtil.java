@@ -77,9 +77,7 @@ public class WorldUtil {
         }
     }
 
-    /**
-     * World#setGameRule is (GameRule, Object) after erasure, a lookup by the argument classes never finds it
-     */
+    /** Erased signature, ReflectionUtil.invokeMethod cannot find it */
     private static void setGameRule(World world, GameRule<?> rule, Object value) throws ReflectiveOperationException {
         World.class.getMethod("setGameRule", GameRule.class, Object.class).invoke(world, rule, value);
     }
