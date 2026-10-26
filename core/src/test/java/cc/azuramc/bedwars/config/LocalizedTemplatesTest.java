@@ -34,6 +34,7 @@ class LocalizedTemplatesTest {
         service.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
         service.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 3);
         service.register("items", "items.yml", ItemConfig.class, ApplyMode.LIVE, 1);
+        service.register("devtools", "devtools.yml", DevtoolsConfig.class, ApplyMode.LIVE, 1);
         service.registerTemplate("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.NEXT_GAME, 2, "upgrades");
         service.registerTemplate("shop/menu", "shop/menu.yml", ShopMenuConfig.class, ApplyMode.LIVE, 1, "shop/menu");
         service.registerTemplate("shop/tiers", "shop/tiers.yml", TierChains.class, ApplyMode.NEXT_GAME, 1, "shop/tiers");
@@ -46,7 +47,7 @@ class LocalizedTemplatesTest {
     void chineseTemplatesHaveTheKeysOfTheDefaults() throws IOException {
         ConfigService english = service(new File(dataFolder, "en"), null);
         ConfigService chinese = service(new File(dataFolder, "zh"), "zh_CN");
-        for (String id : new String[]{"database", "gameplay", "display", "generators", "timeline", "items"}) {
+        for (String id : new String[]{"database", "gameplay", "display", "generators", "timeline", "items", "devtools"}) {
             Map<String, Object> rendered = new Yaml().load(english.template(english.document(id)));
             rendered.remove("config-version");
             assertEquals(LangConfigTest.paths("", rendered), LangConfigTest.paths("", chinese.bundled(id + ".yml")), id);
@@ -64,6 +65,7 @@ class LocalizedTemplatesTest {
         assertEquals("铁", service.get(GeneratorConfig.class).resource("iron").getName());
         assertEquals("§a方块", service.get("shop/categories/blocks", ShopCategoryConfig.class).getName());
         assertTrue(ConfigService.read(new File(dataFolder, "gameplay.yml")).contains("# 玩家最大生命值"));
+        assertTrue(ConfigService.read(new File(dataFolder, "devtools.yml")).contains("# 监听端口"));
     }
 
     @Test
