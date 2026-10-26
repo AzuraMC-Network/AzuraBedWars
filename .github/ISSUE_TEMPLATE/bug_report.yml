@@ -13,7 +13,7 @@ body:
     attributes:
       label: Minecraft Version
       description: What version of Minecraft are you running?
-      placeholder: e.g. 1.8.8, 1.12.2, 1.16.5, 1.20.1
+      placeholder: e.g. 1.8.8, 1.12.2, 1.21.11, 26.3
     validations:
       required: true
 
