@@ -52,6 +52,8 @@ public final class Devtools implements McpServer.Host {
     private static final long MAIN_THREAD_TIMEOUT_SECONDS = 5;
     private static final int AUDIT_VALUE_LIMIT = 300;
     private static final int MAX_PORT = 65535;
+    /** Also bounds the scan when the host itself cannot be bound */
+    private static final int AUTO_PORT_ATTEMPTS = 100;
 
     private final AzuraBedWars plugin;
     @Getter
@@ -126,14 +128,17 @@ public final class Devtools implements McpServer.Host {
     private static String listen(McpServer server, DevtoolsConfig config) throws IOException {
         String port = config.getPort().trim();
         if (DevtoolsConfig.AUTO_PORT.equalsIgnoreCase(port)) {
-            for (int candidate = DevtoolsConfig.FIRST_AUTO_PORT; candidate <= MAX_PORT; candidate++) {
+            BindException last = null;
+            for (int candidate = DevtoolsConfig.FIRST_AUTO_PORT; candidate < DevtoolsConfig.FIRST_AUTO_PORT + AUTO_PORT_ATTEMPTS; candidate++) {
                 try {
                     server.start(config.getHost(), candidate);
                     return null;
-                } catch (BindException ignored) {
+                } catch (BindException e) {
+                    last = e;
                 }
             }
-            return "no free port from " + DevtoolsConfig.FIRST_AUTO_PORT + " on " + config.getHost();
+            return "cannot listen on " + config.getHost() + " at ports " + DevtoolsConfig.FIRST_AUTO_PORT + " to "
+                    + (DevtoolsConfig.FIRST_AUTO_PORT + AUTO_PORT_ATTEMPTS - 1) + ": " + last.getMessage();
         }
         int number;
         try {
