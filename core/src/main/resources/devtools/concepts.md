@@ -43,6 +43,20 @@ A file with errors is never applied. A single bad value in a file that loads at 
 
 Values such as passwords are shown as `"<hidden>"`. Change other keys of that file with `config_set`, which leaves hidden values alone.
 
+## Shop and upgrades
+
+The shop is `shop/menu.yml` (title, category order, quick buy), `shop/tiers.yml` (tier chains such as pickaxes and armor that only go up) and one file per category in `shop/categories/`. A category's `layout` is six rows of nine characters, each character placing the item with that key, so a page is drawn by hand like the inventory it becomes. Prices are written as amount and resource id, such as `4 iron`, and the resources are the ones in `generators.yml`. `upgrades.yml` holds team upgrades and traps with the same kind of layout.
+
+After a change, `shop_render` and `upgrade_render` draw the page as players will see it. In game mode `shop_open` opens it for a player in game, and `player_give` hands out resources to try a purchase.
+
+## Test games
+
+In game mode, `game_state` shows the timeline and the teams. `game_control` starts a waiting game once two teams can be filled, runs the current timeline stage at once, or ends the game. Ending works like a real game end: stats are recorded and the server shuts down after the results.
+
+## Extensions
+
+Other plugins can add shop items, purchase actions and conditions, upgrade and trap effects, timeline actions and placeholders, referenced as `<plugin>:<id>`. `extension_list` shows what is registered, where each is written and the schema of its settings. Plugins can also add their own tools to this endpoint, named `<plugin>_<id>`.
+
 ## Safety
 
 Every config write and map edit backs up the previous version, `history_list` and `history_rollback` undo it. Ten backups are kept per file or map. Writes are refused while a player without the `azurabedwars.admin` permission is online, unless the server owner allowed it.

@@ -118,6 +118,10 @@ public final class ShopCatalog {
     }
 
     public static ShopCatalog get() {
+        return get(AzuraBedWars.getInstance().getGameManager().getEconomyType());
+    }
+
+    public static ShopCatalog get(EconomyType economy) {
         AzuraBedWars plugin = AzuraBedWars.getInstance();
         ConfigService service = plugin.getConfigService();
         ShopMenuConfig menu = service.get(ShopMenuConfig.class);
@@ -126,7 +130,6 @@ public final class ShopCatalog {
         for (Map.Entry<String, ShopCategoryConfig> entry : service.all(ShopCategoryConfig.class).entrySet()) {
             configs.put(ConfigService.name(entry.getKey()), entry.getValue());
         }
-        EconomyType economy = plugin.getGameManager().getEconomyType();
 
         List<Object> sources = new ArrayList<>(Arrays.asList(menu, tiers, plugin.getGeneratorConfig(), economy, plugin.getExtensions().getVersion()));
         sources.addAll(configs.values());

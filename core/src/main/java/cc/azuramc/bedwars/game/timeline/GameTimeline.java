@@ -80,6 +80,36 @@ public class GameTimeline {
         return index < events.size() ? events.get(index).getSeconds() - secondsIntoEvent : 0;
     }
 
+    /**
+     * Events from the running one to the last
+     */
+    public List<TimelineEvent> getUpcoming() {
+        return events.subList(Math.min(index, events.size()), events.size());
+    }
+
+    /**
+     * Runs the current event on the next tick instead of waiting for it
+     *
+     * @return the event name, null when none is left
+     */
+    @Nullable
+    public String skip() {
+        if (task == null || ended || index >= events.size()) {
+            return null;
+        }
+        secondsIntoEvent = events.get(index).getSeconds();
+        return events.get(index).getName();
+    }
+
+    /**
+     * Ends the game without a winner, like the end-game timeline action
+     */
+    public void endNow() {
+        if (!ended) {
+            endWithoutWinner();
+        }
+    }
+
     private void tick() {
         if (index < events.size()) {
             TimelineEvent event = events.get(index);

@@ -3,8 +3,11 @@ package cc.azuramc.bedwars.devtools;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.DevtoolsConfig;
 import cc.azuramc.bedwars.devtools.tool.ConfigTools;
+import cc.azuramc.bedwars.devtools.tool.ExtensionTools;
+import cc.azuramc.bedwars.devtools.tool.GameTools;
 import cc.azuramc.bedwars.devtools.tool.MapTools;
 import cc.azuramc.bedwars.devtools.tool.ServerTools;
+import cc.azuramc.bedwars.devtools.tool.ShopTools;
 import cc.azuramc.bedwars.extension.Extensions;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.google.gson.JsonElement;
@@ -89,6 +92,9 @@ public final class Devtools implements McpServer.Host {
             tools.addAll(new ServerTools(plugin, this).tools());
             tools.addAll(new ConfigTools(plugin, this).tools());
             tools.addAll(new MapTools(plugin, this).tools());
+            tools.addAll(new ShopTools(plugin, this).tools());
+            tools.addAll(new GameTools(plugin, this).tools());
+            tools.addAll(new ExtensionTools(plugin, this).tools());
             builtIn = new HashSet<>();
             for (McpTool tool : tools) {
                 builtIn.add(tool.getName());
