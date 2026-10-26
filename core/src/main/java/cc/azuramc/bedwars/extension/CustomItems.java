@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.extension;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.extension.ItemUseContext;
+import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.shop.ShopCatalog;
@@ -11,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,8 +39,7 @@ public final class CustomItems implements Listener {
     public void onInteract(PlayerInteractEvent event) {
         String ref = of(event.getItem());
         Player player = event.getPlayer();
-        // isSimilar skips the off hand of 1.9 and later
-        if (ref == null || event.getAction() == Action.PHYSICAL || !event.getItem().isSimilar(PlayerUtil.getItemInHand(player))) {
+        if (ref == null || event.getAction() == Action.PHYSICAL || !VersionUtil.isVersion1_8() && event.getHand() != EquipmentSlot.HAND) {
             return;
         }
         ShopItem item = ShopCatalog.get().find(ref);
