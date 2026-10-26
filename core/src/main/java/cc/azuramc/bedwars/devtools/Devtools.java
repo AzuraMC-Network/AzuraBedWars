@@ -238,11 +238,15 @@ public final class Devtools implements McpServer.Host {
     }
 
     @Override
-    public void checkWriteAllowed() throws Exception {
-        String blocked = sync(this::writeBlocker);
-        if (blocked != null) {
-            throw new ToolError(blocked);
-        }
+    public JsonElement callWrite(McpTool.Handler handler, Args args) throws Exception {
+        // one main-thread task, so no player joins between the check and the write
+        return sync(() -> {
+            String blocked = writeBlocker();
+            if (blocked != null) {
+                throw new ToolError(blocked);
+            }
+            return handler.call(args);
+        });
     }
 
     /**

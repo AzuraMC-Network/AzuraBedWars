@@ -38,8 +38,8 @@ public final class McpServer {
 
     /** What the endpoint needs from the plugin */
     public interface Host {
-        /** Throws {@link ToolError} when writes are not allowed right now */
-        void checkWriteAllowed() throws Exception;
+        /** Runs a write tool, throws {@link ToolError} when writes are not allowed right now */
+        JsonElement callWrite(McpTool.Handler handler, Args args) throws Exception;
 
         void audit(String tool, JsonObject arguments, String outcome);
     }
@@ -235,10 +235,8 @@ public final class McpServer {
         boolean failed = false;
         String text;
         try {
-            if (!tool.isReadOnly()) {
-                host.checkWriteAllowed();
-            }
-            JsonElement result = tool.getHandler().call(new Args(arguments));
+            Args args = new Args(arguments);
+            JsonElement result = tool.isReadOnly() ? tool.getHandler().call(args) : host.callWrite(tool.getHandler(), args);
             text = result.isJsonPrimitive() ? result.getAsString() : gson.toJson(result);
         } catch (ToolError e) {
             failed = true;
