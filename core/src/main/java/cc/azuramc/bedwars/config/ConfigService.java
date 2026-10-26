@@ -360,26 +360,58 @@ public final class ConfigService {
      * @param path dotted key path such as {@code debug-mode}
      */
     public ApplyResult setValue(String id, String path, Object value) {
+        return setValues(id, Collections.singletonMap(path, value), null);
+    }
+
+    /**
+     * Changes several scalar values in place and applies them together, or none of them
+     *
+     * @param expectedHash {@link #hash} of the file the values were based on, null to skip the check
+     */
+    public ApplyResult setValues(String id, Map<String, Object> changes, @Nullable String expectedHash) {
         ConfigDocument<?> document = require(id);
         String text;
         try {
+            if (expectedHash != null && !expectedHash.equals(hash(id))) {
+                return ApplyResult.rejected(id, Collections.singletonList(fileProblem(document,
+                        "The file changed on disk since it was read, read it again before writing")));
+            }
             text = read(file(document));
         } catch (IOException e) {
             return ApplyResult.rejected(id, Collections.singletonList(fileProblem(document, "Cannot read the file: " + e.getMessage())));
         }
         YamlBinder binder = new YamlBinder(document.getPath(), true);
-        Node node = YamlBinder.find(binder.parse(text), path);
-        String scalar = YamlWriter.scalar(value);
-        String updated;
-        if (node instanceof ScalarNode) {
-            updated = replace(text, node.getStartMark(), node.getEndMark(), scalar);
-        } else if (node == null && !path.contains(".") && binder.getProblems().isEmpty()) {
-            updated = text + (text.endsWith("\n") || text.isEmpty() ? "" : "\n") + path + ": " + scalar + "\n";
-        } else {
-            return ApplyResult.rejected(id, Collections.singletonList(new ConfigProblem(ConfigProblem.Severity.ERROR,
-                    document.getPath(), 0, 0, path, "Cannot set this key in place, edit the file instead")));
+        Node root = binder.parse(text);
+        List<int[]> ranges = new ArrayList<>();
+        List<String> replacements = new ArrayList<>();
+        StringBuilder appended = new StringBuilder();
+        for (Map.Entry<String, Object> change : changes.entrySet()) {
+            String path = change.getKey();
+            Node node = YamlBinder.find(root, path);
+            String scalar = YamlWriter.scalar(change.getValue());
+            if (node instanceof ScalarNode) {
+                ranges.add(new int[]{offset(text, node.getStartMark()), offset(text, node.getEndMark())});
+                replacements.add(scalar);
+            } else if (node == null && !path.contains(".") && binder.getProblems().isEmpty()) {
+                appended.append(path).append(": ").append(scalar).append('\n');
+            } else {
+                return ApplyResult.rejected(id, Collections.singletonList(new ConfigProblem(ConfigProblem.Severity.ERROR,
+                        document.getPath(), 0, 0, path, "Cannot set this key in place, edit the file instead")));
+            }
         }
-        return write(id, updated, null);
+        StringBuilder updated = new StringBuilder(text);
+        List<Integer> order = new ArrayList<>();
+        for (int i = 0; i < ranges.size(); i++) {
+            order.add(i);
+        }
+        order.sort((a, b) -> Integer.compare(ranges.get(b)[0], ranges.get(a)[0]));
+        for (int i : order) {
+            updated.replace(ranges.get(i)[0], ranges.get(i)[1], replacements.get(i));
+        }
+        if (appended.length() > 0 && updated.length() > 0 && updated.charAt(updated.length() - 1) != '\n') {
+            updated.append('\n');
+        }
+        return write(id, updated.append(appended).toString(), null);
     }
 
     /**
@@ -745,14 +777,26 @@ public final class ConfigService {
     }
 
     private void backup(ConfigDocument<?> document, File file) throws IOException {
-        if (!file.exists()) {
-            return;
+        if (file.exists()) {
+            backup(dataFolder, historyPrefix(document), Files.readAllBytes(file.toPath()));
         }
+    }
+
+    /**
+     * Prefix of the backups of a document in {@value #HISTORY_DIR}, each file name continues with a timestamp
+     */
+    public static String historyPrefix(ConfigDocument<?> document) {
+        return document.getPath().replace('/', '_') + ".";
+    }
+
+    /**
+     * Stores content in {@value #HISTORY_DIR} and keeps the newest {@value #HISTORY_LIMIT} copies with the same prefix
+     */
+    public static void backup(File dataFolder, String prefix, byte[] content) throws IOException {
         File history = new File(dataFolder, HISTORY_DIR);
-        String prefix = document.getPath().replace('/', '_') + ".";
         String stamp = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
         Files.createDirectories(history.toPath());
-        Files.copy(file.toPath(), new File(history, prefix + stamp).toPath(), StandardCopyOption.REPLACE_EXISTING);
+        Files.write(new File(history, prefix + stamp).toPath(), content);
 
         File[] old = history.listFiles((dir, name) -> name.startsWith(prefix));
         if (old != null && old.length > HISTORY_LIMIT) {
@@ -779,10 +823,6 @@ public final class ConfigService {
     }
 
     /** SnakeYAML marks count code points, String offsets count UTF-16 units */
-    private static String replace(String text, Mark start, Mark end, String replacement) {
-        return text.substring(0, offset(text, start)) + replacement + text.substring(offset(text, end));
-    }
-
     private static int offset(String text, Mark mark) {
         int lineStart = 0;
         for (int line = 0; line < mark.getLine(); line++) {
