@@ -105,7 +105,7 @@ AzuraBedWars是一个基于Spigot/Paper的Minecraft床战插件。该项目目�
 1. 执行 `/bw devtools on`，或者在 `devtools.yml` 里设置 `enabled: true` 后执行 `/bw devtools restart`
 2. 执行 `/bw devtools status`，会输出端点地址和一条带令牌、可直接粘贴的 `claude mcp add` 命令
 
-端点监听 `127.0.0.1:25599`，除非打开 `allow-remote`，否则只接受本机连接。令牌保存在 `plugins/AzuraBedWars/devtools/token`，`/bw devtools rotate` 可以更换。有非管理员玩家在线时会拒绝写入，每次改动都可以从 `.history/` 回滚。
+端点监听 `127.0.0.1`，默认用 25599，被占用就往后找空闲端口，也可以在 `port` 里写固定端口。除非打开 `allow-remote`，否则只接受本机连接。令牌保存在 `plugins/AzuraBedWars/devtools/token`，`/bw devtools rotate` 可以更换。有非管理员玩家在线时会拒绝写入，每次改动都可以从 `.history/` 回滚。
 
 ## 构建
 

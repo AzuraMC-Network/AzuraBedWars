@@ -1,7 +1,6 @@
 package cc.azuramc.bedwars.config.object;
 
 import cc.azuramc.bedwars.api.config.Comment;
-import cc.azuramc.bedwars.api.config.Range;
 import cc.azuramc.bedwars.api.config.Raw;
 import lombok.Data;
 
@@ -19,9 +18,11 @@ public class DevtoolsConfig {
     @Raw
     private String host = "127.0.0.1";
 
-    @Comment("Listen port")
-    @Range(min = 1, max = 65535)
-    private int port = 25599;
+    public static final String AUTO_PORT = "auto";
+    public static final int FIRST_AUTO_PORT = 25599;
+
+    @Comment({"Listen port", "auto takes the first free port from 25599"})
+    private String port = AUTO_PORT;
 
     @Comment({"Allow listening on addresses other than this machine", "Anyone on the network with the token can then change the server config"})
     private boolean allowRemote = false;

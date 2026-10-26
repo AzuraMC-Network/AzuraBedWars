@@ -119,9 +119,10 @@ off by default, keep it off on production servers.
 1. Run `/bw devtools on`, or set `enabled: true` in `devtools.yml` and run `/bw devtools restart`
 2. Run `/bw devtools status`, which prints the endpoint and a ready-to-paste `claude mcp add` command with the token
 
-The endpoint listens on `127.0.0.1:25599` and only accepts local connections unless `allow-remote` is turned on. The
-token is stored in `plugins/AzuraBedWars/devtools/token` and `/bw devtools rotate` replaces it. Writes are refused
-while players without admin permission are online, and every change can be rolled back from `.history/`.
+The endpoint listens on `127.0.0.1`, port 25599 or the next free one unless `port` is set to a number, and only accepts
+local connections unless `allow-remote` is turned on. The token is stored in `plugins/AzuraBedWars/devtools/token` and
+`/bw devtools rotate` replaces it. Writes are refused while players without admin permission are online, and every
+change can be rolled back from `.history/`.
 
 ## Building
 
