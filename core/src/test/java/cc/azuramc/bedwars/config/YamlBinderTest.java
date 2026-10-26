@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.config;
 
-import cc.azuramc.bedwars.config.annotation.Range;
-import cc.azuramc.bedwars.config.annotation.Raw;
+import cc.azuramc.bedwars.api.config.Range;
+import cc.azuramc.bedwars.api.config.Raw;
 import cc.azuramc.bedwars.config.yaml.YamlBinder;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import org.junit.jupiter.api.Test;

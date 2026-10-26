@@ -25,5 +25,6 @@ dependencies {
         exclude(group = "com.google.protobuf")
     }
 
+    testImplementation(project(":api"))
     testImplementation(libs.spigot.api)
 }

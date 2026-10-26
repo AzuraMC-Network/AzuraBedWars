@@ -1,11 +1,13 @@
 package cc.azuramc.bedwars.config.object;
 
-import cc.azuramc.bedwars.config.annotation.Comment;
-import cc.azuramc.bedwars.config.annotation.Range;
-import cc.azuramc.bedwars.config.annotation.Raw;
+import cc.azuramc.bedwars.api.config.Comment;
+import cc.azuramc.bedwars.api.config.Range;
+import cc.azuramc.bedwars.api.config.Raw;
+import cc.azuramc.bedwars.config.ExtensionSettings;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -188,6 +190,7 @@ public class TimelineConfig {
         public static final List<String> TYPES = Collections.unmodifiableList(Arrays.asList(
                 GENERATOR_LEVEL, DESTROY_BEDS, END_GAME, TITLE, SOUND, MESSAGE, COMMAND));
 
+        @Comment({"generator-level, destroy-beds, end-game, title, sound, message, command", "or an action of another plugin as plugin:id"})
         @Raw
         private String type = END_GAME;
 
@@ -241,6 +244,11 @@ public class TimelineConfig {
         @Nullable
         @Raw
         private List<String> commands;
+
+        @Comment("Settings of an action of another plugin")
+        @Nullable
+        @ExtensionSettings("type=timeline-action")
+        private Node settings;
 
         public Action(String type) {
             this.type = type;

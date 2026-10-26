@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.config.yaml;
 
-import cc.azuramc.bedwars.config.annotation.Comment;
+import cc.azuramc.bedwars.api.config.Comment;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.nodes.Node;
 

@@ -1,7 +1,7 @@
 package cc.azuramc.bedwars.config.object.shop;
 
-import cc.azuramc.bedwars.config.annotation.Comment;
-import cc.azuramc.bedwars.config.annotation.Range;
+import cc.azuramc.bedwars.api.config.Comment;
+import cc.azuramc.bedwars.api.config.Range;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

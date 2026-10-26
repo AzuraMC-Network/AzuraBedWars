@@ -16,6 +16,7 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,12 +50,12 @@ class ConfigModelsTest {
 
     @Test
     void schemasDescribeEveryKey() {
-        JsonObject schema = SchemaExporter.export(GameplayConfig.class, "gameplay.yml");
+        JsonObject schema = SchemaExporter.export(GameplayConfig.class, "gameplay.yml", kind -> Collections.emptyMap());
         JsonObject properties = schema.getAsJsonObject("properties");
         assertTrue(properties.has("max-health"));
         assertEquals(1, properties.getAsJsonObject("max-health").get("minimum").getAsInt());
         assertTrue(properties.getAsJsonObject("chat").getAsJsonObject("properties").has("global-chat-cooldown"));
-        JsonObject settings = SchemaExporter.export(SettingsConfig.class, "settings.yml").getAsJsonObject("properties");
+        JsonObject settings = SchemaExporter.export(SettingsConfig.class, "settings.yml", kind -> Collections.emptyMap()).getAsJsonObject("properties");
         assertEquals("ITEM", settings.getAsJsonObject("economy-mode").get("default").getAsString());
         assertTrue(settings.getAsJsonObject("editor-mode").get("x-restart-required").getAsBoolean());
     }

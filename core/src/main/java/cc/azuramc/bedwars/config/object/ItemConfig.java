@@ -1,6 +1,6 @@
 package cc.azuramc.bedwars.config.object;
 
-import cc.azuramc.bedwars.config.annotation.Comment;
+import cc.azuramc.bedwars.api.config.Comment;
 import lombok.Data;
 
 /**

@@ -93,6 +93,9 @@ public final class MessageUtil {
 
     @NotNull
     public static String parse(@Nullable Player player, @Nullable String string) {
+        if (string != null) {
+            string = AzuraBedWars.getInstance().getExtensions().replace(string, player);
+        }
         if (usingPlaceholderAPI) {
             if (string != null) {
                 string = color(PlaceholderAPI.setPlaceholders(player, string));

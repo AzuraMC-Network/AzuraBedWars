@@ -25,6 +25,7 @@ decor:
 #   generator  resource, interval in seconds, max-stack, a team without this generator gets a new one
 #   reveal   shows invisible intruders
 #   title sound message command  target: team base intruder
+#   plugin:id  an effect of another plugin, its settings go under settings
 upgrades:
   S:
     id: sharpened_swords

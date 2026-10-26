@@ -45,6 +45,7 @@ dependencyResolutionManagement {
 }
 
 include("api", "bootstrap", "core", "plugin")
+include(":examples:grapple")
 
 rootDir.resolve("nms").listFiles()!!
     .filter { it.resolve("build.gradle.kts").isFile }

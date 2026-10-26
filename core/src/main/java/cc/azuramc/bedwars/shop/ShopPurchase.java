@@ -47,8 +47,19 @@ public final class ShopPurchase {
             gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getShop().getNoPermission());
             return false;
         }
+        if (spec.getRequires() != null) {
+            for (ShopItemSpec.Condition condition : spec.getRequires().getConditions()) {
+                String denied = AzuraBedWars.getInstance().getExtensions().check(condition.getType(), condition.getSettings(), gamePlayer);
+                if (denied != null) {
+                    if (!denied.isEmpty()) {
+                        gamePlayer.sendMessage(denied);
+                    }
+                    return false;
+                }
+            }
+        }
         boolean armor = item.getChain() != null && item.getChain().getSlot() == TierChains.Slot.ARMOR;
-        if (!armor && gamePlayer.getPlayer().getInventory().firstEmpty() == -1) {
+        if (!armor && spec.getAction() == null && gamePlayer.getPlayer().getInventory().firstEmpty() == -1) {
             gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getShop().getInventoryFull());
             return false;
         }
@@ -78,22 +89,30 @@ public final class ShopPurchase {
     }
 
     /**
-     * Puts the item of a shop item without a tier chain into the inventory
+     * Puts the item of a shop item without a tier chain into the inventory, or runs its purchase action
      */
     public static void give(GamePlayer gamePlayer, ShopItem item) {
+        ShopItemSpec spec = item.getSpec();
+        if (spec.getAction() != null) {
+            AzuraBedWars.getInstance().getExtensions().purchase(spec.getAction(), spec.getSettings(), gamePlayer);
+            return;
+        }
         if (item.getItem() == null) {
             return;
         }
         ItemStack stack = item.getItem().clone();
         GameTeam gameTeam = gamePlayer.getGameTeam();
-        if (gameTeam != null && item.getSpec().getItem() != null && item.getSpec().getItem().isTeamColor()) {
+        if (gameTeam != null && spec.getItem() != null && spec.getItem().isTeamColor()) {
             stack = ItemSpecs.teamColored(stack, gameTeam);
         }
-        if (item.getSpec().isSword()) {
+        if (spec.isSword()) {
             gamePlayer.getPlayer().getInventory().remove(Objects.requireNonNull(XMaterial.WOODEN_SWORD.get()));
             if (gameTeam != null) {
                 UpgradeEffects.enchantSword(gameTeam, stack);
             }
+        }
+        if (spec.getCustom() != null) {
+            stack = AzuraBedWars.getInstance().getExtensions().createItem(spec.getCustom(), spec.getSettings(), gamePlayer, stack);
         }
         gamePlayer.getPlayer().getInventory().addItem(stack);
     }

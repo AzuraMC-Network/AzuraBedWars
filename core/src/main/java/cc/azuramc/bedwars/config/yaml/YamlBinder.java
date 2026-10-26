@@ -1,8 +1,8 @@
 package cc.azuramc.bedwars.config.yaml;
 
 import cc.azuramc.bedwars.config.ConfigProblem;
-import cc.azuramc.bedwars.config.annotation.Range;
-import cc.azuramc.bedwars.config.annotation.Raw;
+import cc.azuramc.bedwars.api.config.Range;
+import cc.azuramc.bedwars.api.config.Raw;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Nullable;
@@ -75,21 +75,29 @@ public final class YamlBinder {
     }
 
     public <T> T bind(@Nullable Node root, Class<T> type) {
-        return bindOnto(root, type.cast(ConfigKeys.newInstance(type)));
+        return bind(root, type, "");
+    }
+
+    /**
+     * @param path key path of {@code root} in its file, empty for the whole file
+     */
+    public <T> T bind(@Nullable Node root, Class<T> type, String path) {
+        return bindOnto(root, type.cast(ConfigKeys.newInstance(type)), path);
     }
 
     /**
      * Keys missing from {@code root} keep the values of {@code instance}
      */
-    public <T> T bindOnto(@Nullable Node root, T instance) {
+    public <T> T bindOnto(@Nullable Node root, T instance, String path) {
+        boolean top = path.isEmpty();
         if (root instanceof MappingNode) {
             if (instance instanceof Map) {
-                bindMap((MappingNode) root, castMap(instance), ConfigKeys.typeArgument(instance.getClass(), 1), "", true);
+                bindMap((MappingNode) root, castMap(instance), ConfigKeys.typeArgument(instance.getClass(), 1), path, top);
             } else {
-                bindObject((MappingNode) root, instance, "", true);
+                bindObject((MappingNode) root, instance, path, top);
             }
-        } else if (root != null) {
-            error(root, "", "Expected keys and values at the top level");
+        } else if (root != null && !Tag.NULL.equals(root.getTag())) {
+            error(root, path, top ? "Expected keys and values at the top level" : "Expected a section of keys and values");
         }
         if (translateColors) {
             translateDefaults(instance);
