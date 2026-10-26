@@ -1,6 +1,8 @@
 package cc.azuramc.bedwars.example.grapple;
 
 import cc.azuramc.bedwars.api.AzuraBedWarsAPI;
+import cc.azuramc.bedwars.api.extension.ExtensionRegistry;
+import com.google.gson.JsonObject;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -12,6 +14,12 @@ public final class GrapplePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        AzuraBedWarsAPI.getRegistry().registerItem(this, "hook", GrappleSettings.class, new GrappleHook());
+        ExtensionRegistry registry = AzuraBedWarsAPI.getRegistry();
+        GrappleHook hook = new GrappleHook();
+        registry.registerItem(this, "hook", GrappleSettings.class, hook);
+        JsonObject noArguments = new JsonObject();
+        noArguments.addProperty("type", "object");
+        registry.registerDevTool(this, "pulls", "Seconds since each online player last pulled with the grappling hook",
+                noArguments, true, arguments -> hook.lastPulls());
     }
 }

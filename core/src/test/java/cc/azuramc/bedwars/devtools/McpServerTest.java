@@ -32,6 +32,7 @@ class McpServerTest {
     private static final String TOKEN = "0123456789abcdef0123456789abcdef";
 
     private final List<String> audit = new ArrayList<>();
+    private final List<McpTool> tools = new ArrayList<>();
     private boolean writesBlocked;
     private McpServer server;
     private String url;
@@ -51,12 +52,10 @@ class McpServerTest {
                 audit.add(tool + " " + outcome);
             }
         };
-        List<McpTool> tools = Arrays.asList(
-                McpTool.read("echo", "Echo").string("text", "Text", true)
-                        .handle(args -> new JsonPrimitive(args.string("text"))),
-                McpTool.write("touch", "Write something").handle(args -> new JsonPrimitive("done"))
-        );
-        server = new McpServer(host, new McpContent(null, null), tools, TOKEN, "test");
+        tools.add(McpTool.read("echo", "Echo").string("text", "Text", true)
+                .handle(args -> new JsonPrimitive(args.string("text"))));
+        tools.add(McpTool.write("touch", "Write something").handle(args -> new JsonPrimitive("done")));
+        server = new McpServer(host, new McpContent(null, null), () -> tools, TOKEN, "test");
         server.start("127.0.0.1", 0);
         url = "http://127.0.0.1:" + server.getAddress().getPort() + McpServer.PATH;
     }
@@ -94,6 +93,14 @@ class McpServerTest {
         assertTrue(missing.get("isError").getAsBoolean());
         assertEquals("Missing argument text", missing.getAsJsonArray("content").get(0).getAsJsonObject().get("text").getAsString());
         assertEquals(Arrays.asList("echo ok", "echo error: Missing argument text"), audit);
+    }
+
+    @Test
+    void picksUpToolsAddedAfterStart() throws IOException {
+        tools.add(McpTool.external("late_tool", "Late", new JsonObject(), true, args -> new JsonPrimitive("late")));
+        assertEquals(3, call("tools/list", "{}").getAsJsonArray("tools").size());
+        JsonObject result = call("tools/call", "{\"name\":\"late_tool\"}");
+        assertEquals("late", result.getAsJsonArray("content").get(0).getAsJsonObject().get("text").getAsString());
     }
 
     @Test

@@ -11,6 +11,8 @@ import cc.azuramc.bedwars.config.object.UpgradeConfig;
 import cc.azuramc.bedwars.config.object.shop.ShopCategoryConfig;
 import cc.azuramc.bedwars.config.object.shop.ShopMenuConfig;
 import cc.azuramc.bedwars.config.object.shop.TierChains;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.bukkit.plugin.Plugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -120,5 +122,18 @@ class ExtensionsTest {
         extensions.unregisterAll(plugin);
         assertEquals(Extensions.Status.UNKNOWN, extensions.status(ExtensionKind.TIMELINE_ACTION, "test:meteor"));
         assertEquals(Extensions.Status.NO_PLUGIN, extensions.status(ExtensionKind.TIMELINE_ACTION, "other:meteor"));
+    }
+
+    @Test
+    void devToolsAreNamedByPluginAndRemovedWithIt() {
+        JsonObject schema = new JsonObject();
+        extensions.registerDevTool(plugin, "dump", "Dump", schema, true, arguments -> new JsonPrimitive("ok"));
+        assertEquals("test_dump", extensions.getDevTools().get(0).getName());
+        assertThrows(IllegalArgumentException.class,
+                () -> extensions.registerDevTool(plugin, "dump", "Again", schema, true, arguments -> new JsonPrimitive("ok")));
+        assertThrows(IllegalArgumentException.class,
+                () -> extensions.registerDevTool(plugin, "Bad Id", "Bad", schema, true, arguments -> new JsonPrimitive("ok")));
+        extensions.unregisterAll(plugin);
+        assertTrue(extensions.getDevTools().isEmpty());
     }
 }

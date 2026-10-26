@@ -44,6 +44,7 @@ public final class McpContent {
         return "Tools of a live AzuraBedWars BedWars server for Minecraft. Read azura://guide/concepts before the first change."
                 + " Start with server_info. Every config change is validated and backed up, history_rollback undoes it."
                 + " Positions can come from an online player, so ask the admin to stand where a point belongs."
+                + " After a shop or upgrade change, check the page with shop_render or upgrade_render."
                 + " Talk to the admin in their language.";
     }
 

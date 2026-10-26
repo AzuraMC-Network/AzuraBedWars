@@ -141,6 +141,24 @@ stages:
           count: 20
 ```
 
+## Tools for AI clients
+
+Servers that turn on the development MCP in `devtools.yml` let AI clients such as Claude Code read and change the
+config. A plugin can add its own tools there, so the AI can inspect or drive what the plugin added. They are listed as
+`<plugin>_<id>`, with the plugin name in lower case.
+
+```java
+JsonObject schema = new JsonObject();
+schema.addProperty("type", "object");
+registry.registerDevTool(this, "pulls", "Seconds since each online player last pulled with the grappling hook",
+        schema, true, arguments -> hook.lastPulls());
+```
+
+The schema is the JSON Schema of the arguments object, and the AI fills the arguments from it. The tool runs on the main
+thread. Return a `JsonPrimitive` string for plain text, or any other JSON. Throw `IllegalArgumentException` for a wrong
+argument and the AI sees its message. Pass `readOnly` false for a tool that changes something. Such tools are refused
+while players without admin rights are online, like the built-in ones.
+
 ## What gets checked
 
 On the first tick, again when a file is reloaded, and on `/bw config check`:
@@ -168,6 +186,7 @@ and does not stop the game.
 | `TrapEffect.trigger` | when an enemy sets off the trap |
 | `TimelineAction.run` | when the stage starts |
 | `Placeholder.apply` | each time a line holding it is shown, with the viewing player or null |
+| `DevTool.call` | when an AI client calls the tool |
 
 `CustomItem.create` receives the stack already tagged as your item. Change that stack, such as its meta, rather than
 returning a new one, or `onUse` will no longer recognize it.

@@ -3,8 +3,12 @@ package cc.azuramc.bedwars.devtools;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.DevtoolsConfig;
 import cc.azuramc.bedwars.devtools.tool.ConfigTools;
+import cc.azuramc.bedwars.devtools.tool.ExtensionTools;
+import cc.azuramc.bedwars.devtools.tool.GameTools;
 import cc.azuramc.bedwars.devtools.tool.MapTools;
 import cc.azuramc.bedwars.devtools.tool.ServerTools;
+import cc.azuramc.bedwars.devtools.tool.ShopTools;
+import cc.azuramc.bedwars.extension.Extensions;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -23,9 +27,12 @@ import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -54,6 +61,7 @@ public final class Devtools implements McpServer.Host {
     @Getter
     @Nullable
     private String token;
+    private Set<String> builtIn = Collections.emptySet();
 
     public Devtools(AzuraBedWars plugin) {
         this.plugin = plugin;
@@ -84,7 +92,14 @@ public final class Devtools implements McpServer.Host {
             tools.addAll(new ServerTools(plugin, this).tools());
             tools.addAll(new ConfigTools(plugin, this).tools());
             tools.addAll(new MapTools(plugin, this).tools());
-            McpServer created = new McpServer(this, new McpContent(plugin, this), tools, token,
+            tools.addAll(new ShopTools(plugin, this).tools());
+            tools.addAll(new GameTools(plugin, this).tools());
+            tools.addAll(new ExtensionTools(plugin, this).tools());
+            builtIn = new HashSet<>();
+            for (McpTool tool : tools) {
+                builtIn.add(tool.getName());
+            }
+            McpServer created = new McpServer(this, new McpContent(plugin, this), () -> withDevTools(tools), token,
                     plugin.getPlugin().getDescription().getVersion());
             created.start(config.getHost(), config.getPort());
             server = created;
@@ -97,6 +112,28 @@ public final class Devtools implements McpServer.Host {
             LoggerUtil.warn("MCP devtools accept remote connections, anyone with the token can change this server");
         }
         return null;
+    }
+
+    private List<McpTool> withDevTools(List<McpTool> builtInTools) {
+        List<McpTool> tools = new ArrayList<>(builtInTools);
+        for (Extensions.Tool registered : plugin.getExtensions().getDevTools()) {
+            if (builtIn.contains(registered.getName())) {
+                continue;
+            }
+            tools.add(McpTool.external(registered.getName(), "From the plugin " + registered.getPlugin().getName() + ". " + registered.getDescription(),
+                    registered.getInputSchema(), registered.isReadOnly(), args -> sync(() -> {
+                        try {
+                            return registered.getTool().call(args.json());
+                        } catch (IllegalArgumentException e) {
+                            throw new ToolError(e.getMessage());
+                        }
+                    })));
+        }
+        return tools;
+    }
+
+    public boolean isBuiltIn(String name) {
+        return builtIn.contains(name);
     }
 
     /**
