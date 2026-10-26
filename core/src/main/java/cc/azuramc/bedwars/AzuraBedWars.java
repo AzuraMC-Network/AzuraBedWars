@@ -11,6 +11,7 @@ import cc.azuramc.bedwars.config.ConfigService;
 import cc.azuramc.bedwars.config.migrate.LegacyConfigMigrator;
 import cc.azuramc.bedwars.config.object.*;
 import cc.azuramc.bedwars.database.provider.DatabaseProviderFactory;
+import cc.azuramc.bedwars.devtools.Devtools;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
@@ -60,6 +61,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
     private Chat chat = null;
     private ConfigService configService;
     private DatabaseProviderFactory databaseProviderFactory;
+    private Devtools devtools;
     private Economy econ = null;
     private GameManager gameManager;
     private LuckPerms luckPermsApi;
@@ -88,6 +90,10 @@ public final class AzuraBedWars implements PluginEntrypoint {
         PacketEvents.getAPI().init();
         // 初始化配置系统
         initConfigSystem();
+        devtools = new Devtools(this);
+        if (getDevtoolsConfig().isEnabled()) {
+            devtools.captureLogs();
+        }
 
         // ReflectionUtil初始化版本
         ReflectionUtil.initializeVersions();
@@ -110,6 +116,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         }
 
         initCommands();
+        initDevtools();
         // bStats
         loadBStats();
 
@@ -118,6 +125,9 @@ public final class AzuraBedWars implements PluginEntrypoint {
 
     @Override
     public void onDisable() {
+        if (devtools != null) {
+            devtools.stop();
+        }
 
         if (gameManager != null) {
             gameManager.getTimeline().stop();
@@ -144,6 +154,15 @@ public final class AzuraBedWars implements PluginEntrypoint {
      */
     private void initCommands() {
         new CommandRegistry(this);
+    }
+
+    private void initDevtools() {
+        if (getDevtoolsConfig().isEnabled()) {
+            String error = devtools.start();
+            if (error != null) {
+                LoggerUtil.error("MCP devtools did not start: " + error);
+            }
+        }
     }
 
     /**
@@ -321,6 +340,7 @@ public final class AzuraBedWars implements PluginEntrypoint {
         configService.register("items", "items.yml", ItemConfig.class, ApplyMode.LIVE, 1);
         configService.register("upgrades", "upgrades.yml", UpgradeConfig.class, ApplyMode.LIVE, 1);
         configService.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
+        configService.register(Devtools.DOCUMENT_ID, "devtools.yml", DevtoolsConfig.class, ApplyMode.LIVE, 1);
 
         LegacyConfigMigrator.migrateIfPresent(plugin.getDataFolder(), configService);
         logProblems(configService.loadAll());
@@ -376,6 +396,10 @@ public final class AzuraBedWars implements PluginEntrypoint {
 
     public MessageConfig getMessageConfig() {
         return configService.get(MessageConfig.class);
+    }
+
+    public DevtoolsConfig getDevtoolsConfig() {
+        return configService.get(DevtoolsConfig.class);
     }
 
     /**
