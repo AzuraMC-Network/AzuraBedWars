@@ -2,9 +2,11 @@ package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.event.bed.BedwarsBedDestroyEvent;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
+import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.hook.VaultUtil;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
@@ -24,14 +26,14 @@ public class BedBreakHandler {
         event.setCancelled(true);
 
         if (gameTeam.isBedBlock(block)) {
-            gamePlayer.sendMessage("§c你不能破坏你家的床");
+            gamePlayer.sendMessage(PLUGIN.getLang().getGame().getOwnBed());
             return;
         }
 
         for (GameTeam targetTeam : GAME_MANAGER.getGameTeams()) {
             if (targetTeam.isBedBlock(block)) {
                 if (targetTeam.isDead() && !GAME_MANAGER.isWaitingForReconnect(targetTeam)) {
-                    gamePlayer.sendMessage("§c此床没有队伍");
+                    gamePlayer.sendMessage(PLUGIN.getLang().getGame().getBedWithoutTeam());
                 } else {
                     processBedDestruction(gamePlayer, gameTeam, targetTeam);
                 }
@@ -53,9 +55,11 @@ public class BedBreakHandler {
 
         gamePlayer.recordBedBreak();
 
-        String message = "&f&l床被破坏 >>> " + targetTeam.getChatColor() + targetTeam.getName() + " 的床 &7被 " + gameTeam.getChatColor() + gamePlayer.getNickName() + " 破坏";
-        String title = "§c§l床被摧毁";
-        String subTitle = "§c死亡将无法复活";
+        LangConfig.Game lang = PLUGIN.getLang().getGame();
+        String message = MessageUtil.fill(lang.getBedBroken(), "team", targetTeam.getChatColor() + targetTeam.getName(),
+                "breaker", gameTeam.getChatColor() + gamePlayer.getNickName());
+        String title = lang.getBedBrokenTitle();
+        String subTitle = lang.getBedBrokenSubtitle();
         BedwarsBedDestroyEvent.Post postEvent = new BedwarsBedDestroyEvent.Post(gamePlayer, targetTeam, GAME_MANAGER, message, title, subTitle);
         Bukkit.getPluginManager().callEvent(postEvent);
 
@@ -70,7 +74,7 @@ public class BedBreakHandler {
         if (VaultUtil.ecoIsNull) {
             return;
         }
-        gamePlayer.sendMessage("§6+" + PLUGIN.getGameplayConfig().getBedDestroyReward() + "个金币 (破坏床)");
+        gamePlayer.sendMessage(MessageUtil.fill(PLUGIN.getLang().getGame().getBedReward(), "coins", PLUGIN.getGameplayConfig().getBedDestroyReward()));
         VaultUtil.depositPlayer(gamePlayer, PLUGIN.getGameplayConfig().getBedDestroyReward());
         new BukkitRunnable() {
             int i = 0;
@@ -81,7 +85,7 @@ public class BedBreakHandler {
                     cancel();
                     return;
                 }
-                gamePlayer.sendActionBar("§6+" + PLUGIN.getGameplayConfig().getBedDestroyReward() + "个金币");
+                gamePlayer.sendActionBar(MessageUtil.fill(PLUGIN.getLang().getGame().getBedRewardActionBar(), "coins", PLUGIN.getGameplayConfig().getBedDestroyReward()));
                 i++;
             }
         }.runTaskTimer(PLUGIN.getPlugin(), 0, 10);

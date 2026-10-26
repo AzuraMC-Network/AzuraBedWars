@@ -17,10 +17,10 @@ import java.util.Map;
  * @author an5w1r@163.com
  */
 @Data
-@Comment({"资源点配置", "每种资源同时就是商店的货币，价格写成 数量 资源id，例如 4 iron"})
+@Comment({"Generators", "Every resource is also a shop currency, prices are written as amount and resource id, such as 4 iron"})
 public class GeneratorConfig {
 
-    @Comment("资源种类，键是资源 id")
+    @Comment("Resources by id")
     private LinkedHashMap<String, Resource> resources = defaults();
 
     @Nullable
@@ -30,33 +30,33 @@ public class GeneratorConfig {
 
     @Data
     public static class Resource {
-        @Comment("物品材质")
+        @Comment("Item material")
         @Raw
         private String material = "IRON_INGOT";
 
-        @Comment("价格里显示的名字")
-        private String name = "铁";
+        @Comment("Name shown in prices")
+        private String name = "Iron";
 
-        @Comment("BASE 在每个队伍基地生成，PUBLIC 在地图的公共资源点生成")
+        @Comment("BASE spawns at every team base, PUBLIC at the public generators of the map")
         private Spawn at = Spawn.BASE;
 
-        @Comment("PUBLIC 资源使用的地图资源点类型")
+        @Comment("Map generator type used by a PUBLIC resource")
         @Nullable
         private MapData.DropType drop;
 
-        @Comment("PUBLIC 资源点上方旋转展示的方块")
+        @Comment("Block spinning above a PUBLIC generator")
         @Nullable
         @Raw
         private String block;
 
-        @Comment({"PUBLIC 资源点全息文字，从上到下", "变量: {level} 为罗马数字等级, {seconds} 为距下次生成的秒数"})
+        @Comment({"Hologram lines above a PUBLIC generator, from top to bottom", "Placeholders: {level} roman level, {seconds} until the next spawn"})
         private List<String> hologram = new ArrayList<>();
 
-        @Comment("经验模式下拾取一个换算的等级")
+        @Comment("Levels gained per item picked up in experience mode")
         @Range(min = 0)
         private int xpValue = 1;
 
-        @Comment({"各级的生成间隔和堆积上限", "第一项是开局等级，时间线升级资源点时进入下一项"})
+        @Comment({"Spawn interval and max stack per level", "The first entry is the starting level, the timeline moves a generator to the next one"})
         private List<Level> levels = new ArrayList<>();
 
         public Level level(int level) {
@@ -66,11 +66,11 @@ public class GeneratorConfig {
 
     @Data
     public static class Level {
-        @Comment("生成间隔(秒)")
+        @Comment("Spawn interval in seconds")
         @Range(min = 0.05)
         private double interval = 1;
 
-        @Comment("资源点最多堆积数量")
+        @Comment("Most items a generator holds")
         @Range(min = 1)
         private int maxStack = 48;
 
@@ -90,13 +90,13 @@ public class GeneratorConfig {
 
     private static LinkedHashMap<String, Resource> defaults() {
         LinkedHashMap<String, Resource> resources = new LinkedHashMap<>();
-        resources.put("iron", resource("IRON_INGOT", "铁", 1, new Level(1, 48)));
-        resources.put("gold", resource("GOLD_INGOT", "金", 3, new Level(3, 8)));
-        Resource diamond = resource("DIAMOND", "钻石", 40, new Level(35, 4), new Level(23, 6), new Level(15, 8));
-        publicResource(diamond, MapData.DropType.DIAMOND, "DIAMOND_BLOCK", "&b钻石");
+        resources.put("iron", resource("IRON_INGOT", "Iron", 1, new Level(1, 48)));
+        resources.put("gold", resource("GOLD_INGOT", "Gold", 3, new Level(3, 8)));
+        Resource diamond = resource("DIAMOND", "Diamond", 40, new Level(35, 4), new Level(23, 6), new Level(15, 8));
+        publicResource(diamond, MapData.DropType.DIAMOND, "DIAMOND_BLOCK", "&bDiamond");
         resources.put("diamond", diamond);
-        Resource emerald = resource("EMERALD", "绿宝石", 80, new Level(60, 2), new Level(23, 4), new Level(15, 4));
-        publicResource(emerald, MapData.DropType.EMERALD, "EMERALD_BLOCK", "&2绿宝石");
+        Resource emerald = resource("EMERALD", "Emerald", 80, new Level(60, 2), new Level(23, 4), new Level(15, 4));
+        publicResource(emerald, MapData.DropType.EMERALD, "EMERALD_BLOCK", "&2Emerald");
         resources.put("emerald", emerald);
         return resources;
     }
@@ -114,7 +114,7 @@ public class GeneratorConfig {
         resource.setAt(Spawn.PUBLIC);
         resource.setDrop(drop);
         resource.setBlock(block);
-        resource.setHologram(new ArrayList<>(Arrays.asList("&e等级 &c{level}", title, "&e将在&c{seconds}&e秒后刷新")));
+        resource.setHologram(new ArrayList<>(Arrays.asList("&eTier &c{level}", title, "&eSpawns in &c{seconds} &eseconds")));
     }
 
     /**
@@ -122,7 +122,7 @@ public class GeneratorConfig {
      *
      * @param timeline content of a version 1 timeline.yml
      */
-    public static Map<String, Object> fromVersion1(Map<String, Object> generators, Map<String, Object> timeline) {
+    public static Map<String, Object> fromVersion1(Map<String, Object> generators, Map<String, Object> timeline, GeneratorConfig defaults) {
         Map<String, Object> old = new LinkedHashMap<>(generators);
         for (String id : Arrays.asList("diamond", "emerald")) {
             Object event = timeline.get(id + "-update-event");
@@ -133,7 +133,6 @@ public class GeneratorConfig {
                 }
             }
         }
-        GeneratorConfig defaults = new GeneratorConfig();
         Map<String, Object> resources = new LinkedHashMap<>();
         for (Map.Entry<String, Resource> entry : defaults.getResources().entrySet()) {
             String id = entry.getKey();

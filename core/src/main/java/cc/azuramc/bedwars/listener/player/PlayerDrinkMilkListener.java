@@ -51,7 +51,7 @@ public class PlayerDrinkMilkListener implements Listener {
         event.setCancelled(true);
         PlayerUtil.setItemInHand(player, itemStack, true);
 
-        gamePlayer.sendMessage("&a你喝下了魔法牛奶，将会在30s内不受陷阱效果影响");
+        gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getMagicMilkDrunk());
         gamePlayer.startTrapProtectionTask();
     }
 }

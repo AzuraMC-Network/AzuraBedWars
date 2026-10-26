@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Limit {
 
-    @Comment("每局最多购买次数")
+    @Comment("Most purchases per game")
     @Range(min = 1)
     private int times = 1;
 

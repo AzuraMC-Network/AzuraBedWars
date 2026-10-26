@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.compat.util.WorldUtil;
 import cc.azuramc.bedwars.config.ApplyResult;
 import cc.azuramc.bedwars.config.ConfigProblem;
 import cc.azuramc.bedwars.config.ConfigService;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.devtools.Devtools;
 import cc.azuramc.bedwars.util.CommandUtil;
 import cc.azuramc.bedwars.util.MessageUtil;
@@ -23,7 +24,6 @@ import revxrsal.commands.bukkit.annotation.CommandPermission;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,23 +37,12 @@ public class AdminCommand {
 
     @DefaultFor({"azurabedwars", "bedwars", "abw", "bw"})
     public void getHelpCommand(BukkitCommandActor actor) {
-        List<String> helpMessages = MessageUtil.color(Arrays.asList(
-                MessageUtil.CHAT_BAR,
-                "&b&lAzuraBedWars &8- &7v" + plugin.getPlugin().getDescription().getVersion() + " &8- &b起床战争 - 指令帮助",
-                "",
-                "&7 • &f/bw reload [配置名] &7校验并重新加载配置文件",
-                "&7 • &f/bw config check &7检查所有配置文件的错误",
-                "&7 • &f/bw config schema &7重新生成编辑器补全用的 JSON Schema",
-                "&7 • &f/map &7查看地图相关指令帮助 &3&o[仅EditMode]",
-                "&7 • &f/setup &7查看快速配置相关指令 &3&o[仅EditMode]",
-                "&7 • &f/bw editorMode true/false &7开关编辑模式(重启后生效)",
-                "&7 • &f/bw debugMode true/false &7开关调试日志",
-                "&7 • &f/bw devtools on/off/status/restart/rotate &7开发服的 AI 配置助手(MCP)",
-                "&7 • &f/bw toWorld <worldName> &7前往世界",
-                "&7 • &f/bw loadWorld <worldName> &7加载世界",
-                "&7 • &f/bw start &7立即开始游戏 &3&o[仅非EditMode]",
-                MessageUtil.CHAT_BAR
-        ));
+        List<String> helpMessages = new ArrayList<>();
+        helpMessages.add(MessageUtil.CHAT_BAR);
+        for (String line : lang().getHelp()) {
+            helpMessages.add(MessageUtil.fill(line, "version", plugin.getPlugin().getDescription().getVersion()));
+        }
+        helpMessages.add(MessageUtil.CHAT_BAR);
 
         CommandUtil.sendLayout(actor, helpMessages);
     }
@@ -63,7 +52,7 @@ public class AdminCommand {
     public void reloadConfigFiles(BukkitCommandActor actor, @Optional String document) {
         ConfigService configService = plugin.getConfigService();
         if (document != null && !configService.isReloadable(document)) {
-            CommandUtil.sendLayout(actor, "&c没有名为 " + document + " 的配置，可选: " + documentIds());
+            CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getUnknownConfig(), "config", document, "available", documentIds()));
             return;
         }
         List<ApplyResult> results = document == null
@@ -81,7 +70,7 @@ public class AdminCommand {
     public void checkConfig(BukkitCommandActor actor) {
         List<ConfigProblem> problems = plugin.getConfigService().check();
         List<String> lines = new ArrayList<>();
-        lines.add(problems.isEmpty() ? "&a配置文件没有发现问题" : "&e配置文件有 " + problems.size() + " 个问题:");
+        lines.add(problems.isEmpty() ? lang().getConfigClean() : MessageUtil.fill(lang().getConfigProblems(), "count", problems.size()));
         addProblems(lines, problems);
         CommandUtil.sendLayout(actor, lines);
     }
@@ -89,7 +78,7 @@ public class AdminCommand {
     @Subcommand("config schema")
     public void exportSchema(BukkitCommandActor actor) {
         plugin.getConfigService().exportSchemas();
-        CommandUtil.sendLayout(actor, "&a已重新生成 " + ConfigService.SCHEMA_DIR + "/ 下的 JSON Schema");
+        CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getSchemaWritten(), "folder", ConfigService.SCHEMA_DIR));
     }
 
     @Subcommand("editorMode")
@@ -131,12 +120,12 @@ public class AdminCommand {
         ApplyResult result = plugin.getConfigService().setValue(Devtools.DOCUMENT_ID, "enabled", false);
         if (result.getStatus() == ApplyResult.Status.REJECTED) {
             List<String> lines = new ArrayList<>();
-            lines.add("&eMCP 已关闭 但 devtools.yml 未能保存 重启后会再次开启");
+            lines.add(lang().getDevtoolsOffUnsaved());
             addProblems(lines, result.getProblems());
             CommandUtil.sendLayout(actor, lines);
             return;
         }
-        CommandUtil.sendLayout(actor, "&aMCP 已关闭 端口已释放");
+        CommandUtil.sendLayout(actor, lang().getDevtoolsOff());
     }
 
     @Subcommand("devtools rotate")
@@ -144,14 +133,14 @@ public class AdminCommand {
         try {
             String error = plugin.getDevtools().rotateToken();
             if (error != null) {
-                CommandUtil.sendLayout(actor, "&c令牌已更换 但 MCP 未能重新启动: " + error);
+                CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getDevtoolsRotateRestartFailed(), "error", error));
                 return;
             }
         } catch (IOException e) {
-            CommandUtil.sendLayout(actor, "&c无法写入新令牌: " + e.getMessage());
+            CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getDevtoolsTokenWriteFailed(), "error", e.getMessage()));
             return;
         }
-        CommandUtil.sendLayout(actor, "&a令牌已更换 旧令牌立即失效 AI 客户端需要用新命令重新添加");
+        CommandUtil.sendLayout(actor, lang().getDevtoolsRotated());
         devtoolsStatus(actor);
     }
 
@@ -159,15 +148,14 @@ public class AdminCommand {
     public void devtoolsStatus(BukkitCommandActor actor) {
         Devtools devtools = plugin.getDevtools();
         if (!devtools.isRunning()) {
-            CommandUtil.sendLayout(actor, "&eMCP 未开启 /bw devtools on 开启");
+            CommandUtil.sendLayout(actor, lang().getDevtoolsNotRunning());
             return;
         }
-        CommandUtil.sendLayout(actor, Arrays.asList(
-                "&aMCP 运行中 &f" + devtools.endpoint(),
-                "&7在 AI 客户端所在的电脑上执行:",
-                "&f" + devtools.connectCommand(),
-                "&7令牌保存在 plugins/AzuraBedWars/devtools/token 审计日志在 devtools/audit.log"
-        ));
+        List<String> lines = new ArrayList<>();
+        for (String line : lang().getDevtoolsRunning()) {
+            lines.add(MessageUtil.fill(line, "endpoint", devtools.endpoint(), "command", devtools.connectCommand()));
+        }
+        CommandUtil.sendLayout(actor, lines);
     }
 
     private void startDevtools(BukkitCommandActor actor, ApplyResult configResult) {
@@ -177,23 +165,23 @@ public class AdminCommand {
         }
         String error = plugin.getDevtools().start();
         if (error != null) {
-            CommandUtil.sendLayout(actor, "&cMCP 未能启动: " + error);
+            CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getDevtoolsStartFailed(), "error", error));
             return;
         }
         devtoolsStatus(actor);
     }
 
     private static String describe(ApplyResult result) {
-        String name = "&f" + result.getDocumentId() + " ";
+        String name = result.getDocumentId();
         switch (result.getStatus()) {
             case APPLIED:
-                return name + "&a已生效";
+                return MessageUtil.fill(lang().getApplied(), "config", name);
             case NEXT_GAME:
-                return name + "&e已保存，下一局开始时生效";
+                return MessageUtil.fill(lang().getAppliedNextGame(), "config", name);
             case RESTART_REQUIRED:
-                return name + "&e已生效，以下项重启后生效: &f" + String.join(", ", result.getRestartPaths());
+                return MessageUtil.fill(lang().getAppliedRestart(), "config", name, "paths", String.join(", ", result.getRestartPaths()));
             default:
-                return name + "&c有错误，未应用，仍使用原配置";
+                return MessageUtil.fill(lang().getRejected(), "config", name);
         }
     }
 
@@ -204,9 +192,13 @@ public class AdminCommand {
             lines.add((problem.isError() ? "&c ✖ " : "&e ! ") + "&7" + problem);
         }
         if (problems.size() > shown) {
-            lines.add("&7 ……还有 " + (problems.size() - shown) + " 个，完整列表见控制台");
+            lines.add(MessageUtil.fill(lang().getMoreProblems(), "count", problems.size() - shown));
             AzuraBedWars.logProblems(problems);
         }
+    }
+
+    private static LangConfig.Admin lang() {
+        return AzuraBedWars.getInstance().getLang().getAdmin();
     }
 
     private String documentIds() {
@@ -217,7 +209,7 @@ public class AdminCommand {
     public void toWorld(Player player, String worldName) {
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
-            player.sendMessage(MessageUtil.color("&c世界 " + worldName + " 未加载 先用 /bw loadWorld " + worldName));
+            player.sendMessage(MessageUtil.fill(lang().getWorldNotLoaded(), "world", worldName));
             return;
         }
         player.teleport(world.getSpawnLocation());
@@ -226,15 +218,15 @@ public class AdminCommand {
     @Subcommand("loadWorld")
     public void loadWorld(BukkitCommandActor actor, String worldName) {
         if (!new File(Bukkit.getWorldContainer(), worldName + "/level.dat").isFile()) {
-            CommandUtil.sendLayout(actor, "&c服务器目录下没有世界存档 " + worldName);
+            CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getWorldMissing(), "world", worldName));
             return;
         }
         World world = Bukkit.createWorld(new WorldCreator(worldName).environment(World.Environment.NORMAL));
         if (world == null) {
-            CommandUtil.sendLayout(actor, "&c无法加载世界 " + worldName);
+            CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getWorldLoadFailed(), "world", worldName));
             return;
         }
         WorldUtil.setWorldRules(world);
-        CommandUtil.sendLayout(actor, "&a世界 " + worldName + " 已加载 /bw toWorld " + worldName + " 前往");
+        CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getWorldLoaded(), "world", worldName));
     }
 }

@@ -2,10 +2,14 @@ package cc.azuramc.bedwars.config.object;
 
 import cc.azuramc.bedwars.config.annotation.Comment;
 import cc.azuramc.bedwars.config.annotation.Range;
+import cc.azuramc.bedwars.config.annotation.Raw;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,161 +18,260 @@ import java.util.Map;
  * @author an5w1r@163.com
  */
 @Data
-@Comment({"对局阶段配置", "阶段时间在开局时读取, 进行中的对局不受重载影响"})
+@Comment({"Game stages", "Stage times are read when a game starts, a running game keeps its own"})
 public class TimelineConfig {
 
-    @Comment("游戏开始配置")
+    @Comment("Game start")
     private GameStartEvent gameStartEvent = new GameStartEvent();
 
-    @Comment("床自毁事件配置")
-    private BedDestroyedEvent bedDestroyedEvent = new BedDestroyedEvent();
+    @Comment({"Stages after the start, after is the seconds since the previous stage", "The scoreboard shows the name of the next stage"})
+    private List<Stage> stages = new ArrayList<>(Arrays.asList(
+            new Stage("Diamond II", 360, Action.generatorLevel("diamond", 2)),
+            new Stage("Emerald II", 360, Action.generatorLevel("emerald", 2)),
+            new Stage("Diamond III", 360, Action.generatorLevel("diamond", 3)),
+            new Stage("Emerald III", 360, Action.generatorLevel("emerald", 3)),
+            new Stage("Bed gone", 360, new Action(Action.DESTROY_BEDS),
+                    Action.title("&c&lBED DESTRUCTION", "&eAll beds have been destroyed", 10, 20, 10), Action.sound("ENTITY_ENDER_DRAGON_GROWL")),
+            new Stage("Game over", 360, new Action(Action.END_GAME))));
 
-    @Comment("游戏结束事件配置")
+    @Comment("Game end")
     private GameOverEvent gameOverEvent = new GameOverEvent();
 
     @Data
     public static class GameStartEvent {
-        @Comment("开始倒计时时间(秒)")
+        @Comment("Start countdown in seconds")
         @Range(min = 0)
         private int countDown = 5;
 
-        @Comment("倒计时标题")
-        private String titleString = "&c&l游戏即将开始";
+        @Comment("Countdown title")
+        private String titleString = "&c&lGame starting";
 
-        @Comment("倒计时副标题")
+        @Comment("Countdown subtitle")
         private String subtitle = "&e&l";
 
-        @Comment("标题淡入时间(tick)")
+        @Comment("Title fade in in ticks")
         @Range(min = 0)
         private int fadeIn = 1;
 
-        @Comment("标题停留时间(tick)")
+        @Comment("Title stay time in ticks")
         @Range(min = 0)
         private int titleStay = 20;
 
-        @Comment("标题淡出时间(tick)")
+        @Comment("Title fade out in ticks")
         @Range(min = 0)
         private int fadeOut = 1;
 
-        @Comment({"倒计时数字标题", "变量: %d 为倒计时秒数"})
+        @Comment({"Countdown number title", "Placeholders: %d seconds left"})
         private String titleCountdown = "&c&l%d";
 
-        @Comment("倒计时副标题文本")
-        private String subtitleText = "&e&l准备战斗吧！";
+        @Comment("Countdown subtitle text")
+        private String subtitleText = "&e&lGet ready to fight!";
 
-        @Comment("默认等待倒计时(秒)")
+        @Comment("Waiting countdown in seconds")
         @Range(min = 1)
         private int defaultCountdown = 120;
 
-        @Comment("快速开始倒计时(秒)")
+        @Comment("Countdown when the game is full in seconds")
         @Range(min = 1)
         private int quickStartCountdown = 10;
 
-        @Comment("公告时间点(秒)")
+        @Comment("Seconds that are announced")
         private int[] announcementTimes = {60, 30, 5, 4, 3, 2, 1};
 
-        @Comment({"倒计时消息", "变量: %d 为剩余秒数"})
-        private String msgCountdown = "&e游戏将在&c%d&e秒后开始！";
+        @Comment({"Countdown message", "Placeholders: %d seconds left"})
+        private String msgCountdown = "&eThe game starts in &c%d &eseconds!";
 
-        @Comment("人数不足消息")
-        private String msgNotEnoughPlayers = "&c人数不足，取消倒计时！";
+        @Comment("Not enough players message")
+        private String msgNotEnoughPlayers = "&cNot enough players, countdown cancelled!";
 
-        @Comment("游戏人满消息")
-        private String msgGameFull = "&e游戏人数已满,10秒后开始游戏！";
-    }
-
-    @Data
-    public static class BedDestroyedEvent {
-        @Comment("床自毁触发时间(秒，从上一阶段结束计算)")
-        @Range(min = 1)
-        private int executeSeconds = 360;
-
-        @Comment("床自毁标题")
-        private String title = "&c&l床自毁";
-
-        @Comment("床自毁副标题")
-        private String subtitle = "&e所有队伍床消失";
-
-        @Comment("标题淡入时间(tick)")
-        @Range(min = 0)
-        private int fadeIn = 10;
-
-        @Comment("标题停留时间(tick)")
-        @Range(min = 0)
-        private int titleStay = 20;
-
-        @Comment("标题淡出时间(tick)")
-        @Range(min = 0)
-        private int fadeOut = 10;
+        @Comment("Game full message")
+        private String msgGameFull = "&eThe game is full, starting in 10 seconds!";
     }
 
     @Data
     public static class GameOverEvent {
-        @Comment("游戏强制结束时间(秒，从床自毁后计算)")
-        @Range(min = 1)
-        private int executeSeconds = 360;
-
-        @Comment("游戏结束倒计时时间(秒)")
+        @Comment("Game end countdown in seconds")
         @Range(min = 0)
         private int defaultCountdown = 15;
 
-        @Comment("标题淡入时间(tick)")
+        @Comment("Title fade in in ticks")
         @Range(min = 0)
         private int titleFadeIn = 0;
 
-        @Comment("标题停留时间(tick)")
+        @Comment("Title stay time in ticks")
         @Range(min = 0)
         private int titleStay = 40;
 
-        @Comment("标题淡出时间(tick)")
+        @Comment("Title fade out in ticks")
         @Range(min = 0)
         private int titleFadeOut = 0;
 
-        @Comment("服务器关闭延迟(tick)")
+        @Comment("Server shutdown delay in ticks")
         @Range(min = 0)
         private long shutdownDelay = 40L;
 
-        @Comment("烟花生成高度(方块)")
+        @Comment("Firework height in blocks")
         private double fireworkHeight = 2.0D;
 
-        @Comment("胜利标题")
-        private String victoryTitle = "&6&l获胜！";
+        @Comment("Victory title")
+        private String victoryTitle = "&6&lVICTORY!";
 
-        @Comment("胜利副标题")
-        private String victorySubtitle = "&7你获得了最终的胜利";
+        @Comment("Victory subtitle")
+        private String victorySubtitle = "&7You won the game";
 
-        @Comment("失败标题")
-        private String defeatTitle = "&c&l失败！";
+        @Comment("Defeat title")
+        private String defeatTitle = "&c&lGAME OVER!";
 
-        @Comment("失败副标题")
-        private String defeatSubtitle = "&7你输掉了这场游戏";
+        @Comment("Defeat subtitle")
+        private String defeatSubtitle = "&7You lost this game";
 
-        @Comment("平局标题")
-        private String tieTitle = "&e&lTies！";
+        @Comment("Draw title")
+        private String tieTitle = "&e&lDRAW!";
 
-        @Comment("平局副标题")
+        @Comment("Draw subtitle")
         private String tieSubtitle = "&7No team has won";
 
-        @Comment("无胜者消息")
+        @Comment("No winner message")
         private String noWinner = "&eTie! No team has won";
 
-        @Comment("平局时是否发射烟花")
+        @Comment("Launch fireworks on a draw")
         private boolean tieFireworkEnabled = true;
 
-        @Comment({"自定义排行榜消息", "可用变量: <winnerFormat>, <firstName>, <firstKills>, <secondName>, <secondKills>, <thirdName>, <thirdKills>"})
+        @Comment({"Leaderboard message", "Placeholders: <winnerFormat>, <firstName>, <firstKills>, <secondName>, <secondKills>, <thirdName>, <thirdKills>"})
         private List<String> customLeaderboardMessages = new ArrayList<>(Arrays.asList(
                 "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-                "&f                                   &l起床战争",
+                "&f                                   &lBed Wars",
                 "",
                 "&f          <winnerFormat>",
                 "",
                 "",
-                "&e                          &l击杀数第一名 &7- <firstName> - <firstKills>",
-                "&6                          &l击杀数第二名 &7- <secondName> - <secondKills>",
-                "&c                          &l击杀数第三名 &7- <thirdName> - <thirdKills>",
+                "&e                          &l1st Killer &7- <firstName> - <firstKills>",
+                "&6                          &l2nd Killer &7- <secondName> - <secondKills>",
+                "&c                          &l3rd Killer &7- <thirdName> - <thirdKills>",
                 "",
                 "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
         ));
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class Stage {
+        private String name = "";
+
+        @Comment("Seconds since the previous stage")
+        @Range(min = 0)
+        private int after = 360;
+
+        @Comment("generator-level, destroy-beds, end-game, title, sound, message, command")
+        private List<Action> actions = new ArrayList<>();
+
+        public Stage(String name, int after, Action... actions) {
+            this.name = name;
+            this.after = after;
+            this.actions = new ArrayList<>(Arrays.asList(actions));
+        }
+    }
+
+    /**
+     * One action type with the fields its type reads
+     */
+    @Data
+    @NoArgsConstructor
+    public static class Action {
+        public static final String GENERATOR_LEVEL = "generator-level";
+        public static final String DESTROY_BEDS = "destroy-beds";
+        public static final String END_GAME = "end-game";
+        public static final String TITLE = "title";
+        public static final String SOUND = "sound";
+        public static final String MESSAGE = "message";
+        public static final String COMMAND = "command";
+        public static final List<String> TYPES = Collections.unmodifiableList(Arrays.asList(
+                GENERATOR_LEVEL, DESTROY_BEDS, END_GAME, TITLE, SOUND, MESSAGE, COMMAND));
+
+        @Raw
+        private String type = END_GAME;
+
+        @Comment("Resource id of generator-level")
+        @Nullable
+        @Raw
+        private String resource;
+
+        @Comment("Level of generator-level, 1 is the first")
+        @Nullable
+        @Range(min = 1)
+        private Integer level;
+
+        @Nullable
+        private String title;
+
+        @Nullable
+        private String subtitle;
+
+        @Comment("Fade in, stay and fade out of title in ticks, 10 40 10 by default")
+        @Nullable
+        @Range(min = 0)
+        private Integer fadeIn;
+
+        @Nullable
+        @Range(min = 0)
+        private Integer stay;
+
+        @Nullable
+        @Range(min = 0)
+        private Integer fadeOut;
+
+        @Comment("Sound of sound, an XSeries name")
+        @Nullable
+        @Raw
+        private String sound;
+
+        @Nullable
+        @Range(min = 0)
+        private Float volume;
+
+        @Nullable
+        @Range(min = 0, max = 2)
+        private Float pitch;
+
+        @Comment("Text of message, sent to every player")
+        @Nullable
+        private List<String> message;
+
+        @Comment("Command run by the console")
+        @Nullable
+        @Raw
+        private List<String> commands;
+
+        public Action(String type) {
+            this.type = type;
+        }
+
+        public static Action fromString(String type) {
+            return new Action(type.trim());
+        }
+
+        public static Action generatorLevel(String resource, int level) {
+            Action action = new Action(GENERATOR_LEVEL);
+            action.resource = resource;
+            action.level = level;
+            return action;
+        }
+
+        public static Action title(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+            Action action = new Action(TITLE);
+            action.title = title;
+            action.subtitle = subtitle;
+            action.fadeIn = fadeIn;
+            action.stay = stay;
+            action.fadeOut = fadeOut;
+            return action;
+        }
+
+        public static Action sound(String sound) {
+            Action action = new Action(SOUND);
+            action.sound = sound;
+            return action;
+        }
     }
 
     /**
@@ -179,5 +282,61 @@ public class TimelineConfig {
         upgraded.remove("diamond-update-event");
         upgraded.remove("emerald-update-event");
         return upgraded;
+    }
+
+    /**
+     * Version 2 had the bed destruction and the forced end as fixed events
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> fromVersion2(Map<String, Object> old) {
+        Map<String, Object> upgraded = new LinkedHashMap<>(old);
+        Map<String, Object> bed = old.get("bed-destroyed-event") instanceof Map
+                ? (Map<String, Object>) old.get("bed-destroyed-event") : new LinkedHashMap<String, Object>();
+        Map<String, Object> end = old.get("game-over-event") instanceof Map
+                ? new LinkedHashMap<>((Map<String, Object>) old.get("game-over-event")) : new LinkedHashMap<String, Object>();
+        upgraded.remove("bed-destroyed-event");
+        Object endSeconds = end.remove("execute-seconds");
+        if (!end.isEmpty()) {
+            upgraded.put("game-over-event", end);
+        } else {
+            upgraded.remove("game-over-event");
+        }
+
+        Map<String, Object> title = new LinkedHashMap<>();
+        title.put("type", Action.TITLE);
+        title.put("title", bed.getOrDefault("title", "&c&lBED DESTRUCTION"));
+        title.put("subtitle", bed.getOrDefault("subtitle", "&eAll beds have been destroyed"));
+        title.put("fade-in", bed.getOrDefault("fade-in", 10));
+        title.put("stay", bed.getOrDefault("title-stay", 20));
+        title.put("fade-out", bed.getOrDefault("fade-out", 10));
+        Map<String, Object> sound = new LinkedHashMap<>();
+        sound.put("type", Action.SOUND);
+        sound.put("sound", "ENTITY_ENDER_DRAGON_GROWL");
+
+        List<Object> stages = new ArrayList<>();
+        stages.add(stage("Diamond II", 360, generatorLevel("diamond", 2)));
+        stages.add(stage("Emerald II", 360, generatorLevel("emerald", 2)));
+        stages.add(stage("Diamond III", 360, generatorLevel("diamond", 3)));
+        stages.add(stage("Emerald III", 360, generatorLevel("emerald", 3)));
+        stages.add(stage("Bed gone", bed.getOrDefault("execute-seconds", 360), Action.DESTROY_BEDS, title, sound));
+        stages.add(stage("Game over", endSeconds != null ? endSeconds : 360, Action.END_GAME));
+        upgraded.put("stages", stages);
+        return upgraded;
+    }
+
+    private static Map<String, Object> stage(String name, Object after, Object... actions) {
+        Map<String, Object> stage = new LinkedHashMap<>();
+        stage.put("name", name);
+        stage.put("after", after);
+        stage.put("actions", new ArrayList<>(Arrays.asList(actions)));
+        return stage;
+    }
+
+    private static Map<String, Object> generatorLevel(String resource, int level) {
+        Map<String, Object> action = new LinkedHashMap<>();
+        action.put("type", Action.GENERATOR_LEVEL);
+        action.put("resource", resource);
+        action.put("level", level);
+        return action;
     }
 }

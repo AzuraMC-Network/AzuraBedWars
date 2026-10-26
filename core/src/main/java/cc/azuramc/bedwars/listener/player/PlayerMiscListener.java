@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.spectator.SpectatorSettings;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.GameMode;
@@ -29,6 +30,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  * @author an5w1r@163.com
  */
 public class PlayerMiscListener implements Listener {
+    private static final String BED_ALERT_KEY = "azurabedwars:bed-alert";
     private final GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
     @EventHandler
@@ -89,14 +91,14 @@ public class PlayerMiscListener implements Listener {
         }
 
         if (gamePlayer.isSpectator() && (SpectatorSettings.get(gamePlayer).getOption(SpectatorSettings.Option.FIRST_PERSON)) && player.getGameMode() == GameMode.SPECTATOR) {
-            gamePlayer.sendTitle("§e退出旁观模式", "", 0, 20, 0);
+            gamePlayer.sendTitle(AzuraBedWars.getInstance().getLang().getSpectator().getLeftSpectating(), "", 0, 20, 0);
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);
             player.setFlying(true);
             return;
         }
 
-        if (gamePlayer.isSpectator() || gamePlayer.isRespawning() || player.hasMetadata("等待上一次求救")) {
+        if (gamePlayer.isSpectator() || gamePlayer.isRespawning() || player.hasMetadata(BED_ALERT_KEY)) {
             return;
         }
 
@@ -104,7 +106,7 @@ public class PlayerMiscListener implements Listener {
             return;
         }
 
-        player.setMetadata("等待上一次求救", new FixedMetadataValue(AzuraBedWars.getInstance().getPlugin(), ""));
+        player.setMetadata(BED_ALERT_KEY, new FixedMetadataValue(AzuraBedWars.getInstance().getPlugin(), ""));
 
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameTeam == null) {
@@ -117,12 +119,12 @@ public class PlayerMiscListener implements Listener {
             @Override
             public void run() {
                 if (i > 5) {
-                    player.removeMetadata("等待上一次求救", AzuraBedWars.getInstance().getPlugin());
+                    player.removeMetadata(BED_ALERT_KEY, AzuraBedWars.getInstance().getPlugin());
                     cancel();
                     return;
                 }
 
-                gameManager.broadcastTeamTitle(gameTeam, "", gameTeam.getChatColor() + gamePlayer.getNickName() + " 说: §c注意,我们的床有危险！", 0, 8, 0);
+                gameManager.broadcastTeamTitle(gameTeam, "", MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getBedInDanger(), "player", gameTeam.getChatColor() + gamePlayer.getNickName()), 0, 8, 0);
                 gameManager.broadcastTeamSound(gameTeam, XSound.UI_BUTTON_CLICK.get(), 1f, 1f);
                 i++;
             }

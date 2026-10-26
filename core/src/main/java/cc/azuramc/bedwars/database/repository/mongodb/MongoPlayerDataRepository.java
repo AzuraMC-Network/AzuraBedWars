@@ -52,9 +52,9 @@ public class MongoPlayerDataRepository implements IPlayerDataRepository {
             IndexOptions options = new IndexOptions().unique(true);
             collection.createIndex(Indexes.ascending(COL_UUID), options);
 
-            LoggerUtil.info("MongoDB 索引创建完毕");
+            LoggerUtil.info("Created the MongoDB indexes");
         } catch (Exception e) {
-            LoggerUtil.error("MongoDB 无法创建索引 " + e.getMessage());
+            LoggerUtil.error("Cannot create the MongoDB indexes: " + e.getMessage());
             e.printStackTrace();
         }
     }

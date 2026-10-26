@@ -16,71 +16,71 @@ import java.util.List;
 @Data
 public class ShopItemSpec {
 
-    @Comment({"商品 id，不写时用键名", "快速购买和 ref 用 分类.id 引用商品"})
+    @Comment({"Item id, the key when left out", "Quick buy and ref point at items as category.id"})
     @Nullable
     @Raw
     private String id;
 
-    @Comment("商品名")
+    @Comment("Item name")
     private String name = "";
 
-    @Comment("发放的物品，只写材质时可以简写成 item: WHITE_WOOL")
+    @Comment("Item given, a lone material can be written as item: WHITE_WOOL")
     @Nullable
     private ItemSpec item;
 
-    @Comment("价格，数量 资源id，例如 4 iron")
+    @Comment("Price, amount and resource id, such as 4 iron")
     @Nullable
     private Price price;
 
-    @Comment("经验模式的价格(级)，不写时按资源的 xp-value 换算")
+    @Comment("Price in levels for experience mode, converted from the xp-value of the resource when left out")
     @Nullable
     @Range(min = 0)
     private Integer xp;
 
-    @Comment("tiers.yml 里的升级链 id，图标和价格随玩家当前等级变化")
+    @Comment("Tier chain id from tiers.yml, the icon and price follow the tier of the player")
     @Nullable
     @Raw
     private String tier;
 
-    @Comment({"升级链的目标等级，1 是第一级", "不写时购买下一级"})
+    @Comment({"Target tier of the chain, 1 is the first", "The next tier when left out"})
     @Range(min = 0)
     private int level;
 
-    @Comment("拿走木剑并套上队伍锋利附魔")
+    @Comment("Takes the wooden sword and applies the team sharpness")
     private boolean sword;
 
-    @Comment({"内置特殊道具", "fireball, tnt, popup_tower, rescue_platform, warp_powder, bridge_egg, silverfish, dream_defender, magic_milk, invisibility, speed_wool"})
+    @Comment({"Built-in special item", "fireball, tnt, popup_tower, rescue_platform, warp_powder, bridge_egg, silverfish, dream_defender, magic_milk, invisibility, speed_wool"})
     @Nullable
     @Raw
     private String special;
 
-    @Comment({"购买后以控制台身份执行的命令", "变量: {player} 玩家名, {team} 队伍名"})
+    @Comment({"Commands run by the console after a purchase", "Placeholders: {player} player name, {team} team name"})
     @Raw
     private List<String> commands = new ArrayList<>();
 
-    @Comment("once 只能买一次，数字表示每局最多几次")
+    @Comment("once for a single purchase, a number for most purchases per game")
     @Nullable
     private Limit limit;
 
-    @Comment("复活和重连时重新发放")
+    @Comment("Given again on respawn and reconnect")
     private boolean keepOnRespawn;
 
-    @Comment("只在这个经济模式出现")
+    @Comment("Only shown in this economy mode")
     @Nullable
     private EconomyType economy;
 
-    @Comment("复用另一个分类的商品，例如 blocks.wool，其余字段都不用写")
+    @Comment("Reuses an item of another category, such as blocks.wool, no other field is needed")
     @Nullable
     @Raw
     private String ref;
 
-    @Comment("购买条件")
+    @Comment("Purchase requirements")
     @Nullable
     private Requires requires;
 
     @Data
     public static class Requires {
-        @Comment("需要的权限")
+        @Comment("Required permission")
         @Nullable
         @Raw
         private String permission;

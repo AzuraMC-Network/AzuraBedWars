@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.shop.gui;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.config.object.shop.ItemSpec;
@@ -118,12 +119,12 @@ public class ItemShopGUI extends CustomGUI {
 
             setItem(slots.get(index), new ItemBuilder()
                             .setItemStack(XMaterial.RED_STAINED_GLASS_PANE.parseItem())
-                            .setDisplayName("§c空闲的槽位")
-                            .setLores("§7这是一个快捷购买槽位!§bShift+左键", "§7将任意物品放到这里~")
+                            .setDisplayName(AzuraBedWars.getInstance().getLang().getShop().getEmptySlotName())
+                            .setLores(AzuraBedWars.getInstance().getLang().getShop().getEmptySlotLore())
                             .getItem(),
                     new NewGUIAction(0, event -> {
                         if (event.isShiftClick()) {
-                            gamePlayer.sendMessage("§c这是个空的槽位!请使用Shift+左键添加物品到这里~");
+                            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getShop().getEmptySlotClicked());
                         }
                     }, false));
         }

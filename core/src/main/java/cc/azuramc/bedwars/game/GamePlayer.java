@@ -196,7 +196,7 @@ public class GamePlayer implements IGamePlayer {
         invisibilityWaitingTask = new BukkitRunnable() {
             @Override
             public void run() {
-                sendMessage("&c隐身效果结束");
+                sendMessage(AzuraBedWars.getInstance().getLang().getItems().getInvisibilityEnded());
                 endInvisibility();
             }
         };
@@ -225,7 +225,7 @@ public class GamePlayer implements IGamePlayer {
         trapProtectionTask = new BukkitRunnable() {
             @Override
             public void run() {
-                sendMessage("&c魔法牛奶效果结束");
+                sendMessage(AzuraBedWars.getInstance().getLang().getItems().getMagicMilkEnded());
                 endTrapProtection();
             }
         };
@@ -505,15 +505,15 @@ public class GamePlayer implements IGamePlayer {
         public void sendClosestPlayer() {
             GamePlayer closestPlayer = AzuraBedWars.getInstance().getGameManager().findTargetPlayer(gamePlayer);
             if (closestPlayer == null || closestPlayer.getGameTeam() == null) {
-                gamePlayer.sendActionBar("§c没有目标");
+                gamePlayer.sendActionBar(AzuraBedWars.getInstance().getLang().getGame().getNoTarget());
                 return;
             }
 
             Player player = gamePlayer.getPlayer();
             Player targetPlayer = closestPlayer.getPlayer();
             int distance = (int) targetPlayer.getLocation().distance(player.getLocation());
-            gamePlayer.sendActionBar(String.format("§f玩家 %s%s §f距离您 %dm",
-                    closestPlayer.getGameTeam().getChatColor(), closestPlayer.getNickName(), distance));
+            gamePlayer.sendActionBar(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getTrackerTarget(),
+                    "player", closestPlayer.getGameTeam().getChatColor() + closestPlayer.getNickName(), "distance", distance));
             player.setCompassTarget(targetPlayer.getLocation());
         }
     }

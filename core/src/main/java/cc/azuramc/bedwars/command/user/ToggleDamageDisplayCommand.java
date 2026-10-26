@@ -4,7 +4,6 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.util.CommandUtil;
-import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.DefaultFor;
@@ -19,19 +18,19 @@ public class ToggleDamageDisplayCommand {
 
     @DefaultFor({"displaydamage", "dd"})
     public void toggleDisplayDamage(BukkitCommandActor actor) {
-        CommandUtil.sendLayout(actor, "&c用法: /displaydamage <arrow|attack>");
+        CommandUtil.sendLayout(actor, AzuraBedWars.getInstance().getLang().getCommand().getDamageDisplayUsage());
     }
 
     @Subcommand("arrow")
     public void toggleArrowDamage(Player player) {
 
         if (!AzuraBedWars.getInstance().getGameManager().isArrowDisplayEnabled()) {
-            player.sendMessage(MessageUtil.color("&c该功能未启用！"));
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getDamageDisplayDisabled());
             return;
         }
 
         if (AzuraBedWars.getInstance().getGameManager().getGameState() != GameState.RUNNING) {
-            player.sendMessage(MessageUtil.color("&c该命令只能在游戏开始后使用！"));
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getOnlyInGame());
             return;
         }
 
@@ -42,10 +41,10 @@ public class ToggleDamageDisplayCommand {
 
         if (gamePlayer.isViewingArrowDamage()) {
             gamePlayer.setViewingArrowDamage(false);
-            player.sendMessage(MessageUtil.color("&c弓箭伤害显示已关闭！"));
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getArrowDamageOff());
         } else {
             gamePlayer.setViewingArrowDamage(true);
-            player.sendMessage(MessageUtil.color("&a弓箭伤害显示已开启！"));
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getArrowDamageOn());
         }
     }
 
@@ -53,12 +52,12 @@ public class ToggleDamageDisplayCommand {
     public void toggleAttackDamage(Player player) {
 
         if (!AzuraBedWars.getInstance().getGameManager().isAttackDisplayEnabled()) {
-            player.sendMessage(MessageUtil.color("&c该功能未启用！"));
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getDamageDisplayDisabled());
             return;
         }
 
         if (AzuraBedWars.getInstance().getGameManager().getGameState() != GameState.RUNNING) {
-            player.sendMessage(MessageUtil.color("&c该命令只能在游戏开始后使用！"));
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getOnlyInGame());
             return;
         }
 
@@ -69,10 +68,10 @@ public class ToggleDamageDisplayCommand {
 
         if (gamePlayer.isViewingAttackDamage()) {
             gamePlayer.setViewingAttackDamage(false);
-            player.sendMessage(MessageUtil.color("&c攻击伤害显示已关闭！"));
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getAttackDamageOff());
         } else {
             gamePlayer.setViewingAttackDamage(true);
-            player.sendMessage(MessageUtil.color("&a攻击伤害显示已开启！"));
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getAttackDamageOn());
         }
     }
 }

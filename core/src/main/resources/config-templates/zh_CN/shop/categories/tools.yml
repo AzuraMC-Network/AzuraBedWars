@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&a工具"
+icon: STONE_PICKAXE
+items:
+  # 升级链商品的图标和价格随玩家当前等级变化
+  pickaxe:
+    name: "镐子"
+    tier: pickaxe
+  axe:
+    name: "斧子"
+    tier: axe
+  shears:
+    name: "剪刀"
+    item: { material: SHEARS, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
+    price: 30 iron
+    xp: 30
+    limit: once
+    keep-on-respawn: true

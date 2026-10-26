@@ -1,0 +1,635 @@
+# yaml-language-server: $schema=../schema/lang.json
+# Text shown to players and admins
+# Words in braces such as {player} are filled in by the plugin
+config-version: 1
+
+command:
+  missing-argument: "&cMissing argument"
+  player-offline: "&cThat player is not online"
+  no-permission: "&cYou do not have permission"
+  players-only: "&cOnly players can use this command!"
+  only-in-game: "&cYou can only use this command during a game!"
+  shout-usage: "&cUsage: /shout <message>"
+  shout-cooldown: "&cYou must wait before shouting again!"
+  game-started: "&cThe game has already started or is ending!"
+
+  # {min}
+  not-enough-players: "&cNot enough players! At least {min} players in two teams are needed to &nstart the game&c."
+  damage-display-usage: "&cUsage: /displaydamage <arrow|attack>"
+  damage-display-disabled: "&cThis feature is not enabled!"
+  arrow-damage-on: "&aArrow damage display enabled!"
+  arrow-damage-off: "&cArrow damage display disabled!"
+  attack-damage-on: "&aAttack damage display enabled!"
+  attack-damage-off: "&cAttack damage display disabled!"
+
+admin:
+  # {version}
+  help:
+    - "&b&lAzuraBedWars &8- &7v{version} &8- &bBedWars - Commands"
+    - ""
+    - "&7 • &f/bw reload [config] &7Check and reload config files"
+    - "&7 • &f/bw config check &7Check every config file for errors"
+    - "&7 • &f/bw config schema &7Write the JSON Schema used by editors"
+    - "&7 • &f/map &7Map commands &3&o[editor mode only]"
+    - "&7 • &f/setup &7Setup tool commands &3&o[editor mode only]"
+    - "&7 • &f/bw editorMode true/false &7Toggle editor mode, applies after a restart"
+    - "&7 • &f/bw debugMode true/false &7Toggle debug logging"
+    - "&7 • &f/bw devtools on/off/status/restart/rotate &7AI config assistant over MCP for dev servers"
+    - "&7 • &f/bw toWorld <worldName> &7Go to a world"
+    - "&7 • &f/bw loadWorld <worldName> &7Load a world"
+    - "&7 • &f/bw start &7Start the game now &3&o[outside editor mode]"
+
+  # {config} {available}
+  unknown-config: "&cNo config named {config}, available: {available}"
+  config-clean: "&aNo problems found in the config files"
+
+  # {count}
+  config-problems: "&eThe config files have {count} problems:"
+
+  # {count}
+  more-problems: "&7 ...and {count} more, see the console for the full list"
+
+  # {folder}
+  schema-written: "&aWrote the JSON Schema files in {folder}/"
+
+  # {config}
+  applied: "&f{config} &aapplied"
+  applied-next-game: "&f{config} &esaved, applies when the next game starts"
+
+  # {config} {paths}
+  applied-restart: "&f{config} &eapplied, these apply after a restart: &f{paths}"
+  rejected: "&f{config} &chas errors, not applied, the current config stays"
+
+  # {world}
+  world-not-loaded: "&cWorld {world} is not loaded, use /bw loadWorld {world} first"
+  world-missing: "&cThe server folder has no world save named {world}"
+  world-load-failed: "&cCould not load world {world}"
+  world-loaded: "&aWorld {world} loaded, /bw toWorld {world} to go there"
+  devtools-off: "&aMCP stopped, the port is free"
+  devtools-off-unsaved: "&eMCP stopped, but devtools.yml could not be saved, it starts again after a restart"
+  devtools-not-running: "&eMCP is off, /bw devtools on to start it"
+  devtools-rotated: "&aToken replaced, the old one stops working now, add the server to the AI client again with the new command"
+
+  # {error}
+  devtools-start-failed: "&cMCP could not start: {error}"
+  devtools-rotate-restart-failed: "&cToken replaced, but MCP could not restart: {error}"
+  devtools-token-write-failed: "&cCould not write the new token: {error}"
+
+  # {endpoint} {command}
+  devtools-running:
+    - "&aMCP running &f{endpoint}"
+    - "&7Run this on the computer with the AI client:"
+    - "&f{command}"
+    - "&7The token is in plugins/AzuraBedWars/devtools/token, the audit log in devtools/audit.log"
+
+map:
+  # {version} {range}
+  help:
+    - "&b&lAzuraBedWars &8- &7v{version} &8- &bBedWars - Map Setup"
+    - ""
+    - "&7 • &f/map create <map> &7Create a map"
+    - "&7 • &f/map setUrl <map> <path> &7Set the world folder of the map"
+    - "&7 •  &9&l▸ &fVariables {$serverDir} server folder {$baseDir} plugins {$pluginDir} plugins/AzuraBedWars"
+    - "&7 • &f/map setWaiting <map> &7Set the waiting lobby where you stand"
+    - "&7 • &f/map setRespawn <map> &7Set the spectator spawn where you stand"
+    - "&7 • &f/map setPos1 <map> &7 /map setPos2 <map> &7Set the map border, the higher corner sets the build limit"
+    - "&7 • &f/map addBase <map> &7Add a team base where you stand, nearby wool sets its color"
+    - "&7 • &f/map addDrop <map> <BASE/DIAMOND/EMERALD> &7Add a generator"
+    - "&7 • &f/map addShop <map> <ITEM/UPGRADE> &7Add a shop"
+    - "&7 • &f/map remove <map> &7Remove the nearest base, generator or shop within {range} blocks"
+    - "&7 • &f/map setAuthor <map> <author> &7Set the author"
+    - "&7 • &f/map setTeamPlayers <map> <players> &7Set the players per team"
+    - "&7 • &f/map setMinPlayers <map> <players> &7Set the players needed to start"
+    - "&7 • &f/map check <map> &7List what the map is missing"
+    - "&7 • &f/map info <map> &7Show the map"
+    - "&7 • &f/map list [JSON/MYSQL] &7List maps"
+    - "&7 • &f/map load <map> &7Read the map from storage again"
+    - "&7 • &f/map delete <map> confirm &7Delete the map data, the world files stay"
+    - "&7 • &f/map migrate <from> <to> [map] &7Move maps between storages"
+    - "&7 • &f/map align &7Snap your position and view to whole numbers"
+  invalid-name: "&cMap names may only use letters, digits, underscores and hyphens, up to 30 characters"
+
+  # {map}
+  exists: "&cMap {map} already exists"
+  save-failed: "&cCould not save the map, see the console"
+  created: "&aMap {map} created, next run /map setUrl {map} <world folder>"
+  not-found: "&cMap {map} not found"
+  not-found-create: "&cMap {map} not found, create it with /map create {map}"
+  delete-confirm: "&eThis deletes the config of map {map}, the world folder stays. Run /map delete {map} confirm to go ahead"
+  deleted: "&aMap {map} deleted"
+  delete-failed: "&cCould not delete the map, see the console"
+
+  # {folder}
+  folder-set: "&aWorld folder set to {folder}"
+
+  # {problem}
+  folder-problem: " &ebut {problem}"
+  waiting-set: "&aWaiting lobby set"
+  respawn-set: "&aSpectator spawn set"
+  pos1-set: "&aMap border 1 set"
+  pos2-set: "&aMap border 2 set"
+
+  # {number} {color}
+  base-added: "&aBase #{number} added, nearby wool {color}"
+
+  # {number} {radius}
+  base-added-no-wool: "&aBase #{number} added &eno wool within {radius} blocks, a color is assigned when the game starts"
+
+  # {type} {count}
+  drop-added: "&a{type} generator added, {count} in total"
+  shop-added: "&a{type} shop added, {count} in total"
+
+  # {range}
+  nothing-to-remove: "&cNo base, generator or shop within {range} blocks"
+
+  # {what} {location}
+  removed: "&aRemoved {what} {location}"
+
+  # {type}
+  drop: "{type} generator"
+  shop: "{type} shop"
+  base: "base"
+  author-too-long: "&cAuthor names are up to 24 characters"
+
+  # {author}
+  author-set: "&aAuthor set to {author}"
+  team-players-range: "&cPlayers per team must be between 1 and 8"
+
+  # {players} {capacity}
+  team-players-set: "&aPlayers per team set to {players}, the map holds {capacity}"
+  min-players-range: "&cAt least 2 players are needed to start"
+  min-players-set: "&aPlayers needed to start set to {players}"
+
+  # {map}
+  ready: "&aMap {map} is ready to play"
+  not-ready: "&cMap {map} cannot be played yet"
+
+  # {name} {author} {min} {team} {capacity} {height} {pos1} {pos2} {waiting} {respawn} {bases}
+  # {base-drops} {diamond-drops} {emerald-drops} {item-shops} {upgrade-shops} {folder}
+  info:
+    - "&bMap info"
+    - ""
+    - " &9&l▸ &fName: &b{name}"
+    - " &9&l▸ &fAuthor: &b{author}"
+    - " &9&l▸ &fPlayers to start: &b{min}"
+    - " &9&l▸ &fPlayers per team: &b{team} &7holds {capacity}"
+    - " &9&l▸ &fBuild limit: &b{height}"
+    - ""
+    - " &9&l▸ &fPos1: {pos1}"
+    - " &9&l▸ &fPos2: {pos2}"
+    - " &9&l▸ &fWaiting lobby: {waiting}"
+    - " &9&l▸ &fSpectator spawn: {respawn}"
+    - ""
+    - " &9&l▸ &fBases:"
+    - "{bases}"
+    - ""
+    - " &9&l▸ &fBase generators: &b{base-drops}"
+    - " &9&l▸ &fDiamond generators: &b{diamond-drops}"
+    - " &9&l▸ &fEmerald generators: &b{emerald-drops}"
+    - " &9&l▸ &fItem shops: &b{item-shops}"
+    - " &9&l▸ &fUpgrade shops: &b{upgrade-shops}"
+    - ""
+    - " &9&l▸ &fWorld folder: &b{folder}"
+
+  # {number} {location}
+  base-line: "    &7- Base {number}: {location}"
+  none: "&cnone"
+  not-set: "&cnot set"
+  unknown-world: "unknown world"
+
+  # {storage} {count}
+  list-header: "&b{count} maps in storage {storage}"
+  list-empty: " &eNo maps found"
+
+  # {map}
+  reloaded: "&aRead map {map} from storage again"
+  not-in-storage: "&cMap {map} is not in storage"
+  same-storage: "&cThe source and target storage must differ"
+
+  # {storage} {map}
+  not-in-source: "&cMap {map} is not in {storage}"
+
+  # {maps} {from} {to}
+  migrated: "&aMoved {maps} from {from} to {to}"
+  all-maps: "all maps"
+
+  # {map}
+  one-map: "map {map}"
+  migrate-failed: "&cSome maps could not be moved, see the console"
+
+  # {x} {y} {z} {yaw} {pitch}
+  aligned: "&aAligned to {x}, {y}, {z} &7Yaw {yaw} Pitch {pitch}"
+
+  # {value} {available}
+  invalid-type: "&cInvalid type {value}, available: {available}"
+  mysql-unavailable: "&cMYSQL map storage needs database-type MySQL in database.yml"
+
+map-check:
+  # {world}
+  world-not-loaded: "World {world} is not loaded, bed and wool checks skipped"
+  no-waiting: "No waiting lobby, /map setWaiting"
+  no-respawn: "No spectator spawn, /map setRespawn"
+  no-region: "No map border, /map setPos1 and /map setPos2"
+
+  # {count}
+  too-few-bases: "At least 2 bases are needed, there are {count}"
+
+  # {max} {count}
+  too-many-bases: "At most {max} bases, there are {count}"
+  no-base-drop: "No base generator, /map addDrop <map> BASE"
+  no-diamond-drop: "No diamond generator"
+  no-emerald-drop: "No emerald generator"
+  no-item-shop: "No item shop"
+  no-upgrade-shop: "No team upgrade shop"
+
+  # {map}
+  same-as-main-world: "The map cannot be named {map} like the main world"
+  no-author: "No author, /map setAuthor"
+  region-worlds: "Border 1 and border 2 are in different worlds"
+  respawn: "Spectator spawn"
+
+  # {number}
+  base: "Base #{number}"
+
+  # {type}
+  drop: "{type} generator"
+  shop: "{type} shop"
+
+  # {name} {world} {region-world}
+  other-world: "{name} is in world {world}, not in the border world {region-world}"
+
+  # {name}
+  outside-region: "{name} is outside the map border, players cannot place blocks there"
+
+  # {min} {capacity}
+  min-above-capacity: "Players to start {min} is more than the map holds {capacity}, the game can never start"
+  no-folder: "No world folder, /map setUrl"
+
+  # {file}
+  not-a-world: "the world folder is not a world save, {file} is missing"
+
+  # {folder}
+  folder-is-game-world: "the world folder is the game world {folder}, which is cleared when a game starts. Move the map elsewhere"
+
+  # {folder} {error}
+  folder-unreadable: "cannot resolve the world folder {folder} {error}"
+
+  # {name} {radius}
+  no-wool: "{name} has no wool within {radius} blocks, a color is assigned"
+
+  # {name} {color}
+  same-color: "{name} is {color} like another base, another color is assigned"
+
+  # {name} {radius}
+  no-bed: "{name} has no bed within {radius} blocks"
+  shared-bed: "{name} found the same bed as another base"
+  several-beds: "{name} has more than one bed nearby, the one closest to the spawn is used"
+  shared-drop: "{name} shares a base generator with another base"
+
+  # {name} {color} {beds} {distance}
+  base-line: "{name} wool {color} bed blocks {beds} generator distance {distance}"
+  none: "none"
+
+setup:
+  # {version}
+  help:
+    - "&b&lAzuraBedWars &8- &7v{version} &8- &bBedWars - Setup Tools"
+    - ""
+    - "&7 • &f/setup start <map> &7Get the setup tools, right click to set where you stand"
+    - "&7 • &f/setup stop &7Put the setup tools away"
+
+  # {map}
+  started: "&aSetting up map {map}, right click a tool to set where you stand, every change is saved"
+  stopped: "&aStopped setting up the map"
+  not-active: "&cYou are not setting up a map"
+  waiting:
+    name: "&eSet waiting lobby"
+    lore: "Sets the waiting lobby where you stand"
+  respawn:
+    name: "&eSet spectator spawn"
+    lore: "Sets the spectator spawn where you stand"
+  pos1:
+    name: "&cSet border 1"
+    lore: "Sets one corner of the map border where you stand"
+  pos2:
+    name: "&cSet border 2"
+    lore: "Sets the other corner of the map border where you stand"
+  base:
+    name: "&dAdd team base"
+    lore: "Stand on the spawn, nearby wool sets the team color"
+  base-drop:
+    name: "&7Add base generator"
+    lore: "Adds a base generator where you stand"
+  diamond-drop:
+    name: "&bAdd diamond generator"
+    lore: "Adds a diamond generator where you stand"
+  emerald-drop:
+    name: "&aAdd emerald generator"
+    lore: "Adds an emerald generator where you stand"
+  item-shop:
+    name: "&6Add item shop"
+    lore: "Adds an item shop where you stand"
+  upgrade-shop:
+    name: "&dAdd team upgrade shop"
+    lore: "Adds a team upgrade shop where you stand"
+  remove:
+    name: "&cRemove nearest point"
+    lore: "Removes the nearest base, generator or shop"
+  check:
+    name: "&aCheck map"
+    lore: "Lists what the map is missing"
+
+game:
+  # {player}
+  reconnected: "&7{player}&a reconnected"
+  left: "&7{player}&e left the game"
+  full: "Game is full"
+  already-started: "The game has already started"
+  normal-kill-reward: "&6+1 coin"
+  final-kill-reward: "&6+1 coin (Final Kill)"
+
+  # {seconds}
+  respawn-countdown-title: "&e&l{seconds}"
+  respawn-countdown-subtitle: "&7You died and will respawn soon"
+  respawned-title: "&aRespawned!"
+  respawned-subtitle: "&7Your bed is still standing so you respawned"
+  eliminated-title: "&cYou died!"
+  eliminated-subtitle: "&7Your bed is gone"
+  team-eliminated-bar: "&7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃"
+
+  # {team} {breaker}
+  team-eliminated: "{team} &chas been eliminated! &eBed broken by: {breaker}"
+  play-again: "&cYou died! Want to play again? "
+  play-again-button: "&b&lClick here!"
+  own-bed: "&cYou cannot break your own bed"
+  bed-without-team: "&cThis bed has no team"
+
+  # {team} {breaker}
+  bed-broken: "&f&lBED DESTRUCTION >>> {team}'s bed &7was destroyed by {breaker}"
+  bed-broken-title: "&c&lBED DESTROYED"
+  bed-broken-subtitle: "&cYou will no longer respawn"
+
+  # {coins}
+  bed-reward: "&6+{coins} coins (Bed Destruction)"
+  bed-reward-action-bar: "&6+{coins} coins"
+
+  # {player}
+  bed-in-danger: "{player} says: &cWatch out, our bed is in danger!"
+  cannot-place: "&cYou cannot place blocks here!"
+  cannot-place-water: "&cYou cannot place water here!"
+  team-chest-only: "&cOnly this team can open this chest"
+  team-chest-use-only: "&cOnly this team can use this chest"
+  fast-put-last-item: "&cYou cannot put your only one of this item in the chest!"
+
+  # {count}
+  fast-put-moved: "&aMoved {count} items!"
+
+  # {moved} {total}
+  fast-put-partial: "&eSome items did not fit! Moved {moved}/{total} items, the chest is full."
+  fast-put-failed: "&cCould not add the items! The chest is full."
+
+  # {damage} {health}
+  damage-display: "&bDamage &f- &e{damage}  &bHealth &f- &e{health}"
+
+  # {player} {health}
+  arrow-hit: "&e&l{player} &e&lhas &c&l{health} &e&lhealth left"
+  no-target: "&cNo target"
+
+  # {player} {distance}
+  tracker-target: "&fPlayer {player} &fis {distance}m away"
+
+  # {team} {distance}
+  base-tracker: "&fTeam: {team}&f Tracking: {distance}m"
+
+  # {old} {new}
+  level-up: "&6Congratulations! You went from level {old} to level {new}!"
+
+  # {levels} {old} {new}
+  levels-up: "&6Congratulations! You gained {levels} levels, from level {old} to level {new}!"
+
+  # {levels}
+  xp-gained: "&e+{levels} levels"
+  xp-price: "{levels} levels"
+  no-winner: "None"
+  start-stage: "Game start"
+
+  # {health} {team} {seconds}
+  golem-name: "&c{health}❤ {team} Guard &e{seconds}s"
+  silverfish-name: "{team} Silverfish &e{seconds}s"
+
+# Team names by color
+teams:
+  RED: "&cRed"
+  BLUE: "&9Blue"
+  GREEN: "&aGreen"
+  YELLOW: "&eYellow"
+  AQUA: "&bAqua"
+  WHITE: "&fWhite"
+  PINK: "&dPink"
+  GRAY: "&8Gray"
+  ORANGE: "&6Orange"
+  MAGENTA: "&5Magenta"
+  LIGHT_BLUE: "&bLight Blue"
+  LIME: "&aLime"
+  PURPLE: "&5Purple"
+  CYAN: "&3Cyan"
+  BLACK: "&0Black"
+  BROWN: "&4Brown"
+
+death:
+  # Added after the message of a final kill
+  final-kill: "&b&lFINAL KILL!"
+
+  # {player} {killer} {color} {final}
+  quit: "&b&l» {player} {color}disconnected {final}"
+  quit-in-combat: "&b&l» {player} {color}disconnected while fleeing {killer} {color}{final}"
+
+  # Deaths without a killer by damage cause, VOID is used for the others
+  # {player} {color} {final}
+  self:
+    VOID:
+      - "&b&l» {player} {color}fell into the void {final}"
+      - "&b&l» {player} {color}fell out of the world {final}"
+    FALL:
+      - "&b&l» {player} {color}hit the ground too hard {final}"
+      - "&b&l» {player} {color}could not escape gravity {final}"
+    FIRE:
+      - "&b&l» {player} {color}went up in flames {final}"
+      - "&b&l» {player} {color}was burned to a crisp {final}"
+    FIRE_TICK:
+      - "&b&l» {player} {color}went up in flames {final}"
+      - "&b&l» {player} {color}was burned to a crisp {final}"
+    LAVA:
+      - "&b&l» {player} {color}tried to swim in lava {final}"
+    PROJECTILE:
+      - "&b&l» {player} {color}was shot {final}"
+    ENTITY_EXPLOSION:
+      - "&b&l» {player} {color}blew up {final}"
+    BLOCK_EXPLOSION:
+      - "&b&l» {player} {color}blew up {final}"
+
+  # Deaths with a killer by damage cause, VOID is used for the others
+  # {player} {killer} {color} {final}
+  kill:
+    VOID:
+      - "&b&l» {player} {color}was knocked into the void by {killer}{color} {final}"
+      - "&b&l» {player} {color}fell into the void while fleeing {killer}{color} {final}"
+    ENTITY_ATTACK:
+      - "&b&l» {player} {color}was killed by {killer}{color} {final}"
+      - "&b&l» {player} {color}could not escape {killer}{color} {final}"
+    FALL:
+      - "&b&l» {player} {color}hit the ground too hard while fleeing {killer}{color} {final}"
+    FIRE:
+      - "&b&l» {player} {color}was burned to a crisp while fighting {killer}{color} {final}"
+    FIRE_TICK:
+      - "&b&l» {player} {color}was burned to a crisp while fighting {killer}{color} {final}"
+    LAVA:
+      - "&b&l» {player} {color}tried to swim in lava to escape {killer}{color} {final}"
+    PROJECTILE:
+      - "&b&l» {player} {color}was shot by {killer}{color} {final}"
+    ENTITY_EXPLOSION:
+      - "&b&l» {player} {color}was blown up by {killer}{color} {final}"
+    BLOCK_EXPLOSION:
+      - "&b&l» {player} {color}was blown up by {killer}{color} {final}"
+
+team-selection:
+  title: "&8Select a team"
+
+  # {players} {max}
+  players: "&7Players: &f{players}&7/&f{max}"
+  members: "&7Members:"
+
+  # {player}
+  you: "&a  ▸ {player} &7(you)"
+  member: "&7  ▸ {player}"
+  selected: "&a&l✓ Selected"
+  full: "&c&l✗ Team full"
+  click-to-select: "&7Click to join this team"
+  already-selected: "&cYou are already in this team!"
+  team-full: "&cThis team is full!"
+  unbalanced: "&cPlease pick a team with fewer players to keep the game fair!"
+
+  # {team}
+  joined: "&aYou joined {team}"
+  join-failed: "&cCould not join the team, please try again!"
+
+shop:
+  item-shop-name: "&b&lItem Shop"
+  upgrade-shop-name: "&e&lTeam Upgrades"
+  not-enough-resources: "&cYou do not have enough resources!"
+  no-permission: "&cYou do not have permission to buy this item!"
+  inventory-full: "&cYour inventory is full!"
+  empty-slot-name: "&cEmpty slot"
+  empty-slot-lore:
+    - "&7This is a Quick Buy slot! &bShift+Left Click"
+    - "&7any item to put it here"
+  empty-slot-clicked: "&cThis slot is empty! Shift+Left Click an item to add it here"
+  quick-buy-edit-title: "&8Add item to Quick Buy"
+  quick-buy-adding: "&eAdding the item to Quick Buy..."
+  quick-buy-replace: "&eClick to replace with this item"
+
+  # {item}
+  quick-buy-default-name: "&a{item} &7(default)"
+  quick-buy-default-lore:
+    - "&7This is a default Quick Buy item"
+    - "&eClick to replace it with the selected item"
+  quick-buy-set: "&eClick to put the item here"
+
+items:
+  invisibility-ended: "&cYour invisibility wore off"
+  magic-milk-ended: "&cYour Magic Milk wore off"
+  magic-milk-drunk: "&aYou drank Magic Milk, traps cannot affect you for 30 seconds"
+  rescue-platform-not-in-air: "&cYou are not in the air!"
+
+  # {seconds}
+  rescue-platform-cooldown: "&cYou must wait &e{seconds}s&c before using another Rescue Platform!"
+  fireball-cooldown: "&cYour fireball is on cooldown"
+  golem-no-space: "&cAn Iron Golem cannot spawn here, pick a more open spot on the ground."
+
+  # {seconds}
+  warp-powder-start: "&aYou will be teleported in &c{seconds}&a seconds, do not move!"
+  warp-powder-cancelled: "&cYour teleport was cancelled!"
+  warp-powder-moved: "&cYou moved, the teleport was cancelled!"
+  warp-powder-active: "&cYou are already teleporting!"
+  warp-powder-in-air: "&cYou cannot use Warp Powder in the air!"
+  warp-powder-no-spawn: "&cYour team spawn could not be found!"
+  recovery-bed-used: "&aYou used the Recovery Bed!"
+
+  # {team}
+  recovery-bed-broadcast: "{team} &cused the Recovery Bed!"
+  recovery-bed-too-late: "&cMore than 10 minutes have passed since the game started."
+  recovery-bed-used-before: "&cYour team already used the Recovery Bed"
+  recovery-bed-standing: "&cYour bed is still standing"
+  recovery-bed-no-bed: "&cThe map has no bed for your team"
+  recovery-bed-too-far: "&cUse it near your spawn!"
+
+spectator:
+  compass-item: "&a&lTeleporter &7(Right Click)"
+  settings-item: "&c&lSpectator Settings &7(Right Click)"
+  play-again-item: "&b&lPlay Again &7(Right Click)"
+  leave-item: "&c&lReturn to Lobby &7(Right Click)"
+  compass-title: "&8Teleport to a player"
+
+  # {value}
+  health: "&fHealth: &8{value}"
+  food: "&fHunger: &8{value}"
+  level: "&fLevel: &8{value}"
+  distance: "&fDistance: &8{value}"
+  settings-title: "&8Spectator Settings"
+  no-speed: "&aNo Speed"
+
+  # {level}
+  speed: "&aSpeed {level}"
+  speed-removed: "&cYou no longer have any Speed effects!"
+  speed-added: "&aYou now have Speed {level}!"
+  auto-tp-on: "&aStart Auto Teleport"
+  auto-tp-off: "&cStop Auto Teleport"
+  auto-tp-on-lore: "&7Click to enable auto teleport"
+  auto-tp-off-lore: "&7Click to disable auto teleport"
+  auto-tp-enabled: "&aAuto teleport enabled!"
+  auto-tp-disabled: "&cYou will no longer be teleported to your target!"
+  night-vision-on: "&aEnable Night Vision"
+  night-vision-off: "&cDisable Night Vision"
+  night-vision-on-lore: "&7Click to enable night vision"
+  night-vision-off-lore: "&7Click to disable night vision"
+  night-vision-enabled: "&aYou now have night vision!"
+  night-vision-disabled: "&cYou no longer have night vision!"
+  first-person-on: "&aEnable First Person"
+  first-person-off: "&cDisable First Person"
+  first-person-on-lore:
+    - "&7Click to use first person"
+    - "&7when you pick a player with the compass!"
+    - "&7You can also right click a player"
+    - "&7to spectate in first person"
+  first-person-off-lore: "&7Click to disable first person"
+  first-person-enabled: "&aPicking a player with the compass now spectates them in first person!"
+  first-person-disabled: "&cYou will use third person by default!"
+  hide-others-on: "&cHide Spectators"
+  hide-others-off: "&aShow Spectators"
+  hide-others-on-lore: "&7Click to hide other spectators"
+  hide-others-off-lore: "&7Click to show other spectators"
+  hide-others-enabled: "&cYou can no longer see other spectators!"
+  hide-others-disabled: "&aYou can now see other spectators!"
+  fly-on: "&aEnable Always Flying"
+  fly-off: "&cDisable Always Flying"
+  fly-on-lore: "&7Click to always fly"
+  fly-off-lore: "&7Click to stop always flying"
+  fly-enabled: "&aYou can no longer stop flying!"
+  fly-disabled: "&aYou can stop flying again!"
+  target-lost: "&c&lTarget lost or in another world"
+  left-spectating: "&eStopped spectating"
+
+  # {player}
+  first-person-title: "&aSpectating &7{player}"
+  first-person-subtitle: "&aLeft Click for the menu  &cSneak to exit"
+
+  # {player} {health}
+  first-person-action-bar: "&fTarget: &a&l{player}  &fHealth: &a&l{health} &c&l❤  &aLeft Click for the menu  &cSneak to exit"
+
+  # {player} {health} {distance}
+  third-person-action-bar: "&fTarget: &a&l{player}  &fHealth: &a&l{health}  &fDistance: &a&l{distance}m"
+
+tab:
+  unknown: "&7[Unknown] | "
+  spectator: "&7[Spectator] | "
+  unassigned: "&7[No team] | "

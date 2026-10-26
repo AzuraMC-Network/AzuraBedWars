@@ -1,7 +1,8 @@
 package cc.azuramc.bedwars.listener.setup;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.command.admin.MapCommand;
-import cc.azuramc.bedwars.util.MessageUtil;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -9,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collections;
+import java.util.function.Function;
 
 /**
  * Hotbar tools of /setup, each runs the matching /map subcommand
@@ -16,28 +18,26 @@ import java.util.Collections;
  * @author an5w1r@163.com
  */
 public enum SetupItem {
-    WAITING(XMaterial.COMPASS, "&e设置等待大厅", "在脚下设置等待大厅", MapCommand::setWaiting),
-    RESPAWN(XMaterial.BEACON, "&e设置观战重生点", "在脚下设置观战重生点", MapCommand::setRespawn),
-    POS1(XMaterial.GOLDEN_AXE, "&c设置边界1", "在脚下设置地图边界的一角", MapCommand::setPos1),
-    POS2(XMaterial.DIAMOND_AXE, "&c设置边界2", "在脚下设置地图边界的另一角", MapCommand::setPos2),
-    BASE(XMaterial.RED_BED, "&d添加队伍基地", "站在出生点 附近的羊毛决定队伍颜色", MapCommand::addBase),
-    BASE_DROP(XMaterial.IRON_INGOT, "&7添加基地资源点", "在脚下添加基地资源点", (command, player, map) -> command.addDrop(player, map, "BASE")),
-    DIAMOND_DROP(XMaterial.DIAMOND, "&b添加钻石资源点", "在脚下添加钻石资源点", (command, player, map) -> command.addDrop(player, map, "DIAMOND")),
-    EMERALD_DROP(XMaterial.EMERALD, "&a添加绿宝石资源点", "在脚下添加绿宝石资源点", (command, player, map) -> command.addDrop(player, map, "EMERALD")),
-    ITEM_SHOP(XMaterial.CHEST, "&6添加物品商店", "在脚下添加物品商店", (command, player, map) -> command.addShop(player, map, "ITEM")),
-    UPGRADE_SHOP(XMaterial.ANVIL, "&d添加团队升级商店", "在脚下添加团队升级商店", (command, player, map) -> command.addShop(player, map, "UPGRADE")),
-    REMOVE(XMaterial.BARRIER, "&c删除最近的点", "删除附近最近的基地 资源点或商店", MapCommand::remove),
-    CHECK(XMaterial.BOOK, "&a检查地图", "列出地图还缺什么", MapCommand::check);
+    WAITING(XMaterial.COMPASS, LangConfig.Setup::getWaiting, MapCommand::setWaiting),
+    RESPAWN(XMaterial.BEACON, LangConfig.Setup::getRespawn, MapCommand::setRespawn),
+    POS1(XMaterial.GOLDEN_AXE, LangConfig.Setup::getPos1, MapCommand::setPos1),
+    POS2(XMaterial.DIAMOND_AXE, LangConfig.Setup::getPos2, MapCommand::setPos2),
+    BASE(XMaterial.RED_BED, LangConfig.Setup::getBase, MapCommand::addBase),
+    BASE_DROP(XMaterial.IRON_INGOT, LangConfig.Setup::getBaseDrop, (command, player, map) -> command.addDrop(player, map, "BASE")),
+    DIAMOND_DROP(XMaterial.DIAMOND, LangConfig.Setup::getDiamondDrop, (command, player, map) -> command.addDrop(player, map, "DIAMOND")),
+    EMERALD_DROP(XMaterial.EMERALD, LangConfig.Setup::getEmeraldDrop, (command, player, map) -> command.addDrop(player, map, "EMERALD")),
+    ITEM_SHOP(XMaterial.CHEST, LangConfig.Setup::getItemShop, (command, player, map) -> command.addShop(player, map, "ITEM")),
+    UPGRADE_SHOP(XMaterial.ANVIL, LangConfig.Setup::getUpgradeShop, (command, player, map) -> command.addShop(player, map, "UPGRADE")),
+    REMOVE(XMaterial.BARRIER, LangConfig.Setup::getRemove, MapCommand::remove),
+    CHECK(XMaterial.BOOK, LangConfig.Setup::getCheck, MapCommand::check);
 
     private final XMaterial material;
-    private final String name;
-    private final String lore;
+    private final Function<LangConfig.Setup, LangConfig.Tool> text;
     private final Action action;
 
-    SetupItem(XMaterial material, String name, String lore, Action action) {
+    SetupItem(XMaterial material, Function<LangConfig.Setup, LangConfig.Tool> text, Action action) {
         this.material = material;
-        this.name = MessageUtil.color(name);
-        this.lore = MessageUtil.color("&7" + lore);
+        this.text = text;
         this.action = action;
     }
 
@@ -47,7 +47,7 @@ public enum SetupItem {
         }
         String displayName = item.getItemMeta().getDisplayName();
         for (SetupItem setupItem : values()) {
-            if (setupItem.name.equals(displayName)) {
+            if (setupItem.tool().getName().equals(displayName)) {
                 return setupItem;
             }
         }
@@ -57,10 +57,14 @@ public enum SetupItem {
     public ItemStack createItem() {
         ItemStack item = material.parseItem();
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
-        meta.setLore(Collections.singletonList(lore));
+        meta.setDisplayName(tool().getName());
+        meta.setLore(Collections.singletonList(ChatColor.GRAY + tool().getLore()));
         item.setItemMeta(meta);
         return item;
+    }
+
+    private LangConfig.Tool tool() {
+        return text.apply(AzuraBedWars.getInstance().getLang().getSetup());
     }
 
     public void run(MapCommand command, Player player, String mapName) {

@@ -10,6 +10,7 @@ import cc.azuramc.bedwars.api.game.IGameTeam;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.GameplayConfig;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.database.entity.PlayerData;
 import cc.azuramc.bedwars.database.service.PlayerDataService;
 import cc.azuramc.bedwars.game.economy.EconomyMode;
@@ -28,6 +29,7 @@ import cc.azuramc.bedwars.tablist.TabListManager;
 import cc.azuramc.bedwars.util.DamageUtil;
 import cc.azuramc.bedwars.util.LoadGameUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.ServerMOTD;
 import cc.azuramc.bedwars.util.hook.VaultUtil;
 import com.cryptomorin.xseries.XMaterial;
@@ -206,7 +208,7 @@ public class GameManager implements IGameManager {
         gamePlayer.setReconnect(true);
         gamePlayer.cleanState();
         new RespawnTask(this, gamePlayer, RECONNECT_RESPAWN_SECONDS).start();
-        broadcastMessage(String.format(plugin.getMessageConfig().getPlayerReconnectMessage(), gamePlayer.getNickName()));
+        broadcastMessage(MessageUtil.fill(plugin.getLang().getGame().getReconnected(), "player", gamePlayer.getNickName()));
         Bukkit.getPluginManager().callEvent(new BedwarsPlayerReconnectEvent.Post(gamePlayer, gameTeam, this));
     }
 
@@ -216,7 +218,7 @@ public class GameManager implements IGameManager {
     public void removePlayer(GamePlayer gamePlayer) {
         GameTeam gameTeam = gamePlayer.getGameTeam();
         if (gameState == GameState.WAITING) {
-            broadcastMessage(String.format(plugin.getMessageConfig().getPlayerLeaveMessage(), gamePlayer.getNickName()));
+            broadcastMessage(MessageUtil.fill(plugin.getLang().getGame().getLeft(), "player", gamePlayer.getNickName()));
         } else if (gameState == GameState.RUNNING && gameTeam != null) {
             if (gameTeam.isDestroyed() && !gamePlayer.isSpectator()) {
                 handlePlayerDeath(gamePlayer, null);
@@ -275,7 +277,7 @@ public class GameManager implements IGameManager {
     private void rewardFinalKillCoins(GamePlayer killer) {
         GameplayConfig.PlayerDeath config = plugin.getGameplayConfig().getPlayerDeath();
         VaultUtil.depositPlayer(killer, config.getCoinsReward());
-        killer.sendMessage(plugin.getMessageConfig().getFinalKillRewardsMessage());
+        killer.sendMessage(plugin.getLang().getGame().getFinalKillReward());
         new BukkitRunnable() {
             int shown = 0;
 
@@ -285,7 +287,7 @@ public class GameManager implements IGameManager {
                     cancel();
                     return;
                 }
-                killer.sendActionBar(plugin.getMessageConfig().getNormalKillRewardsMessage());
+                killer.sendActionBar(plugin.getLang().getGame().getNormalKillReward());
             }
         }.runTaskTimer(plugin.getPlugin(), 0, config.getActionBarPeriod());
     }
@@ -293,10 +295,11 @@ public class GameManager implements IGameManager {
     private void eliminateTeam(GameTeam gameTeam) {
         GamePlayer destroyer = gameTeam.getDestroyPlayer();
         broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
-        broadcastMessage(plugin.getMessageConfig().getTeamEliminatedFormat(), " ",
-                String.format(plugin.getMessageConfig().getTeamEliminatedMessage(), gameTeam.getChatColor() + gameTeam.getName(),
-                        destroyer != null ? destroyer.getNickName() : "null"),
-                " ", plugin.getMessageConfig().getTeamEliminatedFormat());
+        LangConfig.Game lang = plugin.getLang().getGame();
+        broadcastMessage(lang.getTeamEliminatedBar(), " ",
+                MessageUtil.fill(lang.getTeamEliminated(), "team", gameTeam.getChatColor() + gameTeam.getName(),
+                        "breaker", destroyer != null ? destroyer.getNickName() : "null"),
+                " ", lang.getTeamEliminatedBar());
     }
 
     public int getMaxPlayers() {

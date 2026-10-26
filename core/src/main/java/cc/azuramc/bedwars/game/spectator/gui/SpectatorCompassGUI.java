@@ -2,11 +2,12 @@ package cc.azuramc.bedwars.game.spectator.gui;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
-import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.gui.base.CustomGUI;
 import cc.azuramc.bedwars.gui.base.action.GUIAction;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,7 +28,7 @@ public class SpectatorCompassGUI extends CustomGUI {
      * @param gamePlayer 打开GUI的玩家
      */
     public SpectatorCompassGUI(GamePlayer gamePlayer) {
-        super(gamePlayer, spectatorMessages().getSpectatorCompassGuiTitle(), calculateInventorySize());
+        super(gamePlayer, spectatorMessages().getCompassTitle(), calculateInventorySize());
         initializeItems();
     }
 
@@ -85,10 +86,10 @@ public class SpectatorCompassGUI extends CustomGUI {
                 .setDisplayName(gameTeam.getName() + " " + gamePlayer.getNickName())
                 .setLores(
                         " ",
-                        String.format(spectatorMessages().getHealthFormat(), (int) targetPlayer.getHealth()),
-                        String.format(spectatorMessages().getFoodFormat(), targetPlayer.getFoodLevel()),
-                        String.format(spectatorMessages().getLevelFormat(), targetPlayer.getLevel()),
-                        String.format(spectatorMessages().getDistanceFormat(), (int) targetPlayer.getLocation().distance(gamePlayer.getPlayer().getLocation()))
+                        MessageUtil.fill(spectatorMessages().getHealth(), "value", (int) targetPlayer.getHealth()),
+                        MessageUtil.fill(spectatorMessages().getFood(), "value", targetPlayer.getFoodLevel()),
+                        MessageUtil.fill(spectatorMessages().getLevel(), "value", targetPlayer.getLevel()),
+                        MessageUtil.fill(spectatorMessages().getDistance(), "value", (int) targetPlayer.getLocation().distance(gamePlayer.getPlayer().getLocation()))
                 )
                 .getItem();
     }
@@ -107,7 +108,7 @@ public class SpectatorCompassGUI extends CustomGUI {
         }, true);
     }
 
-    private static MessageConfig.Spectator spectatorMessages() {
-        return AzuraBedWars.getInstance().getMessageConfig().getSpectator();
+    private static LangConfig.Spectator spectatorMessages() {
+        return AzuraBedWars.getInstance().getLang().getSpectator();
     }
 }

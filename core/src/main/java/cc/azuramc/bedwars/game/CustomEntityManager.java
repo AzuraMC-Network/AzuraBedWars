@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.game;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.api.nms.MobGoals;
+import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,10 +25,6 @@ public class CustomEntityManager {
 
     private static final int DEFAULT_DESPAWN_TIME = 250;
     private static final int KILL_DAMAGE = Integer.MAX_VALUE;
-
-    // 实体名称模板
-    private static final String IRON_GOLEM_NAME_TEMPLATE = "§c{Health}❤ {TeamColor}{TeamName}队守卫 §e{Countdown}s";
-    private static final String SILVERFISH_NAME_TEMPLATE = "{TeamColor}{TeamName}队蠹虫 §e{Countdown}s";
 
     @Getter
     private static final ConcurrentHashMap<UUID, CustomEntityManager> customEntityMap = new ConcurrentHashMap<>();
@@ -200,11 +197,8 @@ public class CustomEntityManager {
             return;
         }
 
-        String displayName = nameTemplate
-                .replace("{TeamColor}", gameTeam.getChatColor().toString())
-                .replace("{TeamName}", gameTeam.getName())
-                .replace("{Countdown}", String.valueOf(liveLeftTime))
-                .replace("{Health}", String.valueOf(Math.round((float) livingEntity.getHealth())));
+        String displayName = MessageUtil.fill(nameTemplate, "team", gameTeam.getName(), "seconds", liveLeftTime,
+                "health", Math.round((float) livingEntity.getHealth()));
 
         livingEntity.setCustomName(displayName);
     }
@@ -214,9 +208,9 @@ public class CustomEntityManager {
      */
     private String getNameTemplate() {
         if (livingEntity instanceof IronGolem) {
-            return IRON_GOLEM_NAME_TEMPLATE;
+            return AzuraBedWars.getInstance().getLang().getGame().getGolemName();
         } else if (livingEntity instanceof Silverfish) {
-            return SILVERFISH_NAME_TEMPLATE;
+            return AzuraBedWars.getInstance().getLang().getGame().getSilverfishName();
         }
         return "";
     }

@@ -1,26 +1,26 @@
 # yaml-language-server: $schema=../../schema/shop-category.json
 config-version: 1
 
-name: "&a远程武器"
+name: "&aRanged"
 icon: BOW
 items:
   arrows:
-    name: "箭 x8"
+    name: "Arrow"
     item: { material: ARROW, amount: 8 }
     price: 2 gold
     xp: 10
   bow:
-    name: "弓"
+    name: "Bow"
     item: { material: BOW, unbreakable: true, flags: [HIDE_ATTRIBUTES] }
     price: 12 gold
     xp: 30
   power_bow:
-    name: "弓（力量I）"
+    name: "Bow (Power I)"
     item: { material: BOW, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { POWER: 1 } }
     price: 24 gold
     xp: 60
   punch_bow:
-    name: "弓（力量I,冲击I）"
+    name: "Bow (Power I, Punch I)"
     item: { material: BOW, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { POWER: 1, PUNCH: 1 } }
     price: 6 emerald
     xp: 600

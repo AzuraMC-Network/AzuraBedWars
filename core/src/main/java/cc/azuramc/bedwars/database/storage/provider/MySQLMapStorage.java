@@ -40,7 +40,7 @@ public class MySQLMapStorage implements IMapStorage {
                     + "  `" + MAP_DATA_KEY + "` TEXT\n"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
         } catch (SQLException e) {
-            LoggerUtil.error("创建地图表 " + tableName + " 失败", e);
+            LoggerUtil.error("Cannot create the map table " + tableName, e);
         }
     }
 

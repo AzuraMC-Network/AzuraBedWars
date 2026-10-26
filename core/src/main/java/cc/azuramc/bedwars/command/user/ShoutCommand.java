@@ -19,7 +19,7 @@ public class ShoutCommand {
     public void shoutInGame(BukkitCommandActor actor, @Default("") String message) {
         // 控制台执行
         if (actor.isConsole()) {
-            CommandUtil.sendLayout(actor, "&c该命令只能由玩家执行！");
+            CommandUtil.sendLayout(actor, AzuraBedWars.getInstance().getLang().getCommand().getPlayersOnly());
             return;
         }
 
@@ -31,13 +31,13 @@ public class ShoutCommand {
 
         // 游戏未开始时使用
         if (gameManager.getGameState() != GameState.RUNNING) {
-            CommandUtil.sendLayout(actor, "&c该命令只能在游戏开始后使用！");
+            CommandUtil.sendLayout(actor, AzuraBedWars.getInstance().getLang().getCommand().getOnlyInGame());
             return;
         }
 
         // 消息为空时
         if (message.isEmpty()) {
-            CommandUtil.sendLayout(actor, "&c用法: /shout <message>");
+            CommandUtil.sendLayout(actor, AzuraBedWars.getInstance().getLang().getCommand().getShoutUsage());
             return;
         }
 

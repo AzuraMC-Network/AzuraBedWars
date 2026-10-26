@@ -75,10 +75,16 @@ public final class YamlBinder {
     }
 
     public <T> T bind(@Nullable Node root, Class<T> type) {
-        T instance = type.cast(ConfigKeys.newInstance(type));
+        return bindOnto(root, type.cast(ConfigKeys.newInstance(type)));
+    }
+
+    /**
+     * Keys missing from {@code root} keep the values of {@code instance}
+     */
+    public <T> T bindOnto(@Nullable Node root, T instance) {
         if (root instanceof MappingNode) {
             if (instance instanceof Map) {
-                bindMap((MappingNode) root, castMap(instance), ConfigKeys.typeArgument(type, 1), "", true);
+                bindMap((MappingNode) root, castMap(instance), ConfigKeys.typeArgument(instance.getClass(), 1), "", true);
             } else {
                 bindObject((MappingNode) root, instance, "", true);
             }

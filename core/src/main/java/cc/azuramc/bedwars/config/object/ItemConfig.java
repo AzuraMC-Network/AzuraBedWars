@@ -7,78 +7,78 @@ import lombok.Data;
  * @author ant1aura@qq.com
  */
 @Data
-@Comment("特殊道具配置")
+@Comment("Special items")
 public class ItemConfig {
 
-    @Comment("救援平台配置")
+    @Comment("Rescue platform")
     private RescuePlatform rescuePlatform = new RescuePlatform();
 
-    @Comment("传送粉配置")
+    @Comment("Warp powder")
     private WarpPowder warpPowder = new WarpPowder();
 
-    @Comment("速度羊毛配置")
+    @Comment("Speed wool")
     private SpeedWoolHandler speedWoolHandler = new SpeedWoolHandler();
 
-    @Comment("搭桥蛋配置")
+    @Comment("Bridge egg")
     private EggBridge eggBridge = new EggBridge();
 
-    @Comment("游戏管理物品配置")
+    @Comment("Lobby items")
     private GameManager gameManager = new GameManager();
 
     @Data
     public static class SpeedWoolHandler {
-        @Comment("速度羊毛最大延伸长度")
+        @Comment("Longest path of speed wool")
         private int maxSpeedWoolLength = 6;
     }
 
     @Data
     public static class RescuePlatform {
-        @Comment("平台存在时间(秒)")
+        @Comment("Seconds the platform stays")
         private int defaultBreakTime = 12;
 
-        @Comment("使用冷却时间(秒)")
+        @Comment("Cooldown in seconds")
         private int defaultWaitTime = 20;
 
-        @Comment("跳跃提升力度")
+        @Comment("Jump boost strength")
         private double jumpBoost = 0.7;
     }
 
     @Data
     public static class WarpPowder {
-        @Comment("传送所需时间(秒)")
+        @Comment("Seconds before the teleport")
         private int defaultTeleportTime = 6;
 
-        @Comment("每个粒子环的粒子数量")
+        @Comment("Particles per ring")
         private int circleElements = 20;
 
-        @Comment("粒子环半径")
+        @Comment("Ring radius")
         private double particleRadius = 1.0;
 
-        @Comment("粒子效果总高度")
+        @Comment("Total height of the particles")
         private double particleHeight = 2.0;
 
-        @Comment("粒子环的数量")
+        @Comment("Number of rings")
         private double circleCount = 15.0;
 
-        @Comment("取消传送物品名称")
-        private String cancelItemName = "&4取消传送";
+        @Comment("Name of the cancel item")
+        private String cancelItemName = "&4Cancel Teleport";
     }
 
     @Data
     public static class GameManager {
-        @Comment("队伍选择器物品名称")
-        private String teamSelectorName = "&e队伍选择 &7(右键选择)";
+        @Comment("Name of the team selector item")
+        private String teamSelectorName = "&eTeam Selector &7(Right Click)";
 
-        @Comment("离开游戏物品名称")
-        private String leaveGameName = "&c离开游戏 &7(右键离开)";
+        @Comment("Name of the leave item")
+        private String leaveGameName = "&cReturn to Lobby &7(Right Click)";
     }
 
     @Data
     public static class EggBridge {
-        @Comment("搭桥蛋冷却时间(秒)")
+        @Comment("Bridge egg cooldown in seconds")
         private int eggCooldownSeconds = 3;
 
-        @Comment("冷却中提示消息")
-        private String eggCooldownMessage = "&c搭桥蛋冷却中！";
+        @Comment("Cooldown message")
+        private String eggCooldownMessage = "&cYour bridge egg is on cooldown!";
     }
 }

@@ -2,8 +2,10 @@ package cc.azuramc.bedwars.game.map;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.config.object.GameplayConfig;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.game.TeamColor;
 import cc.azuramc.bedwars.util.MapUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,7 +46,7 @@ public final class MapCheck {
         if (pos1 != null && Bukkit.getWorld(pos1.getWorld()) != null) {
             check.checkBlocks(map);
         } else if (pos1 != null) {
-            check.warnings.add("世界 " + pos1.getWorld() + " 未加载 跳过床和羊毛检查");
+            check.warnings.add(MessageUtil.fill(lang().getWorldNotLoaded(), "world", pos1.getWorld()));
         }
         return check;
     }
@@ -52,40 +54,40 @@ public final class MapCheck {
     private void checkLocations(MapData map) {
         MapData.Region region = map.getRegion();
         if (map.getWaitingLocation() == null) {
-            errors.add("未设置等待大厅 /map setWaiting");
+            errors.add(lang().getNoWaiting());
         }
         if (map.getRespawnLocation() == null) {
-            errors.add("未设置观战重生点 /map setRespawn");
+            errors.add(lang().getNoRespawn());
         }
         if (region.getPos1() == null || region.getPos2() == null) {
-            errors.add("未设置地图边界 /map setPos1 与 /map setPos2");
+            errors.add(lang().getNoRegion());
         }
         if (map.getBases().size() < 2) {
-            errors.add("至少需要 2 个基地 当前 " + map.getBases().size() + " 个");
+            errors.add(MessageUtil.fill(lang().getTooFewBases(), "count", map.getBases().size()));
         }
         if (map.getBases().size() > TeamColor.values().length) {
-            errors.add("基地最多 " + TeamColor.values().length + " 个 当前 " + map.getBases().size() + " 个");
+            errors.add(MessageUtil.fill(lang().getTooManyBases(), "max", TeamColor.values().length, "count", map.getBases().size()));
         }
         if (map.getDrops(MapData.DropType.BASE) == 0) {
-            errors.add("没有基地资源点 /map addDrop <地图> BASE");
+            errors.add(lang().getNoBaseDrop());
         }
         if (map.getDrops(MapData.DropType.DIAMOND) == 0) {
-            warnings.add("没有钻石资源点");
+            warnings.add(lang().getNoDiamondDrop());
         }
         if (map.getDrops(MapData.DropType.EMERALD) == 0) {
-            warnings.add("没有绿宝石资源点");
+            warnings.add(lang().getNoEmeraldDrop());
         }
         if (map.getShops(MapData.ShopType.ITEM) == 0) {
-            warnings.add("没有物品商店");
+            warnings.add(lang().getNoItemShop());
         }
         if (map.getShops(MapData.ShopType.UPGRADE) == 0) {
-            warnings.add("没有团队升级商店");
+            warnings.add(lang().getNoUpgradeShop());
         }
         if (!Bukkit.getWorlds().isEmpty() && Bukkit.getWorlds().get(0).getName().equals(map.getName())) {
-            errors.add("地图名不能与主世界 " + map.getName() + " 同名");
+            errors.add(MessageUtil.fill(lang().getSameAsMainWorld(), "map", map.getName()));
         }
         if (map.getAuthor() == null) {
-            warnings.add("未设置作者 /map setAuthor");
+            warnings.add(lang().getNoAuthor());
         }
         if (region.getPos1() == null || region.getPos2() == null) {
             return;
@@ -93,18 +95,18 @@ public final class MapCheck {
 
         String world = region.getPos1().getWorld();
         if (!world.equals(region.getPos2().getWorld())) {
-            errors.add("边界 1 和边界 2 不在同一个世界");
+            errors.add(lang().getRegionWorlds());
             return;
         }
-        checkInRegion(map, "观战重生点", map.getRespawnLocation());
+        checkInRegion(map, lang().getRespawn(), map.getRespawnLocation());
         for (int i = 0; i < map.getBases().size(); i++) {
-            checkInRegion(map, "基地 #" + (i + 1), map.getBases().get(i));
+            checkInRegion(map, MessageUtil.fill(lang().getBase(), "number", i + 1), map.getBases().get(i));
         }
         for (MapData.DropRawLocation drop : map.getDrops()) {
-            checkInRegion(map, drop.getDropType() + " 资源点", drop);
+            checkInRegion(map, MessageUtil.fill(lang().getDrop(), "type", drop.getDropType()), drop);
         }
         for (MapData.ShopRawLocation shop : map.getShops()) {
-            checkInRegion(map, shop.getShopType() + " 商店", shop);
+            checkInRegion(map, MessageUtil.fill(lang().getShop(), "type", shop.getShopType()), shop);
         }
     }
 
@@ -113,19 +115,19 @@ public final class MapCheck {
             return;
         }
         if (!point.getWorld().equals(map.getRegion().getPos1().getWorld())) {
-            errors.add(name + " 在世界 " + point.getWorld() + " 不在边界所在的世界 " + map.getRegion().getPos1().getWorld());
+            errors.add(MessageUtil.fill(lang().getOtherWorld(), "name", name, "world", point.getWorld(), "region-world", map.getRegion().getPos1().getWorld()));
             return;
         }
         Location location = new Location(null, point.getX(), point.getY(), point.getZ());
         if (map.isOutsideRegion(location)) {
-            warnings.add(name + " 在地图边界外 玩家在边界外无法放置方块");
+            warnings.add(MessageUtil.fill(lang().getOutsideRegion(), "name", name));
         }
     }
 
     private void checkPlayers(MapData map) {
         int maxPlayers = map.getMaxPlayers();
         if (map.getBases().size() >= 2 && map.getPlayers().getMin() > maxPlayers) {
-            errors.add("最少人数 " + map.getPlayers().getMin() + " 超过地图容量 " + maxPlayers + " 游戏永远无法开始");
+            errors.add(MessageUtil.fill(lang().getMinAboveCapacity(), "min", map.getPlayers().getMin(), "capacity", maxPlayers));
         }
     }
 
@@ -135,18 +137,18 @@ public final class MapCheck {
     public static String findWorldFolderError(MapData map) {
         File folder = map.getWorldFolder();
         if (folder == null) {
-            return "未设置地图文件夹 /map setUrl";
+            return lang().getNoFolder();
         }
         if (!new File(folder, "level.dat").isFile()) {
-            return "地图文件夹不是一个世界存档 找不到 " + new File(folder, "level.dat").getPath();
+            return MessageUtil.fill(lang().getNotAWorld(), "file", new File(folder, "level.dat").getPath());
         }
         try {
             File gameWorld = new File(Bukkit.getWorldContainer(), map.getName()).getCanonicalFile();
             if (folder.getCanonicalFile().equals(gameWorld)) {
-                return "地图文件夹就是游戏世界目录 " + gameWorld.getPath() + " 开局复制时会被清空 请把地图放到其它目录";
+                return MessageUtil.fill(lang().getFolderIsGameWorld(), "folder", gameWorld.getPath());
             }
         } catch (IOException e) {
-            return "无法解析地图文件夹 " + folder.getPath() + " " + e.getMessage();
+            return MessageUtil.fill(lang().getFolderUnreadable(), "folder", folder.getPath(), "error", e.getMessage());
         }
         return null;
     }
@@ -161,36 +163,40 @@ public final class MapCheck {
             if (base.getWorld() == null) {
                 continue;
             }
-            String name = "基地 #" + (i + 1);
+            String name = MessageUtil.fill(lang().getBase(), "number", i + 1);
 
             TeamColor color = MapData.findWoolColor(base, gameplay.getTeamBlockSearchRadius());
             if (color == null) {
-                warnings.add(name + " 附近 " + gameplay.getTeamBlockSearchRadius() + " 格内没有羊毛 将自动分配颜色");
+                warnings.add(MessageUtil.fill(lang().getNoWool(), "name", name, "radius", gameplay.getTeamBlockSearchRadius()));
             } else if (colors.contains(color)) {
-                warnings.add(name + " 与其它基地都识别为 " + color.name() + " 将自动换一个颜色");
+                warnings.add(MessageUtil.fill(lang().getSameColor(), "name", name, "color", color.name()));
             }
             colors.add(color);
 
             List<Block> beds = findBedBlocks(base, gameplay.getBedSearchRadius());
             List<Block> teamBed = pickTeamBed(base, beds);
             if (teamBed.isEmpty()) {
-                errors.add(name + " 附近 " + gameplay.getBedSearchRadius() + " 格内没有床");
+                errors.add(MessageUtil.fill(lang().getNoBed(), "name", name, "radius", gameplay.getBedSearchRadius()));
             } else if (teamBed.stream().anyMatch(claimedBeds::contains)) {
-                errors.add(name + " 与其它基地识别到同一张床");
+                errors.add(MessageUtil.fill(lang().getSharedBed(), "name", name));
             } else if (beds.size() > 2) {
-                warnings.add(name + " 附近有不止一张床 将使用离出生点最近的一张");
+                warnings.add(MessageUtil.fill(lang().getSeveralBeds(), "name", name));
             }
             claimedBeds.addAll(teamBed);
 
             Location drop = map.getClosestDrop(base, MapData.DropType.BASE);
             if (drop != null && baseDrops.contains(drop)) {
-                warnings.add(name + " 与其它基地共用同一个基地资源点");
+                warnings.add(MessageUtil.fill(lang().getSharedDrop(), "name", name));
             }
             baseDrops.add(drop);
 
-            baseLines.add(name + " 羊毛 " + (color == null ? "无" : color.name()) + " 床方块 " + beds.size()
-                    + " 资源点距离 " + (drop == null ? "无" : String.format("%.1f", drop.distance(base))));
+            baseLines.add(MessageUtil.fill(lang().getBaseLine(), "name", name, "color", color == null ? lang().getNone() : color.name(),
+                    "beds", beds.size(), "distance", drop == null ? lang().getNone() : String.format("%.1f", drop.distance(base))));
         }
+    }
+
+    private static LangConfig.MapCheck lang() {
+        return AzuraBedWars.getInstance().getLang().getMapCheck();
     }
 
     private static List<Block> findBedBlocks(Location center, int radius) {

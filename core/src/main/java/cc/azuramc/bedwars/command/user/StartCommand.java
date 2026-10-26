@@ -19,13 +19,13 @@ public class StartCommand {
         GameManager gameManager = AzuraBedWars.getInstance().getGameManager();
 
         if (gameManager.getGameState() != GameState.WAITING) {
-            actor.getSender().sendMessage(MessageUtil.color("&c游戏已经开始或处于结算状态!"));
+            actor.getSender().sendMessage(AzuraBedWars.getInstance().getLang().getCommand().getGameStarted());
             return;
         }
 
         if (!gameManager.canStart()) {
             int min = gameManager.getMapData().getPlayers().getMin();
-            actor.getSender().sendMessage(MessageUtil.color("&c游戏人数不足! 至少需要" + min + "人且分属两支队伍才能&n开始游戏&c."));
+            actor.getSender().sendMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getCommand().getNotEnoughPlayers(), "min", min));
             return;
         }
 

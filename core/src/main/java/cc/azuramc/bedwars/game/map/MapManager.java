@@ -87,7 +87,7 @@ public class MapManager {
         if (names.remove(preferred)) {
             names.add(0, preferred);
         } else if (preferred != null && !preferred.isEmpty()) {
-            LoggerUtil.warn("默认地图 " + preferred + " 不存在");
+            LoggerUtil.warn("The default map " + preferred + " does not exist");
         }
 
         for (String name : names) {
@@ -106,7 +106,7 @@ public class MapManager {
                 continue;
             }
             if (!name.equals(preferred)) {
-                LoggerUtil.warn("改用地图 " + name);
+                LoggerUtil.warn("Using map " + name + " instead");
             }
             return map;
         }
@@ -117,11 +117,11 @@ public class MapManager {
         MapCheck check = MapCheck.of(map);
         if (check.getErrors().isEmpty()) {
             if (logWarnings) {
-                check.getWarnings().forEach(warning -> LoggerUtil.warn("地图 " + map.getName() + " " + warning));
+                check.getWarnings().forEach(warning -> LoggerUtil.warn("Map " + map.getName() + ": " + warning));
             }
             return false;
         }
-        LoggerUtil.warn("地图 " + map.getName() + " 配置不完整 无法使用");
+        LoggerUtil.warn("Map " + map.getName() + " is not set up completely and cannot be used");
         check.getErrors().forEach(error -> LoggerUtil.warn("  " + error));
         return true;
     }
@@ -134,14 +134,14 @@ public class MapManager {
 
         World existing = Bukkit.getWorld(name);
         if (existing != null && !Bukkit.unloadWorld(existing, false)) {
-            LoggerUtil.warn("无法卸载已加载的世界 " + name + " 地图名不能与主世界同名");
+            LoggerUtil.warn("Cannot unload the loaded world " + name + ", a map cannot have the name of the main world");
             return null;
         }
         try {
             FileUtils.deleteDirectory(target);
             FileUtils.copyDirectory(source, target);
         } catch (IOException e) {
-            LoggerUtil.error("复制地图 " + name + " 的世界文件失败", e);
+            LoggerUtil.error("Cannot copy the world files of map " + name, e);
             return null;
         }
         // Bukkit refuses duplicate world uids
@@ -150,7 +150,7 @@ public class MapManager {
 
         World world = Bukkit.createWorld(new WorldCreator(name).environment(World.Environment.NORMAL));
         if (world == null) {
-            LoggerUtil.warn("无法加载地图 " + name + " 的世界");
+            LoggerUtil.warn("Cannot load the world of map " + name);
             return null;
         }
         return WorldUtil.setWorldRules(world);

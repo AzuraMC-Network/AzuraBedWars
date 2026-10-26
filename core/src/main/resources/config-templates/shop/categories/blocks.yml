@@ -1,58 +1,58 @@
 # yaml-language-server: $schema=../../schema/shop-category.json
 config-version: 1
 
-name: "&a方块"
+name: "&aBlocks"
 icon: TERRACOTTA
-# 不写 layout 时商品按顺序填进快速购买的格子，items 的键就是商品 id
+# Without a layout the items fill the quick buy slots in order, the keys of items are the item ids
 items:
   wool:
-    name: "羊毛"
+    name: "Wool"
     item: { material: WHITE_WOOL, amount: 16, team-color: true }
     price: 4 iron
     xp: 4
   speed_wool:
-    name: "火速羊毛"
+    name: "Speed Wool"
     item: { material: WHITE_WOOL, amount: 4, team-color: true, enchants: { EFFICIENCY: 1 }, flags: [HIDE_ENCHANTS] }
     special: speed_wool
     price: 4 iron
     xp: 4
   clay:
-    name: "硬化粘土"
+    name: "Hardened Clay"
     item: { material: TERRACOTTA, amount: 16, team-color: true }
     price: 12 iron
     xp: 12
   glass:
-    name: "防爆玻璃"
+    name: "Blast-Proof Glass"
     item: { material: GLASS, amount: 4, team-color: true }
     price: 12 iron
     xp: 12
   endstone:
-    name: "末地石"
+    name: "End Stone"
     item: { material: END_STONE, amount: 12 }
     price: 24 iron
     xp: 24
   ladder:
-    name: "梯子"
+    name: "Ladder"
     item: { material: LADDER, amount: 16 }
     price: 4 iron
     xp: 4
   planks:
-    name: "橡木板"
+    name: "Wood"
     item: { material: OAK_PLANKS, amount: 16 }
     price: 4 gold
     xp: 20
   slime:
-    name: "史莱姆块"
+    name: "Slime Block"
     item: { material: SLIME_BLOCK, amount: 4 }
     price: 2 gold
     xp: 10
   cobweb:
-    name: "蜘蛛网"
+    name: "Cobweb"
     item: { material: COBWEB, amount: 2 }
     price: 4 gold
     xp: 20
   obsidian:
-    name: "黑曜石"
+    name: "Obsidian"
     item: { material: OBSIDIAN, amount: 4 }
     price: 4 emerald
     xp: 400

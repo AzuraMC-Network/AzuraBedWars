@@ -55,7 +55,7 @@ public class SpectatorCompassTask {
                     updateAllPlayers();
                 } catch (Exception e) {
                     // 记录错误但不停止任务运行
-                    AzuraBedWars.getInstance().getPlugin().getLogger().warning("指南针追踪任务发生错误: " + e.getMessage());
+                    AzuraBedWars.getInstance().getPlugin().getLogger().warning("Error in the spectator compass task: " + e.getMessage());
                     e.printStackTrace();
                 }
             }, 0L, UPDATE_FREQUENCY).getTaskId();

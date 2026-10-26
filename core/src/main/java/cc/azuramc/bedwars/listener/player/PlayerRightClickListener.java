@@ -11,6 +11,7 @@ import cc.azuramc.bedwars.game.spectator.gui.SpectatorSettingGUI;
 import cc.azuramc.bedwars.util.BungeeUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.MapUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Bukkit;
@@ -150,11 +151,11 @@ public class PlayerRightClickListener implements Listener {
     }
 
     private void announceRejuvenationBedUsed(GamePlayer gamePlayer, GameTeam gameTeam) {
-        gamePlayer.sendMessage("§a使用回春床成功!");
+        gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getRecoveryBedUsed());
         gameManager.broadcastSound(XSound.ENTITY_ENDER_DRAGON_HURT.get(), 10, 10);
         gameManager.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
         gameManager.broadcastMessage(" ");
-        gameManager.broadcastMessage(gameTeam.getChatColor() + gameTeam.getName() + " §c使用了回春床！");
+        gameManager.broadcastMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getItems().getRecoveryBedBroadcast(), "team", gameTeam.getChatColor() + gameTeam.getName()));
         gameManager.broadcastMessage(" ");
         gameManager.broadcastMessage("§7▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃▃");
     }
@@ -162,27 +163,27 @@ public class PlayerRightClickListener implements Listener {
 
     private boolean canUseRejuvenationBed(GamePlayer gamePlayer, GameTeam gameTeam) {
         if (gameManager.getTimeline().getGameSeconds() >= 600) {
-            gamePlayer.sendMessage("§c开局已超过10分钟.");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getRecoveryBedTooLate());
             return false;
         }
 
         if (gameTeam.isRejuvenated()) {
-            gamePlayer.sendMessage("§c已使用过回春床了");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getRecoveryBedUsedBefore());
             return false;
         }
 
         if (!gameTeam.isDestroyed()) {
-            gamePlayer.sendMessage("§c床仍然存在 无法使用回春床");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getRecoveryBedStanding());
             return false;
         }
 
         if (gameTeam.getBedHead() == null) {
-            gamePlayer.sendMessage("§c地图没有为你的队伍设置床");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getRecoveryBedNoBed());
             return false;
         }
 
         if (gamePlayer.getPlayer().getLocation().distance(gameTeam.getSpawnLocation()) > 18) {
-            gamePlayer.sendMessage("§c请靠近出生点使用!");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getRecoveryBedTooFar());
             return false;
         }
 

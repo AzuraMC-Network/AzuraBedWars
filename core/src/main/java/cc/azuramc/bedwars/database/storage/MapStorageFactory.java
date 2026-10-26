@@ -26,7 +26,7 @@ public class MapStorageFactory {
     public static MapStorageType getDefaultType() {
         MapStorageType type = AzuraBedWars.getInstance().getSettingsConfig().getMapStorage();
         if (type == MapStorageType.MYSQL && !isMysqlAvailable()) {
-            LoggerUtil.error("map-storage 为 MYSQL 但 database.yml 的 database-type 不是 MySQL 改用 JSON 存储地图");
+            LoggerUtil.error("map-storage is MYSQL but database-type in database.yml is not MySQL, maps are stored as JSON");
             return MapStorageType.JSON;
         }
         return type;
@@ -63,7 +63,7 @@ public class MapStorageFactory {
         for (String name : mapName != null ? Collections.singletonList(mapName) : source.getAllMapNames()) {
             MapData map = source.loadMap(name);
             if (map == null || !target.saveMap(name, map)) {
-                LoggerUtil.warn("迁移地图 " + name + " 失败");
+                LoggerUtil.warn("Cannot migrate map " + name);
                 success = false;
             }
         }

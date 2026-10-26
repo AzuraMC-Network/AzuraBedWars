@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.spectator.SpectatorSettings;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -56,7 +57,7 @@ public class SpectatorInteractAtEntityListener implements Listener {
      * 启用第一人称旁观模式
      */
     private void enableFirstPersonSpectating(GamePlayer gamePlayer, Player spectator, Player target) {
-        gamePlayer.sendTitle("§a正在旁观§7" + target.getName(), "§a点击左键打开菜单  §c按Shift键退出", 0, 20, 0);
+        gamePlayer.sendTitle(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getSpectator().getFirstPersonTitle(), "player", target.getName()), AzuraBedWars.getInstance().getLang().getSpectator().getFirstPersonSubtitle(), 0, 20, 0);
         spectator.setGameMode(GameMode.SPECTATOR);
         spectator.setSpectatorTarget(target);
     }

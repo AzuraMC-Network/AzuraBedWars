@@ -1,62 +1,62 @@
 # yaml-language-server: $schema=../schema/shop-tiers.json
 config-version: 1
-# 升级链：购买、复活、重连和商店显示都读这里
-# buy-order: SEQUENTIAL 只能逐级买，ANY 可以直接买更高级
-# on-death: KEEP 保留，DOWNGRADE 降一级但不低于第一级，RESET 回到 start
+# Tier chains, read by purchases, respawns, reconnects and the shop
+# buy-order: SEQUENTIAL buys one tier at a time, ANY can skip to a higher tier
+# on-death: KEEP keeps it, DOWNGRADE drops one tier but never below the first, RESET goes back to start
 
 pickaxe:
-  name: "镐子"
+  name: "Pickaxe"
   buy-order: SEQUENTIAL
   on-death: DOWNGRADE
   tiers:
-    - name: "木镐"
+    - name: "Wooden Pickaxe"
       item: { material: WOODEN_PICKAXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
       price: 10 iron
       xp: 10
-    - name: "石镐"
+    - name: "Stone Pickaxe"
       item: { material: STONE_PICKAXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
       price: 20 iron
       xp: 20
-    - name: "铁镐"
+    - name: "Iron Pickaxe"
       item: { material: IRON_PICKAXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
       price: 8 gold
       xp: 24
-    - name: "钻石镐"
+    - name: "Diamond Pickaxe"
       item: { material: DIAMOND_PICKAXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
       price: 12 gold
       xp: 36
 
 axe:
-  name: "斧子"
+  name: "Axe"
   buy-order: SEQUENTIAL
   on-death: DOWNGRADE
   tiers:
-    - name: "木斧"
+    - name: "Wooden Axe"
       item: { material: WOODEN_AXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
       price: 10 iron
       xp: 10
-    - name: "石斧"
+    - name: "Stone Axe"
       item: { material: STONE_AXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
       price: 20 iron
       xp: 20
-    - name: "铁斧"
+    - name: "Iron Axe"
       item: { material: IRON_AXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
       price: 8 gold
       xp: 24
-    - name: "钻石斧"
+    - name: "Diamond Axe"
       item: { material: DIAMOND_AXE, unbreakable: true, flags: [HIDE_ATTRIBUTES], enchants: { EFFICIENCY: 1 } }
       price: 12 gold
       xp: 36
 
 armor:
-  name: "盔甲"
+  name: "Armor"
   buy-order: ANY
   on-death: KEEP
-  # 出生自带皮革，不在商店出售
+  # Leather is worn from spawn and not sold
   start: 1
   slot: ARMOR
   tiers:
-    - { name: "皮革", material-prefix: LEATHER }
-    - { name: "锁链", material-prefix: CHAINMAIL, price: 40 iron, xp: 40 }
-    - { name: "铁", material-prefix: IRON, price: 12 gold, xp: 60 }
-    - { name: "钻石", material-prefix: DIAMOND, price: 6 emerald, xp: 600 }
+    - { name: "Leather", material-prefix: LEATHER }
+    - { name: "Chainmail", material-prefix: CHAINMAIL, price: 40 iron, xp: 40 }
+    - { name: "Iron", material-prefix: IRON, price: 12 gold, xp: 60 }
+    - { name: "Diamond", material-prefix: DIAMOND, price: 6 emerald, xp: 600 }

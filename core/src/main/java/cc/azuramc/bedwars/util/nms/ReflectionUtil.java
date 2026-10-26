@@ -74,7 +74,7 @@ public class ReflectionUtil {
             try {
                 return Class.forName(name);
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException("无法找到类: " + name, e);
+                throw new RuntimeException("Class not found: " + name, e);
             }
         });
     }
@@ -114,7 +114,7 @@ public class ReflectionUtil {
                 return getFieldFromParent(parent, fieldName);
             }
         }
-        throw new RuntimeException("无法找到字段: " + fieldName + " 在类 " + clazz.getName());
+        throw new RuntimeException("Field " + fieldName + " not found in " + clazz.getName());
     }
 
     /**
@@ -129,7 +129,7 @@ public class ReflectionUtil {
             Field field = getField(target.getClass(), fieldName);
             field.set(target, value);
         } catch (Exception e) {
-            throw new RuntimeException("设置字段失败: " + fieldName, e);
+            throw new RuntimeException("Cannot set field " + fieldName, e);
         }
     }
 
@@ -145,7 +145,7 @@ public class ReflectionUtil {
             Field field = getField(target.getClass(), fieldName);
             return (T) field.get(target);
         } catch (Exception e) {
-            throw new RuntimeException("获取字段失败: " + fieldName, e);
+            throw new RuntimeException("Cannot get field " + fieldName, e);
         }
     }
 
@@ -161,7 +161,7 @@ public class ReflectionUtil {
             Field field = getField(clazz, fieldName);
             field.set(null, value);
         } catch (Exception e) {
-            throw new RuntimeException("设置静态字段失败: " + fieldName, e);
+            throw new RuntimeException("Cannot set static field " + fieldName, e);
         }
     }
 
@@ -177,7 +177,7 @@ public class ReflectionUtil {
             Field field = getField(clazz, fieldName);
             return (T) field.get(null);
         } catch (Exception e) {
-            throw new RuntimeException("获取静态字段失败: " + fieldName, e);
+            throw new RuntimeException("Cannot get static field " + fieldName, e);
         }
     }
 
@@ -216,7 +216,7 @@ public class ReflectionUtil {
                 return getMethodFromParent(parent, methodName, paramTypes);
             }
         }
-        throw new RuntimeException("无法找到方法: " + methodName + " 在类 " + clazz.getName());
+        throw new RuntimeException("Method " + methodName + " not found in " + clazz.getName());
     }
 
     /**
@@ -233,7 +233,7 @@ public class ReflectionUtil {
             Method method = getMethod(target.getClass(), methodName, paramTypes);
             return (T) method.invoke(target, args);
         } catch (Exception e) {
-            throw new RuntimeException("调用方法失败: " + methodName, e);
+            throw new RuntimeException("Cannot call method " + methodName, e);
         }
     }
 
@@ -251,7 +251,7 @@ public class ReflectionUtil {
             Method method = getMethod(clazz, methodName, paramTypes);
             return (T) method.invoke(null, args);
         } catch (Exception e) {
-            throw new RuntimeException("调用静态方法失败: " + methodName, e);
+            throw new RuntimeException("Cannot call static method " + methodName, e);
         }
     }
 
@@ -270,7 +270,7 @@ public class ReflectionUtil {
                 constructor.setAccessible(true);
                 return constructor;
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException("无法找到构造器在类 " + clazz.getName(), e);
+                throw new RuntimeException("No constructor found in " + clazz.getName(), e);
             }
         });
     }
@@ -288,7 +288,7 @@ public class ReflectionUtil {
             Constructor<?> constructor = getConstructor(clazz, paramTypes);
             return (T) constructor.newInstance(args);
         } catch (Exception e) {
-            throw new RuntimeException("创建实例失败: " + clazz.getName(), e);
+            throw new RuntimeException("Cannot create an instance of " + clazz.getName(), e);
         }
     }
 
@@ -391,7 +391,7 @@ public class ReflectionUtil {
      */
     public static String getCacheStats() {
         return String.format(
-                "缓存统计 - 类: %d, 字段: %d, 方法: %d, 构造器: %d",
+                "Cached classes %d, fields %d, methods %d, constructors %d",
                 CLASS_CACHE.size(),
                 FIELD_CACHE.size(),
                 METHOD_CACHE.size(),
@@ -410,7 +410,7 @@ public class ReflectionUtil {
             Method getHandle = getMethod(player.getClass(), "getHandle");
             return getHandle.invoke(player);
         } catch (Exception e) {
-            throw new RuntimeException("获取NMS玩家失败", e);
+            throw new RuntimeException("Cannot get the NMS player", e);
         }
     }
 
@@ -425,7 +425,7 @@ public class ReflectionUtil {
             Method getHandle = getMethod(craftObject.getClass(), "getHandle");
             return getHandle.invoke(craftObject);
         } catch (Exception e) {
-            throw new RuntimeException("获取NMS对象失败: " + craftObject.getClass().getSimpleName(), e);
+            throw new RuntimeException("Cannot get the NMS object of " + craftObject.getClass().getSimpleName(), e);
         }
     }
 }

@@ -67,12 +67,12 @@ public class NMSProvider {
         this.access = module == null ? null : createNMSAccess(module);
 
         if (access == null) {
-            LoggerUtil.warn("NMS支持未找到 (" + VersionUtil.getParsedVersion() + ")! 启用兼容模式 可能存在意外问题!");
+            LoggerUtil.warn("No NMS support for " + VersionUtil.getParsedVersion() + ", running in compatibility mode, things may break");
             access = new CompatibilityModeNMS();
         } else if (version >= UNTESTED) {
-            LoggerUtil.warn("服务端版本 " + VersionUtil.getParsedVersion() + " 尚未经过测试, 正在使用 " + module);
+            LoggerUtil.warn("Server version " + VersionUtil.getParsedVersion() + " is untested, using " + module);
         } else {
-            LoggerUtil.info("正在使用受支持的版本! (" + module + ")");
+            LoggerUtil.info("Using supported version " + module);
         }
 
         return access;
@@ -82,11 +82,11 @@ public class NMSProvider {
         try {
             return (NMSAccess) Class.forName(this.getClass().getPackage().getName() + "." + module + ".NMS_" + module).getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException | NoSuchMethodException e) {
-            LoggerUtil.warn("未受支持的版本: " + e.getMessage());
+            LoggerUtil.warn("Unsupported version: " + e.getMessage());
         } catch (InstantiationException | IllegalAccessException e) {
-            LoggerUtil.warn("创建NMS访问失败: " + e.getMessage());
+            LoggerUtil.warn("Cannot create the NMS access: " + e.getMessage());
         } catch (InvocationTargetException e) {
-            LoggerUtil.error("调用构造方法失败: " + e.getMessage());
+            LoggerUtil.error("Cannot call the NMS constructor: " + e.getMessage());
         }
         return null;
     }

@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.game.economy;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GamePlayer;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public interface EconomyMode {
             if (XSound.ENTITY_ENDERMAN_TELEPORT.get() != null) {
                 gamePlayer.playSound(XSound.ENTITY_ENDERMAN_TELEPORT.get(), 30F, 1F);
             }
-            gamePlayer.sendMessage("§c没有足够资源购买！");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getShop().getNotEnoughResources());
             return false;
         }
 

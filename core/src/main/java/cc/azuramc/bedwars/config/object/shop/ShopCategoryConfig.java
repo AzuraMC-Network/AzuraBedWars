@@ -13,22 +13,22 @@ import java.util.List;
  * @author an5w1r@163.com
  */
 @Data
-@Comment({"商店分类", "文件名就是分类 id，在 shop/menu.yml 的 categories 里排序"})
+@Comment({"Shop category", "The file name is the category id, ordered by categories in shop/menu.yml"})
 public class ShopCategoryConfig {
 
-    @Comment("分类名")
+    @Comment("Category name")
     private String name = "";
 
-    @Comment("分类图标")
+    @Comment("Category icon")
     private ItemSpec icon = new ItemSpec("STONE");
 
-    @Comment("只在这个经济模式出现")
+    @Comment("Only shown in this economy mode")
     @Nullable
     private EconomyType economy;
 
-    @Comment({"6 行 9 列的字符画，每个字符对应 items 里同名的键，空格是空位", "前两行是导航栏，必须留空", "不写时按顺序填进快速购买的格子"})
+    @Comment({"6 rows of 9 characters, each one the key of an entry in items, a space is an empty slot", "The first two rows are the navigation bar and must stay empty", "Items fill the quick buy slots in order when left out"})
     private List<String> layout = new ArrayList<>();
 
-    @Comment("商品")
+    @Comment("Items")
     private LinkedHashMap<String, ShopItemSpec> items = new LinkedHashMap<>();
 }

@@ -30,7 +30,7 @@ public class JsonMapStorage implements IMapStorage {
     public JsonMapStorage() {
         this.mapDirectory = new File(AzuraBedWars.getInstance().getPlugin().getDataFolder(), "maps");
         if (!mapDirectory.isDirectory() && !mapDirectory.mkdirs()) {
-            LoggerUtil.error("无法创建地图目录 " + mapDirectory.getAbsolutePath());
+            LoggerUtil.error("Cannot create the map folder " + mapDirectory.getAbsolutePath());
         }
     }
 
@@ -47,7 +47,7 @@ public class JsonMapStorage implements IMapStorage {
             Files.move(temp.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
-            LoggerUtil.error("保存地图文件 " + file.getPath() + " 失败", e);
+            LoggerUtil.error("Cannot save the map file " + file.getPath(), e);
             return false;
         }
     }
@@ -61,13 +61,13 @@ public class JsonMapStorage implements IMapStorage {
         try {
             MapData mapData = gson.fromJson(new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8), MapData.class);
             if (mapData == null) {
-                LoggerUtil.error("地图文件 " + file.getPath() + " 是空的");
+                LoggerUtil.error("The map file " + file.getPath() + " is empty");
                 return null;
             }
             mapData.setName(mapName);
             return mapData;
         } catch (Exception e) {
-            LoggerUtil.error("读取地图文件 " + file.getPath() + " 失败", e);
+            LoggerUtil.error("Cannot read the map file " + file.getPath(), e);
             return null;
         }
     }

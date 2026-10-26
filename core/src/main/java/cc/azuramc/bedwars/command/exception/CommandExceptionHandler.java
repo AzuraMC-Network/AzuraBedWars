@@ -1,5 +1,7 @@
 package cc.azuramc.bedwars.command.exception;
 
+import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.bukkit.exception.BukkitExceptionAdapter;
 import revxrsal.commands.bukkit.exception.InvalidPlayerException;
@@ -15,18 +17,22 @@ public class CommandExceptionHandler extends BukkitExceptionAdapter {
     @Override
     public void missingArgument(@NotNull CommandActor actor,
                                 @NotNull MissingArgumentException exception) {
-        actor.error("&c缺少参数");
+        actor.error(lang().getMissingArgument());
     }
 
     @Override
     public void invalidPlayer(@NotNull CommandActor actor,
                               @NotNull InvalidPlayerException exception) {
-        actor.error("&c指定的玩家不在线");
+        actor.error(lang().getPlayerOffline());
     }
 
     @Override
     public void noPermission(@NotNull CommandActor actor,
                              @NotNull NoPermissionException exception) {
-        actor.error("&c权限不足");
+        actor.error(lang().getNoPermission());
+    }
+
+    private static LangConfig.Command lang() {
+        return AzuraBedWars.getInstance().getLang().getCommand();
     }
 }

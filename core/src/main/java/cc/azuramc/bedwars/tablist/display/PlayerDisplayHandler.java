@@ -1,5 +1,6 @@
 package cc.azuramc.bedwars.tablist.display;
 
+import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
@@ -152,11 +153,11 @@ public class PlayerDisplayHandler {
         String displayName;
 
         if (gameTeam == null) {
-            displayName = "&7[未知] | " + gamePlayer.getNickName();
+            displayName = AzuraBedWars.getInstance().getLang().getTab().getUnknown() + gamePlayer.getNickName();
         } else if (gamePlayer.isRespawning()) {
             displayName = "&7" + gameTeam.getNameWithoutColor() + " | " + gamePlayer.getNickName();
         } else if (gamePlayer.isSpectator()) {
-            displayName = "&7[旁观者] | " + gamePlayer.getNickName();
+            displayName = AzuraBedWars.getInstance().getLang().getTab().getSpectator() + gamePlayer.getNickName();
         } else {
             displayName = gameTeam.getName() + " | " + gamePlayer.getNickName();
         }
@@ -207,11 +208,11 @@ public class PlayerDisplayHandler {
         String prefix;
         // 如果 gameTeam 为 null，直接显示为未分配状态
         if (gameTeam == null) {
-            prefix = "&7[未分配] | ";
+            prefix = AzuraBedWars.getInstance().getLang().getTab().getUnassigned();
         } else if (gamePlayer.isRespawning()) {
             prefix = "&7" + gameTeam.getNameWithoutColor() + " | ";
         } else if (gamePlayer.isSpectator()) {
-            prefix = "&7[旁观者] | ";
+            prefix = AzuraBedWars.getInstance().getLang().getTab().getSpectator();
         } else {
             prefix = gameTeam.getName() + " | ";
         }

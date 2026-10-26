@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=schema/gameplay.json
+# 对局规则
+config-version: 1
+
+# 玩家最大生命值
+max-health: 20
+
+# 最大静止时间(秒)，超过将被判定为挂机
+max-no-movement-time: 45
+
+# 队伍出生点保护半径
+team-spawn-protection-radius: 6
+
+# 资源点保护半径
+resource-spawn-protection-radius: 2
+
+# 队伍方块搜索半径
+team-block-search-radius: 15
+
+# 床搜索半径(以队伍出生点为中心查找该队的床)
+bed-search-radius: 18
+
+# 破坏床奖励金币数量
+bed-destroy-reward: 10
+
+# 火球配置
+fire-ball:
+  # 火球爆炸伤害值
+  fireball-damage: 3
+
+# 聊天配置
+chat:
+  # 全局聊天前缀(使用此前缀发送消息将被所有人看到)
+  global-chat-prefix: "!"
+
+  # 旁观者聊天前缀
+  spectator-prefix: "&7[旁观者]"
+
+  # 全局聊天标签
+  global-chat-tag: "&6[全局]"
+
+  # 队伍聊天标签
+  team-chat-tag: "&9[团队]"
+
+  # 聊天分隔符
+  chat-separator: "&7: "
+
+  # 全局聊天冷却时间(秒)
+  global-chat-cooldown: 10
+
+# 玩家死亡相关配置
+player-death:
+  # 金币奖励动作栏显示次数
+  coins-action-bar-times: 5
+
+  # 动作栏显示间隔(tick)
+  action-bar-period: 10
+
+  # 击杀金币奖励数量
+  coins-reward: 1.0
+
+  # 火球造成的摔落伤害系数
+  fireball-fallen-damage-rate: 0.4
+
+  # 普通摔落伤害系数
+  normal-fallen-damage-rate: 0.6
+
+  # 爆炸伤害系数
+  explosion-damage-rate: 0.4
+
+# 玩家复活相关配置
+player-respawn:
+  # 复活倒计时时间(秒)
+  respawn-countdown-seconds: 5
+
+  # 复活保护时间(tick)
+  respawn-protection-ticks: 60
+
+  # 标题停留时间(tick)
+  title-stay: 20
+
+# 旁观者相关配置
+spectator:
+  # 旁观者设置 GUI 配置
+  setting-gui:
+    # GUI 大小(必须是9的倍数)
+    inventory-size: 36
+
+    # 无速度按钮槽位
+    speed-none-slot: 11
+
+    # 速度 I 按钮槽位
+    speed-i-slot: 12
+
+    # 速度 II 按钮槽位
+    speed-ii-slot: 13
+
+    # 速度 III 按钮槽位
+    speed-iii-slot: 14
+
+    # 速度 IV 按钮槽位
+    speed-iv-slot: 15
+
+    # 自动传送按钮槽位
+    auto-tp-slot: 20
+
+    # 夜视按钮槽位
+    night-vision-slot: 21
+
+    # 第一人称按钮槽位
+    first-person-slot: 22
+
+    # 隐藏其他旁观者按钮槽位
+    hide-others-slot: 23
+
+    # 飞行锁定按钮槽位
+    fly-slot: 24
+
+  # 目标追踪配置
+  target:
+    # 自动传送触发距离
+    auto-tp-distance: 20.0
+
+    # 标题显示持续时间(tick)
+    title-duration: 20

@@ -5,6 +5,7 @@ import cc.azuramc.bedwars.config.object.shop.ShopCategoryConfig;
 import cc.azuramc.bedwars.config.object.shop.ShopMenuConfig;
 import cc.azuramc.bedwars.config.object.shop.TierChains;
 import cc.azuramc.bedwars.shop.ShopValidator;
+import cc.azuramc.bedwars.shop.SpecChecks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ShopConfigTest {
 
-    private static final ShopValidator.Names ANY_NAME = new ShopValidator.Names() {
+    static final SpecChecks.Names ANY_NAME = new SpecChecks.Names() {
         @Override
         public boolean material(String name) {
             return !name.startsWith("NOT_");
@@ -44,6 +45,11 @@ class ShopConfigTest {
         public boolean entity(String name) {
             return true;
         }
+
+        @Override
+        public boolean sound(String name) {
+            return true;
+        }
     };
 
     @TempDir
@@ -55,7 +61,8 @@ class ShopConfigTest {
     void setUp() {
         service = new ConfigService(dataFolder, () -> false);
         service.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
-        service.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, service.content("timeline.yml")));
+        service.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, service.content("timeline.yml"),
+                service.bundled("generators.yml", GeneratorConfig.class)));
         service.registerTemplate("shop/menu", "shop/menu.yml", ShopMenuConfig.class, ApplyMode.LIVE, 1, "shop/menu");
         service.registerTemplate("shop/tiers", "shop/tiers.yml", TierChains.class, ApplyMode.NEXT_GAME, 1, "shop/tiers");
         service.registerDirectory("shop/categories", ShopCategoryConfig.class, ApplyMode.LIVE, 1, "shop/category",

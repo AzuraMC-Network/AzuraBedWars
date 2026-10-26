@@ -5,7 +5,7 @@ import cc.azuramc.bedwars.config.object.DisplayConfig;
 import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.config.object.ItemConfig;
-import cc.azuramc.bedwars.config.object.MessageConfig;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
 import cc.azuramc.bedwars.config.object.TimelineConfig;
 import cc.azuramc.bedwars.config.object.UpgradeConfig;
@@ -25,7 +25,7 @@ class ConfigModelsTest {
 
     private static final List<Class<?>> MODELS = Arrays.asList(SettingsConfig.class, DatabaseConfig.class,
             GameplayConfig.class, DisplayConfig.class, GeneratorConfig.class, TimelineConfig.class,
-            ItemConfig.class, UpgradeConfig.class, MessageConfig.class);
+            ItemConfig.class, UpgradeConfig.class, LangConfig.class);
 
     @Test
     void generatedTemplatesReadBackAsTheDefaults() throws Exception {

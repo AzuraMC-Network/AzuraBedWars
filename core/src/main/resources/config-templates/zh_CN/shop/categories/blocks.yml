@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schema/shop-category.json
+config-version: 1
+
+name: "&a方块"
+icon: TERRACOTTA
+# 不写 layout 时商品按顺序填进快速购买的格子，items 的键就是商品 id
+items:
+  wool:
+    name: "羊毛"
+    item: { material: WHITE_WOOL, amount: 16, team-color: true }
+    price: 4 iron
+    xp: 4
+  speed_wool:
+    name: "火速羊毛"
+    item: { material: WHITE_WOOL, amount: 4, team-color: true, enchants: { EFFICIENCY: 1 }, flags: [HIDE_ENCHANTS] }
+    special: speed_wool
+    price: 4 iron
+    xp: 4
+  clay:
+    name: "硬化粘土"
+    item: { material: TERRACOTTA, amount: 16, team-color: true }
+    price: 12 iron
+    xp: 12
+  glass:
+    name: "防爆玻璃"
+    item: { material: GLASS, amount: 4, team-color: true }
+    price: 12 iron
+    xp: 12
+  endstone:
+    name: "末地石"
+    item: { material: END_STONE, amount: 12 }
+    price: 24 iron
+    xp: 24
+  ladder:
+    name: "梯子"
+    item: { material: LADDER, amount: 16 }
+    price: 4 iron
+    xp: 4
+  planks:
+    name: "橡木板"
+    item: { material: OAK_PLANKS, amount: 16 }
+    price: 4 gold
+    xp: 20
+  slime:
+    name: "史莱姆块"
+    item: { material: SLIME_BLOCK, amount: 4 }
+    price: 2 gold
+    xp: 10
+  cobweb:
+    name: "蜘蛛网"
+    item: { material: COBWEB, amount: 2 }
+    price: 4 gold
+    xp: 20
+  obsidian:
+    name: "黑曜石"
+    item: { material: OBSIDIAN, amount: 4 }
+    price: 4 emerald
+    xp: 400

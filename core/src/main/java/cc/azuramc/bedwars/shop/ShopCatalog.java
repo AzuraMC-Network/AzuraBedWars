@@ -190,13 +190,13 @@ public final class ShopCatalog {
                 .getItem();
     }
 
-    private static List<Integer> slots(List<String> layout, char key) {
+    public static List<Integer> slots(List<String> layout, char key) {
         List<Integer> slots = new ArrayList<>();
-        for (int row = 0; row < layout.size() && row < ShopValidator.ROWS; row++) {
+        for (int row = 0; row < layout.size() && row < SpecChecks.ROWS; row++) {
             String line = layout.get(row);
-            for (int column = 0; column < line.length() && column < ShopValidator.COLUMNS; column++) {
+            for (int column = 0; column < line.length() && column < SpecChecks.COLUMNS; column++) {
                 if (line.charAt(column) == key) {
-                    slots.add(row * ShopValidator.COLUMNS + column);
+                    slots.add(row * SpecChecks.COLUMNS + column);
                 }
             }
         }

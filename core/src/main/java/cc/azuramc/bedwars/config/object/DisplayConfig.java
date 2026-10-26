@@ -13,33 +13,33 @@ import java.util.List;
  * @author an5w1r@163.com
  */
 @Data
-@Comment("计分板、Tab 列表与伤害显示")
+@Comment("Scoreboards, tab list and damage display")
 public class DisplayConfig {
 
-    @Comment("游戏中计分板")
+    @Comment("In-game scoreboard")
     private GameScoreboard gameScoreboard = new GameScoreboard();
 
-    @Comment("大厅计分板")
+    @Comment("Lobby scoreboard")
     private LobbyScoreboard lobbyScoreboard = new LobbyScoreboard();
 
-    @Comment("游戏结束计分板")
+    @Comment("Game end scoreboard")
     private GameEndScoreboard gameEndScoreboard = new GameEndScoreboard();
 
-    @Comment("Tab 列表")
+    @Comment("Tab list")
     private TabLists tabList = new TabLists();
 
-    @Comment("伤害显示")
+    @Comment("Damage display")
     private DisplayDamage displayDamage = new DisplayDamage();
 
     @Data
     public static class GameScoreboard {
-        @Comment("计分板标题")
-        private String title = "&e&l起床战争";
+        @Comment("Scoreboard title")
+        private String title = "&e&lBED WARS";
 
         @Comment({
-                "计分板内容行",
-                "可用变量: {date}, {next_event}, {time_left}, {server}",
-                "特殊标记: {teams} 会被替换为所有队伍状态行"
+                "Scoreboard lines",
+                "Placeholders: {date}, {next_event}, {time_left}, {server}",
+                "{teams} is replaced by one line per team"
         })
         private List<String> lines = new ArrayList<>(Arrays.asList(
                 "&7{date}",
@@ -53,76 +53,76 @@ public class DisplayConfig {
         ));
 
         @Comment({
-                "队伍行格式",
-                "可用变量: {team_name}, {bed_status}, {alive_count}, {my_team_mark}"
+                "Team line",
+                "Placeholders: {team_name}, {bed_status}, {alive_count}, {my_team_mark}"
         })
         private String teamLineFormat = "{team_name} {bed_status} &f| {alive_count}{my_team_mark}";
 
-        @Comment("我的队伍标记")
-        private String myTeamMark = " &7(我的队伍)";
+        @Comment("Your team mark")
+        private String myTeamMark = " &7YOU";
 
-        @Comment("床已被破坏图标")
+        @Comment("Destroyed bed icon")
         private String bedDestroyed = "&7❤";
 
-        @Comment("床存活图标")
+        @Comment("Standing bed icon")
         private String bedAlive = "&c❤";
     }
 
     @Data
     public static class LobbyScoreboard {
-        @Comment("计分板标题")
-        private String title = "&e&l起床战争";
+        @Comment("Scoreboard title")
+        private String title = "&e&lBED WARS";
 
         @Comment({
-                "计分板内容行",
-                "可用变量: {date}, {map_name}, {team_size}, {team_count}, {author},",
+                "Scoreboard lines",
+                "Placeholders: {date}, {map_name}, {team_size}, {team_count}, {author},",
                 "          {players}, {max_players}, {countdown}, {mode}, {version}, {server}"
         })
         private List<String> lines = new ArrayList<>(Arrays.asList(
                 "&7{date}",
                 "",
-                "&f地图: &a{map_name}",
-                "&f队伍: &a{team_size}人 {team_count}队",
-                "&f作者: &a{author}",
+                "&fMap: &a{map_name}",
+                "&fTeams: &a{team_count}x{team_size}",
+                "&fAuthor: &a{author}",
                 "",
-                "&f玩家: &a{players}/{max_players}",
+                "&fPlayers: &a{players}/{max_players}",
                 "",
                 "{countdown}",
                 "",
-                "&f模式: &a{mode}",
+                "&fMode: &a{mode}",
                 "",
-                "&f版本: &a{version}",
+                "&fVersion: &a{version}",
                 "",
                 "&bas.azuramc.cc"
         ));
 
-        @Comment("等待中消息")
-        private String waitingMessage = "&f等待中...";
+        @Comment("Waiting text")
+        private String waitingMessage = "&fWaiting...";
 
-        @Comment("倒计时格式")
-        private String countdownFormat = "{seconds}秒后开始";
+        @Comment("Countdown text")
+        private String countdownFormat = "Starting in {seconds}s";
 
-        @Comment("普通模式名称")
-        private String defaultMode = "普通模式";
+        @Comment("Name of the item mode")
+        private String defaultMode = "Normal";
 
-        @Comment("经验模式名称")
-        private String expMode = "经验模式";
+        @Comment("Name of the experience mode")
+        private String expMode = "Experience";
     }
 
     @Data
     public static class GameEndScoreboard {
-        @Comment("计分板标题")
-        private String title = "&e&l起床战争";
+        @Comment("Scoreboard title")
+        private String title = "&e&lBED WARS";
 
         @Comment({
-                "计分板内容行",
-                "可用变量: {date}, {winner}, {server}"
+                "Scoreboard lines",
+                "Placeholders: {date}, {winner}, {server}"
         })
         private List<String> lines = new ArrayList<>(Arrays.asList(
                 "&7{date}",
                 "",
-                "&c游戏结束",
-                "&f胜利者: &a{winner}",
+                "&cGame Over",
+                "&fWinner: &a{winner}",
                 "",
                 "&bas.azuramc.cc"
         ));
@@ -130,23 +130,23 @@ public class DisplayConfig {
 
     @Data
     public static class TabLists {
-        @Comment("等待中")
+        @Comment("Waiting")
         private TabList waiting = new TabList(
-                new ArrayList<>(Arrays.asList("&b你正在 &eAzuraMC &b游玩起床战争")),
+                new ArrayList<>(Arrays.asList("&bYou are playing &eBed Wars &bon &eAzuraMC")),
                 new ArrayList<>(Arrays.asList("&bas.azuramc.cc")));
 
-        @Comment({"游戏中", "可用变量: <currentGameKill>, <currentGameFinalKill>, <currentGameBedBreak>"})
+        @Comment({"In game", "Placeholders: <currentGameKill>, <currentGameFinalKill>, <currentGameBedBreak>"})
         private TabList running = new TabList(
-                new ArrayList<>(Arrays.asList("&b你正在 &eAzuraMC &b游玩起床战争")),
+                new ArrayList<>(Arrays.asList("&bYou are playing &eBed Wars &bon &eAzuraMC")),
                 new ArrayList<>(Arrays.asList(
-                        "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>",
+                        "&bKills: &e<currentGameKill> &bFinal Kills: &e<currentGameFinalKill> &bBeds Broken: &e<currentGameBedBreak>",
                         "&bas.azuramc.cc")));
 
-        @Comment({"游戏结束", "可用变量: <gameResult>, <currentGameKill>, <currentGameFinalKill>, <currentGameBedBreak>"})
+        @Comment({"Game over", "Placeholders: <gameResult>, <currentGameKill>, <currentGameFinalKill>, <currentGameBedBreak>"})
         private TabList ending = new TabList(
-                new ArrayList<>(Arrays.asList("&b你正在 &eAzuraMC &b游玩起床战争", "&b游戏结束 &e<gameResult>")),
+                new ArrayList<>(Arrays.asList("&bYou are playing &eBed Wars &bon &eAzuraMC", "&bGame over &e<gameResult>")),
                 new ArrayList<>(Arrays.asList(
-                        "&b击杀数: &e<currentGameKill> &b最终击杀数: &e<currentGameFinalKill> &b破坏床数: &e<currentGameBedBreak>",
+                        "&bKills: &e<currentGameKill> &bFinal Kills: &e<currentGameFinalKill> &bBeds Broken: &e<currentGameBedBreak>",
                         "&bas.azuramc.cc")));
     }
 
@@ -154,19 +154,19 @@ public class DisplayConfig {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TabList {
-        @Comment("头部")
+        @Comment("Header")
         private List<String> header = new ArrayList<>();
 
-        @Comment("底部")
+        @Comment("Footer")
         private List<String> footer = new ArrayList<>();
     }
 
     @Data
     public static class DisplayDamage {
-        @Comment("是否启用弓箭伤害显示")
+        @Comment("Show arrow damage")
         private boolean arrowDisplayEnabled = true;
 
-        @Comment("是否启用近战伤害显示")
+        @Comment("Show melee damage")
         private boolean attackDisplayEnabled = true;
     }
 }

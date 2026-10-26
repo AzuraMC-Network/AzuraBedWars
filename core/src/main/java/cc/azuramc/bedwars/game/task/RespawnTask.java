@@ -2,13 +2,14 @@ package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
-import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.GameplayConfig;
+import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.config.object.shop.TierChains;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.shop.ShopCatalog;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -56,7 +57,7 @@ public class RespawnTask extends BukkitRunnable {
             return;
         }
         if (secondsLeft > 0) {
-            gamePlayer.sendTitle(String.format(messages().getRespawnCountdownTitle(), secondsLeft), messages().getRespawnCountdownSubTitle(),
+            gamePlayer.sendTitle(MessageUtil.fill(messages().getRespawnCountdownTitle(), "seconds", secondsLeft), messages().getRespawnCountdownSubtitle(),
                     1, config().getTitleStay(), 1);
             secondsLeft--;
             return;
@@ -89,14 +90,14 @@ public class RespawnTask extends BukkitRunnable {
         player.setGameMode(GameMode.SURVIVAL);
         gamePlayer.protectAfterRespawn(config().getRespawnProtectionTicks());
 
-        gamePlayer.sendTitle(messages().getRespawnCompleteTitle(), messages().getRespawnCompleteSubTitle(), 1, config().getTitleStay(), 1);
+        gamePlayer.sendTitle(messages().getRespawnedTitle(), messages().getRespawnedSubtitle(), 1, config().getTitleStay(), 1);
     }
 
     private static GameplayConfig.PlayerRespawn config() {
         return AzuraBedWars.getInstance().getGameplayConfig().getPlayerRespawn();
     }
 
-    private static MessageConfig messages() {
-        return AzuraBedWars.getInstance().getMessageConfig();
+    private static LangConfig.Game messages() {
+        return AzuraBedWars.getInstance().getLang().getGame();
     }
 }

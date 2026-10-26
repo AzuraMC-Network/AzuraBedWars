@@ -54,7 +54,7 @@ public class PlayerChestOpenListener implements Listener {
             if (block != null && team.getSpawnLocation().distance(block.getLocation()) <= 18) {
                 if (!team.getAlivePlayers().isEmpty() && !team.isInTeam(gamePlayer)) {
                     event.setCancelled(true);
-                    gamePlayer.sendMessage("&c只有该队伍的玩家可以打开这个箱子");
+                    gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getGame().getTeamChestOnly());
                 }
             }
         }

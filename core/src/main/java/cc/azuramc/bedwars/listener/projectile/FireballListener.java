@@ -60,7 +60,7 @@ public class FireballListener implements Listener {
             long cooldownTime = 1000;
 
             if (currentTime - lastFireballTime < cooldownTime) {
-                gamePlayer.sendMessage("&c火焰弹发射冷却中");
+                gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getFireballCooldown());
                 return;
             }
 

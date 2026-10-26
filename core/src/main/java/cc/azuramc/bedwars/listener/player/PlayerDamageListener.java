@@ -9,6 +9,7 @@ import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.listener.projectile.FireballHandler;
 import cc.azuramc.bedwars.util.LoadGameUtil;
+import cc.azuramc.bedwars.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -172,8 +173,8 @@ public class PlayerDamageListener implements Listener {
             int remainingHealth = Math.max(Math.round((float) gamePlayer.getPlayer().getHealth()) - finalDamage, 0);
             attackPlayer.sendTitle(
                     "&r ",
-                    "&b伤害 &f- &e" + finalDamage + "  &b血量 &f- &e" + remainingHealth +
-                            "&f/&e" + Math.round((float) PlayerUtil.getMaxHealth(gamePlayer.getPlayer())),
+                    MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getDamageDisplay(), "damage", finalDamage,
+                            "health", remainingHealth + "§f/§e" + Math.round((float) PlayerUtil.getMaxHealth(gamePlayer.getPlayer()))),
                     1, ATTACK_DISPLAY_TITLE_TICKS, 5);
         }
     }
@@ -205,8 +206,8 @@ public class PlayerDamageListener implements Listener {
         gamePlayer.setLastDamage(attackerPlayer);
 
         if (arrowDisplayEnabled && attackerPlayer.isViewingArrowDamage()) {
-            attackerPlayer.sendMessage("&e&l目标玩家 &c&l" + gamePlayer.getPlayer().getName() + " &e&l剩余血量: &c&l"
-                    + String.format("%.1f", gamePlayer.getPlayer().getHealth()) + " &c&l❤");
+            attackerPlayer.sendMessage(MessageUtil.fill(AzuraBedWars.getInstance().getLang().getGame().getArrowHit(), "player", gamePlayer.getPlayer().getName(),
+                    "health", String.format("%.1f", gamePlayer.getPlayer().getHealth())));
         }
     }
 

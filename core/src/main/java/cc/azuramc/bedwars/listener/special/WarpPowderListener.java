@@ -183,13 +183,13 @@ public class WarpPowderListener implements Listener {
     private void handleWarpPowderUse(PlayerInteractEvent event, GamePlayer gamePlayer, WarpPowder activePowder, WarpPowder warpPowder) {
         // 检查是否已有激活的传送粉末
         if (activePowder != null) {
-            gamePlayer.sendMessage("§c你已经开始了一个传送!");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getWarpPowderActive());
             return;
         }
 
         // 检查玩家是否在空中
         if (gamePlayer.getPlayer().getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR) {
-            gamePlayer.sendMessage("§c你不能在空中使用传送粉末!");
+            gamePlayer.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getWarpPowderInAir());
             return;
         }
 
@@ -228,7 +228,7 @@ public class WarpPowderListener implements Listener {
             powder.setStackAmount(powder.getStack().getAmount() + 1);
             player.updateInventory();
             powder.cancelTeleport(true, true);
-            player.sendMessage("§c你移动了，传送被取消!");
+            player.sendMessage(AzuraBedWars.getInstance().getLang().getItems().getWarpPowderMoved());
         }
     }
 
