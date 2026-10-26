@@ -194,7 +194,7 @@ public final class ConfigService {
             values.put(document.getId(), loaded.value);
             return loaded.problems;
         } catch (IOException e) {
-            values.put(document.getId(), new YamlBinder(document.getPath(), true).bind(null, document.getType()));
+            values.put(document.getId(), new YamlBinder(document.getPath(), true).bindOnto(null, defaults(document)));
             return Collections.singletonList(fileProblem(document, "Cannot read or create the file, defaults are used: " + e.getMessage()));
         }
     }
@@ -624,12 +624,24 @@ public final class ConfigService {
             String upgraded = upgrade(document, text, version);
             if (upgraded != null) {
                 YamlBinder upgradedBinder = new YamlBinder(document.getPath(), true);
-                T value = upgradedBinder.bind(upgradedBinder.parse(upgraded), document.getType());
+                T value = upgradedBinder.bindOnto(upgradedBinder.parse(upgraded), defaults(document));
                 return new Loaded<>(value, upgradedBinder.getProblems(), upgraded);
             }
         }
-        T value = binder.bind(root, document.getType());
+        T value = binder.bindOnto(root, defaults(document));
         return new Loaded<>(value, binder.getProblems(), null);
+    }
+
+    /**
+     * Values of keys a file leaves out, from the bundled template in the server language
+     */
+    private <T> T defaults(ConfigDocument<T> document) {
+        Class<T> type = document.getType();
+        // entries removed from a map document stay removed
+        if (Map.class.isAssignableFrom(type)) {
+            return type.cast(ConfigKeys.newInstance(type));
+        }
+        return bundled(document.getPath(), type);
     }
 
     /**

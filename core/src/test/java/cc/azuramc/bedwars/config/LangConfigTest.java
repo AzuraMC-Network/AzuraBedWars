@@ -88,6 +88,17 @@ class LangConfigTest {
         assertFalse(new File(dataFolder, MessagesMigrator.FILE).exists());
     }
 
+    @Test
+    void keysMissingFromAFileKeepTheBundledLanguage() throws IOException {
+        ConfigService.writeAtomically(new File(dataFolder, "lang/zh_CN.yml"), "config-version: 1\nadmin:\n  config-clean: \"&a没有问题\"\n");
+
+        List<ConfigProblem> problems = service.loadAll();
+        assertTrue(problems.isEmpty(), problems::toString);
+        LangConfig chinese = service.get("lang/zh_CN", LangConfig.class);
+        assertEquals("§a没有问题", chinese.getAdmin().getConfigClean());
+        assertEquals("§eMCP 未开启 /bw devtools on 开启", chinese.getAdmin().getDevtoolsNotRunning());
+    }
+
     static Set<String> paths(String prefix, Map<String, Object> section) {
         Set<String> paths = new TreeSet<>();
         for (Map.Entry<String, Object> entry : section.entrySet()) {
