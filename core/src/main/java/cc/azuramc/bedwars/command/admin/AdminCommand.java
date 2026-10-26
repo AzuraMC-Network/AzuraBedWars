@@ -217,7 +217,7 @@ public class AdminCommand {
 
     @Subcommand("loadWorld")
     public void loadWorld(BukkitCommandActor actor, String worldName) {
-        if (!new File(Bukkit.getWorldContainer(), worldName + "/level.dat").isFile()) {
+        if (!WorldUtil.isWorldSave(new File(Bukkit.getWorldContainer(), worldName)) && !WorldUtil.isWorldSave(WorldUtil.getDimensionFolder(worldName))) {
             CommandUtil.sendLayout(actor, MessageUtil.fill(lang().getWorldMissing(), "world", worldName));
             return;
         }

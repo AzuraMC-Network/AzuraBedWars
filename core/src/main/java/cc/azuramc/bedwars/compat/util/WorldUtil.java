@@ -3,13 +3,26 @@ package cc.azuramc.bedwars.compat.util;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.nms.ReflectionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.World;
+
+import java.io.File;
 
 /**
  * @author an5w1r@163.com
  */
 public class WorldUtil {
+
+    /** Paper 26 moves a world loaded from the server folder here */
+    public static File getDimensionFolder(String worldName) {
+        return new File(Bukkit.getWorldContainer(), Bukkit.getWorlds().get(0).getName() + "/dimensions/minecraft/" + worldName);
+    }
+
+    /** A world folder or a Paper 26 dimension folder */
+    public static boolean isWorldSave(File folder) {
+        return new File(folder, "level.dat").isFile() || new File(folder, "data/minecraft/world_gen_settings.dat").isFile();
+    }
 
     public static World setWorldRules(World world) {
         world.setAutoSave(false);
@@ -36,9 +49,9 @@ public class WorldUtil {
             GameRule<?> fireSpreadRadius = ReflectionUtil.getStaticField(GameRule.class, "FIRE_SPREAD_RADIUS_AROUND_PLAYER");
             GameRule<?> showAdvancementMessages = ReflectionUtil.getStaticField(GameRule.class, "SHOW_ADVANCEMENT_MESSAGES");
 
-            ReflectionUtil.invokeMethod(world, "setGameRule", spawnMobs, false);
-            ReflectionUtil.invokeMethod(world, "setGameRule", fireSpreadRadius, 0);
-            ReflectionUtil.invokeMethod(world, "setGameRule", showAdvancementMessages, false);
+            setGameRule(world, spawnMobs, false);
+            setGameRule(world, fireSpreadRadius, 0);
+            setGameRule(world, showAdvancementMessages, false);
             LoggerUtil.debug("WorldUtil$trySetNewestGameRules | true");
             return true;
         } catch (Exception e) {
@@ -53,15 +66,20 @@ public class WorldUtil {
             GameRule<?> doFireTick = ReflectionUtil.getStaticField(GameRule.class, "DO_FIRE_TICK");
             GameRule<?> announceAdvancements = ReflectionUtil.getStaticField(GameRule.class, "ANNOUNCE_ADVANCEMENTS");
 
-            ReflectionUtil.invokeMethod(world, "setGameRule", doMobSpawning, false);
-            ReflectionUtil.invokeMethod(world, "setGameRule", doFireTick, false);
-            ReflectionUtil.invokeMethod(world, "setGameRule", announceAdvancements, false);
+            setGameRule(world, doMobSpawning, false);
+            setGameRule(world, doFireTick, false);
+            setGameRule(world, announceAdvancements, false);
             LoggerUtil.debug("WorldUtil$trySetLegacyGameRules | true");
             return true;
         } catch (Exception e) {
             LoggerUtil.debug("WorldUtil$trySetLegacyGameRules | false");
             return false;
         }
+    }
+
+    /** Erased signature, ReflectionUtil.invokeMethod cannot find it */
+    private static void setGameRule(World world, GameRule<?> rule, Object value) throws ReflectiveOperationException {
+        World.class.getMethod("setGameRule", GameRule.class, Object.class).invoke(world, rule, value);
     }
 
     private static void trySetOldestGameRules(World world) {

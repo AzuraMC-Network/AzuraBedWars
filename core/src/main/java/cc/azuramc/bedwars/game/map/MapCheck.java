@@ -1,6 +1,7 @@
 package cc.azuramc.bedwars.game.map;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.compat.util.WorldUtil;
 import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.config.object.LangConfig;
 import cc.azuramc.bedwars.game.TeamColor;
@@ -139,13 +140,14 @@ public final class MapCheck {
         if (folder == null) {
             return lang().getNoFolder();
         }
-        if (!new File(folder, "level.dat").isFile()) {
+        if (!WorldUtil.isWorldSave(folder)) {
             return MessageUtil.fill(lang().getNotAWorld(), "file", new File(folder, "level.dat").getPath());
         }
         try {
-            File gameWorld = new File(Bukkit.getWorldContainer(), map.getName()).getCanonicalFile();
-            if (folder.getCanonicalFile().equals(gameWorld)) {
-                return MessageUtil.fill(lang().getFolderIsGameWorld(), "folder", gameWorld.getPath());
+            for (File gameWorld : new File[]{new File(Bukkit.getWorldContainer(), map.getName()), WorldUtil.getDimensionFolder(map.getName())}) {
+                if (folder.getCanonicalFile().equals(gameWorld.getCanonicalFile())) {
+                    return MessageUtil.fill(lang().getFolderIsGameWorld(), "folder", gameWorld.getCanonicalPath());
+                }
             }
         } catch (IOException e) {
             return MessageUtil.fill(lang().getFolderUnreadable(), "folder", folder.getPath(), "error", e.getMessage());
