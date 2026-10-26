@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.config.yaml;
 
 import cc.azuramc.bedwars.config.annotation.Comment;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.nodes.Node;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -37,6 +38,14 @@ public final class YamlWriter {
             }
         }
         out.append(ConfigKeys.VERSION_KEY).append(": ").append(version).append('\n');
+        if (instance instanceof Map) {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) instance).entrySet()) {
+                String key = String.valueOf(entry.getKey());
+                out.append('\n').append(PLAIN_KEY.matcher(key).matches() ? key : quote(key)).append(':');
+                writeValue(out, entry.getValue(), 0, true);
+            }
+            return out.toString();
+        }
         writeObject(out, instance, 0, true, true);
         return out.toString();
     }
@@ -46,7 +55,7 @@ public final class YamlWriter {
         boolean first = true;
         for (Map.Entry<String, Field> entry : ConfigKeys.fields(instance.getClass()).entrySet()) {
             Object value = get(entry.getValue(), instance);
-            if (value == null) {
+            if (value == null || value instanceof Node) {
                 continue;
             }
             Comment comment = entry.getValue().getAnnotation(Comment.class);

@@ -197,4 +197,9 @@ public class PlayerUtil {
         return player.getMaxHealth();
     }
 
+    @SuppressWarnings("deprecation")
+    public static void setMaxHealth(Player player, double maxHealth) {
+        player.setMaxHealth(maxHealth);
+    }
+
 }

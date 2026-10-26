@@ -65,4 +65,25 @@ public class NMS_v1_9_R1 implements NMSAccess {
     public void setWoolBlockData(Block block, byte data) {
         block.setData(data);
     }
+
+    @Override
+    public ItemStack setItemTag(ItemStack itemStack, String key, String value) {
+        net.minecraft.server.v1_9_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound tag = nmsItem.hasTag() ? nmsItem.getTag() : new NBTTagCompound();
+        NBTTagCompound values = tag.getCompound(TAG_NAMESPACE);
+        values.setString(key, value);
+        tag.set(TAG_NAMESPACE, values);
+        nmsItem.setTag(tag);
+        return CraftItemStack.asBukkitCopy(nmsItem);
+    }
+
+    @Override
+    public String getItemTag(ItemStack itemStack, String key) {
+        net.minecraft.server.v1_9_R1.ItemStack nmsItem = itemStack != null ? CraftItemStack.asNMSCopy(itemStack) : null;
+        if (nmsItem == null || !nmsItem.hasTag()) {
+            return null;
+        }
+        NBTTagCompound values = nmsItem.getTag().getCompound(TAG_NAMESPACE);
+        return values.hasKey(key) ? values.getString(key) : null;
+    }
 }

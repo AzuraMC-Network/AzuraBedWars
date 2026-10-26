@@ -2,18 +2,23 @@ package cc.azuramc.bedwars.util;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.VersionUtil;
+import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.map.MapData;
+import cc.azuramc.bedwars.game.task.generator.ResourceHologram;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author an5w1r@163.com
@@ -30,14 +35,9 @@ public class LoadGameUtil {
     private static final double NAME_TAG_FINE_TUNE = 0.25D;
     // 资源生成点的Y轴偏移
     private static final double RESOURCE_GENERATOR_Y_OFFSET = 1.0D;
-    // 资源名称第一层偏移
-    private static final double RESOURCE_NAME_OFFSET_1 = 0.25D;
-    // 资源名称第二层偏移
-    private static final double RESOURCE_NAME_OFFSET_2 = 0.28D;
-    private static final float FALL_DISTANCE_7 = 7.0F;
-    private static final float FALL_DISTANCE_6 = 6.0F;
-    private static final float FALL_DISTANCE_5 = 5.0F;
-    private static final float FALL_DISTANCE_4 = 4.0F;
+    private static final double RESOURCE_LINE_SPACING = 0.27D;
+    /** Must match the fall distance ArmorStandUtil animates */
+    private static final float BLOCK_FALL_DISTANCE = 7.0F;
     private static final String ITEM_SHOP_DISPLAY_NAME = "§b§l物品商人";
     private static final String UPGRADE_SHOP_DISPLAY_NAME = "§e§l团队升级";
 
@@ -57,19 +57,18 @@ public class LoadGameUtil {
                 loc -> spawnUpgradeVillager(plugin, loc)
         );
 
-        // 生成钻石生成点
-        spawnResourceGenerators(
-                gameManager,
-                mapData.getDropLocations(MapData.DropType.DIAMOND),
-                MapData.DropType.DIAMOND
-        );
-
-        // 生成绿宝石生成点
-        spawnResourceGenerators(
-                gameManager,
-                mapData.getDropLocations(MapData.DropType.EMERALD),
-                MapData.DropType.EMERALD
-        );
+        for (Map.Entry<String, GeneratorConfig.Resource> entry : plugin.getGeneratorConfig().getResources().entrySet()) {
+            GeneratorConfig.Resource resource = entry.getValue();
+            if (resource.getAt() != GeneratorConfig.Spawn.PUBLIC || resource.getDrop() == null) {
+                continue;
+            }
+            List<ResourceHologram> holograms = new ArrayList<>();
+            for (Location location : mapData.getDropLocations(resource.getDrop())) {
+                ensureChunkLoaded(location);
+                holograms.add(spawnResourceHologram(location.clone().add(0.0D, RESOURCE_GENERATOR_Y_OFFSET, 0.0D), resource));
+            }
+            gameManager.getResourceHolograms().put(entry.getKey(), holograms);
+        }
     }
 
     /**
@@ -82,20 +81,6 @@ public class LoadGameUtil {
         for (Location location : locations) {
             ensureChunkLoaded(location);
             spawner.accept(location);
-        }
-    }
-
-    /**
-     * 在指定位置批量生成资源生成器
-     *
-     * @param gameManager 游戏管理器
-     * @param locations   位置列表
-     * @param dropType    掉落类型
-     */
-    private static void spawnResourceGenerators(GameManager gameManager, Iterable<Location> locations, MapData.DropType dropType) {
-        for (Location location : locations) {
-            ensureChunkLoaded(location);
-            spawnResourceGenerator(gameManager, location.clone(), dropType);
         }
     }
 
@@ -226,92 +211,22 @@ public class LoadGameUtil {
         nameTag.setCustomNameVisible(true);
         nameTag.setGravity(false);
         nameTag.setVisible(false);
-        nameTag.setFallDistance(FALL_DISTANCE_5);
     }
 
-    /**
-     * 生成资源生成点（钻石或绿宝石）
-     *
-     * @param gameManager 游戏管理器
-     * @param location    生成位置
-     * @param dropType    掉落类型
-     */
-    private static void spawnResourceGenerator(
-            GameManager gameManager,
-            Location location,
-            MapData.DropType dropType) {
-
-        // 调整基础位置
-        location.add(0.0D, RESOURCE_GENERATOR_Y_OFFSET, 0.0D);
-
-        // 确定使用的材料和存储集合
-        XMaterial blockMaterial = getBlockMaterialForDropType(dropType);
-        Set<ArmorStand> storageSet = getStorageSetForDropType(gameManager, dropType);
-
-        // 生成四层盔甲架
-        spawnResourceGeneratorLayers(location, blockMaterial, storageSet);
-    }
-
-    /**
-     * 根据掉落类型获取方块材料
-     */
-    private static XMaterial getBlockMaterialForDropType(MapData.DropType dropType) {
-        return dropType == MapData.DropType.DIAMOND ? XMaterial.DIAMOND_BLOCK : XMaterial.EMERALD_BLOCK;
-    }
-
-    /**
-     * 根据掉落类型获取存储集合
-     */
-    private static Set<ArmorStand> getStorageSetForDropType(GameManager gameManager, MapData.DropType dropType) {
-        return dropType == MapData.DropType.DIAMOND
-                ? gameManager.getArmorStand()
-                : gameManager.getArmorSande();
-    }
-
-    /**
-     * 生成资源生成点的四层盔甲架
-     */
-    private static void spawnResourceGeneratorLayers(
-            Location baseLocation,
-            XMaterial blockMaterial,
-            Set<ArmorStand> storageSet) {
-
-        // 第一层 显示方块（钻石块或绿宝石块）
-        ArmorStand blockStand = createResourceArmorStand(
-                baseLocation,
-                FALL_DISTANCE_7,
-                false
-        );
-        if (blockMaterial.get() != null) {
-            blockStand.setHelmet(new ItemStack(blockMaterial.get()));
+    private static ResourceHologram spawnResourceHologram(Location base, GeneratorConfig.Resource resource) {
+        ArmorStand block = null;
+        Material blockMaterial = resource.getBlock() != null
+                ? XMaterial.matchXMaterial(resource.getBlock()).map(XMaterial::get).orElse(null) : null;
+        if (blockMaterial != null) {
+            block = createResourceArmorStand(base, BLOCK_FALL_DISTANCE, false);
+            block.setHelmet(new ItemStack(blockMaterial));
         }
-        storageSet.add(blockStand);
-
-        // 第二层 第一个名称标签
-        ArmorStand nameTag1 = createResourceArmorStand(
-                baseLocation,
-                FALL_DISTANCE_6,
-                true
-        );
-        storageSet.add(nameTag1);
-
-        // 第三层 第二个名称标签
-        Location layer3Location = baseLocation.clone().add(0.0D, RESOURCE_NAME_OFFSET_1, 0.0D);
-        ArmorStand nameTag2 = createResourceArmorStand(
-                layer3Location,
-                FALL_DISTANCE_5,
-                true
-        );
-        storageSet.add(nameTag2);
-
-        // 第四层 第三个名称标签
-        Location layer4Location = layer3Location.clone().add(0.0D, RESOURCE_NAME_OFFSET_2, 0.0D);
-        ArmorStand nameTag3 = createResourceArmorStand(
-                layer4Location,
-                FALL_DISTANCE_4,
-                true
-        );
-        storageSet.add(nameTag3);
+        List<ArmorStand> lines = new ArrayList<>();
+        int count = resource.getHologram().size();
+        for (int i = 0; i < count; i++) {
+            lines.add(createResourceArmorStand(base.clone().add(0.0D, (count - 1 - i) * RESOURCE_LINE_SPACING, 0.0D), 0.0F, true));
+        }
+        return new ResourceHologram(block, lines);
     }
 
     /**

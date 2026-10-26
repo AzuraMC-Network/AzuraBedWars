@@ -4,14 +4,17 @@ import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.GameplayConfig;
+import cc.azuramc.bedwars.config.object.shop.TierChains;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import cc.azuramc.bedwars.game.item.tool.ToolType;
+import cc.azuramc.bedwars.shop.ShopCatalog;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import java.util.Map;
 
 /**
  * Holds a player at the respawn point as a spectator, then puts them back at their base
@@ -70,8 +73,15 @@ public class RespawnTask extends BukkitRunnable {
         gamePlayer.setReconnect(false);
         gamePlayer.setRespawning(false);
 
-        gamePlayer.setPickaxeType(downgrade(gamePlayer.getPickaxeType()));
-        gamePlayer.setAxeType(downgrade(gamePlayer.getAxeType()));
+        for (Map.Entry<String, TierChains.Chain> entry : ShopCatalog.get().getTiers().entrySet()) {
+            TierChains.Chain chain = entry.getValue();
+            int level = gamePlayer.getTierLevel(entry.getKey());
+            if (chain.getOnDeath() == TierChains.OnDeath.DOWNGRADE && level > 1) {
+                gamePlayer.getTierLevels().put(entry.getKey(), level - 1);
+            } else if (chain.getOnDeath() == TierChains.OnDeath.RESET) {
+                gamePlayer.getTierLevels().remove(entry.getKey());
+            }
+        }
         gamePlayer.giveInventory();
 
         PlayerUtil.showPlayer(GamePlayer.getOnlinePlayers(), gamePlayer);
@@ -80,19 +90,6 @@ public class RespawnTask extends BukkitRunnable {
         gamePlayer.protectAfterRespawn(config().getRespawnProtectionTicks());
 
         gamePlayer.sendTitle(messages().getRespawnCompleteTitle(), messages().getRespawnCompleteSubTitle(), 1, config().getTitleStay(), 1);
-    }
-
-    private static ToolType downgrade(ToolType type) {
-        switch (type) {
-            case DIAMOND:
-                return ToolType.IRON;
-            case IRON:
-                return ToolType.STONE;
-            case STONE:
-                return ToolType.WOOD;
-            default:
-                return type;
-        }
     }
 
     private static GameplayConfig.PlayerRespawn config() {

@@ -6,15 +6,17 @@ import cc.azuramc.bedwars.api.event.player.BedwarsPlayerStateChangeEvent.StateCh
 import cc.azuramc.bedwars.api.game.IGamePlayer;
 import cc.azuramc.bedwars.compat.VersionUtil;
 import cc.azuramc.bedwars.compat.util.ItemBuilder;
+import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.database.entity.PlayerData;
-import cc.azuramc.bedwars.game.item.armor.ArmorType;
-import cc.azuramc.bedwars.game.item.tool.ToolType;
+import cc.azuramc.bedwars.config.object.shop.TierChains;
 import cc.azuramc.bedwars.game.level.PlayerLevelManager;
 import cc.azuramc.bedwars.game.spectator.SpectatorTarget;
+import cc.azuramc.bedwars.shop.ShopCatalog;
+import cc.azuramc.bedwars.shop.ShopItem;
+import cc.azuramc.bedwars.shop.ShopPurchase;
 import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import cc.azuramc.bedwars.util.MessageUtil;
 import cc.azuramc.bedwars.util.packet.ArmorHider;
-import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import fr.mrmicky.fastboard.FastBoard;
 import lombok.AccessLevel;
@@ -36,7 +38,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,10 +61,6 @@ public class GamePlayer implements IGamePlayer {
     private static final long INVISIBILITY_TICKS = 30 * 20L;
     private static final long TRAP_PROTECTION_TICKS = 30 * 20L;
     private static final long TRAP_TRIGGER_COOLDOWN_TICKS = 8 * 20L;
-
-    /** Indexed by {@link ToolType#ordinal()} */
-    private static final XMaterial[] PICKAXES = {null, XMaterial.WOODEN_PICKAXE, XMaterial.STONE_PICKAXE, XMaterial.IRON_PICKAXE, XMaterial.DIAMOND_PICKAXE};
-    private static final XMaterial[] AXES = {null, XMaterial.WOODEN_AXE, XMaterial.STONE_AXE, XMaterial.IRON_AXE, XMaterial.DIAMOND_AXE};
 
     private final Player player;
     private final UUID uuid;
@@ -86,10 +88,12 @@ public class GamePlayer implements IGamePlayer {
     private BukkitRunnable invisibilityWaitingTask;
     private BukkitRunnable invisibilityFootStepTask;
 
-    private ArmorType armorType = ArmorType.DEFAULT;
-    private ToolType pickaxeType = ToolType.NONE;
-    private ToolType axeType = ToolType.NONE;
-    private boolean shear;
+    /** Tier chain id to owned level, chains not in here are at their start level */
+    private Map<String, Integer> tierLevels = new HashMap<>();
+    /** Shop item ref to purchases this game, counted for items with a limit */
+    private Map<String, Integer> purchases = new HashMap<>();
+    /** Shop item refs given again on respawn */
+    private Set<String> keptItems = new LinkedHashSet<>();
 
     @Setter(AccessLevel.NONE)
     private boolean isReconnect;
@@ -361,34 +365,58 @@ public class GamePlayer implements IGamePlayer {
         PlayerInventory inventory = player.getInventory();
         inventory.setHelmet(armorPiece(XMaterial.LEATHER_HELMET, true));
         inventory.setChestplate(armorPiece(XMaterial.LEATHER_CHESTPLATE, true));
-        giveArmor();
         giveSword(false);
-        givePickaxe(false);
-        giveAxe(false);
-        giveShear();
+        TierChains tiers = ShopCatalog.get().getTiers();
+        if (tiers.values().stream().noneMatch(chain -> chain.getSlot() == TierChains.Slot.ARMOR)) {
+            giveArmor(null, 0);
+        }
+        for (String id : tiers.keySet()) {
+            giveTier(id, false);
+        }
+        for (String ref : keptItems) {
+            ShopItem item = ShopCatalog.get().find(ref);
+            if (item != null) {
+                ShopPurchase.give(this, item);
+            }
+        }
         player.updateInventory();
     }
 
-    public void giveArmor() {
-        PlayerInventory inventory = player.getInventory();
-        switch (armorType) {
-            case CHAINMAIL:
-                inventory.setLeggings(armorPiece(XMaterial.CHAINMAIL_LEGGINGS, false));
-                inventory.setBoots(armorPiece(XMaterial.CHAINMAIL_BOOTS, false));
-                break;
-            case IRON:
-                inventory.setLeggings(armorPiece(XMaterial.IRON_LEGGINGS, false));
-                inventory.setBoots(armorPiece(XMaterial.IRON_BOOTS, false));
-                break;
-            case DIAMOND:
-                inventory.setLeggings(armorPiece(XMaterial.DIAMOND_LEGGINGS, false));
-                inventory.setBoots(armorPiece(XMaterial.DIAMOND_BOOTS, false));
-                break;
-            default:
-                inventory.setLeggings(armorPiece(XMaterial.LEATHER_LEGGINGS, true));
-                inventory.setBoots(armorPiece(XMaterial.LEATHER_BOOTS, true));
-                break;
+    public int getTierLevel(String id) {
+        TierChains.Chain chain = ShopCatalog.get().getTiers().get(id);
+        return tierLevels.getOrDefault(id, chain != null ? chain.getStart() : 0);
+    }
+
+    public void giveTier(String id, boolean replacePrevious) {
+        TierChains.Chain chain = ShopCatalog.get().getTiers().get(id);
+        if (chain == null) {
+            return;
         }
+        int level = Math.min(getTierLevel(id), chain.getTiers().size());
+        if (chain.getSlot() == TierChains.Slot.ARMOR) {
+            giveArmor(chain, level);
+            return;
+        }
+        if (replacePrevious && chain.isReplacePrevious()) {
+            for (int i = 0; i < chain.getTiers().size(); i++) {
+                ItemStack previous = i + 1 == level ? null : ShopCatalog.tierItem(chain, i + 1);
+                if (previous != null) {
+                    player.getInventory().remove(previous.getType());
+                }
+            }
+        }
+        ItemStack item = level > 0 ? ShopCatalog.tierItem(chain, level) : null;
+        if (item != null) {
+            player.getInventory().addItem(item);
+        }
+    }
+
+    private void giveArmor(@Nullable TierChains.Chain chain, int level) {
+        String prefix = chain != null && level > 0 ? chain.getTiers().get(level - 1).getMaterialPrefix() : null;
+        boolean leather = prefix == null || "LEATHER".equals(prefix);
+        PlayerInventory inventory = player.getInventory();
+        inventory.setLeggings(armorPiece(XMaterial.matchXMaterial((leather ? "LEATHER" : prefix) + "_LEGGINGS").orElse(XMaterial.LEATHER_LEGGINGS), leather));
+        inventory.setBoots(armorPiece(XMaterial.matchXMaterial((leather ? "LEATHER" : prefix) + "_BOOTS").orElse(XMaterial.LEATHER_BOOTS), leather));
         UpgradeEffects.enchantArmor(this);
     }
 
@@ -410,36 +438,6 @@ public class GamePlayer implements IGamePlayer {
         player.getInventory().addItem(sword);
     }
 
-    public void givePickaxe(boolean replacePrevious) {
-        giveTool(PICKAXES, pickaxeType, replacePrevious);
-    }
-
-    public void giveAxe(boolean replacePrevious) {
-        giveTool(AXES, axeType, replacePrevious);
-    }
-
-    private void giveTool(XMaterial[] tiers, ToolType type, boolean replacePrevious) {
-        if (type == ToolType.NONE) {
-            return;
-        }
-        XMaterial previous = tiers[type.ordinal() - 1];
-        if (replacePrevious && previous != null) {
-            player.getInventory().remove(previous.get());
-        }
-        player.getInventory().addItem(new ItemBuilder()
-                .setType(tiers[type.ordinal()].get())
-                .setUnbreakable(true, true)
-                .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
-                .addEnchant(XEnchantment.EFFICIENCY.get(), 1)
-                .getItem());
-    }
-
-    public void giveShear() {
-        if (shear) {
-            player.getInventory().addItem(new ItemBuilder().setType(XMaterial.SHEARS.get()).setUnbreakable(true, true).addItemFlag(ItemFlag.HIDE_ATTRIBUTES).getItem());
-        }
-    }
-
     public void cleanState() {
         player.setAllowFlight(false);
         player.setFlying(false);
@@ -450,7 +448,9 @@ public class GamePlayer implements IGamePlayer {
         player.setFoodLevel(MAX_FOOD_LEVEL);
         player.setSaturation(MAX_SATURATION);
         player.setExhaustion(0.0f);
-        player.setHealth(AzuraBedWars.getInstance().getGameplayConfig().getMaxHealth());
+        int maxHealth = AzuraBedWars.getInstance().getGameplayConfig().getMaxHealth();
+        PlayerUtil.setMaxHealth(player, maxHealth);
+        player.setHealth(maxHealth);
         player.setFireTicks(0);
         if (gameTeam != null) {
             endInvisibility();

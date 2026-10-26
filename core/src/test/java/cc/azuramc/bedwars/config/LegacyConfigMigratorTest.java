@@ -7,6 +7,7 @@ import cc.azuramc.bedwars.config.object.GameplayConfig;
 import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.config.object.MessageConfig;
 import cc.azuramc.bedwars.config.object.SettingsConfig;
+import cc.azuramc.bedwars.config.object.TimelineConfig;
 import cc.azuramc.bedwars.database.storage.MapStorageType;
 import cc.azuramc.bedwars.game.economy.EconomyType;
 import org.junit.jupiter.api.Test;
@@ -38,13 +39,18 @@ class LegacyConfigMigratorTest {
                 "spectator:\n  settingGUI:\n    nightVersionSlot: 30\n");
         ConfigService.writeAtomically(new File(legacy, "tasks.yml"), "goldSpawnInterval: 4\nmaxDiamondStackLevel2: 7\n");
         ConfigService.writeAtomically(new File(legacy, "message.yml"), "spectator:\n  nightVersionEnabled: \"§aNV\"\n");
+        ConfigService.writeAtomically(new File(legacy, "eventSettings.yml"),
+                "diamondUpdateEvent:\n  level2RefreshSecond: 20\nbedDestroyedEvent:\n  executeSeconds: 100\n");
 
         ConfigService service = new ConfigService(dataFolder, () -> false);
         service.register("settings", "settings.yml", SettingsConfig.class, ApplyMode.LIVE, 1);
         service.register("database", "database.yml", DatabaseConfig.class, ApplyMode.RESTART, 1);
         service.register("gameplay", "gameplay.yml", GameplayConfig.class, ApplyMode.LIVE, 1);
         service.register("display", "display.yml", DisplayConfig.class, ApplyMode.LIVE, 1);
-        service.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 1);
+        service.register("generators", "generators.yml", GeneratorConfig.class, ApplyMode.NEXT_GAME, 2);
+        service.addMigration("generators", 1, old -> GeneratorConfig.fromVersion1(old, service.content("timeline.yml")));
+        service.register("timeline", "timeline.yml", TimelineConfig.class, ApplyMode.NEXT_GAME, 2);
+        service.addMigration("timeline", 1, TimelineConfig::fromVersion1);
         service.register("messages", "messages.yml", MessageConfig.class, ApplyMode.LIVE, 1);
 
         LegacyConfigMigrator.migrateIfPresent(dataFolder, service);
@@ -70,8 +76,10 @@ class LegacyConfigMigratorTest {
         assertEquals("§bHi", display.getTabList().getWaiting().getHeader().get(0));
 
         GeneratorConfig generators = service.get(GeneratorConfig.class);
-        assertEquals(3, generators.getGoldInterval());
-        assertEquals(7, generators.getMaxDiamondStackLevel2());
+        assertEquals(3, generators.resource("gold").level(1).getInterval());
+        assertEquals(7, generators.resource("diamond").level(2).getMaxStack());
+        assertEquals(20, generators.resource("diamond").level(2).getInterval());
+        assertEquals(100, service.get(TimelineConfig.class).getBedDestroyedEvent().getExecuteSeconds());
         assertEquals("§aNV", service.get(MessageConfig.class).getSpectator().getNightVisionEnabled());
 
         String written = ConfigService.read(new File(dataFolder, "gameplay.yml"));

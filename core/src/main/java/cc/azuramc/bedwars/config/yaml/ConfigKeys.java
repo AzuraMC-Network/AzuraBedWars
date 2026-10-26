@@ -3,12 +3,14 @@ package cc.azuramc.bedwars.config.yaml;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,6 +22,7 @@ public final class ConfigKeys {
     public static final String VERSION_KEY = "config-version";
 
     private static final Map<Class<?>, Map<String, Field>> FIELDS = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Optional<Method>> FROM_STRING = new ConcurrentHashMap<>();
 
     private ConfigKeys() {
     }
@@ -52,6 +55,9 @@ public final class ConfigKeys {
     public static Map<String, Field> fields(Class<?> type) {
         return FIELDS.computeIfAbsent(type, t -> {
             Map<String, Field> fields = new LinkedHashMap<>();
+            if (Map.class.isAssignableFrom(t)) {
+                return fields;
+            }
             for (Field field : t.getDeclaredFields()) {
                 int modifiers = field.getModifiers();
                 if (Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers) || field.isSynthetic()) {
@@ -80,9 +86,13 @@ public final class ConfigKeys {
     }
 
     /**
-     * Type argument {@code index} of a generic field type, {@code String} when the field is not parameterized
+     * Type argument {@code index} of a generic field type, or of the generic superclass of a class such as
+     * {@code class Chains extends LinkedHashMap<String, Chain>}. {@code String} when neither is parameterized
      */
     public static Type typeArgument(Type type, int index) {
+        if (type instanceof Class && ((Class<?>) type).getGenericSuperclass() instanceof ParameterizedType) {
+            return typeArgument(((Class<?>) type).getGenericSuperclass(), index);
+        }
         if (type instanceof ParameterizedType) {
             Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
             if (index < arguments.length) {
@@ -90,6 +100,23 @@ public final class ConfigKeys {
             }
         }
         return String.class;
+    }
+
+    /**
+     * {@code public static T fromString(String)} of a config object that also accepts a single value,
+     * such as {@code price: 4 iron}. It throws {@link IllegalArgumentException} with the reason
+     */
+    @Nullable
+    public static Method fromString(Class<?> type) {
+        return FROM_STRING.computeIfAbsent(type, t -> {
+            try {
+                Method method = t.getMethod("fromString", String.class);
+                return Modifier.isStatic(method.getModifiers()) && t.isAssignableFrom(method.getReturnType())
+                        ? Optional.of(method) : Optional.<Method>empty();
+            } catch (NoSuchMethodException e) {
+                return Optional.empty();
+            }
+        }).orElse(null);
     }
 
     public static Object newInstance(Class<?> type) {

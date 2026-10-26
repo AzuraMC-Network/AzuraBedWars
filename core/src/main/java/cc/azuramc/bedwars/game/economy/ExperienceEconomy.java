@@ -1,29 +1,17 @@
 package cc.azuramc.bedwars.game.economy;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
-import com.cryptomorin.xseries.XMaterial;
+import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import com.cryptomorin.xseries.XSound;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author an5w1r@163.com
  */
 public class ExperienceEconomy implements EconomyMode {
-
-    private static final Map<Material, Integer> RESOURCE_LEVELS = new HashMap<>();
-
-    static {
-        RESOURCE_LEVELS.put(XMaterial.IRON_INGOT.get(), 1);
-        RESOURCE_LEVELS.put(XMaterial.GOLD_INGOT.get(), 3);
-        RESOURCE_LEVELS.put(XMaterial.DIAMOND.get(), 40);
-        RESOURCE_LEVELS.put(XMaterial.EMERALD.get(), 80);
-    }
 
     @Override
     public String getDisplayName() {
@@ -47,13 +35,13 @@ public class ExperienceEconomy implements EconomyMode {
 
     @Override
     public boolean deposit(GamePlayer gamePlayer, ItemStack resource) {
-        Integer levels = RESOURCE_LEVELS.get(resource.getType());
-        if (levels == null) {
+        GeneratorConfig.Resource config = GeneratorManager.resourceOf(resource.getType());
+        if (config == null) {
             return false;
         }
 
         Player player = gamePlayer.getPlayer();
-        player.setLevel(player.getLevel() + levels * resource.getAmount());
+        player.setLevel(player.getLevel() + config.getXpValue() * resource.getAmount());
         if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
             gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
         }
@@ -66,8 +54,9 @@ public class ExperienceEconomy implements EconomyMode {
         int levels = victimPlayer.getLevel();
         // resources bought back from the convert shop
         for (ItemStack item : victimPlayer.getInventory().getContents()) {
-            if (item != null && RESOURCE_LEVELS.containsKey(item.getType())) {
-                levels += RESOURCE_LEVELS.get(item.getType()) * item.getAmount();
+            GeneratorConfig.Resource resource = item != null ? GeneratorManager.resourceOf(item.getType()) : null;
+            if (resource != null) {
+                levels += resource.getXpValue() * item.getAmount();
             }
         }
         if (levels == 0) {

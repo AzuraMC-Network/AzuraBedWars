@@ -78,8 +78,8 @@ public final class UpgradeEffects {
 
     private static void upgradeFurnace(GameTeam gameTeam, int level) {
         GeneratorManager generatorManager = gameTeam.getGameManager().getGeneratorManager();
-        PrivateResourceGenerator iron = generatorManager.getPrivateResourceGenerator("铁锭" + gameTeam.getName());
-        PrivateResourceGenerator gold = generatorManager.getPrivateResourceGenerator("金锭" + gameTeam.getName());
+        PrivateResourceGenerator iron = generatorManager.getPrivateResourceGenerator("iron", gameTeam);
+        PrivateResourceGenerator gold = generatorManager.getPrivateResourceGenerator("gold", gameTeam);
 
         switch (level) {
             case 1:
@@ -100,14 +100,14 @@ public final class UpgradeEffects {
                 gold.setInterval(20L * 2);
                 gold.setMaxStack(16);
                 generatorManager.addPrivateResourceTask(new PrivateResourceGenerator(gameTeam.getGameManager(),
-                        "绿宝石" + gameTeam.getName(), gameTeam.getResourceDropLocation(), XMaterial.EMERALD.get(), 2), 20L * 60);
+                        GeneratorManager.privateName("emerald", gameTeam), gameTeam.getResourceDropLocation(), XMaterial.EMERALD.get(), 2), 20L * 60);
                 break;
             default:
                 iron.setInterval(8L);
                 iron.setMaxStack(128);
                 gold.setInterval(32L);
                 gold.setMaxStack(24);
-                generatorManager.getPrivateResourceGenerator("绿宝石" + gameTeam.getName()).setInterval(20L * 30);
+                generatorManager.getPrivateResourceGenerator("emerald", gameTeam).setInterval(20L * 30);
                 break;
         }
     }

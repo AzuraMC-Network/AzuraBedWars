@@ -3,7 +3,6 @@ package cc.azuramc.bedwars.command.admin;
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.compat.util.WorldUtil;
 import cc.azuramc.bedwars.config.ApplyResult;
-import cc.azuramc.bedwars.config.ConfigDocument;
 import cc.azuramc.bedwars.config.ConfigProblem;
 import cc.azuramc.bedwars.config.ConfigService;
 import cc.azuramc.bedwars.devtools.Devtools;
@@ -25,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -64,13 +62,13 @@ public class AdminCommand {
     @AutoComplete("@configDocuments")
     public void reloadConfigFiles(BukkitCommandActor actor, @Optional String document) {
         ConfigService configService = plugin.getConfigService();
-        if (document != null && configService.document(document) == null) {
+        if (document != null && !configService.isReloadable(document)) {
             CommandUtil.sendLayout(actor, "&c没有名为 " + document + " 的配置，可选: " + documentIds());
             return;
         }
         List<ApplyResult> results = document == null
                 ? configService.reloadAll()
-                : Collections.singletonList(configService.reload(document));
+                : configService.reload(document);
         List<String> lines = new ArrayList<>();
         for (ApplyResult result : results) {
             lines.add(describe(result));
@@ -124,7 +122,7 @@ public class AdminCommand {
 
     @Subcommand("devtools restart")
     public void devtoolsRestart(BukkitCommandActor actor) {
-        startDevtools(actor, plugin.getConfigService().reload(Devtools.DOCUMENT_ID));
+        startDevtools(actor, plugin.getConfigService().reload(Devtools.DOCUMENT_ID).get(0));
     }
 
     @Subcommand("devtools off")
@@ -212,11 +210,7 @@ public class AdminCommand {
     }
 
     private String documentIds() {
-        List<String> ids = new ArrayList<>();
-        for (ConfigDocument<?> document : plugin.getConfigService().documents()) {
-            ids.add(document.getId());
-        }
-        return String.join(", ", ids);
+        return String.join(", ", plugin.getConfigService().reloadableIds());
     }
 
     @Subcommand("toWorld")

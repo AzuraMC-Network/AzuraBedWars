@@ -1,16 +1,14 @@
 package cc.azuramc.bedwars.listener.block;
 
 import cc.azuramc.bedwars.AzuraBedWars;
-import cc.azuramc.bedwars.compat.util.PlayerUtil;
 import cc.azuramc.bedwars.game.*;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import cc.azuramc.bedwars.popuptower.impl.TowerEast;
 import cc.azuramc.bedwars.popuptower.impl.TowerNorth;
 import cc.azuramc.bedwars.popuptower.impl.TowerSouth;
 import cc.azuramc.bedwars.popuptower.impl.TowerWest;
 import cc.azuramc.bedwars.util.MapUtil;
-import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -20,7 +18,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Optional;
 
 /**
  * @author an5w1r@163.com
@@ -58,17 +55,17 @@ public class PlacementListener implements Listener {
             return;
         }
 
-        if (block.getType() == XMaterial.TNT.get()) {
+        ItemStack item = event.getItemInHand();
+        if (SpecialItems.is(item, SpecialItems.TNT)) {
             TNTPlacementHandler.handleTNTPlacement(event, player);
             return;
         }
 
-        ItemStack item = PlayerUtil.getItemInHand(player);
-        if (isSpeedWool(item)) {
+        if (SpecialItems.is(item, SpecialItems.SPEED_WOOL)) {
             handleSpeedWoolPlacement(event, player, item);
         }
 
-        if (event.getBlock().getType() == XMaterial.CHEST.get()) {
+        if (SpecialItems.is(item, SpecialItems.POPUP_TOWER)) {
             handlePopUpTowerPlacement(event, player);
         }
     }
@@ -117,16 +114,4 @@ public class PlacementListener implements Listener {
             new TowerEast(loc, event.getBlockPlaced(), color, player);
         }
     }
-
-    private boolean isSpeedWool(ItemStack item) {
-        return item != null && isWoolMaterialByName(item.getType()) && !item.getEnchantments().isEmpty();
-    }
-
-    private boolean isWoolMaterialByName(Material material) {
-        Optional<XMaterial> xMaterialOptional = Optional.of(XMaterial.matchXMaterial(material));
-
-        return xMaterialOptional.map(xMat -> xMat.name().contains("WOOL"))
-                .orElse(false);
-    }
-
 }

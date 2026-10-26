@@ -2,6 +2,7 @@ package cc.azuramc.bedwars.game.task;
 
 import cc.azuramc.bedwars.AzuraBedWars;
 import cc.azuramc.bedwars.game.GameManager;
+import cc.azuramc.bedwars.game.task.generator.ResourceHologram;
 import cc.azuramc.bedwars.util.LoggerUtil;
 import cc.azuramc.bedwars.util.packet.ArmorStandUtil;
 import org.bukkit.Bukkit;
@@ -66,14 +67,12 @@ public class GeneratorTask {
         taskId = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), () -> {
             try {
                 List<ArmorStand> allArmor = new ArrayList<>();
-
-                // 安全地添加盔甲架到列表中
-                if (gameManager.getArmorSande() != null) {
-                    allArmor.addAll(gameManager.getArmorSande());
-                }
-
-                if (gameManager.getArmorStand() != null) {
-                    allArmor.addAll(gameManager.getArmorStand());
+                for (List<ResourceHologram> holograms : gameManager.getResourceHolograms().values()) {
+                    for (ResourceHologram hologram : holograms) {
+                        if (hologram.getBlock() != null) {
+                            allArmor.add(hologram.getBlock());
+                        }
+                    }
                 }
 
                 // 过滤掉无效的盔甲架

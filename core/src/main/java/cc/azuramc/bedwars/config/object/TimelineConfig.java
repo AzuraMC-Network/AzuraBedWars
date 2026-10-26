@@ -6,7 +6,9 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author an5w1r@163.com
@@ -17,12 +19,6 @@ public class TimelineConfig {
 
     @Comment("游戏开始配置")
     private GameStartEvent gameStartEvent = new GameStartEvent();
-
-    @Comment("钻石升级事件配置")
-    private DiamondUpdateEvent diamondUpdateEvent = new DiamondUpdateEvent();
-
-    @Comment("绿宝石升级事件配置")
-    private EmeraldUpdateEvent emeraldUpdateEvent = new EmeraldUpdateEvent();
 
     @Comment("床自毁事件配置")
     private BedDestroyedEvent bedDestroyedEvent = new BedDestroyedEvent();
@@ -79,28 +75,6 @@ public class TimelineConfig {
 
         @Comment("游戏人满消息")
         private String msgGameFull = "&e游戏人数已满,10秒后开始游戏！";
-    }
-
-    @Data
-    public static class DiamondUpdateEvent {
-        @Comment("二级钻石刷新间隔(秒)")
-        @Range(min = 1)
-        private int level2RefreshSecond = 23;
-
-        @Comment("三级钻石刷新间隔(秒)")
-        @Range(min = 1)
-        private int level3RefreshSecond = 15;
-    }
-
-    @Data
-    public static class EmeraldUpdateEvent {
-        @Comment("二级绿宝石刷新间隔(秒)")
-        @Range(min = 1)
-        private int level2RefreshSecond = 23;
-
-        @Comment("三级绿宝石刷新间隔(秒)")
-        @Range(min = 1)
-        private int level3RefreshSecond = 15;
     }
 
     @Data
@@ -195,5 +169,15 @@ public class TimelineConfig {
                 "",
                 "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
         ));
+    }
+
+    /**
+     * Version 1 also held the diamond and emerald intervals, which moved to the levels of generators.yml
+     */
+    public static Map<String, Object> fromVersion1(Map<String, Object> old) {
+        Map<String, Object> upgraded = new LinkedHashMap<>(old);
+        upgraded.remove("diamond-update-event");
+        upgraded.remove("emerald-update-event");
+        return upgraded;
     }
 }

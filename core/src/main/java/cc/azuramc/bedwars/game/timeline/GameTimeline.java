@@ -8,8 +8,6 @@ import cc.azuramc.bedwars.game.GameTeam;
 import cc.azuramc.bedwars.game.spectator.task.SpectatorCompassTask;
 import cc.azuramc.bedwars.game.task.GameOverTask;
 import cc.azuramc.bedwars.game.task.GeneratorTask;
-import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
-import cc.azuramc.bedwars.game.task.generator.PublicResourceGenerator;
 import cc.azuramc.bedwars.upgrade.UpgradeEffects;
 import com.cryptomorin.xseries.XSound;
 import lombok.Getter;
@@ -52,14 +50,12 @@ public class GameTimeline {
             return;
         }
         config = AzuraBedWars.getInstance().getTimelineConfig();
-        TimelineConfig.DiamondUpdateEvent diamond = config.getDiamondUpdateEvent();
-        TimelineConfig.EmeraldUpdateEvent emerald = config.getEmeraldUpdateEvent();
         events.clear();
         events.add(new TimelineEvent("开始游戏", config.getGameStartEvent().getCountDown(), this::showStartCountdown, this::startGenerators));
-        events.add(new TimelineEvent("钻石资源点升级到II级", 360, () -> upgradeGenerator("钻石", 2, diamond.getLevel2RefreshSecond())));
-        events.add(new TimelineEvent("绿宝石升级到II级", 360, () -> upgradeGenerator("绿宝石", 2, emerald.getLevel2RefreshSecond())));
-        events.add(new TimelineEvent("钻石资源点升级到III级", 360, () -> upgradeGenerator("钻石", 3, diamond.getLevel3RefreshSecond())));
-        events.add(new TimelineEvent("绿宝石升级到III级", 360, () -> upgradeGenerator("绿宝石", 3, emerald.getLevel3RefreshSecond())));
+        events.add(new TimelineEvent("钻石资源点升级到II级", 360, () -> gameManager.getGeneratorManager().setPublicLevel("diamond", 2)));
+        events.add(new TimelineEvent("绿宝石升级到II级", 360, () -> gameManager.getGeneratorManager().setPublicLevel("emerald", 2)));
+        events.add(new TimelineEvent("钻石资源点升级到III级", 360, () -> gameManager.getGeneratorManager().setPublicLevel("diamond", 3)));
+        events.add(new TimelineEvent("绿宝石升级到III级", 360, () -> gameManager.getGeneratorManager().setPublicLevel("emerald", 3)));
         events.add(new TimelineEvent("床自毁", config.getBedDestroyedEvent().getExecuteSeconds(), this::destroyAllBeds));
         events.add(new TimelineEvent("游戏结束", config.getGameOverEvent().getExecuteSeconds(), this::endWithoutWinner));
         task = Bukkit.getScheduler().runTaskTimer(AzuraBedWars.getInstance().getPlugin(), this::tick, 0L, 20L);
@@ -137,18 +133,6 @@ public class GameTimeline {
     private void startGenerators() {
         new GeneratorTask(gameManager).start();
         new SpectatorCompassTask().start();
-    }
-
-    private void upgradeGenerator(String resource, int level, int refreshSeconds) {
-        GeneratorManager generatorManager = gameManager.getGeneratorManager();
-        PublicResourceGenerator generator = generatorManager.getPublicResourceGenerator(resource);
-        if (generator == null) {
-            return;
-        }
-        generator.setInterval(refreshSeconds * 20L);
-        generator.setLevel(level);
-        generator.setMaxStack(generatorManager.getMaxStackForResource(resource, level));
-        generator.restartTask();
     }
 
     private void destroyAllBeds() {

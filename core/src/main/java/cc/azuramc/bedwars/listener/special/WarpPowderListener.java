@@ -6,6 +6,7 @@ import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
 import cc.azuramc.bedwars.game.item.special.AbstractSpecialItem;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import cc.azuramc.bedwars.game.item.special.impl.WarpPowder;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -133,18 +134,15 @@ public class WarpPowderListener implements Listener {
             return;
         }
 
-        // 检查物品类型
-        Material material = item.getType();
-        if (!material.equals(warpPowder.getItemMaterial()) && !material.equals(warpPowder.getActivatedMaterial())) {
-            return;
-        }
-
         // 获取玩家已激活的传送粉末
         WarpPowder activePowder = getActiveWarpPowder(gameManager, gamePlayer);
 
         // 处理取消传送物品
-        if (material.equals(warpPowder.getActivatedMaterial())) {
+        if (item.getType().equals(warpPowder.getActivatedMaterial())) {
             handleCancelItem(event, item, gamePlayer, activePowder);
+            return;
+        }
+        if (!SpecialItems.is(item, SpecialItems.WARP_POWDER)) {
             return;
         }
 

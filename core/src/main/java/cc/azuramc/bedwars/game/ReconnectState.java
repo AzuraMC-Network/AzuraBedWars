@@ -1,11 +1,13 @@
 package cc.azuramc.bedwars.game;
 
-import cc.azuramc.bedwars.game.item.armor.ArmorType;
-import cc.azuramc.bedwars.game.item.tool.ToolType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -28,10 +30,9 @@ public class ReconnectState {
     private int currentGameDeaths;
     private final int currentGameDestroyedBeds;
 
-    private final ArmorType armorType;
-    private final ToolType pickaxeType;
-    private final ToolType axeType;
-    private final boolean shear;
+    private final Map<String, Integer> tierLevels;
+    private final Map<String, Integer> purchases;
+    private final Set<String> keptItems;
 
     public ReconnectState(@NotNull GamePlayer gamePlayer) {
         this.uuid = gamePlayer.getUuid();
@@ -44,10 +45,9 @@ public class ReconnectState {
         this.currentGameDeaths = gamePlayer.getCurrentGameDeaths();
         this.currentGameDestroyedBeds = gamePlayer.getCurrentGameDestroyedBeds();
 
-        this.armorType = gamePlayer.getArmorType();
-        this.pickaxeType = gamePlayer.getPickaxeType();
-        this.axeType = gamePlayer.getAxeType();
-        this.shear = gamePlayer.isShear();
+        this.tierLevels = new HashMap<>(gamePlayer.getTierLevels());
+        this.purchases = new HashMap<>(gamePlayer.getPurchases());
+        this.keptItems = new LinkedHashSet<>(gamePlayer.getKeptItems());
     }
 
     public void addDeath() {
@@ -68,9 +68,8 @@ public class ReconnectState {
         gamePlayer.setCurrentGameDeaths(currentGameDeaths);
         gamePlayer.setCurrentGameDestroyedBeds(currentGameDestroyedBeds);
 
-        gamePlayer.setArmorType(armorType);
-        gamePlayer.setPickaxeType(pickaxeType);
-        gamePlayer.setAxeType(axeType);
-        gamePlayer.setShear(shear);
+        gamePlayer.setTierLevels(new HashMap<>(tierLevels));
+        gamePlayer.setPurchases(new HashMap<>(purchases));
+        gamePlayer.setKeptItems(new LinkedHashSet<>(keptItems));
     }
 }

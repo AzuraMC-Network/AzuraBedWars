@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../schema/shop-menu.json
+config-version: 1
+# 商店外框：分类顺序、说明文字、快速购买
+
+title: "&8道具商店 - {category}"
+# 分类顺序，最多 8 个，写 shop/categories 里的文件名，删掉一个就是隐藏这个分类
+categories: [blocks, melee, armor, tools, ranged, potions, utility, convert]
+
+navigation:
+  selected: LIME_STAINED_GLASS_PANE
+  unselected: GRAY_STAINED_GLASS_PANE
+  category-lore: ["&e点击查看！"]
+
+item-name: "&c{name}"
+# 单独一行的 {tiers} {hint} {status} 没有内容时这一行去掉
+lore:
+  - "&7物品:"
+  - "&8•{name}"
+  - "{tiers}"
+  - " "
+  - "{hint}"
+  - "&7花费: &3&l{price}"
+  - "{status}"
+
+status:
+  can-buy: "&e点击购买"
+  too-poor: "&c资源不足"
+  owned: "&a已拥有"
+  maxed: "&a已满级"
+  locked: "&c需要先购买上一级"
+
+quick-buy:
+  icon: NETHER_STAR
+  name: "&b快速购买"
+  # Q 是玩家可以自定义的格子
+  layout:
+    - "         "
+    - "         "
+    - " QQQQQQQ "
+    - " QQQQQQQ "
+    - " QQQQQQQ "
+    - "         "
+  defaults: [blocks.wool, melee.stone_sword, armor.chainmail, utility.golden_apple,
+             ranged.bow, potions.speed, utility.tnt, blocks.planks, melee.iron_sword,
+             armor.iron, utility.fireball, ranged.arrows, potions.jump, utility.water]
+  add-hint: "&7Shift+左键添加到快捷购买"
+  remove-hint: "&7Shift+左键从快捷购买中移除"
+
+tier-lore:
+  header: "&7等级 {current}/{max}"
+  owned: "&a✔ {name}"
+  next: "&e➜ {name} &7- {price}"
+  locked: "&8✖ {name} - {price}"
+  keep: ""
+  downgrade: "&7死亡后降一级"
+  reset: "&7死亡后回到初始"

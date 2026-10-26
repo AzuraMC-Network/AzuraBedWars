@@ -20,9 +20,9 @@ import cc.azuramc.bedwars.game.spectator.SpectatorManager;
 import cc.azuramc.bedwars.game.task.GameStartTask;
 import cc.azuramc.bedwars.game.task.RespawnTask;
 import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
+import cc.azuramc.bedwars.game.task.generator.ResourceHologram;
 import cc.azuramc.bedwars.game.timeline.GameTimeline;
 import cc.azuramc.bedwars.listener.player.PlayerAFKListener;
-import cc.azuramc.bedwars.shop.ShopCatalog;
 import cc.azuramc.bedwars.tablist.TabListListener;
 import cc.azuramc.bedwars.tablist.TabListManager;
 import cc.azuramc.bedwars.util.DamageUtil;
@@ -34,7 +34,6 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import lombok.Data;
 import org.bukkit.*;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -75,8 +74,8 @@ public class GameManager implements IGameManager {
     private GameStartTask gameStartTask = null;
     private List<GameTeam> gameTeams;
 
-    private Set<ArmorStand> armorSande;
-    private Set<ArmorStand> armorStand;
+    /** Keyed by resource id */
+    private final Map<String, List<ResourceHologram>> resourceHolograms = new HashMap<>();
 
     private List<AbstractSpecialItem> abstractSpecialItems;
 
@@ -88,11 +87,8 @@ public class GameManager implements IGameManager {
     public GameManager(AzuraBedWars plugin) {
         this.plugin = plugin;
         this.gameTeams = new ArrayList<>();
-        this.armorSande = new HashSet<>();
-        this.armorStand = new HashSet<>();
         this.abstractSpecialItems = new ArrayList<>();
         this.economyType = plugin.getSettingsConfig().getEconomyMode();
-        ShopCatalog.init(economyType);
         this.generatorManager = new GeneratorManager(this);
         this.timeline = new GameTimeline(this);
         this.teamSelectorMaterial = XMaterial.WHITE_WOOL.get();

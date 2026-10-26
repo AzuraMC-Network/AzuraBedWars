@@ -1,30 +1,20 @@
 package cc.azuramc.bedwars.game.economy;
 
 import cc.azuramc.bedwars.AzuraBedWars;
+import cc.azuramc.bedwars.config.object.GeneratorConfig;
 import cc.azuramc.bedwars.game.GamePlayer;
-import com.cryptomorin.xseries.XMaterial;
+import cc.azuramc.bedwars.game.task.generator.GeneratorManager;
 import com.cryptomorin.xseries.XSound;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author an5w1r@163.com
  */
 public class ItemEconomy implements EconomyMode {
-
-    private static final Map<Material, String> RESOURCE_NAMES = new LinkedHashMap<>();
-
-    static {
-        RESOURCE_NAMES.put(XMaterial.IRON_INGOT.get(), "铁");
-        RESOURCE_NAMES.put(XMaterial.GOLD_INGOT.get(), "金");
-        RESOURCE_NAMES.put(XMaterial.DIAMOND.get(), "钻石");
-        RESOURCE_NAMES.put(XMaterial.EMERALD.get(), "绿宝石");
-    }
 
     @Override
     public String getDisplayName() {
@@ -33,16 +23,18 @@ public class ItemEconomy implements EconomyMode {
 
     @Override
     public boolean canAfford(Player player, PriceCost price) {
-        return countItems(player.getInventory(), price.material()) >= price.amount();
+        Material material = material(price);
+        return price.amount() <= 0 || material != null && countItems(player.getInventory(), material) >= price.amount();
     }
 
     @Override
     public void withdraw(Player player, PriceCost price) {
+        Material material = material(price);
         ItemStack[] contents = player.getInventory().getContents();
         int remaining = price.amount();
         for (int i = 0; i < contents.length && remaining > 0; i++) {
             ItemStack item = contents[i];
-            if (item == null || item.getType() != price.material()) {
+            if (item == null || item.getType() != material) {
                 continue;
             }
             if (item.getAmount() > remaining) {
@@ -58,17 +50,18 @@ public class ItemEconomy implements EconomyMode {
 
     @Override
     public String formatPrice(PriceCost price) {
-        return price.amount() + " " + RESOURCE_NAMES.getOrDefault(price.material(), "资源");
+        GeneratorConfig.Resource resource = AzuraBedWars.getInstance().getGeneratorConfig().resource(price.currency());
+        return price.amount() + " " + (resource != null ? resource.getName() : price.currency());
     }
 
     @Override
     public boolean deposit(GamePlayer gamePlayer, ItemStack resource) {
-        Material type = resource.getType();
-        if (type != XMaterial.IRON_INGOT.get() && type != XMaterial.GOLD_INGOT.get()) {
+        GeneratorConfig.Resource config = GeneratorManager.resourceOf(resource.getType());
+        if (config == null || config.getAt() != GeneratorConfig.Spawn.BASE) {
             return false;
         }
 
-        gamePlayer.getPlayer().getInventory().addItem(new ItemStack(type, resource.getAmount()));
+        gamePlayer.getPlayer().getInventory().addItem(new ItemStack(resource.getType(), resource.getAmount()));
         if (XSound.ENTITY_PLAYER_LEVELUP.get() != null) {
             gamePlayer.playSound(XSound.ENTITY_PLAYER_LEVELUP.get(), 10, 15F);
         }
@@ -80,17 +73,24 @@ public class ItemEconomy implements EconomyMode {
         Inventory victimInventory = victim.getPlayer().getInventory();
         Player killerPlayer = killer.getPlayer();
 
-        for (Map.Entry<Material, String> resource : RESOURCE_NAMES.entrySet()) {
-            int amount = countItems(victimInventory, resource.getKey());
+        for (GeneratorConfig.Resource resource : AzuraBedWars.getInstance().getGeneratorConfig().getResources().values()) {
+            Material material = GeneratorManager.material(resource);
+            int amount = material != null ? countItems(victimInventory, material) : 0;
             if (amount == 0) {
                 continue;
             }
 
-            for (ItemStack leftover : killerPlayer.getInventory().addItem(new ItemStack(resource.getKey(), amount)).values()) {
+            for (ItemStack leftover : killerPlayer.getInventory().addItem(new ItemStack(material, amount)).values()) {
                 killerPlayer.getWorld().dropItemNaturally(killerPlayer.getLocation(), leftover);
             }
-            killer.sendMessage("§e+" + amount + " " + resource.getValue());
+            killer.sendMessage("§e+" + amount + " " + resource.getName());
         }
+    }
+
+    @Nullable
+    private static Material material(PriceCost price) {
+        GeneratorConfig.Resource resource = AzuraBedWars.getInstance().getGeneratorConfig().resource(price.currency());
+        return resource != null ? GeneratorManager.material(resource) : null;
     }
 
     private static int countItems(Inventory inventory, Material material) {

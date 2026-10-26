@@ -6,7 +6,7 @@ import cc.azuramc.bedwars.game.CustomEntityManager;
 import cc.azuramc.bedwars.game.GameManager;
 import cc.azuramc.bedwars.game.GamePlayer;
 import cc.azuramc.bedwars.game.GameState;
-import com.cryptomorin.xseries.XMaterial;
+import cc.azuramc.bedwars.game.item.special.SpecialItems;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,7 +39,7 @@ public class IronGolemSpawnListener implements Listener {
         }
 
         if (action != Action.RIGHT_CLICK_BLOCK
-                || item == null || item.getType() != XMaterial.WOLF_SPAWN_EGG.get()
+                || !SpecialItems.is(item, SpecialItems.DREAM_DEFENDER)
                 || gameManager.getGameState() != GameState.RUNNING
                 || gamePlayer == null) {
             return;

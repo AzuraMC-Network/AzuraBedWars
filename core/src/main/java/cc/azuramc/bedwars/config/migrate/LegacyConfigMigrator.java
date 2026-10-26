@@ -51,8 +51,9 @@ public final class LegacyConfigMigrator {
             if (document == null || entry.getValue().isEmpty() || service.file(document).exists()) {
                 continue;
             }
+            Map<String, Object> content = service.upgrade(document.getKind(), entry.getValue(), 1, document.getVersion());
             YamlBinder binder = new YamlBinder(document.getPath(), false);
-            Object value = binder.bind(binder.parse(new Yaml().dump(entry.getValue())), document.getType());
+            Object value = binder.bind(binder.parse(new Yaml().dump(content)), document.getType());
             for (ConfigProblem problem : binder.getProblems()) {
                 if (problem.isError()) {
                     LoggerUtil.warn("Old config value not migrated, the default is used: " + problem);
@@ -109,10 +110,17 @@ public final class LegacyConfigMigrator {
         target.put("display", display);
 
         // spawn intervals and iron or gold stack sizes of tasks.yml were never read, so they are left out
-        target.put("generators", pick(legacy.get("tasks"), "max-diamond-stack-level1", "max-diamond-stack-level2",
+        Map<String, Object> generators = pick(legacy.get("tasks"), "max-diamond-stack-level1", "max-diamond-stack-level2",
                 "max-diamond-stack-level3", "max-emerald-stack-level1", "max-emerald-stack-level2", "max-emerald-stack-level3",
-                "diamond-name", "emerald-name", "time-remaining-format", "level-i", "level-ii", "level-iii"));
-        target.put("timeline", legacy.get("eventSettings"));
+                "diamond-name", "emerald-name", "time-remaining-format", "level-i");
+        Map<String, Object> timeline = legacy.get("eventSettings");
+        for (String resource : Arrays.asList("diamond", "emerald")) {
+            Map<String, Object> event = section(timeline, resource + "-update-event");
+            putIfPresent(generators, resource + "-level2-interval", event.get("level2-refresh-second"));
+            putIfPresent(generators, resource + "-level3-interval", event.get("level3-refresh-second"));
+        }
+        target.put("generators", generators);
+        target.put("timeline", timeline);
         target.put("items", legacy.get("items"));
         target.put("upgrades", legacy.get("teamUpgrade"));
 

@@ -79,7 +79,7 @@ public final class ConfigTools {
                         .string("reason", "Why, kept in the audit log", false)
                         .handle(args -> devtools.sync(() -> write(args))),
                 McpTool.write("config_reload", "Reread documents from disk after someone edited the files by hand")
-                        .string("id", "Document id, leave out for all", false)
+                        .string("id", "Document id or a directory such as shop/categories, leave out for all", false)
                         .handle(args -> devtools.sync(() -> reload(args))),
                 McpTool.read("history_list", "Backups taken before each config or map change, newest first")
                         .string("target", "Document id or map:<name>, leave out for all", false)
@@ -221,10 +221,20 @@ public final class ConfigTools {
     private JsonElement reload(Args args) {
         JsonArray results = new JsonArray();
         if (args.has("id")) {
-            results.add(result(service.reload(document(args.string("id")).getId())));
+            String id = args.string("id");
+            if (Devtools.DOCUMENT_ID.equals(id) || !service.isReloadable(id)) {
+                List<String> ids = new ArrayList<>(service.reloadableIds());
+                ids.remove(Devtools.DOCUMENT_ID);
+                throw new ToolError("No config document or directory " + id + ", available: " + String.join(", ", ids));
+            }
+            for (ApplyResult result : service.reload(id)) {
+                results.add(result(result));
+            }
         } else {
-            for (ConfigDocument<?> document : visibleDocuments()) {
-                results.add(result(service.reload(document.getId())));
+            for (ApplyResult result : service.reloadAll()) {
+                if (!Devtools.DOCUMENT_ID.equals(result.getDocumentId())) {
+                    results.add(result(result));
+                }
             }
         }
         return results;
