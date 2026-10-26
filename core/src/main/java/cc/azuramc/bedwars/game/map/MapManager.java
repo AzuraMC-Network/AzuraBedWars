@@ -137,8 +137,11 @@ public class MapManager {
             LoggerUtil.warn("Cannot unload the loaded world " + name + ", a map cannot have the name of the main world");
             return null;
         }
+        // Paper 26+ moves a loaded world into <main world>/dimensions/minecraft/<name> and refuses to overwrite it next time
+        File migrated = new File(Bukkit.getWorldContainer(), Bukkit.getWorlds().get(0).getName() + "/dimensions/minecraft/" + name);
         try {
             FileUtils.deleteDirectory(target);
+            FileUtils.deleteDirectory(migrated);
             FileUtils.copyDirectory(source, target);
         } catch (IOException e) {
             LoggerUtil.error("Cannot copy the world files of map " + name, e);
